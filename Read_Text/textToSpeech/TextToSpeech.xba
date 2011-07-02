@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TextToSpeech" script:language="StarBasic">REM  *****  BASIC  *****
+OPTION EXPLICIT
+&apos; Read Text Extension
+
+&apos; Copyright And License 
+
+&apos;(c)2008-2011 James Holgate Vancouver,CANADA(james_h(a)http://openofficeforum.org)
+
+&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS
+&apos; OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION; 
+&apos; EITHER VERSION 2 OF THE LICENSE,OR(AT YOUR OPTION)ANY LATER VERSION. THIS SCRIPT
+&apos; IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL,BUT WITHOUT ANY WARRANTY; 
+&apos; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. 
+&apos; SEE THE GNU GENERAL PUBLIC LICENSE FOR MORE DETAILS.
+
+&apos; YOU SHOULD HAVE RECEIVED A COPY OF THE GNU GENERAL PUBLIC LICENSE ALONG WITH THIS SOFTWARE; 
+&apos; IF NOT,WRITE TO THE FREE SOFTWARE FOUNDATION,INC.,59 TEMPLE PLACE,SUITE 330,BOSTON,MA
+&apos; 02111-1307  USA
+
+&apos;Call this Sub To start reading text aloud
+Sub ReadTextAloud
+	Dim sFile As String
+	Dim msgs()As Variant
+	Dim errorCode As Integer 
+	Dim config(fiCountConfigOptions)As Variant
+	sFile=fsFullPathOf(fsExtensionSettingsIni)	
+	If fileExists(sFile)Then
+		tts_config_parseFile(sFile,config(),errorCode)
+		If config(fiAlwaysShowDialogCheckBox)=1 Then
+			ConfigureReadTextAloud()
+		Else
+			ttsActuate(config(),msgs(),errorCode,&quot;&quot;)
+		Endif
+	Else 
+		ConfigureReadTextAloud()
+	Endif	
+End Sub
+
+Sub SetupReadTextAloud
+	&apos;Call this Sub To setup the text-To-speech options And read the text aloud
+	Dim msgs()As Variant
+	Dim errorCode As Integer
+	ConfigureReadTextAloud()
+End Sub 
+
+Sub PresentationSpeechExample1
+	&apos; These are templates For a macro interaction in a presentation. Set up a picture To use an interaction To play the macro.
+	&apos; Right Click  the picture amd choose Interaction... &gt; Action at Mouse Click &gt; Macro, Browse To the macro.
+	&apos; Then,during the presentation,the user can click the picture To play the text.
+	MsgSpeak(&quot;Yes, that is correct.&quot;)
+End Sub
+
+Sub PresentationSpeechExample2
+	MsgSpeak(&quot;No, that is incorrect.&quot;)
+End Sub
+
+Sub webHelp
+	Dim oSvc As Object
+	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+	oSvc.execute(fsDialogMyRegion(fiL10nHELP_ONLINE_URL),&quot;&quot;,0)
+End Sub
+
+Sub previewWScript
+	Dim  f_dlgAboutVBS As Variant
+	Dim s1 As String
+	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
+	f_dlgAboutVBS=CreateUnoDialog(DialogLibraries.textToSpeech.Dialog2)
+	f_dlgAboutVBS.GetControl(&quot;TextField1&quot;).model.Text=fsVBSTextString
+	f_dlgAboutVBS.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsExtensionLogo
+	f_dlgAboutVBS.GetControl(&quot;CommandButton2&quot;).model.Label=fsStringLanguage(fiL10nCANCEL,fsGetLanguage())
+	f_dlgAboutVBS.Execute()
+End Sub
+
+Sub previewWScript2
+	Dim  f_dlgAboutVBS As Variant
+	Dim s1 As String
+	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
+	f_dlgAboutVBS=CreateUnoDialog(DialogLibraries.textToSpeech.Dialog2)
+	f_dlgAboutVBS.GetControl(&quot;TextField1&quot;).model.Text=fsVBSText2String
+	f_dlgAboutVBS.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsExtensionLogo
+	f_dlgAboutVBS.GetControl(&quot;CommandButton2&quot;).model.Label=fsStringLanguage(fiL10nCANCEL,fsGetLanguage())
+	f_dlgAboutVBS.Execute()
+End Sub
+
+Sub ReadClipBoard
+	&apos; This Sub reads the clipboard from any module that supports a
+	&apos; text clipboard,including the Macro editor. You normally
+	&apos; fill the clipboard by selecting some text,Then using Edit &gt; Copy.
+	&apos; If this is useful, assign a key combination To the macro with Tools &gt; Customize. 
+	msgSpeak(fsGetClipBoard)
+End Sub
+</script:module>

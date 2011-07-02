@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<meta>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp" indexer="include" status="PUBLISH">
+<title id="tokens" xml-lang="en-US">
+Using Read Text Extension</title>
+<filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
+</topic>
+<history>
+<created date="2010-10-22T00:00:00">
+James Holgate</created>
+<lastedited date="2011-04-10T00:00:00">
+Code for United Kingdom corrected. Added token description for Pico.</lastedited>
+</history>
+</meta>
+<body>
+<paragraph role="heading" id="tokens1" xml-lang="en-US" level="1">
+Setting up Read Text Extension</paragraph>
+<paragraph role="heading" id="tokens1.1" xml-lang="en-US" level="2">
+Command and Script Tokens
+</paragraph>
+<paragraph>
+When you need these values in a command or a script use the appropriate token. When the add-on is 
+executed, the value in brackets is replaced by the actual string required.</paragraph>
+<list>
+<listitem>
+Current date as spoken in region (DATE)</listitem>
+<listitem>
+Current day of week as spoken in region (WEEKDAY)</listitem>
+<listitem>
+Current time as spoken in region (TIME)</listitem>
+<listitem>
+Current time reformatted so that you can use it in a filename (NOW)</listitem>
+<listitem>
+Full name of path and temporary file containing selected text (TMP)</listitem>
+<listitem>
+Name of the author (AUTHOR)</listitem>
+<listitem>
+Path of the %PRODUCTNAME sound gallery (SOUND_GALLERY)</listitem>
+<switchinline select="sys">
+<caseinline select="WIN">
+<listitem>
+Path to a Windows Script to read using the system's voice (TTS_WSCRIPT_VBS)</listitem>
+</caseinline>
+<caseinline select="UNIX">
+<listitem>
+Path to a Python script that encodes text in a PNG image for mobile devices (CREATE_QR_LABEL_PY)</listitem>
+<listitem>
+Path to a Python script that runs a operating system shell command (OS_PY)</listitem>
+<listitem>
+Path to a Python Script to read using espeak (ESPEAK_READ_TEXT_PY)</listitem>
+<listitem>
+Path to a Python Script to read using festival text2wave (FESTIVAL_READ_TEXT_PY)</listitem>
+<listitem>
+Path to a Python Script to read using pico (PICO_READ_TEXT_PY)</listitem>
+<listitem>
+Path to a Python Script to read using speech-dispatcher (SPD_READ_TEXT_PY)</listitem>
+</caseinline>
+<defaultinline>
+</defaultinline>
+</switchinline>
+<listitem>
+Work directory also known as Documents, My Documents or home (HOME)</listitem>
+<listitem>
+Application language code – en for English; fr for French etc. (LANGUAGE_CODE)</listitem>
+<listitem>
+Application country code - US for United States; FR for France, etc. (COUNTRY_CODE)</listitem>
+<listitem>
+Application regional code - fr-CA for French in Canada; en-GB for English in the United Kingdom, etc. (LANGUAGE_COUNTRY_CODE)</listitem>
+<listitem>
+Selection language code – en for English; fr for French etc. (SELECTION_LANGUAGE_CODE)</listitem>
+<listitem>
+Selection country code - US for United States; FR for France, etc. (SELECTION_COUNTRY_CODE)</listitem>
+<listitem>
+Selection regional code - fr-CA for French in Canada; en-GB for English in the United Kingdom, etc. (SELECTION_LANGUAGE_COUNTRY_CODE)</listitem>
+<listitem>
+The first 99 letters of the selected text encoded for URL (OOO_WEBTEXTSMALL)</listitem>
+<listitem>
+The first 249 letters of the selected text encoded for URL (OOO_WEBTEXT250)</listitem>
+<listitem>
+The first 999 letters of the selected text encoded for URL (OOO_WEBTEXT)</listitem>
+<listitem>
+The first 9999 letters of the selected text encoded for URL (OOO_WEBTEXTBIG)</listitem>
+</list>
+<section id="relatedtopics">
+<embed href="text/shared/guide/accessibility.xhp#accessibility"/>
+</section>
+</body>
+</helpdocument>

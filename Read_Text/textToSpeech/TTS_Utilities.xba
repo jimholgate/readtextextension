@@ -1,0 +1,1771 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Utilities" script:language="StarBasic">REM  *****  BASIC  *****
+OPTION EXPLICIT
+
+Sub OK_MouseUp(Event As Object)
+	&apos; This Sub uses the current dialog settings without dismissing
+	&apos; the dialog If you right click the OK button.
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.RIGHT Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,&quot;&quot;)
+	Elseif Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,f_dlgSpeechSetup.GetControl(&quot;CommandButton1&quot;).model.Label)
+	Endif
+End Sub
+
+Sub Cancel_MouseUp(Event As Object)
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,f_dlgSpeechSetup.GetControl(&quot;CommandButton2&quot;).model.Label)
+	Endif
+End Sub
+
+Sub Reset_MouseUp(Event As Object)
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,f_dlgSpeechSetup.GetControl(&quot;CommandButton4&quot;).model.Label)
+	ElseIf Event.Buttons AND com.sun.star.awt.MouseButton.LEFT Then
+		resetSpeech()
+		
+	Endif
+End Sub
+
+Sub About_MouseUp(Event As Object)
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,f_dlgSpeechSetup.GetControl(&quot;CommandButton3&quot;).model.Label)
+	Else 
+		aboutReadTextDialog()
+	Endif
+End Sub
+
+Sub UseFestival_MouseUp(Event As Object)
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,f_dlgSpeechSetup.GetControl(&quot;FrameControl1&quot;).model.Label &amp; &quot;,&quot; &amp; f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).model.Label)
+	Endif
+End Sub
+
+Sub Label1_MouseUp(Event As Object)
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,f_dlgSpeechSetup.GetControl(&quot;Label1&quot;).model.Label)
+	Endif
+End Sub
+
+Sub Label2_MouseUp(Event As Object)
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,f_dlgSpeechSetup.GetControl(&quot;Label2&quot;).model.Label)
+	Endif
+End Sub
+
+Sub UseExternal_MouseUp(Event As Object)
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,f_dlgSpeechSetup.GetControl(&quot;FrameControl1&quot;).model.Label  &amp; &quot;,&quot; &amp; f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).model.Label)
+	Endif
+End Sub
+
+Sub UseWeb_MouseUp(Event As Object)
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,f_dlgSpeechSetup.GetControl(&quot;FrameControl1&quot;).model.Label  &amp; &quot;,&quot; &amp;  f_dlgSpeechSetup.GetControl(&quot;OptionButton3&quot;).model.Label)
+	Endif
+End Sub
+
+Sub UseAlwaysShow_MouseUp(Event As Object)
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,f_dlgSpeechSetup.GetControl(&quot;FrameControl2&quot;).model.Label  &amp; &quot;,&quot; &amp;  f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).model.Label)
+	Endif
+End Sub
+
+Sub AboutButton_MouseUp(Event As Object)
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons Then
+		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,fsAbout())
+	Endif
+End Sub
+
+Function fbHelpIsInstalled as Boolean
+	Dim sA as String
+	sA=fsPathSettings(&quot;Help&quot;) &amp; &quot;/&quot;
+	If fileExists( sA &amp; fsGetLanguage) Then
+		fbHelpIsInstalled=True
+	Elseif fileExists(sA &amp; &quot;en&quot;) Then
+		fbHelpIsInstalled=True
+	Elseif fileExists(sA &amp; &quot;fr&quot;) Then
+		fbHelpIsInstalled=True
+	Else
+		fbHelpIsInstalled=False
+	Endif
+End Function
+
+Function soundsDirectory() As String
+	&apos;This Function returns the application sound gallery location
+	Dim strA As String
+	Dim intA As Integer
+	strA=fsPathSettings(&quot;Gallery&quot;)
+	intA=Instr(strA,&quot;;&quot;)
+	If intA &lt;&gt; 0 Then
+		strA=Left(strA,intA - 1) &apos; We don&apos;t want the semi-colon or the String that follows it
+	Endif
+	soundsDirectory=ConvertFromURL(strA &amp; &quot;/sounds/&quot;)
+End Function
+
+Function fsGetTextSelection() As String
+	Dim oDoc   As Object
+	Dim oSelection As Object
+	Dim sSelectedText As String
+	Dim n As Integer
+	On Error Goto TEXTSELECTERROR
+	oDoc=thisComponent
+	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+		sSelectedText=fsRetrieveCalcActiveCellText()
+	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
+		sSelectedText=fsDrawText()
+	Elseif oDoc.supportsService(&quot;com.sun.star.text.TextDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.WebDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.GlobalDocument&quot;) Then
+		oSelection=oDoc.getCurrentSelection()
+		sSelectedText=&quot;&quot;  	
+		If oSelection.supportsService(&quot;com.sun.star.text.TextRanges&quot;) Then
+			For n=0 To(oSelection.getCount() - 1)
+	sSelectedText=sSelectedText &amp; &quot; &quot; &amp; oSelection.getByIndex(n).getString()
+			Next
+		Else 
+			sSelectedText=oSelection.getByIndex(0).getString()
+		Endif
+		If sSelectedText=&quot; &quot; Then
+			sSelectedText=fsgetCursorWord()
+		Endif
+	Else &apos;unsupported document format
+		sSelectedText=&quot;&quot;  
+	Endif
+	fsGetTextSelection=Trim(sSelectedText)
+	Exit Function
+	TEXTSELECTERROR:
+	fsGetTextSelection=&quot;&quot;
+End Function
+
+Function WinSpeechProgramPath() As String
+	&apos; 2011-03-14
+	&apos; Always default to wscript. 
+	&apos; The dialog shows all compatible SAPI5 voices
+	&apos; SAPI5 can&apos;t use Microsoft Speech Server voices
+	Dim s1 As String
+	If fileExists(&quot;C:\Windows\SysWOW64\wscript.exe&quot;) Then
+		s1=&quot;C:\Windows\SysWOW64\wscript.exe&quot;
+	Else
+		s1=&quot;C:\WINDOWS\system32\wscript.exe&quot;
+	Endif
+	WinSpeechProgramPath=s1
+End Function
+
+Function WinSpeechArgument() As String
+	&apos;OOo For Windows always default to wscript.exe
+	Dim s1 As String
+	s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; &quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+	WinSpeechArgument=s1
+End Function
+
+Sub dialog1Combo2ShowSAPIChoices(oDialog)
+	&apos; Use Windows WScript To determine which SAPI voices are installed,Then
+	&apos; populate the Combo Box with the names of the voices. This script is only
+	&apos; invoked If you show dialog1 And you use TTS_WSCRIPT_VBS As the speech method
+	Dim myTextFile As Object,sf As Object,fileStream As Object
+	Dim aLineOfText As String,myScriptPath As String
+	Dim n1 As Integer,s1 As String,oComboBox As Variant
+	Dim sProgram As String,myTextPath As String
+	myScriptPath=convertFromURL(fsTTSListVoicesVBS)
+	myTextPath=convertFromURL(fsFullPathOf(fsSapiVoiceListDoc))
+	If fileExists(myTextPath) Then
+		Kill myTextPath
+	Endif	
+	sProgram=&quot;wscript.exe&quot; &apos;is already in system path,don&apos;t need To specify full path 
+	s1=Chr$(34) &amp; myScriptPath &amp; Chr$(34) &amp; &quot; &quot; &amp; _
+	Chr$(34) &amp; MyTextPath &amp; Chr$(34)
+	Shell(sProgram,0,s1,True) &apos;wait For shell To finish
+	REM get control
+	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
+	REM first remove all old items from the list
+	n1=oComboBox.getItemCount()
+	oComboBox.removeItems( 0,n1)
+	sf=createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	On Error Goto fichierKO
+	fileStream=sf.openFileRead(myTextPath)
+	myTextFile=createUnoService(&quot;com.sun.star.io.TextInputStream&quot;)
+	myTextFile.InputStream=fileStream
+	myTextFile.Encoding=&quot;iso-8859-15&quot;
+	Do While Not myTextFile.IsEOF
+		s1=myTextFile.readLine
+		For n1=10 To -10 step -2
+			oComboBox.addItem( Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+			&quot; /voice:&quot; &amp; Chr$(34) &amp; s1 &amp; Chr$(34)&amp; _
+			&quot; /rate:&quot; &amp; Trim(n1) &amp; &quot; &quot; &amp; _
+			Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34),0)
+		Next
+	Loop
+	fileStream.closeInput
+	myTextFile.closeInput	
+	On Error Goto 0
+	For n1=10 To -10 step -2
+		oComboBox.addItem( Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /rate:&quot; &amp; Trim(n1) &amp; &quot; &quot; &amp; _
+		Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34),0)
+	Next
+	If fileExists(fsOptDirectory() &amp; &quot;oggenc.exe&quot;) or fileExists(fsOptDirectory() &amp; &quot;oggenc2.exe&quot;) Then
+		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /use-optional-app:&quot; &amp; Chr$(34) &amp; &quot;True&quot; &amp; Chr$(34) &amp; _
+		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).ogg&quot; &amp; Chr$(34) &amp; _
+			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+		oComboBox.addItem(s1,0)
+	EndIf
+	If fileExists(fsOptDirectory() &amp; &quot;lame.exe&quot;) Then
+		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /use-optional-app:&quot; &amp; Chr$(34) &amp; &quot;True&quot; &amp; Chr$(34) &amp; _
+		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).mp3&quot; &amp; Chr$(34) &amp; _
+			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+		oComboBox.addItem(s1,0)
+	EndIf
+
+	If fileExists(fsOptDirectory() &amp; &quot;faac.exe&quot;) or fileExists(fsOptDirectory() &amp; &quot;neroAacEnc.exe&quot;) Then
+		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /use-optional-app:&quot; &amp; Chr$(34) &amp; &quot;True&quot; &amp; Chr$(34) &amp; _
+		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).m4a&quot; &amp; Chr$(34) &amp; _
+			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+		oComboBox.addItem(s1,0)
+	EndIf
+	If fileExists(fsOptDirectory() &amp; &quot;flac.exe&quot;)  Then
+		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /use-optional-app:&quot; &amp; Chr$(34) &amp; &quot;True&quot; &amp; Chr$(34) &amp; _
+		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).flac&quot; &amp; Chr$(34) &amp; _
+			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+		oComboBox.addItem(s1,0)
+	EndIf
+	If fileExists(fsProgramDirectory() &amp; &quot;iTunes&quot;) or fileExists(fsProgramDirectoryx86() &amp; &quot;iTunes&quot;) Then
+		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).aif&quot; &amp; Chr$(34) &amp; _
+			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+		oComboBox.addItem(s1,0)
+		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).m4a&quot; &amp; Chr$(34) &amp; _
+			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+		oComboBox.addItem(s1,0)
+		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).mp3&quot; &amp; Chr$(34) &amp; _
+			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+		oComboBox.addItem(s1,0)
+	EndIf
+	s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+	&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+	&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).wav&quot; &amp; Chr$(34) &amp; _
+		&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+	oComboBox.addItem(s1,0)
+	s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+	&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+	oComboBox.addItem(s1,0)
+	
+	s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
+		&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+	oComboBox.addItem(s1,0)
+	If fileExists(myTextPath) Then
+		Kill myTextPath
+	Endif
+	Exit Sub
+	FichierKO:
+	Resume FichierKO2
+	FichierKO2:
+	On Error Resume Next
+	ErrorDisplay()
+	fileStream.closeInput
+	myTextFile.closeInput
+	On Error Goto 0 
+End Sub
+
+Function fsMacVoice(n) As String
+	Dim ar1(24) As String
+	ar1(00)=&quot;Zarvox&quot;
+	ar1(01)=&quot;Whisper&quot;
+	ar1(02)=&quot;Victoria&quot;
+	ar1(03)=&quot;Vicki&quot;
+	ar1(04)=&quot;Trinoids&quot;
+	ar1(05)=&quot;Ralph&quot;
+	ar1(06)=&quot;Princess&quot;
+	ar1(07)=&quot;Pipe Organ&quot;
+	ar1(08)=&quot;Kathy&quot;
+	ar1(09)=&quot;Junior&quot;
+	ar1(10)=&quot;Hysterical&quot;
+	ar1(11)=&quot;Good News&quot;
+	ar1(12)=&quot;Fred&quot;
+	ar1(13)=&quot;Deranged&quot;
+	ar1(14)=&quot;Cellos&quot;
+	ar1(15)=&quot;Bubbles&quot;
+	ar1(16)=&quot;Bruce&quot;
+	ar1(17)=&quot;Boing&quot;
+	ar1(18)=&quot;Bells&quot;
+	ar1(19)=&quot;Bahh&quot;
+	ar1(20)=&quot;Bad News&quot;
+	ar1(21)=&quot;Albert&quot;
+	ar1(22)=&quot;Agnes&quot;
+	ar1(23)=&quot;&quot; &apos;Last array item must be empty to exit do -&gt; loop
+	fsMacVoice=ar1(n)
+end Function
+
+Sub dialog1Combo2ShowSAYChoices(oDialog)
+	&apos;Mac OSX say
+	Dim n As Integer
+	Dim s1 As String
+	Dim s2(4) As String
+	Dim oComboBox As Variant
+	REM get control
+	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
+	REM first remove all old items from the list
+	n=oComboBox.getItemCount()
+	oComboBox.removeItems( 0,n)
+	n=0
+	Do
+		s1=&quot;-v &quot; &amp; Chr$(34) &amp; fsMacVoice(n) &amp; Chr$(34) &amp; &quot; -f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+		oComboBox.addItem(s1,0)
+		n=n+1
+	Loop Until fsMacVoice(n) = &quot;&quot;
+	s2(1)=&quot;.wav&quot;
+	s2(2)=&quot;.mp3&quot;
+	s2(3)=&quot;.m4a&quot;
+	s2(4)=&quot;.aif&quot;
+	For n=1 To 4
+			s1=&quot;-o &quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW)&quot; &amp; s2(n) &amp; Chr$(34) &amp; &quot; -f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+			oComboBox.addItem(s1,0)
+	Next 
+	s1=&quot;-f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
+	oComboBox.addItem(s1,0)
+End Sub
+
+Sub dialog1Combo2ShowESPEAKChoices(oDialog)
+	&apos;espeak
+	Dim n As Integer
+	Dim s1 As String
+	Dim s2(3) As String
+	Dim s3 As String
+	Dim s4 As String
+	Dim n2 As Integer
+	Dim oComboBox As Variant
+	Dim sLanguage as String
+	sLanguage=Lcase(fsGetLanguage())
+	REM get control
+	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
+	REM first remove all old items from the list
+	n=oComboBox.getItemCount()
+	oComboBox.removeItems(0,n)
+	s3=&quot;&quot;
+	s2(0)=&quot; -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;
+	s2(1)=&quot; -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;
+	s2(2)=&quot; -s 130 -f &apos;(TMP)&apos;&quot;
+	s2(3)=&quot; -f &apos;(TMP)&apos;&quot;
+    For n=0 To 3
+&apos;		s1=s3 &amp; &quot;-v (SELECTION_LANGUAGE_CODE)&quot; &amp; s2(n)
+&apos;		oComboBox.addItem(s1,0)
+&apos;		s1=s3 &amp; &quot;-v (LANGUAGE_CODE)&quot; &amp; s2(n)
+&apos;		oComboBox.addItem(s1,0)
+		&apos;English
+		s1=s3 &amp; &quot;-v en-us&quot; &amp; s2(n)
+		oComboBox.addItem(s1,0)
+		s1=s3 &amp; &quot;-v en&quot; &amp; s2(n)
+		oComboBox.addItem(s1,0)
+		Select Case sLanguage
+		Case &quot;es&quot;
+		    s1=s3 &amp; &quot;-v es-mx&quot; &amp; s2(n)
+		    oComboBox.addItem(s1,0) 
+			s1=s3 &amp; &quot;-v es-la&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0) 
+			s1=s3 &amp; &quot;-v es&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0)  	
+		Case &quot;fr&quot;
+			s1=s3 &amp; &quot;-v fr-be&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0) 
+			s1=s3 &amp; &quot;-v fr&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0)   
+		Case &quot;nb&quot;,&quot;nn&quot;,&quot;no&quot;
+			&apos; Norway
+			s1=s3 &amp; &quot;-v no&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0)
+		Case &quot;pt&quot;
+			&apos; Portugal And Brazil
+			s1=s3 &amp; &quot;-v pt-pt&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0)
+			s1=s3 &amp; &quot;-v pt&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0)
+		Case &quot;zh&quot;
+			s1=s3 &amp; &quot;-v zh-yue&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0)
+			s1=s3 &amp; &quot;-v zh&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0)
+		Case &quot;af&quot;,&quot;bs&quot;,&quot;ca&quot;,&quot;cs&quot;,&quot;cy&quot;,&quot;da&quot;,&quot;de&quot;,&quot;el&quot;,&quot;eo&quot;,&quot;fi&quot;,&quot;hi&quot;,&quot;hr&quot;,&quot;hu&quot;,_
+			&quot;hy&quot;,&quot;id&quot;,&quot;is&quot;,&quot;it&quot;,&quot;ku&quot;,&quot;la&quot;,&quot;lv&quot;,&quot;mk&quot;,&quot;nl&quot;,&quot;pl&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sk&quot;,&quot;sq&quot;,_
+			&quot;sr&quot;,&quot;sv&quot;,&quot;sw&quot;,&quot;ta&quot;,&quot;tr&quot;,&quot;vi&quot;
+			s1=s3 &amp; &quot;-v &quot; &amp; sLanguage &amp; s2(n)
+			oComboBox.addItem(s1,0)  
+		Case Else  
+		End Select
+		If fileExists( &quot;/usr/bin/mbrola&quot;) or fileExists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) or fileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Then
+			s1=s3 &amp; &quot;-v mb-(SELECTION_LANGUAGE_CODE)1 &quot; &amp; s2(n)
+			oComboBox.addItem(s1,0)
+		Endif
+		For n2=0 To fiCountEspeakMbrolaLanguage()
+			s4=fsGetEspeakMbrolaLanguage(n2,1)
+			If fileExists( &quot;/usr/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) or _
+				fileExists( &quot;/usr/local/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) or _
+				fileExists( &quot;/usr/share/mbrola/voices/&quot; &amp; s4) or _
+				fileExists( &quot;/usr/local/share/mbrola/voices/&quot; &amp; s4) or _
+				fileExists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) or _
+				fileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Then
+				s1=s3 &amp; &quot;-v mb-&quot; &amp; s4 &amp; &quot; &quot; &amp; s2(n)
+				oComboBox.addItem(s1,0)
+			Endif
+		Next
+		s1=s3 &amp; s2(n)
+		oComboBox.addItem(s1,0)
+	Next
+End Sub
+
+Sub dialog1Combo2ShowMEDIAChoices(oDialog)
+	&apos;Show some URLs
+	Dim n1 As Integer
+	Dim s1 As String
+	Dim oComboBox As Variant
+	REM get control
+	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
+	REM first remove all old items from the list
+	n1=oComboBox.getItemCount()
+	oComboBox.removeItems( 0,n1)
+	s1=&quot;http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
+	oComboBox.addItem(s1,0)
+	s1=&quot;http://translate.google.com/translate_tts?tl=(LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
+	oComboBox.addItem(s1,0)
+	s1=&quot;http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=en-us&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)...&quot;
+	oComboBox.addItem(s1,0)
+	s1=&quot;http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=EkhoMandarin&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)...&quot;
+	oComboBox.addItem(s1,0)
+	s1=&quot;http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=EkhoCantonese&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)...&quot;
+	oComboBox.addItem(s1,0)
+	s1=&quot;http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=(SELECTION_LANGUAGE_CODE)&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)...&quot;
+	oComboBox.addItem(s1,0)
+	s1=&quot;http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=(LANGUAGE_CODE)&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)...&quot;
+	oComboBox.addItem(s1,0)
+End Sub
+
+Sub dialog1Combo2ShowFESTIVALChoices(oDialog)
+	&apos;Show some URLs
+	Dim n1 As Integer
+	Dim s1 As String
+	Dim oComboBox As Variant
+	REM get control
+	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
+	REM first remove all old items from the list
+	n1=oComboBox.getItemCount()
+	oComboBox.removeItems( 0,n1)
+	s1=&quot;--language welsh --tts &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+	oComboBox.addItem(s1,0)
+	s1=&quot;--language spanish --tts &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+	oComboBox.addItem(s1,0)
+	s1=&quot;--language english --tts &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+	oComboBox.addItem(s1,0)
+	s1=&quot;--tts &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+	oComboBox.addItem(s1,0)
+End Sub
+
+Sub dialog1Combo2ShowTEXT2WAVEChoices(oDialog)
+	&apos;Show this festival script options
+	Dim n1 As Integer
+	Dim s1 As String
+	Dim oComboBox As Variant
+	REM get control
+	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
+	REM first remove all old items from the list
+	n1=oComboBox.getItemCount()
+	oComboBox.removeItems( 0,n1)
+	s1=Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) &amp; &quot; -otype snd -o &quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).wav&quot; &amp; Chr$(34)
+	oComboBox.addItem(s1,0)
+	s1=Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) &amp; &quot; -o &quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).wav&quot; &amp; Chr$(34)
+	oComboBox.addItem(s1,0)
+End Sub
+
+Sub dialog1Combo1ShowFESTIVALScripts(oDialog)
+	Dim n As Integer
+	Dim n2 As Integer
+	Dim s1 as String
+	Dim s2(4) As String
+	Dim oComboBox As Variant
+	REM get control
+	oComboBox=oDialog.getControl(&quot;ComboBox1&quot;)
+	REM first remove all old items from the list
+	n=oComboBox.getItemCount()
+	oComboBox.removeItems(0,n)
+	s2(4)=&quot;( tts &quot; &amp; chr(34) &amp; &quot;(TMP)&quot; &amp; chr(34) &amp; &quot; nil)(quit)&quot;
+	s2(3)=&quot;(SayText &quot; &amp; chr(34) &amp; &quot;The selection says: &quot; &amp; chr(34) &amp; &quot;)( tts &quot; &amp; chr(34) &amp; &quot;(TMP)&quot; &amp; chr(34) &amp; &quot; nil)(quit)&quot;
+	s2(2)=&quot;(SayText &quot; &amp; chr(34) &amp; &quot;On (WEEKDAY), (DATE) at (TIME), (AUTHOR) said: &quot; &amp; chr(34) &amp; &quot;)( tts &quot; &amp; chr(34) &amp; &quot;(TMP)&quot; &amp; chr(34) &amp; &quot; nil)(quit)&quot;
+	s2(1)=&quot;(set! utt1 (Utterance Phrase ((Phrase ((name B))The (selected ((EMPH 3)))text )(Phrase ((name BB)) says: ))))(utt.synth utt1)(utt.play utt1)( tts &quot; &amp; chr(34) &amp; &quot;(TMP)&quot; &amp; chr(34) &amp; &quot; nil)(quit)&quot;
+	s2(0)=&quot;(set! utt1 (Utterance Wave (SOUND_GALLERY)apert.wav))(utt.synth utt1)(utt.play utt1)(tts &quot; &amp; chr(34) &amp; &quot;(TMP)&quot; &amp; chr(34) &amp; &quot; nil)(quit)&quot;
+	For n=0 To 4
+		For n2 = 0 to fiCountFestivalDirectory
+			if fileExists (fsFestivalDirectory (n2)) Then
+				s1= &quot;(voice_&quot; &amp; fsFestivalVoice(n2) &amp; &quot;)&quot;
+				oComboBox.addItem(s1 &amp; s2(n),0)
+			Endif
+		Next
+	Next
+	For n=0 To 4
+		oComboBox.addItem(s2(n),0)
+	Next
+End Sub
+
+Sub dialog1Combo2ShowMyPythonChoices(oDialog)
+	&apos;Show the python script options
+	Dim n As Integer
+	Dim n2 As Integer
+	Dim s1 As String
+	Dim s2(10) As String
+	Dim s3 As String
+	Dim s4 As String
+	Dim sLanguage as String
+	sLanguage=Lcase(fsGetLanguage())
+	Dim oComboBox As Variant
+	REM get control
+	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
+	REM first remove all old items from the list
+	n=oComboBox.getItemCount()
+	oComboBox.removeItems(0,n)
+	If fsGetOS()=&quot;WINDOWS&quot; Then &apos;Show examples
+		s1=&quot;-c &quot; &amp; Chr(34) &amp; &quot;import os; os.startfile(&apos;http://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot; &amp; Chr(34) 
+		oComboBox.addItem(s1,0)
+		s1=&quot;-c &quot; &amp; Chr(34) &amp; &quot;import os; os.startfile(&apos;http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&apos;)&quot; &amp; Chr(34) 
+		oComboBox.addItem(s1,0)
+		s1=Chr(34) &amp; &quot;(OS_PY)&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;notepad &apos;(TMP)&apos;&quot; &amp; Chr(34) 
+		oComboBox.addItem(s1,0)
+	Endif
+	If fileExists( fsProgramDirectory() &amp; &quot;Python\Lib\site-packages\pyttsx&quot;) Or fileExists( fsProgramDirectoryx86() &amp; &quot;Python\Lib\site-packages\pyttsx&quot;) Then
+		s2(0)=&quot; --rate 90 &quot; 
+		s2(1)=&quot; --rate 60 &quot;
+		s2(2)=&quot; --rate 30 &quot;
+		s2(3)=&quot; --rate 0 &quot;
+		s2(4)=&quot; --rate -30 &quot;
+		s2(5)=&quot; --rate -60 &quot;
+		s2(6)=&quot; --rate -90 &quot;
+		s2(7)=&quot; &quot;
+		For n=0 To 7
+			s1=Chr(34) &amp; &quot;(PYTTSX_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; s2(n) &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Next
+	Endif
+	If fileExists(&quot;/usr/bin/spd-say&quot;) Then
+		s2(0)=&quot;MALE3&quot; 
+		s2(1)=&quot;MALE2&quot;
+		s2(2)=&quot;MALE1&quot;
+		s2(3)=&quot;FEMALE3&quot;
+		s2(4)=&quot;FEMALE2&quot;
+		s2(5)=&quot;FEMALE1&quot;
+		s2(6)=&quot;CHILD_MALE&quot;
+		s2(7)=&quot;CHILD_FEMALE&quot;
+		For n=0 To 7
+			s1=Chr(34) &amp; &quot;(SPD_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+			&quot; --language &quot; &amp; Chr(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr(34) &amp; &quot; --voice &quot; &amp; Chr(34) &amp; s2(n) &amp; _
+			Chr(34) &amp; &quot; --rate &quot; &amp; Chr(34) &amp; &quot;-30&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+			oComboBox.addItem(s1,0)
+			s1=Chr(34) &amp; &quot;(SPD_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+			&quot; --language &quot; &amp; Chr(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr(34) &amp; &quot; --voice &quot; &amp; Chr(34) &amp; s2(n) &amp; _
+			Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+			oComboBox.addItem(s1,0)
+		Next
+		s1=Chr(34) &amp; &quot;(SPD_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+		&quot; --language &quot; &amp; Chr(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr(34) &amp; _
+		&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+		oComboBox.addItem(s1,0)
+		s1=Chr(34) &amp; &quot;(SPD_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+		oComboBox.addItem(s1,0)
+	Endif
+	If fileExists(&quot;/usr/bin/qrencode&quot;) Then
+	   	s2(0)=&quot;12&quot; 
+		s2(1)=&quot;9&quot;
+		s2(2)=&quot;6&quot;
+		s2(3)=&quot;3&quot;
+		s2(4)=&quot;1&quot;
+		For n=0 to 4
+			s1=Chr(34) &amp; &quot;(CREATE_QR_LABEL_PY)&quot; &amp; Chr(34) &amp; &quot; --size &quot; &amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).png&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34) 
+			oComboBox.addItem(s1,0)
+			s1=Chr(34) &amp; &quot;(CREATE_QR_LABEL_PY)&quot; &amp; Chr(34) &amp; &quot; --size &quot; &amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;/tmp/&quot; &amp; _
+			fsGetSetting(&quot;ooname&quot;) &amp; &quot; - &quot; &amp; fsStringLanguage(fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()) &amp; &quot; - &quot; &amp; _
+			fsUserName &amp; &quot;.png&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Next
+		s1=Chr(34) &amp; &quot;(CREATE_QR_LABEL_PY)&quot; &amp; Chr(34) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).png&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+		oComboBox.addItem(s1,0)
+		s1=Chr(34) &amp; &quot;(CREATE_QR_LABEL_PY)&quot; &amp; Chr(34) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;/tmp/&quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; - &quot; &amp; fsStringLanguage(fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()) &amp; &quot;.png&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+		oComboBox.addItem(s1,0)
+	Endif
+	If fileExists(&quot;/usr/bin/espeak&quot;) Then &apos; doesn&apos;t work in Windows, only Linux...
+		s2(0)=&quot; -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot; &amp; Chr(34)
+		s2(1)=&quot; -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot; &amp; Chr(34)
+		s2(2)=&quot; -s 130 -f &apos;(TMP)&apos;&quot; &amp; Chr(34)
+		s2(3)=&quot; -f &apos;(TMP)&apos;&quot; &amp; Chr(34)
+		s3=Chr(34) &amp; &quot;(OS_PY)&quot; &amp; Chr(34) &amp; &quot; --c &quot; &amp; Chr(34) &amp; &quot;espeak &quot;
+	    For n=0 To 3
+			&apos;English
+			s1=s3 &amp; &quot;-v en-us&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0)
+			s1=s3 &amp; &quot;-v en&quot; &amp; s2(n)
+			oComboBox.addItem(s1,0)
+			Select Case sLanguage
+			Case &quot;es&quot;
+				s1=s3 &amp; &quot;-v es-mx&quot; &amp; s2(n)
+				oComboBox.addItem(s1,0) 
+				s1=s3 &amp; &quot;-v es-la&quot; &amp; s2(n)
+				oComboBox.addItem(s1,0) 
+				s1=s3 &amp; &quot;-v es&quot; &amp; s2(n)
+				oComboBox.addItem(s1,0)  	
+			Case &quot;fr&quot;
+				s1=s3 &amp; &quot;-v fr-be&quot; &amp; s2(n)
+				oComboBox.addItem(s1,0) 
+				s1=s3 &amp; &quot;-v fr&quot; &amp; s2(n)
+				oComboBox.addItem(s1,0)   
+			Case &quot;nb&quot;,&quot;nn&quot;,&quot;no&quot;
+				&apos; Norway
+				s1=s3 &amp; &quot;-v no&quot; &amp; s2(n)
+				oComboBox.addItem(s1,0)
+			Case &quot;pt&quot;
+				&apos; Portugal And Brazil
+				s1=s3 &amp; &quot;-v pt-pt&quot; &amp; s2(n)
+				oComboBox.addItem(s1,0)
+				s1=s3 &amp; &quot;-v pt&quot; &amp; s2(n)
+				oComboBox.addItem(s1,0)
+			Case &quot;zh&quot;
+				s1=s3 &amp; &quot;-v zh-yue&quot; &amp; s2(n)
+				oComboBox.addItem(s1,0)
+				s1=s3 &amp; &quot;-v zh&quot; &amp; s2(n)
+				oComboBox.addItem(s1,0)
+			Case &quot;af&quot;,&quot;bs&quot;,&quot;ca&quot;,&quot;cs&quot;,&quot;cy&quot;,&quot;da&quot;,&quot;de&quot;,&quot;el&quot;,&quot;eo&quot;,&quot;fi&quot;,&quot;hi&quot;,&quot;hr&quot;,&quot;hu&quot;,_
+				&quot;hy&quot;,&quot;id&quot;,&quot;is&quot;,&quot;it&quot;,&quot;ku&quot;,&quot;la&quot;,&quot;lv&quot;,&quot;mk&quot;,&quot;nl&quot;,&quot;pl&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sk&quot;,&quot;sq&quot;,_
+				&quot;sr&quot;,&quot;sv&quot;,&quot;sw&quot;,&quot;ta&quot;,&quot;tr&quot;,&quot;vi&quot;
+				s1=s3 &amp; &quot;-v &quot; &amp; sLanguage &amp; s2(n)
+				oComboBox.addItem(s1,0)  
+			Case Else  
+			End Select
+			For n2=0 To fiCountEspeakMbrolaLanguage()
+				s4=fsGetEspeakMbrolaLanguage(n2,1)
+				If fileExists( &quot;/usr/share/mbrola/&quot; &amp; s4) or _
+					fileExists( &quot;/usr/local/share/mbrola/&quot; &amp; s4) or _
+					fileExists( &quot;/usr/share/mbrola/voices/&quot; &amp; s4) or _
+					fileExists( &quot;/usr/local/share/mbrola/voices/&quot; &amp; s4) Then
+					s1=s3 &amp; &quot;-v mb-&quot; &amp; s4 &amp; &quot; &quot; &amp; s2(n)
+					oComboBox.addItem(s1,0)
+				Endif
+			Next
+			s1=s3 &amp; s2(n)
+			oComboBox.addItem(s1,0)
+		Next
+	EndIf
+	If fileExists(&quot;/usr/bin/say&quot;) Then
+		n=0
+		Do
+			s1=Chr(34) &amp; &quot;(OS_PY)&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;say -v &apos;&quot; &amp; fsMacVoice(n) &amp; &quot;&apos; -f &apos;(TMP)&apos;&quot; &amp; Chr$(34)
+			oComboBox.addItem(s1,0)
+			n=n+1
+		Loop Until fsMacVoice(n) = &quot;&quot;
+		s2(1)=&quot;.wav&quot;
+		s2(2)=&quot;.mp3&quot;
+		s2(3)=&quot;.m4a&quot;
+		s2(4)=&quot;.aif&quot;
+		For n=1 To 4
+			s1=Chr(34) &amp; &quot;(OS_PY)&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;say -o &apos;(HOME)(NOW)&quot; &amp; s2(n) &amp; &quot;&apos; -f &apos;(TMP)&apos;&quot; &amp; Chr$(34)
+			oComboBox.addItem(s1,0)
+		Next
+
+		s1=Chr(34) &amp; &quot;(OS_PY)&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; chr(34) &amp; &quot; say -f &apos;(TMP)&apos;&quot;  &amp; Chr(34)
+		oComboBox.addItem(s1,0)
+	EndIf
+	If fileExists( &quot;/usr/bin/text2wave&quot;)  or fileExists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave&quot;) or _
+ 		fileExists(fsProgramDirectory() &amp; &quot;festival\texttowave&quot;) Then
+ 		
+		If fileExists( &quot;/usr/bin/ffmpeg&quot;) Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Then
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).webm&quot; &amp; Chr(34) &amp; _
+				&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).webm&quot; &amp; Chr(34) &amp; _
+				&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
+				&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER2_PNG)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
+				&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
+				&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
+				&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
+				&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
+				&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Endif		
+		If fileExists( &quot;/usr/bin/ffmpeg&quot;)  Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Or fileExists( &quot;/usr/bin/twolame&quot;) Then
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp2&quot; &amp; _
+				Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Endif
+		If fileExists( &quot;/usr/bin/oggenc&quot;)  Or fileExists(&quot;C:\opt\oggenc.exe&quot;)  Or fileExists(&quot;C:\opt\oggenc2.exe&quot;) Then
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).ogg&quot; &amp; _
+				Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Endif
+		If fileExists( &quot;/usr/bin/lame&quot;)  Or fileExists(&quot;C:\opt\lame.exe&quot;) Then
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp3&quot; &amp; _
+				Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Endif
+		If fileExists( &quot;/usr/bin/faac&quot;)  Or fileExists(&quot;C:\opt\neroAacEnc.exe&quot;)  Then
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).m4a&quot; &amp; _
+				Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Endif
+		If fileExists( &quot;/usr/bin/flac&quot;) Or fileExists(&quot;C:\opt\flac.exe&quot;) Or fileExists( &quot;/usr/bin/ffmpeg&quot;) Then
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).flac&quot; &amp; _
+				Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Endif		
+		s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+			&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).wav&quot; &amp; _
+			Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+		oComboBox.addItem(s1,0)
+		s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+			&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+		oComboBox.addItem(s1,0)
+		s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+			&quot; --visible=false &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+		oComboBox.addItem(s1,0)
+	Endif
+	
+	If fileExists( &quot;/usr/bin/espeak&quot;) or fileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) or _
+ 		fileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then 
+		
+		s2(0)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		If fileExists( &quot;/usr/bin/ffmpeg&quot;) Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Then
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).webm&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).webm&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER2_PNG)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+
+		Endif		
+		If fileExists( &quot;/usr/bin/ffmpeg&quot;) Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Or fileExists( &quot;/usr/bin/twolame&quot;) Then
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp2&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif
+		If fileExists( &quot;/usr/bin/oggenc&quot;) Or fileExists(&quot;C:\opt\oggenc.exe&quot;) Or fileExists(&quot;C:\opt\oggenc2.exe&quot;) Then
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).ogg&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif
+		If fileExists( &quot;/usr/bin/lame&quot;) Or fileExists(&quot;C:\opt\lame.exe&quot;) Then
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp3&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif
+		If fileExists( &quot;/usr/bin/faac&quot;) Or fileExists(&quot;C:\opt\neroAacEnc.exe&quot;) or fileExists(&quot;C:\opt\faac.exe&quot;) Then
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).m4a&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif
+		If fileExists( &quot;/usr/bin/flac&quot;) Or fileExists(&quot;C:\opt\flac.exe&quot;) Or fileExists( &quot;/usr/bin/ffmpeg&quot;) Then
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).flac&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif		
+		For n=0 To 0
+			s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).wav&quot; &amp; _
+				Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Next
+		For n=0 To 0
+			s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --language=&quot;&amp; s2(n) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Next
+		For n=0 To 0
+			s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --visible=false &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Next
+	Endif	
+	
+	If fileExists( &quot;/usr/bin/pico2wave&quot;) Then
+		s2(0)=&quot;it&quot; 
+		s2(1)=&quot;fr&quot;
+		s2(2)=&quot;es&quot;
+		s2(3)=&quot;en-GB&quot;
+		s2(4)=&quot;en&quot;
+		s2(5)=&quot;de&quot;
+		s2(6)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		s2(7)=&quot;(SELECTION_LANGUAGE_CODE)&quot;
+		
+		If fileExists( &quot;/usr/bin/ffmpeg&quot;) Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Then
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).webm&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).webm&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER2_PNG)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
+					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+
+		Endif		
+		If fileExists( &quot;/usr/bin/ffmpeg&quot;)  Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Or fileExists( &quot;/usr/bin/twolame&quot;) Then
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp2&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif
+		If fileExists( &quot;/usr/bin/oggenc&quot;)  Or fileExists(&quot;C:\opt\oggenc.exe&quot;)  Or fileExists(&quot;C:\opt\oggenc2.exe&quot;) Then
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).ogg&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif
+		If fileExists( &quot;/usr/bin/lame&quot;)  Or fileExists(&quot;C:\opt\lame.exe&quot;) Then
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp3&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif
+		If fileExists( &quot;/usr/bin/faac&quot;)  Or fileExists(&quot;C:\opt\neroAacEnc.exe&quot;)  Then
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).m4a&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif
+		If fileExists( &quot;/usr/bin/flac&quot;) Or fileExists(&quot;C:\opt\flac.exe&quot;) Or fileExists( &quot;/usr/bin/ffmpeg&quot;) Then
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).flac&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif		
+		For n=6 To 6
+			s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).wav&quot; &amp; _
+				Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Next
+		For n=6 To 6
+			s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --language=&quot;&amp; s2(n) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Next
+		For n=6 To 6
+			s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --rate=80% --visible=false &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Next
+		For n=0 To 6
+			s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --visible=false &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Next
+	Endif
+End Sub
+
+Function PosixSpeechProgramPath() As String
+	&apos;September 27,2010
+	&apos;OOo For Macintosh - default To a reasonable path
+	&apos;OOo For Linux - If espeak compiled locally,choose the local version
+	Dim s1 As String
+	If fileExists(&quot;/usr/local/bin/espeak&quot;) Then
+		s1=&quot;/usr/local/bin/espeak&quot;
+	Elseif fileExists( &quot;/usr/bin/local/say&quot;) Then
+		s1=&quot;/usr/bin/local/say&quot;
+	Elseif fileExists( &quot;/usr/bin/say&quot;) Then
+		s1=&quot;/usr/bin/say&quot;
+	Else
+		s1=&quot;/usr/bin/espeak&quot;
+	Endif
+	PosixSpeechProgramPath=s1
+End Function
+
+&apos;This macro deletes the temporary files that the speech program creates.
+Sub resetSpeech
+	Dim aFile As String
+	Dim bFile As String
+	aFile=fsFullPathOf(fsFestivalScriptName)
+	If fileExists(aFile) Then
+		kill aFile
+	Endif	
+	bFile=fsFullPathOf(fsTemporaryTextDoc)	
+	If fileExists(bFile) Then
+		kill bFile
+	Endif
+End Sub
+
+&apos;This macro creates a temporary script file For the speech synthesiser.
+Sub writeScript(myscript As String,msgs() As Variant,errorCode As Integer)
+	Dim aFile As String
+	Dim iNumber As Integer
+	aFile=fsFullPathOf(fsFestivalScriptName)
+	iNumber=Freefile
+	Open aFile For Output As #iNumber
+	Print #iNumber,myScript
+	Close #iNumber
+End Sub
+
+Function fsAbout() As String
+	fsAbout=getTextFromFile(fsDescriptionDoc,&quot;utf-8&quot;) &apos;Application&apos;s Default encoding
+End Function
+
+Function fsVBSTextString() As String
+	fsVBSTextString=getTextFromFile(fsTTSScriptVBS,&quot;iso-8859-15&quot;) &apos;iso-8859-15 Windows encoding
+End Function
+
+Function fsVBSText2String() As String
+	fsVBSText2String=getTextFromFile(fsTTSListVoicesVBS,&quot;iso-8859-15&quot;) &apos;iso-8859-15 Windows encoding
+End Function
+
+Function fsSPDTextString
+	fsSPDTextString=getTextFromFile(fsPythonSpdDoc,&quot;utf-8&quot;)
+End Function
+
+Function fsPicoTextString
+	fsPicoTextString=getTextFromFile(fsPythonPicoDoc,&quot;utf-8&quot;)
+End Function
+&apos;
+Function fsEspeakTextString
+	fsEspeakTextString=getTextFromFile(fsPythonEspeakDoc,&quot;utf-8&quot;)
+End Function
+
+Function fsFestivalTextString
+	fsFestivalTextString=getTextFromFile(fsPythonFestivalDoc,&quot;utf-8&quot;)
+End Function
+
+Function fsPyttsxTextString
+	fsPyttsxTextString=getTextFromFile(fsPythonPyttsxDoc,&quot;utf-8&quot;)
+End Function
+
+Function fsOSTextString
+	fsOSTextString=getTextFromFile(fsPythonOSDoc,&quot;utf-8&quot;)
+End Function
+
+Function fsQRTextString
+	fsQRTextString=getTextFromFile(fsPythonCreateQR,&quot;utf-8&quot;)
+End Function
+
+Function getTextFromFile(sFilePath,sEncoding) As String
+	&apos;http://www.oooforum.org/forum/viewtopic.phtml?t=53813
+	&apos;Use simpleFileAccess instead of Basic file handling To translate encoded text
+	Dim myTextFile As Object,sf As Object,fileStream As Object
+	Dim aLineOfText As String,myFilePath As String
+	myFilePath=convertToURL(sFilePath)
+	sf=createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	On Error Goto fichierKO
+	fileStream=sf.openFileRead(myFilePath)
+	myTextFile=createUnoService(&quot;com.sun.star.io.TextInputStream&quot;)
+	myTextFile.InputStream=fileStream
+	myTextFile.Encoding=sEncoding
+	Do While Not myTextFile.IsEOF
+		getTextFromFile=getTextFromFile &amp; myTextFile.readLine &amp; chr(13)
+	Loop 
+	fileStream.closeInput
+	myTextFile.closeInput
+	On Error Goto 0
+	Exit Function
+	FichierKO:
+		Resume FichierKO2
+	FichierKO2:
+	On Error Resume Next
+	Msgbox(&quot;File read Error !&quot;,16)
+	fileStream.closeInput
+	myTextFile.closeInput
+	On Error Goto 0 
+End Function
+
+Sub writeSpeech(mySpeech As String,msgs() As Variant,errorCode As Integer)
+	&apos;creates a temporary text file For the speech synthesiser.
+	Dim bFile As String
+	Dim iNumber As Integer
+	bFile=fsFullPathOf(fsTemporaryTextDoc)
+	iNumber=Freefile
+	Open bFile For Output As #iNumber
+	Print #iNumber,mySpeech
+	Close #iNumber
+End Sub
+
+Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverRide As String)
+	Dim sCommand As String
+	Dim sScript As String
+	Dim sTextToSpeak As String
+	Dim sProgram As String
+	Dim aVal As Integer
+	Dim bWait As Boolean
+	Dim oBar    &apos; Generated status bar 
+	Dim oFrame  &apos; Current frame 
+	On Error Resume Next
+	oFrame=ThisComponent.getCurrentController().getFrame() 
+	oBar=oFrame.createStatusIndicator() 
+	oBar.start(fsStringLanguage( fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()),100)
+	On Error Goto ErrorHandler
+	sCommand=&quot;&quot;
+	sScript=&quot;&quot;
+	&apos;Get rid of the old files containing a script And/or plain text of selected String
+	resetSpeech
+	On Error Resume Next
+	oBar.Value=30
+	On Error Goto errorHandler
+	&apos;Choose what To speak
+	If sOverRide=&quot;&quot; Then  
+		sTextToSpeak=fsGetTextSelection()
+	Else
+		sTextToSpeak=sOverRide
+	Endif
+	If config(fiFestivalOption) Then
+		writeSpeech(sTextToSpeak,msgs(),errorCode)
+		sProgram=config(fiFestivalPath)
+		sCommand=Chr$(34) &amp; ConvertFromURL(fsFullPathOf(fsFestivalScriptName)) &amp; Chr$(34)
+		&apos;Write the Festival script	
+		sScript=replaceLocalTokensWithStr(config(fiFestivalComboChoice))
+		sScript=replacePublicTokensWithStr(sScript)
+		writeScript(sScript,msgs(),errorCode)	
+	Elseif config(fiExternalOption) Then
+		writeSpeech(sTextToSpeak,msgs(),errorCode)
+		sProgram=config(fiExternalProgramPath)
+		sCommand=replaceLocalTokensWithStr(config(fiExternalCommand))
+		sCommand=replacePublicTokensWithStr(sCommand)
+		sCommand=replaceWebTokensWithStr(sCommand,sTextToSpeak) &apos;for online content with media player
+	Else &apos;If config(fiHtmlOption) Then
+	&apos;Translate And read with web tools
+		sProgram=&quot;com.sun.star.system.SystemShellExecute&quot;
+		sCommand=replacePublicTokensWithStr(config(fiHtmlComboURL))
+		sCommand=replaceWebTokensWithStr(sCommand,sTextToSpeak)
+		Dim oSvc As Object
+		oSvc=createUnoService(sProgram)
+		&apos; HTML file   
+		oSvc.execute(sCommand,&quot;&quot;,0)
+	oBar.End() 
+		Exit Sub
+	Endif
+	
+	If fileExists(sProgram) Then
+		&apos; program path
+		&apos; 0 - focus is On the hidden program window,
+		&apos; program parameter strings,
+		&apos; False - tasks do Not wait until shell task ends
+		bWait=False
+	If sCommand &lt;&gt; &quot;&quot; Then 
+		errorCode=Shell(sProgram,0,sCommand,bWait)
+		Endif
+		On Error Resume Next
+		oBar.Value=60
+		On Error Goto errorHandler
+	Else
+		Msgbox( fsStringLanguage( fiL10nCOULD_NOT_LOCATE_THE_PROGRAM,fsGetLanguage()) &amp; _
+			fsStringLanguage( fiL10nSTRING_CANNOT_BE_ANALYZED,fsGetLanguage()),64,_
+			fsStringLanguage( fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()))
+		If fileExists(	fsFullPathOf(fsExtensionSettingsIni)) Then
+			kill fsFullPathOf(fsExtensionSettingsIni)
+		Endif
+		resetSpeech
+	Endif
+	On Error Resume Next
+	oBar.Value=100
+	oBar.End() 
+	Exit Sub
+	ErrorHandler:
+		Msgbox(fsStringLanguage( fiL10nSTRING_CANNOT_BE_ANALYZED,fsGetLanguage()),48,_
+			fsStringLanguage( fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()))
+		If fileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
+			kill fsFullPathOf(fsExtensionSettingsIni)	
+		Endif
+		resetSpeech
+End Sub
+
+Function fsReplaceText(sA As String,sFind As String,sReplace As String) As String
+	&apos;This Function replaces each instance of the sFind String in the sA String with the sReplace String
+	&apos;For example,we can use it To replace(TMP) with an actual temporary file name...
+	While Instr(sA,sFind) &lt;&gt; 0 
+		fsReplaceText=Left(sA,Instr(sA,sFind)-1) &amp; _
+			sReplace &amp; _
+			Mid(sA,Instr(sA,sFind)+Len(sFind),Len(sA)-Instr(sA,sFind)+Len(sFind)
+		sA=fsReplaceText
+	Wend
+	fsReplaceText=sA
+End Function
+
+Function replaceLocalTokensWithStr(sA As String) As String
+	&apos;This Function takes a String with tokens And replaces each token with
+	&apos;a useful String 
+		Dim sFind As String
+		Dim sReplace As String
+		Dim sB As String
+		sB=fsGetTextSelection()
+		&apos;Temporary file name
+		sFind=&quot;(TMP)&quot;
+		sReplace=ConvertFromURL(fsFullPathOf(fsTemporaryTextDoc))
+		sA=fsReplaceText(sA,sFind,sReplace)
+	
+		sFind=&quot;(TTS_WSCRIPT_VBS)&quot;
+		sReplace=ConvertFromURL(fsTTSScriptVBS)
+		sA=fsReplaceText(sA,sFind,sReplace)
+		
+		sFind=&quot;(SPD_READ_TEXT_PY)&quot;
+		sReplace=ConvertFromURL(fsPythonSpdDoc)
+		sA=fsReplaceText(sA,sFind,sReplace)
+
+		sFind=&quot;(PICO_READ_TEXT_PY)&quot;
+		sReplace=ConvertFromURL(fsPythonPicoDoc)
+		sA=fsReplaceText(sA,sFind,sReplace)
+
+		sFind=&quot;(ESPEAK_READ_TEXT_PY)&quot;
+		sReplace=ConvertFromURL(fsPythonEspeakDoc)
+		sA=fsReplaceText(sA,sFind,sReplace)
+
+		sFind=&quot;(FESTIVAL_READ_TEXT_PY)&quot;
+		sReplace=ConvertFromURL(fsPythonFestivalDoc)
+		sA=fsReplaceText(sA,sFind,sReplace)
+		
+		sFind=&quot;(PYTTSX_READ_TEXT_PY)&quot;
+		sReplace=ConvertFromURL(fsPythonPyttsxDoc)
+		sA=fsReplaceText(sA,sFind,sReplace)
+		
+		sFind=&quot;(OS_PY)&quot;
+		sReplace=ConvertFromURL(fsPythonOSDoc)
+		sA=fsReplaceText(sA,sFind,sReplace)
+		
+		sFind=&quot;(CREATE_QR_LABEL_PY)&quot;
+		sReplace=ConvertFromURL(fsPythonCreateQR)
+		sA=fsReplaceText(sA,sFind,sReplace)
+	
+		&apos;Work directory also known As My Documents or home
+		sFind=&quot;(HOME)&quot;
+		sReplace=ConvertFromURL(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;)
+		sA=fsReplaceText(sA,sFind,sReplace)
+	
+		&apos;Current time reformatted so that you can use it in a filename
+		sFind=&quot;(NOW)&quot;
+		sReplace=fsFileTime()
+		sA=fsReplaceText(sA,sFind,sReplace)
+	
+		sFind=&quot;(SOUND_GALLERY)&quot;
+		sReplace=soundsDirectory()
+		sA=fsReplaceText(sA,sFind,sReplace)
+		
+		&apos;Sample image for movie clip with embedded speech
+		sFind=&quot;(POSTER_PNG)&quot;
+		sReplace=ConvertFromURL(fsPosterPng)
+		sA=fsReplaceText(sA,sFind,sReplace)
+		
+		&apos;Sample image for movie clip with embedded speech
+		sFind=&quot;(POSTER2_PNG)&quot;
+		sReplace=ConvertFromURL(fsPoster2Png)
+		sA=fsReplaceText(sA,sFind,sReplace)
+
+		&apos;Choose an image for your movie clip with embedded speech
+		if instr(sA,&quot;(MY_IMAGE)&quot;)&gt;0 Then
+			sFind=&quot;(MY_IMAGE)&quot;
+			sReplace=fsGetPicturePath()
+			sA=fsReplaceText(sA,sFind,sReplace)
+		Endif	
+		&apos;New line 
+		sFind=&quot;(/NL)&quot;
+		sReplace=Chr$(13)
+		sA=fsReplaceText(sA,sFind,sReplace)
+		&apos;	
+		replaceLocalTokensWithStr=sA
+End Function
+
+Function ReplaceWebTokensWithStr(sA As String,sB As String) As String
+	Dim sFind As String
+	Dim sReplace As String
+	
+	sFind=&quot;(OOO_WEBTEXTBIG)&quot;
+	sReplace=fsEscapeStr(Left(sB,9999)) &apos; A lot of text. Use If you have a dedicated online speech server.
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	sFind=&quot;(OOO_WEBTEXT)&quot;
+	sReplace=fsEscapeStr(Left(sB,999)) &apos; Use with free online text-To-speech utilities
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	sFind=&quot;(OOO_WEBTEXT250)&quot;
+	sReplace=fsEscapeStr(Left(sB,249)) &apos; Use with online QRCode utilities
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	sFind=&quot;(OOO_WEBTEXTSMALL)&quot; &apos; Use with Google Translate To ensure that the text-To-speech is enabled
+	sReplace=fsEscapeStr(Left(sB,99))
+	sA=fsReplaceText(sA,sFind,sReplace)
+	ReplaceWebTokensWithStr=sA
+End Function
+
+Function replacePublicTokensWithStr(sA As String) As String
+	Dim sFind As String
+	Dim sReplace As String
+	
+	sFind=&quot;(AUTHOR)&quot;
+	sReplace=ltrim(rtrim(ThisComponent.getDocumentInfo().Author))
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	sFind=&quot;(TITLE)&quot;
+	sReplace=ThisComponent.getDocumentInfo().Title
+	If sReplace=&quot;&quot; Then 
+		sReplace=fsDateMyRegion() &amp; &quot; - &quot; &amp; fsTimeMyRegion()
+	Endif
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;Current date
+	sFind=&quot;(DATE)&quot;
+	sReplace=fsDateMyRegion()
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;Current time As spoken in region
+	sFind=&quot;(TIME)&quot;
+	sReplace=fsTimeMyRegion()
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;Current day of week As spoken in region
+	sFind=&quot;(WEEKDAY)&quot;
+	sReplace=fsWeekDayMyRegion()
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;Language - en For English fr For French etc. ISO_639-1
+	sFind=&quot;(LANGUAGE_CODE)&quot;
+	sReplace=fsGetLanguage()
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;Country - US For United States FR For France etc.
+	sFind=&quot;(COUNTRY_CODE)&quot;
+	sReplace=fsGetCountry()
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;Language And Region en-US or fr-FR
+	sFind=&quot;(LANGUAGE_COUNTRY_CODE)&quot;
+	sReplace=fsGetLanguage()&amp; &quot;-&quot; &amp; fsGetCountry()
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;Selection Country - US For United States FR For France etc. 
+	sFind=&quot;(SELECTION_COUNTRY_CODE)&quot;
+	sReplace=fsSelectionCountry()
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;Selection Language - en For English fr For French etc. ISO_639-1
+	sFind=&quot;(SELECTION_LANGUAGE_CODE)&quot;
+	sReplace=fsSelectionLanguage()
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;Selection Language And Region en-US or fr-FR
+	sFind=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+	sReplace=fsSelectionLanguageAndRegion()
+	sA=fsReplaceText(sA,sFind,sReplace)
+	replacePublicTokensWithStr=sA
+End Function
+
+
+Function fsFileTime() As String
+	&apos;Revised 2011-02-20_17-18 so all versions and locales return the same value
+	fsFileTime=Year(NOW) &amp; &quot;-&quot; &amp; Month(NOW) &amp; &quot;-&quot; &amp; Day(NOW) &amp; &quot;_&quot; &amp; fsReplaceText(Time(NOW),&quot;:&quot;,&quot;-&quot;)
+End Function
+
+Function fsPathSettings(sPathType As String,Optional bshowall As Boolean,Optional ListIndex As Integer) As String
+	&apos; Gets a special configured PathSetting
+	Dim oSettings,oPathSettings As Object
+	Dim sPath As String
+	Dim PathList() As String
+	Dim MaxIndex As Integer
+	Dim oPS As Object
+	oPS=createUnoService(&quot;com.sun.star.util.PathSettings&quot;)
+
+  	If Not IsMissing(bShowall) Then
+		If bShowAll Then
+			ShowPropertyValues(oPS)
+			Exit Function
+		Endif
+	Endif
+ 	sPath=oPS.getPropertyValue(sPathType)
+	If Not IsMissing(ListIndex) Then
+		&apos; Share And User-Directory
+		If Instr(1,sPath,&quot;;&quot;) &lt;&gt; 0 Then
+			PathList=ArrayoutofString(sPath,&quot;;&quot;,MaxIndex)
+			If ListIndex &lt;=MaxIndex Then
+				sPath=PathList(ListIndex)
+			Else
+				Msgbox( fsStringLanguage( fiL10nSTRING_CANNOT_BE_ANALYZED,fsGetLanguage()),48,_
+					fsStringLanguage( fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()))
+			Endif
+		Endif
+	Endif
+	If Instr(1,sPath,&quot;;&quot;)=0 Then
+		fsPathSettings=ConvertToUrl(sPath)
+	Else
+		fsPathSettings=sPath
+	Endif
+End Function
+
+Function fiStringToInteger(value As String) As Integer 
+	Dim b As Integer: b=0
+	Dim v As String: v=Trim(value)
+	On Error Goto CONVERSIONERROR
+	b=value
+	fiStringToInteger=b
+	Exit Function
+	CONVERSIONERROR:
+	fiStringToInteger=0
+End Function 
+
+Function fsgetCursorWord As String
+	&apos; Function To get a word under the current cursor position.
+	&apos; Adapted from code contributed On 2009-04-25  by JohnV To 
+	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t=83411&amp;highlight=
+	Dim oDoc,oVC,oTC
+	oDoc=ThisComponent
+	oVC=oDoc.getCurrentController.getViewCursor
+	oTC=oDoc.getText.createTextCursorByRange(oVC,False)
+	oTC.gotoEndOfWord(False)
+	oTC.gotoStartOfWord(True)
+	fsgetCursorWord=oTC.String 
+End Function
+
+Function  fsSelectionLanguageAndRegion As String
+	fsSelectionLanguageAndRegion=fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
+End Function
+
+Function fsRetrieveCalcActiveCellText() As String
+	fsRetrieveCalcActiveCellText=fsRetrieveCalcActiveCellProperty(&quot;String&quot;)
+End Function
+
+Function fsSelectionLanguage as String
+   	Dim oDoc,oVC,sA,longI,sB
+    On Error Goto SELECTLANGUAGEERROR
+	oDoc=ThisComponent
+	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+		sA=fsRetrieveCalcActiveCellProperty(&quot;language&quot;)
+		sB=fsRetrieveCalcActiveCellProperty(&quot;string&quot;)
+	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
+		sA=fsDrawProperty(&quot;language&quot;)
+		sB=fsDrawProperty(&quot;string&quot;)
+	Else	
+		oVC=oDoc.getCurrentController.getViewCursor			
+		sA=oVC.CharLocale.Language
+		sB=oVC.GetString()
+	Endif
+	&apos;The application&apos;s built in CharLocale.Language property does not identify oriental or complex text locales
+	&apos;See http://www.utf8-chartable.de/
+	If sB=&quot;&quot; Then
+		longI=0
+    Else
+		longI=asc(sB)
+	Endif
+	If longI &gt;=clng(&quot;&amp;H3400&quot;) And longI &lt;=clng(&quot;&amp;H9FFF&quot;) Then
+		If fbHasJaKatakana(sB) Then 
+   		sa=&quot;ja&quot;
+   	Elseif fbHasKoHangul(sB) Then
+   		sA=&quot;ko&quot;
+		Else
+   			sA=&quot;zh&quot;
+   		Endif
+	Elseif longI &gt;=clng(&quot;&amp;H3040&quot;) And longI &lt;=clng(&quot;&amp;H31FF&quot;) Then
+   		sA=&quot;ja&quot;
+   	Elseif longI &gt;=asc(&quot;･&quot;) And longI &lt;=asc(&quot;ﾟ&quot;) Then
+   		sA=&quot;ja&quot;
+   	Elseif longI &gt;=clng(&quot;&amp;HAC00&quot;) And longI &lt;=clng(&quot;&amp;HD7A3&quot;) Then
+   		sA=&quot;ko&quot;
+  	Elseif longI &gt;=clng(&quot;&amp;HFFA0&quot;) And longI &lt;=clng(&quot;&amp;HFFDC&quot;) Then
+   		sA=&quot;ko&quot;
+ 	Elseif longI &gt;=clng(&quot;&amp;H0600&quot;) And longI &lt;=clng(&quot;&amp;H06FF&quot;) Then
+		If fbHasFarsi(sB) Then 
+   			sA=&quot;fa&quot;
+   		Else
+   			sA=&quot;ar&quot;
+   		Endif
+   	Elseif longI &gt;=clng(&quot;&amp;H0900&quot;) And longI &lt;=clng(&quot;&amp;H0972&quot;) Then
+   		sA=&quot;hi&quot; &apos; Devanagari script is probably Hindi - but we should test further 
+   	Elseif longI &gt;=clng(&quot;&amp;H0E00&quot;) And longI &lt;=clng(&quot;&amp;H0E7F&quot;) Then
+   		sA=&quot;th&quot; &apos; Thai language - no voice For Google Translate
+   	Elseif longI &gt;=clng(&quot;&amp;H0591&quot;) And longI &lt;=clng(&quot;&amp;H05F4&quot;) Then
+   		sA=&quot;he&quot; &apos; Hebrew - no voice For Google Translate
+   	Elseif longI &gt;=clng(&quot;&amp;H0A00&quot;) And longI &lt;=clng(&quot;&amp;H0AFF&quot;) Then
+   		sA=&quot;pa&quot; &apos; Gurmukhi script is probably Punjabi - No Google translate support
+   	Else &apos;western
+		&apos;accept locale
+	Endif
+	If sA=&quot;zxx&quot; Then &apos;undefined language - use system default
+		sA=fsGetLanguage
+	Endif
+	fsSelectionLanguage=sA
+	Exit Function
+	SELECTLANGUAGEERROR:
+	fsSelectionLanguage=fsGetLanguage
+End Function
+
+Function fbHasJaKatakana(sA) As Boolean
+	Dim sB,sC,nB,nC,n2
+	fbHasJaKatakana=False
+	sB=&quot;のカサタナハマヤラワキクケコシスセソチツテトニヌネノヒフヘホミムメモユヨリルレロヰヱヲ&quot;
+	nB=Len(sB)
+	sA=Left(sA,99)
+	For n2=1 To nB
+		nC=Instr(sB,n2)
+		sC=Mid(sB,n2,1)
+		If Instr(sA,sC)&lt;&gt;0 Then
+			fbHasJaKatakana=True
+			Exit For
+		Endif	
+	Next
+End Function
+
+Function fbHasKoHangul(sA) As Boolean
+	Dim sB,sC,nB,nC,n2
+	fbHasKoHangul=False
+	sB=&quot;ㅇㄱㄴㄷㄹㅁㅂㅅㅈㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ&quot;
+	nB=Len(sB)
+	sA=Left(sA,99)
+	For n2=1 To nB
+		nC=Instr(sB,n2)
+		sC=Mid(sB,n2,1)
+		If Instr(sA,sC)&lt;&gt;0 Then
+			fbHasKoHangul=True
+			Exit For
+		Endif	
+	Next
+End Function
+
+Function fbHasFarsi(sA) As Boolean
+	&apos;Farsi uses Arabic letter forms; test system language
+	If fsGetLanguage()=&quot;fa&quot; Then
+		fbHasFarsi=True
+	Else
+		fbHasFarsi=False
+	Endif
+End Function
+
+Function fsSelectionCountry As String
+   	Dim oDoc,oVC,sA
+        On Error Goto SELECTREGIONERROR
+	oDoc=ThisComponent
+	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+		sA=fsRetrieveCalcActiveCellProperty(&quot;country&quot;)
+	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
+		sA=fsDrawProperty(&quot;country&quot;)
+	Else
+		oVC=oDoc.getCurrentController.getViewCursor
+		sA=oVC.CharLocale.Country
+	Endif
+	If sA=&quot;&quot; Then &apos;undefined country - use system default
+		sA=fsGetCountry()
+	Endif
+	fsSelectionCountry=sA
+	Exit Function
+	SELECTREGIONERROR:
+	fsSelectionCountry=fsGetCountry()
+End Function
+
+Function fsDrawText() As String
+	&apos;Function To get text selection in a drawing or a presentation slide
+	fsDrawText=fsDrawProperty(&quot;String&quot;)
+End Function
+
+Function fsDrawProperty(strA) As String
+	Dim oDoc As Object
+	Dim oController As Object
+	Dim oSelection As Object
+	Dim s1r As String
+	s1r=&quot;&quot;
+	oDoc=ThisComponent
+	oController=oDoc.getCurrentController()
+	oSelection=oController.getSelection() 
+	If oSelection.supportsService(&quot;com.sun.star.text.TextCursor&quot;) Then
+	Select Case strA
+	Case &quot;country&quot;
+	s1r=oSelection.CharLocale.Country  
+	Case &quot;language&quot;
+	s1r=oSelection.CharLocale.Language  
+	Case Else
+	s1r=oSelection.getString()
+		End Select
+	EndIf
+	fsDrawProperty=s1r
+End Function
+
+Sub MsgSpeak(strA As String)
+	Dim sFile As String
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	Dim config(fiCountConfigOptions) As Variant
+	sFile=fsFullPathOf(fsExtensionSettingsIni)	
+	If fileExists(sFile) Then
+		tts_config_parseFile(sFile,config(),errorCode)
+		ttsActuate(config(),msgs(),errorCode,strA)
+	Else 
+		ConfigureReadTextAloud
+	Endif	
+End Sub
+
+Function fsEscapeStr(sA As String) As String
+	&apos;Examples of custom URL schemes include:
+	&apos; MECARD:N:Appleseed,Johnny;TEL:+14089961010;EMAIL:majordomo@apple.com;URL:http://www.apple.com;NOTE:Tech hardware and software;BDAY:19760401;ADR:,,1 Infinite Loop,Cupertino,CA,95014,USA;;
+	&apos; MEBKM:TITLE:Dartmouth Sportsplex;URL:http://www.dartmouthsportsplex.com/;;
+	&apos; mailto:support@microsoft.com &apos;Mail
+	&apos; tel:+18000000000 &apos; Phone call
+	&apos; sms:+18000000000 &apos; SMS message
+	&apos; http://www.dartmouthsportplex.com &apos; Web
+	&apos; http://maps.google.ca/maps?q=44.6696,-63.5750 &apos; Google Maps
+	&apos; http://www.youtube.com/watch?v=OCARVoZqC-s &apos; Youtube App
+	&apos; feed://sites.google.com/site/readtextextension/home/announcements/posts.xml &apos; Subscription(Apple iOS)
+	&apos; comgoogleearth:// &apos; - Opens Google Earth app with Apple iOS if installed
+	&apos; com-innerfence-ccterminal:// &apos; Longest known string length 26 - Opens Credit Card terminal if installed
+	&apos; The Vcard format is not well supported on the Apple iOS
+	&apos; For more information,see: http://wiki.akosma.com/IPhone_URL_Schemes
+	sA=fsreplaceText(sA,&quot;+&quot;,&quot;%2B&quot;)
+	sA=fsreplaceText(sA,&quot;&amp;&quot;,&quot;%26&quot;)
+	Select Case LCase(Left(ConvertToURL(sA),Instr(ConvertToURL(sA),&quot;:&quot;)))
+	Case &quot;file:&quot;
+		fsEscapeStr=Mid(ConvertToURL(sA),9)
+	Case Else
+		fsEscapeStr=sA
+	End Select
+End Function
+
+Function fsLang As String
+	&apos; Full Language String - en-US en-GB zh-CN zh-TW etc
+	Dim SubstService As Variant
+	SubstService=CreateUnoService(&quot;com.sun.star.util.PathSubstitution&quot;)
+	fsLang=SubstService.substituteVariables(&quot;$(vlang)&quot;,True)
+End Function
+
+Function fsOptDirectory As String
+	If fsGetOS=&quot;WINDOWS&quot; Then
+		fsOptDirectory= fsHomeDrive() &amp; &quot;\opt\&quot;
+	Else
+		fsOptDirectory=&quot;/opt/&quot;
+	Endif
+End Function
+
+Function fsHomeDrive As String
+	fsHomeDrive=Environ(&quot;HOMEDRIVE&quot;)
+	If fsHomeDrive=&quot;&quot; Then
+		If fsGetOS=&quot;WINDOWS&quot; Then
+			fsHomeDrive=&quot;C:&quot;
+		Else
+			fsHomeDrive=&quot;&quot;
+		EndIf
+	Endif
+End Function
+
+Function fsProgramDirectory As String
+	Dim c As String
+	c=Environ(&quot;ProgramFiles&quot;)
+	If Instr(c,&quot;\&quot;) &lt;&gt; 0 Then
+		fsProgramDirectory=c &amp; &quot;\&quot;
+	Else
+		fsProgramDirectory=&quot;/usr/bin/&quot;
+	Endif
+End Function
+
+Function fsProgramDirectoryx86 As String
+	Dim c As String
+	c=Environ(&quot;ProgramFiles(x86)&quot;)
+	If Instr(c,&quot;\&quot;) &lt;&gt; 0 Then
+		fsProgramDirectoryx86=c &amp; &quot;\&quot;
+	Else
+		fsProgramDirectoryx86=&quot;/usr/bin/&quot;
+	Endif
+End Function
+
+Function fsInstallPath As String
+	Dim SubstService As Variant
+	SubstService=CreateUnoService(&quot;com.sun.star.util.PathSubstitution&quot;)
+	fsInstallPath=SubstService.substituteVariables(&quot;$(inst)&quot;,True)
+End Function
+
+Function fbIsAMediaPlayer(s1 As String) As Boolean
+	Dim n As Integer
+	s1=Lcase(s1)
+	fbIsAMediaPlayer=False
+	For n=0 To fiCountMediaPlayers
+		If Instr(s1,fsMediaPlayer(n)) &gt; 0 Then
+			fbIsAMediaPlayer=True
+			Exit For
+		Endif
+	Next
+End Function
+
+Sub myBeep
+	Dim sA As String
+	sA=soundsDirectory()&amp;&quot;apert.wav&quot;
+    sA=convertToURL(sA)
+	Dim oSvc As Object
+	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+	oSvc.execute(sA,&quot;&quot;,1)
+End Sub
+</script:module>
