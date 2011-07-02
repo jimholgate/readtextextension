@@ -1,0 +1,1592 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Indices" script:language="StarBasic">REM  *****  BASIC  *****
+OPTION EXPLICIT
+
+Sub ErrorDisplay
+	&apos; Error message
+	 Msgbox (fsStringLanguage(fiL10nSTRING_CANNOT_BE_ANALYZED,fsGetLanguage()),48, _
+		fsStringLanguage(fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()))
+End Sub
+
+Function fsMyURL As String
+	fsMyURL=fsGetPackageDirURL(&quot;ca.bc.vancouver.holgate.james.readtextextension&quot;)
+End Function
+
+Function fsExtensionVersion As String
+	Dim aFile As String
+	Dim iNumber As Integer
+	Dim sLine As String
+	Dim s1 As String
+	Dim s2 As String
+	s1=fsMyURL &amp; &quot;/description.xml&quot;
+	s2=&quot;&quot;
+	aFile=ConvertFromURL(s1)
+	iNumber=Freefile
+	Open aFile For Input As #iNumber
+	While (s2=&quot;&quot;) And (Not Eof(iNumber))
+		Line Input #iNumber, sLine
+		If Instr (sLine, &quot;&lt;version value=&quot;) &gt; 0 Then
+			s2=sLine
+		Endif
+	Wend
+	Close #iNumber
+	s2=Mid(sLine,Instr(s2,chr(34))+1)
+	fsExtensionVersion=Left(s2,Instr(s2,chr(34))-1)				
+End Function
+
+Function fsPosterPng as String
+	fsPosterPng=fsMyURL &amp; &quot;/images/poster-001.png&quot;
+End Function
+
+Function fsPoster2Png as String
+	fsPoster2Png=fsMyURL &amp; &quot;/images/poster-002.png&quot;
+End Function
+
+Function fsExtensionTitle as String
+	fsExtensionTitle=fsDialogMyRegion(fiL10nADDON_READ_THE_SELECTION)
+End Function
+
+Function fsExtensionLogo as String
+	fsExtensionLogo=fsMyURL &amp; &quot;/images/textToSpeech_64.png&quot;
+End Function
+
+Function fsSpeakerLogo as String
+	fsSpeakerLogo=fsMyURL &amp; &quot;/images/testSound_26.png&quot;
+End Function
+
+Function fsClipBoardLogo as String
+	fsClipboardLogo=fsMyURL &amp; &quot;/images/clipboard_26.png&quot;
+End Function
+
+Function fsSelectionLogo as String
+	fsSelectionLogo=fsMyURL &amp; &quot;/images/textToSpeech_26.png&quot;
+End Function
+
+Function fsLicenseDoc as String
+	Dim s1 As String
+	s1=fsMyURL &amp; &quot;/license/LICENSE&quot;
+	If fileExists (s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()) Then
+		fsLicenseDoc=s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()
+	Elseif fileExists (s1 &amp; &quot;.&quot; &amp; fsGetLanguage()) Then
+		fsLicenseDoc=s1 &amp; &quot;.&quot; &amp; fsGetLanguage()
+	Else
+		fsLicenseDoc=s1
+	Endif
+End Function
+
+Function fsPythonSpdDoc as String
+	fsPythonSpdDoc=fsMyURL &amp; &quot;/python/spd_read_text_file.py&quot;
+End Function
+
+Function fsPythonPicoDoc as String
+	fsPythonPicoDoc=fsMyURL &amp; &quot;/python/pico_read_text_file.py&quot;
+End Function
+
+Function fsPythonEspeakDoc as String
+	fsPythonEspeakDoc=fsMyURL &amp; &quot;/python/espeak_read_text_file.py&quot;
+End Function
+
+Function fsPythonFestivalDoc as String
+	fsPythonFestivalDoc=fsMyURL &amp; &quot;/python/festival_read_text_file.py&quot;
+End Function
+
+Function fsPythonPyttsxDoc as String
+	fsPythonPyttsxDoc=fsMyURL &amp; &quot;/python/pyttsx_read_text_file.py&quot;
+End Function
+
+Function fsPythonOSDoc as String
+	fsPythonOSDoc=fsMyURL &amp; &quot;/python/os.py&quot;
+End Function
+
+Function fsPythonCreateQR as String
+	fsPythonCreateQR=fsMyURL &amp; &quot;/python/create_qr_label.py&quot;
+End Function
+
+Function fsDescriptionDoc as String
+	Dim s1 As String
+	s1=fsMyURL &amp; &quot;/description/component.txt&quot;
+	If fileExists (s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()) Then
+		fsDescriptionDoc=s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()
+	Elseif fileExists (s1 &amp; &quot;.&quot; &amp; fsGetLanguage()) Then
+		fsDescriptionDoc=s1 &amp; &quot;.&quot; &amp; fsGetLanguage()
+	Else
+		fsDescriptionDoc=s1
+	Endif
+End Function
+
+Function fsCopyright as String
+	fsCopyright=fsDialogMyRegion(fiL10nCOPYRIGHT_BY)
+End Function
+
+Function fsFestivalScriptName As String
+	fsFestivalScriptName=&quot;tts_scr.sh&quot;
+End Function
+
+Function fsSapiVoiceListDoc As String
+	fsSapiVoiceListDoc=&quot;tts_sapi_voices_list.txt&quot;
+End Function
+
+Function fsTTSScriptVBS As String
+	fsTTSScriptVBS=fsMyURL &amp; &quot;/script/tts_wscript.vbs&quot;
+End Function
+
+Function fsTTSListVoicesVBS As String
+	fsTTSListVoicesVBS=fsMyURL &amp; &quot;/script/tts_list_voices.vbs&quot;
+End Function
+
+Function fsTemporaryTextDoc As String
+	fsTemporaryTextDoc=&quot;tts_str.txt&quot;
+End Function
+
+Function fsExtensionSettingsIni As String
+	fsExtensionSettingsIni=&quot;ooo_text-to-speech.ini&quot;
+End Function
+
+Function fiFestivalOption As Integer 
+	fiFestivalOption=0
+End Function 
+
+Function fiFestivalPath As Integer
+	fiFestivalPath=1
+End Function 
+
+Function fiFestivalComboChoice As Integer	
+	fiFestivalComboChoice=2
+End Function 
+
+Function fiExternalOption As Integer
+	fiExternalOption=3
+End Function 
+
+Function fiExternalProgramPath As Integer
+	fiExternalProgramPath=4
+End Function 
+
+Function fiExternalCommand As Integer
+	fiExternalCommand=5
+End Function
+
+Function fiAlwaysShowDialogCheckBox As Integer
+	fiAlwaysShowDialogCheckBox=6
+End Function
+
+Function fiDialogLanguageCombo As Integer
+	fiDialogLanguageCombo=7
+End Function
+
+Function fiHtmlOption As Integer
+	fiHtmlOption=8
+End Function
+
+Function fiHtmlComboURL As Integer
+	fiHtmlComboURL=9
+End Function
+
+Function fiCountConfigOptions As Integer
+	&apos;This is the size of the array To hold settings from the configuration file And dialog
+	fiCountConfigOptions=fiHtmlComboURL &apos; this is the last TTS_OPTION item above - an Integer
+End Function
+
+&apos; These definitions help identify the dialog labels in your language
+Function fiL10nADDON_READ_THE_SELECTION As Integer
+	fiL10nADDON_READ_THE_SELECTION=0
+End Function
+Function fiL10nEXTERNAL_PROGRAM As Integer
+	fiL10nEXTERNAL_PROGRAM=1
+End Function
+Function fiL10nUSE_FESTIVAL_WITH_A_SCRIPT As Integer
+	fiL10nUSE_FESTIVAL_WITH_A_SCRIPT=2
+End Function
+Function fiL10nFESTIVAL_SCRIPT_COMMANDS As Integer
+	fiL10nFESTIVAL_SCRIPT_COMMANDS=3
+End Function
+Function fiL10nUSE_EXTERNAL_PROGRAM As Integer
+	fiL10nUSE_EXTERNAL_PROGRAM=4
+End Function
+Function fiL10nCOMMAND_LINE_OPTIONS As Integer
+	fiL10nCOMMAND_LINE_OPTIONS=5
+End Function
+Function fiL10nDISPLAY As Integer
+	fiL10nDISPLAY=6
+End Function
+Function fiL10nALWAYS_SHOW_DIALOG As Integer
+	fiL10nALWAYS_SHOW_DIALOG=7
+End Function
+Function fiL10nABOUT As Integer
+	fiL10nABOUT=8
+End Function
+Function fiL10nCANCEL As Integer
+	fiL10nCANCEL=9
+End Function
+Function fiL10nOK As Integer
+	fiL10nOK=10
+End Function
+Function fiL10nCOMMAND As Integer
+	fiL10nCOMMAND=11
+End Function
+Function fiL10nSCRIPT As Integer
+	fiL10nSCRIPT=12
+End Function
+Function fiL10nCOPYRIGHT_BY As Integer
+	fiL10nCOPYRIGHT_BY=13
+End Function
+Function fiL10nTEST As Integer
+	fiL10nTEST=14
+End Function
+Function fiL10nCOULD_NOT_LOCATE_THE_PROGRAM As Integer
+	fiL10nCOULD_NOT_LOCATE_THE_PROGRAM=15
+End Function
+Function fiL10nSTRING_CANNOT_BE_ANALYZED As Integer
+	fiL10nSTRING_CANNOT_BE_ANALYZED=16
+End Function
+
+Function fiL10nGET_HELP_ONLINE As Integer
+	fiL10nGET_HELP_ONLINE=17
+End Function
+
+Function fiL10nHELP_ONLINE_URL As Integer
+	fiL10nHELP_ONLINE_URL=18
+End Function
+
+Function fiL10nREAD_THE_SELECTION_WITH_HTML As Integer
+	fiL10nREAD_THE_SELECTION_WITH_HTML=19
+End Function
+&apos; Configuration file  uses these strings As keys
+
+Function fsKeyUSE_FESTIVAL_BOOLEAN  As String 
+	fsKeyUSE_FESTIVAL_BOOLEAN=&quot;text-To-speech.use.festival.boolean&quot;
+End Function 
+
+Function fsKeyFESTIVAL_PATH_STRING As String
+	fsKeyFESTIVAL_PATH_STRING=&quot;text-To-speech.festival.path.String&quot;
+End Function 
+
+Function fsKeyFESTIVAL_SCRIPT_STRING As String	
+	fsKeyFESTIVAL_SCRIPT_STRING=&quot;text-To-speech.festival.script.String&quot;
+End Function 
+
+Function fsKeyUSE_ESPEAK_BOOLEAN As String
+	fsKeyUSE_ESPEAK_BOOLEAN=&quot;text-To-speech.use.espeak.boolean&quot;
+End Function 
+
+Function fsKeyESPEAK_PATH_STRING As String
+	fsKeyESPEAK_PATH_STRING=&quot;text-To-speech.espeak.path.String&quot;
+End Function 
+
+Function fsKeyESPEAK_COMMANDS_STRING As String
+	fsKeyESPEAK_COMMANDS_STRING=&quot;text-To-speech.espeak.options.String&quot;
+End Function
+
+Function fsKeyDISPLAY_INFO_INTEGER As String
+	fsKeyDISPLAY_INFO_INTEGER=&quot;text-To-speech.display.info.Integer&quot;
+End Function
+
+Function fsKeyDISPLAY_LANGUAGE_STRING As String
+	fsKeyDISPLAY_LANGUAGE_STRING=&quot;text-To-speech.display.language.String&quot;
+End Function
+
+Function fsKeyUSE_HTML_BOOLEAN As String
+	fsKeyUSE_HTML_BOOLEAN=&quot;text-To-speech.use.html.boolean&quot;
+End Function 
+
+Function fsKeyHTML_STRING As String
+	fsKeyHTML_STRING=&quot;text-To-speech.html.String&quot;
+End Function 
+
+Function fsGetCountry() As String
+	fsGetCountry=fsGetSetting(&quot;country&quot;)
+End Function
+
+Function fsGetLanguage() As String
+	fsGetLanguage=fsGetSetting(&quot;language&quot;)
+End Function
+
+Function fsGetOS() As String     
+	  Select Case getGUIType
+	  Case 1: 
+	    fsGetOS=&quot;WINDOWS&quot;
+	  Case 3: 
+	    fsGetOS=&quot;MAC&quot;
+	  Case 4: 
+	    If Instr(Environ(&quot;URE_BOOTSTRAP&quot;),&quot;MacOS&quot;)&lt;&gt;0 Then &apos; aka uname Darwin
+			fsGetOS=&quot;OSX&quot;  
+	    Else
+			fsGetOS=&quot;UNIX&quot;
+	    Endif
+	  Case Else
+		fsGetOS=&quot;UNKNOWN&quot;	  
+	  End Select
+End Function
+
+Function fsGetSetting(sA) As String
+	GlobalScope.BasicLibraries.LoadLibrary(&quot;Tools&quot;)
+	Dim oProdNameAccess As Object
+	oProdNameAccess=GetRegistryKeyContent(&quot;org.openoffice.Setup/Product&quot;)
+    Select Case Lcase(sA)
+    Case &quot;language&quot;
+		fsGetSetting=GetStarOfficeLocale().language
+	Case &quot;country&quot;
+		fsGetSetting=GetStarOfficeLocale().country
+	Case &quot;ooname&quot;
+		fsGetSetting=oProdNameAccess.getByName(&quot;ooName&quot;)
+	Case &quot;ooversion&quot;,&quot;oosetupversion&quot;
+		fsGetSetting=oProdNameAccess.getByName(&quot;ooSetupVersion&quot;)
+	Case Else
+		fsGetSetting=&quot;???&quot;
+	End Select
+End Function
+
+Function fsDisplayLanguage As String
+    On Error Goto DISPLAYLANGUAGEERROR
+	Select Case f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text
+	Case &quot;&quot;, &quot;...&quot;, &quot;Default&quot;, &quot;default&quot;
+		fsDisplayLanguage=fsGetLanguage()
+	Case Else
+		fsDisplayLanguage=f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text
+	End Select
+	Exit Function
+	DISPLAYLANGUAGEERROR:
+	fsDisplayLanguage=fsGetLanguage()
+End Function
+
+Function fsDialogMyRegion (i As Integer) As String
+	fsDialogMyRegion=fsStringLanguage (i, fsDisplayLanguage())
+End Function
+
+Function fsDialogSysRegion (i As Integer) As String
+	fsDialogMyRegion=fsStringLanguage (i, fsGetLanguage())
+End Function
+
+Function fsMediaPlayer(i As Integer) As String
+	Dim sMedia(fiCountMediaPlayers) As String
+	sMedia(0)=&quot;/usr/bin/bangarang&quot;
+	sMedia(1)=&quot;/usr/bin/exaile&quot;
+	sMedia(2)=&quot;/usr/bin/ffplay&quot;
+	sMedia(3)=&quot;/usr/bin/gmplayer&quot;
+	sMedia(4)=&quot;/usr/bin/gnome-open&quot;
+	sMedia(5)=&quot;/usr/bin/kaffeine&quot;
+	sMedia(6)=&quot;/usr/bin/kde-open&quot;
+	sMedia(7)=&quot;/usr/bin/kplayer&quot;
+	sMedia(8)=&quot;/usr/bin/mpg123&quot;
+	sMedia(9)=&quot;/usr/bin/mpg321&quot;
+	sMedia(10)=&quot;/usr/bin/mplayer&quot;
+	sMedia(11)=&quot;/usr/bin/noatun&quot;
+	sMedia(12)=&quot;/usr/bin/parole&quot;
+	sMedia(13)=&quot;/usr/bin/sensible-browser&quot;
+	sMedia(14)=&quot;/usr/bin/totem&quot;
+	sMedia(15)=&quot;/usr/bin/xdg-open&quot;
+	sMedia(16)=&quot;/usr/bin/xfmedia&quot;
+	sMedia(17)=&quot;/usr/bin/xine&quot;
+	sMedia(18)=&quot;/usr/bin/xmms&quot;
+	sMedia(19)=&quot;audacity&quot;
+	sMedia(20)=&quot;chrome&quot;
+	sMedia(21)=&quot;chromium&quot;
+	sMedia(22)=&quot;firefox&quot;
+	sMedia(23)=&quot;iceweasel&quot;
+	sMedia(24)=&quot;iexplore&quot;
+	sMedia(25)=&quot;opera&quot;
+	sMedia(26)=&quot;quicktimeplayer.exe&quot;
+	sMedia(27)=&quot;vlc&quot;
+	sMedia(28)=&quot;winamp&quot;
+	sMedia(29)=&quot;wmplayer&quot;
+    fsMediaPlayer=Lcase(sMedia(i))
+End Function
+
+Function fiCountMediaPlayers As Integer
+	fiCountMediaPlayers=29
+End Function
+
+Function fsSubStringToRight(x,y)
+	While Instr (x,y)
+		x=Right((x),Len(x)-Instr(x,y),Len(x))
+	Wend
+	fsSubStringToRight=x 
+end Function
+
+Function fsFestivalVoice(n)
+	Dim x as String
+	&apos;Linux, OSX
+	x=fsSubStringToRight(fsFestivalDirectory(n),&quot;/&quot;)
+	&apos;Windows
+	x=fsSubStringToRight(x,&quot;\&quot;)
+	fsFestivalVoice=x
+end Function
+
+Function fsFestivalDirectory(n) As String
+	Dim s2 as String
+	Dim s4 as String
+	Dim s1(fiCountFestivalDirectory) as String
+	s2=&quot;/usr/share/festival/&quot;
+	If fileExists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
+		s4=fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;
+	Else
+		s4=fsProgramDirectory &amp; &quot;Festival\voices\&quot;
+	EndIf
+	&apos; List of voices retrieved 2011-03-25 from 
+	&apos; http://www.cstr.ed.ac.uk/projects/festival/manual/festival_24.html
+	&apos; Incorrectly installed voices will be silent. Some instructions on 
+	&apos; the web for installing mbrola voices need to be updated to work  
+	&apos; with the latest version of Festival.
+	Select Case fsGetOS()
+	Case &quot;WINDOWS&quot;
+		s1(0)=s4 &amp; &quot;voices\telugu\telugu_NSK_diphone&quot;
+		s1(1)=s4 &amp; &quot;voices\spanish\el_diphone&quot;
+		s1(2)=s4 &amp; &quot;voices\russian\msu_ru_nsh_clunits&quot;
+		s1(3)=s4 &amp; &quot;voices\marathi\marathi_NSK_diphone&quot;
+		s1(4)=s4 &amp; &quot;voices\italian\pc_diphone&quot;
+		s1(5)=s4 &amp; &quot;voices\italian\lp_diphone&quot;	
+		s1(6)=s4 &amp; &quot;voices\hindi\hindi_NSK_diphone&quot;
+		s1(7)=s4 &amp; &quot;voices\german\german_de2_os&quot;
+		s1(8)=s4 &amp; &quot;voices\finnish\suo_fi_mv_diphone&quot;	
+		s1(9)=s4 &amp; &quot;voices\finnish\suo_fi_lj_diphone&quot;
+		s1(10)=s4 &amp; &quot;voices\english\us3_mbrola&quot;
+		s1(11)=s4 &amp; &quot;voices\english\us2_mbrola&quot;
+		s1(12)=s4 &amp; &quot;voices\english\us1_mbrola&quot;
+		s1(13)=s4 &amp; &quot;voices\english\rab_diphone&quot;
+		s1(14)=s4 &amp; &quot;voices\english\ked_diphone&quot;
+		s1(15)=s4 &amp; &quot;voices\english\kal_diphone&quot;
+		s1(16)=s4 &amp; &quot;voices\english\gsw_diphone&quot;
+		s1(17)=s4 &amp; &quot;voices\english\en1_mbrola&quot;
+		s1(18)=s4 &amp; &quot;voices\english\don_diphone&quot;
+		s1(19)=s4 &amp; &quot;voices\czech\czech_ph&quot;
+		s1(20)=s4 &amp; &quot;voices\castilian\el_diphone&quot;
+		s1(21)=s4 &amp; &quot;lib\voices\english\us3_mbrola&quot;
+		s1(22)=s4 &amp; &quot;lib\voices\english\us2_mbrola&quot;
+		s1(23)=s4 &amp; &quot;lib\voices\english\us1_mbrola&quot;
+		s1(24)=s4 &amp; &quot;lib\voices\english\en1_mbrola&quot;
+		s1(25)=s4 &amp; &quot;voices\vietnamese\wow_vi_ptn_diphone&quot;
+		s1(26)=s4 &amp; &quot;voices\vietnamese\wow_vi_liz_diphone&quot;
+	Case Else
+		s1(0)=s2 &amp; &quot;voices/telugu/telugu_NSK_diphone&quot;
+		s1(1)=s2 &amp; &quot;voices/spanish/el_diphone&quot;
+		s1(2)=s2 &amp; &quot;voices/russian/msu_ru_nsh_clunits&quot;
+		s1(3)=s2 &amp; &quot;voices/marathi/marathi_NSK_diphone&quot;
+		s1(4)=s2 &amp; &quot;voices/italian/pc_diphone&quot;
+		s1(5)=s2 &amp; &quot;voices/italian/lp_diphone&quot;
+		s1(6)=s2 &amp; &quot;voices/hindi/hindi_NSK_diphone&quot;
+		s1(7)=s2 &amp; &quot;voices/german/german_de2_os&quot;
+		s1(8)=s2 &amp; &quot;voices/finnish/suo_fi_mv_diphone&quot;
+		s1(9)=s2 &amp; &quot;voices/finnish/suo_fi_lj_diphone&quot;
+		s1(10)=s2 &amp; &quot;voices/english/us3_mbrola&quot;
+		s1(11)=s2 &amp; &quot;voices/english/us2_mbrola&quot;
+		s1(12)=s2 &amp; &quot;voices/english/us1_mbrola&quot;
+		s1(13)=s2 &amp; &quot;voices/english/rab_diphone&quot;
+		s1(14)=s2 &amp; &quot;voices/english/ked_diphone&quot;
+		s1(15)=s2 &amp; &quot;voices/english/kal_diphone&quot;
+		s1(16)=s2 &amp; &quot;voices/english/gsw_diphone&quot;
+		s1(17)=s2 &amp; &quot;voices/english/en1_mbrola&quot;
+		s1(18)=s2 &amp; &quot;voices/english/don_diphone&quot;
+		s1(19)=s2 &amp; &quot;voices/czech/czech_ph&quot;
+		s1(20)=s2 &amp; &quot;voices/castilian/el_diphone&quot;
+		s1(21)=s2 &amp; &quot;lib/voices/english/us3_mbrola&quot;
+		s1(22)=s2 &amp; &quot;lib/voices/english/us2_mbrola&quot;
+		s1(23)=s2 &amp; &quot;lib/voices/english/us1_mbrola&quot;
+		s1(24)=s2 &amp; &quot;lib/voices/english/en1_mbrola&quot;
+		s1(25)=s4 &amp; &quot;voices/vietnamese/wow_vi_ptn_diphone&quot;
+		s1(26)=s4 &amp; &quot;voices/vietnamese/wow_vi_liz_diphone&quot;
+	End Select
+	fsFestivalDirectory=s1(n)
+end Function
+
+Function fiCountFestivalDirectory as Integer
+	fiCountFestivalDirectory=26
+End Function
+
+Function fsGetEspeakMbrolaLanguage(i As Integer, j As Integer) As String
+	&apos;Values for j
+	&apos;1 is mbrola voice file name
+	&apos;2 is language and country code
+	&apos; See http://www.loc.gov/standards/iso639-2/php/English_list.php
+	&apos; and http://www.iso.org/iso/english_country_names_and_code_elements
+	&apos;3 is gender
+	&apos;4 is name of voice in English
+	Dim s(fiCountEspeakMbrolaLanguage(), 4)
+	s(0,1)=&quot;vz1&quot;
+	s(0,2)=&quot;es-VE&quot;
+	s(0,3)=&quot;male&quot;
+	s(0,4)=&quot;Venezuelan Spanish 1&quot;
+	s(1,1)=&quot;us3&quot;
+	s(1,2)=&quot;en-US&quot;
+	s(1,3)=&quot;male&quot;
+	s(1,4)=&quot;American English 3&quot;
+	s(2,1)=&quot;us2&quot;
+	s(2,2)=&quot;en-US&quot;
+	s(2,3)=&quot;male&quot;
+	s(2,4)=&quot;American English 2&quot;
+	s(3,1)=&quot;us1&quot;
+	s(3,2)=&quot;en-US&quot;
+	s(3,3)=&quot;female&quot;
+	s(3,4)=&quot;American English 1&quot;
+	s(4,1)=&quot;tr2&quot;
+	s(4,2)=&quot;tr-TR&quot;
+	s(4,3)=&quot;female&quot;
+	s(4,4)=&quot;Turkish 2&quot;
+	s(5,1)=&quot;tr1&quot;
+	s(5,2)=&quot;tr-TR&quot;
+	s(5,3)=&quot;male&quot;
+	s(5,4)=&quot;Turkish 1&quot;
+	s(6,1)=&quot;sw2&quot;
+	s(6,2)=&quot;sv-SE&quot;
+	s(6,3)=&quot;female&quot;
+	s(6,4)=&quot;Swedish 2&quot;
+	s(7,1)=&quot;sw1&quot;
+	s(7,2)=&quot;sv-SE&quot;
+	s(7,3)=&quot;male&quot;
+	s(7,4)=&quot;Swedish 1&quot;
+	s(8,1)=&quot;ro1&quot;
+	s(8,2)=&quot;ro-RO&quot;
+	s(8,3)=&quot;male&quot;
+	s(8,4)=&quot;Romanian 1&quot;
+	s(9,1)=&quot;pt1&quot;
+	s(9,2)=&quot;pt-PT&quot;
+	s(9,3)=&quot;female&quot;
+	s(9,4)=&quot;European Portuguese 1&quot;
+	s(10,1)=&quot;pl1&quot;
+	s(10,2)=&quot;en-us&quot;
+	s(10,3)=&quot;female&quot;
+	s(10,4)=&quot;Polish 1&quot;
+	s(11,1)=&quot;nl3&quot;
+	s(11,2)=&quot;nl-NL&quot;
+	s(11,3)=&quot;female&quot;
+	s(11,4)=&quot;Dutch 3&quot;
+	s(12,1)=&quot;nl2&quot;
+	s(12,2)=&quot;nl-NL&quot;
+	s(12,3)=&quot;male&quot;
+	s(12,4)=&quot;Dutch 1&quot;
+	s(13,1)=&quot;nl1&quot;
+	s(13,2)=&quot;nl-NL&quot;
+	s(13,3)=&quot;male&quot;
+	s(13,4)=&quot;Dutch 2&quot;
+	s(14,1)=&quot;mx2&quot;
+	s(14,2)=&quot;es-MX&quot;
+	s(14,3)=&quot;male&quot;
+	s(14,4)=&quot;Mexican Spanish 2&quot;
+	s(15,1)=&quot;mx1&quot;
+	s(15,2)=&quot;es-MX&quot;
+	s(15,3)=&quot;male&quot;
+	s(15,4)=&quot;Mexican Spanish 1&quot;
+	s(16,1)=&quot;la1&quot;
+	s(16,2)=&quot;la-IT&quot;
+	s(16,3)=&quot;male&quot;
+	s(16,4)=&quot;Classical Latin 1&quot;
+	s(17,1)=&quot;it4&quot;
+	s(17,2)=&quot;it-IT&quot;
+	s(17,3)=&quot;female&quot;
+	s(17,4)=&quot;Italian 4&quot;
+	s(18,1)=&quot;it3&quot;
+	s(18,2)=&quot;it-IT&quot;
+	s(18,3)=&quot;male&quot;
+	s(18,4)=&quot;Italian 3&quot;
+	s(19,1)=&quot;it2&quot;
+	s(19,2)=&quot;it-IT&quot;
+	s(19,3)=&quot;female&quot;
+	s(19,4)=&quot;Italian 2&quot;
+	s(20,1)=&quot;it1&quot;
+	s(20,2)=&quot;it-IT&quot;
+	s(20,3)=&quot;male&quot;
+	s(20,4)=&quot;Italian 1&quot;
+	s(21,1)=&quot;in2&quot;
+	s(21,2)=&quot;hi-IN&quot;
+	s(21,3)=&quot;female&quot;
+	s(21,4)=&quot;Hindi 2&quot;
+	s(22,1)=&quot;in1&quot;
+	s(22,2)=&quot;hi-IN&quot;
+	s(22,3)=&quot;male&quot;
+	s(22,4)=&quot;Hindi 1&quot;
+	s(23,1)=&quot;id1&quot;
+	s(23,2)=&quot;en-us&quot;
+	s(23,3)=&quot;male&quot;
+	s(23,4)=&quot;Indonesian 1&quot;
+	s(24,1)=&quot;hu1&quot;
+	s(24,2)=&quot;en-us&quot;
+	s(24,3)=&quot;female&quot;
+	s(24,4)=&quot;Hungarian 1&quot;
+	s(25,1)=&quot;gr2&quot;
+	s(25,2)=&quot;he-GR&quot;
+	s(25,3)=&quot;male&quot;
+	s(25,4)=&quot;Greek 2&quot;
+	s(26,1)=&quot;gr1&quot;
+	s(26,2)=&quot;he-GR&quot;
+	s(26,3)=&quot;male&quot;
+	s(26,4)=&quot;Greek 1&quot;
+	s(27,1)=&quot;fr7&quot;
+	s(27,2)=&quot;fr-FR&quot;
+	s(27,3)=&quot;male&quot;
+	s(27,4)=&quot;French 7&quot;
+	s(28,1)=&quot;fr6&quot;
+	s(28,2)=&quot;fr-FR&quot;
+	s(28,3)=&quot;male&quot;
+	s(28,4)=&quot;French 6&quot;
+	s(29,1)=&quot;fr5&quot;
+	s(29,2)=&quot;fr-FR&quot;
+	s(29,3)=&quot;male&quot;
+	s(29,4)=&quot;French 5&quot;
+	s(30,1)=&quot;fr4&quot;
+	s(30,2)=&quot;fr-FR&quot;
+	s(30,3)=&quot;female&quot;
+	s(30,4)=&quot;French 4&quot;
+	s(31,1)=&quot;fr3&quot;
+	s(31,2)=&quot;fr-FR&quot;
+	s(31,3)=&quot;male&quot;
+	s(31,4)=&quot;French 3&quot;
+	s(32,1)=&quot;fr2&quot;
+	s(32,2)=&quot;fr-FR&quot;
+	s(32,3)=&quot;female&quot;
+	s(32,4)=&quot;French 2&quot; 
+	s(33,1)=&quot;fr1&quot;
+	s(33,2)=&quot;fr-FR&quot;
+	s(33,3)=&quot;male&quot;
+	s(33,4)=&quot;French 1&quot;
+	s(34,1)=&quot;es4&quot;
+	s(34,2)=&quot;es-ES&quot;
+	s(34,3)=&quot;male&quot;
+	s(34,4)=&quot;Spanish 4&quot;
+	s(35,1)=&quot;es2&quot;
+	s(35,2)=&quot;es-ES&quot;
+	s(35,3)=&quot;male&quot;
+	s(35,4)=&quot;Spanish 2&quot; 
+	s(36,1)=&quot;es1&quot;
+	s(36,2)=&quot;es-ES&quot;
+	s(36,3)=&quot;male&quot;
+	s(36,4)=&quot;Spanish 1&quot;
+	s(37,1)=&quot;en1&quot;
+	s(37,2)=&quot;en-GB&quot;
+	s(37,3)=&quot;male&quot;
+	s(37,4)=&quot;British English 1&quot;
+	s(38,1)=&quot;de8&quot;
+	s(38,2)=&quot;de-DE&quot;
+	s(38,3)=&quot;male&quot;
+	s(38,4)=&quot;German 8&quot;
+	s(39,1)=&quot;de7&quot;
+	s(39,2)=&quot;de-DE&quot;
+	s(39,3)=&quot;female&quot;
+	s(39,4)=&quot;German 7&quot;
+	s(40,1)=&quot;de6&quot;
+	s(40,2)=&quot;de-DE&quot;
+	s(40,3)=&quot;male&quot;
+	s(40,4)=&quot;German 6&quot;
+	s(41,1)=&quot;de5&quot;
+	s(41,2)=&quot;de-DE&quot;
+	s(41,3)=&quot;female&quot;
+	s(41,4)=&quot;German 5&quot;
+	s(42,1)=&quot;de4&quot;
+	s(42,2)=&quot;de-DE&quot;
+	s(42,3)=&quot;male&quot;
+	s(42,4)=&quot;German 4&quot;
+	s(43,1)=&quot;de3&quot;
+	s(43,2)=&quot;de-DE&quot;
+	s(43,3)=&quot;female&quot;
+	s(43,4)=&quot;German 3&quot;
+	s(44,1)=&quot;de2&quot;
+	s(44,2)=&quot;de-DE&quot;
+	s(44,3)=&quot;male&quot;
+	s(44,4)=&quot;German 2&quot;
+	s(45,1)=&quot;de1&quot;
+	s(45,2)=&quot;de-DE&quot;
+	s(45,3)=&quot;male&quot;
+	s(45,4)=&quot;German-Bavarian 1&quot;
+	s(46,1)=&quot;cz2&quot;
+	s(46,2)=&quot;cs-CZ&quot;
+	s(46,3)=&quot;male&quot;
+	s(46,4)=&quot;Czech 2&quot;
+	s(47,1)=&quot;cz1&quot;
+	s(47,2)=&quot;cs-CZ&quot;
+	s(47,3)=&quot;female&quot;
+	s(47,4)=&quot;Czech 1&quot;
+	s(48,1)=&quot;ca2&quot;
+	s(48,2)=&quot;fr-CA&quot;
+	s(48,3)=&quot;male&quot;
+	s(48,4)=&quot;Canadian French 2&quot;
+	s(49,1)=&quot;ca1&quot;
+	s(49,2)=&quot;fr-CA&quot;
+	s(49,3)=&quot;male&quot;
+	s(49,4)=&quot;Canadian French 1&quot;
+	s(50,1)=&quot;br4&quot;
+	s(50,2)=&quot;pt-BR&quot;
+	s(50,3)=&quot;male&quot;
+	s(50,4)=&quot;Brazilian Portuguese 4&quot;
+	s(51,1)=&quot;br3&quot;
+	s(51,2)=&quot;pt-BR&quot;
+	s(51,3)=&quot;male&quot;
+	s(51,4)=&quot;Brazilian Portuguese 3&quot;
+	s(52,1)=&quot;br1&quot;
+	s(52,2)=&quot;pt-BR&quot;
+	s(52,3)=&quot;male&quot;
+	s(52,4)=&quot;Brazilian Portuguese 2&quot;
+	s(53,1)=&quot;af1&quot;
+	s(53,2)=&quot;af-ZA&quot;
+	s(53,3)=&quot;male&quot;
+	s(53,4)=&quot;Afrikaans 1&quot;
+	fsGetEspeakMbrolaLanguage=s(i,j)
+End Function
+
+Function fiCountEspeakMbrolaLanguage
+	fiCountEspeakMbrolaLanguage=53
+End Function
+
+Function fsStringLanguage(i As Integer, b As String) As String
+	Dim sL10N(20) As String
+	Select Case b
+	Case &quot;af&quot; &apos;Afrikaans
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Eksterne program&quot;
+		sL10N(2)=&quot;Gebruik Festival met &apos;n script&quot;
+		sL10N(3)=&quot;Script opdragte&quot;
+		sL10N(4)=&quot;Lees met &apos;n eksterne program&quot;
+		sL10N(5)=&quot;Commandoregel opsies&quot;
+		sL10N(6)=&quot;Vertoon&quot;
+		sL10N(7)=&quot;Wys altyd hierdie dialoog&quot;
+		sL10N(8)=&quot;About &quot;
+		sL10N(9)=&quot;Kanselleer&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Command&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Toets&quot;
+		sL10N(15)=&quot;Kon nie die program.&quot;
+		sL10N(16)=&quot;String kan nie ontleed word!&quot;
+		sL10N(17)=&quot;On-line help&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Vertaal en lees met web tools&quot;
+	Case &quot;bg&quot; &apos;Bulgarian
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Външната програма&quot;
+		sL10N(2)=&quot;Използване на фестивал с ръкопис&quot;
+		sL10N(3)=&quot;Script команди&quot;
+		sL10N(4)=&quot;Чете се с външна програма&quot;
+		sL10N(5)=&quot;Команден ред възможности&quot;
+		sL10N(6)=&quot;Покажи&quot;
+		sL10N(7)=&quot;Винаги показвай този диалогов прозорец&quot;
+		sL10N(8)=&quot;За&quot;
+		sL10N(9)=&quot;Отказ&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;управление&quot;
+		sL10N(12)=&quot;Скрипт&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Тест&quot;
+		sL10N(15)=&quot;Не може да намерите на програмата.&quot;
+		sL10N(16)=&quot;String не може да се анализира!&quot;
+		sL10N(17)=&quot;Он-лайн помощ&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Превод и четат с уеб инструменти&quot;
+	Case &quot;ca&quot; &apos;Catalan
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Programa extern&quot;
+		sL10N(2)=&quot;Utilitza Festival amb una seqüència de comandaments&quot;
+		sL10N(3)=&quot;Script comandaments&quot;
+		sL10N(4)=&quot;Llegir amb un programa extern&quot;
+		sL10N(5)=&quot;Opcions de línia de comandaments&quot;
+		sL10N(6)=&quot;Mostra&quot;
+		sL10N(7)=&quot;Mostra sempre aquest quadre de diàleg&quot;
+		sL10N(8)=&quot;Informació&quot;
+		sL10N(9)=&quot;Cancel&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Comando&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Prova&quot;
+		sL10N(15)=&quot;No s&apos;ha pogut localitzar el programa.&quot;
+		sL10N(16)=&quot;La cadena no pot ser analitzat!&quot;
+		sL10N(17)=&quot;Ajuda en línia&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Traduir i llegir amb eines de la web&quot;
+	Case &quot;cs&quot; &apos;Czech
+		sL10N(0)=&quot;Read Text&quot; 
+		sL10N(1)=&quot;Externí program&quot; 
+		sL10N(2)=&quot;Použít Festival s skript&quot; 
+		sL10N(3)=&quot;Script příkazy&quot; 
+		sL10N(4)=&quot;Čtení s vnějším program &quot;
+		sL10N(5)=&quot;Parametry příkazové řádky &quot;
+		sL10N(6)=&quot;Zobrazit &quot;
+		sL10N(7)=&quot;Vždy zobrazit toto dialogové okno &quot;
+		sL10N(8)=&quot;O&quot;
+		sL10N(9)=&quot;Zrušit &quot;
+		sL10N(10)=&quot;OK&quot; 
+		sL10N(11)=&quot;Příkaz&quot; 
+		sL10N(12)=&quot;Script&quot; 
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot; 
+		sL10N(14)=&quot;Test&quot; 
+		sL10N(15)=&quot;Nelze najít programu.&quot;
+		sL10N(16)=&quot;Řetězec nelze analyzovat!&quot;
+		sL10N(17)=&quot;On-line help&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Přeložit a ve spojení s webovou nástroje&quot;
+	Case &quot;da&quot; &apos;Danish
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Eksternt program&quot;
+		sL10N(2)=&quot;Brug Festival med et script&quot;
+		sL10N(3)=&quot;Script commands&quot;
+		sL10N(4)=&quot;Læs med et eksternt program&quot;
+		sL10N(5)=&quot;Kommandlinjetilvalg&quot;
+		sL10N(6)=&quot;Display&quot;
+		sL10N(7)=&quot;Vis altid denne dialog&quot;
+		sL10N(8)=&quot;Om&quot;
+		sL10N(9)=&quot;Cancel&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Command&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Kunne ikke finde programmet.&quot;
+		sL10N(16)=&quot;String ikke kan analyseres!&quot;
+		sL10N(17)=&quot;On-line hjælp&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Oversæt og læs med web værktøjer&quot;
+	Case &quot;de&quot; &apos; Includes German translations provided by Eugene Seidel
+		&apos; &quot;Read Text&quot; %READ_TEXT%
+		&apos; &quot;Über Read Text&quot; %ABOUT_READ_TEXT%
+		&apos; &quot;Markierten Text vorlesen&quot; %READ_SELECTION%
+		&apos; &quot;Zwischenablage vorlesen&quot; %READ_CLIPBOARD%
+		sL10N(0)=&quot;Read Text&quot; 
+		sL10N(1)=&quot;Externes Programm&quot; &apos; &quot;External program&quot;
+		sL10N(2)=&quot;Festival mit Script verwenden&quot; &apos; &quot;Use Festival with a script&quot;
+		sL10N(3)=&quot;Script-Befehle&quot; &apos; &quot;Script commands&quot;
+		sL10N(4)=&quot;Vorlesen mit externem Programm&quot; &apos; &quot;Read with an external program&quot;
+		sL10N(5)=&quot;Befehlszeilen-Optionen&quot; &apos; &quot;Command line options&quot;
+		sL10N(6)=&quot;Anzeigen&quot; &apos; &quot;Display&quot;
+		sL10N(7)=&quot;Diesen Dialog immer zeigen&quot; &apos; &quot;Always show this dialog&quot;
+		sL10N(8)=&quot;Info&quot; &apos; &quot;About&quot;
+		sL10N(9)=&quot;Abbrechen&quot; &apos; &quot;Cancel&quot;
+		sL10N(10)=&quot;OK&quot; &apos; &quot;OK&quot;
+		sL10N(11)=&quot;Befehl&quot; &apos; &quot;Command&quot; &apos;For &quot;Browse&quot;, the German is &quot;Durchsuchen&quot;
+		sL10N(12)=&quot;Script&quot; &apos; &quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot; &apos; &quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot; &apos; &quot;Test&quot;
+		sL10N(15)=&quot;Programm nicht auffindbar.&quot; &apos; &quot;Could not locate the program. &quot;
+		sL10N(16)=&quot;Zeichenkette kann nicht analysiert werden!&quot; &apos; &quot;String cannot be analyzed!&quot;
+		sL10N(17)=&quot;Online-Hilfe&quot; &apos; &quot;On-line help&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Web-Anwendung verwenden&quot; &apos; &quot;Use a web application&quot;
+	Case &quot;el&quot; &apos;Greek
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Πρόγραμμα Εξωτερικού&quot;
+		sL10N(2)=&quot;Χρήση Φεστιβάλ με ένα σενάριο&quot;
+		sL10N(3)=&quot;Σενάριο εντολές&quot;
+		sL10N(4)=&quot;Διαβάστε με ένα εξωτερικό πρόγραμμα&quot;
+		sL10N(5)=&quot;Επιλογές γραμμής εντολών&quot;
+		sL10N(6)=&quot;Εμφάνιση&quot;
+		sL10N(7)=&quot;Πάντα εμφάνιση αυτού του διαλόγου&quot;
+		sL10N(8)=&quot;Σχετικά&quot;
+		sL10N(9)=&quot;Άκυρο&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Εντολή&quot;
+		sL10N(12)=&quot;Σενάριο&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Δοκιμή&quot;
+		sL10N(15)=&quot;Δεν μπόρεσα να βρώ το πρόγραμμα.&quot;
+		sL10N(16)=&quot;String δεν μπορεί να αναλυθεί!&quot;
+		sL10N(17)=&quot;Βοήθεια On-line&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Μετάφραση και σε συνδυασμό με εργαλεία web&quot;
+	Case &quot;es&quot; &apos;Includes Spanish translations provided by Ariel Del Valle
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Programa&quot;
+		sL10N(2)=&quot;Usar Festival con un script&quot;
+		sL10N(3)=&quot;Comandos script&quot;
+		sL10N(4)=&quot;Leer el texto con un programa distinto&quot;
+		sL10N(5)=&quot;Opciones adicionales en linea de comando&quot;
+		sL10N(6)=&quot;Cuadro de díalogo&quot;
+		sL10N(7)=&quot;Mostrar siempre este cuadro de dialogo al ejecutar&quot;
+		sL10N(8)=&quot;Acerca&quot;
+		sL10N(9)=&quot;Cancelar&quot;
+		sL10N(10)=&quot;Aceptar&quot;
+		sL10N(11)=&quot;Comando&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Prueba&quot;
+		sL10N(15)=&quot;No se encontró el programa.&quot;
+		sL10N(16)=&quot;La secuencia no se puede analizar!&quot;
+		sL10N(17)=&quot;Ayuda On-line&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Usar las herramientas web&quot;
+	Case &quot;fr&quot; &apos;French
+		sL10N(0)=&quot;L&apos;extension Read Text&quot;
+		sL10N(1)=&quot;Application externe&quot;
+		sL10N(2)=&quot;Utiliser Festival avec un script&quot;
+		sL10N(3)=&quot;Le script du Festival&quot;
+		sL10N(4)=&quot;Lire avec une application externe&quot;
+		sL10N(5)=&quot;Les options sur la ligne de commande&quot;
+		sL10N(6)=&quot;Affichage&quot;
+		sL10N(7)=&quot;Toujours affiche cette boîte de dialogue&quot;
+		sL10N(8)=&quot;À propos&quot;
+		sL10N(9)=&quot;Annuler&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Commande&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot; 
+		sL10N(15)=&quot;Application externe inconnue.&quot;
+		sL10N(16)=&quot;Une fonction BASIC ne peut pas analyser une chaîne de caractères.&quot;
+		sL10N(17)=&quot;L&apos;aide en ligne&quot;	
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Outils en ligne&quot;
+	Case &quot;et&quot; &apos;Estonian
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Väline programm&quot;
+		sL10N(2)=&quot;Kasuta Festival script&quot;
+		sL10N(3)=&quot;Script käsud&quot;
+		sL10N(4)=&quot;Loe välise programmi&quot;
+		sL10N(5)=&quot;Käsureavõtmed&quot;
+		sL10N(6)=&quot;Display&quot;
+		sL10N(7)=&quot;Alati näita seda dialoogi&quot;
+		sL10N(8)=&quot;Teave&quot;
+		sL10N(9)=&quot;Tühista&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Käsk&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Testi&quot;
+		sL10N(15)=&quot;Ei leia programmi.&quot;
+		sL10N(16)=&quot;String ei saa analüüsida!&quot;
+		sL10N(17)=&quot;On-line help&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Tõlgi ja lugeda veebitööriistadega&quot;
+	Case &quot;fi&quot; &apos;Finnish
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Ulkoinen ohjelma&quot;
+		sL10N(2)=&quot;Käytä Festival script&quot;
+		sL10N(3)=&quot;Komentosarjakomennot&quot;
+		sL10N(4)=&quot;Lue ja ulkoinen ohjelma&quot;
+		sL10N(5)=&quot;Komentorivioptioita&quot;
+		sL10N(6)=&quot;Näytä&quot;
+		sL10N(7)=&quot;Aina näytä tätä valintaikkunaa&quot;
+		sL10N(8)=&quot;Tietoa&quot;
+		sL10N(9)=&quot;Peruuta&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Komento&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Testaa&quot;
+		sL10N(15)=&quot;Ei voitu paikallistaa ohjelman.&quot;
+		sL10N(16)=&quot;Merkkijono ei voida analysoida!&quot;
+		sL10N(17)=&quot;On-line help&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Käännä ja lukea web-työkalujen&quot;
+	Case &quot;ga&quot; &apos;Irish
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Relations clár&quot;
+		sL10N(2)=&quot;Bain úsáid As Festival le script&quot;
+		sL10N(3)=&quot;Orduithe Script&quot;
+		sL10N(4)=&quot;Léigh le clár seachtrach&quot;
+		sL10N(5)=&quot;Roghanna líne Ordaithe&quot;
+		sL10N(6)=&quot;Taispeáin&quot;
+		sL10N(7)=&quot;Thaispeáint i gcónaí leis an dialóg&quot;
+		sL10N(8)=&quot;About&quot;
+		sL10N(9)=&quot;Cancel&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Msgstr&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Tástáil&quot;
+		sL10N(15)=&quot;Níorbh fhéidir teacht ar an gclár.&quot;
+		sL10N(16)=&quot;Ní féidir anailís a dhéanamh String!&quot;
+		sL10N(17)=&quot;Ar-líne chabhrach&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Aistrigh agus léifear le huirlisí gréasáin&quot;
+	Case &quot;hi&quot; &apos;Hindi
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;विदेश प्रोग्राम&quot;
+		sL10N(2)=&quot;का प्रयोग करें Festival एक स्क्रिप्ट के साथ&quot;
+		sL10N(3)=&quot;Festival स्क्रिप्ट&quot;
+		sL10N(4)=&quot;एक अलग कार्यक्रम का प्रयोग करें&quot;
+		sL10N(5)=&quot;कमांड लाइन विकल्प&quot;
+		sL10N(6)=&quot;प्रदर्शन&quot;
+		sL10N(7)=&quot;हमेशा इस संवाद शो&quot;
+		sL10N(8)=&quot;के बारे म&quot;
+		sL10N(9)=&quot;रद्द करें &quot;
+		sL10N(10)=&quot;ठीक है&quot;
+		sL10N(11)=&quot;कमान&quot;
+		sL10N(12)=&quot;स्क्रिप्ट&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;परीक्षण&quot;
+		sL10N(15)=&quot;मैं प्रोग्राम को नहीं ढूँढ सकते है.&quot;
+		sL10N(16)=&quot;मैं स्ट्रिंग का विश्लेषण नहीं कर सकता है!&quot;
+		sL10N(17)=&quot;ऑन लाइन मदद&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;अनुवाद और वेब उपकरणों के साथ पढ़ें&quot;
+	Case &quot;hu&quot; &apos;Hungarian
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Külső program&quot;
+		sL10N(2)=&quot;A Festival egy script&quot;
+		sL10N(3)=&quot;Script parancsok&quot;
+		sL10N(4)=&quot;Itt egy külső program&quot;
+		sL10N(5)=&quot;Parancssori&quot;
+		sL10N(6)=&quot;Display&quot;
+		sL10N(7)=&quot;Mindig jelenjen meg ez a párbeszédablak&quot;
+		sL10N(8)=&quot;Névjegy&quot;
+		sL10N(9)=&quot;Mégse&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Parancs&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Teszt&quot;
+		sL10N(15)=&quot;Nem találom a programot.&quot;
+		sL10N(16)=&quot;String nem lehet elemezni!&quot;
+		sL10N(17)=&quot;On-line segítség&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Fordítás és olvassa el a webes eszközök&quot;
+	Case &quot;id&quot; &apos;Indonesian
+		&apos;&quot;Baca Teks&quot;  READ_TEXT
+		&apos;&quot;Tentang Baca Teks&quot; ABOUT_READ_TEXT
+		&apos;&quot;Baca teks yang dipilih&quot; READ_SELECTION
+		&apos;&quot;Baca Clipboard&quot; READ_CLIPBOARD
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Program eksternal&quot;
+		sL10N(2)=&quot;Gunakan Festival dengan script&quot;
+		sL10N(3)=&quot;Script perintah&quot;
+		sL10N(4)=&quot;Baca dengan program eksternal&quot;
+		sL10N(5)=&quot;Perintah pilihan baris&quot;
+		sL10N(6)=&quot;Tampilkan&quot;
+		sL10N(7)=&quot;Selalu tampilkan dialog ini&quot;
+		sL10N(8)=&quot;Tentang&quot;
+		sL10N(9)=&quot;Batal&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Perintah&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Tidak dapat menemukan program.&quot;
+		sL10N(16)=&quot;String tidak dapat dianalisis!&quot;
+		sL10N(17)=&quot;On-line help &quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Terjemahkan dan membaca dengan alat-alat web&quot;
+	Case &quot;is&quot;
+		sL10N(0)=&quot;Lesa Texti Eftirnafn&quot;
+		sL10N(1)=&quot;Ytri program&quot;
+		sL10N(2)=&quot;Nota Festival með handrit&quot;
+		sL10N(3)=&quot;Script skipanir&quot;
+		sL10N(4)=&quot;Lestu með utanaðkomandi forrit&quot;
+		sL10N(5)=&quot;Command lína valkostur&quot;
+		sL10N(6)=&quot;Display&quot;
+		sL10N(7)=&quot;Alltaf sýna þessum glugga&quot;
+		sL10N(8)=&quot;Um&quot;
+		sL10N(9)=&quot;Cancel&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Command&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Gat ekki fundið forritið.&quot;
+		sL10N(16)=&quot;String er ekki hægt að greina!&quot;
+		sL10N(17)=&quot;Á-hjálp&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Þýða og lesa með verkfærum vefnum&quot;
+	Case &quot;it&quot; &apos;Italian
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Programma esterno&quot;
+		sL10N(2)=&quot;Usa Festival con uno script&quot;
+		sL10N(3)=&quot;I comandi script&quot;
+		sL10N(4)=&quot;Leggere con un programma esterno&quot;
+		sL10N(5)=&quot;Opzioni sulla riga di comando&quot;
+		sL10N(6)=&quot;Vista&quot;
+		sL10N(7)=&quot;Mostra sempre questa finestra di dialogo&quot;
+		sL10N(8)=&quot;About&quot; 
+		sL10N(9)=&quot;Annulla&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Ordine&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot; 
+		sL10N(15)=&quot;External Application sconosciuto. &quot;
+		sL10N(16)=&quot;Una funzione BASIC non può analizzare una stringa.&quot;
+		sL10N(17)=&quot;Help On-line&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Tradurre e leggere con strumenti web&quot;
+	Case &quot;jp&quot; &apos;Japanese
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;外部プログラム&quot;
+		sL10N(2)=&quot;スクリプトで使用するのFestival&quot;
+		sL10N(3)=&quot;スクリプトは、コマンド&quot;
+		sL10N(4)=&quot;外部プログラムで読む&quot;
+		sL10N(5)=&quot;コマンドラインオプション&quot;
+		sL10N(6)=&quot;ディスプレイ&quot;
+		sL10N(7)=&quot;常にこのダイアログを表示&quot;
+		sL10N(8)=&quot;について&quot;
+		sL10N(9)=&quot;キャンセル&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;コマンド&quot;
+		sL10N(12)=&quot;スクリプト&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;テスト&quot; 
+		sL10N(15)=&quot;プログラムを見つけることができませんでした&quot;
+		sL10N(16)=&quot;文字列を解析することはできません！&quot;
+		sL10N(17)=&quot;ラインで&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;オンラインツール&quot;
+	Case &quot;ko&quot; &apos;Korean
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;외부 프로그램&quot;
+		sL10N(2)=&quot;스크립트 여기서 Festival 사용&quot;
+		sL10N(3)=&quot;스크립트 명령&quot;
+		sL10N(4) =&quot;외부 프로그램과 함께 읽기&quot;
+		sL10N(5)=&quot;커맨드 라인 옵션&quot;
+		sL10N(6)=&quot;디스플레이&quot;
+		sL10N(7)= &quot;항상이 대화 상자를 표시&quot;
+		sL10N(8)=&quot;정보&quot;
+		sL10N(9)=&quot;취소&quot;
+		sL10N(10)=&quot;확인&quot;
+		sL10N(11)=&quot;명령&quot;
+		sL10N(12)=&quot;스크립트&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;테스트&quot;
+		sL10N(15)=&quot;프로그램을 찾을 수 없습니다.&quot;
+		sL10N(16)=&quot;문자열을 분석할 수 없어!&quot;
+		sL10N(17)=&quot;온라인 도움말 &quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;번역 및 웹 도구와 읽기&quot;
+	Case &quot;lv&quot; &apos;Latvian
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Ārējā programma&quot;
+		sL10N(2)=&quot;Lietot Festival ar skriptu&quot;
+		sL10N(3)=&quot;Script komandas&quot;
+		sL10N(4)=&quot;Lasīt ar ārēju programmu&quot;
+		sL10N(5)=&quot;Command line options&quot;
+		sL10N(6)=&quot;Display&quot;
+		sL10N(7)=&quot;Vienmēr rādīt šo dialogu&quot;
+		sL10N(8)=&quot;Par&quot;
+		sL10N(9)=&quot;Atcelt&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Komandu&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Nevarēja atrast programmu.&quot;
+		sL10N(16)=&quot;Stīgu nevar analizēt!&quot;
+		sL10N(17)=&quot;On-line help&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Tulkot un lasīt ar web rīkus&quot;
+	Case &quot;lt&quot; &apos;Lithuanian
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Išorės programa&quot;
+		sL10N(2)=&quot;Naudoti Festival scenarijų&quot;
+		sL10N(3)=&quot;Scenarijaus komandas&quot;
+		sL10N(4)=&quot;Skaityti su išorės programa&quot;
+		sL10N(5)=&quot;Komandų eilutės parinktis&quot;
+		sL10N(6)=&quot;Ekranas&quot;
+		sL10N(7)=&quot;Visada rodyti šį langą&quot;
+		sL10N(8)=&quot;Apie&quot;
+		sL10N(9)=&quot;Atšaukti&quot;
+		sL10N(10)=&quot;Gerai&quot;
+		sL10N(11)=&quot;Komanda&quot;
+		sL10N(12)=&quot;Scenarijus&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Testas&quot;
+		sL10N(15)=&quot;Nepavyksta rasti programos&quot;
+		sL10N(16)=&quot;Styginių negali būti analizuojamas!&quot;
+		sL10N(17)=&quot;On-line help&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Versti ir skaityti žiniatinklio įrankius&quot;
+	Case &quot;mt&quot; &apos;Maltese
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Programm Esterni&quot;
+		sL10N(2)=&quot;Użu Festival bil-iskrittura&quot;
+		sL10N(3)=&quot;Script kmandijiet&quot;
+		sL10N(4)=&quot;Aqra ma &apos;programm estern&quot;
+		sL10N(5)=&quot;Għażliet Linja ta &apos;Kmand&quot;
+		sL10N(6)=&quot;Display&quot;
+		sL10N(7)=&quot;Dejjem juru din dialog&quot;
+		sL10N(8)=&quot;Dwar&quot;
+		sL10N(9)=&quot;Ikkanċella&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Kmand&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Ma kellekx jillokalizza l-programm.&quot;
+		sL10N(16)=&quot;String ma jistgħux jiġu analizzati!&quot;
+		sL10N(17)=&quot;On-line jgħinu&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Ittraduċi u jinqraw bl-għodda tal-web&quot;
+	Case &quot;nl&quot; &apos;Dutch
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Externe programma&quot;
+		sL10N(2)=&quot;Gebruik Festival met een script&quot;
+		sL10N(3)=&quot;Scriptopdrachten&quot;
+		sL10N(4)=&quot;Lezen met een extern programma&quot;
+		sL10N(5)=&quot;Command line opties&quot;
+		sL10N(6)=&quot;Weergave&quot;
+		sL10N(7)=&quot;Altijd weergeven&quot;
+		sL10N(8)=&quot;About&quot;
+		sL10N(9)=&quot;Annuleren&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Command&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Kan niet vinden het programma.&quot;
+		sL10N(16)=&quot;String kan niet worden geanalyseerd!&quot;
+		sL10N(17)=&quot;On-line help&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Vertalen en lees met web tools&quot;
+	Case &quot;pl&quot; &apos;Polish
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Program zewnętrzne&quot;
+		sL10N(2)=&quot;Użyj Festival skrypt&quot;
+		sL10N(3)=&quot;Script polecenia&quot;
+		sL10N(4)=&quot;Czytaj z zewnętrznego programu&quot;
+		sL10N(5)=&quot;Opcje wiersza poleceń&quot;
+		sL10N(6)=&quot;Ekran&quot;
+		sL10N(7)=&quot;Zawsze pokazuj tego okna&quot;
+		sL10N(8)=&quot;O&quot;
+		sL10N(9)=&quot;Anuluj&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Command&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Nie można odnaleźć programu.&quot;
+		sL10N(16)=&quot;Napis nie może być analizowana!&quot;
+		sL10N(17)=&quot;Pomoże On-line&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Przetłumacz i czytać z narzędzi internetowych&quot;
+	Case &quot;pt&quot; &apos;Portuguese
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Aplicação Externa&quot;
+		sL10N(2)=&quot;Usando o Festival com um script&quot;
+		sL10N(3)=&quot;Script Festival&quot;
+		sL10N(4)=&quot;Seleção Tocar com a aplicação externa&quot;
+		sL10N(5)=&quot;As opções na linha de comando&quot;
+		sL10N(6)=&quot;Exibir&quot;
+		sL10N(7)=&quot;Sempre exibir este diálogo&quot;
+		sL10N(8)=&quot;Sobre&quot;
+		sL10N(9)=&quot;Cancelar&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Ordem&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Teste&quot;
+		sL10N(15)=&quot;Desconhecido aplicativo externo.&quot;
+		sL10N(16)=&quot;Uma função básica não é possível analisar uma seqüência.&quot;
+		sL10N(17)=&quot;Ajuda Online&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Traduzir e ler ferramentas da Web&quot;	
+	Case &quot;ro&quot; &apos;Romanian
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Externă program&quot;
+		sL10N(2)=&quot;Foloseste Festival cu un script&quot;
+		sL10N(3)=&quot;Script comenzi&quot;
+		sL10N(4)=&quot;Citeşte cu un program extern&quot;
+		sL10N(5)=&quot;Linia de comanda opţiuni&quot;
+		sL10N(6)=&quot;Display&quot;
+		sL10N(7)=&quot;Arată întotdeauna acest dialog&quot;
+		sL10N(8)=&quot;Despre&quot;
+		sL10N(9)=&quot;Cancel&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Command&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Nu am putut localiza programul.&quot;
+		sL10N(16)=&quot;String nu poate fi analizată!&quot;
+		sL10N(17)=&quot;Ajutor On-line&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Traduceţi şi citesc cu instrumente web&quot;
+	Case &quot;ru&quot; &apos;Russian
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Наружное применение&quot; 
+		sL10N(2)=&quot;Использование Festival со сценарием&quot; 
+		sL10N(3)=&quot;Сценарий Festival&quot; 
+		sL10N(4)=&quot;Использование Наружное применение&quot; 
+		sL10N(5)=&quot;Параметры командной строки&quot; 
+		sL10N(6)=&quot;Вид&quot; 
+		sL10N(7)=&quot;Всегда показывать этот диалог&quot; 
+		sL10N(8)=&quot;О программе&quot; 
+		sL10N(9)=&quot;Отмена&quot; 
+		sL10N(10)=&quot;OK&quot; 
+		sL10N(11)=&quot;Заказать&quot; 
+		sL10N(12)=&quot;Сценарий&quot; 
+		sL10N(13)=&quot;(с) 2008-2011 James Holgate&quot; 
+		sL10N(14)=&quot;Тест&quot;
+		sL10N(15)=&quot;Наружное применение неизвестно&quot;
+		sL10N(16)=&quot;Основная функция не может разобрать строку&quot;
+		sL10N(17)=&quot;Справка&quot; 
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;веб-инструменты&quot;
+	Case &quot;sk&quot; &apos;Slovak
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Externý program&quot;
+		sL10N(2)=&quot;Použiť Festival s skript&quot;
+		sL10N(3)=&quot;Script príkazy&quot;
+		sL10N(4)=&quot;Čítanie s externým programom&quot;
+		sL10N(5)=&quot;Parametre príkazového riadku&quot;
+		sL10N(6)=&quot;Zobraziť&quot;
+		sL10N(7)=&quot;Vždy zobraziť toto dialógové okno&quot;
+		sL10N(8)=&quot;O&quot;
+		sL10N(9)=&quot;Zrušiť&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Príkaz&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Nemožno nájsť program.&quot;
+		sL10N(16)=&quot;Reťazec nemožno analyzovať!&quot;
+		sL10N(17)=&quot;On-line help&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Preložiť a v spojení s webovou nástroje&quot;
+	Case &quot;sl&quot; &apos;Slovenian
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Zunanji program&quot;
+		sL10N(2)=&quot;Uporabi Festival z skript&quot;
+		sL10N(3)=&quot;Script ukazi&quot;
+		sL10N(4)=&quot;Beri z zunanjim program&quot;
+		sL10N(5)=&quot;Možnosti ukazne vrstice&quot;
+		sL10N(6)=&quot;Display&quot;
+		sL10N(7)=&quot;Vedno prikaži tem pogovornem oknu&quot;
+		sL10N(8)=&quot;O&quot;
+		sL10N(9)=&quot;Cancel&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Command&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Ni bilo mogoče najti program.&quot;
+		sL10N(16)=&quot;Niz ne more biti analizirana!&quot;
+		sL10N(17)=&quot;On-line pomoč&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Prevedi in brati s spletnimi orodji&quot;
+	Case &quot;sv&quot; &apos;Swedish
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Extern programmet&quot;
+		sL10N(2)=&quot;Använd Festival med ett manus&quot;
+		sL10N(3)=&quot;Skriptkommandon&quot;
+		sL10N(4)=&quot;Läs tillsammans med ett externt program&quot;
+		sL10N(5)=&quot;Kommandoradsväljare&quot;
+		sL10N(6)=&quot;Visa&quot;
+		sL10N(7)=&quot;Visa alltid den här dialogrutan&quot;
+		sL10N(8)=&quot;Om&quot;
+		sL10N(9)=&quot;Avbryt&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Kommando&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Kunde inte hitta programmet.&quot;
+		sL10N(16)=&quot;Kan Sträng inte analyseras!&quot;
+		sL10N(17)=&quot;On-line hjälp&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Översätt och läste med webbverktyg&quot;	
+	Case &quot;tl&quot;
+		&apos;&quot;Basahin Text&quot; READ_TEXT
+		&apos;&quot;Basahin Tungkol Text&quot; ABOUT_READ_TEXT
+		&apos;&quot;Basahin ang mga piniling teksto&quot; READ_SELECTION
+		&apos;&quot;Basahin ang Clipboard&quot; READ_CLIPBOARD
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Panlabas na programa&quot;
+		sL10N(2)=&quot;Gamitin ang Festival sa isang script&quot;
+		sL10N(3)=&quot;Script command&quot;
+		sL10N(4)=&quot;Basahin ang sa isang panlabas na programa&quot;
+		sL10N(5)=&quot;Command linya ng opsyon&quot;
+		sL10N(6)=&quot;Ipakita&quot;
+		sL10N(7)=&quot;Laging ipakita ang dialog na ito&quot;
+		sL10N(8)=&quot;About&quot;
+		sL10N(9)=&quot;Kanselahin&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Command&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Hindi mahanap ang programa.&quot;
+		sL10N(16)=&quot;String ay hindi maaaring aralan!&quot;
+		sL10N(17)=&quot;On-line help &quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Isalin at basahin sa mga tool ng web&quot;
+	Case &quot;tr&quot;
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Harici programı&quot;
+		sL10N(2)=&quot;Bir komut ile Festival kullan&quot;
+		sL10N(3)=&quot;komut dosyası komutları&quot;
+		sL10N(4)=&quot;Harici bir program ile oku&quot;
+		sL10N(5)=&quot;Komut satırı seçenekleri&quot;
+		sL10N(6)=&quot;Ekran&quot;
+		sL10N(7)=&quot;Her zaman bu iletişim göstermek&quot;
+		sL10N(8)=&quot;Hakkında&quot;
+		sL10N(9)=&quot;İptal&quot;
+		sL10N(10)=&quot;Tamam&quot;
+		sL10N(11)=&quot;Command&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Programı bulunamıyor.&quot;
+		sL10N(16)=&quot;String analiz olamaz!&quot;
+		sL10N(17)=&quot;On-line yardım&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Çevir ve web araçları ile oku &quot;
+	Case &quot;uk&quot;
+		&apos; &quot;Читання тексту&quot; READ_TEXT
+		&apos; &quot;Про Читання тексту&quot; ABOUT_READ_TEXT
+		&apos; &quot;Читати виділеного тексту&quot; READ_SELECTION
+		&apos; &quot;Читайте в буфер обміну&quot; READ_CLIPBOARD
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;Зовнішні програми &quot;
+		sL10N(2)=&quot;Використовувати Festival з сценарій &quot;
+		sL10N(3)=&quot;Команди сценарію &quot;
+		sL10N(4)=&quot;Читання з зовнішньою програмою&quot;
+		sL10N(5)=&quot;Параметри командного рядка&quot;
+		sL10N(6)=&quot;Показати &quot;
+		sL10N(7)=&quot;Завжди показувати цей діалог&quot;
+		sL10N(8)=&quot;Про програму &quot;
+		sL10N(9)=&quot;Скасувати &quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Команда&quot;
+		sL10N(12)=&quot;Сценарій &quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Тест&quot;
+		sL10N(15)=&quot;Неможливо знайти програму. &quot;
+		sL10N(16)=&quot;Рядок не може бути проаналізована!&quot;
+		sL10N(17)=&quot;Он-лайн допомогу &quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Перекласти й читати з веб-інструментів&quot;
+	Case &quot;zh-TW&quot; &apos;Traditional Chinese
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;外部程序&quot;
+		sL10N(2)=&quot;使用 Festival 程序的腳本&quot;
+		sL10N(3)=&quot;的 Festival 腳本&quot;
+		sL10N(4)=&quot;使用不同的程序&quot;
+		sL10N(5)=&quot;命令行選項&quot;
+		sL10N(6)=&quot;顯示&quot;
+		sL10N(7)=&quot;宏觀要始終顯示此對話框&quot;
+		sL10N(8)=&quot;關於&quot;
+		sL10N(9)=&quot;取消&quot;
+		sL10N(10)=&quot;確定&quot;
+		sL10N(11)=&quot;命令&quot;
+		sL10N(12)=&quot;腳本&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;測試&quot;  
+		sL10N(15)=&quot;宏無法找到該程序.&quot;
+		sL10N(16)=&quot;宏無法讀取的字符串正確！&quot;
+		sL10N(17)=&quot;在線幫助&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;翻譯和閱讀網頁工具&quot;
+	Case &quot;zh&quot; , &quot;zh-CN&quot; &apos;Simplified Chinese
+		sL10N(0)=&quot;Read Text&quot;
+		sL10N(1)=&quot;外部程序&quot; 
+		sL10N(2)=&quot;使用的脚本Festival计划&quot; 
+		sL10N(3)=&quot;的Festival脚本&quot; 
+		sL10N(4)=&quot;使用不同的程序&quot; 
+		sL10N(5)=&quot;命令行选项&quot; 
+		sL10N(6)=&quot;显示&quot; 
+		sL10N(7)=&quot;宏观要始终显示此对话框&quot; 
+		sL10N(8)=&quot;关于&quot; 
+		sL10N(9)=&quot;取消&quot; 
+		sL10N(10)=&quot;确定&quot; 
+		sL10N(11)=&quot;命令&quot; 
+		sL10N(12)=&quot;脚本&quot; 
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;测试&quot; 
+		sL10N(15)=&quot;宏无法找到该程序.&quot; 
+		sL10N(16)=&quot;宏无法读取的字符串正确！&quot;
+		sL10N(17)=&quot;获得帮助在线&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;翻译和阅读网页工具&quot;
+	Case Else &apos;&quot;en&quot; English (default)
+	    &apos; &quot;Read Text&quot; %READ_TEXT%
+	    &apos; &quot;About Read Text&quot; %ABOUT_READ_TEXT%
+	    &apos; &quot;Read the selected text&quot; %READ_SELECTION%
+	    &apos; &quot;Read the Clipboard&quot; %READ_CLIPBOARD%
+		sL10N(0)=&quot;Read Text Extension&quot;
+		sL10N(1)=&quot;External program&quot;
+		sL10N(2)=&quot;Use Festival with a script&quot;
+		sL10N(3)=&quot;Script commands&quot;
+		sL10N(4)=&quot;Read with an external program&quot;
+		sL10N(5)=&quot;Command line options&quot;
+		sL10N(6)=&quot;Display&quot;
+		sL10N(7)=&quot;Always show this dialog&quot;
+		sL10N(8)=&quot;About&quot;
+		sL10N(9)=&quot;Cancel&quot;
+		sL10N(10)=&quot;OK&quot;
+		sL10N(11)=&quot;Command&quot;
+		sL10N(12)=&quot;Script&quot;
+		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(14)=&quot;Test&quot;
+		sL10N(15)=&quot;Could not locate the program. &quot;
+		sL10N(16)=&quot;String cannot be analyzed!&quot;
+		sL10N(17)=&quot;On-line help&quot;
+		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(19)=&quot;Use a web application&quot;
+	End Select
+	fsStringLanguage=sL10N(i)
+End Function
+
+Function fsDateMyRegion(i As Integer) As String
+	Dim sL10N As String
+	Select Case fsGetLanguage()
+	Case &quot;es&quot;  &apos;el 1 de enero, 2009
+		sL10N=&quot;el &quot; &amp; Format(Now,&quot;D&quot; ) &amp; &quot; de &quot; &amp; Format(Now,&quot;MMMM, YYYY&quot;)
+	Case &quot;gl&quot; 
+		sL10N=Format(Now,&quot;D&quot; ) &amp; &quot; de &quot; &amp; Format(Now,&quot;MMMM, YYYY&quot;)
+	Case &quot;fr&quot;  &apos;le 1 janvier, 2009
+		sL10N=&quot;le &quot; &amp;  Format(Now,&quot;D MMMM, YYYY&quot;)
+	Case &quot;hr&quot;,&quot;cs&quot;,&quot;da&quot;,&quot;hu&quot;
+		sL10N=Format(Now,&quot;D, MMMM, YYYY&quot;)
+	Case &quot;pt&quot;, &quot;ca&quot; &apos;01 de janeiro de 2009
+		sL10N=Format(Now,&quot;DD&quot;) &amp; &quot; de &quot; &amp; Format(Now,&quot;MMMM&quot; ) &amp; &quot; de &quot; &amp; Format(Now,&quot;YYYY&quot;)
+	Case &quot;de&quot; &apos;der 1. Januar 2009
+		sL10N=&quot;der &quot; &amp; Format(Now,&quot;D. MMMM YYYY&quot;)	
+	Case &quot;sv&quot;,&quot;sl&quot;,&quot;et&quot;
+		sL10N=Format(Now,&quot;D. MMMM YYYY&quot;)
+	Case &quot;tr&quot;
+		sL10N=Format(Now,&quot;D.MMMM.YYYY&quot;)
+	Case &quot;cy&quot;,&quot;ga&quot; &apos;
+		sL10N=Format(Now,&quot;D MMMM, YYYY&quot;)
+	Case &quot;mt&quot;,&quot;no&quot; &apos;
+		sL10N=Format(Now,&quot;D, MMMM YYYY&quot;)
+	Case &quot;zh&quot;,&quot;zh-CN&quot;,&quot;zh-TW&quot;,&quot;zh-HK&quot;,&quot;zh-MO&quot;,&quot;zh-SG&quot; &apos; 2009年10月25日 星期日
+		sL10N=Year(NOW)  &amp; &quot;年&quot; &amp; Month(NOW)  &amp; &quot;月&quot; &amp; Day(NOW)  &amp; &quot;日&quot;
+	Case &quot;jp&quot; &apos; 2011年2月6日
+		sL10N=Year(NOW)  &amp; &quot;年&quot; &amp; Month(NOW)  &amp; &quot;月&quot; &amp; Day(NOW)  &amp; &quot;日&quot;
+	Case &quot;ko&quot;  &apos;Korean 
+		sL10N=Year(NOW)  &amp; &quot;년&quot; &amp; Month(NOW)  &amp; &quot;월&quot; &amp; Day(NOW)  &amp; &quot;일&quot;
+	Case &quot;en&quot;,&quot;lv&quot;,&quot;sk&quot;,&quot;uk&quot;,&quot;tl&quot; &apos;January 1, 2009
+		sL10N=Format(Now,&quot;MMMM D, YYYY&quot;)
+	Case Else &apos;&quot;af&quot;,&quot;bg&quot;,&quot;el&quot;,&quot;it&quot;,&quot;hi&quot;,&quot;id&quot;,&quot;mk&quot;,&quot;nl&quot;,&quot;po&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sl&quot;,&quot;th&quot;,&quot;tr&quot; 
+		sL10N=Year(NOW) &amp; &quot;-&quot; &amp; Month(NOW) &amp; &quot;-&quot; &amp; Day(NOW) &apos;Revised To international time 2011-02-06
+	End Select	
+	fsDateMyRegion=sL10N
+End Function
+
+Function fsTimeMyRegion(i As Integer) As String
+	Dim sL10N As String
+	Select Case fsGetLanguage()
+
+	Case &quot;es&quot;  &apos;la 1 y 40 de la mañana; las 2 y 40 de la tarde
+		If Hour(NOW)=0 Then
+			sL10N=&quot;medionoche&quot; &amp; &quot; y &quot; &amp; Minute(NOW) 
+		Elseif Hour(NOW)=1 Then
+			sL10N=&quot;la &quot; &amp; Hour(NOW) &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la mañana&quot;
+		Elseif Hour(NOW) &lt; 12 Then
+			sL10N=&quot;las &quot; &amp; Hour(NOW) &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la mañana&quot;
+		Elseif Hour(NOW)=12 Then
+			sL10N=&quot;mediodia&quot; &amp; &quot; y &quot; &amp; Minute(NOW) 
+		Elseif Hour(NOW)=13 Then 
+			sL10N=&quot;la &quot; &amp; Hour(NOW) Mod 12 &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la tarde&quot;
+		Elseif Hour(NOW) &lt; 20 Then 
+			sL10N=&quot;las &quot; &amp; Hour(NOW) Mod 12 &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la tarde&quot;
+		Else 
+			sL10N=&quot;las &quot; &amp; Hour(NOW) Mod 12 &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la noche&quot;
+		Endif
+	Case &quot;fr&quot;  
+		If Hour(NOW)=1 Then
+			sL10N=&quot; &quot; &amp; Hour(NOW) &amp; &quot; heure &quot; &amp; Minute(NOW)
+		Else
+			sL10N=&quot; &quot; &amp; Hour(NOW) &amp; &quot; heures &quot; &amp; Minute(NOW)
+		Endif 
+	Case &quot;en&quot; &apos;1:40 AM ; 2:40 PM (One forty A M; Two forty P M)
+		sL10N=Format(Now,&quot;h:mm AM/PM&quot;)
+	Case Else &apos;1:40 ; 14:40 
+		sL10N=Format(Now,&quot;h:mm&quot;)
+	End Select
+	fsTimeMyRegion=ltrim(rtrim(sL10N))
+End Function
+
+Function fsWeekDayMyRegion() As String
+    fsWeekDayMyRegion=ltrim(rtrim(Format(Now,&quot;NNNN&quot;)))
+End Function
+
+Function fsUserName
+    fsUserName=environ(&quot;USERNAME&quot;)
+    if fsUserName=&quot;&quot; Then
+    	fsUserName=environ(&quot;USER&quot;)
+    Endif
+End Function
+</script:module>

@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<meta>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp" indexer="include" status="PUBLISH">
+<title id="read_selection" xml-lang="fr-CA">
+Lire la sélection</title>
+<filename>/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp</filename>
+</topic>
+<history>
+<created date="2010-10-22T00:00:00">
+James Holgate</created>
+<lastedited date="2011-04-16T00:00:35">
+Changed Default External UNIX App to python</lastedited>
+</history>
+</meta>
+<body>
+<paragraph role="heading" id="read_selection1" xml-lang="fr-CA" level="1">
+Utilisation de l'extension Read text</paragraph>
+<paragraph role="heading" id="read_selection1.1" xml-lang="fr-CA" level="2">
+Lire la sélection
+</paragraph>
+<list>
+<listitem>
+<switchinline select="appl">
+<caseinline select="CALC">
+Sélectionnez un cellule. 
+</caseinline>
+<caseinline select="DRAW">
+Sélectionnez du texte dans une boite texte. 
+</caseinline>
+<caseinline select="IMPRESS">
+Sélectionnez du texte en mode d'affichage normal ou en mode d'affichage notes. 
+</caseinline>
+<caseinline select="WRITER">
+Sélectionnez du texte. 
+</caseinline>
+<defaultinline>
+Ouvrez Calc, Draw, Impress, Web Writer ou Writer, et sélectionnez du texte. 
+</defaultinline>
+</switchinline>
+</listitem>
+<listitem>
+Cliquez le bouton 
+<emph>
+Lire la sélection</emph>
+sur la barre.
+</listitem>
+</list>
+<section id="relatedtopics">
+<embed href="text/shared/guide/accessibility.xhp#accessibility"/>
+</section>
+</body>
+</helpdocument>

@@ -1,0 +1,228 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<oor:component-data 
+ xmlns:oor="http://openoffice.org/2001/registry"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ oor:name="Addons"
+ oor:package="org.openoffice.Office">
+	<node oor:name="AddonUI">
+		<node oor:name="OfficeToolBar">
+			<node oor:name="textToSpeech.OfficeToolBar" oor:op="replace">
+				<node oor:name="m1" oor:op="replace">
+					<prop oor:name="Context" oor:type="xs:string">
+ 						<value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.presentation.PresentationDocument,com.sun.star.drawing.DrawingDocument</value>
+					</prop>
+					<prop oor:name="URL" oor:type="xs:string">
+						<value>vnd.sun.star.script:textToSpeech.TextToSpeech.ReadTextAloud?language=Basic&amp;location=application</value>
+					</prop>
+					<prop oor:name="Title" oor:type="xs:string">
+						<value>Read Selection</value>
+						<value xml:lang="af">Lees die seleksie</value>
+						<value xml:lang="bg">Прочетете избора</value>
+						<value xml:lang="ca">Llegiu la selecció</value>
+						<value xml:lang="cs">Přečtěte si výběr</value>
+						<value xml:lang="da">Las výběr</value>
+						<value xml:lang="de">Markierten Text vorlesen</value>
+						<value xml:lang="el">ΟΤΑ επιλογής</value>
+						<value xml:lang="en">Read selection</value>
+						<value xml:lang="es">Leer la selección</value>
+						<value xml:lang="et">Las valik</value>
+						<value xml:lang="fi">Las valinta</value>
+						<value xml:lang="fr">Lire la sélection</value>
+						<value xml:lang="ga">Las roghnú</value>
+						<value xml:lang="hi">पढ़ें चयन  </value>
+						<value xml:lang="hu">Las kiválasztása</value>
+						<value xml:lang="id">Baca teks yang dipilih</value>
+						<value xml:lang="is">Lesa valinn texta</value>
+						<value xml:lang="it">Leggi la selezione</value>
+						<value xml:lang="jp">選択を読む</value>
+						<value xml:lang="ko">선택 읽기</value>
+						<value xml:lang="lt">Skaityti atrankos</value>
+						<value xml:lang="lv">Lasīt atlases</value>
+						<value xml:lang="mt">Aqra l-għażla</value>
+						<value xml:lang="nl">Lees de selectie</value>
+						<value xml:lang="pl">Przeczytaj wybór</value>
+						<value xml:lang="pt">Leia a seleção</value>
+						<value xml:lang="ro">Citiţi selecţie</value>
+						<value xml:lang="ru">Читать выбора</value>
+						<value xml:lang="sk">Prečítajte si výber</value>
+						<value xml:lang="sl">Preberite izbor</value>
+						<value xml:lang="sv">Läs valet</value>
+						<value xml:lang="tl">Basahin ang mga piniling teksto</value>
+						<value xml:lang="tr">Seçim Oku</value>
+						<value xml:lang="uk">Читати виділеного тексту</value>
+						<value xml:lang="zh-CN">阅读选择 </value>
+						<value xml:lang="zh-TW">閱讀選擇 </value>
+						<value xml:lang="zh">阅读选择 </value>
+					</prop>
+					<prop oor:name="Target" oor:type="xs:string">
+						<value>_self</value>
+					</prop>
+				</node>
+			</node>
+		</node>
+		<node oor:name="AddonMenu">
+				<node oor:name="textToSpeech.AddonMenu.m1" oor:op="replace">
+					<prop oor:name="Context" oor:type="xs:string">
+ 						<value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.presentation.PresentationDocument,com.sun.star.drawing.DrawingDocument</value>
+					</prop>
+					<prop oor:name="URL" oor:type="xs:string">
+						<value>vnd.sun.star.script:textToSpeech.TextToSpeech.SetupReadTextAloud?language=Basic&amp;location=application</value>
+					</prop>
+					<prop oor:name="Title" oor:type="xs:string">
+						<value>Read Selection...</value>
+						<value xml:lang="af">Lees die seleksie...</value>
+						<value xml:lang="bg">Прочетете избора...</value>
+						<value xml:lang="ca">Llegiu la selecció...</value>
+						<value xml:lang="cs">Přečtěte si výběr...</value>
+						<value xml:lang="da">Las výběr...</value>
+						<value xml:lang="de">Markierten Text vorlesen...</value>
+						<value xml:lang="el">ΟΤΑ επιλογής...</value>
+						<value xml:lang="en">Read selection...</value>
+						<value xml:lang="es">Leer la selección...</value>
+						<value xml:lang="et">Las valik...</value>
+						<value xml:lang="fi">Las valinta...</value>
+						<value xml:lang="fr">Lire la sélection...</value>
+						<value xml:lang="ga">Las roghnú...</value>
+						<value xml:lang="hi">पढ़ें चयन  ...</value>
+						<value xml:lang="hu">Las kiválasztása...</value>
+						<value xml:lang="id">Baca teks yang dipilih...</value>
+						<value xml:lang="is">Lesa valinn texta...</value>
+						<value xml:lang="it">Leggi la selezione...</value>
+						<value xml:lang="jp">選択を読む...</value>
+						<value xml:lang="ko">선택 읽기...</value>
+						<value xml:lang="lt">Skaityti atrankos...</value>
+						<value xml:lang="lv">Lasīt atlases...</value>
+						<value xml:lang="mt">Aqra l-għażla...</value>
+						<value xml:lang="nl">Lees de selectie...</value>
+						<value xml:lang="pl">Przeczytaj wybór...</value>
+						<value xml:lang="pt">Leia a seleção...</value>
+						<value xml:lang="ro">Citiţi selecţie...</value>
+						<value xml:lang="ru">Читать выбора...</value>
+						<value xml:lang="sk">Prečítajte si výber...</value>
+						<value xml:lang="sl">Preberite izbor...</value>
+						<value xml:lang="sv">Läs valet...</value>
+						<value xml:lang="tl">Basahin ang mga piniling teksto...</value>
+						<value xml:lang="tr">Seçim Oku...</value>
+						<value xml:lang="uk">Читати виділеного тексту...</value>
+						<value xml:lang="zh-CN">阅读选择 ...</value>
+						<value xml:lang="zh-TW">閱讀選擇 ...</value>
+						<value xml:lang="zh">阅读选择 ...</value>
+					</prop>
+					<prop oor:name="Target" oor:type="xs:string">
+						<value>_self</value>
+					</prop>
+				</node>
+				<node oor:name="textToSpeech.AddonMenu.m2" oor:op="replace">
+					<prop oor:name="Context" oor:type="xs:string">
+						<value>com.sun.star.drawing.DrawingDocument,com.sun.star.formula.FormulaProperties,com.sun.star.presentation.PresentationDocument,com.sun.star.script.BasicIDE,com.sun.star.sdb.OfficeDatabaseDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.GlobalDocument,com.sun.star.text.TextDocument,com.sun.star.text.WebDocument</value>
+					</prop>
+					<prop oor:name="URL" oor:type="xs:string">
+						<value>vnd.sun.star.script:textToSpeech.TextToSpeech.ReadClipBoard?language=Basic&amp;location=application</value>
+					</prop>
+					<prop oor:name="Title" oor:type="xs:string">
+						<value>Read Clipboard</value>
+						<value xml:lang="af">Lees die knipbord</value>
+						<value xml:lang="bg">Прочетете клипборда</value>
+						<value xml:lang="ca">Llegir el portapapers</value>
+						<value xml:lang="cs">Přečtěte si schránky</value>
+						<value xml:lang="da">Læs udklipsholderen</value>
+						<value xml:lang="de">Zwischenablage vorlesen</value>
+						<value xml:lang="el">Διαβάστε το πρόχειρο</value>
+						<value xml:lang="en">Read clipboard</value>
+						<value xml:lang="es">Leer el portapapeles</value>
+						<value xml:lang="et">Loe lõikelauale</value>
+						<value xml:lang="fi">Lue leikepöydälle</value>
+						<value xml:lang="fr">Lire le presse-papiers</value>
+						<value xml:lang="ga">Léigh an ghearrthaisce</value>
+						<value xml:lang="hi">क्लिपबोर्ड पढ़ें</value>
+						<value xml:lang="hu">Olvassa el a vágólapra</value>
+						<value xml:lang="id">Baca Clipboard</value>
+						<value xml:lang="is">Lesa Klemmuspjald</value>
+						<value xml:lang="it">Leggi gli appunti</value>
+						<value xml:lang="jp">クリップボードを読む</value>
+						<value xml:lang="ko">클립 보드 읽기</value>
+						<value xml:lang="lt">Skaityti į iškarpinę</value>
+						<value xml:lang="lv">Lasīt starpliktuves</value>
+						<value xml:lang="mt">Aqra l-clipboard</value>
+						<value xml:lang="nl">Lees het klembord</value>
+						<value xml:lang="pl">Przeczytaj schowka</value>
+						<value xml:lang="pt">Leia a área de transferência</value>
+						<value xml:lang="ro">Citiţi clipboard</value>
+						<value xml:lang="ru">Читайте в буфер обмена</value>
+						<value xml:lang="sk">Prečítajte si schránky</value>
+						<value xml:lang="sl">Preberite odložišče</value>
+						<value xml:lang="sv">Läs klippbordet</value>
+						<value xml:lang="tl">Basahin ang Clipboard</value>
+						<value xml:lang="tr">Panoya Oku</value>
+						<value xml:lang="uk">Читайте в буфер обміну</value>
+						<value xml:lang="zh-CN">读取剪贴板</value>
+						<value xml:lang="zh-TW">讀取剪貼板</value>
+						<value xml:lang="zh">读取剪贴板</value>
+					</prop>
+					<prop oor:name="Target" oor:type="xs:string">
+						<value>_self</value>
+					</prop>
+				</node>
+		</node>
+		<!-- specify image urls for icons -->
+		<node oor:name="Images">
+			<node oor:name="org.openoffice.Office.addon.textToSpeech.img01" oor:op="replace">
+				<prop oor:name="URL" oor:type="xs:string">
+					<value>vnd.sun.star.script:textToSpeech.TextToSpeech.SetupReadTextAloud?language=Basic&amp;location=application</value>
+				</prop>
+			<node oor:name="UserDefinedImages">
+				<prop oor:name="ImageSmallURL">
+					<value>%origin%/../../../../../images/textToSpeech_16.png</value>
+				</prop>
+				<prop oor:name="ImageSmallHCURL">
+					<value>%origin%/../../../../../images/textToSpeech_16h.png</value>
+				</prop>
+				<prop oor:name="ImageBigURL">
+					<value>%origin%/../../../../../images/textToSpeech_26.png</value>
+				</prop>
+				<prop oor:name="ImageBigHCURL">
+					<value>%origin%/../../../../../images/textToSpeech_26h.png</value>
+				</prop>
+			</node>
+		</node>
+      		<node oor:name="org.openoffice.Office.addon.textToSpeech.img02" oor:op="replace">
+        		<prop oor:name="URL" oor:type="xs:string">
+          			<value>vnd.sun.star.script:textToSpeech.TextToSpeech.ReadTextAloud?language=Basic&amp;location=application</value>
+        		</prop>
+        		<node oor:name="UserDefinedImages">
+          			<prop oor:name="ImageSmallURL">
+					<value>%origin%/../../../../../images/textToSpeech_16.png</value>
+				</prop>
+				<prop oor:name="ImageSmallHCURL">
+					<value>%origin%/../../../../../images/textToSpeech_16h.png</value>
+				</prop>
+				<prop oor:name="ImageBigURL">
+					<value>%origin%/../../../../../images/textToSpeech_26.png</value>
+				</prop>
+				<prop oor:name="ImageBigHCURL">
+					<value>%origin%/../../../../../images/textToSpeech_26h.png</value>
+				</prop>
+			</node>
+		</node>
+		<node oor:name="org.openoffice.Office.addon.clipboardToSpeech.img01" oor:op="replace">
+			<prop oor:name="URL" oor:type="xs:string">
+				<value>vnd.sun.star.script:textToSpeech.TextToSpeech.ReadClipBoard?language=Basic&amp;location=application</value>
+			</prop>
+			<node oor:name="UserDefinedImages">
+				<prop oor:name="ImageSmallURL">
+					<value>%origin%/../../../../../images/clipboard_16.png</value>
+				</prop>
+				<prop oor:name="ImageSmallHCURL">
+					<value>%origin%/../../../../../images/clipboard_16h.png</value>
+				</prop>
+				<prop oor:name="ImageBigURL">
+					<value>%origin%/../../../../../images/clipboard_26.png</value>
+				</prop>
+				<prop oor:name="ImageBigHCURL">
+					<value>%origin%/../../../../../images/clipboard_26h.png</value>
+				</prop>
+			</node>
+		</node>
+	</node>
+</node>
+</oor:component-data>
