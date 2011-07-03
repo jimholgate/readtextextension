@@ -1,4 +1,4 @@
-#summary Setting up Read Text Command and Script Tokens
+#summary Setting up Read Text Extension - Command and Script Tokens
 
 = Command and Script Tokens =
 
