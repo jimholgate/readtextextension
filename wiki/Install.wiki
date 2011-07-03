@@ -1,4 +1,4 @@
-#summary Installing Read Text Extension.
+#summary Installing Read Text Extension
 
 = Install =
 
