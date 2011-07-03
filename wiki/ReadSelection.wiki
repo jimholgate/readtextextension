@@ -1,4 +1,4 @@
-#summary Using Read Text Extension- Read Selection
+#summary Using Read Text Extension - Read Selection
 
 = Read Selection =
 
