@@ -9,6 +9,10 @@ Read Text Extension uses an external program or a web service to read text. Read
   * [http://extensions.services.openoffice.org/project/Read_Text OpenOffice.org Extensions]
   * [http://code.google.com/p/readtextextension/downloads/list Google Project Hosting]
 
+==Screen Shot==
+
+[http://sites.google.com/site/readtextextension/ http://sites.google.com/site/readtextextension/_/rsrc/1297227351096/home/microsoft-windows/Default64.png]
+
 ==Tutorial==
 
 <wiki:video url=https://www.youtube.com/watch?v=OCARVoZqC-s />
