@@ -1,0 +1,7 @@
+#summary Using Read Text Extension- Read Selection
+
+= Read Selection =
+
+Add your content here.  Format your content with:
+  * Open Calc, Draw, Impress, Web Writer or Writer, then make a selection. 
+  * Click the Read Selection button on the menu bar. 
