@@ -1,4 +1,4 @@
-#summary Read Text Extension - An OpenOffice.org & LibreOffice extension to read text with an external program
+#summary About Read Text Extension - An OpenOffice.org & LibreOffice extension to read text with an external program
 
 =About=
 
