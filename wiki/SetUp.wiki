@@ -1,4 +1,4 @@
-#summary Setting up Read Text Extension
+#summary Setting up Read Text Extension.
 
 = Set up = 
   * Click the icon on the menu bar or choose *Tools - Add-Ons - Read Selection...* 
