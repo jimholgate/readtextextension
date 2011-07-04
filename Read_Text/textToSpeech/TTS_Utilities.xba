@@ -747,9 +747,9 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 				&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
 			oComboBox.addItem(s1,0)
 		Endif		
-		If fileExists( &quot;/usr/bin/ffmpeg&quot;)  Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Or fileExists( &quot;/usr/bin/twolame&quot;) Then
+		If fileExists( &quot;/usr/bin/speexenc&quot;) Then
 			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp2&quot; &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).spx&quot; &amp; _
 				Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
 			oComboBox.addItem(s1,0)
 		Endif
@@ -762,6 +762,12 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 		If fileExists( &quot;/usr/bin/lame&quot;)  Or fileExists(&quot;C:\opt\lame.exe&quot;) Then
 			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
 				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp3&quot; &amp; _
+				Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+			oComboBox.addItem(s1,0)
+		Endif
+		If fileExists( &quot;/usr/bin/ffmpeg&quot;)  Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Or fileExists( &quot;/usr/bin/twolame&quot;) Then
+			s1=Chr(34) &amp; &quot;(FESTIVAL_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+				&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp2&quot; &amp; _
 				Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
 			oComboBox.addItem(s1,0)
 		Endif
@@ -852,10 +858,11 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 			Next
 
 		Endif		
-		If fileExists( &quot;/usr/bin/ffmpeg&quot;) Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Or fileExists( &quot;/usr/bin/twolame&quot;) Then
+
+		If fileExists( &quot;/usr/bin/speexenc&quot;) Then
 			For n=0 To 0
 				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp2&quot; &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).spx&quot; &amp; _
 					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
 				oComboBox.addItem(s1,0)
 			Next
@@ -872,6 +879,14 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 			For n=0 To 0
 				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
 					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp3&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif
+		If fileExists( &quot;/usr/bin/ffmpeg&quot;) Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Or fileExists( &quot;/usr/bin/twolame&quot;) Then
+			For n=0 To 0
+				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp2&quot; &amp; _
 					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
 				oComboBox.addItem(s1,0)
 			Next
@@ -979,10 +994,10 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 			Next
 
 		Endif		
-		If fileExists( &quot;/usr/bin/ffmpeg&quot;)  Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Or fileExists( &quot;/usr/bin/twolame&quot;) Then
-			For n=6 To 6
+		If fileExists( &quot;/usr/bin/speexenc&quot;) Then
+		    For n=6 To 6
 				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp2&quot; &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).spx&quot; &amp; _
 					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
 				oComboBox.addItem(s1,0)
 			Next
@@ -1003,7 +1018,15 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 				oComboBox.addItem(s1,0)
 			Next
 		Endif
-		If fileExists( &quot;/usr/bin/faac&quot;)  Or fileExists(&quot;C:\opt\neroAacEnc.exe&quot;)  Then
+		If fileExists( &quot;/usr/bin/ffmpeg&quot;)  Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Or fileExists( &quot;/usr/bin/twolame&quot;) Then
+			For n=6 To 6
+				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp2&quot; &amp; _
+					Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+				oComboBox.addItem(s1,0)
+			Next
+		Endif
+		If fileExists( &quot;/usr/bin/faac&quot;)  Or fileExists(&quot;C:\opt\neroAacEnc.exe&quot;) Then
 			For n=6 To 6
 				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
 					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).m4a&quot; &amp; _
