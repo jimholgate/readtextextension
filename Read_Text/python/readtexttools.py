@@ -83,7 +83,7 @@ def fsGetSoundFileName(sTMP1,sIMG1,sType1):
         sOUT1=sTMP1+".wav"
         sTMP1=sOUT1
   elif sTMP1EXT==".spx":
-      if os.path.isfile("/usr/bin/gst-launch"):
+      if os.path.isfile("/usr/bin/gst-launch") or os.path.isfile("/usr/bin/speexenc"):
         sOUT1=sTMP1
         sTMP1=sOUT1+".wav"
       else:
@@ -212,8 +212,11 @@ def Wav2Media(sB,sTMP1,sIMG1,sOUT1,sAUDIBLE,sVISIBLE):
         s1='lame --tl "'+sTL+'" --ta "'+sTA+'" --tt "'+sTT+'" --tg "'+sTG+'" --ty '+sTY+' "'+sTMP1+'" "'+sOUT1+'"'
         myossystem(s1)
     elif sOUT1EXT==".spx":
-      # Speex is slow to encode... but the file size is very small... gst-launch is a Gstreamer utility
-      s1='gst-launch filesrc location="'+sTMP1+'" ! decodebin ! speexenc ! oggmux ! filesink location="'+sOUT1+'"'
+      # gst-launch is slow to encode... but the file size is very small... gst-launch is a Gstreamer utility
+      if os.path.isfile("/usr/bin/speexenc"):
+        s1='speexenc --title "'+sTT+'" "'+sTMP1+'" "'+sOUT1+'"'
+      else:
+        s1='gst-launch filesrc location="'+sTMP1+'" ! decodebin ! speexenc ! oggmux ! filesink location="'+sOUT1+'"'
       myossystem(s1)
     elif sOUT1EXT==".mp2":
       if os.path.isfile("/usr/bin/twolame"):
