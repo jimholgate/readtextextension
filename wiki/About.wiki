@@ -4,7 +4,7 @@
 
 Read Text Extension uses an external program or a web service to read text. Read the selection with Calc, Draw, Impress, Web Writer and Writer. Read the contents of the clipboard. Use speech synthesis to help to edit documents. Compare computer documents with printed documents. Learn a new language. Learn how to pronounce words correctly. Easily transfer text to your mobile device using QR Codes.
 
-==Distribution==
+==Download==
 
   * [http://extensions.services.openoffice.org/project/Read_Text OpenOffice.org Extensions]
   * [http://code.google.com/p/readtextextension/downloads/list Google Project Hosting]
