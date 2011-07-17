@@ -1,0 +1,13 @@
+#summary Installation de l'extension Read text
+
+= Configuration = 
+Cliquez sur l'icône dans la barre de menu ou sélectionnez Outils - Add-ons - Lire la sélection ... 
+  * Choisissez un logiciel ou un site et modifier les paramètres. 
+  * Par défaut, l'extension utilise */usr/bin/python* avec *Lire la sélection avec une application externe* et *"(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false "(TMP)"* dans *Les options sur la ligne de commande* . 
+  * Vous pouvez tester les paramètres sans les enregistrer par un clic droit sur *OK* . 
+  * Lorsque vous êtes satisfait des paramètres, décochez la case *Toujours affiche cette boîte de dialogue* . 
+  * Cliquez sur *OK* . 
+
+= Personnaliser = 
+  * Vous pouvez utiliser des applications externes ou des sites Web pour la synthese vocale des langues différentes ou pour la traduction de texte. 
+  * Si vous souhaitez afficher la boîte de dialogue pour modifier les paramètres, utilisez la commande *Outils - Add-ons - Lire la sélection ...* 
