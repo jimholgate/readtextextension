@@ -1,4 +1,4 @@
-#summary Read Text - Une extension OpenOffice.org & LibreOffice qui permet à un programme externe ou une application web lire
+#summary Read Text - Utilisez un programme externe ou une application web pour lire le texte sélectioné
 
 =Apropos=
 
