@@ -1,0 +1,11 @@
+  * Apropos
+    * [About Apropos]
+  * Installation
+    * [Install Installation]
+    * [SetUp Configuration]
+    * [CommandAndScriptTokens Tokens]
+  * Utilisation
+    * [ReadClipboard Lire le presse-papiers]
+    * [ReadSelection Lire la sélection]
+  * Download
+    * [http://code.google.com/p/readtextextension/downloads/list Download]
