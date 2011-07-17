@@ -1,0 +1,32 @@
+#summary Installation de l'extension Read text - Tokens
+
+= Tokens =
+
+Lorsque vous avez besoin de ces valeurs variables dans une commande ou dans un script vous pouvez utiliser une option appropriée. La valeur entre parenthèses serait remplacé par la chaîne approprié.
+
+  * La date actuelle (DATE) 
+  * Jour de la semaine (WEEKDAY) 
+  * Heure actuelle (TIME) 
+  * Heure actuelle reformaté pour que vous puissiez l'utiliser dans un fichier (NOW) 
+  * Nom de fichier temporaire contenant la sélection de texte (TMP) 
+  * Nom de l'auteur (AUTHOR) 
+  * Nom du document (TITLE) 
+  * Gallerie de son (SOUND_GALLERY) 
+  * Un script Windows Visual Basic qui utilise la synthese vocale du système (TTS_WSCRIPT_VBS)
+  * Un script Python qui encode le texte sélectionné dans un image PNG pour les appareils mobiles (CREATE_QR_LABEL_PY) 
+  * Un script Python qui exécute une commande du système d'exploitation (OS_PY) 
+  * Un script Python qui utilise espeak (ESPEAK_READ_TEXT_PY) 
+  * Un script Python qui utilise festival text2wave (FESTIVAL_READ_TEXT_PY) 
+  * Un script Python qui utilise pico (PICO_READ_TEXT_PY) 
+  * Un script Python qui utilise speech-dispatcher (SPD_READ_TEXT_PY) 
+  * Directoire de travail (HOME) 
+  * Code langue de l'application - en pour l'anglais; fr pour le français, etc (LANGUAGE_CODE) 
+  * Code national de l'application - CA pour Canada; FR pour France, etc. (COUNTRY_CODE) 
+  * Code régional de l'application - fr-CA pour Canada; fr-FR pour France, etc. (LANGUAGE_COUNTRY_CODE) 
+  * Code langue de la sélection - en pour l'anglais; fr pour le français, etc. (SELECTION_LANGUAGE_CODE) 
+  * Code national de la sélection - CA pour Canada; FR pour France, etc. (SELECTION_COUNTRY_CODE) 
+  * Code régional de la sélection - fr-CA pour Canada; fr-FR pour France, etc. (SELECTION_LANGUAGE_COUNTRY_CODE) 
+  * Les 99 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXTSMALL) 
+  * Les 249 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT250) 
+  * Les 999 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT) 
+  * Les 9999 premiers caractères du texte sélectionné codées pour URL (OOO_WEBTEXTBIG) 
