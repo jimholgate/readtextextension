@@ -1,6 +1,6 @@
   * Info
     * [About Info]
-  * Install
+  * Installieren
     * [Install Installieren]
     * [SetUp Setup]
     * [CommandAndScriptTokens Tokens]
