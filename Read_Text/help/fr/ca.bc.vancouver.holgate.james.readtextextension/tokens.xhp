@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+ <?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
 <meta>
 <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp" indexer="include" status="PUBLISH">
@@ -8,8 +8,8 @@ Tokens</title>
 <history>
 <created date="2010-10-22T00:00:00">
 James Holgate</created>
-<lastedited date="2011-04-10T00:00:00">
-Added token description for Pico.</lastedited></history></meta>
+<lastedited date="2011-07-16T23:33:32">
+Added token description for Title.</lastedited></history></meta>
 <body>
 <paragraph role="heading" id="tokens1" xml-lang="fr-CA" level="1">
 Installation de l'extension Read text</paragraph>
@@ -30,6 +30,8 @@ Heure actuelle reformaté pour que vous puissiez l'utiliser dans un fichier (NOW
 Nom de fichier temporaire contenant la sélection de texte (TMP)</listitem>
 <listitem>
 Nom de l'auteur (AUTHOR)</listitem>
+<listitem>
+Nom du document (TITLE)</listitem>
 <listitem>
 %PRODUCTNAME Gallerie de son (SOUND_GALLERY) </listitem>
 <switchinline select="sys">
