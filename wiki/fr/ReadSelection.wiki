@@ -1,0 +1,6 @@
+#summary Utilisation de l'extension Read text - Lire la sélection 
+
+= Lire la sélection =
+
+  * Ouvrez Calc, Draw, Impress, Web Writer ou Writer, et sélectionnez du texte. 
+  * Cliquez le bouton *Lire la sélection* sur la barre.
