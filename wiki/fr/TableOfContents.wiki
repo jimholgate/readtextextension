@@ -7,5 +7,5 @@
   * Utilisation
     * [ReadClipboard Lire le presse-papiers]
     * [ReadSelection Lire la sélection]
-  * Download
-    * [http://code.google.com/p/readtextextension/downloads/list Download]
+  * Télécharger
+    * [http://code.google.com/p/readtextextension/downloads/list Télécharger]
