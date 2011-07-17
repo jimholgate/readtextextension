@@ -10,6 +10,7 @@ When you need these values in a command or a script use the appropriate token. W
   * Current time reformatted so that you can use it in a filename (NOW)
   * Full name of path and temporary file containing selected text (TMP)
   * Name of the author (AUTHOR)
+  * Name of the document (TITLE)
   * Path of sound gallery (SOUND_GALLERY)
   * Path to a Windows Script to read using the system's voice (TTS_WSCRIPT_VBS)
   * Path to a Python Script to read aloud or record a sound file using any espeak supported languages. (ESPEAK_READ_TEXT_PY)
