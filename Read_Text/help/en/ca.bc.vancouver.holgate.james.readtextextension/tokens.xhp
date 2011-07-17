@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+ <?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
 <meta>
 <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp" indexer="include" status="PUBLISH">
@@ -9,8 +9,8 @@ Using Read Text Extension</title>
 <history>
 <created date="2010-10-22T00:00:00">
 James Holgate</created>
-<lastedited date="2011-04-10T00:00:00">
-Code for United Kingdom corrected. Added token description for Pico.</lastedited>
+<lastedited date="2011-07-16T23:30:00">
+Added token description for Title.</lastedited>
 </history>
 </meta>
 <body>
@@ -35,6 +35,9 @@ Current time reformatted so that you can use it in a filename (NOW)</listitem>
 Full name of path and temporary file containing selected text (TMP)</listitem>
 <listitem>
 Name of the author (AUTHOR)</listitem>
+<listitem>
+<listitem>
+Name of the document (TITLE)</listitem>
 <listitem>
 Path of the %PRODUCTNAME sound gallery (SOUND_GALLERY)</listitem>
 <switchinline select="sys">
