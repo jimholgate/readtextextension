@@ -1,7 +1,7 @@
   * Info
     * [About Info]
   * Install
-    * [Install Befehls- und Script-Tokens]
+    * [Install Installieren]
     * [SetUp Setup]
     * [CommandAndScriptTokens Tokens]
   * So verwenden Sie die Read Text Extension 
