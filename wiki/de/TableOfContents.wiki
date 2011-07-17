@@ -1,0 +1,11 @@
+  * Info
+    * [About Info]
+  * Install
+    * [Install Befehls- und Script-Tokens]
+    * [SetUp Setup]
+    * [CommandAndScriptTokens Tokens]
+  * So verwenden Sie die Read Text Extension 
+    * [ReadClipboard Zwischenablage vorlesen]
+    * [ReadSelection Markierten Text vorlesen]
+  * Download
+    * [http://code.google.com/p/readtextextension/downloads/list Download]
