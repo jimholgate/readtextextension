@@ -4,4 +4,4 @@
 
   * Obtenez la version la plus récente de l’extension. 
   * Ouvrez l'extension. Approuver la licence. 
-  * Redémarrez LibreOffice. 
+  * Redémarrez LibreOffice ou OpenOffice.org
