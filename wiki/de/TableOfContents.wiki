@@ -7,5 +7,5 @@
   * So verwenden Sie die Read Text Extension 
     * [ReadClipboard Zwischenablage vorlesen]
     * [ReadSelection Markierten Text vorlesen]
-  * Download
-    * [http://code.google.com/p/readtextextension/downloads/list Download]
+  * Dann laden
+    * [http://code.google.com/p/readtextextension/downloads/list Dann laden]
