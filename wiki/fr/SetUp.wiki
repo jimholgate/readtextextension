@@ -3,7 +3,7 @@
 = Configuration = 
 Cliquez sur l'icône dans la barre de menu ou sélectionnez Outils - Add-ons - Lire la sélection ... 
   * Choisissez un logiciel ou un site et modifier les paramètres. 
-  * Par défaut, l'extension utilise */usr/bin/python* avec *Lire la sélection avec une application externe* et *"(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false "(TMP)"* dans *Les options sur la ligne de commande* . 
+  * La plupart du temps les paramètres affichés peuvent synthétiser la parole sans modification.
   * Vous pouvez tester les paramètres sans les enregistrer par un clic droit sur *OK* . 
   * Lorsque vous êtes satisfait des paramètres, décochez la case *Toujours affiche cette boîte de dialogue* . 
   * Cliquez sur *OK* . 
