@@ -4,7 +4,7 @@
 
   * Klicken Sie auf das Symbol in der Menüleiste oder wählen Sie *Extras - Add-Ons - Markierten Text vorlesen...* 
   * Wählen Sie das Programm oder die Website, die Read Text verwenden soll, und wählen Sie eine Befehlszeile oder ein Script aus. 
-  * Standardmäßig nutzt Read Text */usr/bin/python* als externe Anwendung und *"(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false "(TMP)"* für die Befehlszeilen-Optionen, wobei *'(TMP)'* für den Dateinamen steht. Stimme und Sprechgeschwindigkeit lassen sich in der Befehlszeile einstellen. 
+  * Stimme und Sprechgeschwindigkeit lassen sich in der Befehlszeile einstellen. 
   * Sie können die Einstellung vorläufig testen, indem Sie auf *OK* rechtsklicken. 
   * Sind Sie mit der Einstellung zufrieden, entfernen Sie das Häkchen bei *Diesen Dialog immer zeigen*. 
   * Klicken Sie *OK*. 
