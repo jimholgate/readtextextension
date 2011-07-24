@@ -27,4 +27,4 @@ Cette extension permet à un programme externe ou une application web lire le te
 
 -----
 ===Rubriques connexes===
-[Accessibilité dans LibreOffice http://help.libreoffice.org/Common/Accessibility_in/fr]
+[http://help.libreoffice.org/Common/Accessibility_in/fr Accessibilité dans LibreOffice]
