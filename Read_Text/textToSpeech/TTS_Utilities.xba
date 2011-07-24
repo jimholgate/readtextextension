@@ -304,31 +304,208 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 End Sub
 
 Function fsMacVoice(n) As String
-	Dim ar1(24) As String
-	ar1(00)=&quot;Zarvox&quot;
-	ar1(01)=&quot;Whisper&quot;
-	ar1(02)=&quot;Victoria&quot;
-	ar1(03)=&quot;Vicki&quot;
-	ar1(04)=&quot;Trinoids&quot;
-	ar1(05)=&quot;Ralph&quot;
-	ar1(06)=&quot;Princess&quot;
-	ar1(07)=&quot;Pipe Organ&quot;
-	ar1(08)=&quot;Kathy&quot;
-	ar1(09)=&quot;Junior&quot;
-	ar1(10)=&quot;Hysterical&quot;
-	ar1(11)=&quot;Good News&quot;
-	ar1(12)=&quot;Fred&quot;
-	ar1(13)=&quot;Deranged&quot;
-	ar1(14)=&quot;Cellos&quot;
-	ar1(15)=&quot;Bubbles&quot;
-	ar1(16)=&quot;Bruce&quot;
-	ar1(17)=&quot;Boing&quot;
-	ar1(18)=&quot;Bells&quot;
-	ar1(19)=&quot;Bahh&quot;
-	ar1(20)=&quot;Bad News&quot;
-	ar1(21)=&quot;Albert&quot;
-	ar1(22)=&quot;Agnes&quot;
-	ar1(23)=&quot;&quot; &apos;Last array item must be empty to exit do -&gt; loop
+	Dim m As Integer
+	Dim sLanguage as String
+	Dim ar1(40) As String
+	sLanguage=fsSelectionLanguageAndRegion()
+	m=0
+	If fsSelectionLanguage=&quot;en&quot; Then
+		ar1(m)=&quot;Zarvox&quot;
+		m=m+1
+		ar1(m)=&quot;Whisper&quot;
+		m=m+1
+		ar1(m)=&quot;Victoria&quot;
+		m=m+1
+		ar1(m)=&quot;Vicki&quot;
+		m=m+1
+		ar1(m)=&quot;Trinoids&quot;
+		m=m+1
+		ar1(m)=&quot;Ralph&quot;
+		m=m+1
+		ar1(m)=&quot;Princess&quot;
+		m=m+1
+		ar1(m)=&quot;Pipe Organ&quot;
+		m=m+1
+		ar1(m)=&quot;Kathy&quot;
+		m=m+1
+		ar1(m)=&quot;Junior&quot;
+		m=m+1
+		ar1(m)=&quot;Hysterical&quot;
+		m=m+1
+		ar1(m)=&quot;Good News&quot;
+		m=m+1
+		ar1(m)=&quot;Fred&quot;
+		m=m+1
+		ar1(m)=&quot;Deranged&quot;
+		m=m+1
+		ar1(m)=&quot;Cellos&quot;
+		m=m+1
+		ar1(m)=&quot;Bubbles&quot;
+		m=m+1
+		ar1(m)=&quot;Bruce&quot;
+		m=m+1
+		ar1(m)=&quot;Boing&quot;
+		m=m+1
+		ar1(m)=&quot;Bells&quot;
+		m=m+1
+		ar1(m)=&quot;Bahh&quot;
+		m=m+1
+		ar1(m)=&quot;Bad News&quot;
+		m=m+1
+		ar1(m)=&quot;Albert&quot;
+		m=m+1
+		ar1(m)=&quot;Agnes&quot;
+		m=m+1
+	EndIf
+	Select Case sLanguage
+	Case &quot;en-US&quot;,&quot;en-CA&quot;
+		ar1(m)=&quot;Vicki&quot;
+		m=m+1
+		ar1(m)=&quot;Tom&quot;
+		m=m+1
+		ar1(m)=&quot;Samantha&quot;
+		m=m+1
+		ar1(m)=&quot;Jill&quot;
+		m=m+1
+		ar1(m)=&quot;Alex&quot;
+		m=m+1
+	Case &quot;en-AU&quot;,&quot;en-NZ&quot;
+		ar1(m)=&quot;Lee&quot;
+		m=m+1
+		ar1(m)=&quot;Karen&quot;
+		m=m+1
+	Case &quot;en-GB&quot;,&quot;en-BD&quot;,&quot;en-BS&quot;,&quot;en-GH&quot;,&quot;en-HK&quot;,&quot;en-JM&quot;,&quot;en-TT&quot;,&quot;en-IE&quot;
+		ar1(m)=&quot;Serena&quot;
+		m=m+1
+		ar1(m)=&quot;Moira&quot;
+		m=m+1
+		ar1(m)=&quot;Fiona&quot;
+		m=m+1
+		ar1(m)=&quot;Emily&quot;
+		m=m+1
+		ar1(m)=&quot;Daniel&quot;
+		m=m+1
+	Case &quot;en-IN&quot;,&quot;en-PK&quot;
+		ar1(m)=&quot;Sangeetal&quot;
+		m=m+1
+	Case &quot;en-ZA&quot;
+		ar1(m)=&quot;Tessa&quot;
+		m=m+1
+	Case &quot;ar-SA&quot;
+		ar1(m)=&quot;Maged&quot;
+		m=m+1
+	Case &quot;zh-CN&quot;,&quot;zh-SG&quot;,&quot;zh-MY&quot;
+		ar1(m)=&quot;Ting-Ting&quot;
+		m=m+1
+	Case &quot;zh-HK&quot;,&quot;zh-MO&quot;
+		ar1(m)=&quot;Sin-Ji&quot;
+		m=m+1
+	Case &quot;zh-TW&quot;
+		ar1(m)=&quot;Ya-Ling&quot;
+		m=m+1
+	Case &quot;cs-CZ&quot;
+		ar1(m)=&quot;Zuzana&quot;
+		m=m+1
+	Case &quot;da-DK&quot;
+		ar1(m)=&quot;Ida&quot;
+		m=m+1
+	Case &quot;nl-BE&quot;
+		ar1(m)=&quot;Ellen&quot;
+		m=m+1
+	Case &quot;nl-NL&quot;
+		ar1(m)=&quot;Xander&quot;
+		m=m+1
+		ar1(m)=&quot;Claire&quot;
+		m=m+1
+	Case &quot;fi-FI&quot;
+		ar1(m)=&quot;Mikko&quot;
+		m=m+1
+	Case &quot;fr-CA&quot;
+		ar1(m)=&quot;Julie&quot;
+		m=m+1
+		ar1(m)=&quot;Felix&quot;
+		m=m+1
+	Case &quot;fr-FR&quot;,&quot;fr-BE&quot;
+		ar1(m)=&quot;Virginie&quot;
+		m=m+1
+		ar1(m)=&quot;Thomas&quot;
+		m=m+1
+		ar1(m)=&quot;Sebastien&quot;
+		m=m+1
+	Case &quot;de-DE&quot;,&quot;de-AT&quot;,&quot;de-CH&quot;,&quot;de-LU&quot;,&quot;de-LI&quot;,&quot;de-BE&quot;
+		ar1(m)=&quot;Yannick&quot;
+		m=m+1
+		ar1(m)=&quot;Steffi&quot;
+		m=m+1
+		ar1(m)=&quot;Anna&quot;
+		m=m+1
+	Case &quot;he-GR&quot;
+		ar1(m)=&quot;Alexandros&quot;
+		m=m+1
+	Case &quot;hi-IN&quot;
+		ar1(m)=&quot;Lekha&quot;
+		m=m+1
+	Case &quot;hu-HU&quot;
+		ar1(m)=&quot;Eszter&quot;
+		m=m+1
+	Case &quot;id-ID&quot;
+		ar1(m)=&quot;Damayanti&quot;
+		m=m+1
+	Case &quot;it-IT&quot;
+		ar1(m)=&quot;Silvia&quot;
+		m=m+1
+		ar1(m)=&quot;Paolo&quot;
+		m=m+1
+	Case &quot;ja-JP&quot;
+		ar1(m)=&quot;Kyoko&quot;
+		m=m+1
+	Case &quot;ko-KR&quot;, &quot;ko-KP&quot;
+		ar1(m)=&quot;Narae&quot;
+		m=m+1
+	Case &quot;nb-NO&quot;
+		ar1(m)=&quot;Stine&quot;
+		m=m+1
+	Case &quot;pl-PO&quot;
+		ar1(m)=&quot;Agata&quot;
+		m=m+1
+	Case &quot;pt-BR&quot;
+		ar1(m)=&quot;Raquel&quot;
+		m=m+1
+	Case &quot;pt-PT&quot;
+		ar1(m)=&quot;Joana&quot;
+		m=m+1
+	Case &quot;ro-RO&quot;
+		ar1(m)=&quot;Simona&quot;
+		m=m+1
+	Case &quot;ru-RU&quot;
+		ar1(m)=&quot;Milena&quot;
+		m=m+1
+	Case &quot;sk-SK&quot;
+		ar1(m)=&quot;Laura&quot;
+		m=m+1
+	Case &quot;es-MX&quot;
+		ar1(m)=&quot;Paulina&quot;
+		m=m+1
+		ar1(m)=&quot;Javier&quot;
+		m=m+1
+	Case &quot;es-ES&quot;
+		ar1(m)=&quot;Monica&quot;
+		m=m+1
+		ar1(m)=&quot;Diego&quot;
+		m=m+1
+	Case &quot;sv-SE&quot;
+		ar1(m)=&quot;Oskar&quot;
+		m=m+1
+		ar1(m)=&quot;Alva&quot;
+		m=m+1
+	Case &quot;th-TH&quot;
+		ar1(m)=&quot;Narisa&quot;
+		m=m+1
+	Case &quot;tr-TR&quot;
+		ar1(m)=&quot;Aylin&quot;
+		m=m+1
+	End Select
+	ar1(m)=&quot;&quot; &apos;Last array item must be empty to exit do -&gt; loop
 	fsMacVoice=ar1(n)
 end Function
 
@@ -343,12 +520,6 @@ Sub dialog1Combo2ShowSAYChoices(oDialog)
 	REM first remove all old items from the list
 	n=oComboBox.getItemCount()
 	oComboBox.removeItems( 0,n)
-	n=0
-	Do
-		s1=&quot;-v &quot; &amp; Chr$(34) &amp; fsMacVoice(n) &amp; Chr$(34) &amp; &quot; -f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
-		oComboBox.addItem(s1,0)
-		n=n+1
-	Loop Until fsMacVoice(n) = &quot;&quot;
 	s2(1)=&quot;.wav&quot;
 	s2(2)=&quot;.mp3&quot;
 	s2(3)=&quot;.m4a&quot;
@@ -357,6 +528,13 @@ Sub dialog1Combo2ShowSAYChoices(oDialog)
 			s1=&quot;-o &quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW)&quot; &amp; s2(n) &amp; Chr$(34) &amp; &quot; -f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
 			oComboBox.addItem(s1,0)
 	Next 
+	n=0
+	Do
+		s1=&quot;-v &quot; &amp; Chr$(34) &amp; fsMacVoice(n) &amp; Chr$(34) &amp; &quot; -f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+		oComboBox.addItem(s1,0)
+		n=n+1
+	Loop Until fsMacVoice(n) = &quot;&quot;
+
 	s1=&quot;-f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
 	oComboBox.addItem(s1,0)
 End Sub
