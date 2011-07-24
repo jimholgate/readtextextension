@@ -1120,7 +1120,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Tradurre e leggere con strumenti web&quot;
 		sL10N(20)=&quot;Proprietà riconoscimento vocale&quot;
-	Case &quot;jp&quot; &apos;Japanese
+	Case &quot;ja&quot; &apos;Japanese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;外部プログラム&quot;
 		sL10N(2)=&quot;スクリプトで使用するのFestival&quot;
@@ -1580,7 +1580,7 @@ Function fsDateMyRegion(i As Integer) As String
 		sL10N=Format(Now,&quot;D, MMMM YYYY&quot;)
 	Case &quot;zh&quot;,&quot;zh-CN&quot;,&quot;zh-TW&quot;,&quot;zh-HK&quot;,&quot;zh-MO&quot;,&quot;zh-SG&quot; &apos; 2009年10月25日 星期日
 		sL10N=Year(NOW)  &amp; &quot;年&quot; &amp; Month(NOW)  &amp; &quot;月&quot; &amp; Day(NOW)  &amp; &quot;日&quot;
-	Case &quot;jp&quot; &apos; 2011年2月6日
+	Case &quot;ja&quot; &apos; 2011年2月6日
 		sL10N=Year(NOW)  &amp; &quot;年&quot; &amp; Month(NOW)  &amp; &quot;月&quot; &amp; Day(NOW)  &amp; &quot;日&quot;
 	Case &quot;ko&quot;  &apos;Korean 
 		sL10N=Year(NOW)  &amp; &quot;년&quot; &amp; Month(NOW)  &amp; &quot;월&quot; &amp; Day(NOW)  &amp; &quot;일&quot;
