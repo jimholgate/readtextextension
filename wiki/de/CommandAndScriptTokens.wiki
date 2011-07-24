@@ -10,6 +10,7 @@ Verwenden Sie das passende Token, wenn Sie diese Werte in einem Befehl oder Scri
   * Aktuelle Uhrzeit, umformatiert zur Nutzung im Dateinamen (NOW) 
   * Vollständige Pfadangabe und temporäre Datei mit markiertem Text (TMP) 
   * Name des Verfassers (AUTHOR) 
+  * Name des Dokuments (TITLE)
   * Pfad zur LibreOffice Sound-Galerie (SOUND_GALLERY) 
   * Pfad zu einem Python-Script, das Text als PNG-Bild für Mobilgeräte codiert (CREATE_QR_LABEL_PY) 
   * Pfad zu einem Python-Script, das einen Betriebssystem-Shell-Befehl ausführt (OS_PY) 
