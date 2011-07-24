@@ -63,6 +63,11 @@ Function fsSelectionLogo as String
 	fsSelectionLogo=fsMyURL &amp; &quot;/images/textToSpeech_26.png&quot;
 End Function
 
+
+Function fsToolBoxLogo as String
+	fsToolBoxLogo=fsMyURL &amp; &quot;/images/toolbox_26.png&quot;
+End Function
+
 Function fsLicenseDoc as String
 	Dim s1 As String
 	s1=fsMyURL &amp; &quot;/license/LICENSE&quot;
@@ -252,6 +257,11 @@ End Function
 Function fiL10nREAD_THE_SELECTION_WITH_HTML As Integer
 	fiL10nREAD_THE_SELECTION_WITH_HTML=19
 End Function
+
+Function fiL10nSPEECH_PROPERTIES As Integer
+	fiL10nSPEECH_PROPERTIES=20
+End Function
+
 &apos; Configuration file  uses these strings As keys
 
 Function fsKeyUSE_FESTIVAL_BOOLEAN  As String 
@@ -726,7 +736,7 @@ Function fiCountEspeakMbrolaLanguage
 End Function
 
 Function fsStringLanguage(i As Integer, b As String) As String
-	Dim sL10N(20) As String
+	Dim sL10N(21) As String
 	Select Case b
 	Case &quot;af&quot; &apos;Afrikaans
 		sL10N(0)=&quot;Read Text&quot;
@@ -747,8 +757,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Kon nie die program.&quot;
 		sL10N(16)=&quot;String kan nie ontleed word!&quot;
 		sL10N(17)=&quot;On-line help&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Vertaal en lees met web tools&quot;
+		sL10N(20)=&quot;Toespraak eienskappe&quot;
 	Case &quot;bg&quot; &apos;Bulgarian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Външната програма&quot;
@@ -768,8 +779,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Не може да намерите на програмата.&quot;
 		sL10N(16)=&quot;String не може да се анализира!&quot;
 		sL10N(17)=&quot;Он-лайн помощ&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Превод и четат с уеб инструменти&quot;
+		sL10N(20)=&quot;Свойства на речта&quot;
 	Case &quot;ca&quot; &apos;Catalan
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Programa extern&quot;
@@ -789,8 +801,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;No s&apos;ha pogut localitzar el programa.&quot;
 		sL10N(16)=&quot;La cadena no pot ser analitzat!&quot;
 		sL10N(17)=&quot;Ajuda en línia&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Traduir i llegir amb eines de la web&quot;
+		sL10N(20)=&quot;Propietats de veu&quot;
 	Case &quot;cs&quot; &apos;Czech
 		sL10N(0)=&quot;Read Text&quot; 
 		sL10N(1)=&quot;Externí program&quot; 
@@ -810,8 +823,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Nelze najít programu.&quot;
 		sL10N(16)=&quot;Řetězec nelze analyzovat!&quot;
 		sL10N(17)=&quot;On-line help&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Přeložit a ve spojení s webovou nástroje&quot;
+		sL10N(20)=&quot;Vlastnosti programu Speech&quot;
 	Case &quot;da&quot; &apos;Danish
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Eksternt program&quot;
@@ -831,8 +845,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Kunne ikke finde programmet.&quot;
 		sL10N(16)=&quot;String ikke kan analyseres!&quot;
 		sL10N(17)=&quot;On-line hjælp&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Oversæt og læs med web værktøjer&quot;
+		sL10N(20)=&quot;Egenskaber for tale&quot;
 	Case &quot;de&quot; &apos; Includes German translations provided by Eugene Seidel
 		&apos; &quot;Read Text&quot; %READ_TEXT%
 		&apos; &quot;Über Read Text&quot; %ABOUT_READ_TEXT%
@@ -856,8 +871,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Programm nicht auffindbar.&quot; &apos; &quot;Could not locate the program. &quot;
 		sL10N(16)=&quot;Zeichenkette kann nicht analysiert werden!&quot; &apos; &quot;String cannot be analyzed!&quot;
 		sL10N(17)=&quot;Online-Hilfe&quot; &apos; &quot;On-line help&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About?wl=de&quot;
 		sL10N(19)=&quot;Web-Anwendung verwenden&quot; &apos; &quot;Use a web application&quot;
+		sL10N(20)=&quot;Spracheigenschaften&quot;
 	Case &quot;el&quot; &apos;Greek
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Πρόγραμμα Εξωτερικού&quot;
@@ -877,8 +893,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Δεν μπόρεσα να βρώ το πρόγραμμα.&quot;
 		sL10N(16)=&quot;String δεν μπορεί να αναλυθεί!&quot;
 		sL10N(17)=&quot;Βοήθεια On-line&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Μετάφραση και σε συνδυασμό με εργαλεία web&quot;
+		sL10N(20)=&quot;Ιδιότητες ομιλίας&quot;
 	Case &quot;es&quot; &apos;Includes Spanish translations provided by Ariel Del Valle
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Programa&quot;
@@ -898,8 +915,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;No se encontró el programa.&quot;
 		sL10N(16)=&quot;La secuencia no se puede analizar!&quot;
 		sL10N(17)=&quot;Ayuda On-line&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Usar las herramientas web&quot;
+		sL10N(20)=&quot;Propiedades de voz&quot;
 	Case &quot;fr&quot; &apos;French
 		sL10N(0)=&quot;L&apos;extension Read Text&quot;
 		sL10N(1)=&quot;Application externe&quot;
@@ -919,8 +937,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Application externe inconnue.&quot;
 		sL10N(16)=&quot;Une fonction BASIC ne peut pas analyser une chaîne de caractères.&quot;
 		sL10N(17)=&quot;L&apos;aide en ligne&quot;	
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About?wl=fr&quot;
 		sL10N(19)=&quot;Outils en ligne&quot;
+		sL10N(20)=&quot;Propriétés de la synthèse vocale&quot;
 	Case &quot;et&quot; &apos;Estonian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Väline programm&quot;
@@ -940,8 +959,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Ei leia programmi.&quot;
 		sL10N(16)=&quot;String ei saa analüüsida!&quot;
 		sL10N(17)=&quot;On-line help&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Tõlgi ja lugeda veebitööriistadega&quot;
+		sL10N(20)=&quot;Kõneatribuudid&quot;
 	Case &quot;fi&quot; &apos;Finnish
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Ulkoinen ohjelma&quot;
@@ -961,8 +981,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Ei voitu paikallistaa ohjelman.&quot;
 		sL10N(16)=&quot;Merkkijono ei voida analysoida!&quot;
 		sL10N(17)=&quot;On-line help&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Käännä ja lukea web-työkalujen&quot;
+		sL10N(20)=&quot;Puheominaisuudet&quot;
 	Case &quot;ga&quot; &apos;Irish
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Relations clár&quot;
@@ -982,8 +1003,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Níorbh fhéidir teacht ar an gclár.&quot;
 		sL10N(16)=&quot;Ní féidir anailís a dhéanamh String!&quot;
 		sL10N(17)=&quot;Ar-líne chabhrach&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Aistrigh agus léifear le huirlisí gréasáin&quot;
+		sL10N(20)=&quot;Airíonna Cainte&quot;
 	Case &quot;hi&quot; &apos;Hindi
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;विदेश प्रोग्राम&quot;
@@ -1003,8 +1025,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;मैं प्रोग्राम को नहीं ढूँढ सकते है.&quot;
 		sL10N(16)=&quot;मैं स्ट्रिंग का विश्लेषण नहीं कर सकता है!&quot;
 		sL10N(17)=&quot;ऑन लाइन मदद&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;अनुवाद और वेब उपकरणों के साथ पढ़ें&quot;
+		sL10N(20)=&quot;वाक् गुण&quot;
 	Case &quot;hu&quot; &apos;Hungarian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Külső program&quot;
@@ -1024,8 +1047,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Nem találom a programot.&quot;
 		sL10N(16)=&quot;String nem lehet elemezni!&quot;
 		sL10N(17)=&quot;On-line segítség&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Fordítás és olvassa el a webes eszközök&quot;
+		sL10N(20)=&quot;Beszéd tulajdonságai&quot;
 	Case &quot;id&quot; &apos;Indonesian
 		&apos;&quot;Baca Teks&quot;  READ_TEXT
 		&apos;&quot;Tentang Baca Teks&quot; ABOUT_READ_TEXT
@@ -1049,8 +1073,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Tidak dapat menemukan program.&quot;
 		sL10N(16)=&quot;String tidak dapat dianalisis!&quot;
 		sL10N(17)=&quot;On-line help &quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Terjemahkan dan membaca dengan alat-alat web&quot;
+		sL10N(20)=&quot;Properti Ucapan&quot;
 	Case &quot;is&quot;
 		sL10N(0)=&quot;Lesa Texti Eftirnafn&quot;
 		sL10N(1)=&quot;Ytri program&quot;
@@ -1070,8 +1095,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Gat ekki fundið forritið.&quot;
 		sL10N(16)=&quot;String er ekki hægt að greina!&quot;
 		sL10N(17)=&quot;Á-hjálp&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Þýða og lesa með verkfærum vefnum&quot;
+		sL10N(20)=&quot;Eiginleikar tals&quot;
 	Case &quot;it&quot; &apos;Italian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Programma esterno&quot;
@@ -1091,8 +1117,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;External Application sconosciuto. &quot;
 		sL10N(16)=&quot;Una funzione BASIC non può analizzare una stringa.&quot;
 		sL10N(17)=&quot;Help On-line&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Tradurre e leggere con strumenti web&quot;
+		sL10N(20)=&quot;Proprietà riconoscimento vocale&quot;
 	Case &quot;jp&quot; &apos;Japanese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;外部プログラム&quot;
@@ -1112,8 +1139,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;プログラムを見つけることができませんでした&quot;
 		sL10N(16)=&quot;文字列を解析することはできません！&quot;
 		sL10N(17)=&quot;ラインで&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;オンラインツール&quot;
+		sL10N(20)=&quot;音声認識のプロパティ&quot;
 	Case &quot;ko&quot; &apos;Korean
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;외부 프로그램&quot;
@@ -1133,8 +1161,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;프로그램을 찾을 수 없습니다.&quot;
 		sL10N(16)=&quot;문자열을 분석할 수 없어!&quot;
 		sL10N(17)=&quot;온라인 도움말 &quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;번역 및 웹 도구와 읽기&quot;
+		sL10N(20)=&quot;음성 속성&quot;
 	Case &quot;lv&quot; &apos;Latvian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Ārējā programma&quot;
@@ -1154,8 +1183,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Nevarēja atrast programmu.&quot;
 		sL10N(16)=&quot;Stīgu nevar analizēt!&quot;
 		sL10N(17)=&quot;On-line help&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Tulkot un lasīt ar web rīkus&quot;
+		sL10N(20)=&quot;Runas rekvizīti&quot;
 	Case &quot;lt&quot; &apos;Lithuanian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Išorės programa&quot;
@@ -1175,8 +1205,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Nepavyksta rasti programos&quot;
 		sL10N(16)=&quot;Styginių negali būti analizuojamas!&quot;
 		sL10N(17)=&quot;On-line help&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Versti ir skaityti žiniatinklio įrankius&quot;
+		sL10N(20)=&quot;Kalbėjimo ypatybės&quot;
 	Case &quot;mt&quot; &apos;Maltese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Programm Esterni&quot;
@@ -1196,8 +1227,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Ma kellekx jillokalizza l-programm.&quot;
 		sL10N(16)=&quot;String ma jistgħux jiġu analizzati!&quot;
 		sL10N(17)=&quot;On-line jgħinu&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Ittraduċi u jinqraw bl-għodda tal-web&quot;
+		sL10N(20)=&quot;Proprjetajiet ta&apos; Diskors&quot;
 	Case &quot;nl&quot; &apos;Dutch
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Externe programma&quot;
@@ -1217,8 +1249,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Kan niet vinden het programma.&quot;
 		sL10N(16)=&quot;String kan niet worden geanalyseerd!&quot;
 		sL10N(17)=&quot;On-line help&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Vertalen en lees met web tools&quot;
+		sL10N(20)=&quot;Eigenschappen van spraak&quot;
 	Case &quot;pl&quot; &apos;Polish
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Program zewnętrzne&quot;
@@ -1238,8 +1271,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Nie można odnaleźć programu.&quot;
 		sL10N(16)=&quot;Napis nie może być analizowana!&quot;
 		sL10N(17)=&quot;Pomoże On-line&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Przetłumacz i czytać z narzędzi internetowych&quot;
+		sL10N(20)=&quot;Właściwości mowy&quot;
 	Case &quot;pt&quot; &apos;Portuguese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Aplicação Externa&quot;
@@ -1259,8 +1293,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Desconhecido aplicativo externo.&quot;
 		sL10N(16)=&quot;Uma função básica não é possível analisar uma seqüência.&quot;
 		sL10N(17)=&quot;Ajuda Online&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Traduzir e ler ferramentas da Web&quot;	
+		sL10N(20)=&quot;Propriedades de Fala&quot;
 	Case &quot;ro&quot; &apos;Romanian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Externă program&quot;
@@ -1280,8 +1315,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Nu am putut localiza programul.&quot;
 		sL10N(16)=&quot;String nu poate fi analizată!&quot;
 		sL10N(17)=&quot;Ajutor On-line&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Traduceţi şi citesc cu instrumente web&quot;
+		sL10N(20)=&quot;Proprietăți vorbire&quot;
 	Case &quot;ru&quot; &apos;Russian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Наружное применение&quot; 
@@ -1301,8 +1337,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Наружное применение неизвестно&quot;
 		sL10N(16)=&quot;Основная функция не может разобрать строку&quot;
 		sL10N(17)=&quot;Справка&quot; 
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;веб-инструменты&quot;
+		sL10N(20)=&quot;Свойства речи&quot;
 	Case &quot;sk&quot; &apos;Slovak
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Externý program&quot;
@@ -1322,8 +1359,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Nemožno nájsť program.&quot;
 		sL10N(16)=&quot;Reťazec nemožno analyzovať!&quot;
 		sL10N(17)=&quot;On-line help&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Preložiť a v spojení s webovou nástroje&quot;
+		sL10N(20)=&quot;Reč – vlastnosti&quot;
 	Case &quot;sl&quot; &apos;Slovenian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Zunanji program&quot;
@@ -1343,8 +1381,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Ni bilo mogoče najti program.&quot;
 		sL10N(16)=&quot;Niz ne more biti analizirana!&quot;
 		sL10N(17)=&quot;On-line pomoč&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Prevedi in brati s spletnimi orodji&quot;
+		sL10N(20)=&quot;Lastnosti govora&quot;
 	Case &quot;sv&quot; &apos;Swedish
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Extern programmet&quot;
@@ -1364,8 +1403,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Kunde inte hitta programmet.&quot;
 		sL10N(16)=&quot;Kan Sträng inte analyseras!&quot;
 		sL10N(17)=&quot;On-line hjälp&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Översätt och läste med webbverktyg&quot;	
+		sL10N(20)=&quot;Talegenskaper&quot;
 	Case &quot;tl&quot;
 		&apos;&quot;Basahin Text&quot; READ_TEXT
 		&apos;&quot;Basahin Tungkol Text&quot; ABOUT_READ_TEXT
@@ -1389,8 +1429,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Hindi mahanap ang programa.&quot;
 		sL10N(16)=&quot;String ay hindi maaaring aralan!&quot;
 		sL10N(17)=&quot;On-line help &quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Isalin at basahin sa mga tool ng web&quot;
+		sL10N(20)=&quot;Pagsasalita katangian&quot;
 	Case &quot;tr&quot;
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Harici programı&quot;
@@ -1410,8 +1451,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Programı bulunamıyor.&quot;
 		sL10N(16)=&quot;String analiz olamaz!&quot;
 		sL10N(17)=&quot;On-line yardım&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Çevir ve web araçları ile oku &quot;
+		sL10N(20)=&quot;Konuşma Özellikleri&quot;
 	Case &quot;uk&quot;
 		&apos; &quot;Читання тексту&quot; READ_TEXT
 		&apos; &quot;Про Читання тексту&quot; ABOUT_READ_TEXT
@@ -1435,8 +1477,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Неможливо знайти програму. &quot;
 		sL10N(16)=&quot;Рядок не може бути проаналізована!&quot;
 		sL10N(17)=&quot;Он-лайн допомогу &quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Перекласти й читати з веб-інструментів&quot;
+		sL10N(20)=&quot;Властивості мовлення&quot;
 	Case &quot;zh-TW&quot; &apos;Traditional Chinese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;外部程序&quot;
@@ -1456,8 +1499,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;宏無法找到該程序.&quot;
 		sL10N(16)=&quot;宏無法讀取的字符串正確！&quot;
 		sL10N(17)=&quot;在線幫助&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;翻譯和閱讀網頁工具&quot;
+		sL10N(20)=&quot;語音內容&quot;
 	Case &quot;zh&quot; , &quot;zh-CN&quot; &apos;Simplified Chinese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;外部程序&quot; 
@@ -1477,8 +1521,9 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;宏无法找到该程序.&quot; 
 		sL10N(16)=&quot;宏无法读取的字符串正确！&quot;
 		sL10N(17)=&quot;获得帮助在线&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;翻译和阅读网页工具&quot;
+		sL10N(20)=&quot;语音属性&quot;
 	Case Else &apos;&quot;en&quot; English (default)
 	    &apos; &quot;Read Text&quot; %READ_TEXT%
 	    &apos; &quot;About Read Text&quot; %ABOUT_READ_TEXT%
@@ -1502,11 +1547,13 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Could not locate the program. &quot;
 		sL10N(16)=&quot;String cannot be analyzed!&quot;
 		sL10N(17)=&quot;On-line help&quot;
-		sL10N(18)=&quot;http://sites.google.com/site/readtextextension/&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Use a web application&quot;
+		sL10N(20)=&quot;Speech Properties&quot;
 	End Select
 	fsStringLanguage=sL10N(i)
 End Function
+
 
 Function fsDateMyRegion(i As Integer) As String
 	Dim sL10N As String
