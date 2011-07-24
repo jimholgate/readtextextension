@@ -24,3 +24,7 @@ Read Text Extension uses an external program or a web service to read text. Read
 ==Source Code==
 
   * [http://code.google.com/p/readtextextension/source/browse/Read_Text/ Google Project Hosting]
+
+----
+===Related Topics===
+[http://help.libreoffice.org/Common/Accessibility_in Accessibility in LibreOffice]
