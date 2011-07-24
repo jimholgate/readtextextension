@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
 <meta>
 <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp" indexer="include" status="PUBLISH">
@@ -76,7 +76,19 @@ Les options sur la ligne de commande</emph>
 . 
 </caseinline>
 <defaultinline>
-La plupart du temps les paramètres affichés peuvent synthétiser la parole sans modification.
+Par défaut, l'extension utilise 
+<emph>
+/usr/bin/espeak</emph>
+avec 
+<emph>
+Lire la sélection avec une application externe</emph>
+et 
+<emph>
+-f '(TMP)'</emph>
+dans 
+<emph>
+Les options sur la ligne de commande</emph>
+. 
 </defaultinline>
 </switchinline>
 </listitem>

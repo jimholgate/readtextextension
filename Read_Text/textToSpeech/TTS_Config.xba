@@ -180,6 +180,10 @@ Sub AboutAddOn (config() As Variant, myText As String)
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl3&quot;).model.ImageURL=fsSelectionLogo
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.helpText=Left(fsGetClipBoard(),99) 
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.ImageURL=fsClipBoardLogo
+	If fileExists(&quot;C:\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) or fileExists(&quot;C:\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) Then
+		f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.helpText=fsDialogMyRegion(fiL10nSPEECH_PROPERTIES)
+	Endif
+	f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.ImageURL=fsToolBoxLogo
 	f_dlgAboutReadSelection.GetControl(&quot;Label1&quot;).model.helpText=Left(fsGetTextSelection(),99) 
 	f_dlgAboutReadSelection.GetControl(&quot;Label1&quot;).model.Label=Len(fsGetTextSelection())
 	f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.helpText=Left(fsGetClipBoard(),99)

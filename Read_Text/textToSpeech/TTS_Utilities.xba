@@ -1791,4 +1791,20 @@ Sub myBeep
 	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 	oSvc.execute(sA,&quot;&quot;,1)
 End Sub
+
+Sub windowsSAPIControl
+	If fileExists(&quot;C:\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) Then
+		Shell(&quot;rundll32.exe&quot;,0,&quot;url.dll,FileProtocolHandler C:\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;,True)
+	Elseif fileExists(&quot;C:\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) Then
+		Shell(&quot;rundll32.exe&quot;,0,&quot;url.dll,FileProtocolHandler C:\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;,True)
+	Elseif fileExists(&quot;/usr/bin/systemsettings&quot;) Then &apos;kde
+		Shell(&quot;/usr/bin/systemsettings&quot;,0,&quot;&quot;,True)
+	Elseif fileExists(&quot;/usr/bin/xfce-setting-show&quot;) Then &apos;xfce
+		Shell(&quot;/usr/bin/xfce-setting-show&quot;,0,&quot;&quot;,True)
+	Elseif fileExists(&quot;/usr/bin/gnome-control-center&quot;) Then &apos;gnome
+		Shell(&quot;/usr/bin/gnome-control-center&quot;,0,&quot;&quot;,True)
+	Elseif fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot; Then &apos;osx
+		Shell(&quot;open&quot;,0,&quot;-b com.apple.systempreferences&quot;,True)
+	EndIf
+End Sub
 </script:module>
