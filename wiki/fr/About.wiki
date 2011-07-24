@@ -24,3 +24,7 @@ Cette extension permet à un programme externe ou une application web lire le te
 ==Le code source==
 
   * [http://code.google.com/p/readtextextension/source/browse/Read_Text/ Google Project Hosting]
+
+-----
+===Rubriques connexes===
+[Accessibilité dans LibreOffice http://help.libreoffice.org/Common/Accessibility_in/fr]
