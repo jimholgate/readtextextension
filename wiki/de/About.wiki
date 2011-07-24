@@ -24,3 +24,7 @@ Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Cal
 ==Source-Code==
 
   * [http://code.google.com/p/readtextextension/source/browse/Read_Text/ Google Project Hosting]
+  
+-----
+===Verwandte Themen===
+[Behindertengerechter Zugang http://help.libreoffice.org/Common/Accessibility_in/de]
