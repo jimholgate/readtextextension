@@ -11,7 +11,7 @@ Verwenden Sie das passende Token, wenn Sie diese Werte in einem Befehl oder Scri
   * Vollständige Pfadangabe und temporäre Datei mit markiertem Text (TMP) 
   * Name des Verfassers (AUTHOR) 
   * Name des Dokuments (TITLE)
-  * Pfad zur LibreOffice Sound-Galerie (SOUND_GALLERY) 
+  * Pfad zur Sound-Galerie (SOUND_GALLERY) 
   * Pfad zu einem Python-Script, das Text als PNG-Bild für Mobilgeräte codiert (CREATE_QR_LABEL_PY) 
   * Pfad zu einem Python-Script, das einen Betriebssystem-Shell-Befehl ausführt (OS_PY) 
   * Pfad zu einem Windows Script für das Vorlesen mittels Sprachausgabe (TTS_WSCRIPT_VBS)
