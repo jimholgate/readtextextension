@@ -81,7 +81,7 @@
     <dlg:menuitem dlg:value="id"/>
     <dlg:menuitem dlg:value="is"/>
     <dlg:menuitem dlg:value="it"/>
-    <dlg:menuitem dlg:value="jp"/>
+    <dlg:menuitem dlg:value="ja"/>
     <dlg:menuitem dlg:value="ko"/>
     <dlg:menuitem dlg:value="lt"/>
     <dlg:menuitem dlg:value="lv"/>
