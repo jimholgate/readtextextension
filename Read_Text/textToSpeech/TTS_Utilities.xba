@@ -1971,10 +1971,12 @@ Sub myBeep
 End Sub
 
 Sub windowsSAPIControl
-	If fileExists(&quot;C:\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) Then
-		Shell(&quot;rundll32.exe&quot;,0,&quot;url.dll,FileProtocolHandler C:\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;,True)
-	Elseif fileExists(&quot;C:\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) Then
-		Shell(&quot;rundll32.exe&quot;,0,&quot;url.dll,FileProtocolHandler C:\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;,True)
+    dim s2 As String
+    s2=fsHomeDrive()
+	If fileExists(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) Then
+		Shell(&quot;rundll32.exe&quot;,0,&quot;url.dll,FileProtocolHandler &quot; &amp; s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;,True)
+	Elseif fileExists(s2 &amp;&quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) Then
+		Shell(&quot;rundll32.exe&quot;,0,&quot;url.dll,FileProtocolHandler &quot; &amp; s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;,True)
 	Elseif fileExists(&quot;/usr/bin/systemsettings&quot;) Then &apos;kde
 		Shell(&quot;/usr/bin/systemsettings&quot;,0,&quot;&quot;,True)
 	Elseif fileExists(&quot;/usr/bin/xfce-setting-show&quot;) Then &apos;xfce
