@@ -11,7 +11,7 @@ Read Text Extension uses an external program or a web service to read text. Read
 
 ==Screen Shot==
 
-[http://sites.google.com/site/readtextextension/ http://sites.google.com/site/readtextextension/_/rsrc/1297227351096/home/microsoft-windows/Default64.png]
+[http://sites.google.com/site/readtextextension/ http://readtextextension.googlecode.com/svn/wiki/Default64.png]
 
 ==Tutorial==
 
