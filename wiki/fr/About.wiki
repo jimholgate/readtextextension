@@ -11,7 +11,7 @@ Cette extension permet à un programme externe ou une application web lire le te
 
 ==Capture d'écran==
 
-[http://sites.google.com/site/readtextextension/ http://sites.google.com/site/readtextextension/_/rsrc/1297227351096/home/microsoft-windows/Default64.png]
+[http://sites.google.com/site/readtextextension/ http://readtextextension.googlecode.com/svn/wiki/fr/Default64.png]
 
 ==Tutoriel==
 
