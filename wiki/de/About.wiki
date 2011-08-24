@@ -11,7 +11,7 @@ Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Cal
 
 ==Image==
 
-[http://sites.google.com/site/readtextextension/ http://sites.google.com/site/readtextextension/_/rsrc/1297227351096/home/microsoft-windows/Default64.png]
+[http://sites.google.com/site/readtextextension/ http://readtextextension.googlecode.com/svn/wiki/de/Default64.png]
 
 ==Lernprogramm==
 
