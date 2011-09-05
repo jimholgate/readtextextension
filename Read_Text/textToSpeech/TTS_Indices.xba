@@ -128,16 +128,8 @@ Function fsFestivalScriptName As String
 	fsFestivalScriptName=&quot;tts_scr.sh&quot;
 End Function
 
-Function fsSapiVoiceListDoc As String
-	fsSapiVoiceListDoc=&quot;tts_sapi_voices_list.txt&quot;
-End Function
-
 Function fsTTSScriptVBS As String
 	fsTTSScriptVBS=fsMyURL &amp; &quot;/script/tts_wscript.vbs&quot;
-End Function
-
-Function fsTTSListVoicesVBS As String
-	fsTTSListVoicesVBS=fsMyURL &amp; &quot;/script/tts_list_voices.vbs&quot;
 End Function
 
 Function fsTemporaryTextDoc As String

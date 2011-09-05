@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
-<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Dialog1" dlg:left="18" dlg:top="60" dlg:width="268" dlg:height="221" dlg:closeable="true" dlg:moveable="true" dlg:title="Dialog1">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Dialog1" dlg:left="18" dlg:top="60" dlg:width="268" dlg:height="222" dlg:help-url="ca.bc.vancouver.holgate.james.readtextextension/set_up.xh" dlg:closeable="true" dlg:moveable="true" dlg:title="Dialog1">
  <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:textToSpeech.TextToSpeechConfiguration.testEvent?language=Basic&amp;location=application" script:language="Script"/>
  <dlg:bulletinboard>
   <dlg:filecontrol dlg:id="FileControl1" dlg:tab-index="3" dlg:left="16" dlg:top="26" dlg:width="240" dlg:height="14" dlg:value="festival">

@@ -16,6 +16,8 @@ Sub ConfigureReadTextAloud
 	f_dlgSpeechSetup=CreateUnoDialog( DialogLibraries.textToSpeech.Dialog1 )
 	If fbHelpIsInstalled Then
 		f_dlgSpeechSetup.model.HelpURL=&quot;ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp&quot;
+	Else 
+		f_dlgSpeechSetup.model.HelpURL=&quot;&quot;
 	Endif
 	&apos;Load default settings, so any settings undefined by settings file are Not empty
 	config()=fvTts_config_createDefaultConfig(msgs(), errorCode)

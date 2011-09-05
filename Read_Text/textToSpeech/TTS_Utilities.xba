@@ -621,6 +621,8 @@ Sub dialog1Combo2ShowMEDIAChoices(oDialog)
 	REM first remove all old items from the list
 	n1=oComboBox.getItemCount()
 	oComboBox.removeItems( 0,n1)
+	s1=&quot;http://webanywhere.cs.washington.edu/cgi-bin/ivona/getsound.pl?text=(OOO_WEBTEXT)&amp;cache=1&amp;mtts=1&amp;type=.mp3&quot;
+	oComboBox.addItem(s1,0)
 	s1=&quot;http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
 	oComboBox.addItem(s1,0)
 	s1=&quot;http://translate.google.com/translate_tts?tl=(LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
@@ -1279,9 +1281,7 @@ Function fsVBSTextString() As String
 	fsVBSTextString=getTextFromFile(fsTTSScriptVBS,&quot;iso-8859-15&quot;) &apos;iso-8859-15 Windows encoding
 End Function
 
-Function fsVBSText2String() As String
-	fsVBSText2String=getTextFromFile(fsTTSListVoicesVBS,&quot;iso-8859-15&quot;) &apos;iso-8859-15 Windows encoding
-End Function
+&apos;fsTTSListVoicesVBS
 
 Function fsSPDTextString
 	fsSPDTextString=getTextFromFile(fsPythonSpdDoc,&quot;utf-8&quot;)

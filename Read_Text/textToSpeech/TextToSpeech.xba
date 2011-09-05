@@ -62,28 +62,6 @@ Sub webHelp
 	oSvc.execute(fsDialogMyRegion(fiL10nHELP_ONLINE_URL),&quot;&quot;,0)
 End Sub
 
-Sub previewWScript
-	Dim  f_dlgAboutVBS As Variant
-	Dim s1 As String
-	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
-	f_dlgAboutVBS=CreateUnoDialog(DialogLibraries.textToSpeech.Dialog2)
-	f_dlgAboutVBS.GetControl(&quot;TextField1&quot;).model.Text=fsVBSTextString
-	f_dlgAboutVBS.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsExtensionLogo
-	f_dlgAboutVBS.GetControl(&quot;CommandButton2&quot;).model.Label=fsStringLanguage(fiL10nCANCEL,fsGetLanguage())
-	f_dlgAboutVBS.Execute()
-End Sub
-
-Sub previewWScript2
-	Dim  f_dlgAboutVBS As Variant
-	Dim s1 As String
-	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
-	f_dlgAboutVBS=CreateUnoDialog(DialogLibraries.textToSpeech.Dialog2)
-	f_dlgAboutVBS.GetControl(&quot;TextField1&quot;).model.Text=fsVBSText2String
-	f_dlgAboutVBS.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsExtensionLogo
-	f_dlgAboutVBS.GetControl(&quot;CommandButton2&quot;).model.Label=fsStringLanguage(fiL10nCANCEL,fsGetLanguage())
-	f_dlgAboutVBS.Execute()
-End Sub
-
 Sub ReadClipBoard
 	&apos; This Sub reads the clipboard from any module that supports a
 	&apos; text clipboard,including the Macro editor. You normally
