@@ -407,7 +407,7 @@ Function LanguageCodeToHexString(s1)
     s2="43c"
   Case "id","id-id"
     s2="421"
-  Case "ja","ja-jp"
+  Case "jp","jp-jp"
     s2="411"
   Case "ko","ko-kp","ko-kr"
     s2="412"

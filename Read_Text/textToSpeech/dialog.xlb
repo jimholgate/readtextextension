@@ -3,5 +3,4 @@
 <library:library xmlns:library="http://openoffice.org/2000/library" library:name="textToSpeech" library:readonly="false" library:passwordprotected="false">
  <library:element library:name="Dialog1"/>
  <library:element library:name="Dialog3"/>
- <library:element library:name="Dialog2"/>
 </library:library>
