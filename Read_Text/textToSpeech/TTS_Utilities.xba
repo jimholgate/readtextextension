@@ -109,6 +109,8 @@ Function fbHelpIsInstalled as Boolean
 		fbHelpIsInstalled=True
 	Elseif fileExists(sA &amp; &quot;fr&quot;) Then
 		fbHelpIsInstalled=True
+	Elseif fileExists(sA &amp; &quot;de&quot;) Then
+		fbHelpIsInstalled=True
 	Else
 		fbHelpIsInstalled=False
 	Endif
@@ -181,44 +183,31 @@ Function WinSpeechArgument() As String
 End Function
 
 Sub dialog1Combo2ShowSAPIChoices(oDialog)
-	&apos; Use Windows WScript To determine which SAPI voices are installed,Then
+	&apos; Determine which SAPI voices are installed, then
 	&apos; populate the Combo Box with the names of the voices. This script is only
 	&apos; invoked If you show dialog1 And you use TTS_WSCRIPT_VBS As the speech method
-	Dim myTextFile As Object,sf As Object,fileStream As Object
+	Dim Sapi as Object
+	Dim n as Integer
 	Dim aLineOfText As String,myScriptPath As String
 	Dim n1 As Integer,s1 As String,oComboBox As Variant
 	Dim sProgram As String,myTextPath As String
-	myScriptPath=convertFromURL(fsTTSListVoicesVBS)
-	myTextPath=convertFromURL(fsFullPathOf(fsSapiVoiceListDoc))
-	If fileExists(myTextPath) Then
-		Kill myTextPath
-	Endif	
-	sProgram=&quot;wscript.exe&quot; &apos;is already in system path,don&apos;t need To specify full path 
-	s1=Chr$(34) &amp; myScriptPath &amp; Chr$(34) &amp; &quot; &quot; &amp; _
-	Chr$(34) &amp; MyTextPath &amp; Chr$(34)
-	Shell(sProgram,0,s1,True) &apos;wait For shell To finish
+	Set Sapi=CreateObject(&quot;Sapi.SpVoice&quot;)
 	REM get control
 	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
 	REM first remove all old items from the list
 	n1=oComboBox.getItemCount()
 	oComboBox.removeItems( 0,n1)
-	sf=createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
-	On Error Goto fichierKO
-	fileStream=sf.openFileRead(myTextPath)
-	myTextFile=createUnoService(&quot;com.sun.star.io.TextInputStream&quot;)
-	myTextFile.InputStream=fileStream
-	myTextFile.Encoding=&quot;iso-8859-15&quot;
-	Do While Not myTextFile.IsEOF
-		s1=myTextFile.readLine
+	n=0
+	While n&lt;Sapi.GetVoices.Count
+		s1=Sapi.GetVoices.Item(n).GetDescription
 		For n1=10 To -10 step -2
 			oComboBox.addItem( Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
 			&quot; /voice:&quot; &amp; Chr$(34) &amp; s1 &amp; Chr$(34)&amp; _
 			&quot; /rate:&quot; &amp; Trim(n1) &amp; &quot; &quot; &amp; _
 			Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34),0)
 		Next
-	Loop
-	fileStream.closeInput
-	myTextFile.closeInput	
+		n=n+1
+	Wend
 	On Error Goto 0
 	For n1=10 To -10 step -2
 		oComboBox.addItem( Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
@@ -297,10 +286,6 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 	Resume FichierKO2
 	FichierKO2:
 	On Error Resume Next
-	ErrorDisplay()
-	fileStream.closeInput
-	myTextFile.closeInput
-	On Error Goto 0 
 End Sub
 
 Function fsMacVoice(n) As String
@@ -1992,5 +1977,16 @@ Sub windowsSAPIControl
 	Elseif fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot; Then &apos;osx
 		Shell(&quot;open&quot;,0,&quot;-b com.apple.systempreferences&quot;,True)
 	EndIf
+End Sub
+
+Sub libreHelp
+	&apos; LibreOffice does not show an extension&apos;s help documents if the application&apos;s help documents
+	&apos; are not installed. In this case, we show web based extension help in a browser window
+	Select Case fbHelpIsInstalled()
+	Case False
+		WebHelp()
+	Case Else
+		&apos;Don&apos;t do anything; extension can use ordinary help.
+	End Select
 End Sub
 </script:module>
