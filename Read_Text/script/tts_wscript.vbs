@@ -62,7 +62,7 @@ Sub wav2ogg (wavfile,oggFile,sMyWords)
   Set fso = CreateObject("Scripting.FileSystemObject")
   Set aFile = fso.GetFile(wavfile)
   aFile.Delete
-end Sub
+End Sub
 
 Sub wav2flac (wavfile,outfile,sMyWords)
   ' Play flac encoded sound files http://flac.sourceforge.net/links.html#software
@@ -88,7 +88,7 @@ Sub wav2flac (wavfile,outfile,sMyWords)
   Set fso = CreateObject("Scripting.FileSystemObject")
   Set aFile = fso.GetFile(wavfile)
   aFile.Delete
-end Sub
+End Sub
 
 Sub wav2m4a (wavfile,outFile,sMyWords)
   ' Play mp4 AAC encoded sound files with most music players
@@ -161,7 +161,6 @@ Sub wav2mp3 (wavfile,outFile,sMyWords)
   aFile.Delete
 End Sub
 
-
 Sub wav2iTunes (wavfile,sOut2file,sMyWords)
 'iTunes makes a mp3, aac or m4a in the iTunes Music Library 
 'then wav2iTunes copies the mp3 to specified location
@@ -209,19 +208,21 @@ Sub wav2iTunes (wavfile,sOut2file,sMyWords)
   aFile.Delete
 End Sub
 
-
 Function fbFileExists(sfilespec)
    Dim fso
    Set fso = CreateObject("Scripting.FileSystemObject")
    fbFileExists = (fso.FileExists(sfilespec))
 End Function
 
-Function LanguageCodeToHexString(s1)
+Function AddLanguageCodes(s1,s4)
   s1=Lcase(s1)
+  s2=""
   Select Case s1
-  Case "en","en-us","","zxx"
+  Case "en"
+    s2="9"
+  Case "en-us","","zxx"
     s2="409"
-  Case "en-uk","en-gb","en-vg","en-io","en-gg"
+  Case "en-gb","en-vg","en-io","en-gg"
     s2="809"
   Case "en-au"
     s2="c09"
@@ -458,11 +459,26 @@ Function LanguageCodeToHexString(s1)
   Case "zh-mo"
     s2="1404"
   Case Else 
-  'Use MS Locale ID (hex).
-  'See: http://wiki.services.openoffice.org/wiki/Languages
-    s2=s1
+    s2=""
   End Select
-  LanguageCodeToHexString=s2
+  If s2="" Then ' With Sapi 5.3 and above we can use ISO language code
+    s3="<?xml version=" & Chr(34) & "1.0" & Chr(34) & "?>"
+    s3=s3 & " <speak version=" & Chr(34) & "1.0" & Chr(34) & " xmlns=" & Chr(34) & "http://www.w3.org/2001/10/synthesis" & Chr(34)
+    s3=s3 & " xmlns:xsi=" & Chr(34) & "http://www.w3.org/2001/XMLSchema-instance" & Chr(34)
+    s3=s3 & " xsi:schemaLocation=" & Chr(34) & "http://www.w3.org/2001/10/synthesis"
+    s3=s3 & " http://www.w3.org/TR/speech-synthesis/synthesis.xsd" & Chr(34) & " xml:lang=" & Chr(34)
+    s3=s3 & s1
+    s3=s3 & Chr(34) & "> "
+    s3=s3 & s4
+    s3=s3 & "</speak>"
+  Else
+    s3="<speak><lang langid=" & Chr(34)
+    s3=s3 & s2
+    s3=s3 & Chr(34) & "> "
+    s3= s3 & s4
+    s3=s3 & " </lang></speak>" 
+  End if
+  AddLanguageCodes=s3
 End Function
 
 Sub SayIt(s1,sRate,sVoice)
@@ -480,7 +496,10 @@ Sub SayIt(s1,sRate,sVoice)
       End If
     WEnd
     Sapi.Rate=int(sRate)
-    Sapi.Speak s1
+    Sapi.Speak "",1
+    Sapi.Speak s1,3
+    Do 
+    Loop Until Sapi.WaitUntilDone(1)
     Set Sapi=Nothing 
   End If
 End Sub
@@ -587,11 +606,7 @@ Sub main()
   If sLanguage = "" then
     s1=s2
   Else 
-    s1="<SPEAK><LANG LANGID=" & Chr(34)
-    s1=s1 & LanguageCodeToHexString (sLanguage) 
-    s1=s1 & Chr(34) & "> "
-    s1=s1 & s2
-    s1=s1 & " </LANG></SPEAK>" 
+    s1=AddLanguageCodes(sLanguage,s2)  
   End If
   If sOutFile="" Then
     sayIt s1,sRate,sVoice
