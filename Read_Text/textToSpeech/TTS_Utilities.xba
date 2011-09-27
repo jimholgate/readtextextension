@@ -1691,61 +1691,81 @@ Function fsRetrieveCalcActiveCellText() As String
 End Function
 
 Function fsSelectionLanguage as String
-   	Dim oDoc,oVC,sA,longI,sB
+   	Dim oDoc,oVC,sA,longI,sB,sC,sD
     On Error Goto SELECTLANGUAGEERROR
 	oDoc=ThisComponent
 	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
 		sA=fsRetrieveCalcActiveCellProperty(&quot;language&quot;)
 		sB=fsRetrieveCalcActiveCellProperty(&quot;string&quot;)
+		sC=fsRetrieveCalcActiveCellProperty(&quot;asian-language&quot;)
+		sD=fsRetrieveCalcActiveCellProperty(&quot;complex-language&quot;)
 	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
 		sA=fsDrawProperty(&quot;language&quot;)
 		sB=fsDrawProperty(&quot;string&quot;)
+		sC=fsDrawProperty(&quot;asian-language&quot;)
+		sD=fsDrawProperty(&quot;complex-language&quot;)
 	Else	
 		oVC=oDoc.getCurrentController.getViewCursor			
 		sA=oVC.CharLocale.Language
 		sB=oVC.GetString()
+		sC=oVC.CharLocaleAsian.Language
+		sD=oVC.CharLocaleComplex.Language
 	Endif
 	&apos;The application&apos;s built in CharLocale.Language property does not identify oriental or complex text locales
-	&apos;See http://www.utf8-chartable.de/
+	&apos;so we use the UTF encoding for the first character to evaluate the language. See http://www.utf8-chartable.de/
+	&apos;and http://unicode.org/Public/UNIDATA/Blocks.txt
 	If sB=&quot;&quot; Then
 		longI=0
     Else
 		longI=asc(sB)
 	Endif
-	If longI &gt;=clng(&quot;&amp;H3400&quot;) And longI &lt;=clng(&quot;&amp;H9FFF&quot;) Then
-		If fbHasJaKatakana(sB) Then 
-   		sa=&quot;ja&quot;
-   	Elseif fbHasKoHangul(sB) Then
-   		sA=&quot;ko&quot;
-		Else
-   			sA=&quot;zh&quot;
-   		Endif
+	&apos;Simple characters 
+	If longI &gt;= clng(&quot;&amp;H0000&quot;) And longI &lt;=clng(&quot;&amp;H058F&quot;) Then
+		&apos;Leave sA alone
+	&apos;Asian characters
+	ElseIf longI &gt;=clng(&quot;&amp;H3400&quot;) And longI &lt;=clng(&quot;&amp;H9FFF&quot;) Then
+		sA=sC &apos;zh, ja or ko 
 	Elseif longI &gt;=clng(&quot;&amp;H3040&quot;) And longI &lt;=clng(&quot;&amp;H31FF&quot;) Then
-   		sA=&quot;ja&quot;
+   		sA=sC &apos; &quot;ja&quot;
    	Elseif longI &gt;=asc(&quot;･&quot;) And longI &lt;=asc(&quot;ﾟ&quot;) Then
-   		sA=&quot;ja&quot;
+   		sA=sC &apos; &quot;ja&quot;
    	Elseif longI &gt;=clng(&quot;&amp;HAC00&quot;) And longI &lt;=clng(&quot;&amp;HD7A3&quot;) Then
-   		sA=&quot;ko&quot;
+   		sA=sC &apos; &quot;ko&quot;
   	Elseif longI &gt;=clng(&quot;&amp;HFFA0&quot;) And longI &lt;=clng(&quot;&amp;HFFDC&quot;) Then
-   		sA=&quot;ko&quot;
-  	Elseif longI &gt;=clng(&quot;&amp;H1780&quot;) And longI &lt;=clng(&quot;&amp;H17FF&quot;) Then
-   		sA=&quot;km&quot; &apos; Khmer
+   		sA=sC &apos; &quot;ko&quot;
+   	&apos;Complex characters
+  	Elseif longI = clng(&quot;&amp;H02BC&quot;) Then
+   		sA=sD &apos; Dogri, Bodo, Maithili
+  	Elseif longI &gt;=clng(&quot;&amp;H1750&quot;) And longI &lt;=clng(&quot;&amp;H17FF&quot;) Then
+   		sA=sD &apos; Khmer, Thaana, Dhiveh, Urdu
+  	Elseif longI &gt;=clng(&quot;&amp;HFB50&quot;) And longI &lt;=clng(&quot;&amp;HFDFF&quot;) Then
+   		sA=sD &apos; Urdu
+  	Elseif longI &gt;=clng(&quot;&amp;HFE70&quot;) And longI &lt;=clng(&quot;&amp;HFEFF&quot;) Then
+   		sA=sD &apos; Urdu
   	Elseif longI &gt;=clng(&quot;&amp;H19E0&quot;) And longI &lt;=clng(&quot;&amp;H19FF&quot;) Then
-   		sA=&quot;km&quot; &apos; Khmer symbols
+   		sA=sD &apos; &quot;km&quot; &apos; Khmer symbols
  	Elseif longI &gt;=clng(&quot;&amp;H0600&quot;) And longI &lt;=clng(&quot;&amp;H06FF&quot;) Then
-		If fbHasFarsi(sB) Then 
-   			sA=&quot;fa&quot;
-   		Else
-   			sA=&quot;ar&quot;
-   		Endif
+   		sA=sD &apos; Farsi, Arabic, Kashmiri, Kurdish
    	Elseif longI &gt;=clng(&quot;&amp;H0900&quot;) And longI &lt;=clng(&quot;&amp;H0972&quot;) Then
-   		sA=&quot;hi&quot; &apos; Devanagari script is probably Hindi - but we should test further 
-   	Elseif longI &gt;=clng(&quot;&amp;H0E00&quot;) And longI &lt;=clng(&quot;&amp;H0E7F&quot;) Then
-   		sA=&quot;th&quot; &apos; Thai language - no voice For Google Translate
+   		sA=sD &apos; Devanagari for Hindi or other Indic languages
    	Elseif longI &gt;=clng(&quot;&amp;H0591&quot;) And longI &lt;=clng(&quot;&amp;H05F4&quot;) Then
-   		sA=&quot;he&quot; &apos; Hebrew - no voice For Google Translate
+   		sA=sD &apos; &quot;he&quot; &apos; Hebrew - no voice For Google Translate
    	Elseif longI &gt;=clng(&quot;&amp;H0A00&quot;) And longI &lt;=clng(&quot;&amp;H0AFF&quot;) Then
-   		sA=&quot;pa&quot; &apos; Gurmukhi script is probably Punjabi - No Google translate support
+   		sA=sD &apos; &quot;pa&quot; &apos; Gurmukhi script is probably Punjabi
+   	Elseif longI &gt;=clng(&quot;&amp;H0980&quot;) And longI &lt;=clng(&quot;&amp;H09FF&quot;) Then
+   		sA=sD &apos;Bengali
+   	Elseif longI &gt;=clng(&quot;&amp;H0A80&quot;) And longI &lt;=clng(&quot;&amp;HOD7F&quot;) Then
+   		sA=sD &apos;Gurjarti, Oriya, Tamil, Telugu, Kannada, Malayalam
+   	Elseif longI &gt;=clng(&quot;&amp;H1000&quot;) And longI &lt;=clng(&quot;&amp;H109F&quot;) Then
+   		sA=sD &apos;Burmese (Myanmar)
+   	Elseif longI &gt;=clng(&quot;&amp;H0E00&quot;) And longI &lt;=clng(&quot;&amp;H0FFF&quot;) Then
+   		sA=sD &apos;Thai, Lao, Tibetan, Dzongkha
+   	Elseif longI &gt;=clng(&quot;&amp;H1200&quot;) And longI &lt;=clng(&quot;&amp;H139F&quot;) Then
+   		sA=sD &apos;Ethiopic, Ethiopic Supplement
+   	Elseif longI &gt;=clng(&quot;&amp;H1700&quot;) And longI &lt;=clng(&quot;&amp;H171F&quot;) Then
+   		sA=sD &apos;Limbu
+   	Elseif longI &gt;=clng(&quot;&amp;H2D80&quot;) And longI &lt;=clng(&quot;&amp;H2DDF&quot;) Then
+   		sA=sD &apos;Ethopic Extended
    	Else &apos;western
 		&apos;accept locale
 	Endif
@@ -1756,47 +1776,6 @@ Function fsSelectionLanguage as String
 	Exit Function
 	SELECTLANGUAGEERROR:
 	fsSelectionLanguage=fsGetLanguage
-End Function
-
-Function fbHasJaKatakana(sA) As Boolean
-	Dim sB,sC,nB,nC,n2
-	fbHasJaKatakana=False
-	sB=&quot;のカサタナハマヤラワキクケコシスセソチツテトニヌネノヒフヘホミムメモユヨリルレロヰヱヲ&quot;
-	nB=Len(sB)
-	sA=Left(sA,99)
-	For n2=1 To nB
-		nC=Instr(sB,n2)
-		sC=Mid(sB,n2,1)
-		If Instr(sA,sC)&lt;&gt;0 Then
-			fbHasJaKatakana=True
-			Exit For
-		Endif	
-	Next
-End Function
-
-Function fbHasKoHangul(sA) As Boolean
-	Dim sB,sC,nB,nC,n2
-	fbHasKoHangul=False
-	sB=&quot;ㅇㄱㄴㄷㄹㅁㅂㅅㅈㅊㅋㅌㅍㅎㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ&quot;
-	nB=Len(sB)
-	sA=Left(sA,99)
-	For n2=1 To nB
-		nC=Instr(sB,n2)
-		sC=Mid(sB,n2,1)
-		If Instr(sA,sC)&lt;&gt;0 Then
-			fbHasKoHangul=True
-			Exit For
-		Endif	
-	Next
-End Function
-
-Function fbHasFarsi(sA) As Boolean
-	&apos;Farsi uses Arabic letter forms; test system language
-	If fsGetLanguage()=&quot;fa&quot; Then
-		fbHasFarsi=True
-	Else
-		fbHasFarsi=False
-	Endif
 End Function
 
 Function fsSelectionCountry As String
@@ -1837,9 +1816,13 @@ Function fsDrawProperty(strA) As String
 	If oSelection.supportsService(&quot;com.sun.star.text.TextCursor&quot;) Then
 	Select Case strA
 	Case &quot;country&quot;
-	s1r=oSelection.CharLocale.Country  
+		s1r=oSelection.CharLocale.Country  
 	Case &quot;language&quot;
-	s1r=oSelection.CharLocale.Language  
+		s1r=oSelection.CharLocale.Language
+	Case &quot;asian-language&quot;
+		s1r=oSelection.CharLocaleAsian.Language
+	Case &quot;complex-language&quot;
+		s1r=oSelection.CharLocaleComplex.Language
 	Case Else
 	s1r=oSelection.getString()
 		End Select

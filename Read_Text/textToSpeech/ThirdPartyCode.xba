@@ -238,9 +238,13 @@ Function fsRetrieveCalcActiveCellProperty(strA) As String
 	oActiveCell=ThisComponent.CurrentSelection
 	Select Case strA
 	Case &quot;country&quot;
-		 sCellContent=oActiveCell.CharLocale.Country  
+		sCellContent=oActiveCell.CharLocale.Country  
 	Case &quot;language&quot;
-		 sCellContent=oActiveCell.CharLocale.Language
+		sCellContent=oActiveCell.CharLocale.Language
+	Case &quot;asian-language&quot;
+		sCellContent=oActiveCell.CharLocaleAsian.Language
+	Case &quot;complex-language&quot;
+		sCellContent=oActiveCell.CharLocaleComplex.Language
 	Case Else
 		 sCellContent=oActiveCell.getString()
 	End Select
