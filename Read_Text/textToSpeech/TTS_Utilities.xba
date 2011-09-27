@@ -1728,6 +1728,10 @@ Function fsSelectionLanguage as String
    		sA=&quot;ko&quot;
   	Elseif longI &gt;=clng(&quot;&amp;HFFA0&quot;) And longI &lt;=clng(&quot;&amp;HFFDC&quot;) Then
    		sA=&quot;ko&quot;
+  	Elseif longI &gt;=clng(&quot;&amp;H1780&quot;) And longI &lt;=clng(&quot;&amp;H17FF&quot;) Then
+   		sA=&quot;km&quot; &apos; Khmer
+  	Elseif longI &gt;=clng(&quot;&amp;H19E0&quot;) And longI &lt;=clng(&quot;&amp;H19FF&quot;) Then
+   		sA=&quot;km&quot; &apos; Khmer symbols
  	Elseif longI &gt;=clng(&quot;&amp;H0600&quot;) And longI &lt;=clng(&quot;&amp;H06FF&quot;) Then
 		If fbHasFarsi(sB) Then 
    			sA=&quot;fa&quot;
@@ -1956,10 +1960,10 @@ Sub myBeep
 End Sub
 
 Sub windowsSAPIControl
-  Dim s2 As String
-  Dim oSvc As Object
-  oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
-  s2=fsHomeDrive()
+    Dim s2 As String
+	Dim oSvc As Object
+	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+    s2=fsHomeDrive()
 	If fileExists(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) Then
 		oSvc.execute(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;,&quot;&quot;,0)
 	Elseif fileExists(s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) Then
