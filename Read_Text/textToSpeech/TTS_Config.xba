@@ -157,7 +157,9 @@ Sub AboutAddOn (config() As Variant, myText As String)
 	Dim sFile As String
 	Dim sA As String
 	Dim msgs() As Variant
-	Dim errorCode As Integer 
+	Dim errorCode As Integer
+	Dim s2 As String
+	s2=fsHomeDrive() 
 		&apos; Open up the dialog
 	DialogLibraries.LoadLibrary( &quot;textToSpeech&quot; )
 	f_dlgAboutReadSelection=CreateUnoDialog( DialogLibraries.textToSpeech.Dialog3)
@@ -182,8 +184,14 @@ Sub AboutAddOn (config() As Variant, myText As String)
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl3&quot;).model.ImageURL=fsSelectionLogo
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.helpText=Left(fsGetClipBoard(),99) 
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.ImageURL=fsClipBoardLogo
-	If fileExists(&quot;C:\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) or fileExists(&quot;C:\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) Then
+	If fileExists(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) or _
+		fileExists(s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) or _
+		fileExists(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;) or _
+		fileExists(fsProgramDirectory() &amp; &quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;) _
+	Then
 		f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.helpText=fsDialogMyRegion(fiL10nSPEECH_PROPERTIES)
+	Else
+		f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.helpText=fsDialogMyRegion(fiL10nCONTROL_PANEL)&apos;Can&apos;t find it; use &quot;Control panel&quot;
 	Endif
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.ImageURL=fsToolBoxLogo
 	f_dlgAboutReadSelection.GetControl(&quot;Label1&quot;).model.helpText=Left(fsGetTextSelection(),99) 
@@ -222,7 +230,12 @@ Sub AboutAddOn (config() As Variant, myText As String)
 		Endif
 	Else &apos; If config(fiHtmlOption) Then
 		sA=replacePublicTokensWithStr(config(fiHtmlComboURL))
-		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=&quot;[com.sun.star.system.SystemShellExecute]&quot;	
+		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=&quot;[com.sun.star.system.SystemShellExecute]&quot;
+		If Instr(sA,&quot;.google.&quot;) Then
+			sA=sA &amp; chr(13) &amp; chr(13) &amp; &quot;Powered by Google ™&quot;
+		Elseif instr(sA,&quot;vozme.com&quot;) Then
+			sA=sA &amp; chr(13) &amp; chr(13) &amp; &quot;Powered by Vozme ™&quot;
+		Endif
 		f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=sA		
 	Endif
 	f_dlgAboutReadSelection.GetControl(&quot;TextField1&quot;).model.Text=fsAbout
