@@ -254,6 +254,10 @@ Function fiL10nSPEECH_PROPERTIES As Integer
 	fiL10nSPEECH_PROPERTIES=20
 End Function
 
+Function fiL10nCONTROL_PANEL As Integer
+	fiL10nCONTROL_PANEL=21
+End Function
+
 &apos; Configuration file  uses these strings As keys
 
 Function fsKeyUSE_FESTIVAL_BOOLEAN  As String 
@@ -752,6 +756,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Vertaal en lees met web tools&quot;
 		sL10N(20)=&quot;Toespraak eienskappe&quot;
+		sL10N(21)=&quot;Beheerpaneel&quot;
 	Case &quot;bg&quot; &apos;Bulgarian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Външната програма&quot;
@@ -774,6 +779,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Превод и четат с уеб инструменти&quot;
 		sL10N(20)=&quot;Свойства на речта&quot;
+		sL10N(21)=&quot;Контролен панел&quot;
 	Case &quot;ca&quot; &apos;Catalan
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Programa extern&quot;
@@ -796,6 +802,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Traduir i llegir amb eines de la web&quot;
 		sL10N(20)=&quot;Propietats de veu&quot;
+		sL10N(21)=&quot;Propietats&quot;
 	Case &quot;cs&quot; &apos;Czech
 		sL10N(0)=&quot;Read Text&quot; 
 		sL10N(1)=&quot;Externí program&quot; 
@@ -818,6 +825,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Přeložit a ve spojení s webovou nástroje&quot;
 		sL10N(20)=&quot;Vlastnosti programu Speech&quot;
+		sL10N(21)=&quot;Vlastnosti programu&quot;
 	Case &quot;da&quot; &apos;Danish
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Eksternt program&quot;
@@ -840,6 +848,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Oversæt og læs med web værktøjer&quot;
 		sL10N(20)=&quot;Egenskaber for tale&quot;
+		sL10N(21)=&quot;Kontrolpanel&quot;
 	Case &quot;de&quot; &apos; Includes German translations provided by Eugene Seidel
 		&apos; &quot;Read Text&quot; %READ_TEXT%
 		&apos; &quot;Über Read Text&quot; %ABOUT_READ_TEXT%
@@ -866,6 +875,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About?wl=de&quot;
 		sL10N(19)=&quot;Web-Anwendung verwenden&quot; &apos; &quot;Use a web application&quot;
 		sL10N(20)=&quot;Spracheigenschaften&quot;
+		sL10N(21)=&quot;Systemsteuerung&quot;
 	Case &quot;el&quot; &apos;Greek
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Πρόγραμμα Εξωτερικού&quot;
@@ -888,6 +898,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Μετάφραση και σε συνδυασμό με εργαλεία web&quot;
 		sL10N(20)=&quot;Ιδιότητες ομιλίας&quot;
+		sL10N(21)=&quot;Πίνακας ελέγχου&quot;
 	Case &quot;es&quot; &apos;Includes Spanish translations provided by Ariel Del Valle
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Programa&quot;
@@ -910,6 +921,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Usar las herramientas web&quot;
 		sL10N(20)=&quot;Propiedades de voz&quot;
+		sL10N(21)=&quot;Panel de control&quot;
 	Case &quot;fr&quot; &apos;French
 		sL10N(0)=&quot;L&apos;extension Read Text&quot;
 		sL10N(1)=&quot;Application externe&quot;
@@ -932,6 +944,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About?wl=fr&quot;
 		sL10N(19)=&quot;Outils en ligne&quot;
 		sL10N(20)=&quot;Propriétés de la synthèse vocale&quot;
+		sL10N(21)=&quot;Paramètres du système&quot;
 	Case &quot;et&quot; &apos;Estonian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Väline programm&quot;
@@ -954,6 +967,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Tõlgi ja lugeda veebitööriistadega&quot;
 		sL10N(20)=&quot;Kõneatribuudid&quot;
+		sL10N(21)=&quot;Juhtpaneel&quot;
 	Case &quot;fi&quot; &apos;Finnish
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Ulkoinen ohjelma&quot;
@@ -976,6 +990,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Käännä ja lukea web-työkalujen&quot;
 		sL10N(20)=&quot;Puheominaisuudet&quot;
+		sL10N(21)=&quot;Ohjauspaneeli&quot;
 	Case &quot;ga&quot; &apos;Irish
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Relations clár&quot;
@@ -998,6 +1013,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Aistrigh agus léifear le huirlisí gréasáin&quot;
 		sL10N(20)=&quot;Airíonna Cainte&quot;
+		sL10N(21)=&quot;Painéal Rialúcháin&quot;
 	Case &quot;hi&quot; &apos;Hindi
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;विदेश प्रोग्राम&quot;
@@ -1020,6 +1036,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;अनुवाद और वेब उपकरणों के साथ पढ़ें&quot;
 		sL10N(20)=&quot;वाक् गुण&quot;
+		sL10N(21)=&quot;नियंत्रण कक्ष&quot;
 	Case &quot;hu&quot; &apos;Hungarian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Külső program&quot;
@@ -1042,6 +1059,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Fordítás és olvassa el a webes eszközök&quot;
 		sL10N(20)=&quot;Beszéd tulajdonságai&quot;
+		sL10N(21)=&quot;Vezérlőpult&quot;
 	Case &quot;id&quot; &apos;Indonesian
 		&apos;&quot;Baca Teks&quot;  READ_TEXT
 		&apos;&quot;Tentang Baca Teks&quot; ABOUT_READ_TEXT
@@ -1068,6 +1086,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Terjemahkan dan membaca dengan alat-alat web&quot;
 		sL10N(20)=&quot;Properti Ucapan&quot;
+		sL10N(21)=&quot;Properti&quot;
 	Case &quot;is&quot;
 		sL10N(0)=&quot;Lesa Texti Eftirnafn&quot;
 		sL10N(1)=&quot;Ytri program&quot;
@@ -1090,6 +1109,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Þýða og lesa með verkfærum vefnum&quot;
 		sL10N(20)=&quot;Eiginleikar tals&quot;
+		sL10N(21)=&quot;Stjórnborð&quot;
 	Case &quot;it&quot; &apos;Italian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Programma esterno&quot;
@@ -1112,6 +1132,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Tradurre e leggere con strumenti web&quot;
 		sL10N(20)=&quot;Proprietà riconoscimento vocale&quot;
+		sL10N(21)=&quot;Pannello di controllo&quot;
 	Case &quot;ja&quot; &apos;Japanese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;外部プログラム&quot;
@@ -1134,6 +1155,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;オンラインツール&quot;
 		sL10N(20)=&quot;音声認識のプロパティ&quot;
+		sL10N(21)=&quot;コントロール パネル&quot;
 	Case &quot;ko&quot; &apos;Korean
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;외부 프로그램&quot;
@@ -1156,6 +1178,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;번역 및 웹 도구와 읽기&quot;
 		sL10N(20)=&quot;음성 속성&quot;
+		sL10N(21)=&quot;제어판&quot;
 	Case &quot;lv&quot; &apos;Latvian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Ārējā programma&quot;
@@ -1178,6 +1201,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Tulkot un lasīt ar web rīkus&quot;
 		sL10N(20)=&quot;Runas rekvizīti&quot;
+		sL10N(21)=&quot;vadības panelis&quot;
 	Case &quot;lt&quot; &apos;Lithuanian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Išorės programa&quot;
@@ -1200,6 +1224,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Versti ir skaityti žiniatinklio įrankius&quot;
 		sL10N(20)=&quot;Kalbėjimo ypatybės&quot;
+		sL10N(21)=&quot;Valdymo skydas&quot;
 	Case &quot;mt&quot; &apos;Maltese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Programm Esterni&quot;
@@ -1222,6 +1247,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Ittraduċi u jinqraw bl-għodda tal-web&quot;
 		sL10N(20)=&quot;Proprjetajiet ta&apos; Diskors&quot;
+		sL10N(21)=&quot;Panew tal-Kontroll&quot;
 	Case &quot;nl&quot; &apos;Dutch
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Externe programma&quot;
@@ -1244,6 +1270,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Vertalen en lees met web tools&quot;
 		sL10N(20)=&quot;Eigenschappen van spraak&quot;
+		sL10N(21)=&quot;Configuratiescherm&quot;
 	Case &quot;pl&quot; &apos;Polish
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Program zewnętrzne&quot;
@@ -1266,6 +1293,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Przetłumacz i czytać z narzędzi internetowych&quot;
 		sL10N(20)=&quot;Właściwości mowy&quot;
+		sL10N(21)=&quot;Panel sterowania&quot;
 	Case &quot;pt&quot; &apos;Portuguese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Aplicação Externa&quot;
@@ -1288,6 +1316,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Traduzir e ler ferramentas da Web&quot;	
 		sL10N(20)=&quot;Propriedades de Fala&quot;
+		sL10N(21)=&quot;Painel de Controle&quot;
 	Case &quot;ro&quot; &apos;Romanian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Externă program&quot;
@@ -1310,6 +1339,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Traduceţi şi citesc cu instrumente web&quot;
 		sL10N(20)=&quot;Proprietăți vorbire&quot;
+		sL10N(21)=&quot;Proprietăți&quot;
 	Case &quot;ru&quot; &apos;Russian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Наружное применение&quot; 
@@ -1332,6 +1362,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;веб-инструменты&quot;
 		sL10N(20)=&quot;Свойства речи&quot;
+		sL10N(21)=&quot;Панель управления&quot;
 	Case &quot;sk&quot; &apos;Slovak
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Externý program&quot;
@@ -1354,6 +1385,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Preložiť a v spojení s webovou nástroje&quot;
 		sL10N(20)=&quot;Reč – vlastnosti&quot;
+		sL10N(21)=&quot;Ovládací panel&quot;
 	Case &quot;sl&quot; &apos;Slovenian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Zunanji program&quot;
@@ -1376,6 +1408,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Prevedi in brati s spletnimi orodji&quot;
 		sL10N(20)=&quot;Lastnosti govora&quot;
+		sL10N(21)=&quot;Nadzorna plošča&quot;
 	Case &quot;sv&quot; &apos;Swedish
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Extern programmet&quot;
@@ -1398,6 +1431,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Översätt och läste med webbverktyg&quot;	
 		sL10N(20)=&quot;Talegenskaper&quot;
+		sL10N(21)=&quot;Kontrollpanelen&quot;
 	Case &quot;tl&quot;
 		&apos;&quot;Basahin Text&quot; READ_TEXT
 		&apos;&quot;Basahin Tungkol Text&quot; ABOUT_READ_TEXT
@@ -1424,6 +1458,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Isalin at basahin sa mga tool ng web&quot;
 		sL10N(20)=&quot;Pagsasalita katangian&quot;
+		sL10N(21)=&quot;Control Panel&quot;
 	Case &quot;tr&quot;
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Harici programı&quot;
@@ -1446,6 +1481,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Çevir ve web araçları ile oku &quot;
 		sL10N(20)=&quot;Konuşma Özellikleri&quot;
+		sL10N(21)=&quot;Denetim Masası&quot;
 	Case &quot;uk&quot;
 		&apos; &quot;Читання тексту&quot; READ_TEXT
 		&apos; &quot;Про Читання тексту&quot; ABOUT_READ_TEXT
@@ -1472,6 +1508,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Перекласти й читати з веб-інструментів&quot;
 		sL10N(20)=&quot;Властивості мовлення&quot;
+		sL10N(21)=&quot;Панель керування&quot;
 	Case &quot;zh-TW&quot; &apos;Traditional Chinese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;外部程序&quot;
@@ -1494,6 +1531,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;翻譯和閱讀網頁工具&quot;
 		sL10N(20)=&quot;語音內容&quot;
+		sL10N(21)=&quot;控制台&quot;
 	Case &quot;zh&quot; , &quot;zh-CN&quot; &apos;Simplified Chinese
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;外部程序&quot; 
@@ -1516,6 +1554,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;翻译和阅读网页工具&quot;
 		sL10N(20)=&quot;语音属性&quot;
+		sL10N(21)=&quot;控制面板&quot;
 	Case Else &apos;&quot;en&quot; English (default)
 	    &apos; &quot;Read Text&quot; %READ_TEXT%
 	    &apos; &quot;About Read Text&quot; %ABOUT_READ_TEXT%
@@ -1542,6 +1581,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
 		sL10N(19)=&quot;Use a web application&quot;
 		sL10N(20)=&quot;Speech Properties&quot;
+		sL10N(21)=&quot;System Settings&quot;
 	End Select
 	fsStringLanguage=sL10N(i)
 End Function
