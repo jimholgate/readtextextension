@@ -6,6 +6,7 @@ Read Text Extension uses an external program or a web service to read text. Read
 
 ==Download==
 
+  * [http://extensions.libreoffice.org/extension-center/read-text LibreOffice Extensions]
   * [http://extensions.services.openoffice.org/project/Read_Text OpenOffice.org Extensions]
   * [http://code.google.com/p/readtextextension/downloads/list Google Project Hosting]
 
