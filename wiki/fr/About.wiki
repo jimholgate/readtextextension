@@ -7,7 +7,7 @@ Cette extension permet à un programme externe ou une application web lire le te
 ==Téléchargement==
 
   * [http://extensions.libreoffice.org/extension-center/read-text LibreOffice Extensions]
-  * [http://extensions.services.openoffice.org/project/Read_Text OpenOffice.org Extensions]
+  * [http://aoo-extensions.sourceforge.net/project/Read_Text OpenOffice.org Extensions]
   * [http://code.google.com/p/readtextextension/downloads/list Google Project Hosting]
 
 ==Capture d'écran==
