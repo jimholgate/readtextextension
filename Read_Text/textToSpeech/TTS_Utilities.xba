@@ -1399,7 +1399,7 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 		sCommand=replaceWebTokensWithStr(sCommand,sTextToSpeak)
 		&apos; HTML file
 		if Len(sCommand) &lt;&gt; 0 Then
-			If (Instr(sCommand,&quot;http://&quot;)&lt;&gt;1 And Instr(sCommand,&quot;https://&quot;)&lt;&gt;1) Then
+			If (Instr(sCommand,&quot;http://&quot;)&lt;&gt;1 And Instr(sCommand,&quot;https://&quot;)&lt;&gt;1) And Instr(sCommand,&quot;mailto:&quot;)&lt;&gt;1) Then
 				sCommand=&quot;http://&quot; &amp; sCommand
 			Endif
 			Dim oSvc As Object
