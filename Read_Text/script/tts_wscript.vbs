@@ -182,7 +182,7 @@ Sub wav2iTunes (wavfile,sOut2file,sMyWords)
   Set Reg1 = new RegExp
   Reg1.Pattern = "^10"
   if not (Reg1.Test(vers)) Then
-    Usage "Get / Téléchargez: http://www.apple.com/itunes/" & chr(10) & chr(10) & "Did not find a supported iTunes version / On n'a pas trouvé une version actuelle d'iTunes" & chr(10)
+    Usage "Get / TÃ©lÃ©chargez: http://www.apple.com/itunes/" & chr(10) & chr(10) & "Did not find a supported iTunes version / On n'a pas trouvÃ© une version actuelle d'iTunes" & chr(10)
     Wscript.Exit(0)
   End If
   set encoderCollection = iTunesApp.Encoders
@@ -231,7 +231,7 @@ Function AddLanguageCodes(s1,s4)
 
   Select Case s1
   Case "en"
-    s2="9"
+    s2="409"
   Case "en-us","","zxx"
     s2="409"
   Case "en-gb","en-vg","en-io","en-gg"
@@ -500,7 +500,7 @@ End Function
 Sub SayIt(s1,sRate,sVoice)
   Set Sapi=Wscript.CreateObject("SAPI.SpVoice")
   If Sapi Is Nothing Then
-    Usage "FAILED Sapi.SpVoice creation. SAPI ne pouvait pas créer une voix."
+    Usage "FAILED Sapi.SpVoice creation. SAPI ne pouvait pas crÃ©er une voix."
   Else
     n=0
     While n<Sapi.GetVoices.Count
@@ -525,7 +525,7 @@ Sub WriteIt(s1,sRate,sVoice,sFileName, sMyWords,sLibre)
   Set Sapi=Nothing
   Set Sapi=Wscript.CreateObject("SAPI.SpVoice")
   If Sapi Is Nothing Then
-    Usage "FAILED Sapi.SpVoice creation. SAPI ne pouvait pas créer une voix."
+    Usage "FAILED Sapi.SpVoice creation. SAPI ne pouvait pas crÃ©er une voix."
   Else
     n=0
     While n<Sapi.GetVoices.Count
