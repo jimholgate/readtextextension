@@ -420,7 +420,7 @@ Function AddLanguageCodes(s1,s4)
     s2="43c"
   Case "id","id-id"
     s2="421"
-  Case "jp","jp-jp"
+  Case "ja","ja-jp"
     s2="411"
   Case "ko","ko-kp","ko-kr"
     s2="412"
