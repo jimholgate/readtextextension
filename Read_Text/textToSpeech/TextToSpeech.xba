@@ -6,7 +6,7 @@ OPTION EXPLICIT
 
 &apos; Copyright And License 
 
-&apos;(c)2008-2011 James Holgate Vancouver,CANADA(james_h(a)http://openofficeforum.org)
+&apos;(c)2008-2012 James Holgate Vancouver,CANADA(james_h(a)http://openofficeforum.org)
 
 &apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS
 &apos; OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION; 
@@ -54,6 +54,38 @@ End Sub
 
 Sub PresentationSpeechExample2
 	MsgSpeak(&quot;No, that is incorrect.&quot;)
+End Sub
+
+Sub ReadImpress
+	&apos;Listen to the text of the slides in a Impress presentation.
+	&apos;Adapted from code by DannyB at http://www.oooforum.org/forum/viewtopic.phtml?t=10795 
+	Dim oDoc, oDrawPages,oDrawPage,oShape
+	Dim nNumShapes,nShape,nPage,nNumPages
+	Dim cTitle,cDialogTitle
+	Dim n1
+	oDoc=ThisComponent 
+	oDrawPages=oDoc.getDrawPages() 
+	nNumPages=oDrawPages.getCount()
+	If oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) Then
+		For nPage=0 To nNumPages - 1 
+			oDrawPage=oDrawPages.getByIndex( nPage ) 
+			nNumShapes=oDrawPage.getCount() 
+			For nShape=0 To nNumShapes - 1 
+				oShape=oDrawPage.getByIndex( nShape ) 
+				If HasUnoInterfaces( oShape, &quot;com.sun.star.lang.XServiceInfo&quot; ) Then  
+					cTitle=oShape.getText().getString() 
+					if cTitle &lt;&gt; &quot;&quot; Then
+						msgSpeak fsReplaceText(cTitle,chr(10),&quot;. &quot;) 
+						n1= msgBox (cTitle,1,nPage + 1 &amp; &quot;.&quot; &amp; nShape + 1 &amp; &quot; - &quot; _
+						&amp; fsStringLanguage(fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()))
+					EndIf
+					if n1=2 Then
+						Exit Sub
+					EndIf
+				EndIf 
+			Next
+		Next
+	EndIf
 End Sub
 
 Sub webHelp
