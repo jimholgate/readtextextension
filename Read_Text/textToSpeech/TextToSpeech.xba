@@ -58,26 +58,34 @@ End Sub
 
 Sub ReadImpress
 	&apos;Listen to the text of the slides in a Impress presentation.
-	&apos;Adapted from code by DannyB at http://www.oooforum.org/forum/viewtopic.phtml?t=10795 
-	Dim oDoc, oDrawPages,oDrawPage,oShape
-	Dim nNumShapes,nShape,nPage,nNumPages
+	&apos;Adapted from code by Danny Brewer at http://www.oooforum.org/forum/viewtopic.phtml?t=10795 
+	Dim oDoc, oDrawPages,oDrawPage,oShape,oElem
+	Dim nNumShapes,nShape,nPage,nNumPages,nThisPage
 	Dim cTitle,cDialogTitle
 	Dim n1
 	oDoc=ThisComponent 
 	If oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) Then
-  	 oDrawPages=oDoc.getDrawPages() 
-		 nNumPages=oDrawPages.getCount()
-		For nPage=0 To nNumPages - 1 
+		oDrawPages=oDoc.getDrawPages() 
+		nNumPages=oDrawPages.getCount()
+		oElem=oDoc.getDrawPages().getElementNames() 
+		nThisPage=oDoc.getCurrentController.getCurrentPage().Number-1
+		For nPage=nThisPage To nNumPages - 1 
 			oDrawPage=oDrawPages.getByIndex( nPage ) 
 			nNumShapes=oDrawPage.getCount() 
 			For nShape=0 To nNumShapes - 1 
 				oShape=oDrawPage.getByIndex( nShape ) 
-				If HasUnoInterfaces( oShape, &quot;com.sun.star.lang.XServiceInfo&quot; ) Then  
-					cTitle=oShape.getText().getString() 
+				If HasUnoInterfaces( oShape, &quot;com.sun.star.lang.XServiceInfo&quot; ) Then 
+					If oDrawPage.getName &lt;&gt; &quot;&quot; Then
+						cDialogTitle=nPage + 1 &amp; &quot;.&quot; &amp; nShape + 1 &amp; &quot; - &quot; _
+						&amp; oDrawPage.getName
+					Else
+					    cDialogTitle=nPage + 1 &amp; &quot;.&quot; &amp; nShape + 1 &amp; &quot; - &quot; _
+						&amp; fsStringLanguage(fiL10nADDON_READ_THE_SELECTION,fsGetLanguage())
+					End If
+					cTitle=oShape.getText().getString()
 					if cTitle &lt;&gt; &quot;&quot; Then
 						msgSpeak fsReplaceText(cTitle,chr(10),&quot;. &quot;) 
-						n1= msgBox (cTitle,1,nPage + 1 &amp; &quot;.&quot; &amp; nShape + 1 &amp; &quot; - &quot; _
-						&amp; fsStringLanguage(fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()))
+						n1= msgBox (cTitle,1,cDialogTitle)
 					EndIf
 					if n1=2 Then
 						Exit Sub
