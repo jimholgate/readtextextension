@@ -64,9 +64,9 @@ Sub ReadImpress
 	Dim cTitle,cDialogTitle
 	Dim n1
 	oDoc=ThisComponent 
-	oDrawPages=oDoc.getDrawPages() 
-	nNumPages=oDrawPages.getCount()
 	If oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) Then
+  	 oDrawPages=oDoc.getDrawPages() 
+		 nNumPages=oDrawPages.getCount()
 		For nPage=0 To nNumPages - 1 
 			oDrawPage=oDrawPages.getByIndex( nPage ) 
 			nNumShapes=oDrawPage.getCount() 
