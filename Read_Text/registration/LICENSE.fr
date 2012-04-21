@@ -4,7 +4,7 @@ Après l'installation de cette extension, fermez l'application, puis redémarrez
 
 Copyright et licence
 
-(C) 2012 James Holgate Vancouver, CANADA (james_h (a) http://openofficeforum.org)
+(C) 2011 James Holgate Vancouver, CANADA (james_h (a) http://openofficeforum.org)
 
 <http://www.linux-france.org/article/these/gpl.html>
 
@@ -14,7 +14,7 @@ After installing this extension, close the application then restart it.
 
  Copyright and License 
 
-(c) 2012 James Holgate Vancouver, CANADA (james_h (a) http://openofficeforum.org)
+(c) 2011 James Holgate Vancouver, CANADA (james_h (a) http://openofficeforum.org)
 
 <http://www.gnu.org/licenses/gpl-2.0.txt>
 

@@ -138,22 +138,24 @@ Function fsGetTextSelection() As String
 	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
 		sSelectedText=fsRetrieveCalcActiveCellText()
 	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
-		sSelectedText=fsDrawText()
+		sSelectedText=fsGetSelectionAndCopy()
 	Elseif oDoc.supportsService(&quot;com.sun.star.text.TextDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.WebDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.GlobalDocument&quot;) Then
 		oSelection=oDoc.getCurrentSelection()
-		sSelectedText=&quot;&quot;  	
+		sSelectedText=&quot;&quot;
 		If oSelection.supportsService(&quot;com.sun.star.text.TextRanges&quot;) Then
 			For n=0 To(oSelection.getCount() - 1)
-	sSelectedText=sSelectedText &amp; &quot; &quot; &amp; oSelection.getByIndex(n).getString()
+				sSelectedText=sSelectedText &amp; &quot; &quot; &amp; oSelection.getByIndex(n).getString()
 			Next
+			fsGetSelectionAndCopy() &apos;selected content to clipboard
 		Else 
-			sSelectedText=oSelection.getByIndex(0).getString()
+			sSelectedText=fsGetSelectionAndCopy()
 		Endif
 		If sSelectedText=&quot; &quot; Then
-			sSelectedText=fsgetCursorWord()
+			selectAWord
+			sSelectedText=fsGetSelectionAndCopy()
 		Endif
 	Else &apos;unsupported document format
-		sSelectedText=&quot;&quot;  
+		sSelectedText=fsGetSelectionAndCopy()
 	Endif
 	fsGetTextSelection=Trim(sSelectedText)
 	Exit Function
@@ -491,7 +493,7 @@ Function fsMacVoice(n) As String
 		m=m+1
 	End Select
 	ar1(m)=&quot;&quot; &apos;Last array item must be empty to exit do -&gt; loop
-	fsMacVoice=ar1(n)
+	fsMacVoice=ar1(m)
 end Function
 
 Sub dialog1Combo2ShowSAYChoices(oDialog)
@@ -1985,4 +1987,24 @@ Sub libreHelp
 		&apos;Don&apos;t do anything; extension can use ordinary help.
 	End Select
 End Sub
+
+Sub selectAWord
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dispatcher.executeDispatch(document,&quot;.uno:SelectWord&quot;, &quot;&quot;, 0, Array())
+End Sub
+
+Function fsGetSelectionAndCopy()
+	&apos;We copy to the clipboard, then return the clipboard contents as text. 
+	&apos;The clipboard contents can be used for external tools for the disabled that use
+	&apos;the clipboard. Examples include Braille pads or pictographic symbol displays.
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dispatcher.executeDispatch(document, &quot;.uno:Copy&quot;, &quot;&quot;, 0, Array())
+	fsGetSelectionAndCopy=fsGetClipBoard
+End Function
 </script:module>

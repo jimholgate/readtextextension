@@ -163,6 +163,58 @@
 						<value>_self</value>
 					</prop>
 				</node>
+				<node oor:name="textToSpeech.AddonMenu.m3" oor:op="replace">
+					<prop oor:name="Context" oor:type="xs:string">
+ 						<value>com.sun.star.presentation.PresentationDocument</value>
+					</prop>
+					<prop oor:name="URL" oor:type="xs:string">
+						<value>vnd.sun.star.script:textToSpeech.TextToSpeech.ReadImpress?language=Basic&amp;location=application</value>
+					</prop>
+					<prop oor:name="Title" oor:type="xs:string">
+						<value>Read presentation...</value>
+						<value xml:lang="af">Lees die aanbieding...</value>
+						<value xml:lang="bg">Прочетете презентацията...</value>
+						<value xml:lang="ca">Llegir la presentació...</value>
+						<value xml:lang="cs">Přečtěte si prezentaci...</value>
+						<value xml:lang="da">Læs præsentationen...</value>
+						<value xml:lang="de">Präsentation vorlesen...</value>
+						<value xml:lang="el">Διαβάστε την παρουσίαση..</value>
+						<value xml:lang="en">Read presentation...</value>
+						<value xml:lang="es">Leer la presentación...</value>
+						<value xml:lang="et">Loe esitamine...</value>
+						<value xml:lang="fi">Lue esittely...</value>
+						<value xml:lang="fr">Lire la présentation...</value>
+						<value xml:lang="ga">Léigh an cur i láthair...</value>
+						<value xml:lang="hi">प्रस्तुति पढ़ें...</value>
+						<value xml:lang="hu">Olvassa el a bemutatót...</value>
+						<value xml:lang="id">Baca presentasi...</value>
+						<value xml:lang="is">Lestu kynningu...</value>
+						<value xml:lang="it">Leggi la presentazione...</value>
+						<value xml:lang="jp">プレゼンテーションを読む..</value>
+						<value xml:lang="ko">프레 젠 테이션을 읽고...</value>
+						<value xml:lang="lt">Skaityti pristatymą...</value>
+						<value xml:lang="lv">Lasīt prezentāciju...</value>
+						<value xml:lang="mt">Aqra l-preżentazzjoni...</value>
+						<value xml:lang="nl">Lees de presentatie...</value>
+						<value xml:lang="pl">Przeczytaj prezentacji...</value>
+						<value xml:lang="pt">Leia a apresentação...</value>
+						<value xml:lang="ro">Citeşte prezentarea...</value>
+						<value xml:lang="ru">Прочитайте презентацию...</value>
+						<value xml:lang="sk">Prečítajte si prezentáciu...</value>
+						<value xml:lang="sl">Preberite predstavitev...</value>
+						<value xml:lang="sv">Läs presentationen...</value>
+						<value xml:lang="tl">Basahin ang pagtatanghal...</value>
+						<value xml:lang="tr">Sunum Oku..</value>
+						<value xml:lang="uk">Прочитайте презентацію...</value>
+						<value xml:lang="zh-CN">阅读简报 ...</value>
+						<value xml:lang="zh-TW">閱讀簡報 ...</value>
+						<value xml:lang="zh">阅读简报 ...</value>
+					</prop>
+					<prop oor:name="Target" oor:type="xs:string">
+						<value>_self</value>
+					</prop>
+				</node>
+
 		</node>
 		<!-- specify image urls for icons -->
 		<node oor:name="Images">
