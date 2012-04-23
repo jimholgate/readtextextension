@@ -2133,7 +2133,7 @@ Function fsOsxVoice() As String
 		If s1=&quot;&quot; Then
 			fsOsxVoice=&quot;&quot;
 		Else
-			fsOsxVoice=&quot; -v=&apos;&quot; &amp; s1 &amp; &quot;&apos; &quot;
+			fsOsxVoice=&quot; -v &apos;&quot; &amp; s1 &amp; &quot;&apos; &quot;
 		End If
 	Else
 		fsOsxVoice=&quot;&quot;
