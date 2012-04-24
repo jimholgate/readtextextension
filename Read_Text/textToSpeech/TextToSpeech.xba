@@ -83,7 +83,7 @@ Sub ReadImpress
 						&amp; fsStringLanguage(fiL10nADDON_READ_THE_SELECTION,fsGetLanguage())
 					End If
 					cTitle=oShape.getText().getString()
-					if cTitle &lt;&gt; &quot;&quot; Then
+					if len(cTitle) &lt;&gt; 0 Then
 						msgSpeak fsReplaceText(cTitle,chr(10),&quot;. &quot;) 
 						n1= msgBox (cTitle,1,cDialogTitle)
 					EndIf
@@ -92,6 +92,18 @@ Sub ReadImpress
 					EndIf
 				EndIf 
 			Next
+			If oDrawPage.getName &lt;&gt; &quot;&quot; Then
+				cDialogTitle=nPage + 1 &amp; &quot;.&quot; &amp; nNumShapes + 1 &amp; &quot; - &quot; _
+				&amp; oDrawPage.getName
+			Else
+				cDialogTitle=nPage + 1 &amp; &quot;.&quot; &amp; nNumShapes + 1 &amp; &quot; - &quot; _
+				&amp; fsStringLanguage(fiL10nADDON_READ_THE_SELECTION,fsGetLanguage())
+			End If
+			cTitle=oDrawPage.getNotesPage.getByIndex(1).getText().getString()
+			if len(cTitle) &lt;&gt; 0 Then
+				msgSpeak fsReplaceText(cTitle,chr(10),&quot;. &quot;) 
+				n1= msgBox (cTitle,1,cDialogTitle)
+			End If
 		Next
 	EndIf
 End Sub
