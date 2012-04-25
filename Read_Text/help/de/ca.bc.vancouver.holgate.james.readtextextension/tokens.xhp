@@ -35,6 +35,10 @@ Name des Dokuments (TITLE)</listitem>
 <listitem>
 Pfad zur  %PRODUCTNAME Sound-Galerie (SOUND_GALLERY)</listitem>
 <switchinline select="sys">
+<caseinline select="MAC">
+<listitem>
+Anwendungs-Regionalcode - (OSX_LANGUAGE_VOICE)</listitem>
+</caseinline>
 <caseinline select="WIN">
 <listitem>
 Pfad zu einem Windows-Script zum Vorlesen mittels der System-Sprechstimme (TTS_WSCRIPT_VBS)</listitem></caseinline>
@@ -59,11 +63,11 @@ Anwendungs-Sprachcode - de für Deutsch, fr für Französisch usw. (LANGUAGE_COD
 <listitem>
 Anwendungs-Ländercode - DE für Deutsch, FR für Französisch, usw. (COUNTRY_CODE)</listitem>
 <listitem>
-Anwendungs-Regionalcode- fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw. (LANGUAGE_COUNTRY_CODE)</listitem>
+Anwendungs-Regionalcode - fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw. (LANGUAGE_COUNTRY_CODE)</listitem>
 <listitem>
 Sprachcode-Auswahl - de für Deutsch, fr für Französisch usw. (SELECTION_LANGUAGE_CODE)</listitem>
 <listitem>
- Ländercode.Auswahl - DE für Deutsch, FR für Französisch, usw. (SELECTION_COUNTRY_CODE)</listitem>
+Ländercode.Auswahl - DE für Deutsch, FR für Französisch, usw. (SELECTION_COUNTRY_CODE)</listitem>
 <listitem>
 Regionalcode-Auswahl - fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw. (SELECTION_LANGUAGE_COUNTRY_CODE)</listitem>
 <listitem>

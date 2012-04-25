@@ -103,6 +103,9 @@ Sub ReadImpress
 			if len(cTitle) &lt;&gt; 0 Then
 				msgSpeak fsReplaceText(cTitle,chr(10),&quot;. &quot;) 
 				n1= msgBox (cTitle,1,cDialogTitle)
+				if n1=2 Then
+					Exit Sub
+				EndIf
 			End If
 		Next
 	EndIf
