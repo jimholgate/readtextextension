@@ -7,7 +7,7 @@ Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Cal
 ==Download==
 
   * [http://extensions.libreoffice.org/extension-center/read-text LibreOffice Extensions]
-  * [http://aoo-extensions.sourceforge.net/project/Read_Text OpenOffice.org Extensions]
+  * [http://extensions.services.openoffice.org/de/project/read-text Apache OpenOffice Extensions]
   * [http://code.google.com/p/readtextextension/downloads/list Google Project Hosting]
 
 ==Image==
