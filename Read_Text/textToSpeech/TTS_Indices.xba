@@ -316,7 +316,7 @@ Function fsGetOS() As String
 	    fsGetOS=&quot;MAC&quot;
 	  Case 4: 
 	    If Instr(Environ(&quot;URE_BOOTSTRAP&quot;),&quot;MacOS&quot;)&lt;&gt;0 Then &apos; aka uname Darwin
-			fsGetOS=&quot;OSX&quot;  
+			fsGetOS=&quot;OSX&quot;
 	    Else
 			fsGetOS=&quot;UNIX&quot;
 	    Endif
@@ -748,7 +748,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Toets&quot;
 		sL10N(15)=&quot;Kon nie die program.&quot;
 		sL10N(16)=&quot;String kan nie ontleed word!&quot;
@@ -771,7 +771,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;управление&quot;
 		sL10N(12)=&quot;Скрипт&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Тест&quot;
 		sL10N(15)=&quot;Не може да намерите на програмата.&quot;
 		sL10N(16)=&quot;String не може да се анализира!&quot;
@@ -794,7 +794,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Comando&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Prova&quot;
 		sL10N(15)=&quot;No s&apos;ha pogut localitzar el programa.&quot;
 		sL10N(16)=&quot;La cadena no pot ser analitzat!&quot;
@@ -817,7 +817,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot; 
 		sL10N(11)=&quot;Příkaz&quot; 
 		sL10N(12)=&quot;Script&quot; 
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot; 
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot; 
 		sL10N(14)=&quot;Test&quot; 
 		sL10N(15)=&quot;Nelze najít programu.&quot;
 		sL10N(16)=&quot;Řetězec nelze analyzovat!&quot;
@@ -840,7 +840,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Kunne ikke finde programmet.&quot;
 		sL10N(16)=&quot;String ikke kan analyseres!&quot;
@@ -867,7 +867,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot; &apos; &quot;OK&quot;
 		sL10N(11)=&quot;Befehl&quot; &apos; &quot;Command&quot; &apos;For &quot;Browse&quot;, the German is &quot;Durchsuchen&quot;
 		sL10N(12)=&quot;Script&quot; &apos; &quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot; &apos; &quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot; &apos; &quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot; &apos; &quot;Test&quot;
 		sL10N(15)=&quot;Programm nicht auffindbar.&quot; &apos; &quot;Could not locate the program. &quot;
 		sL10N(16)=&quot;Zeichenkette kann nicht analysiert werden!&quot; &apos; &quot;String cannot be analyzed!&quot;
@@ -890,7 +890,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Εντολή&quot;
 		sL10N(12)=&quot;Σενάριο&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Δοκιμή&quot;
 		sL10N(15)=&quot;Δεν μπόρεσα να βρώ το πρόγραμμα.&quot;
 		sL10N(16)=&quot;String δεν μπορεί να αναλυθεί!&quot;
@@ -913,7 +913,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;Aceptar&quot;
 		sL10N(11)=&quot;Comando&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Prueba&quot;
 		sL10N(15)=&quot;No se encontró el programa.&quot;
 		sL10N(16)=&quot;La secuencia no se puede analizar!&quot;
@@ -936,7 +936,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Commande&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot; 
 		sL10N(15)=&quot;Application externe inconnue.&quot;
 		sL10N(16)=&quot;Une fonction BASIC ne peut pas analyser une chaîne de caractères.&quot;
@@ -959,7 +959,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Käsk&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Testi&quot;
 		sL10N(15)=&quot;Ei leia programmi.&quot;
 		sL10N(16)=&quot;String ei saa analüüsida!&quot;
@@ -968,27 +968,27 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(19)=&quot;Tõlgi ja lugeda veebitööriistadega&quot;
 		sL10N(20)=&quot;Kõneatribuudid&quot;
 		sL10N(21)=&quot;Juhtpaneel&quot;
-	Case &quot;fi&quot; &apos;Finnish
-		sL10N(0)=&quot;Read Text&quot;
+	Case &quot;fi&quot; &apos;Finnish translation provided by Teijo S. on 2013.08.03 
+		sL10N(0)=&quot;Lue ääneen&quot;
 		sL10N(1)=&quot;Ulkoinen ohjelma&quot;
-		sL10N(2)=&quot;Käytä Festival script&quot;
-		sL10N(3)=&quot;Komentosarjakomennot&quot;
-		sL10N(4)=&quot;Lue ja ulkoinen ohjelma&quot;
-		sL10N(5)=&quot;Komentorivioptioita&quot;
-		sL10N(6)=&quot;Näytä&quot;
-		sL10N(7)=&quot;Aina näytä tätä valintaikkunaa&quot;
-		sL10N(8)=&quot;Tietoa&quot;
+		sL10N(2)=&quot;Festival ja sen komentojono&quot;
+		sL10N(3)=&quot;Parametrit&quot;
+		sL10N(4)=&quot;Muu ulkoinen ohjelma&quot;
+		sL10N(5)=&quot;Parametrit&quot;
+		sL10N(6)=&quot;Valintaikkuna&quot;
+		sL10N(7)=&quot;Näytä aina tämä valintaikkuna&quot;
+		sL10N(8)=&quot;Tietoja&quot;
 		sL10N(9)=&quot;Peruuta&quot;
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Komento&quot;
-		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
-		sL10N(14)=&quot;Testaa&quot;
-		sL10N(15)=&quot;Ei voitu paikallistaa ohjelman.&quot;
-		sL10N(16)=&quot;Merkkijono ei voida analysoida!&quot;
-		sL10N(17)=&quot;On-line help&quot;
+		sL10N(12)=&quot;Komentojono&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(14)=&quot;Koekuuntele&quot;
+		sL10N(15)=&quot;Ohjelma ei ole käytettävissä.&quot;
+		sL10N(16)=&quot;Merkkijonoa ei voida tulkita&quot;
+		sL10N(17)=&quot;Ohje verkossa&quot;
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
-		sL10N(19)=&quot;Käännä ja lukea web-työkalujen&quot;
+		sL10N(19)=&quot;Verkkosovellus&quot;
 		sL10N(20)=&quot;Puheominaisuudet&quot;
 		sL10N(21)=&quot;Ohjauspaneeli&quot;
 	Case &quot;ga&quot; &apos;Irish
@@ -1005,7 +1005,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Msgstr&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Tástáil&quot;
 		sL10N(15)=&quot;Níorbh fhéidir teacht ar an gclár.&quot;
 		sL10N(16)=&quot;Ní féidir anailís a dhéanamh String!&quot;
@@ -1028,7 +1028,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;ठीक है&quot;
 		sL10N(11)=&quot;कमान&quot;
 		sL10N(12)=&quot;स्क्रिप्ट&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;परीक्षण&quot;
 		sL10N(15)=&quot;मैं प्रोग्राम को नहीं ढूँढ सकते है.&quot;
 		sL10N(16)=&quot;मैं स्ट्रिंग का विश्लेषण नहीं कर सकता है!&quot;
@@ -1051,7 +1051,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Parancs&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Teszt&quot;
 		sL10N(15)=&quot;Nem találom a programot.&quot;
 		sL10N(16)=&quot;String nem lehet elemezni!&quot;
@@ -1078,7 +1078,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Perintah&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Tidak dapat menemukan program.&quot;
 		sL10N(16)=&quot;String tidak dapat dianalisis!&quot;
@@ -1101,7 +1101,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Gat ekki fundið forritið.&quot;
 		sL10N(16)=&quot;String er ekki hægt að greina!&quot;
@@ -1124,7 +1124,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Ordine&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot; 
 		sL10N(15)=&quot;External Application sconosciuto. &quot;
 		sL10N(16)=&quot;Una funzione BASIC non può analizzare una stringa.&quot;
@@ -1147,7 +1147,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;コマンド&quot;
 		sL10N(12)=&quot;スクリプト&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;テスト&quot; 
 		sL10N(15)=&quot;プログラムを見つけることができませんでした&quot;
 		sL10N(16)=&quot;文字列を解析することはできません！&quot;
@@ -1170,7 +1170,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;확인&quot;
 		sL10N(11)=&quot;명령&quot;
 		sL10N(12)=&quot;스크립트&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;테스트&quot;
 		sL10N(15)=&quot;프로그램을 찾을 수 없습니다.&quot;
 		sL10N(16)=&quot;문자열을 분석할 수 없어!&quot;
@@ -1193,7 +1193,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Komandu&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Nevarēja atrast programmu.&quot;
 		sL10N(16)=&quot;Stīgu nevar analizēt!&quot;
@@ -1216,7 +1216,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;Gerai&quot;
 		sL10N(11)=&quot;Komanda&quot;
 		sL10N(12)=&quot;Scenarijus&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Testas&quot;
 		sL10N(15)=&quot;Nepavyksta rasti programos&quot;
 		sL10N(16)=&quot;Styginių negali būti analizuojamas!&quot;
@@ -1239,7 +1239,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Kmand&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Ma kellekx jillokalizza l-programm.&quot;
 		sL10N(16)=&quot;String ma jistgħux jiġu analizzati!&quot;
@@ -1262,7 +1262,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Kan niet vinden het programma.&quot;
 		sL10N(16)=&quot;String kan niet worden geanalyseerd!&quot;
@@ -1285,7 +1285,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Nie można odnaleźć programu.&quot;
 		sL10N(16)=&quot;Napis nie może być analizowana!&quot;
@@ -1308,7 +1308,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Ordem&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Teste&quot;
 		sL10N(15)=&quot;Desconhecido aplicativo externo.&quot;
 		sL10N(16)=&quot;Uma função básica não é possível analisar uma seqüência.&quot;
@@ -1331,7 +1331,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Nu am putut localiza programul.&quot;
 		sL10N(16)=&quot;String nu poate fi analizată!&quot;
@@ -1354,7 +1354,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot; 
 		sL10N(11)=&quot;Заказать&quot; 
 		sL10N(12)=&quot;Сценарий&quot; 
-		sL10N(13)=&quot;(с) 2008-2011 James Holgate&quot; 
+		sL10N(13)=&quot;(с) 2008-2013 James Holgate&quot; 
 		sL10N(14)=&quot;Тест&quot;
 		sL10N(15)=&quot;Наружное применение неизвестно&quot;
 		sL10N(16)=&quot;Основная функция не может разобрать строку&quot;
@@ -1377,7 +1377,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Príkaz&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Nemožno nájsť program.&quot;
 		sL10N(16)=&quot;Reťazec nemožno analyzovať!&quot;
@@ -1400,7 +1400,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Ni bilo mogoče najti program.&quot;
 		sL10N(16)=&quot;Niz ne more biti analizirana!&quot;
@@ -1423,7 +1423,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Kommando&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Kunde inte hitta programmet.&quot;
 		sL10N(16)=&quot;Kan Sträng inte analyseras!&quot;
@@ -1450,7 +1450,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Hindi mahanap ang programa.&quot;
 		sL10N(16)=&quot;String ay hindi maaaring aralan!&quot;
@@ -1473,7 +1473,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;Tamam&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Programı bulunamıyor.&quot;
 		sL10N(16)=&quot;String analiz olamaz!&quot;
@@ -1500,7 +1500,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Команда&quot;
 		sL10N(12)=&quot;Сценарій &quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Тест&quot;
 		sL10N(15)=&quot;Неможливо знайти програму. &quot;
 		sL10N(16)=&quot;Рядок не може бути проаналізована!&quot;
@@ -1523,7 +1523,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;確定&quot;
 		sL10N(11)=&quot;命令&quot;
 		sL10N(12)=&quot;腳本&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;測試&quot;  
 		sL10N(15)=&quot;宏無法找到該程序.&quot;
 		sL10N(16)=&quot;宏無法讀取的字符串正確！&quot;
@@ -1546,7 +1546,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;确定&quot; 
 		sL10N(11)=&quot;命令&quot; 
 		sL10N(12)=&quot;脚本&quot; 
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;测试&quot; 
 		sL10N(15)=&quot;宏无法找到该程序.&quot; 
 		sL10N(16)=&quot;宏无法读取的字符串正确！&quot;
@@ -1573,7 +1573,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2011 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Could not locate the program. &quot;
 		sL10N(16)=&quot;String cannot be analyzed!&quot;

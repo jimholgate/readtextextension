@@ -40,10 +40,6 @@ Name of the document (TITLE)</listitem>
 <listitem>
 Path of the %PRODUCTNAME sound gallery (SOUND_GALLERY)</listitem>
 <switchinline select="sys">
-<caseinline select="MAC">
-<listitem>
-Selection language code for language and locale (OSX_LANGUAGE_VOICE)</listitem>
-</caseinline>
 <caseinline select="WIN">
 <listitem>
 Path to a Windows Script to read using the system's voice (TTS_WSCRIPT_VBS)</listitem>

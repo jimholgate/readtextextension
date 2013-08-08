@@ -138,24 +138,22 @@ Function fsGetTextSelection() As String
 	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
 		sSelectedText=fsRetrieveCalcActiveCellText()
 	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
-		sSelectedText=fsGetSelectionAndCopy()
+		sSelectedText=fsDrawText()
 	Elseif oDoc.supportsService(&quot;com.sun.star.text.TextDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.WebDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.GlobalDocument&quot;) Then
 		oSelection=oDoc.getCurrentSelection()
-		sSelectedText=&quot;&quot;
+		sSelectedText=&quot;&quot;  	
 		If oSelection.supportsService(&quot;com.sun.star.text.TextRanges&quot;) Then
 			For n=0 To(oSelection.getCount() - 1)
-				sSelectedText=sSelectedText &amp; &quot; &quot; &amp; oSelection.getByIndex(n).getString()
+	sSelectedText=sSelectedText &amp; &quot; &quot; &amp; oSelection.getByIndex(n).getString()
 			Next
-			fsGetSelectionAndCopy() &apos;selected content to clipboard
 		Else 
-			sSelectedText=fsGetSelectionAndCopy()
+			sSelectedText=oSelection.getByIndex(0).getString()
 		Endif
 		If sSelectedText=&quot; &quot; Then
-			selectAWord
-			sSelectedText=fsGetSelectionAndCopy()
+			sSelectedText=fsgetCursorWord()
 		Endif
 	Else &apos;unsupported document format
-		sSelectedText=fsGetSelectionAndCopy()
+		sSelectedText=&quot;&quot;  
 	Endif
 	fsGetTextSelection=Trim(sSelectedText)
 	Exit Function
@@ -507,29 +505,21 @@ Sub dialog1Combo2ShowSAYChoices(oDialog)
 	REM first remove all old items from the list
 	n=oComboBox.getItemCount()
 	oComboBox.removeItems( 0,n)
-	n=0
-	REM -show names of voices available for current language (For example, English novelty voices...)
-	Do
-		s1=&quot;-v &quot; &amp; Chr$(34) &amp; fsMacVoice(n) &amp; Chr$(34) &amp; &quot; -f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
-		oComboBox.addItem(s1,0)
-		n=n+1
-	Loop Until fsMacVoice(n) = &quot;&quot;
-	REM - Show file output options. 
-	s2(1)=&quot;.mp3&quot;
-	s2(2)=&quot;.m4a&quot;
-	s2(3)=&quot;.caff&quot;
+	s2(1)=&quot;.wav&quot;
+	s2(2)=&quot;.mp3&quot;
+	s2(3)=&quot;.m4a&quot;
 	s2(4)=&quot;.aif&quot;
 	For n=1 To 4
 			s1=&quot;-o &quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW)&quot; &amp; s2(n) &amp; Chr$(34) &amp; &quot; -f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
 			oComboBox.addItem(s1,0)
 	Next 
-		For n=1 To 4
-			s1=&quot;(OSX_LANGUAGE_VOICE) -o &quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW)&quot; &amp; s2(n) &amp; Chr$(34) &amp; &quot; -f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
-			oComboBox.addItem(s1,0)
-	Next 
-	REM - show audio options - Switch voice according to language, or use default. 
-	s1=&quot;(OSX_LANGUAGE_VOICE) -f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
-	oComboBox.addItem(s1,0)
+	n=0
+	Do
+		s1=&quot;-v &quot; &amp; Chr$(34) &amp; fsMacVoice(n) &amp; Chr$(34) &amp; &quot; -f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+		oComboBox.addItem(s1,0)
+		n=n+1
+	Loop Until fsMacVoice(n) = &quot;&quot;
+
 	s1=&quot;-f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
 	oComboBox.addItem(s1,0)
 End Sub
@@ -865,21 +855,15 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 			oComboBox.addItem(s1,0)
 			n=n+1
 		Loop Until fsMacVoice(n) = &quot;&quot;
-
-		s2(1)=&quot;.mp3&quot;
-		s2(2)=&quot;.m4a&quot;
-		s2(3)=&quot;.caff&quot;
+		s2(1)=&quot;.wav&quot;
+		s2(2)=&quot;.mp3&quot;
+		s2(3)=&quot;.m4a&quot;
 		s2(4)=&quot;.aif&quot;
-		For n=1 To 4
-			s1=Chr(34) &amp; &quot;(OS_PY)&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;say (OSX_LANGUAGE_VOICE) -o &apos;(HOME)(NOW)&quot; &amp; s2(n) &amp; &quot;&apos; -f &apos;(TMP)&apos;&quot; &amp; Chr$(34)
-			oComboBox.addItem(s1,0)
-		Next
 		For n=1 To 4
 			s1=Chr(34) &amp; &quot;(OS_PY)&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;say -o &apos;(HOME)(NOW)&quot; &amp; s2(n) &amp; &quot;&apos; -f &apos;(TMP)&apos;&quot; &amp; Chr$(34)
 			oComboBox.addItem(s1,0)
 		Next
-		s1=Chr(34) &amp; &quot;(OS_PY)&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; chr(34) &amp; &quot; say (OSX_LANGUAGE_VOICE) -f &apos;(TMP)&apos;&quot;  &amp; Chr(34)
-		oComboBox.addItem(s1,0)
+
 		s1=Chr(34) &amp; &quot;(OS_PY)&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; chr(34) &amp; &quot; say -f &apos;(TMP)&apos;&quot;  &amp; Chr(34)
 		oComboBox.addItem(s1,0)
 	EndIf
@@ -1521,8 +1505,28 @@ Function replaceLocalTokensWithStr(sA As String) As String
 		&apos;Work directory also known As My Documents or home
 		sFind=&quot;(HOME)&quot;
 		sReplace=ConvertFromURL(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;)
+		if fileExists(sReplace) = false then
+			&apos; let&apos;s try to make the directory
+			&apos; if we fail, then we look in other spots.
+			if fbCreateFile(sReplace &amp; &quot;log.txt&quot;, fsGetSetting(&quot;ooname&quot;) &amp; &quot; - &quot; &amp; fsFileTime() &amp; &quot; - created HOME directory &quot;, &quot;utf-8&quot;) then
+				kill sReplace &amp; &quot;log.txt&quot;
+			else
+				if Instr(Environ(&quot;pwd&quot;)) &lt;&gt; &quot;&quot; then
+					&apos;&quot;OSX&quot;,&quot;MAC&quot; or &quot;UNIX&quot; 
+					sReplace = Environ(&quot;pwd&quot;) &amp; &quot;/&quot;
+				elseif Instr(Environ(&quot;HOMEPATH&quot;)) &lt;&gt; &quot;&quot; then
+					&apos; &quot;WINDOWS&quot;
+					sReplace = Environ(&quot;HOMEPATH&quot;) &amp; &quot;\&quot;
+				elseif Instr(Environ(&quot;HOME&quot;)) &lt;&gt; &quot;&quot; then
+					&apos; legacy posix
+					sReplace = Environ(&quot;HOME&quot;) &amp; &quot;/&quot;
+				else
+					&apos; root of home drive
+					sReplace = ConvertFromURL(&quot;file:///&quot;)
+				endif 
+			endif
+		endif
 		sA=fsReplaceText(sA,sFind,sReplace)
-	
 		&apos;Current time reformatted so that you can use it in a filename
 		sFind=&quot;(NOW)&quot;
 		sReplace=fsFileTime()
@@ -1583,11 +1587,11 @@ Function replacePublicTokensWithStr(sA As String) As String
 	Dim sReplace As String
 	
 	sFind=&quot;(AUTHOR)&quot;
-	sReplace=ltrim(rtrim(ThisComponent.getDocumentInfo().Author))
+	sReplace=ltrim(rtrim(ThisComponent.DocumentProperties().Author))
 	sA=fsReplaceText(sA,sFind,sReplace)
 	
 	sFind=&quot;(TITLE)&quot;
-	sReplace=ThisComponent.getDocumentInfo().Title
+	sReplace=ThisComponent.DocumentProperties().Title
 	If sReplace=&quot;&quot; Then 
 		sReplace=fsDateMyRegion() &amp; &quot; - &quot; &amp; fsTimeMyRegion()
 	Endif
@@ -1606,12 +1610,6 @@ Function replacePublicTokensWithStr(sA As String) As String
 	&apos;Current day of week As spoken in region
 	sFind=&quot;(WEEKDAY)&quot;
 	sReplace=fsWeekDayMyRegion()
-	sA=fsReplaceText(sA,sFind,sReplace)
-	
-	&apos;(OSX_LANGUAGE_VOICE) - Replace with OSX Lion voice name according to language code
-	&apos; For example, use &quot;-v &apos;Yannick&apos;&quot; For German (aka de-DE)
-	sFind=&quot;(OSX_LANGUAGE_VOICE)&quot;
-	sReplace=fsOsxVoice()
 	sA=fsReplaceText(sA,sFind,sReplace)
 	
 	&apos;Language - en For English fr For French etc. ISO_639-1
@@ -2008,135 +2006,41 @@ Sub libreHelp
 	End Select
 End Sub
 
-Sub selectAWord
-	dim document   as object
-	dim dispatcher as object
-	document   = ThisComponent.CurrentController.Frame
-	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
-	dispatcher.executeDispatch(document,&quot;.uno:SelectWord&quot;, &quot;&quot;, 0, Array())
-End Sub
-
-Function fsGetSelectionAndCopy()
-	&apos;We copy to the clipboard, then return the clipboard contents as text. 
-	&apos;The clipboard contents can be used for external tools for the disabled that use
-	&apos;the clipboard. Examples include Braille pads or pictographic symbol displays.
-	dim document   as object
-	dim dispatcher as object
-	document   = ThisComponent.CurrentController.Frame
-	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
-	dispatcher.executeDispatch(document, &quot;.uno:Copy&quot;, &quot;&quot;, 0, Array())
-	fsGetSelectionAndCopy=fsGetClipBoard
-End Function
-
-Function fsOsxVoice() As String	
-	&apos;Function returns blank if the selected text is the same as the UI language, otherwise
-	&apos;it uses the say -v parameter to select a particular voice.
-	&apos;New languages and voices are available in Apple OSX Lion. If multilingual text doesn&apos;t
-	&apos;work, you may need to update the operating system or install voices from a third
-	&apos;party vendor.
-	&apos;We use your choice of voice if language and locale of the selection is the same
-	&apos;as the system. Otherwise your computer will try to use another suitable voice
-	&apos;if a voice with the correct language and locale are available.
-	Dim s1,s4 as String
-	If fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot; Then
-		s4=fsSelectionLanguage() &amp; &quot;-&quot; &amp; fsSelectionCountry()
-		Select Case s4
-		Case fsGetSetting(&quot;language&quot;) &amp; &quot;-&quot; &amp; fsGetSetting(&quot;country&quot;)
-			s1=&quot;&quot;
-		Case &quot;en-US&quot;,&quot;en-CA&quot;
-			s1=&quot;Alex&quot;
-		Case &quot;en-AU&quot;,&quot;en-NZ&quot;
-			s1=&quot;Lee&quot;
-		Case &quot;en-GB&quot;,&quot;en-BD&quot;,&quot;en-BS&quot;,&quot;en-GH&quot;,&quot;en-HK&quot;,&quot;en-JM&quot;,&quot;en-TT&quot;,&quot;en-IE&quot;
-			s1=&quot;Serena&quot;
-		Case &quot;en-IN&quot;,&quot;en-PK&quot;
-			s1=&quot;Sangeetal&quot;
-		Case &quot;en-ZA&quot;
-			s1=&quot;Tessa&quot;
-		Case &quot;zh-CN&quot;,&quot;zh-SG&quot;,&quot;zh-MY&quot;
-			s1=&quot;Ting-Ting&quot;
-		Case &quot;zh-HK&quot;,&quot;zh-MO&quot;
-			s1=&quot;Sin-Ji&quot;
-		Case &quot;zh-TW&quot;
-			s1=&quot;Ya-Ling&quot;
-		Case &quot;fr-CA&quot;
-			s1=&quot;Julie&quot;
-		Case &quot;pt-BR&quot;
-			s1=&quot;Raquel&quot;
-		Case &quot;pt-PT&quot;
-			s1=&quot;Joana&quot;
-		Case &quot;es-MX&quot;
-			s1=&quot;Paulina&quot;
-		Case &quot;es-ES&quot;
-			s1=&quot;Monica&quot;
-		Case Else
-			s1=&quot;&quot;
-		End Select
-		If s1=&quot;&quot; Then
-			Select Case fsSelectionLanguage()
-			Case &quot;en&quot;
-				s1=&quot;Alex&quot;
-			Case &quot;ar&quot;
-				s1=&quot;Maged&quot;
-			Case &quot;zh&quot;
-				s1=&quot;Ting-Ting&quot;
-			Case &quot;cs&quot;
-				s1=&quot;Zuzana&quot;
-			Case &quot;da&quot;
-				s1=&quot;Ida&quot;
-			Case &quot;nl&quot;
-				s1=&quot;Xander&quot;
-			Case &quot;fi&quot;
-				s1=&quot;Mikko&quot;
-			Case &quot;fr&quot;
-				s1=&quot;Virginie&quot;
-			Case &quot;de&quot;
-				s1=&quot;Yannick&quot;
-			Case &quot;he&quot;
-				s1=&quot;Alexandros&quot;
-			Case &quot;hi&quot;
-				s1=&quot;Lekha&quot;
-			Case &quot;hu&quot;
-				s1=&quot;Eszter&quot;
-			Case &quot;id&quot;
-				s1=&quot;Damayanti&quot;
-			Case &quot;it&quot;
-				s1=&quot;Silvia&quot;
-			Case &quot;ja&quot;
-				s1=&quot;Kyoko&quot;
-			Case &quot;ko&quot;
-				s1=&quot;Narae&quot;
-			Case &quot;nb&quot;
-				s1=&quot;Stine&quot;
-			Case &quot;pl&quot;
-				s1=&quot;Agata&quot;
-			Case &quot;pt&quot;
-				s1=&quot;Raquel&quot;
-			Case &quot;ro&quot;
-				s1=&quot;Simona&quot;
-			Case &quot;ru&quot;
-				s1=&quot;Milena&quot;
-			Case &quot;sk&quot;
-				s1=&quot;Laura&quot;
-			Case &quot;es&quot;
-				s1=&quot;Monica&quot;
-			Case &quot;sv&quot;
-				s1=&quot;Oskar&quot;
-			Case &quot;th&quot;
-				s1=&quot;Narisa&quot;
-			Case &quot;tr&quot;
-				s1=&quot;Aylin&quot;
-			Case Else
-				s1=&quot;&quot;
-			End Select
-		End If
-		If s1=&quot;&quot; Then
-			fsOsxVoice=&quot;&quot;
-		Else
-			fsOsxVoice=&quot; -v &apos;&quot; &amp; s1 &amp; &quot;&apos; &quot;
-		End If
-	Else
-		fsOsxVoice=&quot;&quot;
-	End If
-end Function
+function fbCreateFile(sFilePath, sWriteString, Optional sEncoding)
+	&apos; fbCreateFile (&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;,&quot;utf-8&quot;) &apos; Best practice
+	&apos; fbCreateFile (&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;) &apos; is allowed, but not best practice.
+	&apos; Windows can not write Asian languages correctly with &quot;iso-8859-15&quot;
+	&apos; Anything written for the extension&apos;s private use should be &quot;utf-8&quot;
+	&apos; This sub will create the file and all the nested directories
+	&apos; in the path in a single step.
+	if ismissing(sEncoding) then 
+		select case fsGetOS()
+		case &quot;WINDOWS&quot;
+			sEncoding = &quot;iso-8859-15&quot; &apos;iso-8859-15 is Windows &quot;western&quot; encoding
+		case else 
+			sEncoding = &quot;utf-8&quot; &apos; Posix standard
+		end select
+	endif
+	on Error goto fbCreateFileError
+ 	dim CR as string
+	CR = chr$(13)
+	dim oOutputAccess As object
+	dim oOutputStream As object
+	dim vOutputData, UDP, PV As Variant
+	if fileExists (sFilePath) then
+		kill sFilePath
+	endif
+	oOutputAccess = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	oOutputStream = CreateUnoService(&quot;com.sun.star.io.TextOutputStream&quot;)
+	vOutputData   = oOutputAccess.openFileWrite( sFilePath )
+	oOutputStream.setOutputStream(vOutputData)
+	oOutputStream.setEncoding(sEncoding)
+	oOutputStream.writeString( sWriteString )
+	oOutputStream.flush()
+	oOutputStream.closeOutput()
+	fbCreateFile = true
+	exit function
+	fbCreateFileError:
+	fbCreateFile = false
+end function
 </script:module>
