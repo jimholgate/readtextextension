@@ -2,21 +2,21 @@
 <helpdocument version="1.0">
 <meta>
 <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp" indexer="include" status="PUBLISH">
-<title id="read_selection" xml-lang="en-US">
+<title id="read_selection" xml-lang="fi-FI">
 Lue valinta</title>
 <filename>/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp</filename>
 </topic>
 <history>
 <created date="2010-10-22T00:00:00">
 James Holgate</created>
-<lastedited date="2011-04-16T00:00:35">
-Muutettu ulkoiseksi oletuskieleksi python</lastedited>
+<lastedited date="2013-08-08T03:18:00">
+Update Finnish localization and metadata from Teijo S.</lastedited>
 </history>
 </meta>
 <body>
-<paragraph role="heading" id="read_selection1" xml-lang="en-US" level="1">
+<paragraph role="heading" id="read_selection1" xml-lang="fi-FI" level="1">
 Käyttö</paragraph>
-<paragraph role="heading" id="read_selection1.1" xml-lang="en-US" level="2">
+<paragraph role="heading" id="read_selection1.1" xml-lang="fi-FI" level="2">
 Lue valinta
 </paragraph>
 <list>
