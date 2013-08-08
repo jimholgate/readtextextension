@@ -35,10 +35,6 @@ Nom du document (TITLE)</listitem>
 <listitem>
 %PRODUCTNAME Gallerie de son (SOUND_GALLERY) </listitem>
 <switchinline select="sys">
-<caseinline select="MAC">
-<listitem>
-Voix régional de la sélection - (OSX_LANGUAGE_VOICE)</listitem>
-</caseinline>
 <caseinline select="WIN">
 <listitem>
 Un script Windows Visual Basic qui utilise la synthese vocale du système (TTS_WSCRIPT_VBS)</listitem></caseinline>

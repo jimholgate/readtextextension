@@ -4,13 +4,13 @@ Después de instalar esta extensión, cerrar la aplicación, a continuación, re
 
 Derechos de autor y de licencia
 
-(c) 2011 James Holgate Vancouver, Canada (james_h (a) http://openofficeforum.org)
+(c) 2011-2013 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 
 <http://www.viti.es/gnu/licenses/gpl.html>
 
 Copyright and License 
 
-(c) 2011 James Holgate Vancouver, CANADA (james_h (a) http://openofficeforum.org)
+(c) 2011-2013 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 
 <http://www.gnu.org/licenses/gpl-2.0.txt>
 
