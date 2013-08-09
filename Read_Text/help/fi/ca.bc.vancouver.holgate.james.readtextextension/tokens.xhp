@@ -9,8 +9,8 @@ Käyttö</title>
 <history>
 <created date="2010-10-22T00:00:00">
 James Holgate</created>
-<lastedited date="2013-08-08T03:18:00">
-Update Finnish localization and metadata from Teijo S.</lastedited>
+<lastedited date="2013-08-08T20:12:00">
+Teijo S, translated help to Finnish</lastedited>
 </history>
 </meta>
 <body>
@@ -37,7 +37,7 @@ Tekijän nimi (AUTHOR)</listitem>
 <listitem>
 Asiakirjan nimi (TITLE)</listitem>
 <listitem>
-%PRODUCTNAMEn äänikirjaston polku (SOUND_GALLERY)</listitem>
+Ohjelman %PRODUCTNAME äänikirjaston polku (SOUND_GALLERY)</listitem>
 <switchinline select="sys">
 <caseinline select="WIN">
 <listitem>
