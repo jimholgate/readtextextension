@@ -9,8 +9,8 @@ Asentaminen</title>
 <history>
 <created date="2010-10-22T00:00:00">
 James Holgate</created>
-<lastedited date="2013-08-08T03:18:00">
-Update Finnish localization and metadata from Teijo S.</lastedited>
+<lastedited date="2013-08-08T20:12:00">
+Teijo S, translated help to Finnish</lastedited>
 </history>
 </meta>
 <body>
@@ -20,7 +20,7 @@ Käyttöönotto</paragraph>
 Asentaminen</paragraph>
 <list>
 <listitem>
-Hanki lisäosan uusin versio %PRODUCTNAMEn lisäosasivustolta.  (http://extensions.%PRODUCTNAME.org).
+Hanki lisäosan uusin versio ohjelman %PRODUCTNAME lisäosasivustolta. (http://extensions.%PRODUCTNAME.org).
 </listitem>
 <listitem>
 Avaa lisäosa sovelluksessa %PRODUCTNAME. Hyväksy lisenssisopimus.
