@@ -67,7 +67,7 @@ def fsGetSoundFileName(sTMP1,sIMG1,sType1):
         sOUT1=sTMP1+".wav"
         sTMP1=sOUT1
   elif sTMP1EXT==".aif":
-      if os.path.isfile("/usr/bin/ffmpeg") or os.path.isfile(r"C:\opt\ffmpeg.exe"):
+      if os.path.isfile("/usr/bin/avconv") or os.path.isfile("/usr/bin/ffmpeg") or os.path.isfile(r"C:\opt\ffmpeg.exe"):
         sOUT1=sTMP1
         sTMP1=sOUT1+".wav"
       else:
@@ -75,7 +75,7 @@ def fsGetSoundFileName(sTMP1,sIMG1,sType1):
         sOUT1=sTMP1+".wav"
         sTMP1=sOUT1
   elif sTMP1EXT==".flac":
-      if os.path.isfile("/usr/bin/ffmpeg") or os.path.isfile(r"C:\opt\flac.exe"):
+      if os.path.isfile("/usr/bin/avconv") or os.path.isfile("/usr/bin/ffmpeg") or os.path.isfile(r"C:\opt\flac.exe"):
         sOUT1=sTMP1
         sTMP1=sOUT1+".wav"
       else:
@@ -91,7 +91,7 @@ def fsGetSoundFileName(sTMP1,sIMG1,sType1):
         sOUT1=sTMP1+".wav"
         sTMP1=sOUT1
   elif sTMP1EXT in ".avi;.webm;.m4v;.mov;.mpg;.mp4;.wmv":
-      if (os.path.isfile("/usr/bin/ffmpeg") or os.path.isfile(r"C:\opt\ffmpeg.exe")) and sIMG1FILEEXT in ".bmp;.gif;.jpeg;.jpg;.png;.tif;.tiff;.tga;":
+      if (os.path.isfile("/usr/bin/avconv") or os.path.isfile("/usr/bin/ffmpeg") or os.path.isfile(r"C:\opt\ffmpeg.exe")) and sIMG1FILEEXT in ".bmp;.gif;.jpeg;.jpg;.png;.tif;.tiff;.tga;":
         sOUT1=sTMP1
         sTMP1=sOUT1+".wav"
       else:
@@ -99,7 +99,7 @@ def fsGetSoundFileName(sTMP1,sIMG1,sType1):
         sOUT1=sTMP1+".wav"
         sTMP1=sOUT1
   elif sTMP1EXT==".mp2":
-      if os.path.isfile("/usr/bin/twolame") or os.path.isfile("/usr/bin/ffmpeg")or os.path.isfile(r"C:\opt\ffmpeg.exe"):
+      if os.path.isfile("/usr/bin/twolame") or os.path.isfile("/usr/bin/avconv") or os.path.isfile("/usr/bin/ffmpeg")or os.path.isfile(r"C:\opt\ffmpeg.exe"):
         sOUT1=sTMP1
         sTMP1=sOUT1+".wav"
       else:
@@ -168,7 +168,10 @@ def Wav2Media(sB,sTMP1,sIMG1,sOUT1,sAUDIBLE,sVISIBLE):
     if "windows" in platform.system().lower():
       sFFcommand=getWinFullPath("opt/ffmpeg.exe")
     else:
-      sFFcommand='ffmpeg'   
+      if os.path.isfile("/usr/bin/avconv"):
+        sFFcommand='avconv'
+      else:
+        sFFcommand='ffmpeg'
     if sOUT1EXT==".ogg":
       sTY=time.strftime("%Y-%m-%d")
       if "windows" in platform.system().lower():
@@ -243,24 +246,23 @@ def Wav2Media(sB,sTMP1,sIMG1,sOUT1,sAUDIBLE,sVISIBLE):
         s1='"'+sFFcommand +'" -i "'+sTMP1+'" '+sFFmeta+' -y "'+sOUT1+'"'
         myossystem(s1)
     elif sOUT1EXT==".avi":
-      # The quality isn't as good as webm. Use avi format if you need to edit the video with Windows Movie Maker
+      # loop_input is not used with avconv. To create an .avi file on a recent version of Ubuntu linux, use pitivi or a gstream convertor
       sFFmeta=' -metadata title="'+sTT+'" -metadata comment="'+sTG+' - '+sTL+', '+sTY+'" -metadata artist="'+sTA+'" -metadata genre="'+sTG+'" '
       s1='"'+sFFcommand +'" -loop_input -r 24000/1001 -i "'+sTMP1+'" -f image2 -i "'+sIMG1+'" -t "'+sTIME+'" -vcodec msmpeg4v2 '+sFFmeta+' -y "'+sOUT1+'"'
       myossystem(s1)
     elif sOUT1EXT==".mpg":
-      # Use mpg format if you need to make a clip for a DVD -s 720x480
+      # loop_input is not used with avconv. To create an .mpg file on a recent version of Ubuntu linux, use pitivi or a gstream convertor
       sFFmeta=' -metadata title="'+sTT+'" '
       s1='"'+sFFcommand +'" -loop_input -r 24000/1001 -i "'+sTMP1+'" -f image2 -i "'+sIMG1+'" -t "'+sTIME+'" -target dvd '+sFFmeta+' -y "'+sOUT1+'"'
       myossystem(s1)
     elif sOUT1EXT==".mp4":
-      # For ipod or iphone video library'
-      sFFmeta=' -metadata title="'+sTT+'" -metadata Year="'+sTY+'" -metadata artist="'+sTA+'" -metadata album="'+sTL+'" -metadata genre="'+sTG+'" '
-      s1='"'+sFFcommand +'" -loop_input -r 24000/1001 -i "'+sTMP1+'" -f image2 -i "'+sIMG1+'" -t "'+sTIME+'" -qmax 5  -aspect 4:3 -s 480x320 '+sFFmeta+' -y "'+sOUT1+'"'
+      # For ipod or iphone library'
+      sFFmeta=' -metadata title="'+sTT+'" -metadata Year="'+sTY+'" -metadata artist="'+sTA+'" -metadata album="'+sTL+'" -metadata genre="'+sTG+'"'
+      s1='"'+sFFcommand +'" -i "'+sTMP1+'" -f image2 -i "'+sIMG1+'" -t "'+sTIME+'" -qmax 5  -r 24000/1001 -aspect 4:3 -s 480x320 '+sFFmeta+' -y "'+sOUT1+'"'
       myossystem(s1)
     elif sOUT1EXT==".webm":
       # Chrome, Firefox (Linux) and totem can open webm directly. Edit webm with openshot or pitivi or upload directly to Youtube.
-      sFFmeta=' -metadata title="'+sTT+'" '
-      s1='"'+sFFcommand +'" -loop_input -r 30 -i "'+sTMP1+'" -f image2 -i "'+sIMG1+'" -t "'+sTIME+'" -b 3900k  -acodec libvorbis -ab 100k -f webm '+sFFmeta+' -y  "'+sOUT1+'"'
+      s1='"'+sFFcommand +'" -i "'+sTMP1+'" -f image2 -i "'+sIMG1+'" -t "'+sTIME+'" -y "'+sOUT1+'"'
       myossystem(s1)
     else:
       sOUT1=sTMP1
