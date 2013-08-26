@@ -964,7 +964,7 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
  		fileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then 
 		
 		s2(0)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		If fileExists( &quot;/usr/bin/ffmpeg&quot;) Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Then
+		If fileExists( &quot;/usr/bin/ffmpeg&quot;) Or fileExists( &quot;/usr/bin/avconv&quot;) Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Then
 			For n=0 To 0
 				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
 					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
@@ -979,49 +979,50 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
 				oComboBox.addItem(s1,0)
 			Next
-			For n=0 To 0
-				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-			For n=0 To 0
-				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER2_PNG)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-			For n=0 To 0
-				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-			For n=0 To 0
-				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-			For n=0 To 0
-				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-			For n=0 To 0
-				s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-
+			if not (fileExists( &quot;/usr/bin/avconv&quot;)) then 
+				For n=0 To 0
+					s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+				For n=0 To 0
+					s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER2_PNG)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+				For n=0 To 0
+					s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+				For n=0 To 0
+					s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+				For n=0 To 0
+					s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+				For n=0 To 0
+					s1=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+			Endif
 		Endif		
 
 		If fileExists( &quot;/usr/bin/speexenc&quot;) Then
@@ -1100,7 +1101,7 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 		s2(6)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s2(7)=&quot;(SELECTION_LANGUAGE_CODE)&quot;
 		
-		If fileExists( &quot;/usr/bin/ffmpeg&quot;) Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Then
+		If fileExists( &quot;/usr/bin/avconv&quot;) or fileExists( &quot;/usr/bin/ffmpeg&quot;) Or fileExists(&quot;C:\opt\ffmpeg.exe&quot;) Then
 			For n=6 To 6
 				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
 					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
@@ -1115,49 +1116,50 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
 				oComboBox.addItem(s1,0)
 			Next
-			For n=6 To 6
-				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-			For n=6 To 6
-				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER2_PNG)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-			For n=6 To 6
-				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-			For n=6 To 6
-				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-			For n=6 To 6
-				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-			For n=6 To 6
-				s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
-					&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
-					&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
-				oComboBox.addItem(s1,0)
-			Next
-
+			if not (fileExists( &quot;/usr/bin/avconv&quot;)) then 
+				For n=6 To 6
+					s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+				For n=6 To 6
+					s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER2_PNG)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mpg&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+				For n=6 To 6
+					s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+				For n=6 To 6
+					s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).mp4&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+				For n=6 To 6
+					s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(MY_IMAGE)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+				For n=6 To 6
+					s1=Chr(34) &amp; &quot;(PICO_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
+						&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot; &amp; Chr(34) &amp; &quot;(POSTER_PNG)&quot; &amp; Chr(34) &amp; _
+						&quot; --output &quot; &amp; Chr(34) &amp; &quot;(HOME)(NOW).avi&quot; &amp; Chr(34) &amp; _
+						&quot; &quot; &amp; Chr(34) &amp; &quot;(TMP)&quot; &amp; Chr(34)
+					oComboBox.addItem(s1,0)
+				Next
+			Endif
 		Endif		
 		If fileExists( &quot;/usr/bin/speexenc&quot;) Then
 		    For n=6 To 6
