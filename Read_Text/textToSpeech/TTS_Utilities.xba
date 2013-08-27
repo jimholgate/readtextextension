@@ -2081,6 +2081,18 @@ function fsNow
 	fsNow = sA
 end function
 
+function fsPrefixZeroes (s1,n1)
+	&apos; s1 is the stringto prefix zeroes with 
+	&apos; n1 is the minimum length of the return string
+	dim s2 as string
+	if n1 &lt; 1000 and len(s1) &lt; n1 then &apos; sanity check
+		s2=String(n1,&quot;0&quot;) &amp; s1
+		fsPrefixZeroes=right(s2,n1)
+	else 
+		fsPrefixZeroes=s1
+	endif
+end function 
+
 function fswriteOSXSpeechScript (sA, sLangLocale)
 	dim sQ as string
 	dim sLang as string
