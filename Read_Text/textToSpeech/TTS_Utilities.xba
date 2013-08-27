@@ -1761,6 +1761,44 @@ Function fsSelectionLanguage as String
 	&apos;The application&apos;s built in CharLocale.Language property does not identify oriental or complex text locales
 	&apos;so we use the UTF encoding for the first character to evaluate the language. See http://www.utf8-chartable.de/
 	&apos;and http://unicode.org/Public/UNIDATA/Blocks.txt
+	fsSelectionLanguage=fsUseLanguageType(sA,sB,sC,sD)
+	Exit Function
+	SELECTLANGUAGEERROR:
+	fsSelectionLanguage=fsGetLanguage
+End Function
+
+Function fsSelectionCountry as String
+   	Dim oDoc,oVC,sA,sB,sC,sD
+    &apos;&apos;On Error Goto SELECTCOUNTRYERROR
+	oDoc=ThisComponent
+	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+		sA=fsRetrieveCalcActiveCellProperty(&quot;country&quot;)
+		sB=fsRetrieveCalcActiveCellProperty(&quot;string&quot;)
+		sC=fsRetrieveCalcActiveCellProperty(&quot;asian-country&quot;)
+		sD=fsRetrieveCalcActiveCellProperty(&quot;complex-country&quot;)
+	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
+		sA=fsDrawProperty(&quot;country&quot;)
+		sB=fsDrawProperty(&quot;string&quot;)
+		sC=fsDrawProperty(&quot;asian-country&quot;)
+		sD=fsDrawProperty(&quot;complex-country&quot;)
+	Else	
+		oVC=oDoc.getCurrentController.getViewCursor			
+		sA=oVC.CharLocale.Country
+		sB=oVC.GetString()
+		sC=oVC.CharLocaleAsian.Country
+		sD=oVC.CharLocaleComplex.Country
+	Endif
+	&apos;The application&apos;s built in CharLocale.Country property does not identify oriental or complex text locales
+	&apos;so we use the UTF encoding for the first character to evaluate the country. See http://www.utf8-chartable.de/
+	&apos;and http://unicode.org/Public/UNIDATA/Blocks.txt
+	fsSelectionCountry=fsUseLanguageType(sA,sB,sC,sD)
+	Exit Function
+	SELECTCOUNTRYERROR:
+	fsSelectionCountry=fsGetCountry
+End Function
+
+function fsUseLanguageType(sA,sB,sC,sD)
+	dim longI
 	If sB=&quot;&quot; Then
 		longI=0
     Else
@@ -1794,7 +1832,7 @@ Function fsSelectionLanguage as String
  	Elseif longI &gt;=clng(&quot;&amp;H0600&quot;) And longI &lt;=clng(&quot;&amp;H06FF&quot;) Then
    		sA=sD &apos; Farsi, Arabic, Kashmiri, Kurdish
    	Elseif longI &gt;=clng(&quot;&amp;H0900&quot;) And longI &lt;=clng(&quot;&amp;H0972&quot;) Then
-   		sA=sD &apos; Devanagari for Hindi or other Indic languages
+   		sA=sD &apos; Devanagari for Hindi or other Indic countrys
    	Elseif longI &gt;=clng(&quot;&amp;H0591&quot;) And longI &lt;=clng(&quot;&amp;H05F4&quot;) Then
    		sA=sD &apos; &quot;he&quot; &apos; Hebrew - no voice For Google Translate
    	Elseif longI &gt;=clng(&quot;&amp;H0A00&quot;) And longI &lt;=clng(&quot;&amp;H0AFF&quot;) Then
@@ -1816,35 +1854,8 @@ Function fsSelectionLanguage as String
    	Else &apos;western
 		&apos;accept locale
 	Endif
-	If sA=&quot;zxx&quot; Then &apos;undefined language - use system default
-		sA=fsGetLanguage
-	Endif
-	fsSelectionLanguage=sA
-	Exit Function
-	SELECTLANGUAGEERROR:
-	fsSelectionLanguage=fsGetLanguage
-End Function
-
-Function fsSelectionCountry As String
-   	Dim oDoc,oVC,sA
-        On Error Goto SELECTREGIONERROR
-	oDoc=ThisComponent
-	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
-		sA=fsRetrieveCalcActiveCellProperty(&quot;country&quot;)
-	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
-		sA=fsDrawProperty(&quot;country&quot;)
-	Else
-		oVC=oDoc.getCurrentController.getViewCursor
-		sA=oVC.CharLocale.Country
-	Endif
-	If sA=&quot;&quot; Then &apos;undefined country - use system default
-		sA=fsGetCountry()
-	Endif
-	fsSelectionCountry=sA
-	Exit Function
-	SELECTREGIONERROR:
-	fsSelectionCountry=fsGetCountry()
-End Function
+	fsUseLanguageType=sA
+end function
 
 Function fsDrawText() As String
 	&apos;Function To get text selection in a drawing or a presentation slide
@@ -1870,6 +1881,10 @@ Function fsDrawProperty(strA) As String
 		s1r=oSelection.CharLocaleAsian.Language
 	Case &quot;complex-language&quot;
 		s1r=oSelection.CharLocaleComplex.Language
+	Case &quot;asian-country&quot;
+		s1r=oSelection.CharLocaleAsian.Country
+	Case &quot;complex-country&quot;
+		s1r=oSelection.CharLocaleComplex.Country
 	Case Else
 	s1r=oSelection.getString()
 		End Select
