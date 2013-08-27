@@ -2140,4 +2140,42 @@ function fsTemporaryTtsAppleScript()
 	sA=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp;  &quot;/readaloud.applescript&quot;
 	fsTemporaryTtsAppleScript=ConvertFromURL(sA)
 end function
+
+function CreateFile(sFilePath, sWriteString, Optional sEncoding)
+	&apos; CreateFile (&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;,&quot;utf-8&quot;) &apos; Best practice
+	&apos; CreateFile (&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;) &apos; is allowed, but not best practice.
+	&apos; Windows can not write Asian languages correctly with &quot;iso-8859-15&quot;
+	&apos; Anything written for the extension&apos;s private use should be &quot;utf-8&quot;
+	&apos; This sub will create the file and all the nested directories
+	&apos; in the path in a single step.
+	if ismissing(sEncoding) then 
+		select case fsGetOS()
+		case &quot;WINDOWS&quot;
+			sEncoding = &quot;iso-8859-15&quot; &apos;iso-8859-15 is Windows &quot;western&quot; encoding
+		case else 
+			sEncoding = &quot;utf-8&quot; &apos; Posix standard
+		end select
+	endif
+	on Error goto CreateFileError
+ 	dim CR as string
+	CR = chr$(13)
+	dim oOutputAccess As object
+	dim oOutputStream As object
+	dim vOutputData, UDP, PV As Variant
+	if fileExists (sFilePath) then
+		kill sFilePath
+	endif
+	oOutputAccess = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	oOutputStream = CreateUnoService(&quot;com.sun.star.io.TextOutputStream&quot;)
+	vOutputData   = oOutputAccess.openFileWrite( sFilePath )
+	oOutputStream.setOutputStream(vOutputData)
+	oOutputStream.setEncoding(sEncoding)
+	oOutputStream.writeString( sWriteString )
+	oOutputStream.flush()
+	oOutputStream.closeOutput()
+	CreateFile = true
+	exit function
+	CreateFileError:
+	CreateFile = false
+end function
 </script:module>
