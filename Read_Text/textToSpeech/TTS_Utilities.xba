@@ -2112,24 +2112,28 @@ function fswriteOSXSpeechScript (sA, sLangLocale)
 	sB=&quot;#/usr/bin/osascript&quot; &amp; CR
 	sB=sB &amp; &quot;-- Read Text Extension created this osascript&quot; &amp; CR
 	sB=sB &amp; &quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;)&amp; &quot; &quot; &amp; fsNow &amp; CR
-	sB=sB &amp; &quot;set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; sQ &amp; CR
-	sB=sB &amp; &quot;set str0 to &quot;&quot;Alex  &quot; &amp; sQ &amp; CR
-	sB=sB &amp; &quot;try&quot;  &amp; CR
-	sB=sB &amp; &quot;	set str0 to (do shell script &quot;&quot;say --voice ? | grep &quot;&quot; &amp; myLang)&quot;  &amp; CR
-	sB=sB &amp; &quot;on error&quot;  &amp; CR
-	sB=sB &amp; &quot;	set myLang to &quot;&quot;&quot; &amp; sLang &amp; &quot;&quot; &amp; sQ &amp; CR
-	sB=sB &amp; &quot;end try&quot;  &amp; CR
-	sB=sB &amp; &quot;try&quot;  &amp; CR
-	sB=sB &amp; &quot;	set str0 to (do shell script &quot;&quot;say --voice ? | grep &quot;&quot; &amp; myLang)&quot;  &amp; CR
-	sB=sB &amp; &quot;on error&quot;  &amp; CR
-	sB=sB &amp; &quot;	set myVoice to &quot;&quot;Alex&quot;&quot; -- en_US&quot;  &amp; CR
-	sB=sB &amp; &quot;end try&quot;  &amp; CR
-	sB=sB &amp; &quot;set iIndex to offset of &quot;&quot;  &quot;&quot; in str0&quot;  &amp; CR
-	sB=sB &amp; &quot;set myVoice to characters 1 thru (iIndex - 1) of str0 as text&quot;  &amp; CR
-	sB=sB &amp; &quot;if myVoice is &quot;&quot;Agnes&quot;&quot; or myVoice is &quot;&quot;Albert&quot;&quot; or myVoice is &quot;&quot;&quot;&quot; then&quot;  &amp; CR
-	sB=sB &amp; &quot;	set myVoice to &quot;&quot;Alex&quot; &amp; sQ &amp; CR
-	sB=sB &amp; &quot;end if&quot;  &amp; CR
-	sB=sB &amp; &quot;say &quot; &amp; sQ &amp; sA &amp; sQ &amp; &quot; using myVoice&quot; &amp; CR
+	if sLangLocale = fsGetSetting(&quot;language&quot;) &amp; &quot;_&quot; &amp; fsGetSetting(&quot;country&quot;) then
+		sB=sB &amp; &quot;say &quot; &amp; sQ &amp; sA &amp; sQ
+	else
+		sB=sB &amp; &quot;set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; sQ &amp; CR
+		sB=sB &amp; &quot;set str0 to &quot;&quot;Alex  &quot; &amp; sQ &amp; CR
+		sB=sB &amp; &quot;try&quot;  &amp; CR
+		sB=sB &amp; &quot;	set str0 to (do shell script &quot;&quot;say --voice ? | grep &quot;&quot; &amp; myLang)&quot;  &amp; CR
+		sB=sB &amp; &quot;on error&quot;  &amp; CR
+		sB=sB &amp; &quot;	set myLang to &quot;&quot;&quot; &amp; sLang &amp; &quot;&quot; &amp; sQ &amp; CR
+		sB=sB &amp; &quot;end try&quot;  &amp; CR
+		sB=sB &amp; &quot;try&quot;  &amp; CR
+		sB=sB &amp; &quot;	set str0 to (do shell script &quot;&quot;say --voice ? | grep &quot;&quot; &amp; myLang)&quot;  &amp; CR
+		sB=sB &amp; &quot;on error&quot;  &amp; CR
+		sB=sB &amp; &quot;	set myVoice to &quot;&quot;Alex&quot;&quot; -- en_US&quot;  &amp; CR
+		sB=sB &amp; &quot;end try&quot;  &amp; CR
+		sB=sB &amp; &quot;set iIndex to offset of &quot;&quot;  &quot;&quot; in str0&quot;  &amp; CR
+		sB=sB &amp; &quot;set myVoice to characters 1 thru (iIndex - 1) of str0 as text&quot;  &amp; CR
+		sB=sB &amp; &quot;if myVoice is &quot;&quot;Agnes&quot;&quot; or myVoice is &quot;&quot;Albert&quot;&quot; or myVoice is &quot;&quot;&quot;&quot; then&quot;  &amp; CR
+		sB=sB &amp; &quot;	set myVoice to &quot;&quot;Alex&quot; &amp; sQ &amp; CR
+		sB=sB &amp; &quot;end if&quot;  &amp; CR
+		sB=sB &amp; &quot;say &quot; &amp; sQ &amp; sA &amp; sQ &amp; &quot; using myVoice&quot; &amp; CR
+	endif
 	sFile=fsTemporaryTtsAppleScript
 	CreateFile(sFile,sB,&quot;utf-8&quot;)
 	fswriteOSXSpeechScript = sB
