@@ -74,6 +74,8 @@ Sub ttsUpdateCombo2a(bRefreshText)
 	&apos; Typical For Mac
 	Elseif Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/say&quot;) &gt; 0 Then
 		dialog1Combo2ShowSAYChoices(f_dlgSpeechSetup)
+	Elseif Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/osascript&quot;) &gt; 0 Then
+		dialog1Combo2ShowAppleScriptChoices(f_dlgSpeechSetup)
 	&apos; Typical For Linux
 	Elseif Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;espeak&quot;) &gt; 0 Then
 		dialog1Combo2ShowESPEAKChoices(f_dlgSpeechSetup)
@@ -225,6 +227,8 @@ Sub AboutAddOn (config() As Variant, myText As String)
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsOSTextString
 		Elseif  Instr(config(fiExternalCommand),&quot;(CREATE_QR_LABEL_PY)&quot;) Then
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsQRTextString
+		Elseif  Instr(config(fiExternalCommand),fsTemporaryTtsAppleScript) Then
+			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (&quot;Your text here!&quot;, &quot;en-US&quot;)
 		Else
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=&quot;&quot;
 		Endif

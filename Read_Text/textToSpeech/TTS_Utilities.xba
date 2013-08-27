@@ -524,6 +524,20 @@ Sub dialog1Combo2ShowSAYChoices(oDialog)
 	oComboBox.addItem(s1,0)
 End Sub
 
+Sub dialog1Combo2ShowAppleScriptChoices(oDialog)
+	&apos;Mac OSX open or osascript
+	Dim n As Integer
+	Dim s1 As String
+	Dim oComboBox As Variant
+	REM get control
+	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
+	REM first remove all old items from the list
+	n=oComboBox.getItemCount()
+	oComboBox.removeItems( 0,n)
+	s1=Chr$(34) &amp; fsTemporaryTtsAppleScript &amp; Chr$(34)
+	oComboBox.addItem(s1,0)
+End Sub
+
 Sub dialog1Combo2ShowESPEAKChoices(oDialog)
 	&apos;espeak
 	Dim n As Integer
@@ -703,6 +717,7 @@ Sub dialog1Combo1ShowFESTIVALScripts(oDialog)
 		oComboBox.addItem(s2(n),0)
 	Next
 End Sub
+
 
 Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 	&apos;Show the python script options
@@ -1390,6 +1405,9 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 		writeScript(sScript,msgs(),errorCode)	
 	Elseif config(fiExternalOption) Then
 		writeSpeech(sTextToSpeak,msgs(),errorCode)
+		if (fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot;) and Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/osascript&quot;) &gt; 0 then
+			fswriteOSXSpeechScript (sTextToSpeak, fsSelectionLanguageAndRegion)
+		endif
 		sProgram=config(fiExternalProgramPath)
 		sCommand=replaceLocalTokensWithStr(config(fiExternalCommand))
 		sCommand=replacePublicTokensWithStr(sCommand)
@@ -1711,7 +1729,7 @@ Function fsgetCursorWord As String
 	fsgetCursorWord=oTC.String 
 End Function
 
-Function  fsSelectionLanguageAndRegion As String
+Function fsSelectionLanguageAndRegion As String
 	fsSelectionLanguageAndRegion=fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
 End Function
 
@@ -2044,5 +2062,67 @@ function fbCreateFile(sFilePath, sWriteString, Optional sEncoding)
 	exit function
 	fbCreateFileError:
 	fbCreateFile = false
+end function
+
+sub testitxxxxx
+	fswriteOSXSpeechScript (&quot;¡No quero agua!&quot;, &quot;es-MX&quot;)
+	playOSXScript
+end sub
+
+function fswriteOSXSpeechScript (sA, sLangLocale)
+	dim sQ as string
+	dim sLang as string
+	dim CR,sB,sFile,sEncoding as string
+	dim errorCode
+	sQ = chr$(34) &apos;Double quote
+	if fileExists (fsTemporaryTtsAppleScript) then
+		kill fsTemporaryTtsAppleScript
+	endif
+	sA = fsReplaceText(sA,&quot;&apos;&quot;,&quot;’&quot;)
+	sA = fsReplaceText(sA,chr$(34),&quot;’’&quot;)
+	sA = fsReplaceText(sA, chr$(13), &quot; &quot;)
+	sLangLocale=fsReplaceText(sLangLocale,&quot;-&quot;,&quot;_&quot;)
+	sLang=left(sLangLocale,instr(sLangLocale,&quot;_&quot;) )
+	CR = chr$(13)
+	sQ = chr$(34)
+	sB=&quot;#/usr/bin/osascript&quot; &amp; CR
+	sB=sB &amp; &quot;-- Read Text Extension created this osascript&quot; &amp; CR
+	sB=sB &amp; &quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;)&amp; &quot; &quot; &amp; fsNow &amp; CR
+	sB=sB &amp; &quot;set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; sQ &amp; CR
+	sB=sB &amp; &quot;set str0 to &quot;&quot;Alex  &quot; &amp; sQ &amp; CR
+	sB=sB &amp; &quot;try&quot;  &amp; CR
+	sB=sB &amp; &quot;	set str0 to (do shell script &quot;&quot;say --voice ? | grep &quot;&quot; &amp; myLang)&quot;  &amp; CR
+	sB=sB &amp; &quot;on error&quot;  &amp; CR
+	sB=sB &amp; &quot;	set myLang to &quot;&quot;&quot; &amp; sLang &amp; &quot;&quot; &amp; sQ &amp; CR
+	sB=sB &amp; &quot;end try&quot;  &amp; CR
+	sB=sB &amp; &quot;try&quot;  &amp; CR
+	sB=sB &amp; &quot;	set str0 to (do shell script &quot;&quot;say --voice ? | grep &quot;&quot; &amp; myLang)&quot;  &amp; CR
+	sB=sB &amp; &quot;on error&quot;  &amp; CR
+	sB=sB &amp; &quot;	set myVoice to &quot;&quot;Alex&quot;&quot; -- en_US&quot;  &amp; CR
+	sB=sB &amp; &quot;end try&quot;  &amp; CR
+	sB=sB &amp; &quot;set iIndex to offset of &quot;&quot;  &quot;&quot; in str0&quot;  &amp; CR
+	sB=sB &amp; &quot;set myVoice to characters 1 thru (iIndex - 1) of str0 as text&quot;  &amp; CR
+	sB=sB &amp; &quot;if myVoice is &quot;&quot;Agnes&quot;&quot; or myVoice is &quot;&quot;Albert&quot;&quot; or myVoice is &quot;&quot;&quot;&quot; then&quot;  &amp; CR
+	sB=sB &amp; &quot;	set myVoice to &quot;&quot;Alex&quot; &amp; sQ &amp; CR
+	sB=sB &amp; &quot;end if&quot;  &amp; CR
+	sB=sB &amp; &quot;say &quot; &amp; sQ &amp; sA &amp; sQ &amp; &quot; using myVoice&quot; &amp; CR
+	sFile=fsTemporaryTtsAppleScript
+	CreateFile(sFile,sB,&quot;utf-8&quot;)
+	fswriteOSXSpeechScript = sB
+end function
+
+sub playOSXScript()
+	dim bWait as boolean
+	dim sQ as string
+	dim errorcode
+	bWait = false
+	sQ = chr$(34)
+	errorCode=Shell (&quot;osascript&quot;, 0, sQ &amp; fsTemporaryTtsAppleScript &amp; sQ, bWait)
+end sub
+
+function fsTemporaryTtsAppleScript()
+	dim sA as string
+	sA=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp;  &quot;/readaloud.applescript&quot;
+	fsTemporaryTtsAppleScript=ConvertFromURL(sA)
 end function
 </script:module>
