@@ -2064,10 +2064,22 @@ function fbCreateFile(sFilePath, sWriteString, Optional sEncoding)
 	fbCreateFile = false
 end function
 
-sub testitxxxxx
-	fswriteOSXSpeechScript (&quot;¡No quero agua!&quot;, &quot;es-MX&quot;)
-	playOSXScript
-end sub
+function fsNow
+	&apos; see http://www.ietf.org/rfc/rfc3339.txt
+	&apos; see Unix man date
+	&apos; local time - doesn&apos;t work in OSX
+	&apos; shell( &quot;bash -c &apos;date +%F-T%X%:z &gt;  &quot;&quot;$HOME/date.txt&quot;&quot;&apos;&quot;)
+	&apos; utc time - works in OSX and Linux 
+	&apos; shell( &quot;bash -c &apos;date -u +%F-T%X-00:00 &gt; &quot;&quot;$HOME/date.txt&quot;&quot;&apos;&quot;)
+	dim sA as string
+	sA= year(now) &amp; &quot;-&quot; &amp; _
+	fsPrefixZeroes(month(now),2) &amp; &quot;-&quot; &amp; _
+	fsPrefixZeroes(day(now),2) &amp; &quot;T&quot; &amp; _
+	fsPrefixZeroes(hour(now),2) &amp; &quot;:&quot; &amp; _
+	fsPrefixZeroes(minute(now),2) &amp; &quot;:&quot; &amp; _
+	fsPrefixZeroes(second(now),2)
+	fsNow = sA
+end function
 
 function fswriteOSXSpeechScript (sA, sLangLocale)
 	dim sQ as string
@@ -2110,15 +2122,6 @@ function fswriteOSXSpeechScript (sA, sLangLocale)
 	CreateFile(sFile,sB,&quot;utf-8&quot;)
 	fswriteOSXSpeechScript = sB
 end function
-
-sub playOSXScript()
-	dim bWait as boolean
-	dim sQ as string
-	dim errorcode
-	bWait = false
-	sQ = chr$(34)
-	errorCode=Shell (&quot;osascript&quot;, 0, sQ &amp; fsTemporaryTtsAppleScript &amp; sQ, bWait)
-end sub
 
 function fsTemporaryTtsAppleScript()
 	dim sA as string
