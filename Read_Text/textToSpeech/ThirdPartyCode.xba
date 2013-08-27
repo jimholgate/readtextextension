@@ -245,6 +245,10 @@ Function fsRetrieveCalcActiveCellProperty(strA) As String
 		sCellContent=oActiveCell.CharLocaleAsian.Language
 	Case &quot;complex-language&quot;
 		sCellContent=oActiveCell.CharLocaleComplex.Language
+	Case &quot;asian-country&quot;
+		sCellContent=oActiveCell.CharLocaleAsian.Country
+	Case &quot;complex-country&quot;
+		sCellContent=oActiveCell.CharLocaleComplex.Country
 	Case Else
 		 sCellContent=oActiveCell.getString()
 	End Select
