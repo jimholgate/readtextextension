@@ -1768,8 +1768,8 @@ Function fsSelectionLanguage as String
 End Function
 
 Function fsSelectionCountry as String
-   	Dim oDoc,oVC,sA,sB,sC,sD
-    &apos;&apos;On Error Goto SELECTCOUNTRYERROR
+  Dim oDoc,oVC,sA,sB,sC,sD
+  On Error Goto SELECTCOUNTRYERROR
 	oDoc=ThisComponent
 	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
 		sA=fsRetrieveCalcActiveCellProperty(&quot;country&quot;)
