@@ -144,7 +144,7 @@ Function fsGetTextSelection() As String
 		sSelectedText=&quot;&quot;  	
 		If oSelection.supportsService(&quot;com.sun.star.text.TextRanges&quot;) Then
 			For n=0 To(oSelection.getCount() - 1)
-	sSelectedText=sSelectedText &amp; &quot; &quot; &amp; oSelection.getByIndex(n).getString()
+				sSelectedText=sSelectedText &amp; &quot; &quot; &amp; oSelection.getByIndex(n).getString()
 			Next
 		Else 
 			sSelectedText=oSelection.getByIndex(0).getString()
@@ -534,7 +534,7 @@ Sub dialog1Combo2ShowAppleScriptChoices(oDialog)
 	REM first remove all old items from the list
 	n=oComboBox.getItemCount()
 	oComboBox.removeItems( 0,n)
-	s1=Chr$(34) &amp; fsTemporaryTtsAppleScript &amp; Chr$(34)
+	s1=Chr$(34) &amp; &quot;(SAY_APPLESCRIPT)&quot; &amp; Chr$(34)
 	oComboBox.addItem(s1,0)
 End Sub
 
@@ -674,7 +674,7 @@ Sub dialog1Combo2ShowFESTIVALChoices(oDialog)
 End Sub
 
 Sub dialog1Combo2ShowTEXT2WAVEChoices(oDialog)
-	&apos;Show this festival script options
+	&apos;Show this Festival script options
 	Dim n1 As Integer
 	Dim s1 As String
 	Dim oComboBox As Variant
@@ -1265,29 +1265,39 @@ Function PosixSpeechProgramPath() As String
 	PosixSpeechProgramPath=s1
 End Function
 
+Function AppleScriptPath() As String
+	AppleScriptPath=&quot;/usr/bin/osascript&quot;
+End Function
+
 &apos;This macro deletes the temporary files that the speech program creates.
 Sub resetSpeech
 	Dim aFile As String
-	Dim bFile As String
 	aFile=fsFullPathOf(fsFestivalScriptName)
 	If fileExists(aFile) Then
 		kill aFile
 	Endif	
-	bFile=fsFullPathOf(fsTemporaryTextDoc)	
+	aFile=fsFullPathOf(fsTemporaryTextDoc)	
+	If fileExists(bFile) Then
+		kill bFile
+	Endif
+	aFile=fsFullPathOf(fsTemporaryTtsAppleScript)	
 	If fileExists(bFile) Then
 		kill bFile
 	Endif
 End Sub
 
-&apos;This macro creates a temporary script file For the speech synthesiser.
+&apos;This macro creates a temporary script file For the Festival speech synthesiser.
 Sub writeScript(myscript As String,msgs() As Variant,errorCode As Integer)
-	Dim aFile As String
-	Dim iNumber As Integer
+	&apos; &quot;Festival expects ISO-8859-15 encoding.&quot;
+	&apos; FestCat: Speech Synthesis in Catalan using Festival
+	&apos; http://festcat.talp.cat/download/archive/README 
+	&apos; November, 2007. Accessed 2013-08-28
 	aFile=fsFullPathOf(fsFestivalScriptName)
-	iNumber=Freefile
-	Open aFile For Output As #iNumber
-	Print #iNumber,myScript
-	Close #iNumber
+	if fsComplexAsiaOrWest(mySpeech)=&quot;WEST&quot; Then
+		fbCreateFile(aFile, mySpeech, &quot;iso-8859-15&quot;)
+	else 
+		fbCreateFile(aFile, mySpeech, &quot;utf-8&quot;)
+	endif
 End Sub
 
 Function fsAbout() As String
@@ -1357,15 +1367,28 @@ Function getTextFromFile(sFilePath,sEncoding) As String
 	On Error Goto 0 
 End Function
 
-Sub writeSpeech(mySpeech As String,msgs() As Variant,errorCode As Integer)
+Sub writeSpeech(byval mySpeech As String,msgs() As Variant,errorCode As Integer, optional bForceISO885915)
 	&apos;creates a temporary text file For the speech synthesiser.
+	&apos;UTF-8 encoding includes Asian and Complex languages.
+	&apos;For western scripts, Festival expects iso-8859-15 encoding.
+	if isMissing (bForceISO885915) then
+		bForceISO885915 = false
+	endif
 	Dim bFile As String
-	Dim iNumber As Integer
 	bFile=fsFullPathOf(fsTemporaryTextDoc)
-	iNumber=Freefile
-	Open bFile For Output As #iNumber
-	Print #iNumber,mySpeech
-	Close #iNumber
+	if fsGetOS()=&quot;WINDOWS&quot; Then
+		if fsComplexAsiaOrWest(mySpeech)=&quot;WEST&quot; Then
+			fbCreateFile(bFile, mySpeech, &quot;iso-8859-15&quot;)
+		else 
+			fbCreateFile(bFile, mySpeech, &quot;utf-8&quot;)
+		endif
+	else
+		if (bForceISO885915) then
+	 		fbCreateFile(bFile, mySpeech, &quot;iso-8859-15&quot;)
+	 	else
+			fbCreateFile(bFile, mySpeech, &quot;utf-8&quot;)
+		endif
+	endif
 End Sub
 
 Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverRide As String)
@@ -1396,15 +1419,22 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 		sTextToSpeak=sOverRide
 	Endif
 	If config(fiFestivalOption) Then
-		writeSpeech(sTextToSpeak,msgs(),errorCode)
+		&apos;Write the Festival script and the file to read aloud
 		sProgram=config(fiFestivalPath)
-		sCommand=Chr$(34) &amp; ConvertFromURL(fsFullPathOf(fsFestivalScriptName)) &amp; Chr$(34)
-		&apos;Write the Festival script	
+		sCommand=Chr$(34) &amp; ConvertFromURL(fsFullPathOf(fsFestivalScriptName)) &amp; Chr$(34)	
 		sScript=replaceLocalTokensWithStr(config(fiFestivalComboChoice))
 		sScript=replacePublicTokensWithStr(sScript)
-		writeScript(sScript,msgs(),errorCode)	
+		if fsComplexAsiaOrWest(sTextToSpeak)=&quot;WEST&quot; then
+			&apos; Compatible characters are officially supported by Festival using iso-8859-15
+			writeScript(sScript,msgs(),errorCode, true)
+			writeSpeech(sTextToSpeak,msgs(),errorCode, true)
+		else
+			&apos; use utf-8 - Complex and Asian characters may not be supported by your version of Festival
+			writeScript(sScript,msgs(),errorCode, false)
+			writeSpeech(sTextToSpeak,msgs(),errorCode, false)
+		endif
 	Elseif config(fiExternalOption) Then
-		writeSpeech(sTextToSpeak,msgs(),errorCode)
+		writeSpeech(sTextToSpeak,msgs(),errorCode, false)
 		if (fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot;) and Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/osascript&quot;) &gt; 0 then
 			fswriteOSXSpeechScript (sTextToSpeak, fsSelectionLanguageAndRegion)
 		endif
@@ -1516,6 +1546,10 @@ Function replaceLocalTokensWithStr(sA As String) As String
 		
 		sFind=&quot;(OS_PY)&quot;
 		sReplace=ConvertFromURL(fsPythonOSDoc)
+		sA=fsReplaceText(sA,sFind,sReplace)
+
+		sFind=&quot;(SAY_APPLESCRIPT)&quot;
+		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript)
 		sA=fsReplaceText(sA,sFind,sReplace)
 		
 		sFind=&quot;(CREATE_QR_LABEL_PY)&quot;
@@ -1767,10 +1801,11 @@ Function fsSelectionLanguage as String
 	fsSelectionLanguage=fsGetLanguage
 End Function
 
-Function fsSelectionCountry as String
-  Dim oDoc,oVC,sA,sB,sC,sD
-  On Error Goto SELECTCOUNTRYERROR
+function fsSelectionCountry as String
+   	Dim oDoc,oVC,sA,sB,sC,sD
+    On Error Goto SELECTCOUNTRYERROR
 	oDoc=ThisComponent
+	
 	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
 		sA=fsRetrieveCalcActiveCellProperty(&quot;country&quot;)
 		sB=fsRetrieveCalcActiveCellProperty(&quot;string&quot;)
@@ -1788,73 +1823,99 @@ Function fsSelectionCountry as String
 		sC=oVC.CharLocaleAsian.Country
 		sD=oVC.CharLocaleComplex.Country
 	Endif
+	
 	&apos;The application&apos;s built in CharLocale.Country property does not identify oriental or complex text locales
 	&apos;so we use the UTF encoding for the first character to evaluate the country. See http://www.utf8-chartable.de/
 	&apos;and http://unicode.org/Public/UNIDATA/Blocks.txt
 	fsSelectionCountry=fsUseLanguageType(sA,sB,sC,sD)
+	&apos;xxxxx
 	Exit Function
 	SELECTCOUNTRYERROR:
 	fsSelectionCountry=fsGetCountry
 End Function
 
-function fsUseLanguageType(sA,sB,sC,sD)
-	dim longI
-	If sB=&quot;&quot; Then
+function fsComplexAsiaOrWest (sA)
+	dim longI as long
+	dim iLocale as integer
+	dim s1 as string
+	if sA=&quot;&quot; then
 		longI=0
-    Else
-		longI=asc(sB)
-	Endif
-	&apos;Simple characters 
-	If longI &gt;= clng(&quot;&amp;H0000&quot;) And longI &lt;=clng(&quot;&amp;H058F&quot;) Then
-		&apos;Leave sA alone
+    	else
+		longI=asc(sA)
+	endif
+	if longI &gt;= clng(&quot;&amp;H0000&quot;) And longI &lt;=clng(&quot;&amp;H058F&quot;) then
+		iLocale=0
 	&apos;Asian characters
-	ElseIf longI &gt;=clng(&quot;&amp;H3400&quot;) And longI &lt;=clng(&quot;&amp;H9FFF&quot;) Then
-		sA=sC &apos;zh, ja or ko 
-	Elseif longI &gt;=clng(&quot;&amp;H3040&quot;) And longI &lt;=clng(&quot;&amp;H31FF&quot;) Then
-   		sA=sC &apos; &quot;ja&quot;
-   	Elseif longI &gt;=asc(&quot;･&quot;) And longI &lt;=asc(&quot;ﾟ&quot;) Then
-   		sA=sC &apos; &quot;ja&quot;
-   	Elseif longI &gt;=clng(&quot;&amp;HAC00&quot;) And longI &lt;=clng(&quot;&amp;HD7A3&quot;) Then
-   		sA=sC &apos; &quot;ko&quot;
-  	Elseif longI &gt;=clng(&quot;&amp;HFFA0&quot;) And longI &lt;=clng(&quot;&amp;HFFDC&quot;) Then
-   		sA=sC &apos; &quot;ko&quot;
+	elseif longI &gt;=clng(&quot;&amp;H3400&quot;) And longI &lt;=clng(&quot;&amp;H9FFF&quot;) then
+		iLocale=1 &apos;zh, ja or ko 
+	elseif longI &gt;=clng(&quot;&amp;H3040&quot;) And longI &lt;=clng(&quot;&amp;H31FF&quot;) then
+   		iLocale=1 &apos; &quot;ja&quot;
+   	elseif longI &gt;=asc(&quot;･&quot;) And longI &lt;=asc(&quot;ﾟ&quot;) then
+   		iLocale=1 &apos; &quot;ja&quot;
+   	elseif longI &gt;=clng(&quot;&amp;HAC00&quot;) And longI &lt;=clng(&quot;&amp;HD7A3&quot;) then
+   		iLocale=1 &apos; &quot;ko&quot;
+  	elseif longI &gt;=clng(&quot;&amp;HFFA0&quot;) And longI &lt;=clng(&quot;&amp;HFFDC&quot;) then
+   		iLocale=1 &apos; &quot;ko&quot;
    	&apos;Complex characters
-  	Elseif longI = clng(&quot;&amp;H02BC&quot;) Then
-   		sA=sD &apos; Dogri, Bodo, Maithili
-  	Elseif longI &gt;=clng(&quot;&amp;H1750&quot;) And longI &lt;=clng(&quot;&amp;H17FF&quot;) Then
-   		sA=sD &apos; Khmer, Thaana, Dhiveh, Urdu
-  	Elseif longI &gt;=clng(&quot;&amp;HFB50&quot;) And longI &lt;=clng(&quot;&amp;HFDFF&quot;) Then
-   		sA=sD &apos; Urdu
-  	Elseif longI &gt;=clng(&quot;&amp;HFE70&quot;) And longI &lt;=clng(&quot;&amp;HFEFF&quot;) Then
-   		sA=sD &apos; Urdu
-  	Elseif longI &gt;=clng(&quot;&amp;H19E0&quot;) And longI &lt;=clng(&quot;&amp;H19FF&quot;) Then
-   		sA=sD &apos; &quot;km&quot; &apos; Khmer symbols
- 	Elseif longI &gt;=clng(&quot;&amp;H0600&quot;) And longI &lt;=clng(&quot;&amp;H06FF&quot;) Then
-   		sA=sD &apos; Farsi, Arabic, Kashmiri, Kurdish
-   	Elseif longI &gt;=clng(&quot;&amp;H0900&quot;) And longI &lt;=clng(&quot;&amp;H0972&quot;) Then
-   		sA=sD &apos; Devanagari for Hindi or other Indic countrys
-   	Elseif longI &gt;=clng(&quot;&amp;H0591&quot;) And longI &lt;=clng(&quot;&amp;H05F4&quot;) Then
-   		sA=sD &apos; &quot;he&quot; &apos; Hebrew - no voice For Google Translate
-   	Elseif longI &gt;=clng(&quot;&amp;H0A00&quot;) And longI &lt;=clng(&quot;&amp;H0AFF&quot;) Then
-   		sA=sD &apos; &quot;pa&quot; &apos; Gurmukhi script is probably Punjabi
-   	Elseif longI &gt;=clng(&quot;&amp;H0980&quot;) And longI &lt;=clng(&quot;&amp;H09FF&quot;) Then
-   		sA=sD &apos;Bengali
-   	Elseif longI &gt;=clng(&quot;&amp;H0A80&quot;) And longI &lt;=clng(&quot;&amp;HOD7F&quot;) Then
-   		sA=sD &apos;Gurjarti, Oriya, Tamil, Telugu, Kannada, Malayalam
-   	Elseif longI &gt;=clng(&quot;&amp;H1000&quot;) And longI &lt;=clng(&quot;&amp;H109F&quot;) Then
-   		sA=sD &apos;Burmese (Myanmar)
-   	Elseif longI &gt;=clng(&quot;&amp;H0E00&quot;) And longI &lt;=clng(&quot;&amp;H0FFF&quot;) Then
-   		sA=sD &apos;Thai, Lao, Tibetan, Dzongkha
-   	Elseif longI &gt;=clng(&quot;&amp;H1200&quot;) And longI &lt;=clng(&quot;&amp;H139F&quot;) Then
-   		sA=sD &apos;Ethiopic, Ethiopic Supplement
-   	Elseif longI &gt;=clng(&quot;&amp;H1700&quot;) And longI &lt;=clng(&quot;&amp;H171F&quot;) Then
-   		sA=sD &apos;Limbu
-   	Elseif longI &gt;=clng(&quot;&amp;H2D80&quot;) And longI &lt;=clng(&quot;&amp;H2DDF&quot;) Then
-   		sA=sD &apos;Ethopic Extended
-   	Else &apos;western
-		&apos;accept locale
-	Endif
-	fsUseLanguageType=sA
+  	elseif longI = clng(&quot;&amp;H02BC&quot;) then
+   		iLocale=2 &apos; Dogri, Bodo, Maithili
+  	elseif longI &gt;=clng(&quot;&amp;H1750&quot;) And longI &lt;=clng(&quot;&amp;H17FF&quot;) then
+   		iLocale=2 &apos; Khmer, Thaana, Dhiveh, Urdu
+  	elseif longI &gt;=clng(&quot;&amp;HFB50&quot;) And longI &lt;=clng(&quot;&amp;HFDFF&quot;) then
+   		iLocale=2 &apos; Urdu
+  	elseif longI &gt;=clng(&quot;&amp;HFE70&quot;) And longI &lt;=clng(&quot;&amp;HFEFF&quot;) then
+   		iLocale=2 &apos; Urdu
+  	elseif longI &gt;=clng(&quot;&amp;H19E0&quot;) And longI &lt;=clng(&quot;&amp;H19FF&quot;) then
+   		iLocale=2 &apos; &quot;km&quot; &apos; Khmer symbols
+ 	elseif longI &gt;=clng(&quot;&amp;H0600&quot;) And longI &lt;=clng(&quot;&amp;H06FF&quot;) then
+   		iLocale=2 &apos; Farsi, Arabic, Kashmiri, Kurdish
+   	elseif longI &gt;=clng(&quot;&amp;H0900&quot;) And longI &lt;=clng(&quot;&amp;H0972&quot;) then
+   		iLocale=2 &apos; Devanagari for Hindi or other Indic languages
+   	elseif longI &gt;=clng(&quot;&amp;H0591&quot;) And longI &lt;=clng(&quot;&amp;H05F4&quot;) then
+   		iLocale=2 &apos; &quot;he&quot; &apos; Hebrew - no voice for Google Translate
+   	elseif longI &gt;=clng(&quot;&amp;H0A00&quot;) And longI &lt;=clng(&quot;&amp;H0AFF&quot;) then
+   		iLocale=2 &apos; &quot;pa&quot; &apos; Gurmukhi script is probably Punjabi
+   	elseif longI &gt;=clng(&quot;&amp;H0980&quot;) And longI &lt;=clng(&quot;&amp;H09FF&quot;) then
+   		iLocale=2 &apos;Bengali
+   	elseif longI &gt;=clng(&quot;&amp;H0A80&quot;) And longI &lt;=clng(&quot;&amp;HOD7F&quot;) then
+   		iLocale=2 &apos;Gurjarti, Oriya, Tamil, Telugu, Kannada, Malayalam
+   	elseif longI &gt;=clng(&quot;&amp;H1000&quot;) And longI &lt;=clng(&quot;&amp;H109F&quot;) then
+   		iLocale=2 &apos;Burmese (Myanmar)
+   	elseif longI &gt;=clng(&quot;&amp;H0E00&quot;) And longI &lt;=clng(&quot;&amp;H0FFF&quot;) then
+   		iLocale=2 &apos;Thai, Lao, Tibetan, Dzongkha
+   	elseif longI &gt;=clng(&quot;&amp;H1200&quot;) And longI &lt;=clng(&quot;&amp;H139F&quot;) then
+   		iLocale=2 &apos;Ethiopic, Ethiopic Supplement
+   	elseif longI &gt;=clng(&quot;&amp;H1700&quot;) And longI &lt;=clng(&quot;&amp;H171F&quot;) then
+   		iLocale=2 &apos;Limbu
+   	elseif longI &gt;=clng(&quot;&amp;H2D80&quot;) And longI &lt;=clng(&quot;&amp;H2DDF&quot;) then
+   		iLocale=2 &apos;Ethopic Extended
+   	else &apos;western
+		iLocale=0
+	endif
+	select case iLocale
+	case 0
+		s1=&quot;WEST&quot;
+	case 1
+		s1=&quot;ASIA&quot;
+	case else 
+		s1=&quot;COMPLEX&quot;
+	end select
+	fsComplexAsiaOrWest = s1
+end function
+
+function fsUseLanguageType( sA,sB,sC,sD)
+	dim sE as string
+	sE = fsComplexAsiaOrWest(sB)
+	
+	select case sE
+	case &quot;ASIA&quot;
+		fsUseLanguageType=sC
+	case &quot;COMPLEX&quot;
+		fsUseLanguageType=sD
+	case else &apos; &quot;WEST&quot; or &quot;UNDEFINED&quot;
+		fsUseLanguageType=sA
+	end select
+	
 end function
 
 Function fsDrawText() As String
@@ -2125,7 +2186,7 @@ function fswriteOSXSpeechScript (sA, sLangLocale)
 	CR = chr$(13)
 	sQ = chr$(34)
 	sB=&quot;#/usr/bin/osascript&quot; &amp; CR
-	sB=sB &amp; &quot;-- Read Text Extension created this osascript&quot; &amp; CR
+	sB=sB &amp; &quot;-- Read Text Extension created this script&quot; &amp; CR
 	sB=sB &amp; &quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;)&amp; &quot; &quot; &amp; fsNow &amp; CR
 	if sLangLocale = fsGetSetting(&quot;language&quot;) &amp; &quot;_&quot; &amp; fsGetSetting(&quot;country&quot;) then
 		sB=sB &amp; &quot;say &quot; &amp; sQ &amp; sA &amp; sQ

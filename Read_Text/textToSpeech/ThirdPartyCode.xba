@@ -74,9 +74,9 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 			config(fiExternalProgramPath)=&quot;/usr/bin/python&quot;
 			config(fiExternalCommand)=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
 				&quot; --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false &quot; &amp; Chr$(34) &amp;  &quot;(TMP)&quot; &amp; Chr(34)
-		Else 
-			config(fiExternalProgramPath)=PosixSpeechProgramPath()
-			config(fiExternalCommand)=&quot;-f &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34)
+		Else &apos;Mac (OSX)
+			config(fiExternalProgramPath)= AppleScriptPath()
+			config(fiExternalCommand)=Chr$(34) &amp; &quot;(SAY_APPLESCRIPT)&quot; &amp; Chr$(34)
 		Endif
 		config(fiAlwaysShowDialogCheckBox)=1 
 		config(fiDialogLanguageCombo)=fsGetLanguage()
@@ -124,40 +124,128 @@ Sub tts_config_parseLine(byval l As String,_
 	
 End Sub
 
-Sub tts_config_writeFile(config() As Variant,byval configFilePath As String)
-	&apos; Writes the configuration file from an array.
-	&apos;
-	&apos; Filehandle
-	Dim fh As Integer: fh=freeFile()
-	
-	&apos; Open the file And write To it
-	open configFilePath For output As #fh
-	print #fh,&quot;# Configuration file For Read Text Extension&quot;
-	print #fh,fsKeyUSE_FESTIVAL_BOOLEAN &amp; &quot;=&quot; _
-		&amp; fsTts_util_booleanToString(config(fiFestivalOption))
-	print #fh,fsKeyFESTIVAL_PATH_STRING &amp; &quot;=&quot; _
-		&amp; config(fiFestivalPath)
-	print #fh,fsKeyFESTIVAL_SCRIPT_STRING &amp; &quot;=&quot; _
-		&amp; config(fiFestivalComboChoice)
-	print #fh,fsKeyUSE_ESPEAK_BOOLEAN &amp; &quot;=&quot; _
-		&amp; fsTts_util_booleanToString(config(fiExternalOption))
-	print #fh,fsKeyUSE_HTML_BOOLEAN &amp; &quot;=&quot; _
-		&amp; fsTts_util_booleanToString(config(fiHtmlOption))	
-	print #fh,fsKeyHTML_STRING &amp; &quot;=&quot; _
-		&amp; config(fiHtmlComboURL)
-	print #fh,fsKeyESPEAK_PATH_STRING &amp; &quot;=&quot; _
-		&amp; config(fiExternalProgramPath)
-	print #fh,fsKeyESPEAK_COMMANDS_STRING &amp; &quot;=&quot; _
-		&amp; config(fiExternalCommand)		
-	print #fh,fsKeyDISPLAY_INFO_INTEGER &amp; &quot;=&quot; _
-		&amp; config(fiAlwaysShowDialogCheckBox)
-	print #fh,fsKeyDISPLAY_LANGUAGE_STRING &amp; &quot;=&quot; _
-		&amp; config(fiDialogLanguageCombo)
-	close #fh
-		
-End Sub
+sub tts_config_writeFile(config() As Variant,byval configFilePath As String)
+	&apos; Writes a configuration file from an array.
+	&apos; This function updated 2013-08-29 - always write as UTF-8
+	dim sA as string
+	dim CR as string
+	CR = chr$(10)
+	sA = &quot;# Configuration file For Read Text Extension&quot; &amp; CR
+	sA = fsKeyUSE_FESTIVAL_BOOLEAN &amp; &quot;=&quot; _
+		&amp; fsTts_util_booleanToString(config(fiFestivalOption)) &amp; CR
+	sA = sA &amp; fsKeyFESTIVAL_PATH_STRING &amp; &quot;=&quot; _
+		&amp; config(fiFestivalPath) &amp; CR
+	sA = sA &amp; fsKeyFESTIVAL_SCRIPT_STRING &amp; &quot;=&quot; _
+		&amp; config(fiFestivalComboChoice) &amp; CR
+	sA = sA &amp; fsKeyUSE_ESPEAK_BOOLEAN &amp; &quot;=&quot; _
+		&amp; fsTts_util_booleanToString(config(fiExternalOption)) &amp; CR
+	sA = sA &amp; fsKeyUSE_HTML_BOOLEAN &amp; &quot;=&quot; _
+		&amp; fsTts_util_booleanToString(config(fiHtmlOption)) &amp; CR	
+	sA = sA &amp; fsKeyHTML_STRING &amp; &quot;=&quot; _
+		&amp; config(fiHtmlComboURL) &amp; CR
+	sA = sA &amp; fsKeyESPEAK_PATH_STRING &amp; &quot;=&quot; _
+		&amp; config(fiExternalProgramPath) &amp; CR
+	sA = sA &amp; fsKeyESPEAK_COMMANDS_STRING &amp; &quot;=&quot; _
+		&amp; config(fiExternalCommand) &amp; CR	
+	sA = sA &amp; fsKeyDISPLAY_INFO_INTEGER &amp; &quot;=&quot; _
+		&amp; config(fiAlwaysShowDialogCheckBox) &amp; CR
+	sA = sA &amp; fsKeyDISPLAY_LANGUAGE_STRING &amp; &quot;=&quot; _
+		&amp; config(fiDialogLanguageCombo) &amp; CR
+	CreateFile(configFilePath, sA, &quot;UTF-8&quot;)
+end sub 
 
 Sub tts_config_parseFile(byval configFilePath As String,_
+						  config() As Variant,_
+						  errorCode As Integer)
+	&apos; Parses the configuration file into an array.
+	&apos; 
+	&apos; Parameters:
+	&apos; configFilePath (in) The path To the configuration file
+	&apos; config() (in out) The configuration settings To update with settings
+	&apos;                   from the file.
+	&apos; errorCode (in out) The Error parameter.
+	&apos;
+	dim sA as string
+	dim CR as string
+	dim CR2 as string
+	dim l as string
+	dim key as string
+	dim value as string
+	dim n1 as integer
+	dim n2 as integer
+	CR = chr$(13)
+	CR2 = chr$(10)
+	sA = getTextFromFile(configFilePath, &quot;UTF-8&quot;)
+	if instr(sA, CR2) &lt; instr(sA, CR) then
+		&apos; choose character return or line feed
+		CR = CR2
+	endif
+	l = sA
+	do while len (l) &gt; 0 
+		l = fsSuperTrim (left (sA, instr(sA, CR)))
+		sA = fsSuperTrim (mid(sA, instr(sA, CR) + 1 ))
+		tts_config_parseLine(l,key,value)
+		if Len(key) &gt; 0 then
+			select case key
+			Case fsKeyUSE_FESTIVAL_BOOLEAN 
+				config(fiFestivalOption)=fbTts_util_stringToBoolean(value)
+				
+			Case fsKeyFESTIVAL_PATH_STRING
+				config(fiFestivalPath)=value
+				
+			Case fsKeyFESTIVAL_SCRIPT_STRING 
+				config(fiFestivalComboChoice)=value
+				
+			Case fsKeyUSE_ESPEAK_BOOLEAN
+				config(fiExternalOption)=fbTts_util_stringToBoolean(value)
+
+			Case fsKeyESPEAK_PATH_STRING
+				config(fiExternalProgramPath)=value
+
+			Case fsKeyESPEAK_COMMANDS_STRING
+				config(fiExternalCommand)=value
+			
+			Case fsKeyUSE_HTML_BOOLEAN
+				config(fiHtmlOption)=fbTts_util_stringToBoolean(value)
+			
+			Case fsKeyHTML_STRING
+				config(fiHtmlComboURL)=value
+			
+			Case fsKeyDISPLAY_INFO_INTEGER
+				config(fiAlwaysShowDialogCheckBox)=fiStringToInteger(value)	
+				
+			Case fsKeyDISPLAY_LANGUAGE_STRING
+				config(fiDialogLanguageCombo)=value				
+			Case Else
+				
+			End Select
+		endif
+	loop
+end sub
+
+function fsSuperTrim (byval sA )
+	&apos; Remove extra line feeds and character returns
+	dim n as integer
+	for n = 1 to 100
+		if right(sA, 1) = chr(10) or right(sA, 1) = chr(13) then
+			sA = left(sA, len(sA) - 1 )
+			sA = trim (sA)
+		else
+			exit for
+		endif
+	next
+	for n = 1 to 100
+		if left(sA, 1) = chr(10) or left(sA, 1) = chr(13) then
+			sA = mid(sA, 2 )
+			sA = trim (sA)
+		else
+			exit for
+		endif
+	next
+	fsSuperTrim = sA
+end function
+
+Sub tts_config_parseFilex(byval configFilePath As String,_
 						  config() As Variant,_
 						  errorCode As Integer)
 	&apos; Parses the configuration file into an array.
