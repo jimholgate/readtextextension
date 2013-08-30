@@ -11,6 +11,7 @@ Derechos de autor y de licencia
 Copyright and License 
 
 (c) 2011-2013 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+"Bubble" icon © 2013 icomoon.io Creative Commons 2.5 (Attribution) license.
 
 <http://www.gnu.org/licenses/gpl-2.0.txt>
 
