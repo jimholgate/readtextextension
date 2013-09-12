@@ -1376,18 +1376,10 @@ Sub writeSpeech(byval mySpeech As String,msgs() As Variant,errorCode As Integer,
 	endif
 	Dim bFile As String
 	bFile=fsFullPathOf(fsTemporaryTextDoc)
-	if fsGetOS()=&quot;WINDOWS&quot; Then
-		if fsComplexAsiaOrWest(mySpeech)=&quot;WEST&quot; Then
-			fbCreateFile(bFile, mySpeech, &quot;iso-8859-15&quot;)
-		else 
-			fbCreateFile(bFile, mySpeech, &quot;utf-8&quot;)
-		endif
-	else
-		if (bForceISO885915) then
-	 		fbCreateFile(bFile, mySpeech, &quot;iso-8859-15&quot;)
-	 	else
-			fbCreateFile(bFile, mySpeech, &quot;utf-8&quot;)
-		endif
+	if (bForceISO885915) then
+ 		fbCreateFile(bFile, mySpeech, &quot;iso-8859-15&quot;)
+ 	else
+		fbCreateFile(bFile, mySpeech, &quot;utf-8&quot;)
 	endif
 End Sub
 

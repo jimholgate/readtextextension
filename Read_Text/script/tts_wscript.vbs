@@ -610,10 +610,7 @@ Sub main()
       end Select
       s2=InputBox(s1,"tts_wscript.vbs",s0)
     Case Else
-      Set objFSO=CreateObject("Scripting.FileSystemObject")
-      Set objText=objFSO.OpenTextFile(s0,ForReading)
-      s2=objText.ReadAll
-      objText.Close
+        s2=getTextFileContent(s0,"UTF-8")
         If Err <> 0 Then
           Usage Err.Number & " -- " &  Err.Description & " -- " & s0
           Wscript.Exit(0)
@@ -631,5 +628,38 @@ Sub main()
   End if
 
 End Sub
+
+Function getTextFileContent (strFileName, strCharSet)
+  ' Stefan Thelenius "VBScript: Reading text files" Friday, 11 April 2008
+  ' Accessed September 11, 2013.
+  ' http://abouttesting.blogspot.ca/2008/04/vbscript-reading-text-files.html
+  Const adTypeBinary = 1 'not used
+  Const adTypeText = 2
+  'Set default CharSet
+  If strCharSet = "" Then strCharSet = "ASCII"
+  ' *** CharSets ***
+  '    Windows-1252
+  '    Windows-1257
+  '    UTF-16
+  '    UTF-8
+  '    UTF-7
+  '    ASCII
+  '    X-ANSI
+  '   iso-8859-2
+  Set objStreamFile = CreateObject("Adodb.Stream")
+  With objStreamFile
+    .CharSet = strCharSet
+    .Type= adTypeText
+    .Open
+    .LoadFromFile strFileName
+    getTextFileContent = .readText
+    .Close
+  End With
+  Set objStreamFile = Nothing
+End Function
+
+Function readFile(s0)
+      readFile=getTextFileContent (s0,"UTF-8")
+End Function
 
 main
