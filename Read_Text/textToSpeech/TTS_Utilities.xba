@@ -211,13 +211,13 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 	On Error Goto 0
 	For n1=10 To -10 step -2
 		oComboBox.addItem( Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
-		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; Chr$(34) &amp; _
 		&quot; /rate:&quot; &amp; Trim(n1) &amp; &quot; &quot; &amp; _
 		Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34),0)
 	Next
 	If fileExists(fsOptDirectory() &amp; &quot;oggenc.exe&quot;) or fileExists(fsOptDirectory() &amp; &quot;oggenc2.exe&quot;) Then
 		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
-		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; Chr$(34) &amp; _
 		&quot; /use-optional-app:&quot; &amp; Chr$(34) &amp; &quot;True&quot; &amp; Chr$(34) &amp; _
 		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).ogg&quot; &amp; Chr$(34) &amp; _
 			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
@@ -225,7 +225,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 	EndIf
 	If fileExists(fsOptDirectory() &amp; &quot;lame.exe&quot;) Then
 		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
-		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; Chr$(34) &amp; _
 		&quot; /use-optional-app:&quot; &amp; Chr$(34) &amp; &quot;True&quot; &amp; Chr$(34) &amp; _
 		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).mp3&quot; &amp; Chr$(34) &amp; _
 			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
@@ -234,7 +234,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 
 	If fileExists(fsOptDirectory() &amp; &quot;faac.exe&quot;) or fileExists(fsOptDirectory() &amp; &quot;neroAacEnc.exe&quot;) Then
 		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
-		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; Chr$(34) &amp; _
 		&quot; /use-optional-app:&quot; &amp; Chr$(34) &amp; &quot;True&quot; &amp; Chr$(34) &amp; _
 		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).m4a&quot; &amp; Chr$(34) &amp; _
 			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
@@ -242,7 +242,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 	EndIf
 	If fileExists(fsOptDirectory() &amp; &quot;flac.exe&quot;)  Then
 		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
-		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; Chr$(34) &amp; _
 		&quot; /use-optional-app:&quot; &amp; Chr$(34) &amp; &quot;True&quot; &amp; Chr$(34) &amp; _
 		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).flac&quot; &amp; Chr$(34) &amp; _
 			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
@@ -250,28 +250,28 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 	EndIf
 	If fileExists(fsProgramDirectory() &amp; &quot;iTunes&quot;) or fileExists(fsProgramDirectoryx86() &amp; &quot;iTunes&quot;) Then
 		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
-		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; Chr$(34) &amp; _
 		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).aif&quot; &amp; Chr$(34) &amp; _
 			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
 		oComboBox.addItem(s1,0)
 		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
-		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; Chr$(34) &amp; _
 		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).m4a&quot; &amp; Chr$(34) &amp; _
 			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
 		oComboBox.addItem(s1,0)
 		s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
-		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+		&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; Chr$(34) &amp; _
 		&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).mp3&quot; &amp; Chr$(34) &amp; _
 			&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
 		oComboBox.addItem(s1,0)
 	EndIf
 	s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
-	&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+	&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; Chr$(34) &amp; _
 	&quot; /soundfile:&quot; &amp; Chr$(34) &amp; &quot;(HOME)(NOW).wav&quot; &amp; Chr$(34) &amp; _
 		&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
 	oComboBox.addItem(s1,0)
 	s1=Chr$(34) &amp; &quot;(TTS_WSCRIPT_VBS)&quot; &amp; Chr$(34) &amp; _
-	&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_CODE)&quot; &amp; Chr$(34) &amp; _
+	&quot; /language:&quot; &amp; Chr$(34) &amp; &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; Chr$(34) &amp; _
 		&quot; &quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) 
 	oComboBox.addItem(s1,0)
 	
@@ -292,7 +292,7 @@ Function fsMacVoice(n) As String
 	Dim m As Integer
 	Dim sLanguage as String
 	Dim ar1(40) As String
-	sLanguage=fsSelectionLanguageAndRegion()
+	sLanguage=fsSelectionLanguageAndRegion(true)
 	m=0
 	If fsSelectionLanguage=&quot;en&quot; Then
 		ar1(m)=&quot;Zarvox&quot;
@@ -635,9 +635,7 @@ Sub dialog1Combo2ShowMEDIAChoices(oDialog)
 	REM first remove all old items from the list
 	n1=oComboBox.getItemCount()
 	oComboBox.removeItems( 0,n1)
-	s1=&quot;http://webanywhere.cs.washington.edu/cgi-bin/ivona/getsound.pl?text=(OOO_WEBTEXT)&amp;cache=1&amp;mtts=1&amp;type=.mp3&quot;
-	oComboBox.addItem(s1,0)
-	s1=&quot;http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
+	s1=&quot;http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
 	oComboBox.addItem(s1,0)
 	s1=&quot;http://translate.google.com/translate_tts?tl=(LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
 	oComboBox.addItem(s1,0)
@@ -738,7 +736,7 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 	If fsGetOS()=&quot;WINDOWS&quot; Then &apos;Show examples
 		s1=&quot;-c &quot; &amp; Chr(34) &amp; &quot;import os; os.startfile(&apos;http://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot; &amp; Chr(34) 
 		oComboBox.addItem(s1,0)
-		s1=&quot;-c &quot; &amp; Chr(34) &amp; &quot;import os; os.startfile(&apos;http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&apos;)&quot; &amp; Chr(34) 
+		s1=&quot;-c &quot; &amp; Chr(34) &amp; &quot;import os; os.startfile(&apos;http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&apos;)&quot; &amp; Chr(34) 
 		oComboBox.addItem(s1,0)
 		s1=Chr(34) &amp; &quot;(OS_PY)&quot; &amp; Chr(34) &amp; &quot; &quot; &amp; Chr(34) &amp; &quot;notepad &apos;(TMP)&apos;&quot; &amp; Chr(34) 
 		oComboBox.addItem(s1,0)
@@ -1414,7 +1412,9 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 		&apos;Write the Festival script and the file to read aloud
 		sProgram=config(fiFestivalPath)
 		sCommand=Chr$(34) &amp; ConvertFromURL(fsFullPathOf(fsFestivalScriptName)) &amp; Chr$(34)	
-		sScript=replaceLocalTokensWithStr(config(fiFestivalComboChoice))
+		&apos; Windows - Don&apos;t limit to SAPI languages
+		sScript=config(fiFestivalComboChoice)
+		sScript=replaceLocalTokensWithStr(sScript)
 		sScript=replacePublicTokensWithStr(sScript)
 		if fsComplexAsiaOrWest(sTextToSpeak)=&quot;WEST&quot; then
 			&apos; Compatible characters are officially supported by Festival using iso-8859-15
@@ -1428,16 +1428,23 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 	Elseif config(fiExternalOption) Then
 		writeSpeech(sTextToSpeak,msgs(),errorCode, false)
 		if (fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot;) and Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/osascript&quot;) &gt; 0 then
-			fswriteOSXSpeechScript (sTextToSpeak, fsSelectionLanguageAndRegion)
+			fswriteOSXSpeechScript (sTextToSpeak, fsSelectionLanguageAndRegion(true))
 		endif
 		sProgram=config(fiExternalProgramPath)
-		sCommand=replaceLocalTokensWithStr(config(fiExternalCommand))
+		sCommand=config(fiExternalCommand)
+		if instr(sCommand,&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot;)=1 then
+			&apos;only consider SAPI voices
+			
+			sCommand= fsReplaceText(sCommand,&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,fsSelectionLanguageAndRegion(false))
+		endif
+		sCommand=replaceLocalTokensWithStr(sCommand)
 		sCommand=replacePublicTokensWithStr(sCommand)
 		sCommand=replaceWebTokensWithStr(sCommand,sTextToSpeak) &apos;for online content with media player
 	Else &apos;If config(fiHtmlOption) Then
 	&apos;Translate And read with web tools
 		sProgram=&quot;com.sun.star.system.SystemShellExecute&quot;
-		sCommand=replacePublicTokensWithStr(config(fiHtmlComboURL))
+		sCommand=config(fiHtmlComboURL)
+		sCommand=replacePublicTokensWithStr(sCommand)
 		sCommand=replaceWebTokensWithStr(sCommand,sTextToSpeak)
 		&apos; HTML file
 		if Len(sCommand) &lt;&gt; 0 Then
@@ -1685,7 +1692,7 @@ Function replacePublicTokensWithStr(sA As String) As String
 	
 	&apos;Selection Language And Region en-US or fr-FR
 	sFind=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-	sReplace=fsSelectionLanguageAndRegion()
+	sReplace=fsSelectionLanguageAndRegion(true)
 	sA=fsReplaceText(sA,sFind,sReplace)
 	replacePublicTokensWithStr=sA
 End Function
@@ -1755,9 +1762,547 @@ Function fsgetCursorWord As String
 	fsgetCursorWord=oTC.String 
 End Function
 
-Function fsSelectionLanguageAndRegion As String
-	fsSelectionLanguageAndRegion=fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
+Function fsSelectionLanguageAndRegion(optional bIgnoreInstalledVoices) As String
+	dim sA,sB as string
+	if isMissing (bIgnoreInstalledVoices) then 
+		bIgnoreInstalledVoices = true
+	endif
+	sA = fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
+	sB = fsSelectionLanguage
+	if bIgnoreInstalledVoices then
+		fsSelectionLanguageAndRegion=sA
+	else
+		select case fsGetOS()
+		case &quot;WINDOWS&quot;
+			if fbWindowsHasVoiceInThisLanguage (sA) then
+			&apos; use language and locale
+				fsSelectionLanguageAndRegion=sA		
+			elseif fbWindowsHasVoiceInThisLanguage(sB) then
+			&apos; use language only
+				fsSelectionLanguageAndRegion=sB
+			else
+			&apos; try using the language only...
+				fsSelectionLanguageAndRegion=sB
+			endif
+		case else
+			fsSelectionLanguageAndRegion=sA
+		end select
+	endif
 End Function
+
+function fbWindowsHasVoiceInThisLanguage (Optional byval sLang)
+	&apos; Since Windows Vista, we can use Speech XML
+	&apos; http://www.w3.org/TR/speech-synthesis
+	&apos; Determine which SAPI voices are installed, then
+	&apos; if we have a modern voice from Windows Vista, Windows 7 or above
+	&apos; then return true, else  if no voices found, then return false
+	dim Sapi as object
+	dim n,n1 as integer
+	dim s1, s2 as string
+	if ismissing(sLang) then
+		sLang = fsGetSetting(&quot;language&quot;)
+	endif
+	sLang = lcase (sLang)
+	fbWindowsHasVoiceInThisLanguage = false
+	&apos;on Error goto VoiceTestError
+	Set Sapi=Createobject(&quot;Sapi.SpVoice&quot;)
+	s1 =lcase (isoToEnglish(sLang))
+	&apos;Let&apos;s see if we recognize the language s1
+	for n = 0 to Sapi.GetVoices.Count - 1
+		s2=lcase(Sapi.GetVoices.Item(n).GetDescription)
+		if instr(s2,s1) &lt;&gt; 0 then
+			fbWindowsHasVoiceInThisLanguage = true
+			exit for
+		endif
+	next
+	Set Sapi = Nothing
+	exit function
+	VoiceTestError:
+	fbWindowsHasVoiceInThisLanguage = false
+	on Error resume next
+end function
+
+function isoToEnglish (s1)
+	&apos; Returns name of language, if known			
+	dim S2 as string
+	select case lcase (S1)
+	case &quot;en-us&quot;
+		S2=&quot;English (United States)&quot;
+	case &quot;en-gb&quot;
+		S2= &quot;English (Great Britain)&quot;
+	case &quot;en-vg&quot;
+		S2= &quot;English (British Virgin Islands)&quot;
+	case &quot;en-io&quot;
+		S2= &quot;English (Great Britain)&quot;
+	case &quot;en-gg&quot;
+		S2=&quot;English (Guernsey)&quot;
+	case &quot;en-au&quot;
+		S2=&quot;English (Australia)&quot;
+	case &quot;en-bz&quot;
+		S2=&quot;English (Belize)&quot;
+	case &quot;en-ca&quot;
+		S2=&quot;English (Canada)&quot;
+	case &quot;en-bs&quot;
+		S2=&quot;English (Bahamas)&quot;
+	case &quot;en-hk&quot;
+		S2=&quot;English (Hong Kong)&quot;
+	case &quot;en-in&quot;
+		S2=&quot;English (India)&quot;
+	case &quot;en-id&quot;
+		S2=&quot;English (Indonesia)&quot;
+	case &quot;en-ie&quot;
+		S2=&quot;English (Ireland)&quot;
+	case &quot;en-jm&quot;
+		S2=&quot;English (Jamaica)&quot;
+	case &quot;en-my&quot;
+		S2=&quot;English (Malaysia)&quot;
+	case &quot;en-nz&quot;
+		S2=&quot;English (New Zealand)&quot;
+	case &quot;en-ph&quot;
+		S2=&quot;English (Philippines)&quot;
+	case &quot;en-sg&quot;
+		S2=&quot;English (Singapore)&quot;
+	case &quot;en-za&quot;
+		S2=&quot;English (South Africa)&quot;
+	case &quot;en-tt&quot;
+		S2=&quot;English (Trinidad &quot; &apos;sic
+	case &quot;en-zw&quot;
+		S2=&quot;English (Zimbabwe)&quot;
+	case &quot;en&quot;
+		S2=&quot;English&quot;
+	case &quot;fr-be&quot;
+		S2=&quot;French (Belgium)&quot;
+	case &quot;fr-ca&quot;
+		S2=&quot;French (Canada)&quot;
+	case &quot;fr-cg&quot;
+		S2=&quot;French (Congo)&quot;
+	case &quot;fr-ch&quot;
+		S2=&quot;French (Switzerland)&quot;
+	case &quot;fr-ci&quot;
+		S2=&quot;French (Ivory Coast)&quot;
+	case &quot;fr-cm&quot;
+		S2=&quot;French (Cameroon)&quot; 
+	case &quot;fr-fr&quot;
+		S2=&quot;French (France)&quot;
+	case &quot;fr-ht&quot;
+		S2=&quot;French (Haiti)&quot;
+	case &quot;fr-lu&quot;
+		S2=&quot;French (Luxembourg)&quot;
+	case &quot;fr-ma&quot;
+		S2=&quot;French (Morocco)&quot;
+	case &quot;fr-mc&quot;
+		S2=&quot;French (Monaco)&quot;
+	case &quot;fr-ml&quot;
+		S2=&quot;French (Mali)&quot;
+	case &quot;fr-re&quot;
+		S2=&quot;French (Reunion)&quot;
+	case &quot;fr-sn&quot;
+		S2=&quot;French (Senegal)&quot;
+	case &quot;fr&quot;
+		S2=&quot;French&quot;
+	case &quot;it&quot;,&quot;it-it&quot;
+		S2=&quot;Italian&quot;
+	case &quot;de-at&quot;
+		S2=&quot;German (Austria)&quot;
+	case &quot;de-ch&quot;
+		S2=&quot;German (Switzerland)&quot;
+	case &quot;de-de&quot;
+		S2=&quot;German (Germany)&quot;
+	case &quot;de-li&quot;
+		S2=&quot;German (Lithuania)&quot;
+	case &quot;de-lu&quot;
+		S2=&quot;German (Luxembourg)&quot;
+	case &quot;de&quot;
+		S2=&quot;German&quot;
+	case &quot;es-es&quot;
+		S2=&quot;Spanish (Spain)&quot;
+	case &quot;es-ar&quot;
+		S2=&quot;Spanish (Argentina)&quot;
+	case &quot;es-bo&quot;
+		S2=&quot;Spanish (Bolivia)&quot;
+	case &quot;es-cl&quot;
+		S2=&quot;Spanish (Chile)&quot;
+	case &quot;es-co&quot;
+		S2=&quot;Spanish (Colombia)&quot;
+	case &quot;es-cr&quot;
+		S2=&quot;Spanish (Costa Rica)&quot;
+	case &quot;es-do&quot;
+		S2=&quot;Spanish (Dominican Republic)&quot;
+	case &quot;es-ec&quot;
+		S2=&quot;Spanish (Ecuador)&quot;
+	case &quot;es-sv&quot;
+		S2=&quot;Spanish (Svalbard) &quot;
+	case &quot;es-gt&quot;
+		S2=&quot;Spanish (Guatemala)&quot;
+	case &quot;es-hn&quot;
+		S2=&quot;Spanish (Honduras)&quot;
+	case &quot;es-mx&quot;
+		S2=&quot;Spanish (Mexico)&quot;
+	case &quot;es-ni&quot;
+		S2=&quot;Spanish (Nicaragua)&quot;
+	case &quot;es-pa&quot;
+		S2=&quot;Spanish (Panama)&quot;
+	case &quot;es-py&quot;
+		S2=&quot;Spanish (Paraguay)&quot;
+	case &quot;es-pe&quot;
+		S2=&quot;Spanish (Peru)&quot;
+	case &quot;es-pr&quot;
+		S2=&quot;Spanish (Puerto Rico)&quot;
+	case &quot;es-us&quot;
+		S2=&quot;Spanish (United States)&quot;
+	case &quot;es-uy&quot;
+		S2=&quot;Spanish (Uraguay)&quot;
+	case &quot;es-ve&quot;
+		S2=&quot;Spanish (Venezuela)&quot;
+	case &quot;es&quot;
+		S2=&quot;Spanish&quot;
+	case &quot;ru&quot;,&quot;ru-ru&quot;
+		S2=&quot;Russian&quot;
+	case &quot;hi&quot;,&quot;hi-in&quot;
+		S2=&quot;Hindi&quot;
+	case &quot;af&quot;,&quot;af-za&quot;
+		S2=&quot;Afrikaans&quot;
+	case &quot;ak&quot;,&quot;ak-gh&quot;
+		S2=&quot;Akan&quot;
+	case &quot;an&quot;,&quot;an-es&quot;
+		S2=&quot;Argonese&quot;
+	case &quot;az&quot;,&quot;az-az&quot;
+		S2=&quot;Azerbaijani&quot;
+	case &quot;ar-sa&quot;
+		S2=&quot;Arabic (Saudi Arabia)&quot;
+	case &quot;ar-dz&quot;
+		S2=&quot;Arabic (Algeria)&quot;
+	case &quot;ar-bh&quot;
+		S2=&quot;Arabic (Bhutan)&quot;
+	case &quot;ar-eg&quot;
+		S2=&quot;Arabic (Egypt)&quot;
+	case &quot;ar-iq&quot;
+		S2=&quot;Arabic (Iraq)&quot;
+	case &quot;ar-jo&quot;
+		S2=&quot;Arabic (Jordan)&quot;
+	case &quot;ar-kw&quot;
+		S2=&quot;Arabic (Kuwait)&quot;
+	case &quot;ar-lb&quot;
+		S2=&quot;Arabic (Lebanon)&quot;
+	case &quot;ar-ly&quot;
+		S2=&quot;Arabic (Libya)&quot;
+	case &quot;ar-om&quot;
+		S2=&quot;Arabic (Oman)&quot;
+	case &quot;ar-qa&quot;
+		S2=&quot;Arabic (Qatar)&quot;
+	case &quot;ar-sy&quot;
+		S2=&quot;Arabic (Syria)&quot;
+	case &quot;ar-tn&quot;
+		S2=&quot;Arabic (Tunisia)&quot;
+	case &quot;ar-ae&quot;
+		S2=&quot;Arabic (United Arab Emirates)&quot;
+	case &quot;ar-ye&quot;
+		S2=&quot;Arabic (Yemen)&quot;
+	case &quot;ar&quot;
+		S2=&quot;Arabic&quot;
+	case &quot;be&quot;,&quot;be-by&quot;
+		S2=&quot;Belarusian&quot;
+	case &quot;bm&quot;,&quot;bm-ml&quot;
+		S2=&quot;Bambara&quot;
+	case &quot;beq&quot;,&quot;beq-cg&quot;
+		S2=&quot;Beembe&quot;
+	case &quot;bk&quot;,&quot;bkw-cg&quot;
+		S2=&quot;Bekwel&quot;
+	case &quot;bn&quot;,&quot;bn-bd&quot;
+		S2=&quot;Bengali&quot;
+	case &quot;bs&quot;,&quot;bs-bn&quot;
+		S2=&quot;Bosnian&quot;
+	case &quot;buc&quot;,&quot;buc-yt&quot;
+		S2=&quot;Bushi&quot;
+	case &quot;eu&quot;,&quot;eu-fr&quot;,&quot;eu-es&quot;
+		S2=&quot;Basque&quot;
+	case &quot;bg&quot;,&quot;bg-bg&quot;
+		S2=&quot;Bulgarian&quot;
+	case &quot;ca&quot;,&quot;ca-es&quot;
+		S2=&quot;Catalan&quot;
+	case &quot;ceb&quot;,&quot;ceb-ph&quot;
+		S2=&quot;Cebuano&quot;
+	case &quot;cop&quot;,&quot;cop-eg&quot;
+		S2=&quot;Coptic&quot;
+	case &quot;csb&quot;,&quot;csb-pl&quot;
+		S2=&quot;Kashubian&quot;
+	case &quot;cv&quot;,&quot;cv-ru&quot;
+		S2=&quot;Chuvash&quot;
+	case &quot;cs&quot;,&quot;cs-cz&quot;
+		S2=&quot;Czech&quot;
+	case &quot;cy&quot;,&quot;cy-gb&quot;
+		S2=&quot;Welsh&quot;
+	case &quot;da&quot;,&quot;da-dk&quot;
+		S2=&quot;Danish&quot;
+	case &quot;dsb&quot;,&quot;dsb-de&quot;
+		S2=&quot;Sorbian, Lower&quot;
+	case &quot;ebo&quot;,&quot;ebo-cg&quot;
+		S2=&quot;Teke-Eboo&quot;
+	case &quot;ee&quot;,&quot;ee-gh&quot;
+		S2=&quot;Éwé&quot;		
+	case &quot;eo&quot;,&quot;eo-&quot;
+		S2=&quot;Esperanto&quot;
+	case &quot;et&quot;,&quot;et-ee&quot;
+		S2=&quot;Estonian&quot;
+	case &quot;fa&quot;,&quot;fa-ir&quot;
+		S2=&quot;Farsi&quot;		
+	case &quot;fi&quot;,&quot;fi-fi&quot;
+		S2=&quot;Finnish&quot;
+	case &quot;fj&quot;,&quot;fj-fj&quot;
+		S2=&quot;Fijian&quot;
+	case &quot;fu&quot;,&quot;fu-it&quot;
+		S2=&quot;Friulian&quot;
+	case &quot;fy&quot;,&quot;fy-nl&quot;
+		S2=&quot;Frisian&quot;
+	case &quot;gd&quot;,&quot;gd-gb&quot;
+		S2=&quot;Gaelic&quot;
+	case &quot;gl&quot;,&quot;gl-es&quot;
+		S2=&quot;Galician&quot;
+	case &quot;gu&quot;,&quot;gu-in&quot;
+		S2=&quot;Gujarati&quot;
+	case &quot;ga&quot;,&quot;ga-ie&quot;
+		S2=&quot;Irish&quot; 
+	case &quot;gd&quot;,&quot;gd-gb&quot;
+		S2=&quot;Gaelic&quot;
+	case &quot;gsc&quot;,&quot;gsc-fr&quot;
+		S2=&quot;Gascon&quot;
+	case &quot;gug&quot;,&quot;gug-py&quot;
+		S2=&quot;Guarani&quot;
+	case &quot;haw&quot;,&quot;haw-us&quot;
+		S2=&quot;Hawaiian&quot;
+	case &quot;hl&quot;,&quot;hl-gr&quot;
+		S2=&quot;Greek&quot;
+	case &quot;he&quot;,&quot;he-il&quot;
+		S2=&quot;Hebrew&quot;
+	case &quot;hr&quot;,&quot;hr-hr&quot;
+		S2=&quot;Croatian&quot;
+	case &quot;hsb&quot;,&quot;hsb-de&quot;
+		S2=&quot;Sorbian, Upper&quot; 
+	case &quot;ht&quot;,&quot;ht-ht&quot;
+		S2=&quot;Haitian&quot;
+	case &quot;hu&quot;,&quot;hu-hu&quot;
+		S2=&quot;Hungarian&quot;
+	case &quot;ha&quot;,&quot;ha-gh&quot;,&quot;ha-ng&quot;
+		S2=&quot;Hausa&quot;
+	case &quot;hil&quot;,&quot;hil-ph&quot;
+		S2=&quot;Hiligaynon&quot;
+	case &quot;ia&quot;,&quot;ia-&quot;
+		S2=&quot;Interlingua&quot;
+	case &quot;id&quot;,&quot;id-id&quot;
+		S2=&quot;Indonesian&quot;
+	case &quot;is&quot;,&quot;is-is&quot;
+		S2=&quot;Icelandic&quot;
+	case &quot;jbo&quot;,&quot;jbo-&quot;
+		S2=&quot;Lojban&quot;
+	case &quot;jp&quot;,&quot;jp-jp&quot; , &quot;ja&quot;, &quot;ja-jp&quot;
+		S2=&quot;Japanese&quot;
+	case &quot;kab&quot;,&quot;kab-dz&quot;
+		S2=&quot;Kabyle&quot;
+	case &quot;ki&quot;,&quot;ki-ke&quot;
+		S2=&quot;Gikuyu&quot;
+	case &quot;kk&quot;,&quot;kk-kz&quot;
+		S2=&quot;Kazak&quot;
+	case &quot;kl&quot;,&quot;kl-gl&quot;
+		S2=&quot;Kalaallisut&quot;
+	case &quot;ksf&quot;,&quot;ksf-cm&quot;
+		S2=&quot;Bafia&quot;
+	case &quot;ko&quot;,&quot;ko-kp&quot;,&quot;ko-kr&quot;
+		S2=&quot;Korean&quot;
+	case &quot;ka&quot;,&quot;ka-ge&quot;
+		S2=&quot;Georgian&quot;
+	case &quot;km&quot;,&quot;km-kh&quot;
+		S2=&quot;Khmer&quot;
+	case &quot;kn&quot;,&quot;kn-in&quot;
+		S2=&quot;Kannada&quot;
+	case &quot;kok&quot;,&quot;kok-in&quot;
+		S2=&quot;Konkani&quot;
+	case &quot;ku&quot;,&quot;ku-sy&quot;,&quot;ku-tr&quot;
+		S2=&quot;Kurdish&quot;
+	case &quot;ky&quot;,&quot;ky-kg&quot;
+		S2=&quot;Kirghiz&quot;
+	case &quot;la&quot;,&quot;la-va&quot;
+		S2=&quot;Latin&quot;
+	case &quot;lb&quot;,&quot;lb-lu&quot;
+		S2=&quot;Luxembourgish&quot;
+	case &quot;ldi&quot;,&quot;ldi-cg&quot;
+		S2=&quot;Lari&quot;
+	case &quot;lg&quot;,&quot;lg-ug&quot;
+		S2=&quot;Ganda&quot;
+	case &quot;ln&quot;,&quot;ln-cd&quot;
+		S2=&quot;Lingala&quot;
+	case &quot;lo&quot;,&quot;lo-la&quot;
+		S2=&quot;Lao&quot;
+	case &quot;lt&quot;,&quot;lt-lt&quot;
+		S2=&quot;Lithuanian&quot;
+	case &quot;ltg&quot;,&quot;ltg-lv&quot;
+		S2=&quot;Latgalian&quot;
+	case &quot;lv&quot;,&quot;lv-lv&quot;
+		S2=&quot;Latvian&quot;
+	case &quot;mdw&quot;,&quot;mdw-cg&quot;
+		S2=&quot;Mbochi&quot;
+	case &quot;mi&quot;,&quot;mi-nz&quot;
+		S2=&quot;Maori (New Zealand)&quot;
+	case &quot;ms&quot;,&quot;ms-sg&quot;,&quot;ms-my&quot;,&quot;ms-id&quot;,&quot;ms-bn&quot;
+		S2=&quot;Malay&quot;
+	case &quot;mk&quot;,&quot;mk-mk&quot;
+		S2=&quot;Macedonian&quot;
+	case &quot;mkw&quot;,&quot;mkw-cg&quot;
+		S2=&quot;Kituba&quot;
+	case &quot;mn&quot;,&quot;mn-mn&quot;
+		S2=&quot;Mongolian&quot;
+	case &quot;mo-mn&quot;,&quot;mo&quot;
+		S2=&quot;Moldavian&quot;
+	case &quot;mos&quot;,&quot;mos-bf&quot;
+		S2=&quot;Moore&quot; 
+	case &quot;mr&quot;,&quot;mr-in&quot;
+		S2=&quot;Marathi&quot;
+	case &quot;nds&quot;,&quot;nds-de&quot;
+		S2=&quot;Low German&quot;
+	case &quot;nl&quot;,&quot;nl-nl&quot;,&quot;nl-be&quot;
+		S2=&quot;Dutch&quot;
+	case &quot;nn&quot;,&quot;nn-no&quot;
+		S2=&quot;Norwegian Norsk&quot; 
+	case &quot;nb&quot;,&quot;nb-no&quot;
+		S2=&quot;Norwegian Bokmal&quot;
+	case &quot;no&quot;,&quot;no-no&quot;
+		S2=&quot;Norwegian&quot;
+	case &quot;nr&quot;,&quot;nr-za&quot;
+		S2=&quot;Ndebele, South&quot;
+	case &quot;nso&quot;,&quot;nso-za&quot;
+		S2=&quot;Northern Sotho&quot;
+	case &quot;ny&quot;,&quot;ny-mw&quot;
+		S2=&quot;Nyanja&quot;
+	case &quot;oc&quot;,&quot;oc-fr&quot;
+		S2=&quot;Occitan&quot;
+	case &quot;om&quot;,&quot;om-et&quot;
+		S2=&quot;Oromo&quot;
+	case &quot;pap&quot;,&quot;pap-aw&quot;,&quot;pap-an&quot;
+		S2=&quot;Papiamento&quot;
+	case &quot;pl&quot;,&quot;pl-pl&quot;
+		S2=&quot;Polish&quot;
+	case &quot;pli&quot;,&quot;pli-&quot;
+		S2=&quot;Pali&quot;
+	case &quot;plt&quot;,&quot;plt-mg&quot;
+		S2=&quot;Malagasy&quot;
+	case &quot;pt-br&quot;
+		S2=&quot;Portuguese (Brazil)&quot;
+	case &quot;pt-pt&quot;
+		S2=&quot;Portuguese (Portugal)&quot;
+	case &quot;pt&quot;
+		S2=&quot;Portuguese&quot;
+	case &quot;qtz&quot;,&quot;qtz-&quot;
+		S2=&quot;KeyID&quot;
+	case &quot;qul&quot;,&quot;quh&quot;,&quot;qu&quot;,&quot;qul-bo&quot;,&quot;qu-ec&quot;,&quot;quh-bo&quot;
+		S2=&quot;Quechua&quot;
+	case &quot;rm&quot;,&quot;rm-ch&quot;
+		S2=&quot;Rhaeto-Romance&quot;
+	case &quot;ro&quot;,&quot;ro-ro&quot;
+		S2=&quot;Romanian&quot;
+	case &quot;ru&quot;,&quot;ru-ru&quot;
+		S2=&quot;Russian&quot;
+	case &quot;rue&quot;,&quot;rue-sk&quot;,&quot;rue-ua&quot;
+		S2=&quot;Rusyan&quot;
+	case &quot;rw&quot;,&quot;rw-rw&quot;
+		S2=&quot;Kinyarwanda&quot;
+	case &quot;smn&quot;,&quot;se&quot;,&quot;smj&quot;,&quot;sma&quot;,&quot;smn-fi&quot;,&quot;smn-ru&quot;,&quot;smj-no&quot;,&quot;smj-se&quot;,&quot;se-fi&quot;,&quot;se-no&quot;,&quot;se-se&quot;,&quot;sms-fi&quot;,&quot;sma-no&quot;,&quot;sma-se&quot;
+		S2=&quot;Sami&quot;
+	case &quot;sh&quot;,&quot;sr&quot;,&quot;sr-me&quot;,&quot;sr-su&quot;,&quot;sr-rs&quot;,&quot;sh-me&quot;,&quot;sh-yu&quot;,&quot;sh-rs&quot;,&quot;sh-su&quot;
+		S2=&quot;Serbian&quot;
+	case &quot;shs&quot;,&quot;shs-ca&quot;
+		S2=&quot;Shuswap&quot;
+	case &quot;sk&quot;,&quot;sk-sk&quot;
+		S2=&quot;Slovakian&quot;
+	case &quot;sl&quot;,&quot;sl-si&quot;
+		S2=&quot;Slovene&quot;
+	case &quot;so&quot;,&quot;so-so&quot;
+		S2=&quot;Somali&quot;
+	case &quot;sq&quot;,&quot;sq-al&quot;
+		S2=&quot;Albanian&quot;
+	case &quot;src&quot;,&quot;src-it&quot;
+		S2=&quot;Sardinian (Logudorese)&quot;
+	case &quot;sdc&quot;,&quot;sdc-it&quot;
+		S2=&quot;Sardinian (Sassarese)&quot;
+	case &quot;ss&quot;,&quot;ss-za&quot;
+		S2=&quot;Swazi&quot;
+	case &quot;st&quot;,&quot;st-za&quot;
+		S2=&quot;Southern Sotho&quot;
+	case &quot;sw&quot;,&quot;sw-tz&quot;,&quot;sw-ke&quot;
+		S2=&quot;Swahili&quot;
+	case &quot;swb&quot;,&quot;swb-yt&quot;
+		S2=&quot;Maore&quot;
+	case &quot;sv&quot;,&quot;sv-se&quot;
+		S2=&quot;Swedish&quot;
+	case &quot;tek&quot;,&quot;tek-cg&quot;
+		S2=&quot;Teke-Ibali&quot;
+	case &quot;tet&quot;,&quot;tet-id&quot;,&quot;tet-tl&quot;
+		S2=&quot;Tetun&quot;
+	case &quot;tg&quot;,&quot;tg-tj&quot;
+		S2=&quot;Tajic&quot;
+	case &quot;th&quot;,&quot;th-th&quot;
+		S2=&quot;Thai&quot;
+	case &quot;ti&quot;,&quot;ti-er&quot;,&quot;ti-et&quot;
+		S2=&quot;Tigrigna&quot;
+	case &quot;tk&quot;,&quot;tk-tm&quot;
+		S2=&quot;Turkmen&quot;
+	case &quot;tl&quot;,&quot;tl-ph&quot;
+		S2=&quot;Tagalog&quot;
+	case &quot;tn&quot;,&quot;tn-bw&quot;,&quot;tn-za&quot;
+		S2=&quot;Tswana&quot;
+	case &quot;tpi&quot;,&quot;tpi-pg&quot;
+		S2=&quot;Tok Pisin&quot;
+	case &quot;tr&quot;,&quot;tr-tr&quot;
+		S2=&quot;Turkish&quot;
+	case &quot;tt&quot;,&quot;tt-ru&quot;
+		S2=&quot;Tatar&quot;
+	case &quot;ts&quot;,&quot;ts-za&quot;
+		S2=&quot;Tsonga&quot;
+	case &quot;ty&quot;,&quot;ty-pf&quot;
+		S2=&quot;Tahitian&quot;
+	case &quot;tyx&quot;,&quot;tyx-cg&quot;
+		S2=&quot;Teke-Tyee&quot;	
+	case &quot;uk&quot;,&quot;uk-ua&quot;
+		S2=&quot;Ukranian&quot;
+	case &quot;ur&quot;,&quot;ur-in&quot;,&quot;ur-pk&quot;
+		S2=&quot;Urdu&quot;
+	case &quot;uz&quot;,&quot;uz-uz&quot;
+		S2=&quot;Uzbec&quot;
+	case &quot;ve&quot;,&quot;ve-za&quot;
+		S2=&quot;Venda&quot;
+	case &quot;vi&quot;,&quot;vi-vn&quot;
+		S2=&quot;Vietnamese&quot;
+	case &quot;vif&quot;,&quot;vif-cg&quot;
+		S2=&quot;Vili&quot;
+	case &quot;wa&quot;,&quot;wa-be&quot;
+		S2=&quot;Walloon&quot;
+	case &quot;xh&quot;,&quot;xh-za&quot;
+		S2=&quot;Xhosa&quot;
+	case &quot;yi&quot;,&quot;yi-us&quot;
+		s2=&quot;Yiddish&quot;
+	case &quot;yo&quot;,&quot;yo-ng&quot;
+		S2=&quot;Yoruba&quot;
+	case &quot;zh-cn&quot;
+		S2=&quot;Chinese (Simplified)&quot;
+	case &quot;zh-tw&quot;
+		S2=&quot;Chinese (Traditional)&quot;
+	case &quot;zh-hk&quot;
+		S2=&quot;Chinese (Hong Kong)&quot;
+	case &quot;zh-sg&quot;
+		S2=&quot;Chinese (Singapore)&quot;
+	case &quot;zh-mo&quot;
+		S2=&quot;Chinese (Macau)&quot;
+	case &quot;zh-yue&quot;,&quot;zh-yu&quot;
+		S2=&quot;Chinese (Yue)&quot;
+	case &quot;zh&quot;
+		S2 = &quot;Chinese&quot;
+	case &quot;zu&quot;,&quot;zu-za&quot;
+		S2=&quot;Zulu&quot;
+	case &quot;zxx&quot;, &quot;zxx-&quot;
+		S2 = &quot;Ambiguous Or Missing Language&quot;
+	case else  
+		S2=S1 &apos; Not Found, So We Return Iso Language Code.
+	end select
+	Isotoenglish = S2	
+end function
 
 Function fsRetrieveCalcActiveCellText() As String
 	fsRetrieveCalcActiveCellText=fsRetrieveCalcActiveCellProperty(&quot;String&quot;)
@@ -1820,7 +2365,6 @@ function fsSelectionCountry as String
 	&apos;so we use the UTF encoding for the first character to evaluate the country. See http://www.utf8-chartable.de/
 	&apos;and http://unicode.org/Public/UNIDATA/Blocks.txt
 	fsSelectionCountry=fsUseLanguageType(sA,sB,sC,sD)
-	&apos;xxxxx
 	Exit Function
 	SELECTCOUNTRYERROR:
 	fsSelectionCountry=fsGetCountry
@@ -2172,7 +2716,8 @@ function fswriteOSXSpeechScript (sA, sLangLocale)
 	endif
 	sA = fsReplaceText(sA,&quot;&apos;&quot;,&quot;’&quot;)
 	sA = fsReplaceText(sA,chr$(34),&quot;’’&quot;)
-	sA = fsReplaceText(sA, chr$(13), &quot; &quot;)
+	sA = fsReplaceText(sA, chr$(13), &quot;[[slnc 200]] &quot;)
+	sA = fsReplaceText(sA, chr$(10), &quot;[[slnc 200]] &quot;)
 	sLangLocale=fsReplaceText(sLangLocale,&quot;-&quot;,&quot;_&quot;)
 	sLang=left(sLangLocale,instr(sLangLocale,&quot;_&quot;) )
 	CR = chr$(13)

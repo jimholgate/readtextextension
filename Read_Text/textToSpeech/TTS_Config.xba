@@ -228,7 +228,7 @@ Sub AboutAddOn (config() As Variant, myText As String)
 		Elseif  Instr(config(fiExternalCommand),&quot;(CREATE_QR_LABEL_PY)&quot;) Then
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsQRTextString
 		Elseif  Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT)&quot;) Then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (fsStringLanguage(fiL10nTEST, fsSelectionLanguage), fsSelectionLanguageAndRegion)
+			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (fsStringLanguage(fiL10nTEST, fsSelectionLanguage), fsSelectionLanguageAndRegion(true))
 		Else
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=&quot;&quot;
 		Endif
