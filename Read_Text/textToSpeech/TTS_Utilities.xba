@@ -1433,7 +1433,7 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 			writeSpeech(sTextToSpeak,msgs(),errorCode, false)
 		endif
 	Elseif config(fiExternalOption) Then
-		if Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/padsp&quot;) &gt; 0
+		if Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/padsp&quot;) &gt; 0 then
 			if Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).Model.Text),&quot;swift&quot;) &gt; 0 then
 				&apos;Cepstral swift Alison (2008) for Linux does not pronounce text around smart quotes correctly,
 				&apos;so we strip the smart quotes. Be sure to tell swift to use utf-8 encoded text as follows: 
