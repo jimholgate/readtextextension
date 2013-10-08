@@ -1381,6 +1381,13 @@ Sub writeSpeech(byval mySpeech As String,msgs() As Variant,errorCode As Integer,
 	endif
 End Sub
 
+function fsStripSmartQuotes(byval sA)
+	sA=fsReplaceText(sA, &quot;“&quot;, &quot;&quot;&quot;&quot;)
+    sA=fsReplaceText(sA, &quot;”&quot;, &quot;&quot;&quot;&quot;)
+	sA=fsReplaceText(sA, &quot;‘&quot;, &quot;&apos;&quot;)
+    fsStripSmartQuotes=fsReplaceText(sA, &quot;’&quot;, &quot;&apos;&quot;)   
+end function
+
 Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverRide As String)
 	Dim sCommand As String
 	Dim sScript As String
@@ -1426,6 +1433,14 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 			writeSpeech(sTextToSpeak,msgs(),errorCode, false)
 		endif
 	Elseif config(fiExternalOption) Then
+		if Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/padsp&quot;) &gt; 0
+			if Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).Model.Text),&quot;swift&quot;) &gt; 0 then
+				&apos;Cepstral swift Alison (2008) for Linux does not pronounce text around smart quotes correctly,
+				&apos;so we strip the smart quotes. Be sure to tell swift to use utf-8 encoded text as follows: 
+				&apos;&quot;Read with external program&quot; set to /usr/bin/padsp and &quot;Command line options&quot; to swift -e utf-8 -m text -f &quot;(TMP)&quot;
+				sTextToSpeak=fsStripSmartQuotes(sTextToSpeak)
+			endif
+		endif
 		writeSpeech(sTextToSpeak,msgs(),errorCode, false)
 		if (fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot;) and Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/osascript&quot;) &gt; 0 then
 			fswriteOSXSpeechScript (sTextToSpeak, fsSelectionLanguageAndRegion(true))
