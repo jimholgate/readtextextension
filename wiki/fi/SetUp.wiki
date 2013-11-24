@@ -1,0 +1,12 @@
+#summary Käyttöönotto - Asetukset - Mukauttaminen
+
+= Asetukset = 
+  * Napsauta työkalupalkin kuvaketta tai valitse Työkalut - Lisäosat - Lue valinta... 
+  * Valitse lisäosan käyttämäksi aiottava sovellus tai internetsivusto sekä komentojono parametreineen. 
+  * Asetukset voi testata tallentamatta napsauttamalla hiiren oikealla painikkeella *OK* . 
+  * Kun asetukset ovat halutunlaiset, poista valinta valintaruudusta Näytä aina tämä valintaikkuna . 
+  * Napsauta *OK*. 
+
+= Mukauttaminen = 
+  * Voit ulkoisen ohjelman tai internetpalvelun avulla lukea tekstejä ääneen tai kääntää niitä toiselle kielelle. 
+  * Asetuksien muuttamiseksi avaa valintaikkuna käyttäen *Työkalut - Lisäosat - Lue valinta...*
