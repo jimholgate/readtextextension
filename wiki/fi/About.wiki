@@ -1,0 +1,31 @@
+﻿#summary Tietoja Read Text Extension - Tämä lisäosa lukee tekstiä ulkoisen ohjelman tai internetpalvelun avulla.
+
+=Tietoja=
+
+Tämä lisäosa lukee tekstiä ulkoisen ohjelman tai internetpalvelun avulla. Valittu teksti voidaan lukea LibreOffice ja OpenOffice -sovelluksissa Calc, Draw, Impress ja Writer sekä nettipohjaisissa tekstinkäsittelyohjelmissa. Teksti voidaan lukea myös leikepöydältä. Puhesynteesiä voidaan käyttää apuna asiakirjojen muokkaamisessa, vertailtaessa sähköisiä ja tulostettuja asiakirjoja sekä opeteltaessa puhumaan uutta kieltä. Lisäosalla voidaan luoda myös mobiililaitteiden käyttämiä QR-viivakoodeja.
+
+==Lataa==
+
+  * [http://extensions.libreoffice.org/extension-center/read-text LibreOffice Extensions]
+  * [http://extensions.services.openoffice.org/en/project/read-text Apache OpenOffice Extensions]
+  * [http://code.google.com/p/readtextextension/downloads/list Google Project Hosting]
+
+==Kuvakaappaus==
+
+[http://sites.google.com/site/readtextextension/ http://readtextextension.googlecode.com/svn/wiki/Default64.png]
+
+==Oppitunti==
+
+<wiki:video url=https://www.youtube.com/watch?v=OCARVoZqC-s />
+
+==Blogi==
+
+  * [http://sites.google.com/site/readtextextension/ Read Text Software]
+
+==Source Code==
+
+  * [http://code.google.com/p/readtextextension/source/browse/Read_Text/ Google Project Hosting]
+
+----
+===Aiheeseen liittyvää===
+[https://help.libreoffice.org/Common/Accessibility_in/fi Esteettömyys ja LibreOffice]
