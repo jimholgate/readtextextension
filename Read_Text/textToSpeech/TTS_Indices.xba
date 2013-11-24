@@ -987,7 +987,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(15)=&quot;Ohjelma ei ole käytettävissä.&quot;
 		sL10N(16)=&quot;Merkkijonoa ei voida tulkita&quot;
 		sL10N(17)=&quot;Ohje verkossa&quot;
-		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About&quot;
+		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About?wl=fi&quot;
 		sL10N(19)=&quot;Verkkosovellus&quot;
 		sL10N(20)=&quot;Puheominaisuudet&quot;
 		sL10N(21)=&quot;Ohjauspaneeli&quot;
