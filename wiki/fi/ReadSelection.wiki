@@ -1,0 +1,6 @@
+#summary Käyttö - Lue valinta 
+
+= Lue valinta =
+
+  * Avaa Writer, Calc, Draw, Impress tai Web Writer ja suorita valinta.  
+  * Napsauta *Lue valinta* -painiketta työkalupalkista. 
