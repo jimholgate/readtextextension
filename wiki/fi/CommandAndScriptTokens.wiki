@@ -1,0 +1,32 @@
+#summary Käyttöönotto - Komentojonot 
+
+= Komentojonot =
+
+Jos komentojonoissa tai parametreissä tarvitaan muuttujia, tulee käyttää sopivaa merkkijonoa. Suorituksen aikana suluissa esitetty arvo korvataan tarvittavalla todellisella arvolla.
+
+  * Nykyinen päivämäärä aluekohtaisessa esitysmuodossa (DATE) 
+  * Nykyinen viikonpäivä aluekohtaisessa esitysmuodossa (WEEKDAY) 
+  * Nykyinen aika aluekohtaisessa esitysmuodossa (TIME) 
+  * Nykyinen aika muodossa joka kelpaa lisättäväksi tiedostonimeen (NOW) 
+  * Valitun tekstin sisältävä tilapäinen tiedosto polkuineen (TMP) 
+  * Tekijän nimi (AUTHOR) 
+  * Asiakirjan nimi (TITLE) 
+  * Ohjelman LibreOffice äänikirjaston polku (SOUND_GALLERY) 
+  * PNG-kuvien koodaamisessa mobiilisovelluksille käytettävän Python-komentojonon polku (CREATE_QR_LABEL_PY) 
+  * Järjestelmän komentotulkin suorittamiseen käytettävän Python-komentojonon polku (OS_PY) 
+  * Espeak-sovelluksen suorittamiseen käytettävän Python-komentojonon polku (ESPEAK_READ_TEXT_PY) 
+  * Festival-sovelluksen suorittamiseen käytettävän Python-komentojonon polku (FESTIVAL_READ_TEXT_PY) 
+  * Pico-sovelluksen suorittamiseen käytettävän Python-komentojonon polku (PICO_READ_TEXT_PY) 
+  * Speech-dispatcher -sovelluksen suorittamiseen käytettävän Python-komentojonon polku (SPD_READ_TEXT_PY) 
+  * Työkansio. Käytetään myös nimiä Tiedostot, Omat tiedostot tai kotikansio (HOME) 
+  * Sovelluksen kielikoodi: en = englanti, fi = suomi jne. (LANGUAGE_CODE) 
+  * Sovelluksen maakoodi: US = U.S.A, FI = Suomi jne. (COUNTRY_CODE) 
+  * Sovelluksen aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne. (LANGUAGE_COUNTRY_CODE) 
+  * Valinnan kielikoodi: en = englanti, fi = suomi jne. (SELECTION_LANGUAGE_CODE) 
+  * Valinnan maakoodi: US = U.S.A, FI = Suomi jne. (SELECTION_COUNTRY_CODE) 
+  * Valinnan aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne. (SELECTION_LANGUAGE_COUNTRY_CODE) 
+  * Valitun tekstin 99 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTSMALL) 
+  * Valitun tekstin 249 lensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT250) 
+  * Valitun tekstin 999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT) 
+  * Valitun tekstin 9999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTBIG)
+
