@@ -1,0 +1,7 @@
+#summary Käyttöönotto - Asentaminen
+
+= Asentaminen =
+
+  * Hanki lisäosan uusin versio ohjelman LibreOffice lisäosasivustolta. 
+  * Avaa lisäosa sovelluksessa LibreOffice. Hyväksy lisenssisopimus. 
+  * Käynnistä sovellus uudelleen. 
