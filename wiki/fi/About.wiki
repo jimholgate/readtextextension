@@ -12,7 +12,7 @@ Tämä lisäosa lukee tekstiä ulkoisen ohjelman tai internetpalvelun avulla. Va
 
 ==Kuvakaappaus==
 
-[http://sites.google.com/site/readtextextension/ http://readtextextension.googlecode.com/svn/wiki/Default64.png]
+[http://sites.google.com/site/readtextextension/ http://readtextextension.googlecode.com/svn/wiki/fi/Default64.png]
 
 ==Oppitunti==
 
