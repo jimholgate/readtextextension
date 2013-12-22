@@ -2391,7 +2391,7 @@ function fsComplexAsiaOrWest (byval sA)
 	dim sB as string
 	dim x as integer
 	&apos;Ignore numbers, basic punctuation, telephone network code and western currency symbols
-	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯₰₱₲₳₴₵₶₷₸₹₺⅓⅔⅛⅜⅝&quot;
+	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯₰₱₲₳₴₵₶₷₸₹₺⅓⅔⅛⅜⅝&quot; &amp; Chr$(10) &amp; Chr$(13)
 	sA = trim(sA)
 	for x = 1 to 100
 		if len(sA) &lt;&gt; 0 and instr (sB, left(sA,1)) &lt;&gt; 0 then
