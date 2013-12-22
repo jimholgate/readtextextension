@@ -2385,10 +2385,22 @@ function fsSelectionCountry as String
 	fsSelectionCountry=fsGetCountry
 End Function
 
-function fsComplexAsiaOrWest (sA)
+function fsComplexAsiaOrWest (byval sA)
 	dim longI as long
 	dim iLocale as integer
-	dim s1 as string
+	dim sB as string
+	dim x as integer
+	&apos;Ignore numbers, basic punctuation, telephone network code and western currency symbols
+	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯₰₱₲₳₴₵₶₷₸₹₺⅓⅔⅛⅜⅝&quot;
+	sA = trim(sA)
+	for x = 1 to 100
+		if len(sA) &lt;&gt; 0 and instr (sB, left(sA,1)) &lt;&gt; 0 then
+			sA = mid(sA,2)
+			sA = trim(sA)
+		else 
+			exit for
+		endif
+	next
 	if sA=&quot;&quot; then
 		longI=0
     	else
@@ -2445,13 +2457,17 @@ function fsComplexAsiaOrWest (sA)
 	endif
 	select case iLocale
 	case 0
-		s1=&quot;WEST&quot;
+		select case fbIsAnURL(sA)
+		case false
+			fsComplexAsiaOrWest=&quot;WEST&quot;
+		case else  &apos;
+			fsComplexAsiaOrWest=&quot;UNDEFINED&quot;
+		end select
 	case 1
-		s1=&quot;ASIA&quot;
+		fsComplexAsiaOrWest=&quot;ASIA&quot;
 	case else 
-		s1=&quot;COMPLEX&quot;
+		fsComplexAsiaOrWest=&quot;COMPLEX&quot;
 	end select
-	fsComplexAsiaOrWest = s1
 end function
 
 function fsUseLanguageType( sA,sB,sC,sD)
