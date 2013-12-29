@@ -8,4 +8,4 @@
     * [ReadClipboard Zwischenablage vorlesen]
     * [ReadSelection Markierten Text vorlesen]
   * Download
-    * [http://code.google.com/p/readtextextension/downloads/list Download]
+    * [http://extensions.openoffice.org/de/project/read-text Download]
