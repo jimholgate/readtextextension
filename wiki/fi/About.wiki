@@ -1,4 +1,4 @@
-﻿#summary Tietoja Read Text Extension - Tämä lisäosa lukee tekstiä ulkoisen ohjelman tai internetpalvelun avulla.
+ #summary Tietoja Read Text Extension - Tämä lisäosa lukee tekstiä ulkoisen ohjelman tai internetpalvelun avulla.
 
 =Tietoja=
 
@@ -8,7 +8,6 @@ Tämä lisäosa lukee tekstiä ulkoisen ohjelman tai internetpalvelun avulla. Va
 
   * [http://extensions.libreoffice.org/extension-center/read-text LibreOffice Extensions]
   * [http://extensions.services.openoffice.org/en/project/read-text Apache OpenOffice Extensions]
-  * [http://code.google.com/p/readtextextension/downloads/list Google Project Hosting]
 
 ==Kuvakaappaus==
 
