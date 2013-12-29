@@ -8,4 +8,4 @@
     * [ReadClipboard Lire le presse-papiers]
     * [ReadSelection Lire la sélection]
   * Télécharger
-    * [http://code.google.com/p/readtextextension/downloads/list Télécharger]
+    * [http://extensions.openoffice.org/fr/project/read-text Télécharger]
