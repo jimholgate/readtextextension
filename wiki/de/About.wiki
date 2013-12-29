@@ -27,4 +27,4 @@ Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Cal
   
 -----
 ===Verwandte Themen===
-[http://help.libreoffice.org/Common/Accessibility_in/de Behindertengerechter Zugang]
+[http://help.libreoffice.org/Common/Accessibility_in/de Zugänglichkeit in LibreOffice]
