@@ -8,4 +8,4 @@
     * [ReadClipboard Lue valinta]
     * [ReadSelection Lue leikepöydältä]
   * Lisätietoja
-    * [http://extensions.openoffice.org/fi/project/read-text Lisätietoja verkossa]
+    * [http://extensions.openoffice.org/en/project/read-text Lisätietoja verkossa]
