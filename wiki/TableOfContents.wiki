@@ -8,4 +8,4 @@
     * [ReadClipboard Read Clipboard]
     * [ReadSelection Read Selection]
   * Download
-    * [http://code.google.com/p/readtextextension/downloads/list Download]
+    * [http://extensions.openoffice.org/en/project/read-text Download]
