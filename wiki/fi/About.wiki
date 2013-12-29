@@ -1,4 +1,4 @@
- #summary Tietoja Read Text Extension - Tämä lisäosa lukee tekstiä ulkoisen ohjelman tai internetpalvelun avulla.
+#summary Tietoja Read Text Extension - Tämä lisäosa lukee tekstiä ulkoisen ohjelman tai internetpalvelun avulla.
 
 =Tietoja=
 
