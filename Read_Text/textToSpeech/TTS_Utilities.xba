@@ -2826,4 +2826,20 @@ function CreateFile(sFilePath, sWriteString, Optional sEncoding)
 	CreateFileError:
 	CreateFile = false
 end function
+
+function fbIsAnURL (sA)
+	if instr(sA, &quot;http:&quot;) = 1 then
+		fbIsAnURL = true
+	elseif instr(sA, &quot;ftp:&quot;) = 1 then
+		fbIsAnURL = true
+	elseif instr(sA, &quot;https:&quot;) = 1 then
+		fbIsAnURL = true
+	elseif instr(sA, &quot;ftps:&quot;) = 1 then
+		fbIsAnURL = true
+	elseif instr(sA, &quot;mailto:&quot;) = 1 then
+		fbIsAnURL = true
+	else
+		fbIsAnURL = false
+	endif
+end function
 </script:module>
