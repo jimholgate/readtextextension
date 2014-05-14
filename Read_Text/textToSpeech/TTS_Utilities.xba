@@ -2625,7 +2625,7 @@ End Function
 
 Sub myBeep
 	Dim sA As String
-	sA=soundsDirectory()&amp;&quot;apert.wav1&quot;
+	sA=soundsDirectory()&amp;&quot;apert.wav&quot;
 	if fileExists (sA) then
     	sA=convertToURL(sA)
     elseif fileExists (&quot;/usr/share/sounds/alsa/Noise.wav&quot;) then
