@@ -421,14 +421,7 @@ end Function
 
 Function fsFestivalDirectory(n) As String
 	Dim s2 as String
-	Dim s4 as String
 	Dim s1(fiCountFestivalDirectory) as String
-	s2=&quot;/usr/share/festival/&quot;
-	If fileExists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
-		s4=fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;
-	Else
-		s4=fsProgramDirectory &amp; &quot;Festival\voices\&quot;
-	EndIf
 	&apos; List of voices retrieved 2011-03-25 from 
 	&apos; http://www.cstr.ed.ac.uk/projects/festival/manual/festival_24.html
 	&apos; Incorrectly installed voices will be silent. Some instructions on 
@@ -436,34 +429,44 @@ Function fsFestivalDirectory(n) As String
 	&apos; with the latest version of Festival.
 	Select Case fsGetOS()
 	Case &quot;WINDOWS&quot;
-		s1(0)=s4 &amp; &quot;voices\telugu\telugu_NSK_diphone&quot;
-		s1(1)=s4 &amp; &quot;voices\spanish\el_diphone&quot;
-		s1(2)=s4 &amp; &quot;voices\russian\msu_ru_nsh_clunits&quot;
-		s1(3)=s4 &amp; &quot;voices\marathi\marathi_NSK_diphone&quot;
-		s1(4)=s4 &amp; &quot;voices\italian\pc_diphone&quot;
-		s1(5)=s4 &amp; &quot;voices\italian\lp_diphone&quot;	
-		s1(6)=s4 &amp; &quot;voices\hindi\hindi_NSK_diphone&quot;
-		s1(7)=s4 &amp; &quot;voices\german\german_de2_os&quot;
-		s1(8)=s4 &amp; &quot;voices\finnish\suo_fi_mv_diphone&quot;	
-		s1(9)=s4 &amp; &quot;voices\finnish\suo_fi_lj_diphone&quot;
-		s1(10)=s4 &amp; &quot;voices\english\us3_mbrola&quot;
-		s1(11)=s4 &amp; &quot;voices\english\us2_mbrola&quot;
-		s1(12)=s4 &amp; &quot;voices\english\us1_mbrola&quot;
-		s1(13)=s4 &amp; &quot;voices\english\rab_diphone&quot;
-		s1(14)=s4 &amp; &quot;voices\english\ked_diphone&quot;
-		s1(15)=s4 &amp; &quot;voices\english\kal_diphone&quot;
-		s1(16)=s4 &amp; &quot;voices\english\gsw_diphone&quot;
-		s1(17)=s4 &amp; &quot;voices\english\en1_mbrola&quot;
-		s1(18)=s4 &amp; &quot;voices\english\don_diphone&quot;
-		s1(19)=s4 &amp; &quot;voices\czech\czech_ph&quot;
-		s1(20)=s4 &amp; &quot;voices\castilian\el_diphone&quot;
-		s1(21)=s4 &amp; &quot;lib\voices\english\us3_mbrola&quot;
-		s1(22)=s4 &amp; &quot;lib\voices\english\us2_mbrola&quot;
-		s1(23)=s4 &amp; &quot;lib\voices\english\us1_mbrola&quot;
-		s1(24)=s4 &amp; &quot;lib\voices\english\en1_mbrola&quot;
-		s1(25)=s4 &amp; &quot;voices\vietnamese\wow_vi_ptn_diphone&quot;
-		s1(26)=s4 &amp; &quot;voices\vietnamese\wow_vi_liz_diphone&quot;
-	Case Else
+		If fileExists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
+			s2=fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;
+		Else
+			s2=fsProgramDirectory &amp; &quot;Festival\voices\&quot;
+		EndIf
+		s1(0)=s2 &amp; &quot;voices\telugu\telugu_NSK_diphone&quot;
+		s1(1)=s2 &amp; &quot;voices\spanish\el_diphone&quot;
+		s1(2)=s2 &amp; &quot;voices\russian\msu_ru_nsh_clunits&quot;
+		s1(3)=s2 &amp; &quot;voices\marathi\marathi_NSK_diphone&quot;
+		s1(4)=s2 &amp; &quot;voices\italian\pc_diphone&quot;
+		s1(5)=s2 &amp; &quot;voices\italian\lp_diphone&quot;	
+		s1(6)=s2 &amp; &quot;voices\hindi\hindi_NSK_diphone&quot;
+		s1(7)=s2 &amp; &quot;voices\german\german_de2_os&quot;
+		s1(8)=s2 &amp; &quot;voices\finnish\suo_fi_mv_diphone&quot;	
+		s1(9)=s2 &amp; &quot;voices\finnish\suo_fi_lj_diphone&quot;
+		s1(10)=s2 &amp; &quot;voices\english\us3_mbrola&quot;
+		s1(11)=s2 &amp; &quot;voices\english\us2_mbrola&quot;
+		s1(12)=s2 &amp; &quot;voices\english\us1_mbrola&quot;
+		s1(13)=s2 &amp; &quot;voices\english\rab_diphone&quot;
+		s1(14)=s2 &amp; &quot;voices\english\ked_diphone&quot;
+		s1(15)=s2 &amp; &quot;voices\english\kal_diphone&quot;
+		s1(16)=s2 &amp; &quot;voices\english\gsw_diphone&quot;
+		s1(17)=s2 &amp; &quot;voices\english\en1_mbrola&quot;
+		s1(18)=s2 &amp; &quot;voices\english\don_diphone&quot;
+		s1(19)=s2 &amp; &quot;voices\czech\czech_ph&quot;
+		s1(20)=s2 &amp; &quot;voices\castilian\el_diphone&quot;
+		s1(21)=s2 &amp; &quot;lib\voices\english\us3_mbrola&quot;
+		s1(22)=s2 &amp; &quot;lib\voices\english\us2_mbrola&quot;
+		s1(23)=s2 &amp; &quot;lib\voices\english\us1_mbrola&quot;
+		s1(24)=s2 &amp; &quot;lib\voices\english\en1_mbrola&quot;
+		s1(25)=s2 &amp; &quot;voices\vietnamese\wow_vi_ptn_diphone&quot;
+		s1(26)=s2 &amp; &quot;voices\vietnamese\wow_vi_liz_diphone&quot;
+		s1(27)=s2 &amp; &quot;voices\catalan\upc_ca_ona_hts&quot;
+		s1(28)=s2 &amp; &quot;voices\czech\czech_dita&quot;
+		s1(29)=s2 &amp; &quot;voices\czech\czech_krb&quot;
+		s1(30)=s2 &amp; &quot;voices\czech\czech_machac&quot;
+	case else
+		s2=&quot;/usr/share/festival/&quot;
 		s1(0)=s2 &amp; &quot;voices/telugu/telugu_NSK_diphone&quot;
 		s1(1)=s2 &amp; &quot;voices/spanish/el_diphone&quot;
 		s1(2)=s2 &amp; &quot;voices/russian/msu_ru_nsh_clunits&quot;
@@ -489,14 +492,18 @@ Function fsFestivalDirectory(n) As String
 		s1(22)=s2 &amp; &quot;lib/voices/english/us2_mbrola&quot;
 		s1(23)=s2 &amp; &quot;lib/voices/english/us1_mbrola&quot;
 		s1(24)=s2 &amp; &quot;lib/voices/english/en1_mbrola&quot;
-		s1(25)=s4 &amp; &quot;voices/vietnamese/wow_vi_ptn_diphone&quot;
-		s1(26)=s4 &amp; &quot;voices/vietnamese/wow_vi_liz_diphone&quot;
+		s1(25)=s2 &amp; &quot;voices/vietnamese/wow_vi_ptn_diphone&quot;
+		s1(26)=s2 &amp; &quot;voices/vietnamese/wow_vi_liz_diphone&quot;
+		s1(27)=s2 &amp; &quot;voices/catalan/upc_ca_ona_hts&quot;
+		s1(28)=s2 &amp; &quot;voices/czech/czech_dita&quot;
+		s1(29)=s2 &amp; &quot;voices/czech/czech_krb&quot;
+		s1(30)=s2 &amp; &quot;voices/czech/czech_machac&quot;
 	End Select
 	fsFestivalDirectory=s1(n)
 end Function
 
 Function fiCountFestivalDirectory as Integer
-	fiCountFestivalDirectory=26
+	fiCountFestivalDirectory=30
 End Function
 
 Function fsGetEspeakMbrolaLanguage(i As Integer, j As Integer) As String

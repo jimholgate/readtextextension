@@ -716,6 +716,9 @@ Sub dialog1Combo1ShowFESTIVALScripts(oDialog)
 	Next
 End Sub
 
+sub xxxxxx
+	msgbox (fsFestivalDirectory(fiCountFestivalDirectory-1))
+end sub
 
 Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 	&apos;Show the python script options
@@ -1290,11 +1293,12 @@ Sub writeScript(myscript As String,msgs() As Variant,errorCode As Integer)
 	&apos; FestCat: Speech Synthesis in Catalan using Festival
 	&apos; http://festcat.talp.cat/download/archive/README 
 	&apos; November, 2007. Accessed 2013-08-28
+	dim aFile as string
 	aFile=fsFullPathOf(fsFestivalScriptName)
-	if fsComplexAsiaOrWest(mySpeech)=&quot;WEST&quot; Then
-		fbCreateFile(aFile, mySpeech, &quot;iso-8859-15&quot;)
+	if fsComplexAsiaOrWest(myscript)=&quot;WEST&quot; Then
+		fbCreateFile(aFile, myscript, &quot;iso-8859-15&quot;)
 	else 
-		fbCreateFile(aFile, mySpeech, &quot;utf-8&quot;)
+		fbCreateFile(aFile, myscript, &quot;utf-8&quot;)
 	endif
 End Sub
 
