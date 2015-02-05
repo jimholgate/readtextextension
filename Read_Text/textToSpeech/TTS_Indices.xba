@@ -315,14 +315,10 @@ function fsGetOS() as string
 	  case 3: 
 	    fsGetOS=&quot;MAC&quot;
 	  case 4: 
-	    if Instr(Environ(&quot;URE_BOOTSTRAP&quot;),&quot;MacOS&quot;)&lt;&gt;0 then &apos; aka uname Darwin
-			fsGetOS=&quot;OSX&quot;
-		elseif  Instr(Environ(&quot;SSH_AUTH_SOCK&quot;),&quot;apple&quot;)&lt;&gt;0 then
-			fsGetOS=&quot;OSX&quot;
-		elseif  Instr(Environ(&quot;Apple_PubSub_Socket_Render&quot;),&quot;apple&quot;)&lt;&gt;0 then
-			fsGetOS=&quot;OSX&quot;
+	    if fileExists(&quot;/usr/bin/osascript&quot;) then
+			  fsGetOS=&quot;OSX&quot;
 	    else 
-			fsGetOS=&quot;UNIX&quot;
+			  fsGetOS=&quot;UNIX&quot;
 	    endif
 	  case else
 		fsGetOS=&quot;UNKNOWN&quot;	  
