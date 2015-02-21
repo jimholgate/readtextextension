@@ -6,7 +6,7 @@ OPTION EXPLICIT
 
 &apos; Copyright And License 
 
-&apos;(c)2008-2013 James Holgate Vancouver,CANADA(james_h(a)http://openofficeforum.org)
+&apos;(c)2008-2015 James Holgate Vancouver,CANADA(james_h(a)http://openofficeforum.org)
 
 &apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS
 &apos; OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION; 
@@ -43,23 +43,15 @@ Sub SetupReadTextAloud
 	Dim msgs()As Variant
 	Dim errorCode As Integer
 	ConfigureReadTextAloud()
-End Sub 
-
-Sub PresentationSpeechExample1
-	&apos; These are templates For a macro interaction in a presentation. Set up a picture To use an interaction To play the macro.
-	&apos; Right Click  the picture amd choose Interaction... &gt; Action at Mouse Click &gt; Macro, Browse To the macro.
-	&apos; Then,during the presentation,the user can click the picture To play the text.
-	MsgSpeak(&quot;Yes, that is correct.&quot;)
 End Sub
 
-Sub PresentationSpeechExample2
-	MsgSpeak(&quot;No, that is incorrect.&quot;)
-End Sub
-
-Sub webHelp
+Sub webHelp (optional sURL)
 	Dim oSvc As Object
+	if ismissing (sURL) then
+		fsDialogMyRegion(fiL10nHELP_ONLINE_URL)
+	endif
 	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
-	oSvc.execute(fsDialogMyRegion(fiL10nHELP_ONLINE_URL),&quot;&quot;,0)
+	oSvc.execute(sURL,&quot;&quot;,0)
 End Sub
 
 Sub ReadClipBoard

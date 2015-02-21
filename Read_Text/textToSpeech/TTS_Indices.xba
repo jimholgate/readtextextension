@@ -31,8 +31,8 @@ Function fsExtensionVersion As String
 		Endif
 	Wend
 	Close #iNumber
-	s2=Mid(sLine,Instr(s2,chr(34))+1)
-	fsExtensionVersion=Left(s2,Instr(s2,chr(34))-1)				
+	s2=Mid(sLine,Instr(s2,&quot;&quot;&quot;&quot;)+1)
+	fsExtensionVersion=Left(s2,Instr(s2,&quot;&quot;&quot;&quot;)-1)				
 End Function
 
 Function fsPosterPng as String
@@ -314,11 +314,11 @@ function fsGetOS() as string
 	    fsGetOS=&quot;WINDOWS&quot;
 	  case 3: 
 	    fsGetOS=&quot;MAC&quot;
-	  case 4: 
-	    if fileExists(&quot;/usr/bin/osascript&quot;) then
-			  fsGetOS=&quot;OSX&quot;
+	  case 4
+	    if fileexists (&quot;/usr/bin/osascript&quot;) then
+			fsGetOS=&quot;OSX&quot;
 	    else 
-			  fsGetOS=&quot;UNIX&quot;
+			fsGetOS=&quot;UNIX&quot;
 	    endif
 	  case else
 		fsGetOS=&quot;UNKNOWN&quot;	  
@@ -365,63 +365,44 @@ Function fsDialogSysRegion (i As Integer) As String
 End Function
 
 Function fsMediaPlayer(i As Integer) As String
-	Dim sMedia(fiCountMediaPlayers) As String
-	sMedia(0)=&quot;/usr/bin/bangarang&quot;
-	sMedia(1)=&quot;/usr/bin/exaile&quot;
-	sMedia(2)=&quot;/usr/bin/ffplay&quot;
-	sMedia(3)=&quot;/usr/bin/gmplayer&quot;
-	sMedia(4)=&quot;/usr/bin/gnome-open&quot;
-	sMedia(5)=&quot;/usr/bin/kaffeine&quot;
-	sMedia(6)=&quot;/usr/bin/kde-open&quot;
-	sMedia(7)=&quot;/usr/bin/kplayer&quot;
-	sMedia(8)=&quot;/usr/bin/mpg123&quot;
-	sMedia(9)=&quot;/usr/bin/mpg321&quot;
-	sMedia(10)=&quot;/usr/bin/mplayer&quot;
-	sMedia(11)=&quot;/usr/bin/noatun&quot;
-	sMedia(12)=&quot;/usr/bin/parole&quot;
-	sMedia(13)=&quot;/usr/bin/sensible-browser&quot;
-	sMedia(14)=&quot;/usr/bin/totem&quot;
-	sMedia(15)=&quot;/usr/bin/xdg-open&quot;
-	sMedia(16)=&quot;/usr/bin/xfmedia&quot;
-	sMedia(17)=&quot;/usr/bin/xine&quot;
-	sMedia(18)=&quot;/usr/bin/xmms&quot;
-	sMedia(19)=&quot;audacity&quot;
-	sMedia(20)=&quot;chrome&quot;
-	sMedia(21)=&quot;chromium&quot;
-	sMedia(22)=&quot;firefox&quot;
-	sMedia(23)=&quot;iceweasel&quot;
-	sMedia(24)=&quot;iexplore&quot;
-	sMedia(25)=&quot;opera&quot;
-	sMedia(26)=&quot;quicktimeplayer.exe&quot;
-	sMedia(27)=&quot;vlc&quot;
-	sMedia(28)=&quot;winamp&quot;
-	sMedia(29)=&quot;wmplayer&quot;
-    fsMediaPlayer=Lcase(sMedia(i))
+	Dim aA
+	Dim sA as string
+	sA = &quot;/usr/bin/bangarang,/usr/bin/exail,/usr/bin/ffpla,/usr/bin/gmplayer,/usr/bin/gnome-open,/usr/bin/kaffeine,/usr/bin/kde-open,/usr/bin/kplayer,/usr/bin/mpg123,/usr/bin/mpg321,/usr/bin/mplayer,/usr/bin/noatun,/usr/bin/parole,/usr/bin/sensible-browser,/usr/bin/totem,/usr/bin/xdg-open,/usr/bin/xfmedia,/usr/bin/xine,/usr/bin/xmms,audacity,chrome,chromium,firefox,iceweasel,iexplore,opera,quicktimeplayer.exe,vlc,winamp,wmplayer,,&quot;
+	aA = split (sA, &quot;,&quot;)
+    fsMediaPlayer= aA(i)
 End Function
 
 Function fiCountMediaPlayers As Integer
-	fiCountMediaPlayers=29
+	dim n as integer
+	for n = 0 to 40
+		if fsMediaPlayer(n) = &quot;&quot; then
+			exit for
+		else
+			fiCountMediaPlayers=n
+		endif
+	next
 End Function
 
-Function fsSubStringToRight(x,y)
-	While Instr (x,y)
-		x=Right((x),Len(x)-Instr(x,y),Len(x))
-	Wend
-	fsSubStringToRight=x 
+Function fsSubStringToRight(byval x,byval y)
+	dim a1
+	dim z as string
+	z = x
+	if instr(x,y) then
+		a1 = split(x,y)
+		z = a1(ubound(a1))
+	endif
+	fsSubStringToRight = z	
 end Function
 
 Function fsFestivalVoice(n)
 	Dim x as String
-	&apos;Linux, OSX
-	x=fsSubStringToRight(fsFestivalDirectory(n),&quot;/&quot;)
-	&apos;Windows
-	x=fsSubStringToRight(x,&quot;\&quot;)
-	fsFestivalVoice=x
+	x=converttourl(fsFestivalDirectory(n))
+	fsFestivalVoice = fsSubStringToRight(x,&quot;/&quot;)
 end Function
 
 Function fsFestivalDirectory(n) As String
-	Dim s2 as String
-	Dim s1(fiCountFestivalDirectory) as String
+	Dim s1, s2 as String
+	Dim a1
 	&apos; List of voices retrieved 2011-03-25 from 
 	&apos; http://www.cstr.ed.ac.uk/projects/festival/manual/festival_24.html
 	&apos; Incorrectly installed voices will be silent. Some instructions on 
@@ -430,80 +411,58 @@ Function fsFestivalDirectory(n) As String
 	Select Case fsGetOS()
 	Case &quot;WINDOWS&quot;
 		If fileExists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
-			s2=fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;
+			s2 = converttourl(fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;)
 		Else
-			s2=fsProgramDirectory &amp; &quot;Festival\voices\&quot;
+			s2 = converttourl(fsProgramDirectory &amp; &quot;Festival\voices\&quot;)
 		EndIf
-		s1(0)=s2 &amp; &quot;voices\telugu\telugu_NSK_diphone&quot;
-		s1(1)=s2 &amp; &quot;voices\spanish\el_diphone&quot;
-		s1(2)=s2 &amp; &quot;voices\russian\msu_ru_nsh_clunits&quot;
-		s1(3)=s2 &amp; &quot;voices\marathi\marathi_NSK_diphone&quot;
-		s1(4)=s2 &amp; &quot;voices\italian\pc_diphone&quot;
-		s1(5)=s2 &amp; &quot;voices\italian\lp_diphone&quot;	
-		s1(6)=s2 &amp; &quot;voices\hindi\hindi_NSK_diphone&quot;
-		s1(7)=s2 &amp; &quot;voices\german\german_de2_os&quot;
-		s1(8)=s2 &amp; &quot;voices\finnish\suo_fi_mv_diphone&quot;	
-		s1(9)=s2 &amp; &quot;voices\finnish\suo_fi_lj_diphone&quot;
-		s1(10)=s2 &amp; &quot;voices\english\us3_mbrola&quot;
-		s1(11)=s2 &amp; &quot;voices\english\us2_mbrola&quot;
-		s1(12)=s2 &amp; &quot;voices\english\us1_mbrola&quot;
-		s1(13)=s2 &amp; &quot;voices\english\rab_diphone&quot;
-		s1(14)=s2 &amp; &quot;voices\english\ked_diphone&quot;
-		s1(15)=s2 &amp; &quot;voices\english\kal_diphone&quot;
-		s1(16)=s2 &amp; &quot;voices\english\gsw_diphone&quot;
-		s1(17)=s2 &amp; &quot;voices\english\en1_mbrola&quot;
-		s1(18)=s2 &amp; &quot;voices\english\don_diphone&quot;
-		s1(19)=s2 &amp; &quot;voices\czech\czech_ph&quot;
-		s1(20)=s2 &amp; &quot;voices\castilian\el_diphone&quot;
-		s1(21)=s2 &amp; &quot;lib\voices\english\us3_mbrola&quot;
-		s1(22)=s2 &amp; &quot;lib\voices\english\us2_mbrola&quot;
-		s1(23)=s2 &amp; &quot;lib\voices\english\us1_mbrola&quot;
-		s1(24)=s2 &amp; &quot;lib\voices\english\en1_mbrola&quot;
-		s1(25)=s2 &amp; &quot;voices\vietnamese\wow_vi_ptn_diphone&quot;
-		s1(26)=s2 &amp; &quot;voices\vietnamese\wow_vi_liz_diphone&quot;
-		s1(27)=s2 &amp; &quot;voices\catalan\upc_ca_ona_hts&quot;
-		s1(28)=s2 &amp; &quot;voices\czech\czech_dita&quot;
-		s1(29)=s2 &amp; &quot;voices\czech\czech_krb&quot;
-		s1(30)=s2 &amp; &quot;voices\czech\czech_machac&quot;
-	case else
-		s2=&quot;/usr/share/festival/&quot;
-		s1(0)=s2 &amp; &quot;voices/telugu/telugu_NSK_diphone&quot;
-		s1(1)=s2 &amp; &quot;voices/spanish/el_diphone&quot;
-		s1(2)=s2 &amp; &quot;voices/russian/msu_ru_nsh_clunits&quot;
-		s1(3)=s2 &amp; &quot;voices/marathi/marathi_NSK_diphone&quot;
-		s1(4)=s2 &amp; &quot;voices/italian/pc_diphone&quot;
-		s1(5)=s2 &amp; &quot;voices/italian/lp_diphone&quot;
-		s1(6)=s2 &amp; &quot;voices/hindi/hindi_NSK_diphone&quot;
-		s1(7)=s2 &amp; &quot;voices/german/german_de2_os&quot;
-		s1(8)=s2 &amp; &quot;voices/finnish/suo_fi_mv_diphone&quot;
-		s1(9)=s2 &amp; &quot;voices/finnish/suo_fi_lj_diphone&quot;
-		s1(10)=s2 &amp; &quot;voices/english/us3_mbrola&quot;
-		s1(11)=s2 &amp; &quot;voices/english/us2_mbrola&quot;
-		s1(12)=s2 &amp; &quot;voices/english/us1_mbrola&quot;
-		s1(13)=s2 &amp; &quot;voices/english/rab_diphone&quot;
-		s1(14)=s2 &amp; &quot;voices/english/ked_diphone&quot;
-		s1(15)=s2 &amp; &quot;voices/english/kal_diphone&quot;
-		s1(16)=s2 &amp; &quot;voices/english/gsw_diphone&quot;
-		s1(17)=s2 &amp; &quot;voices/english/en1_mbrola&quot;
-		s1(18)=s2 &amp; &quot;voices/english/don_diphone&quot;
-		s1(19)=s2 &amp; &quot;voices/czech/czech_ph&quot;
-		s1(20)=s2 &amp; &quot;voices/castilian/el_diphone&quot;
-		s1(21)=s2 &amp; &quot;lib/voices/english/us3_mbrola&quot;
-		s1(22)=s2 &amp; &quot;lib/voices/english/us2_mbrola&quot;
-		s1(23)=s2 &amp; &quot;lib/voices/english/us1_mbrola&quot;
-		s1(24)=s2 &amp; &quot;lib/voices/english/en1_mbrola&quot;
-		s1(25)=s2 &amp; &quot;voices/vietnamese/wow_vi_ptn_diphone&quot;
-		s1(26)=s2 &amp; &quot;voices/vietnamese/wow_vi_liz_diphone&quot;
-		s1(27)=s2 &amp; &quot;voices/catalan/upc_ca_ona_hts&quot;
-		s1(28)=s2 &amp; &quot;voices/czech/czech_dita&quot;
-		s1(29)=s2 &amp; &quot;voices/czech/czech_krb&quot;
-		s1(30)=s2 &amp; &quot;voices/czech/czech_machac&quot;
+	Case Else
+		s2 =  converttourl(&quot;/usr/share/festival/&quot;)
 	End Select
-	fsFestivalDirectory=s1(n)
+	s1 = s2 &amp; &quot;lib/voices/english/en1_mbrola,&quot; &amp; _
+		s2 &amp; &quot;lib/voices/english/us1_mbrola,&quot; &amp; _
+		s2 &amp; &quot;lib/voices/english/us2_mbrola,&quot; &amp; _
+		s2 &amp; &quot;lib/voices/english/us3_mbrola,&quot; &amp; _
+		s2 &amp; &quot;voices/castilian/el_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/catalan/upc_ca_ona_hts,&quot; &amp; _
+		s2 &amp; &quot;voices/czech/czech_dita,&quot; &amp; _
+		s2 &amp; &quot;voices/czech/czech_krb&quot;  &amp; &quot;,&quot; &amp; _
+		s2 &amp; &quot;voices/czech/czech_machac,&quot; &amp; _
+		s2 &amp; &quot;voices/czech/czech_ph,&quot; &amp; _
+		s2 &amp; &quot;voices/english/don_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/english/en1_mbrola,&quot; &amp; _
+		s2 &amp; &quot;voices/english/gsw_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/english/kal_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/english/ked_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/english/rab_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/english/us1_mbrola,&quot; &amp; _
+		s2 &amp; &quot;voices/english/us2_mbrola,&quot; &amp; _
+		s2 &amp; &quot;voices/english/us3_mbrola,&quot; &amp; _
+		s2 &amp; &quot;voices/finnish/suo_fi_lj_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/finnish/suo_fi_mv_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/german/german_de2_os,&quot; &amp; _
+		s2 &amp; &quot;voices/hindi/hindi_NSK_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/italian/lp_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/italian/pc_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/marathi/marathi_NSK_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/russian/msu_ru_nsh_clunits,&quot; &amp; _
+		s2 &amp; &quot;voices/spanish/el_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/telugu/telugu_NSK_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/vietnamese/wow_vi_liz_diphone,&quot; &amp; _
+		s2 &amp; &quot;voices/vietnamese/wow_vi_ptn_diphone,&quot; &amp; _
+		&quot;,,,,&quot;
+	a1 = split (s1,&quot;,&quot;)
+	fsFestivalDirectory=convertfromurl(a1(n))
 end Function
 
-Function fiCountFestivalDirectory as Integer
-	fiCountFestivalDirectory=30
+Function fiCountFestivalDirectory As Integer
+	dim n as integer
+	for n = 0 to 40
+		if fsFestivalDirectory(n) = &quot;&quot; then
+			exit for
+		else
+			fiCountFestivalDirectory=n
+		endif
+	next
 End Function
 
 Function fsGetEspeakMbrolaLanguage(i As Integer, j As Integer) As String
@@ -755,7 +714,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Toets&quot;
 		sL10N(15)=&quot;Kon nie die program.&quot;
 		sL10N(16)=&quot;String kan nie ontleed word!&quot;
@@ -778,7 +737,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;управление&quot;
 		sL10N(12)=&quot;Скрипт&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Тест&quot;
 		sL10N(15)=&quot;Не може да намерите на програмата.&quot;
 		sL10N(16)=&quot;String не може да се анализира!&quot;
@@ -801,7 +760,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Comando&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Prova&quot;
 		sL10N(15)=&quot;No s&apos;ha pogut localitzar el programa.&quot;
 		sL10N(16)=&quot;La cadena no pot ser analitzat!&quot;
@@ -824,7 +783,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot; 
 		sL10N(11)=&quot;Příkaz&quot; 
 		sL10N(12)=&quot;Script&quot; 
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot; 
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot; 
 		sL10N(14)=&quot;Test&quot; 
 		sL10N(15)=&quot;Nelze najít programu.&quot;
 		sL10N(16)=&quot;Řetězec nelze analyzovat!&quot;
@@ -847,7 +806,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Kunne ikke finde programmet.&quot;
 		sL10N(16)=&quot;String ikke kan analyseres!&quot;
@@ -874,7 +833,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot; &apos; &quot;OK&quot;
 		sL10N(11)=&quot;Befehl&quot; &apos; &quot;Command&quot; &apos;For &quot;Browse&quot;, the German is &quot;Durchsuchen&quot;
 		sL10N(12)=&quot;Script&quot; &apos; &quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot; &apos; &quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot; &apos; &quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot; &apos; &quot;Test&quot;
 		sL10N(15)=&quot;Programm nicht auffindbar.&quot; &apos; &quot;Could not locate the program. &quot;
 		sL10N(16)=&quot;Zeichenkette kann nicht analysiert werden!&quot; &apos; &quot;String cannot be analyzed!&quot;
@@ -897,7 +856,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Εντολή&quot;
 		sL10N(12)=&quot;Σενάριο&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Δοκιμή&quot;
 		sL10N(15)=&quot;Δεν μπόρεσα να βρώ το πρόγραμμα.&quot;
 		sL10N(16)=&quot;String δεν μπορεί να αναλυθεί!&quot;
@@ -920,7 +879,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;Aceptar&quot;
 		sL10N(11)=&quot;Comando&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Prueba&quot;
 		sL10N(15)=&quot;No se encontró el programa.&quot;
 		sL10N(16)=&quot;La secuencia no se puede analizar!&quot;
@@ -930,7 +889,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(20)=&quot;Propiedades de voz&quot;
 		sL10N(21)=&quot;Panel de control&quot;
 	Case &quot;fr&quot; &apos;French
-		sL10N(0)=&quot;L&apos;extension Read Text&quot;
+		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Application externe&quot;
 		sL10N(2)=&quot;Utiliser Festival avec un script&quot;
 		sL10N(3)=&quot;Le script du Festival&quot;
@@ -943,7 +902,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Commande&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot; 
 		sL10N(15)=&quot;Application externe inconnue.&quot;
 		sL10N(16)=&quot;Une fonction BASIC ne peut pas analyser une chaîne de caractères.&quot;
@@ -951,7 +910,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(18)=&quot;http://code.google.com/p/readtextextension/wiki/About?wl=fr&quot;
 		sL10N(19)=&quot;Outils en ligne&quot;
 		sL10N(20)=&quot;Propriétés de la synthèse vocale&quot;
-		sL10N(21)=&quot;Paramètres du système&quot;
+		sL10N(21)=&quot;Préférences système&quot;
 	Case &quot;et&quot; &apos;Estonian
 		sL10N(0)=&quot;Read Text&quot;
 		sL10N(1)=&quot;Väline programm&quot;
@@ -966,7 +925,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Käsk&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Testi&quot;
 		sL10N(15)=&quot;Ei leia programmi.&quot;
 		sL10N(16)=&quot;String ei saa analüüsida!&quot;
@@ -989,7 +948,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Komento&quot;
 		sL10N(12)=&quot;Komentojono&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Koekuuntele&quot;
 		sL10N(15)=&quot;Ohjelma ei ole käytettävissä.&quot;
 		sL10N(16)=&quot;Merkkijonoa ei voida tulkita&quot;
@@ -1012,7 +971,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Msgstr&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Tástáil&quot;
 		sL10N(15)=&quot;Níorbh fhéidir teacht ar an gclár.&quot;
 		sL10N(16)=&quot;Ní féidir anailís a dhéanamh String!&quot;
@@ -1035,7 +994,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;ठीक है&quot;
 		sL10N(11)=&quot;कमान&quot;
 		sL10N(12)=&quot;स्क्रिप्ट&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;परीक्षण&quot;
 		sL10N(15)=&quot;मैं प्रोग्राम को नहीं ढूँढ सकते है.&quot;
 		sL10N(16)=&quot;मैं स्ट्रिंग का विश्लेषण नहीं कर सकता है!&quot;
@@ -1058,7 +1017,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Parancs&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Teszt&quot;
 		sL10N(15)=&quot;Nem találom a programot.&quot;
 		sL10N(16)=&quot;String nem lehet elemezni!&quot;
@@ -1085,7 +1044,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Perintah&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Tidak dapat menemukan program.&quot;
 		sL10N(16)=&quot;String tidak dapat dianalisis!&quot;
@@ -1108,7 +1067,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Gat ekki fundið forritið.&quot;
 		sL10N(16)=&quot;String er ekki hægt að greina!&quot;
@@ -1131,7 +1090,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Ordine&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot; 
 		sL10N(15)=&quot;External Application sconosciuto. &quot;
 		sL10N(16)=&quot;Una funzione BASIC non può analizzare una stringa.&quot;
@@ -1154,7 +1113,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;コマンド&quot;
 		sL10N(12)=&quot;スクリプト&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;テスト&quot; 
 		sL10N(15)=&quot;プログラムを見つけることができませんでした&quot;
 		sL10N(16)=&quot;文字列を解析することはできません！&quot;
@@ -1177,7 +1136,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;확인&quot;
 		sL10N(11)=&quot;명령&quot;
 		sL10N(12)=&quot;스크립트&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;테스트&quot;
 		sL10N(15)=&quot;프로그램을 찾을 수 없습니다.&quot;
 		sL10N(16)=&quot;문자열을 분석할 수 없어!&quot;
@@ -1200,7 +1159,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Komandu&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Nevarēja atrast programmu.&quot;
 		sL10N(16)=&quot;Stīgu nevar analizēt!&quot;
@@ -1223,7 +1182,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;Gerai&quot;
 		sL10N(11)=&quot;Komanda&quot;
 		sL10N(12)=&quot;Scenarijus&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Testas&quot;
 		sL10N(15)=&quot;Nepavyksta rasti programos&quot;
 		sL10N(16)=&quot;Styginių negali būti analizuojamas!&quot;
@@ -1246,7 +1205,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Kmand&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Ma kellekx jillokalizza l-programm.&quot;
 		sL10N(16)=&quot;String ma jistgħux jiġu analizzati!&quot;
@@ -1269,7 +1228,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Kan niet vinden het programma.&quot;
 		sL10N(16)=&quot;String kan niet worden geanalyseerd!&quot;
@@ -1292,7 +1251,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Nie można odnaleźć programu.&quot;
 		sL10N(16)=&quot;Napis nie może być analizowana!&quot;
@@ -1315,7 +1274,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Ordem&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Teste&quot;
 		sL10N(15)=&quot;Desconhecido aplicativo externo.&quot;
 		sL10N(16)=&quot;Uma função básica não é possível analisar uma seqüência.&quot;
@@ -1338,7 +1297,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Nu am putut localiza programul.&quot;
 		sL10N(16)=&quot;String nu poate fi analizată!&quot;
@@ -1361,7 +1320,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot; 
 		sL10N(11)=&quot;Заказать&quot; 
 		sL10N(12)=&quot;Сценарий&quot; 
-		sL10N(13)=&quot;(с) 2008-2013 James Holgate&quot; 
+		sL10N(13)=&quot;(с) 2008-2015 James Holgate&quot; 
 		sL10N(14)=&quot;Тест&quot;
 		sL10N(15)=&quot;Наружное применение неизвестно&quot;
 		sL10N(16)=&quot;Основная функция не может разобрать строку&quot;
@@ -1384,7 +1343,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Príkaz&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Nemožno nájsť program.&quot;
 		sL10N(16)=&quot;Reťazec nemožno analyzovať!&quot;
@@ -1407,7 +1366,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Ni bilo mogoče najti program.&quot;
 		sL10N(16)=&quot;Niz ne more biti analizirana!&quot;
@@ -1430,7 +1389,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Kommando&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Kunde inte hitta programmet.&quot;
 		sL10N(16)=&quot;Kan Sträng inte analyseras!&quot;
@@ -1457,7 +1416,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Hindi mahanap ang programa.&quot;
 		sL10N(16)=&quot;String ay hindi maaaring aralan!&quot;
@@ -1480,7 +1439,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;Tamam&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Programı bulunamıyor.&quot;
 		sL10N(16)=&quot;String analiz olamaz!&quot;
@@ -1507,7 +1466,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Команда&quot;
 		sL10N(12)=&quot;Сценарій &quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Тест&quot;
 		sL10N(15)=&quot;Неможливо знайти програму. &quot;
 		sL10N(16)=&quot;Рядок не може бути проаналізована!&quot;
@@ -1530,7 +1489,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;確定&quot;
 		sL10N(11)=&quot;命令&quot;
 		sL10N(12)=&quot;腳本&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;測試&quot;  
 		sL10N(15)=&quot;宏無法找到該程序.&quot;
 		sL10N(16)=&quot;宏無法讀取的字符串正確！&quot;
@@ -1553,7 +1512,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;确定&quot; 
 		sL10N(11)=&quot;命令&quot; 
 		sL10N(12)=&quot;脚本&quot; 
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;测试&quot; 
 		sL10N(15)=&quot;宏无法找到该程序.&quot; 
 		sL10N(16)=&quot;宏无法读取的字符串正确！&quot;
@@ -1580,7 +1539,7 @@ Function fsStringLanguage(i As Integer, b As String) As String
 		sL10N(10)=&quot;OK&quot;
 		sL10N(11)=&quot;Command&quot;
 		sL10N(12)=&quot;Script&quot;
-		sL10N(13)=&quot;© 2008-2013 James Holgate&quot;
+		sL10N(13)=&quot;© 2008-2015 James Holgate&quot;
 		sL10N(14)=&quot;Test&quot;
 		sL10N(15)=&quot;Could not locate the program. &quot;
 		sL10N(16)=&quot;String cannot be analyzed!&quot;
@@ -1592,7 +1551,6 @@ Function fsStringLanguage(i As Integer, b As String) As String
 	End Select
 	fsStringLanguage=sL10N(i)
 End Function
-
 
 Function fsDateMyRegion(i As Integer) As String
 	Dim sL10N As String
@@ -1634,16 +1592,15 @@ End Function
 Function fsTimeMyRegion(i As Integer) As String
 	Dim sL10N As String
 	Select Case fsGetLanguage()
-
 	Case &quot;es&quot;  &apos;la 1 y 40 de la mañana; las 2 y 40 de la tarde
 		If Hour(NOW)=0 Then
-			sL10N=&quot;medionoche&quot; &amp; &quot; y &quot; &amp; Minute(NOW) 
+			sL10N=&quot;medionoche y &quot; &amp; Minute(NOW) 
 		Elseif Hour(NOW)=1 Then
 			sL10N=&quot;la &quot; &amp; Hour(NOW) &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la mañana&quot;
 		Elseif Hour(NOW) &lt; 12 Then
 			sL10N=&quot;las &quot; &amp; Hour(NOW) &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la mañana&quot;
 		Elseif Hour(NOW)=12 Then
-			sL10N=&quot;mediodia&quot; &amp; &quot; y &quot; &amp; Minute(NOW) 
+			sL10N=&quot;mediodia y &quot; &amp; Minute(NOW) 
 		Elseif Hour(NOW)=13 Then 
 			sL10N=&quot;la &quot; &amp; Hour(NOW) Mod 12 &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la tarde&quot;
 		Elseif Hour(NOW) &lt; 20 Then 

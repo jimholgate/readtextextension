@@ -55,7 +55,7 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 		Else
 			config(fiFestivalPath)=fsProgramDirectory &amp; &quot;festival\festival.exe&quot;
 		Endif
-		config(fiFestivalComboChoice)=&quot;(tts&quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) &amp; &quot;nil) (quit)&quot;
+		config(fiFestivalComboChoice)=&quot;(tts&quot;&quot;(TMP)&quot;&quot;nil) (quit)&quot;
 		config(fiExternalOption)=True
 		config(fiHtmlOption)=False
 		config(fiHtmlComboURL)=&quot;http://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
@@ -66,17 +66,28 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 	Else &apos; *n*x or Mac
 		config(fiFestivalOption)=False
 		config(fiFestivalPath)=&quot;/usr/bin/festival&quot;
-		config(fiFestivalComboChoice)=&quot;(tts&quot; &amp; Chr$(34) &amp; &quot;(TMP)&quot; &amp; Chr$(34) &amp; &quot; nil) (quit)&quot;
+		config(fiFestivalComboChoice)=&quot;(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
 		config(fiExternalOption)=True
 		config(fiHtmlOption)=False
 		config(fiHtmlComboURL)=&quot;http://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
 		If fsGetOS()=&quot;UNIX&quot; Then &apos; Linux
-			config(fiExternalProgramPath)=&quot;/usr/bin/python&quot;
-			config(fiExternalCommand)=Chr(34) &amp; &quot;(ESPEAK_READ_TEXT_PY)&quot; &amp; Chr(34) &amp; _
-				&quot; --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false &quot; &amp; Chr$(34) &amp;  &quot;(TMP)&quot; &amp; Chr(34)
+			if fileexists(&quot;/usr/bin/python2.7&quot;) then
+				config(fiExternalProgramPath)=&quot;/usr/bin/python2.7&quot;
+			elseif fileexists(&quot;/usr/bin/python2&quot;) then
+				config(fiExternalProgramPath)=&quot;/usr/bin/python2&quot;
+			else
+				config(fiExternalProgramPath)=&quot;/usr/bin/python&quot;
+			endif
+			If fileexists(&quot;/usr/bin/pico2wave&quot;) then 
+				config(fiExternalCommand)=&quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
+			Else
+				config(fiExternalCommand)=&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
+			Endif
 		Else &apos;Mac (OSX)
 			config(fiExternalProgramPath)= AppleScriptPath()
-			config(fiExternalCommand)=Chr$(34) &amp; &quot;(SAY_APPLESCRIPT)&quot; &amp; Chr$(34)
+			config(fiExternalCommand)=&quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
 		Endif
 		config(fiAlwaysShowDialogCheckBox)=1 
 		config(fiDialogLanguageCombo)=fsGetLanguage()
@@ -129,7 +140,7 @@ sub tts_config_writeFile(config() As Variant,byval configFilePath As String)
 	&apos; This function updated 2013-08-29 - always write as UTF-8
 	dim sA as string
 	dim CR as string
-	CR = chr$(10)
+	CR = Chr$(10)
 	sA = &quot;# Configuration file For Read Text Extension&quot; &amp; CR
 	sA = fsKeyUSE_FESTIVAL_BOOLEAN &amp; &quot;=&quot; _
 		&amp; fsTts_util_booleanToString(config(fiFestivalOption)) &amp; CR
@@ -173,8 +184,8 @@ Sub tts_config_parseFile(byval configFilePath As String,_
 	dim value as string
 	dim n1 as integer
 	dim n2 as integer
-	CR = chr$(13)
-	CR2 = chr$(10)
+	CR = Chr$(13)
+	CR2 = Chr$(10)
 	sA = getTextFromFile(configFilePath, &quot;UTF-8&quot;)
 	if instr(sA, CR2) &lt; instr(sA, CR) then
 		&apos; choose character return or line feed
@@ -227,7 +238,7 @@ function fsSuperTrim (byval sA )
 	&apos; Remove extra line feeds and character returns
 	dim n as integer
 	for n = 1 to 100
-		if right(sA, 1) = chr(10) or right(sA, 1) = chr(13) then
+		if right(sA, 1) = Chr$(10) or right(sA, 1) = Chr$(13) then
 			sA = left(sA, len(sA) - 1 )
 			sA = trim (sA)
 		else
@@ -235,7 +246,7 @@ function fsSuperTrim (byval sA )
 		endif
 	next
 	for n = 1 to 100
-		if left(sA, 1) = chr(10) or left(sA, 1) = chr(13) then
+		if left(sA, 1) = Chr$(10) or left(sA, 1) = Chr$(13) then
 			sA = mid(sA, 2 )
 			sA = trim (sA)
 		else
@@ -244,69 +255,6 @@ function fsSuperTrim (byval sA )
 	next
 	fsSuperTrim = sA
 end function
-
-Sub tts_config_parseFilex(byval configFilePath As String,_
-						  config() As Variant,_
-						  errorCode As Integer)
-	&apos; Parses the configuration file into an array.
-	&apos; 
-	&apos; Parameters:
-	&apos; configFilePath (in) The path To the configuration file
-	&apos; config() (in out) The configuration settings To update with settings
-	&apos;                   from the file.
-	&apos; errorCode (in out) The Error parameter.
-	&apos;
-	&apos; File handle
-	Dim fh As Integer: fh=freeFile()
-	
-	Dim l As String
-	Dim key As String
-	Dim value As String
-	open configFilePath For input As #fh
-	do While Not Eof(fh)
-		line input #fh,l
-		tts_config_parseLine(l,key,value)
-
-		If Len(key) &gt; 0 Then
-			Select Case key
-				
-			Case fsKeyUSE_FESTIVAL_BOOLEAN 
-				config(fiFestivalOption)=fbTts_util_stringToBoolean(value)
-				
-			Case fsKeyFESTIVAL_PATH_STRING
-				config(fiFestivalPath)=value
-				
-			Case fsKeyFESTIVAL_SCRIPT_STRING 
-				config(fiFestivalComboChoice)=value
-				
-			Case fsKeyUSE_ESPEAK_BOOLEAN
-				config(fiExternalOption)=fbTts_util_stringToBoolean(value)
-
-			Case fsKeyESPEAK_PATH_STRING
-				config(fiExternalProgramPath)=value
-
-			Case fsKeyESPEAK_COMMANDS_STRING
-				config(fiExternalCommand)=value
-			
-			Case fsKeyUSE_HTML_BOOLEAN
-				config(fiHtmlOption)=fbTts_util_stringToBoolean(value)
-			
-			Case fsKeyHTML_STRING
-				config(fiHtmlComboURL)=value
-			
-			Case fsKeyDISPLAY_INFO_INTEGER
-				config(fiAlwaysShowDialogCheckBox)=fiStringToInteger(value)	
-				
-			Case fsKeyDISPLAY_LANGUAGE_STRING
-				config(fiDialogLanguageCombo)=value				
-			Case Else
-				
-			End Select
-		Endif
-	loop
-	close #fh
-	
-End Sub
 
 Function fsRetrieveCalcActiveCellProperty(strA) As String
 	&apos; Modified from Sub from: Paolo Mantovani 
