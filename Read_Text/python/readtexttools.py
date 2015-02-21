@@ -269,6 +269,9 @@ def Wav2Media(sB,sTMP1,sIMG1,sOUT1,sAUDIBLE,sVISIBLE):
     if sAUDIBLE.lower()=="false":
       print 'Play is set to false, so the file will not play.'
       print "The program saved the file to:  "+sOUT1
+      if os.path.isfile("/usr/bin/notify-send"):
+        s1 = 'notify-send "Read Text" "'+sOUT1+'"'
+        myossystem(s1)
     else:
       #Play the file
       if sVISIBLE.lower()=="false" and sTMP1EXT not in ".avi;.flv;.webm;.m4v;.mov;.mpg;.mp4;.wmv":
@@ -279,6 +282,9 @@ def Wav2Media(sB,sTMP1,sIMG1,sOUT1,sAUDIBLE,sVISIBLE):
   except IOError,err:
     print >>sys.stderr, "Read Text Tools execution failed"
     print str(err)
+    if os.path.isfile("/usr/bin/notify-send"):
+      s1 = 'notify-send "Read Text" "python error"'
+      myossystem(s1)
     sys.exit(2)
 
 def getTempPrefix():

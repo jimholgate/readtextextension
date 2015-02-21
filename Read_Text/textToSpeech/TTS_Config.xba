@@ -12,6 +12,7 @@ Sub ConfigureReadTextAloud
 	Dim errorCode As Integer 
 	Dim config(fiCountConfigOptions) As Variant
 		&apos; Open up the dialog
+	CheckUnixSpeech
 	DialogLibraries.LoadLibrary( &quot;textToSpeech&quot; )
 	f_dlgSpeechSetup=CreateUnoDialog( DialogLibraries.textToSpeech.Dialog1 )
 	If fbHelpIsInstalled Then
@@ -203,14 +204,14 @@ Sub AboutAddOn (config() As Variant, myText As String)
 	&apos;Change the text in the information text boxes
 	If config(fiFestivalOption) Then
 		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=config(fiFestivalPath) &amp; &quot; &quot; &amp; _
-			chr(34) &amp; ConvertFromURL(fsFullPathOf(fsFestivalScriptName)) &amp; chr(34)
+			&quot;&quot;&quot;&quot; &amp; ConvertFromURL(fsFullPathOf(fsFestivalScriptName)) &amp; &quot;&quot;&quot;&quot;
 		sA=replaceLocalTokensWithStr(config(fiFestivalComboChoice))
 		sA=replacePublicTokensWithStr(sA)
 		f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=sA 
 	Elseif config(fiExternalOption) Then 
 		sA=replaceLocalTokensWithStr(config(fiExternalCommand))
 		sA=replacePublicTokensWithStr(sA)
-		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=chr(34) &amp; config(fiExternalProgramPath) &amp; chr(34) &amp; &quot; &quot; &amp; sA
+		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=&quot;&quot;&quot;&quot; &amp; config(fiExternalProgramPath) &amp; &quot;&quot;&quot; &quot; &amp; sA
 		If  Instr(config(fiExternalCommand),&quot;(TTS_WSCRIPT_VBS)&quot;) Then
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsVBSTextString
 		Elseif  Instr(config(fiExternalCommand),&quot;(SPD_READ_TEXT_PY)&quot;) Then
@@ -228,7 +229,17 @@ Sub AboutAddOn (config() As Variant, myText As String)
 		Elseif  Instr(config(fiExternalCommand),&quot;(CREATE_QR_LABEL_PY)&quot;) Then
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsQRTextString
 		Elseif  Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT)&quot;) Then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (fsStringLanguage(fiL10nTEST, fsSelectionLanguage), fsSelectionLanguageAndRegion(true))
+			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (&quot;&quot;, fsSelectionLanguageAndRegion(true))
+		Elseif  Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;) Then
+			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (&quot;-r 110 &quot;, fsSelectionLanguageAndRegion(true))
+		Elseif  Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_QUICKLY)&quot;) Then
+			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (&quot;-r 240 &quot;, fsSelectionLanguageAndRegion(true))
+		Elseif  Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_AIRPLAY)&quot;) Then
+			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (&quot;-a AirPlay &quot;, fsSelectionLanguageAndRegion(true))
+		Elseif  Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_AIRPLAY_SLOWLY)&quot;) Then
+			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (&quot;-a AirPlay -r 110 &quot;, fsSelectionLanguageAndRegion(true))
+		Elseif  Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_AIRPLAY_QUICKLY)&quot;) Then
+			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (&quot;-a AirPlay -r 240 &quot;, fsSelectionLanguageAndRegion(true))
 		Else
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=&quot;&quot;
 		Endif
@@ -236,9 +247,9 @@ Sub AboutAddOn (config() As Variant, myText As String)
 		sA=replacePublicTokensWithStr(config(fiHtmlComboURL))
 		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=&quot;[com.sun.star.system.SystemShellExecute]&quot;
 		If Instr(sA,&quot;.google.&quot;) Then
-			sA=sA &amp; chr(13) &amp; chr(13) &amp; &quot;Powered by Google ™&quot;
+			sA=sA &amp; Chr$(13) &amp; Chr$(13) &amp; &quot;Powered by Google ™&quot;
 		Elseif instr(sA,&quot;vozme.com&quot;) Then
-			sA=sA &amp; chr(13) &amp; chr(13) &amp; &quot;Powered by Vozme ™&quot;
+			sA=sA &amp; Chr$(13) &amp; Chr$(13) &amp; &quot;Powered by Vozme ™&quot;
 		Endif
 		f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=sA		
 	Endif
