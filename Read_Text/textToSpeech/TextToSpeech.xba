@@ -45,6 +45,12 @@ Sub SetupReadTextAloud
 	ConfigureReadTextAloud()
 End Sub
 
+Sub webHelpButton
+&apos; Dialog3 On-line info Button pressed.
+&apos; parameter
+	webHelp
+End Sub
+
 Sub webHelp (optional sURL)
 	Dim oSvc As Object
 	if ismissing (sURL) then
