@@ -23,10 +23,10 @@ Sub ConfigureReadTextAloud
 	&apos;Load default settings, so any settings undefined by settings file are Not empty
 	config()=fvTts_config_createDefaultConfig(msgs(), errorCode)
 	&apos;Load the settings you used last time
-	sFile=fsFullPathOf(fsExtensionSettingsIni)	
+	sFile=fsFullPathOf(fsExtensionSettingsIni)
 	If fileExists (sFile) Then
 		tts_config_parseFile (sFile, config(), errorCode)
-	Endif									 
+	Endif								 
 	&apos;Now apply the settings To the dialog box
 	f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).Model.State=config(fiAlwaysShowDialogCheckBox)
 	f_dlgSpeechSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiFestivalComboChoice)
@@ -44,6 +44,17 @@ Sub ConfigureReadTextAloud
 	&apos;Update the labels with your language
 	ttsUpdateLabels
 	ttsUpdateDisplay
+	&apos; Stop Linux or OSX speech daemon from continuing to speak
+	&apos; or delete the Windows temporary lock file so speech ends.
+	&apos; The speech only stops if you use the one of the scripts shown
+	&apos; by default in the extension dialogue.
+	if fileExists (sFile) then
+		if f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).Model.State then
+			resetSpeechDispatcher (true)
+		elseif f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).Model.State then
+			Shell(&quot;killall&quot;,0,&quot;festival&quot;,true)
+		endif
+	endif
 	If f_dlgSpeechSetup.Execute() &lt;&gt; 0 Then
 		&apos;Replace the old settings file
 		config()=fvCurrentDialogConfig()
@@ -240,6 +251,8 @@ Sub AboutAddOn (config() As Variant, myText As String)
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (&quot;-a AirPlay -r 110 &quot;, fsSelectionLanguageAndRegion(true))
 		Elseif  Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_AIRPLAY_QUICKLY)&quot;) Then
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (&quot;-a AirPlay -r 240 &quot;, fsSelectionLanguageAndRegion(true))
+		Elseif  Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;) Then
+			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript (&quot;&quot;, &quot;&quot;)
 		Else
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=&quot;&quot;
 		Endif

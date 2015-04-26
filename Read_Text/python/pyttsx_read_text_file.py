@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
+from __future__ import (absolute_import, division, print_function, unicode_literals)
 '''
 To read a plain text file using Python pyttsx speech.
   Designed for reading text aloud with the Windows SAPI5 system.
@@ -21,7 +22,7 @@ Read Text Extension for OpenOffice.org (for Windows) :
   Command line options: "(HOME)Downloads\read_text_file.py" "(TMP)"
   or "(HOME)Downloads\read_text_file.py" --voice "Microsoft Sam" "(TMP)"
 
-Copyright (c) 2010-2011 James Holgate
+Copyright (c) 2010 - 2015 James Holgate
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above

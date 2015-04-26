@@ -13,6 +13,41 @@ Function fsMyURL As String
 	fsMyURL=fsGetPackageDirURL(&quot;ca.bc.vancouver.holgate.james.readtextextension&quot;)
 End Function
 
+function fsMyTempLock (optional byval sExt)
+	dim sTemp, sDiv, sUser as string
+	if isMissing(sExt) then
+		sExt = &quot;lock&quot;
+	endif
+	sUser = Environ(&quot;USER&quot;)
+	if sUser = &quot;&quot; then
+		sUser = Environ (&quot;USERNAME&quot;)
+	endif
+	if sUser = &quot;&quot; then
+		sUser = &quot;UNKNOWN-USER&quot;
+	endif
+	sTemp=Environ (&quot;TEMP&quot;)
+   	If sTemp = &quot;&quot; Then 
+    	sTemp=Environ(&quot;TMP&quot;)
+    Endif
+   	If sTemp = &quot;&quot; Then 
+    	sTemp=Environ(&quot;TMPDIR&quot;)
+    Endif
+   	If sTemp = &quot;&quot; Then 
+    	if fileExists(&quot;/tmp/&quot;) then
+    		sTemp = &quot;/tmp/&quot;
+    	endif
+    Endif
+   	If sTemp = &quot;&quot; Then 
+    	sTemp=Environ(&quot;HOME&quot;)
+    Endif
+    if instr(&quot;/\&quot;,right(sTemp, 1)) = 0 then
+    	sDiv = &quot;/&quot;
+    else
+    	sDiv = &quot;&quot;
+    endif
+    fsMyTempLock = ConvertFromURL(converttourl(sTemp) &amp; sDiv &amp; &quot;ca.bc.vancouver.holgate.james.readtextextension.&quot; &amp; sUser &amp; &quot;.&quot; &amp; sExt )
+end function
+
 Function fsExtensionVersion As String
 	Dim aFile As String
 	Dim iNumber As Integer
@@ -56,11 +91,11 @@ Function fsSpeakerLogo as String
 End Function
 
 Function fsClipBoardLogo as String
-	fsClipboardLogo=fsMyURL &amp; &quot;/images/clipboard_26.png&quot;
+	fsClipboardLogo=fsMyURL &amp; &quot;/images/clipboard_26h.png&quot;
 End Function
 
 Function fsSelectionLogo as String
-	fsSelectionLogo=fsMyURL &amp; &quot;/images/textToSpeech_26.png&quot;
+	fsSelectionLogo=fsMyURL &amp; &quot;/images/textToSpeech_26h.png&quot;
 End Function
 
 

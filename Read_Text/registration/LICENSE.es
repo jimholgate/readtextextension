@@ -1,4 +1,4 @@
-Cómo utilizar
+﻿Cómo utilizar
 
 Después de instalar esta extensión, cerrar la aplicación, a continuación, reinícielo.
 

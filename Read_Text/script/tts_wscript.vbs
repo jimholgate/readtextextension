@@ -1,18 +1,98 @@
-'VBS Script for Read Text Extension by James Holgate
-'Standard: "(TTS_WSCRIPT_VBS)" "(TMP)"
-'1: "(TTS_WSCRIPT_VBS)" /voice:"Microsoft Anna" /rate:-3 "(TMP)"
-'2: "(TTS_WSCRIPT_VBS)" /language:"(SELECTION_LANGUAGE_CODE)" "(TMP)"
-'3: "(TTS_WSCRIPT_VBS)" /language:"(SELECTION_LANGUAGE_CODE)" /soundfile:"(HOME)(NOW).wav" "(TMP)"
-'Use "http://www.apple.com/itunes/" to add mp3, m4a and aif items to an iTunes library and home directory
-'4: "(TTS_WSCRIPT_VBS)" /language:"(SELECTION_LANGUAGE_CODE)" /soundfile:"(HOME)(NOW).mp3" "(TMP)"
-'5: "(TTS_WSCRIPT_VBS)" /language:"(SELECTION_LANGUAGE_CODE)" /soundfile:"(HOME)(NOW).m4a" "(TMP)"
-'6: "(TTS_WSCRIPT_VBS)" /language:"(SELECTION_LANGUAGE_CODE)" /soundfile:"(HOME)(NOW).aif" "(TMP)"
+ '' Script for Read Text Extension
+ '' ==============================
+ '' 
+ '' Reads a text file aloud or saves sound to a file.
+ '' 
+ '' This script uses the Windows speech application programming
+ '' interface (`SAPI`). Depending on the version and locale of 
+ '' Windows, voices in different languages may be available.
+ ''   
+ '' Read Selection... Dialog setup:
+ '' -------------------------------
+ '' 
+ '' External program: 
+ '' 
+ ''     C:\Windows\SysWOW64\wscript.exe
+ '' 
+ '' Command line options (default): 
+ '' 
+ ''     "(TTS_WSCRIPT_VBS)" "(TMP)"
+ '' 
+ '' or (save as a .wav file in the home directory): 
+ '' 
+ ''     "(TTS_WSCRIPT_VBS)" /soundfile:"(HOME)(NOW).wav" "(TMP)"
+ '' 
+ '' or (use a named voice)
+ '' 
+ ''     "(TTS_WSCRIPT_VBS)" /voice:"Microsoft Hazel Desktop - English (Great Britain)" "(TMP)"
+ '' 
+ '' or (read a little slower)
+ '' 
+ ''     "(TTS_WSCRIPT_VBS)" /rate:-3 "(TMP)"
+ '' 
+ '' or (change voice by language)
+ '' 
+ ''     "(TTS_WSCRIPT_VBS)" /language:"(SELECTION_LANGUAGE_COUNTRY_CODE)" "(TMP)"
+ '' 
+ '' **Note**: Selecting this option doesn't work with the SAPI
+ '' speech synthesizer if you haven't installed a voice in the
+ '' language.
+ '' 
+ '' Optional formats
+ '' ----------------
+ '' 
+ '' ###Flac
+ '' 
+ '' Play flac encoded sound files using a player or plugin 
+ '' 
+ ''  * Install `flac.exe` in `C:\opt\`
+ ''  * [flac encoder](http://flac.sourceforge.net/links.html#software)
+ ''  * [Players and plugins](http://flac.sourceforge.net/)
+ '' 
+ '' ###iTunes
+ '' 
+ '' Use [iTunes](http://www.apple.com/itunes/) to add m4a and aif 
+ '' items to an iTunes library and home directory.
+ '' 
+ ''     "(TTS_WSCRIPT_VBS)" /language:"(SELECTION_LANGUAGE_CODE)" /soundfile:"(HOME)(NOW).m4a" "(TMP)"
+ ''     "(TTS_WSCRIPT_VBS)" /language:"(SELECTION_LANGUAGE_CODE)" /soundfile:"(HOME)(NOW).aif" "(TMP)"
+ '' 
+ '' ###Lame
+ '' 
+ '' Play mp3 compatible encoded sound files with most music players
+ '' Use `lame.exe` to make an mp3 compatible file.
+ '' 
+ ''  * Install `lame.exe` in `C:\opt\`
+ ''  * [Lame encoder](http://www.rarewares.org/mp3-lame-bundle.php)
+ '' 
+ '' ###Nero
+ '' 
+ '' Play m4a AAC encoded sound files with most music players
+ '' Use `neroAacEnc.exe` to make an m4a file.
+ '' 
+ ''  * Install `neroAacEnc.exe` in `C:\opt\`
+ ''  * The `neroAacTag.exe` program adds tags.
+ ''  * [Nero m4a encoder](http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php)
+ '' 
+ '' ###Ogg
+ '' 
+ '' Play ogg encoded sound files with firefox, chrome or chromium.
+ '' Use `oggenc.exe` or `oggenc2.exe` to make an ogg file 
+ '' 
+ ''  * The ogg converter program must be installed in `C:\opt\`.
+ ''  * [oggenc2 encoder](http://www.rarewares.org/ogg-oggenc.php)
+ ''  * [Players and plugins](http://www.vorbis.com/setup_windows/)
+ '' 
+ '' [Read Text Extension](http://sites.google.com/site/readtextextension/)
+ '' 
+ '' Copyright (c) 2011 - 2015 James Holgate
 
 Const ForReading=1
 Const ForWriting=3 
 Const AUDIO_FORMAT=34 ' (16 bit mono 44.100 KHz). 
   'Common formats: 8 (8 KHz 8-bit mono), 16 (16 KHz 8-bit mono)
   '35 (44 KHz 16-bit Stereo), 65 (GSM 8 KHz), 66 (GSM 11 KHz)
+Const APP_SIGNATURE="ca.bc.vancouver.holgate.james.readtextextension"
 
 Sub Usage(s1)
   s1=s1 & chr(10)
@@ -44,11 +124,6 @@ Function canUseSpeechXML
 End Function
 
 Sub wav2ogg (wavfile,oggFile,sMyWords)
-  ' Play ogg encoded sound files with firefox, chrome or chromium
-  ' oggenc.exe or oggenc2.exe makes an ogg file in the specified location
-  ' The ogg converter program must be installed in C:\opt\.
-  ' oggenc2 encoder - http://www.rarewares.org/ogg-oggenc.php
-  ' Players and plugins - http://www.vorbis.com/setup_windows/
   ' On Error Resume Next
   if fbFileExists("C:\opt\oggenc2.exe") then
     sPpath="C:\opt\oggenc2.exe"
@@ -69,16 +144,11 @@ Sub wav2ogg (wavfile,oggFile,sMyWords)
        WScript.Sleep 100
     Loop
   end if
- 'kill wavfile
-  Set fso = CreateObject("Scripting.FileSystemObject")
-  Set aFile = fso.GetFile(wavfile)
-  aFile.Delete
+ 
+  fbKillFile wavfile
 End Sub
 
 Sub wav2flac (wavfile,outfile,sMyWords)
-  ' Play flac encoded sound files http://flac.sourceforge.net/links.html#software
-  ' Players and plugins - http://flac.sourceforge.net/
-  ' On Error Resume Next
   if fbFileExists("C:\opt\flac.exe") then
     sPpath="C:\opt\flac.exe"
     sPname="flac.exe:"
@@ -95,20 +165,11 @@ Sub wav2flac (wavfile,outfile,sMyWords)
        WScript.Sleep 100
     Loop
   end if
- 'kill wavfile
-  Set fso = CreateObject("Scripting.FileSystemObject")
-  Set aFile = fso.GetFile(wavfile)
-  aFile.Delete
+ 
+  fbKillFile wavfile
 End Sub
 
 Sub wav2m4a (wavfile,outFile,sMyWords)
-  ' Play mp4 AAC encoded sound files with most music players
-  ' neroAacEnc.exe makes an mp4 file in the specified location
-  ' The mp4 converter program must be installed in C:\opt\
-  ' Script doesn't set file metatags, but you can use the 
-  ' neroAacTag.exe tagging program. See:
-  ' http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php
-  'On Error Resume Next
   if fbFileExists("C:\opt\neroAacEnc.exe") then
     sPpath="C:\opt\neroAacEnc.exe"
     sPname="neroAacEnc.exe:"
@@ -118,8 +179,6 @@ Sub wav2m4a (wavfile,outFile,sMyWords)
   else
     exit sub
   end if        
-  ' Last chance to cancel or rename the file. This option is silent,
-  ' so script reminds you that you are creating a file.
   s2=InputBox(sPname,"Read Text",outFile)
   if len(s2) > 0  then
     Dim WshShell, oExec
@@ -134,18 +193,11 @@ Sub wav2m4a (wavfile,outFile,sMyWords)
        WScript.Sleep 100
     Loop
   end if
- 'kill wavfile
-  Set fso = CreateObject("Scripting.FileSystemObject")
-  Set aFile = fso.GetFile(wavfile)
-  aFile.Delete
+ 
+  fbKillFile wavfile
 End Sub
 
 Sub wav2mp3 (wavfile,outFile,sMyWords)
-  ' Play mp3 compatible encoded sound files with most music players
-  ' lame.exe makes an mp3 compatible file in the specified location
-  ' The mp3 converter program must be installed in C:\opt\
-  ' Script doesn't set file metatags. See:
-  ' http://www.rarewares.org/mp3-lame-bundle.php
   On Error Resume Next
   if fbFileExists("C:\opt\lame.exe") then
     sPpath="C:\opt\lame.exe"
@@ -153,8 +205,6 @@ Sub wav2mp3 (wavfile,outFile,sMyWords)
   else
     exit sub
   end if        
-  ' Last chance to cancel or rename the file. This option is silent,
-  ' so script reminds you that you are creating a file.
   s2=InputBox(sPname,"Read Text",outFile)
   if len(s2) > 0  then
     Dim WshShell, oExec
@@ -166,10 +216,8 @@ Sub wav2mp3 (wavfile,outFile,sMyWords)
        WScript.Sleep 100
     Loop
   end if
- 'kill wavfile
-  Set fso = CreateObject("Scripting.FileSystemObject")
-  Set aFile = fso.GetFile(wavfile)
-  aFile.Delete
+ 
+  fbKillFile wavfile
 End Sub
 
 Sub wav2iTunes (wavfile,sOut2file,sMyWords)
@@ -182,18 +230,18 @@ Sub wav2iTunes (wavfile,sOut2file,sMyWords)
   Set Reg1 = new RegExp
   Reg1.Pattern = "^10"
   if not (Reg1.Test(vers)) Then
-    Usage "Get / Téléchargez: http://www.apple.com/itunes/" & chr(10) & chr(10) & "Did not find a supported iTunes version / On n'a pas trouvé une version actuelle d'iTunes" & chr(10)
+    Usage "Get: http://www.apple.com/itunes/" & chr(10) & chr(10) & "Did not find a supported iTunes version" & chr(10)
     Wscript.Exit(0)
   End If
   set encoderCollection = iTunesApp.Encoders
   oldEncoder=iTunesApp.CurrentEncoder 
   Select Case strExt(sOut2file)
-    Case ".m4a",".aac"
-      set encoder=encoderCollection.ItemByName("AAC Encoder")
+    Case ".mp3"
+      set encoder=encoderCollection.ItemByName("MP3 Encoder")
     Case ".aif",".aiff"
       set encoder=encoderCollection.ItemByName("AIFF Encoder")
-    Case Else
-      set encoder=encoderCollection.ItemByName("MP3 Encoder")
+    Case Else ' ".m4a",".aac"
+      set encoder=encoderCollection.ItemByName("AAC Encoder")
   end Select
   iTunesApp.CurrentEncoder = encoder
   set fso = CreateObject("Scripting.FileSystemObject")  
@@ -213,12 +261,9 @@ Sub wav2iTunes (wavfile,sOut2file,sMyWords)
 
   set outfile=fso.GetFile(opStatus.Tracks.Item(1).Location)
   outfile.copy (sOut2file)
- 'kill wavfile
-  Set fso = CreateObject("Scripting.FileSystemObject")
-  Set aFile = fso.GetFile(wavfile)
-  aFile.Delete
-End Sub
 
+  fbKillFile wavfile
+End Sub
 
 Function fbFileExists(sfilespec)
    Dim fso
@@ -226,6 +271,14 @@ Function fbFileExists(sfilespec)
    fbFileExists = (fso.FileExists(sfilespec))
 End Function
 
+Function fbKillFile(sfilespec)
+   Dim fso
+   Set fso = CreateObject("Scripting.FileSystemObject")
+   If fso.FileExists(sfilespec) Then
+     fso.DeleteFile sfilespec
+   End If
+   fbKillFile = not(fso.FileExists(sfilespec))
+End Function
 
 Function AddLanguageCodes(s1,s4)
   s1=Lcase(s1)
@@ -512,30 +565,47 @@ Sub PopMsgBox(sMsg,sHead,sTitle)
   Do While oExec.Status = 0
     WScript.Sleep 100
   Loop
+  fbKillFile outFile
 End Sub
 
-
 Sub SayIt(s1,sRate,sVoice)
-  Set Sapi=Wscript.CreateObject("SAPI.SpVoice")
-  If Sapi Is Nothing Then
-    Usage "FAILED Sapi.SpVoice creation. SAPI ne pouvait pas créer une voix."
+  Set objFSO=CreateObject("Scripting.FileSystemObject")
+  Dim WshShell, oExec
+  Set WshShell = CreateObject("WScript.Shell")
+  Set WshEnv = WshShell.Environment("Process")
+  tempFolder = WshEnv("TEMP")
+  userid = WshEnv("USERNAME")
+  ' write temporary file
+  outFile = tempFolder & "\" & APP_SIGNATURE & "." & userid & ".lock"
+  If fbFileExists (outFile) Then 
+    fbKillFile outFile
   Else
-    n=0
-    While n<Sapi.GetVoices.Count
-      If instr(Lcase(Sapi.GetVoices.Item(n).GetDescription),Lcase(sVoice)) > 0 Then
-        Set Sapi.Voice=Sapi.GetVoices.Item(n)
-        n=Sapi.GetVoices.Count
-      Else
-        n=n+1
-      End If
-    WEnd
-    Sapi.Rate=int(sRate)
-    Sapi.Speak "",1
-    Sapi.Speak s1,3
-    Do 
-    Loop Until Sapi.WaitUntilDone(1)
-    Set Sapi=Nothing 
+    Set objFile = objFSO.CreateTextFile(outFile,True)
+    objFile.Write APP_SIGNATURE
+    objFile.Close
+    Set Sapi=Wscript.CreateObject("SAPI.SpVoice")
+    If Sapi Is Nothing Then
+      Usage "FAILED Sapi.SpVoice creation. SAPI ne pouvait pas créer une voix."
+    Else
+      n=0
+      While n<Sapi.GetVoices.Count
+        If instr(Lcase(Sapi.GetVoices.Item(n).GetDescription),Lcase(sVoice)) > 0 Then
+          Set Sapi.Voice=Sapi.GetVoices.Item(n)
+          n=Sapi.GetVoices.Count
+        Else
+          n=n+1
+        End If
+      WEnd
+      Sapi.Rate=int(sRate)
+      Sapi.Speak "",1
+      Sapi.Speak s1,3
+      Do
+        WScript.Sleep 100
+      Loop Until Sapi.WaitUntilDone(1) or (objFSO.FileExists(outFile) = false)
+      Set Sapi=Nothing 
+    End If
   End If
+  fbKillFile outFile
 End Sub
 
 Sub WriteIt(s1,sRate,sVoice,sFileName, sMyWords,sLibre)
@@ -555,7 +625,9 @@ Sub WriteIt(s1,sRate,sVoice,sFileName, sMyWords,sLibre)
       End If
     WEnd
     Sapi.Rate=int(sRate)
-    If fs.FileExists(sFileName) Then fs.DeleteFile sFileName
+    If fbFileExists (sFileName) Then 
+      fbKillFile sFileName
+    End If
     sFileNameExt=strExt(sFileName)
     Select Case sFileNameExt
       Case ".mp3",".m4a",".aac",".aif",".aiff"
@@ -731,19 +803,21 @@ Sub main()
       WScript.Exit(0)
     Case "" 
       s0=Year(Date) & "-" & Month(Date) & "-" & Day(Date) &", " & FormatDateTime(now,4)
-      select case left(lcase(sLanguage),2)
-        Case "de"
+      select case GetLocale()
+        Case "de", "1031", "3079", "5127", "4103", "2055"
           s1="Las ein paar Worte..."
-        Case "es"
+        Case "en-CA", "4105"
+          s1="Excuse me... I need to check something. Could you please type in some text?"
+        Case "es","11274", "16394", "13322", "9226", "5130", "7178", "12298", "17418", "4106", "18442", "2058", "19466", "6154", "15370", "10250", "20490", "1034", "14346", "8202"
           s1="Introduzca algunas palabras ..."
-        Case "fr"
+        Case "fr", "3084", "1036", "2060", "11276","9228","12300","5132","13324", "6156", "14348", "10252", "4108", "7180"
           s1="Tapez quelques mots..."
-        Case "pt"
+        Case "pt", "1046", "2072"
           s1="Tipo de poucas palavras..."
         Case else
           s1="Enter a few words..."
       end Select
-      s2=InputBox(s1,"tts_wscript.vbs",s0)
+      s2=InputBox(s1,"Locale: " & GetLocale(),s0)
     Case Else
         s2=getTextFileContent(s0,"UTF-8")
         If Err <> 0 Then
