@@ -1034,6 +1034,10 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 	On Error Resume Next
 	oBar.Value=30
 	On Error Goto errorHandler
+	If fsGetOS() = &quot;OSX&quot; Then
+		&apos; Make sure the sound is at least 400 milliseconds long.
+		sTextToSpeak = sTextToSpeak &amp; &quot;[[slnc 400]]&quot;
+	Endif
 	If config(fiFestivalOption) Then
 		&apos;Write the Festival script and the file to read aloud
 		sProgram=config(fiFestivalPath)
