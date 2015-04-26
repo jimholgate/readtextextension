@@ -32,6 +32,7 @@ Sub ReadTextAloud
 			ConfigureReadTextAloud()
 		Else
 		    if fileExists(fsMyTempLock) Then
+		    	kill fsMyTempLock
 				resetSpeechDispatcher
 			else
 				ttsActuate(config(),msgs(),errorCode,&quot;&quot;)
@@ -73,6 +74,7 @@ Sub ReadClipBoard
 	&apos; If this is useful, assign a key combination To the macro with Tools &gt; Customize. 
     if fileExists(fsMyTempLock) Then
 		resetSpeechDispatcher
+		kill fsMyTempLock
 	else
 		msgSpeak(fsGetClipBoard)
 	endif
