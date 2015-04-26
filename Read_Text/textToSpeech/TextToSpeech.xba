@@ -2,30 +2,141 @@
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TextToSpeech" script:language="StarBasic">REM  *****  BASIC  *****
 OPTION EXPLICIT
-&apos; Read Text Extension
 
-&apos; Copyright And License 
+&apos;&apos; #Read Text Extension
+&apos;&apos;
+&apos;&apos; **Read Text** reads text aloud, saves audio or video files
+&apos;&apos; from text, and can use resources from the web based on the
+&apos;&apos; selected text.
+&apos;&apos;
+&apos;&apos; * Select text.
+&apos;&apos; * Click the *Read selection...* button.
+&apos;&apos; * To read aloud, accept the default in the dialogue, or choose
+&apos;&apos;   another action from the menus.
+&apos;&apos;
+&apos;&apos; Features
+&apos;&apos; --------
+&apos;&apos;
+&apos;&apos; * Automatically change languages according to the text language.
+&apos;&apos; * Create sound or still-image speech files for listening on the go.
+&apos;&apos; * Use web resources to translate, look up, listen, post, or
+&apos;&apos;   interface with web applications.
+&apos;&apos;
+&apos;&apos; What’s new?
+&apos;&apos; -----------
+&apos;&apos;
+&apos;&apos; *Read Text Extension* Versions 0.9.0 and 0.9.1 have many bug fixes and 
+&apos;&apos;  new features.
+&apos;&apos;
+&apos;&apos;  * Click the button while the sound is playing to stop the sound.
+&apos;&apos;  * Supported export formats include metadata that helps you to
+&apos;&apos;    organize your sound clips.
+&apos;&apos;  * In writer, you can select text in a table.
+&apos;&apos;  * You can show a text selection using large high contrast text by
+&apos;&apos;    selecting some text, then using *Tools – Add-ons – Impress-View*.
+&apos;&apos;    If you click the text in the presentation, it will read the note
+&apos;&apos;    aloud.
+&apos;&apos;  * By default, the extension now puts the clips in a folder labelled
+&apos;&apos;    with your language code - i.e.: *en* for English, *de* for German etc.
+&apos;&apos;  * Japanese language text is correctly identified.
+&apos;&apos;  * Python for Linux is now Python 2 and Python 3 compatible.
+&apos;&apos;  * Linux now can use either avconv or ffmpeg to convert files.
+&apos;&apos;  * Windows and OSX users can use ffmpeg to convert files by installing
+&apos;&apos;    [Audacity](http://audacity.sourceforge.net/) or
+&apos;&apos;    [Miro Video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/)
+&apos;&apos;    with a ffmpeg plug-in.
+&apos;&apos;  * Complex language detection is simpler, faster and more reliable.
+&apos;&apos;
+&apos;&apos; Installation
+&apos;&apos; ------------
+&apos;&apos;
+&apos;&apos; Get *Read Text* from the download page and install it by double-clicking it.
+&apos;&apos;
+&apos;&apos; [Apache OpenOffice](http://extensions.services.openoffice.org/en/project/read-text)  
+&apos;&apos; [LibreOffice](http://extensions.libreoffice.org/extension-center/read-text)
+&apos;&apos;
+&apos;&apos; Read text speech API
+&apos;&apos; --------------------
+&apos;&apos;
+&apos;&apos; If you want to include speech in your own scripts, use `msgSpeak(sString)`.
+&apos;&apos; This sample shows how to handle a scripting error if a computer does not 
+&apos;&apos; have the extension.
+&apos;&apos;
+&apos;&apos;     sub OnClickMySlide1Image1()
+&apos;&apos;         &apos; Read text aloud. 
+&apos;&apos;         Dim oSvc
+&apos;&apos;         Dim sURL
+&apos;&apos;         Dim sArg
+&apos;&apos; 
+&apos;&apos;         sArg = &quot;Hello world!&quot;
+&apos;&apos;         sURL = &quot;https://sites.google.com/site/readtextextension/&quot;
+&apos;&apos;         on error goto OnClickMySlide1Image1Err
+&apos;&apos;         msgSpeak(sArg)
+&apos;&apos;         exit sub
+&apos;&apos;         OnClickMySlide1Image1Err:
+&apos;&apos;         if Msgbox(&quot;The button couldn’t find a &quot;&quot;text to speech&quot;&quot; add-on.&quot; &amp; _
+&apos;&apos;                 chr(10) &amp; _
+&apos;&apos;                 sArg &amp; _
+&apos;&apos;                 chr(10) &amp; _
+&apos;&apos;                 &quot;Get on-line help?&quot;, _
+&apos;&apos;                 4, _
+&apos;&apos;                 &quot;Read Text&quot;) &lt;&gt; 7 then
+&apos;&apos;             oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+&apos;&apos;             oSvc.execute(sURL,&quot;&quot;,0)
+&apos;&apos;         endif
+&apos;&apos;     end sub
+&apos;&apos;
+&apos;&apos; Mixed Asian, Complex and Western Text
+&apos;&apos; -------------------------------------
+&apos;&apos; 
+&apos;&apos; Speech synthesis for text with mixed Asian, complex
+&apos;&apos; and western contents may not work as you expect.
+&apos;&apos; 
+&apos;&apos; * In writer, you can check the language of the selected text
+&apos;&apos;   in the status bar. *Mixed* text includes an ambiguous or
+&apos;&apos;   undefined text string. 
+&apos;&apos; * If mixed text is interpreted as undefined or western,
+&apos;&apos;   the speech synthesizer might be silent or it might spell 
+&apos;&apos;   our character codes instead of using Asian or complex
+&apos;&apos;   speech synthesis.
+&apos;&apos; 
+&apos;&apos; Copyright And License
+&apos;&apos; ---------------------
+&apos;&apos;
+&apos;&apos; (c)2008-2015 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+&apos;&apos;
+&apos;&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS
+&apos;&apos; OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION;
+&apos;&apos; EITHER VERSION 2 OF THE LICENSE, OR (AT YOUR OPTION) ANY LATER VERSION.  THIS SCRIPT
+&apos;&apos; IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY WARRANTY;
+&apos;&apos; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+&apos;&apos; SEE THE GNU GENERAL PUBLIC LICENSE FOR MORE DETAILS.
+&apos;&apos;
+&apos;&apos; YOU SHOULD HAVE RECEIVED A COPY OF THE GNU GENERAL PUBLIC LICENSE ALONG WITH THIS SOFTWARE;
+&apos;&apos; If Not, WRITE TO THE FREE SOFTWARE FOUNDATION,INC., 59 TEMPLE PLACE,SUITE 330,BOSTON,MA
+&apos;&apos; 02111-1307  USA
+&apos;&apos;
+&apos;&apos; #Procedures
+&apos;&apos;
+&apos;&apos; Procedures are called from menu items or from the tool bar.
+&apos;&apos;
 
-&apos;(c)2008-2015 James Holgate Vancouver,CANADA(james_h(a)http://openofficeforum.org)
 
-&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS
-&apos; OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION; 
-&apos; EITHER VERSION 2 OF THE LICENSE,OR(AT YOUR OPTION)ANY LATER VERSION. THIS SCRIPT
-&apos; IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL,BUT WITHOUT ANY WARRANTY; 
-&apos; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. 
-&apos; SEE THE GNU GENERAL PUBLIC LICENSE FOR MORE DETAILS.
-
-&apos; YOU SHOULD HAVE RECEIVED A COPY OF THE GNU GENERAL PUBLIC LICENSE ALONG WITH THIS SOFTWARE; 
-&apos; IF NOT,WRITE TO THE FREE SOFTWARE FOUNDATION,INC.,59 TEMPLE PLACE,SUITE 330,BOSTON,MA
-&apos; 02111-1307  USA
-
-&apos;Call this Sub To start reading text aloud
 Sub ReadTextAloud
+&apos;&apos; Use *Read Selection* on the tool bar
+&apos;&apos; ------------------------------------
+&apos;&apos;
+&apos;&apos; The first time you use the extension, you can use this button to set it up.
+&apos;&apos; Once you uncheck *Always show this dialogue*, in the dialogue, this button
+&apos;&apos; will simply do the action that you set up, like – for example – reading text
+&apos;&apos; aloud.
+&apos;&apos;
 	Dim sFile As String
 	Dim msgs()As Variant
-	Dim errorCode As Integer 
+	Dim errorCode As Integer
 	Dim config(fiCountConfigOptions)As Variant
-	sFile=fsFullPathOf(fsExtensionSettingsIni)	
+
+	sFile=fsFullPathOf(fsExtensionSettingsIni)
 	If fileExists(sFile)Then
 		tts_config_parseFile(sFile,config(),errorCode)
 		If config(fiAlwaysShowDialogCheckBox)=1 Then
@@ -34,49 +145,201 @@ Sub ReadTextAloud
 		    if fileExists(fsMyTempLock) Then
 		    	kill fsMyTempLock
 				resetSpeechDispatcher
-			else
-				ttsActuate(config(),msgs(),errorCode,&quot;&quot;)
-			endif
+			Else
+				ttsActuate(config(),_
+						msgs(),_
+						errorCode,_
+						&quot;&quot;)
+			Endif
 		Endif
-	Else 
+	Else
 		ConfigureReadTextAloud()
-	Endif	
+	Endif
 End Sub
 
+
 Sub SetupReadTextAloud
-	&apos;Call this Sub To setup the text-To-speech options And read the text aloud
-	Dim msgs()As Variant
-	Dim errorCode As Integer
+&apos;&apos; Tools – Add-ons – Read Selection...
+&apos;&apos; -----------------------------------
+&apos;&apos;
+&apos;&apos; Use this to setup the text conversion options and to read the text aloud.
+&apos;&apos;
 	ConfigureReadTextAloud()
 End Sub
 
 
-Sub webHelpButton
-	&apos; Dialog3 Button on LibreOffice can&apos;t call webHelp directly because of input parameter
-	webHelp
-End Sub
-
-Sub webHelp (optional sURL)
-	on error goto webHelpErr
-	Dim oSvc
-	if ismissing (sURL) then
-		sURL = fsDialogMyRegion(fiL10nHELP_ONLINE_URL)
-	endif
-	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
-	oSvc.execute(sURL,&quot;&quot;,0)
-	webHelpErr:
-End Sub
-
 Sub ReadClipBoard
-	&apos; This Sub reads the clipboard from any module that supports a
-	&apos; text clipboard,including the Macro editor. You normally
-	&apos; fill the clipboard by selecting some text,Then using Edit &gt; Copy.
-	&apos; If this is useful, assign a key combination To the macro with Tools &gt; Customize. 
+&apos;&apos; Tools – Add-ons – Read Clipboard
+&apos;&apos; --------------------------------
+&apos;&apos; 
+&apos;&apos; Use this to read the clipboard from any module that supports a
+&apos;&apos; text clipboard, including the Macro editor. You normally
+&apos;&apos; fill the clipboard by selecting some text, then using *Edit – Copy*.
+&apos;&apos; If this is useful, assign a key combination To the macro with
+&apos;&apos; *Tools – Customize*.
+&apos;&apos;
     if fileExists(fsMyTempLock) Then
 		resetSpeechDispatcher
-		kill fsMyTempLock
-	else
+	Else
 		msgSpeak(fsGetClipBoard)
-	endif
+	Endif
 End Sub
+
+
+sub PresentSelection
+&apos;&apos; Tools – Add-ons – Impress-View
+&apos;&apos; ------------------------------
+&apos;&apos; 
+&apos;&apos; Use this to open the selected text as an Impress document with the full 
+&apos;&apos; text in the notes and a summary on the slide itself. The font is big and
+&apos;&apos; the format is square to make it easy to export sounds using the image of
+&apos;&apos; the presentation as album cover art for music players.  Exporting cover
+&apos;&apos; art requires a compatible converter program like [Nero AAC Encoder][PS1],
+&apos;&apos; [avconv][PS2], [FFmpeg][PS3] or [iTunes][PS4].
+&apos;&apos;
+&apos;&apos; [PS1]: http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php
+&apos;&apos; [PS2]: https://libav.org/
+&apos;&apos; [PS3]: https://www.ffmpeg.org
+&apos;&apos; [PS4]: https://www.apple.com/itunes/
+&apos;&apos;
+	PresentSelection2()
+end Sub
+
+sub testRtl
+	PresentSelection2(&quot;ar&quot;)
+end sub
+
+sub testAsia
+	PresentSelection2(&quot;zh&quot;)
+end sub
+
+sub testLTR
+	PresentSelection2(&quot;hi&quot;)
+end sub
+
+sub PresentSelection2(optional byval sB)
+	&apos; sB - the language to show.  Defaults to interface language or 
+	&apos; English if the interface language is not available.
+	&apos;
+	&apos; sB = &quot;ar&quot;  &apos; Arabic - RTL complex script
+	&apos; sB = &quot;ca&quot;  &apos; Catalan language -- not country of Canada.
+	&apos; sB = &quot;de&quot;  &apos; German is the original language of StarOffice
+	&apos; sB = &quot;en&quot;  &apos; case else (English default)
+	&apos; sB = &quot;es&quot;  &apos; Spanish (International)
+	&apos; sB = &quot;fi&quot;  &apos; Finnish
+	&apos; sB = &quot;fr&quot;  &apos; French (International)
+	&apos; sB = &quot;hi&quot;  &apos; Hindi - LTR complex script (Devanagari)
+	&apos; sB = &quot;it&quot;  &apos; Italian
+	&apos; sB = &quot;nl&quot;  &apos; Dutch - check word wrap
+	&apos; sB = &quot;pl&quot;  &apos; Polish
+	&apos; sB = &quot;pt&quot;  &apos; Portuguese (Brazil and Portugual)
+	&apos; sB = &quot;ru&quot;  &apos; Russian - Cyrillic script
+	&apos; sB = &quot;zh&quot;  &apos; Simplified Chinese - Asian characters
+	&apos;
+	&apos; #Show Help Template
+	&apos;
+	&apos; We put the complete sample text in the first slide’s note.
+	&apos; Normally, the first slide’s note includes a summary of
+	&apos; the selected text contents in point note form and the
+	&apos; subsequent slides include a summary on the slide with
+	&apos; the full text of each paragraph in the notes.
+	&apos;
+	&apos; - If there is no specific language selection, the presentation 
+	&apos;   routines use the user interface language.
+	&apos; - As a result,  Right to left languages will only be aligned
+	&apos;   to the right margin in the help template if the language of
+	&apos;   the user interface is a right to left language. 
+	&apos;   
+	dim b1 as boolean
+	dim i as integer
+	dim j as integer
+	dim sA as string
+	
+	if ismissing(sB) then
+		sB = fsGetLanguage()
+	endif
+	if ThisComponent.supportsService(&quot;com.sun.star.formula.FormulaProperties&quot;) or _
+			ThisComponent.supportsService(&quot;com.sun.star.sdb.DatabaseContext&quot;) then
+		b1 = false
+	else
+		b1 = true
+	endif
+	sA = fsGetTextSelection()
+    if fileExists(fsMyTempLock) Then
+		resetSpeechDispatcher
+	endif
+	if len(sA) &gt; 1 then
+		NewPresentionFromSelection()
+		if b1 then
+			&apos; Present slide following the title slide
+			wait 1000
+			ThisComponent.getcurrentcontroller().setCurrentPage(ThisComponent.drawpages(1))
+			ThisComponent.Presentation.Start
+		endif
+	else
+		NewPresentionFromSelection(fsLookUpTerm(&quot;s_read-text&quot;, sB) &amp; _
+				&quot; – &quot; &amp; _
+				fsLookUpTerm(&quot;s_speech-synthesis&quot;, sB), _
+				fsSampleMd(sB))
+		i = 1  &apos; presenter note on a new LibreOffice or OpenOffice odp document.
+		j = 0  &apos; first slide on any odp document.
+		ThisComponent.getcurrentcontroller().setCurrentPage(ThisComponent.drawpages(1))
+		ThisComponent.getDrawPages().getByIndex(j).getNotesPage.getByIndex(i).String = fsSampleMd(sB)
+		if b1 then
+			wait 1000
+			ThisComponent.Presentation.Start
+		endif
+	endif
+	ThisComponent.setModified(False)
+end sub
+
+
+sub ReadTheSlideNote
+&apos;&apos;
+&apos;&apos; Read the note
+&apos;&apos; -------------
+&apos;&apos;
+&apos;&apos; If you created a presentation using *Tools – Add-ons – Impress-View*,
+&apos;&apos; you can show a presentation and read the text of the note aloud.
+&apos;&apos;
+&apos;&apos; * If the slideshow isn’t showing, use *Slide Show - Start from first slide*
+&apos;&apos; * Click the text to read the text aloud.
+&apos;&apos; * Click the text while the speech synthesizer is talking to switch the
+&apos;&apos;   speech synthesizer off. 
+&apos;&apos; * To go to the next slide, press the down arrow or the right arrow on your
+&apos;&apos;   keyboard.
+&apos;&apos; 
+&apos;&apos; The computer needs [read text extension][1] to execute this procedure.
+&apos;&apos; If the computer doesn’t have the extension, clicking the shape
+&apos;&apos; will show a dialogue telling you that it couldn’t find the script.
+&apos;&apos; 
+&apos;&apos; The name of the function `ReadTheSlideNote` shows in the dialogue
+&apos;&apos; that Impress displays when a computer that doesn’t have read text
+&apos;&apos; extension calls the procedure. 
+&apos;&apos; 
+&apos;&apos; [1]: http://extensions.services.openoffice.org/en/project/read-text
+&apos;&apos;
+	dim s1 as string
+	dim nPage as integer
+
+	nPage = fiCurrentSlideIndex
+	if nPage = -1 or _
+			not(ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;)) then
+		&apos; Not a valid index or document
+		exit sub
+	else
+		if fileexists(fsMyTempLock(&quot;lock&quot;)) then
+			resetSpeechDispatcher(false)
+		else
+			s1 = ThisComponent.getDrawPages( _
+					).getByIndex(nPage _
+					).getNotesPage.getByIndex(fiGetSlideNoteIndex _
+					).getText( _
+					).getString( _
+					)
+			msgSpeak(s1)
+		endif
+	endif
+end sub
+
 </script:module>
