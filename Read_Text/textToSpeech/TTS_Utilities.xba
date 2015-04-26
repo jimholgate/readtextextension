@@ -299,31 +299,6 @@ Function soundsDirectory() As String
 End Function
 
 
-Function fsGetTextSelectionx(optional byval bHideMDCode as Boolean, optional bgoRight as Boolean) As String
-	if ismissing(bHideMDCode) then
-		bHideMDCode = true
-	endif
-	if ismissing(bgoRight) then
-		bgoRight = true
-	endif
-	&apos; Check whether extension should use fsGetSmartTextSelection or
-	&apos; fsGetOnlySelectedText.  The fsGetSmartTextSelection tries more
-	&apos; strategies to determine the selected text and can automatically
-	&apos; update the position of the text cursor to the next paragraph as
-	&apos; it reads.  In Impress, it will read the note or the text of the 
-	&apos; screen if no text is selected.
-	&apos;
-	&apos; Version 9 and above of the Read Text Extension enable smart text
-	&apos; and include a help file for Tools - Add-ons - Impress-view.
-	if fileexists(fsMyURL &amp; &quot;/help/en/&quot; &amp; fsAppSignature() &amp; &quot;/impress_view.xhp&quot;) or _
-			ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
-		fsGetTextSelection = fsGetSmartTextSelection(bHideMDCode, bgoRight)
-	else
-		fsGetTextSelection = fsGetOnlySelectedText()
-	endif
-End Function
-
-
 Function fsGetTextSelection(optional byval bHideMDCode as Boolean, optional bgoRight as Boolean) As String
 	if ismissing(bHideMDCode) then
 		bHideMDCode = true
