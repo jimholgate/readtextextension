@@ -96,7 +96,11 @@ Sub AboutButton_MouseUp(Event As Object)
 	Dim msgs() As Variant
 	Dim errorCode As Integer 
 	If Event.Buttons Then
-		ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,fsAbout())
+		If fileExists(fsMyTempLock) Then
+			resetSpeechDispatcher
+		Else
+			ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,fsAbout())
+		Endif
 	Endif
 End Sub
 
@@ -372,21 +376,21 @@ function fsMacVoice(n, optional s2)
 	a1 = split(s1, &quot;,&quot;)
 	fsMacVoice = a1(n)
 end function
-
 Sub dialog1Combo2ShowSAYChoices(oDialog)
 	&apos;Mac OSX say
 	Dim n, o As Integer
 	Dim s1 As String
-	Dim s2(4) As String
+	Dim s2 As String
+	Dim aA
 	Dim oComboBox As Variant
 	REM get control
 	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
 	REM first remove all old items from the list
 	n=oComboBox.getItemCount()
 	oComboBox.removeItems( 0,n)
-	s2(1)=&quot;.m4a&quot;
-	s2(2)=&quot;.aiff&quot;
-	For n=1 To 2
+	s2= &quot;.m4a,.aif&quot;
+	aA = split(s2, &quot;,&quot;)
+	For n=lbound(aA) To ubound(aA)
 			s1=&quot;-o &quot;&quot;(HOME)(NOW)&quot; &amp; s2(n) &amp; &quot;&quot;&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
 			oComboBox.addItem(s1,0)
 	Next 
@@ -408,29 +412,36 @@ End Sub
 Sub dialog1Combo2ShowAppleScriptChoices(oDialog)
 	&apos;Mac OSX open or osascript
 	Dim n As Integer
-	Dim s1 As String
-	Dim a1
+	Dim s1, s2 As String
+	Dim a1, a2
 	Dim CR
 	CR = chr$(10)
 	Dim oComboBox As Variant
 	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
 	n=oComboBox.getItemCount()
 	oComboBox.removeItems( 0,n)
-	s1= CR &amp; _
-		&quot;_AIRPLAY_QUICKLY)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;_AIRPLAY_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;_AIRPLAY)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;_QUICKLY)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;_QUICKLY)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;_QUICKLY)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;_SLOWLY)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;_SLOWLY)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;&quot; &amp; CR &amp; _
+	s2 = &quot;&quot;
+	if fbHaveFfmpeg() then
+		s2 = s2 &amp; &quot;.webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480,.webm&quot;&quot; &quot;&quot;(MY_IMAGE),.wav,.ogg,.mp4&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480,.mp4&quot;&quot; &quot;&quot;(MY_IMAGE),.mp4,.mp3,&quot;
+	endif
+	s2 = s2 &amp; &quot;.m4a&quot;&quot;,.aif&quot;&quot;&quot;
+	a2 = split(s2, &quot;,&quot;)
+	s1= &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;_AIRPLAY_QUICKLY)&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;_AIRPLAY_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;_AIRPLAY)&quot;&quot;&quot; &amp; CR		
+	for n = lbound(a2) to ubound(a2)		
+		s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot; &quot;&quot;(HOME)(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;_QUICKLY)&quot;&quot; &quot;&quot;(HOME)(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;_SLOWLY)&quot;&quot; &quot;&quot;(HOME)(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;)&quot;&quot; &quot;&quot;(HOME)(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR
+	next
+	s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;_QUICKLY)&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;)&quot;&quot;&quot;
 	a1=Split(s1,CR)
-	for n = lbound(a1) + 1 to ubound(a1)
+	for n = lbound(a1) to ubound(a1)
 		oComboBox.addItem(&quot;&quot;&quot;(SAY_APPLESCRIPT&quot; &amp; a1(n),0)
 	next
 End Sub
@@ -452,15 +463,11 @@ Sub dialog1Combo2ShowESPEAKChoices(oDialog)
 	n=oComboBox.getItemCount()
 	oComboBox.removeItems(0,n)
 	s3=&quot;&quot;
-	s2(0)=&quot; -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;
-	s2(1)=&quot; -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;
-	s2(2)=&quot; -s 130 -f &apos;(TMP)&apos;&quot;
-	s2(3)=&quot; -f &apos;(TMP)&apos;&quot;
+	s2(0)=&quot; -b 1 -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;
+	s2(1)=&quot; -b 1 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;
+	s2(2)=&quot; -b 1 -s 130 -f &apos;(TMP)&apos;&quot;
+	s2(3)=&quot; -b 1 -f &apos;(TMP)&apos;&quot;
     For n=0 To 3
-&apos;		s1=s3 &amp; &quot;-v (SELECTION_LANGUAGE_CODE)&quot; &amp; s2(n)
-&apos;		oComboBox.addItem(s1,0)
-&apos;		s1=s3 &amp; &quot;-v (LANGUAGE_CODE)&quot; &amp; s2(n)
-&apos;		oComboBox.addItem(s1,0)
 		&apos;English
 		s1=s3 &amp; &quot;-v en-us&quot; &amp; s2(n)
 		oComboBox.addItem(s1,0)
@@ -659,28 +666,30 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PYTTSX_READ_TEXT_PY)&quot;&quot;&quot;&amp; s2(n) &amp; &quot;&quot;&quot;(TMP)&quot;&quot;&quot;
 		Next
 	Endif
-	If fileExists(&quot;/usr/lib/python2.7/dist-packages/speechd/client.py&quot;) Then
-		s2(0)=&quot;MALE3&quot; 
-		s2(1)=&quot;MALE2&quot;
-		s2(2)=&quot;MALE1&quot;
-		s2(3)=&quot;FEMALE3&quot;
-		s2(4)=&quot;FEMALE2&quot;
-		s2(5)=&quot;FEMALE1&quot;
-		s2(6)=&quot;CHILD_MALE&quot;
-		s2(7)=&quot;CHILD_FEMALE&quot;
-		For n=0 To 7
+	if Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/python3&quot;) &gt; 0 Then
+		If fileExists(&quot;/usr/lib/python3/dist-packages/speechd/client.py&quot;) Then
+			s2(0)=&quot;MALE3&quot; 
+			s2(1)=&quot;MALE2&quot;
+			s2(2)=&quot;MALE1&quot;
+			s2(3)=&quot;FEMALE3&quot;
+			s2(4)=&quot;FEMALE2&quot;
+			s2(5)=&quot;FEMALE1&quot;
+			s2(6)=&quot;CHILD_MALE&quot;
+			s2(7)=&quot;CHILD_FEMALE&quot;
+			For n=0 To 7
+				s1=s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot; --voice &quot;&quot;&quot;&amp; s2(n) &amp; _
+				&quot;&quot;&quot; --rate &quot;&quot;-30&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				
+				s1=s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot; --voice &quot;&quot;&quot;&amp; s2(n) &amp; _
+				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			Next
 			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot; --voice &quot;&quot;&quot;&amp; s2(n) &amp; _
-			&quot;&quot;&quot; --rate &quot;&quot;-30&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot; --voice &quot;&quot;&quot;&amp; s2(n) &amp; _
-			&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Next
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-		&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot;&amp; _
-		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot;&amp; _
+			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+		Endif
 	Endif
 	If fileExists(&quot;/usr/bin/qrencode&quot;) Then
 	   	s2(0)=&quot;12&quot; 
@@ -745,107 +754,22 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 			s1=s1 &amp; CR &amp; s3 &amp; s2(n)
 		Next
 	EndIf
+	n=0
 	If fileExists( &quot;/usr/bin/text2wave&quot;)  or fileExists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave&quot;) or _
  		fileExists(fsProgramDirectory() &amp; &quot;festival\texttowave&quot;) Then
-		If fbHaveFfmpeg Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --image &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).webm&quot;&quot;&quot;&amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --image &quot;&quot;(POSTER_PNG)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).webm&quot;&quot;&quot;&amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif		
-		If fileExists( &quot;/usr/bin/speexenc&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).spx&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-		If fileExists( &quot;/usr/bin/oggenc&quot;)  Or fileExists(&quot;C:\opt\oggenc.exe&quot;)  Or fileExists(&quot;C:\opt\oggenc2.exe&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).ogg&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-		If fileExists( &quot;/usr/bin/lame&quot;)  Or fileExists(&quot;C:\opt\lame.exe&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).mp3&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-		If fbHaveFfmpeg Or fileExists( &quot;/usr/bin/twolame&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).mp2&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-		If fileExists( &quot;/usr/bin/faac&quot;)  Or fileExists(&quot;C:\opt\neroAacEnc.exe&quot;)  Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).m4a&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-		If fileExists( &quot;/usr/bin/flac&quot;) Or fileExists(&quot;C:\opt\flac.exe&quot;) Or fbHaveFfmpeg Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).flac&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif		
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --output &quot;&quot;(HOME)(NOW).wav&quot; &amp; _
-			&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;	
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
+		For n = 0 to fiCountFestivalDirectory
+			if fileExists (fsFestivalDirectory (n)) Then
+				s4=&quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(voice_&quot; &amp; fsFestivalVoice(n) &amp; &quot;)&quot;&quot;&quot;			
+				s1= s1 &amp; fspyOutOptions (oDialog,s4)			
+			Endif
+		Next			
 	Endif
 	n=0
 	If fileExists( &quot;/usr/bin/espeak&quot;) or fileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) or _
  		fileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then 
 		s2(0)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		If fbHaveFfmpeg Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).webm&quot;&quot;&quot;&amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot;&quot;(POSTER_PNG)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).webm&quot;&quot;&quot;&amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif		
-		If fileExists( &quot;/usr/bin/speexenc&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).spx&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-		If fileExists( &quot;/usr/bin/oggenc&quot;) Or fileExists(&quot;C:\opt\oggenc.exe&quot;) Or fileExists(&quot;C:\opt\oggenc2.exe&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).ogg&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-		If fileExists( &quot;/usr/bin/lame&quot;) Or fileExists(&quot;C:\opt\lame.exe&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).mp3&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-		If fbHaveFfmpeg Or fileExists( &quot;/usr/bin/twolame&quot;) Then
-				s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-					&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).mp2&quot; &amp; _
-					&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-		If fileExists( &quot;/usr/bin/faac&quot;) Or fileExists(&quot;C:\opt\neroAacEnc.exe&quot;) or fileExists(&quot;C:\opt\faac.exe&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).m4a&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-		If fileExists( &quot;/usr/bin/flac&quot;) Or fileExists(&quot;C:\opt\flac.exe&quot;) Or fbHaveFfmpeg Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).flac&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif		
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).wav&quot; &amp; _
-			&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --language=&quot;&amp; s2(n) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --language=&quot;&amp; s2(n) &amp; &quot; --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
+		s4= &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=&quot;&amp; s2(n)
+		s1= s1 &amp; fspyOutOptions (oDialog,s4)
 	Endif
 	n=6	
 	If fileExists( &quot;/usr/bin/pico2wave&quot;) Then
@@ -857,55 +781,9 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 		s2(5)=&quot;de&quot;
 		s2(6)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s2(7)=&quot;(SELECTION_LANGUAGE_CODE)&quot;
-		If fbHaveFfmpeg Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).webm&quot;&quot;&quot;&amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --image &quot;&quot;(POSTER_PNG)&quot;&quot;&quot;&amp; _
-				&quot; --output &quot;&quot;(HOME)(NOW).webm&quot;&quot;&quot;&amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
-		Endif		
-		If fileExists( &quot;/usr/bin/speexenc&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).spx&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;		
-		Endif
-		If fileExists( &quot;/usr/bin/oggenc&quot;)  Or fileExists(&quot;C:\opt\oggenc.exe&quot;)  Or fileExists(&quot;C:\opt\oggenc2.exe&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).ogg&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;		
-		Endif
-		If fileExists( &quot;/usr/bin/lame&quot;)  Or fileExists(&quot;C:\opt\lame.exe&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).mp3&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;		
-		Endif
-		If fbHaveFfmpeg Or fileExists( &quot;/usr/bin/twolame&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).mp2&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
-		Endif
-		If fileExists( &quot;/usr/bin/faac&quot;)  Or fileExists(&quot;C:\opt\neroAacEnc.exe&quot;) Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).m4a&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
-		Endif
-		If fileExists( &quot;/usr/bin/flac&quot;) Or fileExists(&quot;C:\opt\flac.exe&quot;) Or fbHaveFfmpeg Then
-			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-				&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).flac&quot; &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
-		Endif		
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --language=&quot;&amp; s2(n) &amp; &quot; --output &quot;&quot;(HOME)(NOW).wav&quot; &amp; _
-			&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;		
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --language=&quot;&amp; s2(n) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --language=&quot;&amp; s2(n) &amp; &quot; --rate=80% --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;		
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; _
-			&quot; --language=&quot;&amp; s2(n) &amp; &quot; --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;		
+		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; &quot; --language=&quot;&amp; s2(n) &amp; &quot; --rate=80% --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;	
+		s4= &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=&quot;&amp; s2(n)
+		s1= s1 &amp; fspyOutOptions (oDialog,s4)				
 	Endif
 	if asc(left(s1,1)) = 10 then
 		s1 = mid(s1,2)
@@ -915,6 +793,69 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 		oComboBox.addItem(a1(n),0)
 	next
 End Sub
+
+function fspyOutOptions (oDialog,byval s4)
+	dim s1, s2, s3, CR as string
+	s1 = &quot;&quot;
+	s3 =  &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+	if Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;/bin/python3&quot;) = 0 Then
+		s2 = s3
+	else
+		s2 = &quot; --title=&quot;&quot;(TITLE)&quot;&quot; &quot; &amp; s3
+	endif  
+	CR=Chr$(10)
+	if s4 = &quot;&quot; then
+		s1 = &quot;&quot;
+	else
+		If fbHaveFfmpeg Then
+			s1=s1 &amp; CR &amp; s4 &amp; _
+				&quot; --image &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;&amp; _
+				&quot; --output &quot;&quot;(HOME)(NOW).webm&quot;&quot;&quot;&amp; _
+				s2
+			s1=s1 &amp; CR &amp; s4 &amp; _
+				&quot; --image &quot;&quot;(POSTER2_PNG)&quot;&quot;&quot;&amp; _
+				&quot; --output &quot;&quot;(HOME)(NOW).webm&quot;&quot;&quot; &amp; _
+				s2
+			s1=s1 &amp; CR &amp; s4 &amp; _
+				&quot; --image &quot;&quot;(POSTER_PNG)&quot;&quot;&quot;&amp; _
+				&quot; --output &quot;&quot;(HOME)(NOW).webm&quot;&quot;&quot; &amp; _
+				s2
+		Endif
+		s1=s1 &amp; CR &amp; s4 &amp; _
+			&quot; --output &quot;&quot;(HOME)(NOW).wav&quot;&quot;&quot; &amp; _
+			s3
+		If fileExists( &quot;/usr/bin/oggenc&quot;)  Or fileExists(&quot;C:\opt\oggenc.exe&quot;)  Or fileExists(&quot;C:\opt\oggenc2.exe&quot;) Then
+			s1=s1 &amp; CR &amp; s4 &amp; _
+				&quot; --output &quot;&quot;(HOME)(NOW).ogg&quot;&quot;&quot; &amp; _
+				s2
+		Endif
+		If fileExists( &quot;/usr/bin/lame&quot;)  Or fileExists(&quot;C:\opt\lame.exe&quot;) Then
+			s1=s1 &amp; CR &amp; s4 &amp; _
+				&quot; --output &quot;&quot;(HOME)(NOW).mp3&quot;&quot;&quot; &amp; _
+				s2
+		Endif
+		If fileExists( &quot;/usr/bin/faac&quot;)  Or fileExists(&quot;C:\opt\neroAacEnc.exe&quot;)  Then
+			s1=s1 &amp; CR &amp; s4 &amp; _
+				&quot; --output &quot;&quot;(HOME)(NOW).m4a&quot;&quot;&quot; &amp; _
+				s2
+		Endif
+		If fileExists( &quot;/usr/bin/flac&quot;) Or fileExists(&quot;C:\opt\flac.exe&quot;) Or fbHaveFfmpeg Then
+			s1=s1 &amp; CR &amp; s4 &amp; _
+				&quot; --output &quot;&quot;(HOME)(NOW).flac&quot;&quot;&quot; &amp; _
+				s3
+		Endif
+		If fbHaveFfmpeg Then
+			s1=s1 &amp; CR &amp; s4 &amp; _
+				&quot; --output &quot;&quot;(HOME)(NOW).aif&quot;&quot;&quot; &amp; _
+				s2
+		Endif		
+		s1=s1 &amp; CR &amp; s4 &amp; _
+			s3
+		s1=s1 &amp; CR &amp; s4 &amp; _
+			&quot; --visible=false&quot; &amp; s3
+	endif
+	fspyOutOptions = s1
+end function
 
 Function AppleScriptPath() As String
 	AppleScriptPath=&quot;/usr/bin/osascript&quot;
@@ -926,7 +867,11 @@ Sub resetSpeech
 	Dim a1
 	Dim n as integer
 	CR = Chr$(10)
-	aFile=fsFullPathOf(fsFestivalScriptName) &amp; CR &amp; _
+	aFile=fsMyTempLock(&quot;lock&quot;) &amp; CR &amp;_
+		fsMyTempLock(&quot;lock.id&quot;) &amp; CR &amp;_
+		fsMyTempLock(&quot;lock.title&quot;) &amp; CR &amp;_
+		fsMyTempLock(&quot;lock.album&quot;) &amp; CR &amp;_
+		fsFullPathOf(fsFestivalScriptName) &amp; CR &amp; _
 		fsFullPathOf(fsTemporaryTextDoc) &amp; CR &amp; _
 		fsFullPathOf(fsTemporaryTtsAppleScript)
 	a1 = split(sFile, CR)
@@ -1050,7 +995,26 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 	Dim aVal As Integer
 	Dim bWait As Boolean
 	Dim oBar    &apos; Generated status bar 
-	Dim oFrame  &apos; Current frame 
+	Dim oFrame  &apos; Current frame
+	On Error Goto errorHandler
+	&apos;Choose what To speak
+	If sOverRide=&quot;&quot; Then  
+		sTextToSpeak=fsGetTextSelection()
+	Else
+		sTextToSpeak=sOverRide
+	Endif
+	If fileexists(fsMyTempLock(&quot;lock.id&quot;)) Then
+		Kill fsMyTempLock(&quot;lock.id&quot;)
+	Endif
+	If fileexists(fsMyTempLock(&quot;lock.title&quot;)) Then
+		Kill fsMyTempLock(&quot;lock.title&quot;)
+	Endif
+	If fileexists(fsMyTempLock(&quot;lock.album&quot;)) Then
+		Kill fsMyTempLock(&quot;lock.album&quot;)
+	Endif
+	If Len(sTextToSpeak) = 0 then
+		Exit sub
+	Endif
 	On Error Resume Next
 	oFrame=ThisComponent.getCurrentController().getFrame() 
 	oBar=oFrame.createStatusIndicator() 
@@ -1060,15 +1024,16 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 	sScript=&quot;&quot;
 	&apos;Get rid of the old files containing a script And/or plain text of selected String
 	resetSpeech
+	&apos; An external osa script, python script, or vbs script writes fsMyTempLock(&quot;lock&quot;),
+	&apos; does the work, then removes the file when it completes the work.
+	&apos; Default avconv, iTunes or ffmpeg (Miro) media metadata:
+	&apos;    [Miro](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/)
+	CreateFile(fsMyTempLock(&quot;lock.id&quot;), fsThisDocAuthor(), &quot;UTF-8&quot;)
+	CreateFile(fsMyTempLock(&quot;lock.title&quot;), fsThisDocTitle(), &quot;UTF-8&quot;)
+	CreateFile(fsMyTempLock(&quot;lock.album&quot;), &quot;(&quot; &amp; fsStringLanguage(fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()) &amp; &quot;)&quot;, &quot;UTF-8&quot;)
 	On Error Resume Next
 	oBar.Value=30
 	On Error Goto errorHandler
-	&apos;Choose what To speak
-	If sOverRide=&quot;&quot; Then  
-		sTextToSpeak=fsGetTextSelection()
-	Else
-		sTextToSpeak=sOverRide
-	Endif
 	If config(fiFestivalOption) Then
 		&apos;Write the Festival script and the file to read aloud
 		sProgram=config(fiFestivalPath)
@@ -1109,6 +1074,8 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 				fswriteOSXSpeechScript (&quot;-a AirPlay -r 110 &quot;, fsSelectionLanguageAndRegion(true))
 			elseif instr(sCommand,&quot;&quot;&quot;(SAY_APPLESCRIPT_AIRPLAY_QUICKLY)&quot;&quot;&quot;)=1 then
 				fswriteOSXSpeechScript (&quot;-a AirPlay -r 240 &quot;, fsSelectionLanguageAndRegion(true))
+			elseif  Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;) Then
+				fswriteOSXSpeechScript (&quot;&quot;, &quot;&quot;)
 			else
 				fswriteOSXSpeechScript (&quot;&quot;, fsSelectionLanguageAndRegion(true))
 			endif
@@ -1175,7 +1142,6 @@ Sub ttsActuate(config() As Variant,msgs() As Variant,errorCode As Integer,sOverR
 		Endif
 		resetSpeech
 End Sub
-
 
 function fsReplaceText(sA as string, sFind as string, sReplace as string) as string
 	if not GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
@@ -1245,6 +1211,10 @@ Function replaceLocalTokensWithStr(sA As String) As String
 		sA=fsReplaceText(sA,sFind,sReplace)	
 
 		sFind=&quot;(SAY_APPLESCRIPT_AIRPLAY_QUICKLY)&quot;
+		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript)
+		sA=fsReplaceText(sA,sFind,sReplace)
+		
+		sFind=&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;
 		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript)
 		sA=fsReplaceText(sA,sFind,sReplace)		
 		
@@ -1337,19 +1307,19 @@ Function replacePublicTokensWithStr(sA As String) As String
 	Dim sReplace As String
 	
 	sFind=&quot;(AUTHOR)&quot;
-	sReplace=ltrim(rtrim(ThisComponent.DocumentProperties().Author))
+	sReplace=fsReplaceText(fsThisDocAuthor,&quot; &quot;,chr$(160)) &apos;&amp;nbsp;
 	sA=fsReplaceText(sA,sFind,sReplace)
 	
 	sFind=&quot;(TITLE)&quot;
-	sReplace=ThisComponent.DocumentProperties().Title
+	sReplace=fsReplaceText(fsThisDocTitle,&quot; &quot;,chr$(160)) &apos;&amp;nbsp;
 	If sReplace=&quot;&quot; Then 
-		sReplace=fsDateMyRegion() &amp; &quot; - &quot; &amp; fsTimeMyRegion()
+		sReplace=fsDateMyRegion() &amp; &quot;_&quot; &amp; fsTimeMyRegion()
 	Endif
 	sA=fsReplaceText(sA,sFind,sReplace)
-	
+		
 	&apos;Current date
 	sFind=&quot;(DATE)&quot;
-	sReplace=fsDateMyRegion()
+	sReplace=fsReplaceText(fsDateMyRegion,&quot; &quot;,chr$(160)) &apos;&amp;nbsp;
 	sA=fsReplaceText(sA,sFind,sReplace)
 	
 	&apos;Current time As spoken in region
@@ -1456,7 +1426,7 @@ Function fsgetCursorWord As String
 	oTC=oDoc.getText.createTextCursorByRange(oVC,False)
 	oTC.gotoEndOfWord(False)
 	oTC.gotoStartOfWord(True)
-	fsgetCursorWord=oTC.String 
+	fsgetCursorWord=oTC.String
 End Function
 
 Function fsSelectionLanguageAndRegion(optional bIgnoreInstalledVoices) As String
@@ -2216,28 +2186,20 @@ Sub MsgSpeak(strA As String)
 End Sub
 
 Function fsEscapeStr(sA As String) As String
-	&apos;Examples of custom URL schemes include:
-	&apos; MECARD:N:Appleseed,Johnny;TEL:+14089961010;EMAIL:majordomo@apple.com;URL:http://www.apple.com;NOTE:Tech hardware and software;BDAY:19760401;ADR:,,1 Infinite Loop,Cupertino,CA,95014,USA;;
-	&apos; MEBKM:TITLE:Dartmouth Sportsplex;URL:http://www.dartmouthsportsplex.com/;;
-	&apos; mailto:support@microsoft.com &apos;Mail
-	&apos; tel:+18000000000 &apos; Phone call
-	&apos; sms:+18000000000 &apos; SMS message
-	&apos; http://www.dartmouthsportplex.com &apos; Web
-	&apos; http://maps.google.ca/maps?q=44.6696,-63.5750 &apos; Google Maps
-	&apos; http://www.youtube.com/watch?v=OCARVoZqC-s &apos; Youtube App
-	&apos; feed://sites.google.com/site/readtextextension/home/announcements/posts.xml &apos; Subscription(Apple iOS)
-	&apos; comgoogleearth:// &apos; - Opens Google Earth app with Apple iOS if installed
-	&apos; com-innerfence-ccterminal:// &apos; Longest known string length 26 - Opens Credit Card terminal if installed
-	&apos; The Vcard format is not well supported on the Apple iOS
-	&apos; For more information,see: http://wiki.akosma.com/IPhone_URL_Schemes
-	sA=fsreplaceText(sA,&quot;+&quot;,&quot;%2B&quot;)
-	sA=fsreplaceText(sA,&quot;&amp;&quot;,&quot;%26&quot;)
-	Select Case LCase(Left(ConvertToURL(sA),Instr(ConvertToURL(sA),&quot;:&quot;)))
-	Case &quot;file:&quot;
-		fsEscapeStr=Mid(ConvertToURL(sA),9)
-	Case Else
+	if  fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot; Then 
+		sA=fsreplaceText(sA,&quot;+&quot;,&quot;＋&quot;) &apos;http://www.fileformat.info/info/unicode/char/ff0b/index.htm 
+		sA=fsreplaceText(sA,&quot;&amp;&quot;,&quot;＆&quot;) &apos;http://www.fileformat.info/info/unicode/char/ff06/index.htm
 		fsEscapeStr=sA
-	End Select
+	else 
+		sA=fsreplaceText(sA,&quot;+&quot;,&quot;%2B&quot;)
+		sA=fsreplaceText(sA,&quot;&amp;&quot;,&quot;%26&quot;)
+		Select Case LCase(Left(ConvertToURL(sA),Instr(ConvertToURL(sA),&quot;:&quot;)))
+		Case &quot;file:&quot;
+			fsEscapeStr=Mid(ConvertToURL(sA),9)
+		Case Else
+			fsEscapeStr=sA
+		End Select
+	endif
 End Function
 
 Function fsLang As String
@@ -2425,33 +2387,98 @@ function fsPrefixZeroes (s1,n1)
 	endif
 end function
 
-function fswriteOSXSpeechScript (byval sArguments, sLangLocale)
-	dim sLang as string
-	dim CR,sA,sB,sF,sFile,sEncoding as string
+function fswriteOSXSpeechScript (byval sArguments, byval sArgLangLocale)
+	dim sLang, sLangLocale, sBaseCountry as string
+	dim CR,sA,sB,sF,sFile,sEncoding, sSize, sMeta as string
 	dim errorCode
 	CR = Chr$(13)
+	sLangLocale = &quot;&quot;
+	sBaseCountry = &quot;&quot;
+	&apos; Classic 35 mm camera format looks good on a HDMI screen or a full screen MacBook Pro.
+	&apos; See presets: http://develop.participatoryculture.org/index.php/ConversionMatrix
+	sSize = &quot;1200x800&quot; &apos; DSLR
+	&apos; sSize = &quot;640x480&quot; &apos; VGA projector or NTSC broadcast 4:3
+	&apos; sSize = &quot;720x576 &quot; &apos; PAL broadcast
+	&apos; sSize = &quot;1366x768&quot; &apos; Windows laptop 16:9
+	&apos; sSize = &quot;1280x800&quot; &apos; Apple MacBook
+	&apos; sSize = &quot;1440x900&quot; &apos; Apple MacBook Air
+	&apos; sSize = &quot;1920x1080&quot; &apos; 1080p High Def TV 16:9
+	sMeta = &quot; -metadata title=&quot;&quot; &amp; (quoted form of &quot;&quot;&quot; &amp; fsThisDocTitle() &amp; _
+		&quot;&quot;&quot;) &amp; &quot;&quot; -metadata Year=&quot;&quot; &amp; (quoted form of &quot;&quot;&quot; &amp; year(now) &amp; _
+		&quot;&quot;&quot;) &amp; &quot;&quot; -metadata artist=&quot;&quot; &amp; (quoted form of &quot;&quot;&quot; &amp; fsThisDocAuthor() &amp; _
+		&quot;&quot;&quot;) &amp; &quot;&quot; -metadata album=&quot;&quot; &amp; (quoted form of &quot;&quot;[&quot; &amp; fsStringLanguage(0,fsGetLanguage()) &amp; &quot;](&quot; &amp; fsStringLanguage(18 ,fsGetLanguage()) &amp; &quot;)&quot;&amp; _
+		&quot;&quot;&quot;) &amp; &quot;&quot; -metadata genre=&quot;&quot; &amp; (quoted form of &quot;&quot;Speech&quot;&quot;)&quot;
 	if fileExists (fsTemporaryTtsAppleScript) then
 		kill fsTemporaryTtsAppleScript
 	endif
 	sA = &quot;(*&quot; &amp; CR &amp; _
-			&quot;Read Text&quot; &amp; CR &amp; _
-			&quot;=========&quot; &amp; CR &amp; _
-			&quot;&quot; &amp; CR &amp; _
-			&quot;Read Aloud&quot; &amp; CR &amp; _
-			&quot;&quot; &amp; CR &amp; _
-			&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;  &quot;  &amp; CR &amp; _
-			&quot;&quot; &amp; CR &amp; _
-			&quot;Record&quot; &amp; CR &amp; _
-			&quot;&quot; &amp; CR &amp; _
-			&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;  &quot; &amp; CR &amp; _
-			&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;  &quot;  &amp; CR &amp; _
-			&quot;&quot; &amp; CR &amp; _
-			&quot;Online help&quot; &amp; CR &amp; _
-			&quot;-----------&quot; &amp; CR &amp; _
-			&quot;&quot; &amp; CR &amp; _
-			&quot;[Read Text](https://code.google.com/p/readtextextension/wiki/About)  &quot; &amp; CR &amp; _
-			&quot;&quot; &amp; CR &amp; _
-			&quot;*)&quot; &amp; CR
+		&quot;&quot; &amp; CR &amp; _
+		&quot;Read Text&quot; &amp; CR &amp; _
+		&quot;=========&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;**Read Text** reads text aloud, saves audio or video files&quot; &amp; CR &amp; _
+		&quot;from text, and can use resources from the web based on the&quot; &amp; CR &amp; _
+		&quot;selected text.&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot; * Select text.&quot; &amp; CR &amp; _
+		&quot; * Click the *Read selection...* button.&quot; &amp; CR &amp; _
+		&quot; * To read aloud, accept the default in the dialogue, or choose&quot; &amp; CR &amp; _
+		&quot;   another action from the menus.&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;Read Aloud&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;Record&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;Record an image with sound using Miro (`ffmpeg` or `avconv`)&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;Features&quot; &amp; CR &amp; _
+		&quot;--------&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot; * Automatically change languages according to the text language.&quot; &amp; CR &amp; _
+		&quot; * Create sound or still-image speech files for listening on the go.&quot; &amp; CR &amp; _
+		&quot; * Use web resources to translate, look up, listen, post, or interface&quot; &amp; CR &amp; _
+		&quot;   with web application interfaces.&quot; &amp; CR &amp; _
+		&quot; * **Miro Video Converter** can convert mp3, ogg, webm and other media using `ffmpeg`&quot; &amp; CR &amp; _
+		&quot;   Once installed, read text can use it to make audio and video media files&quot; &amp; CR &amp; _
+		&quot;   for cross-platform web browsers like chromium, chrome, and firefox.&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;###Miro and ffmpeg&quot; &amp; CR &amp; _
+		&quot;&quot;  &amp; CR &amp; _
+		&quot; * [ffmpeg](http://https://www.ffmpeg.org)&quot; &amp; CR &amp; _
+		&quot; * [Miro](http://ftp.osuosl.org/pub/pculture.org/miro/)&quot; &amp; CR &amp; _
+		&quot; * [Miro formats](http://develop.participatoryculture.org/index.php/ConversionMatrix)&quot; &amp; CR &amp; _
+		&quot; * [Miro video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/)&quot; &amp; CR &amp; _
+		&quot; * [Participatory culture foundation](http://pculture.org/)&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;Installation&quot; &amp; CR &amp; _
+		&quot;------------&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;Install *Read Text* by installing the extension from the download page:&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot; * [Apache OpenOffice](http://extensions.services.openoffice.org/en/project/read-text)&quot; &amp; CR &amp; _
+		&quot; * [LibreOffice](http://extensions.libreoffice.org/extension-center/read-text)&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;License&quot; &amp; CR &amp; _
+		&quot;-------&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;The project is licensed under the [GNU 2.0](http://www.gnu.org/licenses/gpl-2.0.txt) license.&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;Online help&quot; &amp; CR &amp; _
+		&quot;-----------&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;[Read Text](https://sites.google.com/site/readtextextension/)&quot; &amp; CR &amp; _
+		&quot;&quot; &amp; CR &amp; _
+		&quot;*)&quot; &amp; CR
 	if sArguments &lt;&gt; &quot;&quot; then
 		if instr(sArguments, &quot;AirPlay&quot;) &lt;&gt; 0 then
 			sA = &quot;(*&quot; &amp; CR &amp; _
@@ -2477,40 +2504,146 @@ function fswriteOSXSpeechScript (byval sArguments, sLangLocale)
 		endif
 	endif
 	sF = ConvertFromURL(fsFullPathOf(fsTemporaryTextDoc))
-	sLangLocale=fsReplaceText(sLangLocale,&quot;-&quot;,&quot;_&quot;)
+	&apos; We use the system voice if the selected language is the same as the user interface
+	&apos; language. You can choose a specific voice for your primary working language using
+	&apos; the system preferences for speech. Secondary languages use voices chosen to match
+	&apos; language and region. We recommend you install the optional high quality voice for
+	&apos; any voice you use regularly.
+
+	if sArgLangLocale = &quot;&quot; then
+		sLangLocale = &quot;&quot;
+	else
+		sLang = fsGetLanguage() &amp; &quot;-&quot; &amp;  fsGetCountry()
+		sBaseCountry = mid(sArgLangLocale, instr(sArgLangLocale,&quot;-&quot;)+1)		
+		select case sArgLangLocale
+		case &quot;&quot;, sLang,  fsGetLanguage() &amp; &quot;-&quot; &amp; sBaseCountry
+			sLangLocale = &quot;&quot; 
+		case else
+			sLangLocale=fsReplaceText(sArgLangLocale,&quot;-&quot;,&quot;_&quot;)
+		end select
+	endif
 	sB =&quot;#/usr/bin/osascript&quot; &amp; CR &amp; sA &amp; _
+		&quot;-- ------------------------------------------------------&quot; &amp; CR &amp; _
 		&quot;-- Read Text Extension created this script&quot; &amp; CR &amp; _
-		&quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;)&amp; &quot; &quot; &amp; fsNow &amp; CR &amp; _
+		&quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; &quot; &amp; fsNow &amp; CR &amp; _
+		&quot;-- ------------------------------------------------------&quot; &amp; CR &amp; _
 		&quot;on run (arguments)&quot; &amp; CR &amp; _
 		&quot;	set argv1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	set argv2 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	set argv3 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	set astring to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	set b to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _	
+		&quot;	set cout1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _	
+		&quot;	set cout2 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _	
+		&quot;	set defaultPng to &quot;&quot;&quot; &amp; ConvertFromURL(fsPoster2Png) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	set defaultSize to &quot;&quot;&quot; &amp; sSize &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	set doPostProcess to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _	
+		&quot;	set doPostProcess2 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;	set err1 to &quot;&quot;Apple Script&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	set ffmeta to &quot;&quot;&quot; &amp; sMeta &amp; CR &amp; _
+		&quot;	set myConverter to &quot;&quot;&quot; &amp; fsMyFfmpeg &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;	set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set textFile to &quot;&quot;&quot; &amp; sF &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; fsMyTempLock &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;	set myOption to &quot;&quot;&quot; &amp; sArguments &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	set textFile to &quot;&quot;&quot; &amp; sF &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;-- ------------------------------------------------------&quot; &amp; CR &amp; _
+		&quot;	set b to (do shell script &quot;&quot;touch &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _		
 		&quot;	try&quot; &amp; CR &amp; _
-		&quot;		set argv1 to quoted form of POSIX path of (first item of arguments)&quot; &amp; CR &amp; _
+		&quot;		set argv1 to (item 1 of arguments)&quot; &amp; CR &amp; _
+		&quot;		set astring to fsChangeCase(getExtension(argv1),&quot;&quot;lower&quot;&quot;)&quot; &amp; CR &amp; _
 		&quot;	on error&quot; &amp; CR &amp; _
-		&quot;			set argv1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;		set argv1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;	end try&quot; &amp; CR &amp; _
-		&quot;	set myVoice to fsGetthevoice(myLang)&quot; &amp; CR &amp; _
+		&quot;	try&quot; &amp; CR &amp; _
+		&quot;		set argv2 to (item 2 of arguments)&quot; &amp; CR &amp; _
+		&quot;	on error&quot; &amp; CR &amp; _
+		&quot;		set argv2 to defaultPng&quot; &amp; CR &amp; _
+		&quot;	end try&quot; &amp; CR &amp; _
+		&quot;	try&quot; &amp; CR &amp; _
+		&quot;		set argv3 to (item 3 of arguments)&quot; &amp; CR &amp; _
+		&quot;	on error&quot; &amp; CR &amp; _
+		&quot;		set argv3 to defaultSize&quot; &amp; CR &amp; _
+		&quot;	end try&quot; &amp; CR &amp; _
+		&quot;	if astring is &quot;&quot;m4a&quot;&quot; or astring is &quot;&quot;aif&quot;&quot; or astring is &quot;&quot;aiff&quot;&quot; then&quot; &amp; CR &amp; _
+		&quot;		set doPostProcess to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _	
+		&quot;	else if myConverter is not &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _			
+		&quot;		if astring is &quot;&quot;mp3&quot;&quot; or astring is &quot;&quot;ogg&quot;&quot; or astring is &quot;&quot;wav&quot;&quot; then&quot; &amp; CR &amp; _
+		&quot;			set cout1 to argv1&quot; &amp; CR &amp; _
+		&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot; &amp; CR &amp; _
+		&quot;		else if astring is &quot;&quot;webm&quot;&quot; then&quot; &amp; CR &amp; _
+		&quot;			set cout1 to argv1&quot; &amp; CR &amp; _
+		&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -f image2 -i &quot;&quot; &amp; (quoted form of POSIX path of argv2) &amp; &quot;&quot; -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot; &amp; CR &amp; _
+		&quot;		else if astring is &quot;&quot;mp4&quot;&quot; then&quot; &amp; CR &amp; _
+		&quot;			set cout1 to argv1&quot; &amp; CR &amp; _
+		&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;			set cout2 to cout1 &amp; &quot;&quot;.webm&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;			set err1 to cout2&quot; &amp; CR &amp; _
+		&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -f image2 -i &quot;&quot; &amp; (quoted form of POSIX path of argv2) &amp; &quot;&quot; -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot; &amp; (quoted form of POSIX path of cout2)&quot; &amp; CR &amp; _
+		&quot;			set doPostProcess2 to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of cout2) &amp; &quot;&quot; -acodec aac -ab 160k -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libx264 -preset slow -profile:v baseline -level 30 -maxrate 10000000 -bufsize 10000000 -f mp4 -threads 0 -strict experimental &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot; &amp; CR &amp; _
+		&quot;		else&quot; &amp; CR &amp; _
+		&quot;			set argv1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;		end if&quot; &amp; CR &amp; _		
+		&quot;	else&quot; &amp; CR &amp; _
+		&quot;		set argv1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	end if&quot; &amp; CR &amp; _		
+		&quot;	if myLang is &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
+		&quot;		set myVoice to &quot;&quot;System&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;		set myLang to &quot;&quot;Default Language&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;		set myVoiceCommand to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	else&quot; &amp; CR &amp; _
+		&quot;		set myVoice to fsGetthevoice(myLang)&quot; &amp; CR &amp; _
+		&quot;		set myVoiceCommand to &quot;&quot; --voice &apos;&quot;&quot; &amp; myVoice &amp; &quot;&quot;&apos;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	end if&quot; &amp; CR &amp; _	
 		&quot;	try&quot; &amp; CR &amp; _
 		&quot;		if argv1 is &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
 		&quot;			if isInString(myOption, &quot;&quot;AirPlay&quot;&quot;) then&quot; &amp; CR &amp; _
 		&quot;				set err1 to &quot;&quot;AirPlay&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;				display notification &quot;&quot;AirPlay&quot;&quot; with title &quot;&quot;Read Text: &quot;&quot; &amp; myVoice &amp; &quot;&quot; (&quot;&quot; &amp; myLang &amp; &quot;&quot;)&quot;&quot; sound name &quot;&quot;Purr&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;				theMsg (&quot;&quot;AirPlay&quot;&quot;, myVoice, myLang, &quot;&quot;Purr&quot;&quot;)&quot; &amp; CR &amp; _
 		&quot;			end if&quot; &amp; CR &amp; _
-		&quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; &quot;&quot; --voice &apos;&quot;&quot; &amp; myVoice &amp; &quot;&quot;&apos; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot; &amp; CR &amp; _		
+		&quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot; &amp; CR &amp; _		
 		&quot;		else&quot; &amp; CR &amp; _
 		&quot;			set err1 to &quot;&quot;Audio file&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; &quot;&quot; -o &quot;&quot; &amp; argv1 &amp; &quot;&quot; --voice &apos;&quot;&quot; &amp; myVoice &amp; &quot;&quot;&apos; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;			display notification argv1 with title &quot;&quot;Read Text: &quot;&quot; &amp; myVoice &amp; &quot;&quot; (&quot;&quot; &amp; myLang &amp; &quot;&quot;)&quot;&quot; sound name &quot;&quot;Purr&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; &quot;&quot; -o &quot;&quot; &amp; argv1 &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot; &amp; CR &amp; _
+		&quot;			if doPostProcess is not &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
+		&quot;				set err1 to &quot;&quot;ffmpeg &quot;&quot; &amp; astring &amp; &quot;&quot; encode&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;				set b to (do shell script doPostProcess)&quot; &amp; CR &amp; _
+		&quot;				if doPostProcess2 is not &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
+		&quot;					set err1 to &quot;&quot;ffmpeg [2] &quot;&quot; &amp; astring &amp; &quot;&quot; encode&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;					set b to (do shell script doPostProcess2)&quot; &amp; CR &amp; _
+		&quot;					set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; cout2 &amp; &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _		
+		&quot;				end if&quot; &amp; CR &amp; _		
+		&quot;				set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; argv1 &amp; &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _		
+		&quot;				set argv1 to cout1&quot; &amp; CR &amp; _
+		&quot;			end if&quot; &amp; CR &amp; _
+		&quot;			theMsg (argv1, myVoice, myLang, &quot;&quot;Purr&quot;&quot;)&quot; &amp; CR &amp; _
 		&quot;		end if&quot; &amp; CR &amp; _
 		&quot;	on error&quot; &amp; CR &amp; _
-		&quot;		set b to (do shell script &quot;&quot;say --voice &apos;Alex&apos; &apos;&quot;&quot; &amp; err1 &amp; &quot;&quot; error!&apos;&quot;&quot;)&quot; &amp; CR &amp; _
 		&quot;		set b to (do shell script &quot;&quot;rm -f &quot;&quot; &amp; argv1)&quot; &amp; CR &amp; _
-		&quot;		display notification &quot;&quot;Annuler&quot;&quot; with title &quot;&quot;Read Text: &quot;&quot; &amp; myVoice &amp; &quot;&quot; (&quot;&quot; &amp; myLang &amp; &quot;&quot;)&quot;&quot; sound name &quot;&quot;Sosumi&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;		theMsg (err1 &amp; &quot;&quot;: &quot; &amp; fsStringLanguage(9, fsGetLanguage) &amp; &quot;&quot;&quot;, myVoice, myLang, &quot;&quot;Sosumi&quot;&quot;)&quot; &amp; CR &amp; _
 		&quot;	end try&quot; &amp; CR &amp; _
+		&quot;	set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _		
 		&quot;end run&quot; &amp; CR &amp; _
+		&quot;-- ------------------------------------------------------&quot; &amp; CR &amp; _
+		&quot;on theMsg(sA, sVoz, myLang, sBeep)&quot; &amp; CR &amp; _
+		&quot;	try&quot; &amp; CR &amp; _
+		&quot;		display notification sA with title &quot;&quot;Read Text: &quot;&quot; &amp; sVoz &amp; &quot;&quot; (&quot;&quot; &amp; myLang &amp; &quot;&quot;)&quot;&quot; sound name sBeep&quot; &amp; CR &amp; _
+		&quot;	end try&quot; &amp; CR &amp; _
+		&quot;end theMsg&quot; &amp; CR &amp; _
+		&quot;on getExtension(sA)&quot; &amp; CR &amp; _
+		&quot;	if sA is &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
+		&quot;		set a3 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	else&quot; &amp; CR &amp; _
+		&quot;		set a1 to theSplit(sA, &quot;&quot;.&quot;&quot;)&quot; &amp; CR &amp; _
+		&quot;		set s1 to the last item of a1&quot; &amp; CR &amp; _
+		&quot;		set a2 to theSplit(s1, &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _
+		&quot;		set s2 to first item of a2&quot; &amp; CR &amp; _
+		&quot;		set a3 to theSplit(s2, &quot;&quot;\&quot;&quot;&quot;&quot;)&quot; &amp; CR &amp; _
+		&quot;		set s3 to first item of a3&quot; &amp; CR &amp; _
+		&quot;	end if&quot; &amp; CR &amp; _
+		&quot;	return a3 as Unicode text&quot; &amp; CR &amp; _
+		&quot;end getExtension&quot; &amp; CR &amp; _
 		&quot;on theSplit(theString, theDelimiter)&quot; &amp; CR &amp; _
 		&quot;	set oldDelimiters to AppleScript&apos;s text item delimiters&quot; &amp; CR &amp; _
 		&quot;	set AppleScript&apos;s text item delimiters to theDelimiter&quot; &amp; CR &amp; _
@@ -2530,6 +2663,15 @@ function fswriteOSXSpeechScript (byval sArguments, sLangLocale)
 		&quot;	end if&quot; &amp; CR &amp; _
 		&quot;	return retval&quot; &amp; CR &amp; _
 		&quot;end isInString&quot; &amp; CR &amp; _
+		&quot;on fsChangeCase ( s1 , s2 )&quot; &amp; CR &amp; _
+		&quot;	if s2 is &quot;&quot;lower&quot;&quot; then&quot; &amp; CR &amp; _
+		&quot;		set s3 to &quot;&quot;A-Z a-z&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	else&quot; &amp; CR &amp; _
+		&quot;		set s3 to &quot;&quot;a-z A-Z&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;	end if&quot; &amp; CR &amp; _
+		&quot;	set s4 to (do shell script &quot;&quot;echo &quot;&quot; &amp; quoted form of ( s1 ) &amp; &quot;&quot; | tr &quot;&quot; &amp; s3 &amp; &quot;&quot; &quot;&quot;)&quot; &amp; CR &amp; _
+		&quot;	return s4&quot; &amp; CR &amp; _
+		&quot;end fsChangeCase&quot; &amp; CR &amp; _
 		&quot;on testTheString(myArray, sLang, sDiv)&quot; &amp; CR &amp; _
 		&quot;	set retval to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;	if sDiv is &quot;&quot; &quot;&quot; then&quot; &amp; CR &amp; _
@@ -2638,7 +2780,7 @@ sub WarnNoSpeech
 	if (1 = MsgBox(&quot;[espeak] &quot; &amp; fsStringLanguage(15, fsGetLanguage) &amp; Chr$(10) &amp; Chr$(10) &amp; fsStringLanguage(17, fsGetLanguage) &amp; &quot; ...&quot; , 49, fsStringLanguage(0, fsGetLanguage))) then
 		select case fsGetOS()
 		case &quot;WINDOWS&quot;,&quot;MAC&quot;,&quot;OSX&quot;
-			webHelp(&quot;https://code.google.com/p/readtextextension/wiki/SetUp&quot;)
+			webHelp(&quot;https://sites.google.com/site/readtextextension/&quot;)
 		case else
 			select case Environ(&quot;DESKTOP_SESSION&quot;)
 			case &quot;debian&quot;
@@ -2646,13 +2788,13 @@ sub WarnNoSpeech
 			case &quot;ubuntu&quot;
 				webHelp(&quot;apt:libttspico-utils&quot;)
 			case else
-				webHelp(&quot;https://code.google.com/p/readtextextension/wiki/SetUp&quot;)
+				webHelp(&quot;https://sites.google.com/site/readtextextension/&quot;)
 			end select
 		end select		 
 	endif
 	exit sub
 	WarnNoSpeechErr:
-	webHelp(&quot;https://code.google.com/p/readtextextension/wiki/SetUp&quot;)
+	webHelp(&quot;https://sites.google.com/site/readtextextension/&quot;)
 end sub
 
 sub CheckUnixSpeech
@@ -2674,10 +2816,282 @@ sub CheckUnixSpeech
 end sub
 
 function fbHaveFfmpeg
-	fbHaveFfmpeg = ((fileExists( &quot;/usr/bin/ffmpeg&quot;) Or _
-	fileExists(&quot;C:\opt\ffmpeg.exe&quot;)) Or _
-	fileExists( &quot;/usr/bin/avconv&quot;)) Or _
-	fileExists(&quot;C:\opt\avconv.exe&quot;) Or _
-	fileExists( &quot;/usr/local/bin/ffmpeg&quot;)
+	fbHaveFfmpeg = not (fsMyFfmpeg() =&quot;&quot;) 
 end function
+
+function fsMyFfmpeg()
+
+&apos;&apos; ###Miro Video Converter (ffmpeg)
+&apos;&apos;
+&apos;&apos; Miro Video Converter can convert mp3, ogg, webm and other media using `ffmpeg`
+&apos;&apos; Once installed, read text can use it to make audio and video media files
+&apos;&apos; for cross-platform web browsers like chromium, chrome, and firefox.
+&apos;&apos;
+&apos;&apos;  * [ffmpeg](http://https://www.ffmpeg.org)
+&apos;&apos;	* [Miro](http://ftp.osuosl.org/pub/pculture.org/miro/)
+&apos;&apos;  * [Miro formats](http://develop.participatoryculture.org/index.php/ConversionMatrix)
+&apos;&apos;  * [Miro video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/)
+&apos;&apos;  * [Participatory culture foundation](http://pculture.org/)
+&apos;&apos;
+&apos;&apos;  The most compact working download is Miro video converter -
+&apos;&apos;  (`MiroConvertorSetup.exe`)[http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/].
+&apos;&apos;  (`Miro_openinstall.exe`)[http://ftp.osuosl.org/pub/pculture.org/miro/]
+&apos;&apos;  is a (full media manager)[http://www.getmiro.org/] like iTunes.
+&apos;&apos;
+&apos;&apos; ###avconv
+&apos;&apos;
+&apos;&apos; On [Ubuntu Linux](http://ubuntu.com), the `avconv` project is included in the repository
+&apos;&apos; instead of `ffmpeg`. Read text can use either.
+
+	dim sProgramPaths, sWebURL, cR, sA, sB, sC, sD, sE as string
+	dim aC, aD
+	dim i as integer
+	aC = split(&quot;ffmpeg,avconv&quot;, &quot;,&quot;)
+	cR = chr$(10)
+	sA = fsProgramDirectory()
+	sB = fsProgramDirectoryx86()
+	sProgramPaths = &quot;&quot;
+	for i = lbound(aC) to ubound(aC)
+		sProgramPaths = sProgramPaths &amp; &quot;file:///usr/bin/&quot; &amp; aC(i) &amp; cR &amp; _
+		&quot;file:///Applications/Miro.app/Contents/Helpers/&quot; &amp; aC(i) &amp; cR &amp; _
+		&quot;file:///Applications/Miro%20Video%20Converter.app/Contents/Helpers/&quot; &amp; aC(i) &amp; cR &amp; _
+		&quot;file:///Applications/Shotcut.app/Contents/MacOS/&quot; &amp; aC(i) &amp; cR &amp; _
+		converttourl(sA) &amp; &quot;Participatory%20Culture%20Foundation/Miro/ffmpeg/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
+		converttourl(sB) &amp; &quot;Participatory%20Culture%20Foundation/Miro/ffmpeg/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
+		converttourl(sA) &amp; &quot;Participatory%20Culture%20Foundation/Miro%20Video%20Converter/ffmpeg/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
+		converttourl(sB) &amp; &quot;Participatory%20Culture%20Foundation/Miro%20Video%20Converter/ffmpeg/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
+		&quot;file:///usr/local/bin/&quot; &amp; aC(i) &amp; cR &amp; _
+		&quot;file:///opt/&quot; &amp; aC(i) &amp; cR &amp; _
+		&quot;file:///opt/local/&quot; &amp; aC(i) &amp; cR &amp; _
+		&quot;file:///opt/Shotcut/Shotcut.app/bin/&quot; &amp; aC(i) &amp; cR
+		&apos; &quot;---END OF CR SEPARATED LIST---&quot;
+	next
+	aD= split( fsSuperTrim ( sProgramPaths), cR)
+	sE = &quot;&quot;
+	for i = lbound(aD) to ubound(aD)
+		if fileExists(aD(i)) then
+			sE = (aD(i))
+			exit for
+		endif
+	next
+	fsMyFfmpeg = convertfromurl(sE)
+end function
+
+sub resetSpeechDispatcher(optional bAll as boolean)
+	dim errorCode
+	dim sTemp
+	if isMissing (bAll) then
+		&apos; Force stop playing the speech daemon?
+		&apos; Speech dispatcher&apos;s problems can often be fixed by shutting
+		&apos; down the daemon and forcing it to restart on the next try.
+		&apos; Check active processes with gnome-system-monitor 
+		bAll = false
+	endif
+	if fsGetOS()=&quot;OSX&quot; or fsGetOS = &quot;MAC&quot; then
+		if fileExists(&quot;/usr/bin/say&quot;) Then
+			if not (fbCreatingOSXMediaFile) and not (fbSendingAirPlay) then
+				errorCode=Shell(&quot;killall&quot;,0,&quot;say&quot;,true)
+			endif
+		endif	
+	elseif fsGetOS()=&quot;UNIX&quot; then
+		if fileExists(&quot;/usr/bin/spd-say&quot;) Then
+			if bAll then
+					errorCode=Shell(&quot;killall&quot;,0,&quot;speech-dispatcher&quot;,true)
+				else
+					errorCode=Shell(&quot;spd-say&quot;,0,&quot;--cancel&quot;,true)			
+			endif
+		endif
+		&apos; esdplay paplay &amp; aplay are background sound players that
+		&apos; the extension can use to play sounds in Linux.
+		if not (fbLetButtonInterruptPosixPlayer) Then
+			if fileExists(&quot;/usr/bin/paplay&quot;) Then
+				errorCode=Shell(&quot;killall&quot;,0,&quot;paplay&quot;,true)
+			endif
+			if fileExists(&quot;/usr/bin/esdplay&quot;) Then
+				errorCode=Shell(&quot;killall&quot;,0,&quot;esdplay&quot;,true)
+			endif
+			if fileExists(&quot;/usr/bin/aplay&quot;) Then
+				errorCode=Shell(&quot;killall&quot;,0,&quot;aplay&quot;,true)
+			endif
+		Endif
+		if fileExists(&quot;/usr/bin/espeak&quot;) Then
+			if not (fbCreatingMediaFile) then
+				errorCode=Shell(&quot;killall&quot;,0,&quot;espeak&quot;,true)
+			endif
+		endif
+		if fileExists(fsMyTempLock) Then
+			kill fsMyTempLock
+		endif	
+	endif
+end sub
+
+function fbLetButtonInterruptPosixPlayer
+	dim b1 as boolean
+	b1 = false
+	&apos; Don&apos;t interrupt if we are writing a media file
+	b1 = fbCreatingMediaFile (&quot;.aif,.aiff,.flac,.m4a,.mp3,.ogg,.wav,.webm&quot;)
+	&apos; Don&apos;t interrupt if we are using a graphical player. 
+	if fbCreatingMediaFile(&quot;--visible=true,--visible=&apos;true&apos;,--visible=&quot;&quot;true&quot;&quot;&quot;) or _
+		not (fbCreatingMediaFile(&quot;--visible=&quot;)) then
+		b1 = false
+	endif
+   fbLetButtonInterruptPosixPlayer = b1
+end function
+
+function fbSendingAirPlay
+	fbSendingAirPlay = fbCreatingMediaFile (&quot;SAY_APPLESCRIPT_AIRPLAY,airplay&quot;)
+end function
+
+function fbCreatingOSXMediaFile
+	dim sA as string
+	if fbHaveFfmpeg then
+		sA = &quot;.mp3,.mp4,.ogg,.wav,.webm,&quot;
+	else
+		sA = &quot;&quot;
+	endif
+	fbCreatingOSXMediaFile = fbCreatingMediaFile (sA &amp; &quot;.aiff,.aif,.m4a&quot;)
+end function
+
+function fbCreatingMediaFile (optional byval s2)
+	&apos; s2 is a csv string of media identifiers- for example, file extensions.
+	Dim sFile, s1 as String
+	Dim aA
+	Dim n as integer
+	Dim msgs()As Variant
+	Dim errorCode As Integer
+	if ismissing(s2) then
+		s2 = &quot;.wav&quot;
+	endif
+	Dim config(fiCountConfigOptions)As Variant
+	fbCreatingMediaFile = false
+	sFile=fsFullPathOf(fsExtensionSettingsIni)
+	tts_config_parseFile(sFile,config(),errorCode)
+	s1 = lcase(config(5))
+	aA = split (lcase(s2), &quot;,&quot;)
+	if len(s1) &lt;&gt; 0 then
+		for n = lbound (aA) to ubound (aA)
+			if aA(n) = &quot;&quot; then
+				exit for
+			elseif instr(s1, aA(n)) &gt; 0 then
+				fbCreatingMediaFile = true
+				exit for
+			endif
+		next
+	endif
+end function
+
+function fsThisDocAuthor
+	on error goto fsThisDocAuthorErr
+	fsThisDocAuthor = ThisComponent.DocumentProperties.Author	
+	if len(fsThisDocAuthor) = 0 then
+		fsThisDocAuthor = fsStringLanguage(0,fsGetLanguage()) &amp; &quot; &quot; &amp; fsExtensionVersion()
+	endif
+	exit function
+	fsThisDocAuthorErr:
+	fsThisDocAuthor = fsStringLanguage(0,fsGetLanguage())
+end function
+
+function fsThisDocTitle
+	on error goto fsThisDocTitleErr
+	dim sA, sB as string
+	dim aA, aB
+	if not GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	fsThisDocTitle = ThisComponent.DocumentProperties.Title	
+	if len(fsThisDocTitle) = 0 then
+		sA = ThisComponent.getURL()
+		aA = split (sA, &quot;/&quot;)
+		sB = convertfromurl (aA(ubound(aA)))
+		aB = split (sB, &quot;.&quot;)
+		fsThisDocTitle = aB(lbound (aB))
+	endif
+	exit function
+	fsThisDocTitleErr:
+	fsThisDocTitle = fsQuickTitle(5)
+end function
+
+function fsQuickTitle(optional iWords)
+    &apos; Returns the first words of the selected string
+    if ismissing (iWords) then
+    	iWords = 4
+    endif
+    on error goto fsQuickTitleErr
+	dim s1, s2  as string
+	dim a1, a2
+	dim n as integer
+	s1 = fsGetTextSelection()
+	s2 = &quot;&quot;
+	a1 = split (s1, &quot; &quot;)
+	for n = lbound(a1) to iWords + 1
+		s1 = s1 &amp; &quot; .&quot;
+	next n
+	a2 = split(s1, &quot; &quot;)
+	for n = lbound (a2) to iWords - 1
+		s2 = s2 &amp; a2(n) &amp; &quot; &quot;
+	next
+	s2 = fsSuperTrim(s2)
+	s2 = fsReplaceText(s2,chr$(13),&quot;&quot;)
+	s2 = fsReplaceText(s2,chr$(10),&quot; &quot;)
+	s2 = fsReplaceText(s2,chr$(9),&quot;&quot;)
+	fsQuickTitle = s2
+	exit function
+	fsQuickTitleErr:
+		fsQuickTitle = &quot;&quot;
+end function
+
+sub xxxxx
+dim ffmeta
+dim doPostProcess, sTitle, sArtist, myConverter, argv1, cout1, sAlbum
+dim doPostProcess2, doPostProcess1, argv2, cout2, csize, cout3
+  myConverter = fsMyFfmpeg
+  argv1 = &quot;input.wav&quot;
+  cout1 = argv1 &amp; &quot;.mp3&quot;
+  argv2 =  argv1 &amp; &quot;.png&quot;
+  cout2 =  argv1 &amp; &quot;.webm&quot;
+  cout3 =  argv1 &amp; &quot;.m4v&quot;
+  csize = &quot;1200x800&quot;
+  ffMeta = &quot; -metadata title=&quot;&quot;&quot; &amp; sTitle &amp; &quot;&quot;&quot; -metadata Year=&quot;&quot;&quot; &amp; Year(Now) &amp; &quot;&quot;&quot; -metadata artist=&quot;&quot;&quot; &amp; sArtist &amp; &quot;&quot;&quot; -metadata album=&quot;&quot;&quot; &amp; sAlbum &amp; &quot;&quot;&quot; -metadata genre=&quot;&quot;Speech&quot;&quot; &quot;
+ sTitle = fsThisDocTitle
+ sArtist = fsThisDocAuthor
+ 
+  &apos; output to sound
+  doPostProcess = &quot;&quot;&quot;&quot; &amp; myConverter &amp; &quot;&quot;&quot; -i &quot;&quot;&quot; &amp; argv1 &amp; &quot;&quot;&quot; &quot; &amp; ffmeta &amp; &quot; -y &quot;&quot;&quot; &amp; cout1 &amp; &quot;&quot;&quot;&quot;
+  &apos; output to video
+  &apos;
+  &apos; webm
+    
+    doPostProcess1 =&quot;&quot;&quot;&quot; &amp; myConverter &amp; &quot;&quot;&quot; -i &quot;&quot;&quot; &amp; argv1 &amp; &quot;&quot;&quot; -f image2 -i &quot;&quot;&quot; &amp; argv2 &amp; &quot;&quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot;&quot; &amp;  cout2 &amp; &quot;&quot;&quot;&quot;
+
+    
+  	doPostProcess2 =&quot;&quot;&quot;&quot; &amp; myConverter &amp; &quot;&quot;&quot; -i &quot;&quot;&quot; &amp; cout2 &amp; &quot;&quot;&quot; -acodec aac -ab 160k -vcodec libx264 -preset slow -profile:v baseline -level 30 -maxrate 10000000 -bufsize 10000000 -f mp4 -threads 0 -strict experimental &quot; &amp; ffmeta &amp; &quot; -y &quot;&quot;&quot; &amp; cout3 &amp; &quot;&quot;&quot;&quot;
+  &apos; check
+  msgbox doPostProcess2
+end sub 
+
+sub xxxx
+
+
+	usage (&quot;Usage&quot;)
+end sub
+Sub Usage(s1)
+  s1=s1 &amp; chr(10)
+  s1=s1 &amp; chr(10)
+  s1=s1 &amp; &quot;tts_wscript.vbs [/language:&quot; &amp; chr(34) &amp; &quot;xxx&quot; &amp; chr(34) &amp; &quot; | /voice:&quot; &amp; chr(34) &amp; &quot;xxx&quot; &amp; chr(34) &amp; &quot;] [/rate:&quot;
+  s1=s1 &amp; &quot;nn] [/soundfile:&quot; &amp; chr(34) &amp; &quot;c:\xxx.wav&quot; &amp; chr(34) &amp; &quot;] &quot; &amp; chr(34) &amp; &quot;filename.txt&quot; &amp; chr(34) &amp; &quot;&quot; &amp; chr(10)
+  s1=s1 &amp; chr(10)
+  s1=s1 &amp; &quot;/language:&quot; &amp; chr(34) &amp; &quot;en&quot; &amp; chr(34) &amp; &quot; - Language option&quot; &amp; chr(10)
+  s1=s1 &amp; &quot;/voice:&quot; &amp; chr(34) &amp; &quot;Microsoft Hazel Desktop - English (Great Britain)&quot; &amp; chr(34) &amp; chr(10)
+  s1=s1 &amp; &quot;/rate:-3 - Minimum -10 &amp; Maximum 10&quot; &amp; chr(10)
+  s1=s1 &amp; &quot;/soundfile:&quot; &amp; chr(34) &amp; &quot;C:\xxx.wav&quot; &amp; chr(34) &amp; &quot; - sound file path&quot; &amp; chr(10)
+  s1=s1 &amp; &quot;/imagefile:&quot; &amp; chr(34) &amp; &quot;C:\xxx.png|jpg&quot; &amp; chr(34) &amp; &quot; - input png or jpg for ffmpeg webm output&quot; &amp; chr(10)
+
+  s1=s1 &amp; chr(34) &amp; &quot;filename.txt&quot; &amp; chr(34) &amp; &quot; Text Document to read (required)&quot;
+  
+  	if not GlobalScope.BasicLibraries.isLibraryLoaded(&quot;schooltools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;schooltools&quot;)
+	endif
+  fbshowdialog (s1)
+End Sub
+
 </script:module>

@@ -31,7 +31,11 @@ Sub ReadTextAloud
 		If config(fiAlwaysShowDialogCheckBox)=1 Then
 			ConfigureReadTextAloud()
 		Else
-			ttsActuate(config(),msgs(),errorCode,&quot;&quot;)
+		    if fileExists(fsMyTempLock) Then
+				resetSpeechDispatcher
+			else
+				ttsActuate(config(),msgs(),errorCode,&quot;&quot;)
+			endif
 		Endif
 	Else 
 		ConfigureReadTextAloud()
@@ -45,19 +49,21 @@ Sub SetupReadTextAloud
 	ConfigureReadTextAloud()
 End Sub
 
+
 Sub webHelpButton
-&apos; Dialog3 On-line info Button pressed.
-&apos; parameter
+	&apos; Dialog3 Button on LibreOffice can&apos;t call webHelp directly because of input parameter
 	webHelp
 End Sub
 
 Sub webHelp (optional sURL)
-	Dim oSvc As Object
+	on error goto webHelpErr
+	Dim oSvc
 	if ismissing (sURL) then
-		fsDialogMyRegion(fiL10nHELP_ONLINE_URL)
+		sURL = fsDialogMyRegion(fiL10nHELP_ONLINE_URL)
 	endif
 	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 	oSvc.execute(sURL,&quot;&quot;,0)
+	webHelpErr:
 End Sub
 
 Sub ReadClipBoard
@@ -65,6 +71,10 @@ Sub ReadClipBoard
 	&apos; text clipboard,including the Macro editor. You normally
 	&apos; fill the clipboard by selecting some text,Then using Edit &gt; Copy.
 	&apos; If this is useful, assign a key combination To the macro with Tools &gt; Customize. 
-	msgSpeak(fsGetClipBoard)
+    if fileExists(fsMyTempLock) Then
+		resetSpeechDispatcher
+	else
+		msgSpeak(fsGetClipBoard)
+	endif
 End Sub
 </script:module>

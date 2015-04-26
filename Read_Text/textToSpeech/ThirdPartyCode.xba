@@ -71,16 +71,39 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 		config(fiHtmlOption)=False
 		config(fiHtmlComboURL)=&quot;http://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
 		If fsGetOS()=&quot;UNIX&quot; Then &apos; Linux
-			if fileexists(&quot;/usr/bin/python2.7&quot;) then
+			If fileexists(&quot;/usr/bin/python3&quot;) then
+				config(fiExternalProgramPath)=&quot;/usr/bin/python3&quot;
+			Elseif fileexists(&quot;/usr/bin/python2.7&quot;) then
 				config(fiExternalProgramPath)=&quot;/usr/bin/python2.7&quot;
-			elseif fileexists(&quot;/usr/bin/python2&quot;) then
+			Elseif fileexists(&quot;/usr/bin/python2&quot;) then
 				config(fiExternalProgramPath)=&quot;/usr/bin/python2&quot;
-			else
+			Else
 				config(fiExternalProgramPath)=&quot;/usr/bin/python&quot;
-			endif
+			Endif
 			If fileexists(&quot;/usr/bin/pico2wave&quot;) then 
 				config(fiExternalCommand)=&quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
+			Elseif fileexists(&quot;/usr/bin/text2wave&quot;) then 
+				config(fiExternalCommand)=&quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+				&quot;--visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
+			Elseif fileexists(&quot;/usr/lib/python3/dist-packages/speechd/client.py&quot;) and fileexists(Environ(&quot;HOME&quot;) &amp; &quot;/.speech-dispatcher/conf/speechd.conf&quot;) then
+				&apos; Speech-dispatcher speech manager
+				&apos; ================================
+				&apos;
+				&apos; You can edit the local speech-dispatcher settings to use specific speech engines 
+				&apos; for different languages. For example, you can set up English and Spanish to use
+				&apos; pico and Catalan to use festival.
+				&apos; 
+				&apos; [Speech-dispatcher help](http://cvs.freebsoft.org/doc/speechd/speech-dispatcher.html)
+				&apos;
+				&apos; Installation
+				&apos; ------------
+				&apos;
+				&apos;     sudo apt-get install speech-dispatcher
+				&apos;
+				config(fiExternalCommand)=&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot; &amp; _
+					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			Else
 				config(fiExternalCommand)=&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
