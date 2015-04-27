@@ -4845,7 +4845,6 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 &apos;&apos;
 &apos;&apos; [fvTts1]: http://cvs.freebsoft.org/doc/speechd/speech-dispatcher.html
 &apos;&apos;
-&apos;  xxxxxxxx
 
 	Dim errorCode
 	Dim oBar
