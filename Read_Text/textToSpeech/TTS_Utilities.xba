@@ -461,7 +461,7 @@ function fsgetTextSelectiontoEnd(optional bAsPara as boolean) as string
 		bAsPara  =  false
 	endif
 	if bAsPara then
-		s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = fsSelectionLanguageAndRegion()
+		SetWorkingCountryLanguage()
 		sA = fsgetCursorWord(false)
 		fbSelecttoEndofParagraph()
 		sB  =  fsGetSelectionAndCopy
@@ -2046,8 +2046,7 @@ Sub ttsActuate(config() As Variant, _
 		&apos; Get current track, then increment it by one to a maximum value of 255. 
 		&apos; (hex FF)
 		n = fiMyCurrentAudioTrack(true)
-		if fsGetOS = &quot;OSX&quot; then 
-			&apos;sTextToSpeak = sTextToSpeak &amp; &quot;[[slnc 400]]&quot;
+		if fsGetOS = &quot;OSX&quot; then
 			bAddTime = true
 		else 
 			if config(fiExternalOption) or config(fiFestivalOption) then
@@ -2669,32 +2668,32 @@ Function fsSelectionLanguageAndRegion(optional bIgnoreInstalledVoices) As String
 &apos;&apos; text.
 &apos;&apos;
 	if s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot; then
-	if isMissing(bIgnoreInstalledVoices) Then
-		bIgnoreInstalledVoices = true
-	Endif
-	sA = fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
-	sB = fsSelectionLanguage
-	if bIgnoreInstalledVoices Then
-		fsSelectionLanguageAndRegion=sA
-	Else
-		Select Case fsGetOS()
-		Case &quot;WINDOWS&quot;
-			if fbWindowsHasVoiceInThisLanguage(sA) Then
-			&apos; use language and locale
-				fsSelectionLanguageAndRegion=sA
-			Elseif fbWindowsHasVoiceInThisLanguage(sB) Then
-			&apos; use language only
-				fsSelectionLanguageAndRegion=sB
-			Else
-			&apos; try using the language only...
-				fsSelectionLanguageAndRegion=sB
-			Endif
-		Case Else
+		if isMissing(bIgnoreInstalledVoices) Then
+			bIgnoreInstalledVoices = true
+		Endif
+		sA = fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
+		sB = fsSelectionLanguage
+		if bIgnoreInstalledVoices Then
 			fsSelectionLanguageAndRegion=sA
-		End Select
-	Endif
+		Else
+			Select Case fsGetOS()
+			Case &quot;WINDOWS&quot;
+				if fbWindowsHasVoiceInThisLanguage(sA) Then
+				&apos; use language and locale
+					fsSelectionLanguageAndRegion=sA
+				Elseif fbWindowsHasVoiceInThisLanguage(sB) Then
+				&apos; use language only
+					fsSelectionLanguageAndRegion=sB
+				Else
+				&apos; try using the language only...
+					fsSelectionLanguageAndRegion=sB
+				Endif
+			Case Else
+				fsSelectionLanguageAndRegion=sA
+			End Select
+		Endif
 	Else
-		fsSelectionLanguageAndRegion = CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage
+		fsSelectionLanguageAndRegion = s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage
 	Endif
 End Function
 
