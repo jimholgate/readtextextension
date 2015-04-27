@@ -461,9 +461,9 @@ function fsgetTextSelectiontoEnd(optional bAsPara as boolean) as string
 		bAsPara  =  false
 	endif
 	if bAsPara then
-		SetWorkingCountryLanguage()
 		sA = fsgetCursorWord(false)
 		fbSelecttoEndofParagraph()
+		SetWorkingCountryLanguage()
 		sB  =  fsGetSelectionAndCopy
 		if len(sA) = 0 then
 			fbGoLeft
@@ -2046,7 +2046,7 @@ Sub ttsActuate(config() As Variant, _
 		&apos; Get current track, then increment it by one to a maximum value of 255. 
 		&apos; (hex FF)
 		n = fiMyCurrentAudioTrack(true)
-		if fsGetOS = &quot;OSX&quot; then
+		if fsGetOS = &quot;OSX&quot; then 
 			bAddTime = true
 		else 
 			if config(fiExternalOption) or config(fiFestivalOption) then
@@ -4845,13 +4845,22 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 &apos;&apos;
 &apos;&apos; [fvTts1]: http://cvs.freebsoft.org/doc/speechd/speech-dispatcher.html
 &apos;&apos;
+&apos;  xxxxxxxx
 
 	Dim errorCode
+	Dim oBar
+	Dim oFrame
 	Dim sTemp
 
 	if isMissing(bAll) Then
 		bAll = false
 	Endif
+	On Error Resume Next
+	oFrame=ThisComponent.getCurrentController().getFrame() 
+	oBar=oFrame.createStatusIndicator() 
+	oBar.start(fsLookUpTerm( &quot;s_read-text&quot;, fsGetLanguage()),100)
+	oBar.Value=70
+	On Error Goto resetSpeechDispatcherErr
 	if fsGetOS()=&quot;WINDOWS&quot; Then
 		if fileExists(fsMyTempLock) Then
 			kill fsMyTempLock
@@ -4893,6 +4902,10 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 			kill fsMyTempLock
 		Endif
 	Endif
+	On Error Resume Next
+	oBar.End()
+	Exit Sub
+	resetSpeechDispatcherErr:
 end sub
 
 
