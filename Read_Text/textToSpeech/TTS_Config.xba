@@ -9,6 +9,7 @@ Private f_dlgAboutReadSelection As Variant
 &apos; the URL of last processed document.
 Global s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle As String
 Global i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack As Integer
+Global s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage As String
 
 &apos;&apos; #Configuration tools
 &apos;&apos;  
@@ -17,6 +18,15 @@ Global i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack As Integer
 &apos;&apos; see them.  You can immediately change the dialogue language from
 &apos;&apos; the display preferences field of the main dialogue.
 &apos;&apos; 
+
+
+Sub ClearWorkingCountryLanguage()
+	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot;
+End Sub
+
+Sub SetWorkingCountryLanguage()
+	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = fsSelectionLanguageAndRegion()
+End Sub
 
 Function fiMyCurrentAudioTrack(optional byval bIncrement)
 &apos;&apos; #Audio tracks
@@ -80,6 +90,7 @@ Sub ConfigureReadTextAloud
 	
 	&apos; Open up the dialog
 	CheckUnixSpeech
+	ClearWorkingCountryLanguage
 	DialogLibraries.LoadLibrary( &quot;textToSpeech&quot; )
 	f_dlgSpeechSetup=CreateUnoDialog( DialogLibraries.textToSpeech.Dialog1 )
 	If fbHelpIsInstalled Then

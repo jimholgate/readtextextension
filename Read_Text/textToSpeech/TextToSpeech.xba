@@ -121,7 +121,6 @@ OPTION EXPLICIT
 &apos;&apos; Procedures are called from menu items or from the tool bar.
 &apos;&apos;
 
-
 Sub ReadTextAloud
 &apos;&apos; Use *Read Selection* on the tool bar
 &apos;&apos; ------------------------------------
@@ -139,9 +138,10 @@ Sub ReadTextAloud
 	sFile=fsFullPathOf(fsExtensionSettingsIni)
 	If fileExists(sFile)Then
 		tts_config_parseFile(sFile,config(),errorCode)
-		If config(fiAlwaysShowDialogCheckBox)=1 Then
+		If config(fiAlwaysShowDialogCheckBox) = 1 Then
 			ConfigureReadTextAloud()
 		Else
+			ClearWorkingCountryLanguage
 		    if fileExists(fsMyTempLock) Then
 		    	kill fsMyTempLock
 				resetSpeechDispatcher
@@ -178,6 +178,7 @@ Sub ReadClipBoard
 &apos;&apos; If this is useful, assign a key combination To the macro with
 &apos;&apos; *Tools – Customize*.
 &apos;&apos;
+	ClearWorkingCountryLanguage
     if fileExists(fsMyTempLock) Then
 		resetSpeechDispatcher
 	Else
@@ -255,6 +256,7 @@ sub PresentSelection2(optional byval sB)
 	dim j as integer
 	dim sA as string
 	
+	ClearWorkingCountryLanguage
 	if ismissing(sB) then
 		sB = fsGetLanguage()
 	endif
