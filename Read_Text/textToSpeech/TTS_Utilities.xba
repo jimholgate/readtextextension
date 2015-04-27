@@ -461,6 +461,7 @@ function fsgetTextSelectiontoEnd(optional bAsPara as boolean) as string
 		bAsPara  =  false
 	endif
 	if bAsPara then
+		s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = fsSelectionLanguageAndRegion()
 		sA = fsgetCursorWord(false)
 		fbSelecttoEndofParagraph()
 		sB  =  fsGetSelectionAndCopy
@@ -1969,6 +1970,7 @@ Sub ttsActuate(config() As Variant, _
 		msgs() As Variant, _
 		errorCode As Integer, _
 		optional byval sOverRide As String)
+	Dim bAddTime as Boolean
 	Dim s1 as String
 	Dim sArtLook as String
 	Dim sArtURL as String
@@ -1999,6 +2001,7 @@ Sub ttsActuate(config() As Variant, _
 &apos;&apos; and name of the temporary file is shown in the Command and Script areas
 &apos;&apos; of the *About...* dialogue.
 &apos;&apos;
+	bAddTime = false
 	sArtURL = &quot;&quot;
 	n = 0
 	On Error Goto errorHandler
@@ -2042,8 +2045,11 @@ Sub ttsActuate(config() As Variant, _
 					sArtLook) then
 		&apos; Get current track, then increment it by one to a maximum value of 255. 
 		&apos; (hex FF)
-		n = fiMyCurrentAudioTrack(true)  
-		if not(fsGetOS() = &quot;OSX&quot;) then 
+		n = fiMyCurrentAudioTrack(true)
+		if fsGetOS = &quot;OSX&quot; then 
+			&apos;sTextToSpeak = sTextToSpeak &amp; &quot;[[slnc 400]]&quot;
+			bAddTime = true
+		else 
 			if config(fiExternalOption) or config(fiFestivalOption) then
 				&apos; Temporary Metadata for an external vbs or python script.
 				&apos; External scripts delete these files once they have been
@@ -2120,6 +2126,9 @@ Sub ttsActuate(config() As Variant, _
 		sTextToSpeak = fsTrimSpecial(sTextToSpeak, chr(13) &amp; chr(10) &amp; &quot;`#&gt;_ =-*+&quot;)
 		sTextToSpeak = fsReplaceText(sTextToSpeak, chr(10) &amp; &quot;&gt;&quot;, chr(10)) &amp; chr(10)
 		sTextToSpeak = fsCleanMdCode(sTextToSpeak)
+		if bAddTime then 
+			sTextToSpeak = sTextToSpeak &amp; &quot; [[slnc 400]]&quot;
+		endif
 &apos;&apos;
 &apos;&apos; Customizing speech
 &apos;&apos; ------------------
@@ -2164,16 +2173,13 @@ Sub ttsActuate(config() As Variant, _
 &apos;&apos; to understand if we add about half a second of silence to the end of
 &apos;&apos; each utterance, especially if gapless playback is enabled.  
 &apos;&apos; 
-&apos;&apos; The [inline code][SMIL3] `[[slnc 500]]` causes the speech synthesizer
-&apos;&apos; to include 500 milliseconds of silence. 
+&apos;&apos; The [inline code][SMIL3] `[[slnc 400]]` causes the speech synthesizer
+&apos;&apos; to include 400 milliseconds of silence. 
 &apos;&apos;
 &apos;&apos; [SMIL1]: https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/Introduction/Introduction.html
 &apos;&apos; [SMIL2]: http://www.w3.org/TR/SMIL3/
 &apos;&apos; [SMIL3]: https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/FineTuning/FineTuning.html#//apple_ref/doc/uid/TP40004365-CH5-SW10
 &apos;&apos; 
-		if fsGetOS = &quot;OSX&quot; then 
-			sTextToSpeak = sTextToSpeak &amp; &quot;[[slnc 400]]&quot;
-		endif
 		writeSpeech(&quot; &quot; &amp; sTextToSpeak, _
 				msgs(), _
 				errorCode, _
@@ -2662,6 +2668,7 @@ Function fsSelectionLanguageAndRegion(optional bIgnoreInstalledVoices) As String
 &apos;&apos; whether speech is installed, try a using a simple English voice with plain ASCII
 &apos;&apos; text.
 &apos;&apos;
+	if s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot; then
 	if isMissing(bIgnoreInstalledVoices) Then
 		bIgnoreInstalledVoices = true
 	Endif
@@ -2685,6 +2692,9 @@ Function fsSelectionLanguageAndRegion(optional bIgnoreInstalledVoices) As String
 		Case Else
 			fsSelectionLanguageAndRegion=sA
 		End Select
+	Endif
+	Else
+		fsSelectionLanguageAndRegion = CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage
 	Endif
 End Function
 
