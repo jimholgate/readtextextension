@@ -457,6 +457,7 @@ function fsgetTextSelectiontoEnd(optional bAsPara as boolean) as string
 	Dim sA as string
 	Dim sB as string
 
+	on error goto fsgetTextSelectiontoEndErr
 	if ismissing(bAsPara) then
 		bAsPara  =  false
 	endif
@@ -473,6 +474,9 @@ function fsgetTextSelectiontoEnd(optional bAsPara as boolean) as string
 		sB = fsGetSelectionAndCopy
 	endif
 	fsgetTextSelectiontoEnd = sB
+	exit function
+	fsgetTextSelectiontoEndErr:
+	fsgetTextSelectiontoEnd = &quot;&quot;
 end function
 
 
