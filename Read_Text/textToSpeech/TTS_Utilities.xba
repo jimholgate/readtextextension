@@ -216,6 +216,47 @@ Sub webHelp(optional sURL)
 End Sub
 
 
+Function fbUsingTouchScreen
+&apos;&apos;
+&apos;&apos; #Touch Screen
+&apos;&apos;
+&apos;&apos; If you are using a touch screen or another pointing device that makes it difficult
+&apos;&apos; to manually select text, you can enable enhanced text selection by checking the
+&apos;&apos; *Touch Screen* checkbox in the main dialogue.  The extension will try to
+&apos;&apos; determine what you want to select before processing the text.  For example, 
+&apos;&apos; in the word processor, the extension will read to the end of the paragraph 
+&apos;&apos; containing the cursor, then move the cursor to the beginning of the next 
+&apos;&apos; paragraph.
+&apos;&apos;
+&apos;&apos; When the Touch Screen function is enabled, the extension might use the system 
+&apos;&apos; clipboard to retrieve text.  If you are using accessibility software or hardware
+&apos;&apos; that also uses the clipboard to retrieve text, check whether the extension 
+&apos;&apos; interferes with your software or hardware when you enable the Touch Screen function.
+&apos;&apos;
+	dim sFile as string
+	dim iSmart as integer
+	dim config
+	dim errorCode
+
+	on error goto fbUsingTouchScreenErr
+	sFile=fsFullPathOf(fsExtensionSettingsIni)
+	If fileExists(sFile)Then
+		tts_config_parseFile(sFile,config(),errorCode)
+		iSmart=config(fiSmartSelectCheckBox)
+	Else
+		iSmart = 0
+	Endif
+	if iSmart = 0 then
+		fbUsingTouchScreen = false
+	else
+		fbUsingTouchScreen = true
+	endif
+	exit function
+	fbUsingTouchScreenErr:
+	fbUsingTouchScreen = false
+end function
+
+
 function fiReportMetaData(optional byval bVerify)
 	&apos; bVerify - if bVerify is false, the function always 
 	&apos; returns 6 (&quot;Yes&quot;) but if bVerify is true, then the
@@ -298,6 +339,15 @@ Function soundsDirectory() As String
 	soundsDirectory=ConvertFromURL(strA &amp; &quot;/sounds/&quot;)
 End Function
 
+Function fbEnhancedRTVersion
+	&apos; Version 9 of the Read Text Extension enables smart text
+	&apos; and includes a help file for Tools - Add-ons - Impress-view.
+	fbEnhancedRTVersion = fileexists(fsMyURL() &amp; _
+			&quot;/help/en/&quot; &amp; _
+			fsAppSignature() &amp; _
+			&quot;/impress_view.xhp&quot;) 
+End Function
+
 
 Function fsGetTextSelection(optional byval bHideMDCode as Boolean, optional bgoRight as Boolean) As String
 	if ismissing(bHideMDCode) then
@@ -313,9 +363,7 @@ Function fsGetTextSelection(optional byval bHideMDCode as Boolean, optional bgoR
 	&apos; it reads.  In Impress, it will read the note or the text of the 
 	&apos; screen if no text is selected.
 	&apos;
-	&apos; Version 9 and above of the Read Text Extension enable smart text
-	&apos; and include a help file for Tools - Add-ons - Impress-view.
-	if fileexists(fsMyURL() &amp; &quot;/help/en/&quot; &amp; fsAppSignature() &amp; &quot;/impress_view.xhp&quot;) or _
+	if fbUsingTouchScreen() or _
 			ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
 		fsGetTextSelection = fsGetSmartTextSelection(bHideMDCode, bgoRight)
 	else
@@ -1973,14 +2021,13 @@ End Function
 Sub ttsActuate(config() As Variant, _
 		msgs() As Variant, _
 		errorCode As Integer, _
-		optional byval sOverRide As String)
+		optional byval sTextToSpeak As String)
 	Dim bAddTime as Boolean
 	Dim s1 as String
 	Dim sArtLook as String
 	Dim sArtURL as String
 	Dim sCommand As String
 	Dim sScript As String
-	Dim sTextToSpeak As String
 	Dim sProgram As String
 	Dim aVal As Integer
 	Dim bWait As Boolean
@@ -2010,7 +2057,7 @@ Sub ttsActuate(config() As Variant, _
 	n = 0
 	On Error Goto errorHandler
 	&apos;Choose what To speak
-	If ismissing(sOverRide) or sOverRide = &quot;&quot; Then  
+	If ismissing(sTextToSpeak) or sTextToSpeak = &quot;&quot; Then  
 		sTextToSpeak = fsGetTextSelection(false, true)
 	Else
 		sTextToSpeak = sOverRide

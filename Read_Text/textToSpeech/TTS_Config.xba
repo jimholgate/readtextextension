@@ -110,6 +110,12 @@ Sub ConfigureReadTextAloud
 	Endif								 
 	&apos;Now apply the settings To the dialog box
 	f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).Model.State=config(fiAlwaysShowDialogCheckBox)
+	if fbEnhancedRTVersion then
+		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Model.State=config(fiSmartSelectCheckBox)
+	else
+		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Model.State= 0
+		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Visible = false
+	endif
 	f_dlgSpeechSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiFestivalComboChoice)
 	f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).Model.Text=config(fiExternalCommand)
 	f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text=config(fiDialogLanguageCombo)
@@ -217,6 +223,7 @@ Sub ttsUpdateLabels
 	s1 = fsDisplayLanguage()
 	&apos;Update the labels with your language
 	f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).model.Label = fsLookUpTerm( &quot;s_always-show-this-dialog&quot;,s1)
+	f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).model.Label = fsLookUpTerm( &quot;s_touch-screen&quot;,s1)
 	f_dlgSpeechSetup.GetControl(&quot;CommandButton1&quot;).model.Label = fsLookUpTerm( &quot;s_ok&quot;, s1)
 	f_dlgSpeechSetup.GetControl(&quot;CommandButton2&quot;).model.Label = fsLookUpTerm( &quot;s_cancel&quot;, s1)
 	f_dlgSpeechSetup.GetControl(&quot;CommandButton3&quot;).model.Label = fsLookUpTerm( &quot;s_about&quot;, s1) &amp; &quot;...&quot;
@@ -247,6 +254,7 @@ Function fvCurrentDialogConfig() As Variant
 	Dim config(fiCountConfigOptions) As Variant
 	
 	config(fiAlwaysShowDialogCheckBox)=f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).model.State
+	config(fiSmartSelectCheckBox)=f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).model.State
 	config(fiDialogLanguageCombo)=f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).model.Text
 	config(fiExternalCommand)=f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).model.Text
 	config(fiExternalOption)=f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).Model.State
