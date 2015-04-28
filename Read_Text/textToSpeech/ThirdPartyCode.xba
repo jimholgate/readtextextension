@@ -68,6 +68,7 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 		config(fiFestivalComboChoice)=&quot;(tts&quot;&quot;(TMP)&quot;&quot;nil) (quit)&quot;
 		config(fiExternalOption)=True
 		config(fiHtmlOption)=False
+		config(fiSmartSelectCheckBox)=0
 		config(fiHtmlComboURL)=&quot;http://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
 		config(fiExternalProgramPath)=WinSpeechProgramPath()
 		config(fiExternalCommand)=WinSpeechArgument()
@@ -79,6 +80,7 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 		config(fiFestivalComboChoice)=&quot;(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
 		config(fiExternalOption)=True
 		config(fiHtmlOption)=False
+		config(fiSmartSelectCheckBox)=0
 		config(fiHtmlComboURL)=&quot;http://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
 		If fsGetOS()=&quot;UNIX&quot; Then &apos; Linux
 			If fileexists(&quot;/usr/bin/python3&quot;) Then
@@ -184,6 +186,8 @@ sub tts_config_writeFile(config() As Variant,byval configFilePath As String)
 		&amp; config(fiExternalCommand) &amp; CR
 	sA = sA &amp; fsKeyDISPLAY_INFO_INTEGER &amp; &quot;=&quot; _
 		&amp; config(fiAlwaysShowDialogCheckBox) &amp; CR
+	sA = sA &amp; fsKeyUSE_SMART_SELECT &amp; &quot;=&quot; _
+		&amp; config(fiSmartSelectCheckBox) &amp; CR
 	sA = sA &amp; fsKeyDISPLAY_LANGUAGE_STRING &amp; &quot;=&quot; _
 		&amp; config(fiDialogLanguageCombo) &amp; CR
 	CreateFile(configFilePath, sA, &quot;UTF-8&quot;)
@@ -253,6 +257,10 @@ Sub tts_config_parseFile(byval configFilePath As String,_
 
 			Case fsKeyDISPLAY_LANGUAGE_STRING
 				config(fiDialogLanguageCombo)=value
+
+			Case fsKeyUSE_SMART_SELECT
+				config(fiSmartSelectCheckBox)=value
+
 			Case Else
 
 			End Select

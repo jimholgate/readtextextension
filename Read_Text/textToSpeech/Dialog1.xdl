@@ -57,10 +57,10 @@
   <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="13" dlg:left="10" dlg:top="164" dlg:width="250" dlg:height="28">
    <dlg:title dlg:value="FrameControl2"/>
   </dlg:titledbox>
-  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="14" dlg:left="16" dlg:top="177" dlg:width="195" dlg:height="10" dlg:value="CheckBox1" dlg:checked="false">
+  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="14" dlg:left="13" dlg:top="175" dlg:width="144" dlg:height="10" dlg:value="CheckBox1" dlg:checked="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.UseAlwaysShow_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:checkbox>
-  <dlg:combobox dlg:id="ComboBox3" dlg:tab-index="15" dlg:left="216" dlg:top="174" dlg:width="41" dlg:height="14" dlg:tag="Display language" dlg:tabstop="false" dlg:value="..." dlg:spin="true">
+  <dlg:combobox dlg:id="ComboBox3" dlg:tab-index="15" dlg:left="227" dlg:top="174" dlg:width="30" dlg:height="14" dlg:tag="Display language" dlg:tabstop="false" dlg:value="..." dlg:spin="true">
    <dlg:menupopup>
     <dlg:menuitem dlg:value="…"/>
     <dlg:menuitem dlg:value="af"/>
@@ -119,5 +119,8 @@
     <dlg:menuitem dlg:value="http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)..."/>
    </dlg:menupopup>
   </dlg:combobox>
+  <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="17" dlg:left="158" dlg:top="175" dlg:width="69" dlg:height="10" dlg:value="CheckBox2" dlg:checked="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.UseAlwaysShow_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:checkbox>
  </dlg:bulletinboard>
 </dlg:window>
