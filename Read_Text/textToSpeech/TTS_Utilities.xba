@@ -2059,8 +2059,6 @@ Sub ttsActuate(config() As Variant, _
 	&apos;Choose what To speak
 	If ismissing(sTextToSpeak) or sTextToSpeak = &quot;&quot; Then  
 		sTextToSpeak = fsGetTextSelection(false, true)
-	Else
-		sTextToSpeak = sOverRide
 	Endif
 	If fileexists(fsMyTempLock(&quot;lock.id&quot;)) Then
 		Kill fsMyTempLock(&quot;lock.id&quot;)
