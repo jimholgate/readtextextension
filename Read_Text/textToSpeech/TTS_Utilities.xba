@@ -307,6 +307,48 @@ function fiReportMetaData(optional byval bVerify)
 end function
 
 
+function fiReportOnlineRequest(optional byval bVerify)
+	&apos; bVerify - if bVerify is false, the function always 
+	&apos; returns 6 (&quot;Yes&quot;) but if bVerify is true, then the
+	&apos; function  returns 6 if you click &quot;Yes&quot;, 7 if you
+	&apos; click &quot;No&quot;, and 2 if you click Cancel
+	&apos;
+	dim iYes as integer
+	dim iNo as integer
+	dim iCancel as integer
+	dim iYesNoCancel as integer
+	dim sA as string
+	dim CR as string
+	dim n as integer
+	
+	on error goto fiReportOnlineRequestErr  
+	iYes = 6
+	iNo = 7
+	iCancel = 2
+	iYesNoCancel = 3
+	n = iYes
+	if ismissing(bVerify) then
+		bVerify = true
+	endif
+	CR = chr(10)
+	sA = &quot;&quot; &amp; _
+			fsLookUpTerm(&quot;s_use-a-web-application&quot;) &amp; _
+				&quot; - &quot; &amp; _
+				fsLookUpTerm(&quot;s_ok&quot;) &amp; _
+				&quot; ? &quot;
+	if bVerify then
+		n = msgbox(sA, _
+				iYesNoCancel, _
+				fsLookUpTerm(&quot;s_read-text&quot;)
+	endif
+	fiReportOnlineRequest = n
+	exit function
+	fiReportOnlineRequestErr:
+	&apos; MetaData has a problem, so return &quot;No&quot;.
+	fiReportOnlineRequest = iNo
+end function
+
+
 Function fbHelpIsInstalled as Boolean
 	Dim sA As String
 
@@ -390,7 +432,7 @@ Function fsGetOnlySelectedText() As String
 		oSelection=oDoc.getCurrentSelection()
 		sSelectedText=&quot;&quot;  	
 		If oSelection.supportsService(&quot;com.sun.star.text.TextRanges&quot;) Then
-			For n=0 To(oSelection.getCount() - 1)
+			For n = 0 To (oSelection.getCount() - 1)
 				sSelectedText=sSelectedText &amp; _
 		&quot; &quot; &amp; _
 		oSelection.getByIndex(n).getString()
@@ -451,7 +493,7 @@ Function fsGetSmartTextSelection(optional byval bHideMDCode as Boolean, optional
 		sSelectedText = &quot;&quot;
 		if oSelection.supportsService(&quot;com.sun.star.text.TextRanges&quot;) then
 			fsGetSelectionAndCopy()
-			for n = 0 To(oSelection.getCount() - 1)
+			for n = 0 To (oSelection.getCount() - 1)
 				sSelectedText = sSelectedText &amp; &quot; &quot; &amp; oSelection.getByIndex(n).getString()
 			next
 		else 
@@ -529,7 +571,7 @@ end function
 
 
 function fsgetCursorWord(optional bSelectWord as boolean) as string
-	&apos; function To get a word under the current cursor position.
+	&apos; function to get a word under the current cursor position.
 	&apos; Adapted from code contributed On 2009-04-25  by JohnV To 
 	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t = 83411&amp;highlight = 
 	Dim oDoc
@@ -1950,7 +1992,7 @@ Function getTextFromFile(sFilePath,sEncoding) As String
 &apos;&apos; notifying you.  Make sure that extensions you use come from a trusted source.
 &apos;&apos;
 	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t=53813
-	&apos; Use simpleFileAccess instead of Basic file handling To 
+	&apos; Use simpleFileAccess instead of Basic file handling to 
 	&apos; translate encoded text
 	Dim myTextFile As Object,sf As Object,fileStream As Object
 	Dim aLineOfText As String,myFilePath As String
@@ -2056,7 +2098,7 @@ Sub ttsActuate(config() As Variant, _
 	sArtURL = &quot;&quot;
 	n = 0
 	On Error Goto errorHandler
-	&apos;Choose what To speak
+	&apos;Choose what to speak
 	If ismissing(sTextToSpeak) or sTextToSpeak = &quot;&quot; Then  
 		sTextToSpeak = fsGetTextSelection(false, true)
 	Endif
@@ -2267,6 +2309,7 @@ Sub ttsActuate(config() As Variant, _
 		fbCreateMissingMediaDirectory(sCommand)	
 	Else &apos;If config(fiHtmlOption) Then
 	&apos;Translate And read with web tools
+		i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 0
 		sProgram=&quot;com.sun.star.system.SystemShellExecute&quot;
 		sCommand=config(fiHtmlComboURL)
 		sCommand=replacePublicTokensWithStr(sCommand)
@@ -2572,7 +2615,7 @@ Function ReplaceWebTokensWithStr(sA As String,sB As String) As String
     sA=fsReplaceText(sA,sFind,sReplace)
 
     sFind=&quot;(OOO_WEBTEXTSMALL)&quot;
-    &apos; Use with Google Translate To ensure that the text-To-speech is enabled
+    &apos; Use with Google Translate to ensure that the text-To-speech is enabled
     sReplace=fsEscapeStr(Left(trim(sB),99))
     sA=fsReplaceText(sA,sFind,sReplace)
     ReplaceWebTokensWithStr=sA
@@ -2584,7 +2627,8 @@ Function ReplaceWebTokensWithStr(sA As String,sB As String) As String
     &apos;
     &apos; http://lema.rae.es/drae/srv/search?key=(OOO_WEBTEXTDEFINITION)
     &apos;
-    sReplace=lcase(fsEscapeStr(fsQuickTitle(1, 99, trim(sB)))
+    sReplace= lcase(fsEscapeStr(fsQuickTitle(1, 99, fsTrimSpecial(sB,  &quot; `_-*#&gt;_&quot;))
+   &apos; sReplace = fsTrimSpecial(sReplace, &quot; `_-*#&gt;_&quot;)
     sA=fsReplaceText(sA,sFind,sReplace)
     ReplaceWebTokensWithStr=sA
 End Function
@@ -3537,7 +3581,7 @@ End Function
 
 
 Function fsDrawText() As String
-	&apos;Function To get text selection in a drawing or a presentation slide
+	&apos;Function to get text selection in a drawing or a presentation slide
 	fsDrawText=fsDrawProperty(&quot;String&quot;)
 End Function
 
@@ -3808,7 +3852,7 @@ Function fbIsAMediaPlayer(s1 As String) As Boolean
 
 	s1=Lcase(s1)
 	fbIsAMediaPlayer=False
-	For n=0 To fiCountMediaPlayers
+	For n=0 to fiCountMediaPlayers
 		If Instr(s1,fsMediaPlayer(n)) &gt; 0 Then
 			fbIsAMediaPlayer=True
 			Exit For
@@ -5042,6 +5086,11 @@ Function fbCreatingMediaFile(optional byval sA, optional byVal sB)
 	if bTattle then
 		msgbox sB &amp; chr(10) &amp; sA
 	endif
+	if not(config(fiExternalOption)) then
+	&apos; If the external option button in the main dialogue is not selected, then return
+	&apos;     fbCreatingMediaFile = false
+		exit function
+	end if
 	aA = split(lcase(sA), &quot;,&quot;)
 	if Len(sB) &lt;&gt; 0 Then
 		For n = Lbound(aA) to Ubound(aA)
@@ -5052,6 +5101,20 @@ Function fbCreatingMediaFile(optional byval sA, optional byVal sB)
 				Exit For
 			Endif
 		next
+	Endif
+End Function
+
+
+Function fbGoingOnline() 
+	Dim sFile As String
+	Dim errorCode As Integer
+	Dim config(fiCountConfigOptions)As Variant
+
+	fbGoingOnline = false
+	sFile=fsFullPathOf(fsExtensionSettingsIni)
+	tts_config_parseFile(sFile, config(), errorCode)
+	if config(fiHtmlOption) then
+		fbGoingOnline = true
 	Endif
 End Function
 

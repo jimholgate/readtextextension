@@ -108,7 +108,7 @@ Sub ConfigureReadTextAloud
 		&apos; The &quot;About&quot; dialog needs this file to show current information
 		tts_config_writeFile(config(), sfile)
 	Endif								 
-	&apos;Now apply the settings To the dialog box
+	&apos;Now apply the settings to the dialog box
 	f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).Model.State=config(fiAlwaysShowDialogCheckBox)
 	if fbEnhancedRTVersion then
 		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Model.State=config(fiSmartSelectCheckBox)
@@ -153,7 +153,7 @@ Sub ConfigureReadTextAloud
 			kill sFile
 		Endif	
 		tts_config_writeFile(config(), sfile)
-		&apos;Call the shell To execute the program specified with the commands specified
+		&apos;Call the shell to execute the program specified with the commands specified
 		ttsActuate(config(),_
 				msgs(),_
 				errorCode,_

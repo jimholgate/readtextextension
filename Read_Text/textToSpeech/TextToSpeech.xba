@@ -29,7 +29,7 @@ OPTION EXPLICIT
 &apos;&apos;  new features.
 &apos;&apos;
 &apos;&apos;  * Click the button while the sound is playing to stop the sound.
-&apos;&apos;  * Supported export formats include metadata that helps you to
+&apos;&apos;  * Supported export formats include meta-data that helps you to
 &apos;&apos;    organize your sound clips.
 &apos;&apos;  * In writer, you can select text in a table.
 &apos;&apos;  * You can show a text selection using large high contrast text by
@@ -103,7 +103,7 @@ OPTION EXPLICIT
 &apos;&apos; Copyright And License
 &apos;&apos; ---------------------
 &apos;&apos;
-&apos;&apos; (c)2008-2015 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+&apos;&apos; © 2008-2015 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 &apos;&apos;
 &apos;&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS
 &apos;&apos; OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION;
@@ -175,7 +175,7 @@ Sub ReadClipBoard
 &apos;&apos; Use this to read the clipboard from any module that supports a
 &apos;&apos; text clipboard, including the Macro editor. You normally
 &apos;&apos; fill the clipboard by selecting some text, then using *Edit – Copy*.
-&apos;&apos; If this is useful, assign a key combination To the macro with
+&apos;&apos; If this is useful, assign a key combination to the macro with
 &apos;&apos; *Tools – Customize*.
 &apos;&apos;
 	ClearWorkingCountryLanguage
@@ -339,7 +339,18 @@ sub ReadTheSlideNote
 					).getText( _
 					).getString( _
 					)
-			msgSpeak(s1)
+			if fbGoingOnline() then
+				select case fiReportOnlineRequest(true)
+				case 6 &apos; if you click &quot;Yes&quot;, 
+					msgSpeak(s1)
+				case 7 &apos; if you click &quot;No&quot;,
+					ConfigureReadTextAloud()
+				case else &apos; if you click &quot;Cancel&quot;
+					exit sub
+				end select
+			else
+				msgSpeak(s1)
+			endif
 		endif
 	endif
 end sub
