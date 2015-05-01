@@ -7,12 +7,12 @@ OPTION EXPLICIT
 &apos;&apos; Code shown here is used or adapted from other sources with permission.
 &apos;&apos;
 &apos; Unless otherwise attributed, the functions and subs below are adapted
-&apos; from Extended PDF 1.4 (c) 2006 [Martin Brown](martin.brown@3bview.com)
+&apos; from Extended PDF 1.4 © 2006 [Martin Brown](martin.brown@3bview.com)
 &apos; and are distributed under the GNU General Public License
 &apos;
 
 Function fbTts_util_stringToBoolean(value As String) As Boolean
-	&apos; Converts a String To a boolean value.
+	&apos; Converts a String to a boolean value.
 	&apos; True=&gt; &quot;True&quot;
 	&apos; False=&gt; &quot;False&quot;
 	Dim b As Boolean: b=False
@@ -28,7 +28,7 @@ End Function
 
 
 Function fsTts_util_booleanToString(value As Boolean) As String
-	&apos; Converts a boolean value To a String.
+	&apos; Converts a boolean value to a String.
 	&apos; True=&gt; &quot;True&quot;
 	&apos; False=&gt; &quot;False&quot;
 	Dim s As String
@@ -54,7 +54,7 @@ End Function
 Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 		errorCode As Integer) As Variant
 
-	&apos; The place To store the configuration data
+	&apos; The place to store the configuration data
 	Dim config(fiCountConfigOptions) As Variant
 
 	&apos; Create default values For variables
@@ -125,9 +125,9 @@ Sub tts_config_parseLine(byval l As String,_
 	&apos; Parses one line from the configuration file.
 	&apos;
 	&apos; Parameters:
-	&apos; l (in) line of input To parse
-	&apos; key (out) Place To put the key; &quot;&quot; If comment.
-	&apos; value (out) Place To put the value; &quot;&quot; If none.
+	&apos; l (in) line of input to parse
+	&apos; key (out) Place to put the key; &quot;&quot; If comment.
+	&apos; value (out) Place to put the value; &quot;&quot; If none.
 	&apos;
 	&apos; If the line is a comment line then the key will
 	&apos; be &quot;&quot;.
@@ -200,8 +200,8 @@ Sub tts_config_parseFile(byval configFilePath As String,_
 	&apos; Parses the configuration file into an array.
 	&apos;
 	&apos; Parameters:
-	&apos; configFilePath (in) The path To the configuration file
-	&apos; config() (in out) The configuration settings To update with settings
+	&apos; configFilePath (in) The path to the configuration file
+	&apos; config() (in out) The configuration settings to update with settings
 	&apos;                   from the file.
 	&apos; errorCode (in out) The Error parameter.
 	&apos;

@@ -51,7 +51,7 @@ OPTION EXPLICIT
 &apos;&apos;             OK;
 &apos;&apos;             Command;
 &apos;&apos;             Script;
-&apos;&apos;             (c) 2008­-2015 James Holgate;
+&apos;&apos;             © 2008­-2015 James Holgate;
 &apos;&apos;             Test;
 &apos;&apos;             Could not locate the program.;
 &apos;&apos;             String cannot be analyzed!;
@@ -347,7 +347,7 @@ function fsSampleMd(optional byval hl)
 				chr(8207) &amp; &quot;- حدد بعض النص&quot; &amp; cr &amp; _
 				chr(8207) &amp; &quot;- حدد أدوات - الأدوات الإضافية&quot; &amp; _
 				chr(8207) &amp; &quot;بدء عرض - &quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
+				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
 				&quot;(http://creativecommons.ca/licenses)`&quot;
 		setComplexDocLanguage(&quot;ar-SA&quot;)
 	case &quot;ca&quot;
@@ -359,7 +359,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- Seleccioneu el text.&quot; &amp; cr &amp; _
 				&quot;- Trieu “Eines – Complements – Impress-Visualització” &quot; &amp; _
 				&quot;per executar la presentació.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
+				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
 				&quot;(http://es.creativecommons.org/)`&quot;
 		setWesternDocLanguage(&quot;ca-ES&quot;)		
 	case &quot;de&quot;
@@ -370,7 +370,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- Markieren Sie eine Textpassage.&quot; &amp; cr &amp; _
 				&quot;- Wählen Sie „Extras - Add-Ons - &quot; &amp; _
 				&quot;Impress-Ansicht”, um die Präsentation zu starten.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0](http://de.creativecommons.org)`&quot;
+				&quot;`© 2015 James Holgate.  [cc by 4.0](http://de.creativecommons.org)`&quot;
 		setWesternDocLanguage(&quot;de-DE&quot;)
 	case &quot;es&quot;
 		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
@@ -380,7 +380,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- Selecciona texto.&quot; &amp; cr &amp; _
 				&quot;- Elija “Herramientas - Complementos - &quot; &amp; _
 				&quot;Impress-Ver” para iniciar la presentación.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0](http://es.creativecommons.org/)`&quot;
+				&quot;`© 2015 James Holgate.  [cc by 4.0](http://es.creativecommons.org/)`&quot;
 		s2 = fsDocCountry
 		select case s2
 		case &quot;MX&quot;, &quot;AR&quot;
@@ -399,7 +399,7 @@ function fsSampleMd(optional byval hl)
 				&quot;##Impress – Näytä&quot; &amp; cr &amp; cr &amp; _
 				&quot;- Avaten dokumentin ja valitse teksti.&quot; &amp; cr &amp; _
 				&quot;- Valitse “Työkalut - Lisäosat - Impress-Näytä” näytöksen suorittamiseksi.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0](http://creativecommons.fi)`&quot;
+				&quot;`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.fi)`&quot;
 		setWesternDocLanguage(&quot;fi-FI&quot;)
 	case &quot;fr&quot;
 		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
@@ -410,7 +410,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- Ouvrez un document et sélectionnez du texte.&quot; &amp; cr &amp; _
 				&quot;- Appuyez sur « Outils – Add-ons – Impress-Afficher » pour démarrer la &quot; &amp; _
 				&quot;présentation.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/node/24)`&quot;
+				&quot;`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/node/24)`&quot;
 		setWesternDocLanguage(&quot;fr-FR&quot;)
 	case &quot;hi&quot;
 		s1 = &quot;पाठ पढ़ा&quot; &amp; &quot; – &quot; &amp; _
@@ -426,7 +426,7 @@ function fsSampleMd(optional byval hl)
 				&quot;इंप्रेस – देखें&quot; &amp; cr &amp; &quot;--------------&quot; &amp; cr &amp; cr &amp; _
 				&quot;- जिस पाठ की नक़ल बनाना चाहते हैं, उसे चुनें&quot; &amp; cr &amp; _
 				&quot;- &quot;&quot;औज़ार – सहयंत्र – इंप्रेस–देखें&quot;&quot;, चुनें&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
+				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
 				&quot;(http://creativecommons.ca/licenses)`&quot;
 		setComplexDocLanguage(&quot;hi-IN&quot;)
 	case &quot;it&quot;
@@ -438,7 +438,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- Aprite un un documento e seleziona testo.&quot; &amp; cr &amp; _
 				&quot;- Selezionate “Strumenti – Add-on – Impress-Vista” &quot; &amp; _
 				&quot;per avviare la presentazione.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
+				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
 				&quot;(http://www.creativecommons.it/)`&quot;	
 		setWesternDocLanguage(&quot;it-IT&quot;)
 	case &quot;nl&quot;
@@ -450,7 +450,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- U moet een document te openen en selecteer de tekst.&quot; &amp; cr &amp; _
 				&quot;- Kies “Extra – Invoegtoepassingen – Impress-Weergave” &quot; &amp; _
 				&quot; om de voorstelling te starten.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
+				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
 				&quot;(http://creativecommons.nl/)`&quot;
 		setWesternDocLanguage(&quot;nl-NL&quot;)
 	case &quot;pl&quot;
@@ -462,7 +462,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- Musisz otworzyć dokument i wybierz tekst.&quot; &amp; cr &amp; _
 				&quot;- Wybierz “Narzędzia – Dodatki – Impress-Widok” &quot; &amp; _
 				&quot;aby uruchomić pokaz.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
+				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
 				&quot;(http://creativecommons.pl)`&quot;
 		setWesternDocLanguage(&quot;pl-PL&quot;)
 	case &quot;pt&quot;
@@ -474,7 +474,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- Abri um documento e selecionai texto.&quot; &amp; cr &amp; _
 				&quot;- Escolha “Ferramentas – Suplementos – Impress-Ver” &quot; &amp; _
 				&quot;para executar a apresentação.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
+				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
 				&quot;(http://www.creativecommons.org.br/)`&quot;
 		s2 = fsGetCountry
 		select case s2
@@ -492,7 +492,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- Выделить текст.&quot; &amp; cr &amp; _
 				&quot;- Для запуска демонстрации выберите &quot; &amp; _
 				&quot;“Сервис  – Дополнения – Impress-Вид”._&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
+				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
 				&quot;(http://creativecommons.ru/)`&quot;	
 		setWesternDocLanguage(&quot;ru-RU&quot;)
 	case &quot;zh&quot;
@@ -507,7 +507,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- 选择 “工具 – 扩展 – 幻灯片放映-视图” &quot; &amp; _
 				&quot;以运行放映。&quot; &amp; _
 				&quot;&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
+				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
 				&quot;(http://creativecommons.org)`&quot;	
 		setAsianDocLanguage(&quot;zh-CN&quot;)
 	case else
@@ -530,7 +530,7 @@ function fsSampleMd(optional byval hl)
 				&quot;- Open a document and select some text.&quot; &amp; cr &amp; _
 				&quot;- Choose “Tools – Add-ons – Impress-View” &quot; &amp; _
 				&quot;to run the show.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`(c) 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
+				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
 				&quot;(http://creativecommons.ca/licenses)`&quot;
 		s2 = fsGetCountry
 		select case s2
@@ -852,7 +852,7 @@ End Function
 
 
 Function fiCountConfigOptions As Integer
-	&apos; This is the size of the array To hold settings from the configuration file
+	&apos; This is the size of the array to hold settings from the configuration file
 	&apos; and dialog
 	fiCountConfigOptions=fiHtmlComboURL
 	&apos; this is the last TTS_OPTION item above - an Integer
@@ -1407,7 +1407,7 @@ Function fsDateMyRegion(optional i As Integer) As String
 	Case Else 
 		&apos; &quot;af&quot;,&quot;bg&quot;,&quot;el&quot;,&quot;it&quot;,&quot;hi&quot;,&quot;id&quot;,&quot;mk&quot;,&quot;nl&quot;,&quot;po&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sl&quot;,&quot;th&quot;,&quot;tr
 		sL10N=Year(NOW) &amp; &quot;-&quot; &amp;  right(&quot; 00&quot; &amp; Month(NOW), 2) &amp; &quot;-&quot; &amp; right(&quot; 00&quot; &amp; Day(NOW), 2) 
-		&apos; Revised To international time 2011-02-06
+		&apos; Revised to international time 2011-02-06
 	End Select
 	fsDateMyRegion=sL10N
 End Function
