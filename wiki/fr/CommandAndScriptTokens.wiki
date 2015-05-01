@@ -26,6 +26,7 @@ Lorsque vous avez besoin de ces valeurs variables dans une commande ou dans un s
   * Code langue de la sélection - en pour l'anglais; fr pour le français, etc. (SELECTION_LANGUAGE_CODE) 
   * Code national de la sélection - CA pour Canada; FR pour France, etc. (SELECTION_COUNTRY_CODE) 
   * Code régional de la sélection - fr-CA pour Canada; fr-FR pour France, etc. (SELECTION_LANGUAGE_COUNTRY_CODE) 
+  * Le premier mot du texte sélectionné codées pour URL (OOO_WEBTEXTDEFINITION)
   * Les 99 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXTSMALL) 
   * Les 249 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT250) 
   * Les 999 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT) 

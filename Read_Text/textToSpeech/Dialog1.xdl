@@ -106,8 +106,12 @@
   <dlg:combobox dlg:id="ComboBox4" dlg:tab-index="16" dlg:disabled="true" dlg:left="16" dlg:top="139" dlg:width="240" dlg:height="14" dlg:value="http://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)http://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)http://translate.google.com/?&amp;langpair=auto|en&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)http://translate.google.com/?&amp;langpair=auto|es&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)http://translate.google.com/?&amp;langpair=auto|fr&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)http://twitter.com/intent/tweet?text=(OOO_WEBTEXTSMALL)http://vozme.com/text2voice.php?lang=ca&amp;bookmarklet=1&amp;gn=ml&amp;default_language=ca&amp;text=(OOO_WEBTEXT)http://vozme.com/text2voice.php?lang=en&amp;bookmarklet=1&amp;gn=ml&amp;default_language=en&amp;text=(OOO_WEBTEXT)http://vozme.com/text2voice.php?lang=es&amp;bookmarklet=1&amp;gn=ml&amp;default_language=es&amp;text=(OOO_WEBTEXT)http://vozme.com/text2voice.php?lang=hi&amp;bookmarklet=1&amp;gn=ml&amp;default_language=hi&amp;text=(OOO_WEBTEXT)http://vozme.com/text2voice.php?lang=it&amp;bookmarklet=1&amp;gn=ml&amp;default_language=it&amp;text=(OOO_WEBTEXT)http://vozme.com/text2voice.php?lang=pt&amp;bookmarklet=1&amp;gn=ml&amp;default_language=pt&amp;text=(OOO_WEBTEXT)http://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTSMALL)" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true">
    <dlg:menupopup>
     <dlg:menuitem dlg:value="http://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)"/>
-    <dlg:menuitem dlg:value="http://google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTSMALL)"/>
-    <dlg:menuitem dlg:value="http://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)"/>
+    <dlg:menuitem dlg:value="http://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)"/>
+    <dlg:menuitem dlg:value="http://google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)"/>
+    <dlg:menuitem dlg:value="http://lema.rae.es/drae/srv/search?key=(OOO_WEBTEXTDEFINITION)"/>
+    <dlg:menuitem dlg:value="http://m.dwds.de/?qu=(OOO_WEBTEXTDEFINITION)"/>
+    <dlg:menuitem dlg:value="https://simple.wiktionary.org/wiki/(OOO_WEBTEXTDEFINITION)"/>
+    <dlg:menuitem dlg:value="https://simple.wikipedia.org/wiki/(OOO_WEBTEXTDEFINITION)"/>
     <dlg:menuitem dlg:value="http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)"/>
     <dlg:menuitem dlg:value="http://twitter.com/intent/tweet?text=(OOO_WEBTEXTSMALL)"/>
     <dlg:menuitem dlg:value="http://vozme.com/text2voice.php?lang=ca&amp;bookmarklet=1&amp;gn=ml&amp;default_language=ca&amp;text=(OOO_WEBTEXT)"/>
@@ -117,6 +121,8 @@
     <dlg:menuitem dlg:value="http://vozme.com/text2voice.php?lang=it&amp;bookmarklet=1&amp;gn=ml&amp;default_language=it&amp;text=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="http://vozme.com/text2voice.php?lang=pt&amp;bookmarklet=1&amp;gn=ml&amp;default_language=pt&amp;text=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)..."/>
+    <dlg:menuitem dlg:value="https://(SELECTION_LANGUAGE_CODE).wiktionary.org/wiki/(OOO_WEBTEXTDEFINITION)"/>
+    <dlg:menuitem dlg:value="https://(SELECTION_LANGUAGE_CODE).wikipedia.org/wiki/(OOO_WEBTEXTDEFINITION)"/>
    </dlg:menupopup>
   </dlg:combobox>
   <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="17" dlg:left="158" dlg:top="175" dlg:width="69" dlg:height="10" dlg:value="CheckBox2" dlg:checked="false">

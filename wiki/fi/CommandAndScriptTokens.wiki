@@ -25,6 +25,7 @@ Jos komentojonoissa tai parametreissä tarvitaan muuttujia, tulee käyttää sop
   * Valinnan kielikoodi: en = englanti, fi = suomi jne. (SELECTION_LANGUAGE_CODE) 
   * Valinnan maakoodi: US = U.S.A, FI = Suomi jne. (SELECTION_COUNTRY_CODE) 
   * Valinnan aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne. (SELECTION_LANGUAGE_COUNTRY_CODE) 
+  * Ensimmäinen sana  (OOO_WEBDEFINITION) 
   * Valitun tekstin 99 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTSMALL) 
   * Valitun tekstin 249 lensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT250) 
   * Valitun tekstin 999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT) 

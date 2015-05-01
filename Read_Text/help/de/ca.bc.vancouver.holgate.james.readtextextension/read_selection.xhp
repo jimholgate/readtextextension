@@ -1,55 +1,55 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
-<meta>
-<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp" indexer="include" status="PUBLISH">
-<title id="read_selection" xml-lang="de-DE">
-Read selection</title>
-<filename>/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp</filename>
-</topic>
-<history>
-<created date="2010-10-22T00:00:00">
-James Holgate</created>
-<lastedited date="2011-03-17T00:00:00">
-First translated to German by Eugene Seidel. If translation is updated, please remove this line.
-</lastedited>
-</history>
-</meta>
-<body>
-<paragraph role="heading" id="read_selection1" xml-lang="de-DE" level="1">
-So verwenden Sie die Read Text Extension
-</paragraph>
-<paragraph role="heading" id="read_selection1.1" xml-lang="de-DE" level="2">
-Markierten Text vorlesen
-</paragraph>
-<list>
-<listitem>
-<switchinline select="appl">
-<caseinline select="CALC">
-Markieren Sie eine Zelle, die Text oder Zahlen enthält. 
-</caseinline>
-<caseinline select="DRAW">
-Markieren Sie Text in einem Textrahmen. 
-</caseinline>
-<caseinline select="IMPRESS">
-Markieren Sie etwas Text im normalen Editierfenster der Folie oder Notiz. 
-</caseinline>
-<caseinline select="WRITER">
-Markieren Sie eine Textpassage. 
-</caseinline>
-<defaultinline>
-Öffnen Sie Calc, Draw, Impress, Writer oder Web Writer, und markieren Sie anschließend eine Stelle. 
-</defaultinline>
-</switchinline>
-</listitem>
-<listitem>
-Klicken Sie auf die Schaltfläche 
-<emph>
-Markierten Text vorlesen</emph>
- in der Menüleiste.
-</listitem>
-</list>
-<section id="relatedtopics">
-<embed href="text/shared/guide/accessibility.xhp#accessibility"/>
-</section>
-</body>
+    <meta>
+        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp" indexer="include" status="PUBLISH">
+            <title id="read_selection" xml-lang="de-DE">
+                Read selection</title>
+            <filename>/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp</filename>
+        </topic>
+        <history>
+            <created date="2010-10-22T00:00:00">
+                James Holgate</created>
+            <lastedited date="2011-03-17T00:00:00">
+                First translated to German by Eugene Seidel. If translation is updated, please remove this line.
+            </lastedited>
+        </history>
+    </meta>
+    <body>
+        <paragraph role="heading" id="read_selection1" xml-lang="de-DE" level="1">
+            So verwenden Sie die Read Text Extension
+        </paragraph>
+        <paragraph role="heading" id="read_selection1.1" xml-lang="de-DE" level="2">
+            Markierten Text vorlesen
+        </paragraph>
+        <list>
+            <listitem>
+                <switchinline select="appl">
+                    <caseinline select="CALC">
+                        Markieren Sie eine Zelle, die Text oder Zahlen enthält.
+                    </caseinline>
+                    <caseinline select="DRAW">
+                        Markieren Sie Text in einem Textrahmen.
+                    </caseinline>
+                    <caseinline select="IMPRESS">
+                        Markieren Sie etwas Text im normalen Editierfenster der Folie oder Notiz.
+                    </caseinline>
+                    <caseinline select="WRITER">
+                        Markieren Sie eine Textpassage.
+                    </caseinline>
+                    <defaultinline>
+                        Öffnen Sie Calc, Draw, Impress, Writer oder Web Writer, und markieren Sie anschließend eine Stelle. 
+                    </defaultinline>
+                </switchinline>
+            </listitem>
+            <listitem>
+                Klicken Sie auf die Schaltfläche 
+                <emph>
+                    Markierten Text vorlesen</emph>
+                in der Menüleiste.
+            </listitem>
+        </list>
+        <section id="relatedtopics">
+            <embed href="text/shared/guide/accessibility.xhp#accessibility"/>
+        </section>
+    </body>
 </helpdocument>
