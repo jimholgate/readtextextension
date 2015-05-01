@@ -26,6 +26,7 @@ Verwenden Sie das passende Token, wenn Sie diese Werte in einem Befehl oder Scri
   * Sprachcode-Auswahl - de für Deutsch, fr für Französisch usw. (SELECTION_LANGUAGE_CODE) 
   * Ländercode.Auswahl - DE für Deutsch, FR für Französisch, usw. (SELECTION_COUNTRY_CODE) 
   * Regionalcode-Auswahl - fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw. (SELECTION_LANGUAGE_COUNTRY_CODE) 
+  * Das erste Wort des markierten Textes, für die URL codiert (OOO_WEBTEXTDEFINITION)
   * Die ersten 99 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXTSMALL) 
   * Die ersten 249 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXT250) 
   * Die ersten 999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXT) 

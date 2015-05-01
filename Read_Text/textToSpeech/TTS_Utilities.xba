@@ -2551,30 +2551,42 @@ Function replaceLocalTokensWithStr(sA As String) As String
 End Function
 
 
+
 Function ReplaceWebTokensWithStr(sA As String,sB As String) As String
-	Dim sFind As String
-	Dim sReplace As String
+    Dim sFind As String
+    Dim sReplace As String
 
-	sFind=&quot;(OOO_WEBTEXTBIG)&quot;
-	sReplace=fsEscapeStr(Left(sB,9999))
-	&apos; A lot of text. Use If you have a dedicated online speech server.
-	sA=fsReplaceText(sA,sFind,sReplace)
+    sFind=&quot;(OOO_WEBTEXTBIG)&quot;
+    sReplace=fsEscapeStr(Left(trim(sB),9999))
+    &apos; A lot of text. Use If you have a dedicated online speech server.
+    sA=fsReplaceText(sA,sFind,sReplace)
 
-	sFind=&quot;(OOO_WEBTEXT)&quot;
-	sReplace=fsEscapeStr(Left(sB,999))
-	&apos; Use with free online text-To-speech utilities
-	sA=fsReplaceText(sA,sFind,sReplace)
+    sFind=&quot;(OOO_WEBTEXT)&quot;
+    sReplace=fsEscapeStr(Left(trim(sB),999))
+    &apos; Use with free online text-To-speech utilities
+    sA=fsReplaceText(sA,sFind,sReplace)
 
-	sFind=&quot;(OOO_WEBTEXT250)&quot;
-	sReplace=fsEscapeStr(Left(sB,249))
-	&apos; Use with online QRCode utilities
-	sA=fsReplaceText(sA,sFind,sReplace)
+    sFind=&quot;(OOO_WEBTEXT250)&quot;
+    sReplace=fsEscapeStr(Left(trim(sB),249))
+    &apos; Use with online QRCode utilities
+    sA=fsReplaceText(sA,sFind,sReplace)
 
-	sFind=&quot;(OOO_WEBTEXTSMALL)&quot;
-	&apos; Use with Google Translate To ensure that the text-To-speech is enabled
-	sReplace=fsEscapeStr(Left(sB,99))
-	sA=fsReplaceText(sA,sFind,sReplace)
-	ReplaceWebTokensWithStr=sA
+    sFind=&quot;(OOO_WEBTEXTSMALL)&quot;
+    &apos; Use with Google Translate To ensure that the text-To-speech is enabled
+    sReplace=fsEscapeStr(Left(trim(sB),99))
+    sA=fsReplaceText(sA,sFind,sReplace)
+    ReplaceWebTokensWithStr=sA
+    
+    sFind = &quot;(OOO_WEBTEXTDEFINITION)&quot;
+    &apos; Use with an on-line dictionary.
+    &apos; The *Real Academia Española* on-line dictionary requires a single
+    &apos; word in lower case.
+    &apos;
+    &apos; http://lema.rae.es/drae/srv/search?key=(OOO_WEBTEXTDEFINITION)
+    &apos;
+    sReplace=lcase(fsEscapeStr(fsQuickTitle(1, 99, trim(sB)))
+    sA=fsReplaceText(sA,sFind,sReplace)
+    ReplaceWebTokensWithStr=sA
 End Function
 
 
