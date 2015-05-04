@@ -546,16 +546,17 @@ End Function
 function fsgetTextSelectiontoEnd(optional bAsPara as boolean) as string
 	Dim sA as string
 	Dim sB as string
-
-	on error goto fsgetTextSelectiontoEndErr
+	
+&apos;	on error goto fsgetTextSelectiontoEndErr
+	on error resume next
 	if ismissing(bAsPara) then
 		bAsPara  =  false
 	endif
 	if bAsPara then
-		sA = fsgetCursorWord(false)
+		sA = fsSupertrim(fsgetCursorWord(false))	
 		fbSelecttoEndofParagraph()
 		SetWorkingCountryLanguage()
-		sB  =  fsGetSelectionAndCopy
+		sB = fsGetSelectionAndCopy
 		if len(sA) = 0 then
 			fbGoLeft
 		endif
@@ -564,6 +565,7 @@ function fsgetTextSelectiontoEnd(optional bAsPara as boolean) as string
 		sB = fsGetSelectionAndCopy
 	endif
 	fsgetTextSelectiontoEnd = sB
+	
 	exit function
 	fsgetTextSelectiontoEndErr:
 	fsgetTextSelectiontoEnd = &quot;&quot;
@@ -3344,7 +3346,6 @@ Function fsSelectionLanguage(optional byVal sFilter) As String
 		sFilter = &quot;&quot;
 	endif
 
-	&apos;On Error Goto SELECTLANGUAGEERROR
 	on error resume next
 	sA = &quot;&quot;
 	sB = &quot;&quot;
@@ -3448,7 +3449,7 @@ Function fsSelectionCountry(optional byval sFilter) As String
 			CountryErr:
 		endif
 	Else
-		&apos; on Error goto svcCountryErr
+		on error resume next
 		oVC=oDoc.getCurrentController.getViewCursor
 		sA=oVC.CharLocale.Country
 		sB=oVC.GetString()
@@ -3485,7 +3486,7 @@ Function fsComplexAsiaOrWest(byval sA)
 	Dim x As Integer
 
 	sA = trim(sA)
-	if fbHasLTRMarker(sA) or fbHasRTLMarker(sA) then
+
 &apos;&apos;
 &apos;&apos; Complex languages
 &apos;&apos; -----------------
@@ -3502,7 +3503,8 @@ Function fsComplexAsiaOrWest(byval sA)
 &apos;&apos; Limbu, and Ethopic Extended.  Some languages use either western
 &apos;&apos; or complex letters depending on region and media.
 &apos;&apos;
-&apos;&apos; 
+&apos;&apos;
+	if fbHasLTRMarker(sA) or fbHasRTLMarker(sA) then
 		fsComplexAsiaOrWest = &quot;COMPLEX&quot;
 		exit function
 	endif
@@ -6704,8 +6706,12 @@ function fbHasRTLMarker(byval sA)
 	if len(sA) = 0 then
 		b1 = false
 	else
-		s1 = converttourl(left(trim(sA), 10))
+		s1 = converttourl(left(trim(sA), 15))
 		if instr(s1, &quot;%D8&quot;) &gt; 0 then
+			&apos; Arabic, Persian
+			b1 = true
+		elseif instr(s1, &quot;%D7&quot;) &gt; 0 then
+			&apos; Hebrew
 			b1 = true
 		endif
 	endif
@@ -6724,7 +6730,7 @@ function fbHasLTRMarker(byval sA)
 	if len(sA) = 0 then
 		b1 = false
 	else
-		s1 = converttourl(left(trim(sA), 10))
+		s1 = converttourl(left(trim(sA), 15))
 		if instr(s1, &quot;%E0&quot;) &gt; 0 then
 			b1 = true
 		endif
