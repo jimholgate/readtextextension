@@ -119,7 +119,9 @@ def guessTime(sSTR, sRATE, sFILEPATH, sLANG):
                                                "",
                                                "ShowWavtoSeconds",
                                                "",
-                                               "")
+                                               "",
+                                               50,
+                                               160)
                 retval = iRATE * (readtexttools.WavtoSeconds(sWAVE))
             except(AttributeError, TypeError, ImportError):
                 # Library is missing or incorrect version
