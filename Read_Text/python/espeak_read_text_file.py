@@ -340,7 +340,7 @@ def eSpeakRate(sA):
             i1 = (float(s1) if '.' in s1 else int(s1) / 100)
             i2 = math.ceil(i1 * retVal)
         else:
-            i1 = (float(sA) if '.' in s1 else int(sA))
+            i1 = (float(sA) if '.' in sA else int(sA))
             i2 = math.ceil(i1)
     except(TypeError):
        print ('I was unable to determine espeak rate!')
@@ -373,7 +373,7 @@ def eSpeakPitch(sA):
             i1 = (float(s1) if '.' in s1 else int(s1) / 100)
             i2 = math.ceil(i1 * retVal)
         else:
-            i1 = (float(sA) if '.' in s1 else int(sA))
+            i1 = (float(sA) if '.' in sA else int(sA))
             i2 = math.ceil(i1)
     except(TypeError):
        print ('I was unable to determine espeak pitch!')
