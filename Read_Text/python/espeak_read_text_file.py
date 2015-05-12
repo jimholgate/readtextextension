@@ -64,8 +64,12 @@ Command line options (default):
 or (save as a .wav file in the home directory):
 
         "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
-          --output "(HOME)(NOW).wav" "(TMP)"
+          --output="(HOME)(NOW).wav" "(TMP)"
 
+or (speak more slowly with a lowered pitch):
+
+        "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
+          --rate=80% --pitch=80% "(HOME)(NOW).wav" "(TMP)"
 
 See the manual page for `espeak` for more detailed information
 
@@ -82,6 +86,7 @@ from __future__ import (
     )
 import codecs
 import getopt
+import math
 import os
 import platform
 import sys
@@ -100,13 +105,14 @@ def usage():
     print ('Usage\n-----\n')
     print(sB + ' "input.txt"')
     print(sB + ' --language [de|en|en-GB|es|fr|it] "input.txt"')
-    print(sB + ' --visible "false" "input.txt"')
-    print(sB + ' --output "output.wav" "input.txt"')
-    print(sB + ' --output "output.[m4a|mp2|mp3|ogg]" "input.txt"')
-    print(sB + ' --output "output.[avi|webm]" \ ')
-    print('       --image "input.[png|jpg] "input.txt"')
-    print(sB + ' --audible "false" --output "output.wav" \ ')
-    print('       "input.txt"\n\n')
+    print(sB + ' --visible="false" "input.txt"')
+    print(sB + ' --rate=100% --pitch=100% "input.txt"')
+    print(sB + ' --output="output.wav" "input.txt"')
+    print(sB + ' --output="output.[m4a|mp2|mp3|ogg]" "input.txt"')
+    print(sB + ' --output="output.[avi|webm]" \ ')
+    print('       --image="input.[png|jpg] "input.txt"')
+    print(sB + ' --audible="false" --output="output.wav" \ ')
+    print('       "input.txt"\n')
 
 
 def espkread(sTXTFILE,
@@ -118,7 +124,9 @@ def espkread(sTXTFILE,
              sB,
              sPOSTPROCESS,
              sART,
-             sDIM):
+             sDIM,
+             iPITCH,
+             iRATE):
     '''
     sTXTFILE - Name of text file to speak
     sLANG - Supported two or four letter language code - defaults to US English
@@ -130,6 +138,8 @@ def espkread(sTXTFILE,
     sPOSTPROCESS - Get information, play file, or convert a file
     sART - Artist or Author
     sDIM - Dimensions to scale photo '600x600'
+    iPITCH - pitch value from 5 to 100, default 50
+    iRATE - rate value from 20 to 640, default 160
     '''
     sOUT1 = ''
     sOTHER = 'af;bs;ca;cs;cy;da;de;el;eo;fi;fr;hi;hr;hu;hy;id;is;it;ku;la;lv;'
@@ -285,7 +295,8 @@ def espkread(sTXTFILE,
         sSub = 'eSpeak/command_line/espeak.exe'
         if 'windows' in platform.system().lower():
             sApp = readtexttools.getWinFullPath(sSub)
-        s1 = '"' + sApp + '" -b 1 -v ' + sVoice + ' -w "' + sTMP1
+        s1 = '"' + sApp + '" -b 1 -p ' + str(iPITCH) + ' -s ' + str(iRATE)
+        s1 = s1 + ' -v ' + sVoice + ' -w "' + sTMP1
         s1 = s1 + '" -f "' + sTXTFILE + '"'
         readtexttools.myossystem(s1)
         print ("-----------------------------------------------------")
@@ -310,7 +321,74 @@ def espkread(sTXTFILE,
         usage()
 
 
+def eSpeakRate(sA):
+    '''
+    sA - rate expressed as a percentage.
+    Use '100%' for default rate of 160 words per minute (wpm).
+    Returns rate between 20 and 640.
+    '''
+    i1 = 0
+    i2 = 0
+    iMinVal = 20
+    iMaxVal = 640
+    retVal = 160
+    s1 = ''
+    
+    try:
+        if '%' in sA:
+            s1 = sA.replace('%', '')
+            i1 = (float(s1) if '.' in s1 else int(s1) / 100)
+            i2 = math.ceil(i1 * retVal)
+        else:
+            i1 = (float(sA) if '.' in s1 else int(sA))
+            i2 = math.ceil(i1)
+    except(TypeError):
+       print ('I was unable to determine espeak rate!')
+    if i2 <= iMinVal:
+        retVal = iMinVal
+    elif i2 >= iMaxVal:
+        retVal = iMaxVal
+    else:
+        retVal = i2
+    return retVal
+
+
+def eSpeakPitch(sA):
+    '''
+    sA - Pitch expressed as a percentage.
+    Use '100%' for default Pitch of 50.
+    "aah" pitch: 0% = a1, 50% = b1, 100% = e2, 200% = d3#
+    Returns pitch value between 0 and 100.
+    '''
+    i1 = 0
+    i2 = 0
+    iMinVal = 0
+    iMaxVal = 100
+    retVal = 50
+    s1 = ''
+    
+    try:
+        if '%' in sA:
+            s1 = sA.replace('%', '')
+            i1 = (float(s1) if '.' in s1 else int(s1) / 100)
+            i2 = math.ceil(i1 * retVal)
+        else:
+            i1 = (float(sA) if '.' in s1 else int(sA))
+            i2 = math.ceil(i1)
+    except(TypeError):
+       print ('I was unable to determine espeak pitch!')
+    if i2 <= iMinVal:
+        retVal = iMinVal
+    elif i2 >= iMaxVal:
+        retVal = iMaxVal
+    else:
+        retVal = i2
+    return retVal
+
+
 def main():
+    iEspeechPitch = 50
+    iEspeechRate = 160
     sLANG = 'en-US'
     sWAVE = ''
     sVISIBLE = ''
@@ -323,6 +401,7 @@ def main():
     sART = ''
     sDIM = '600x600'
     sFILEPATH = sys.argv[-1]
+
     if os.path.isfile(sFILEPATH):
         if sys.argv[-1] == sys.argv[0]:
             usage()
@@ -365,13 +444,11 @@ def main():
             elif o in ('-l', '--language'):
                 sLANG = a
             elif o in ('-r', '--rate'):
-                # Not implimented - Use Pico or spd_read_text_file.py instead.
-                # The stub prevents an error if you try this Pico option.
                 sRATE = a
+                iEspeechRate = eSpeakRate(sRATE)
             elif o in ('-p', '--pitch'):
-                # Not implimented - Use Pico or spd_read_text_file.py instead.
-                # The stub prevents an error if you try this Pico option.
                 sPITCH = a
+                iEspeechPitch = eSpeakPitch(sPITCH)
             elif o in ('-i', '--image'):
                 sIMG1 = a
             elif o in ('-t', '--title'):
@@ -407,7 +484,9 @@ def main():
                          sC,
                          sPOSTPROCESS,
                          sB,
-                         sDIM
+                         sDIM,
+                         iEspeechPitch,
+                         iEspeechRate
                          )
     sys.exit(0)
 

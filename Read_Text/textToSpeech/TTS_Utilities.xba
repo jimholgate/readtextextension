@@ -1716,7 +1716,7 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 			fileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) or _
  			fileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
 		s2(0)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		s4= &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=&quot;&amp; s2(n)
+		s4= &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=&quot;&amp; s2(n) &amp; &quot; --rate=100% --pitch=100% &quot;
 		s1= s1 &amp; fspyOutOptions(oDialog,s4)
 	Endif
 	n=6
@@ -6708,10 +6708,6 @@ function fbHasRTLMarker(byval sA)
 	else
 		s1 = converttourl(left(trim(sA), 15))
 		if instr(s1, &quot;%D8&quot;) &gt; 0 then
-			&apos; Arabic, Persian
-			b1 = true
-		elseif instr(s1, &quot;%D7&quot;) &gt; 0 then
-			&apos; Hebrew
 			b1 = true
 		endif
 	endif
