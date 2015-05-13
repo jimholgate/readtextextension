@@ -32,11 +32,26 @@ or (save as a .wav file in the home directory):
 
     "(FESTIVAL_READ_TEXT_PY)" --output "(HOME)(NOW).wav" "(TMP)"
 
-See the manual page for `text2wave` for more detailed information
+or (speak more slowly with a lowered pitch):
 
-[Read Text Extension](http://sites.google.com/site/readtextextension/)
+    "(FESTIVAL_READ_TEXT_PY)" --rate=75% --pitch=75% "(TMP)"
+
+This python code uses [Sable][1] XML code to change speech rate and pitch.
+Not all voices support Sable markup.  For unsupported voices, the rate and
+pitch command line arguments do not change the sound rate and pitch.
+
+See the info pages for `festival` for more information.
+
+To change the speed and pitch of **recorded** sound files, use [Audacity][2],
+a free multi-track audio editor and recorder.
+
+[Read Text Extension][3]
 
 Copyright (c) 2011 - 2015 James Holgate
+
+  [1]: https://www.cs.cmu.edu/~awb/festival_demos/sable.html
+  [2]: http://sourceforge.net/projects/audacity/
+  [3]: http://sites.google.com/site/readtextextension/
 
 '''
 from __future__ import (
@@ -151,12 +166,34 @@ def festivalread(sFILEPATH,
         sys.exit(2)
 
 
+def festivalSpeakerNameString(sA):
+    '''
+    [Sable][4]
+    =======
+    
+    Use name in `<SPEAKER NAME="kal_diphone">` markup
+    `(voice_upc_ca_ona_hts)` becomes **upc_ca_ona_hts**
+    `(voice_kal_diphone)` becomes **kal_diphone**
+
+    [4]: https://www.cs.cmu.edu/~awb/festival_demos/sable.html
+    
+    '''
+    retVal = 'male1'
+    if '(voice_' in sA:
+        s1 = sA.replace('(voice_', '')
+        s1 = s1.replace(')', '')
+        retVal = s1
+    return retVal
+    
+
 def festivalRateString(sA):
     '''
+    Use RATE for value of Sable `<RATE SPEED="50%">` markup.
     Converts w3 Smil style percentage to Sable style percentage
     sA - rate expressed as a percentage.
     Use '100%' for default rate of 0% in Sable.
-    Returns Sable rate as string between -100% and 100%.
+    Returns Sable rate as string between -99% and 100%.
+    
     '''
     i2 = 0
     iMinVal = -99
@@ -185,10 +222,12 @@ def festivalRateString(sA):
 
 def festivalPitchString(sA):
     '''
+    Use PITCH for value of Sable `<PITCH BASE="50%">` markup.
     Converts w3 Smil style percentage to Sable percentage
     sA - Pitch expressed as a percentage.
     Use '100%' for default Pitch of 0% in Sable markup
-    Returns pitch value as string between -100% and 100%
+    Returns pitch value as string between -99% and 100%
+    
     '''
     i2 = 0
     iMinVal = -99
@@ -220,8 +259,9 @@ def main():
     sVISIBLE = ''
     sAUDIBLE = ''
     sTXTFILE = ''
-    sSABLERATE = '0%'
-    sSABLEPITCH = '0%'
+    sSABLESPEAKER = ''
+    sSABLERATE = ''
+    sSABLEPITCH = ''
     sRATE = '100%'
     sPITCH = '100%'
     sIMG1 = ''
@@ -229,6 +269,7 @@ def main():
     sTIT = ''
     sART = ''
     sDIM = '600x600'
+    
     sFILEPATH = sys.argv[-1]
     if os.path.isfile(sFILEPATH):
         if (sys.argv[-1] == sys.argv[0]):
@@ -278,6 +319,7 @@ def main():
                 sIMG1 = a
             elif o in ('-e', '--eval'):
                 sEVAL1 = a
+                sSABLESPEAKER = festivalSpeakerNameString(sEVAL1)
             elif o in ('-t', '--title'):
                 sTIT = a
             elif o in ('-n', '--artist'):
@@ -292,8 +334,7 @@ def main():
             # iso-8859-15 is for western European languages.  Should festival
             # include a switch to allow Asian & complex languages to use utf-8?
             #
-            # Festival does not use w3 speech markup.  Instead, it uses  
-            #  [sable](https://www.cs.cmu.edu/~awb/festival_demos/sable.html)
+            # Festival voices use Sable markup instead of w3 SMIL  
             #
             oFILE = codecs.open(sFILEPATH, mode='r', encoding='iso8859_15')
         except (IOError):
@@ -303,25 +344,41 @@ def main():
             sTXT = oFILE.read()
             oFILE.close()
             if len(sTXT) != 0:
-                sTXT = readtexttools.cleanstr(sTXT, readtexttools.bFalse())
-                sA = ''
-                sA = sA + '<SABLE><RATE SPEED=\'' + sSABLERATE + '\'>'
-                sA = sA + '<PITCH BASE=\'' + sSABLEPITCH + '\'>'
-                sA = sA + sTXT
-                sA = sA + '</PITCH>'
-                sA = sA + '</RATE></SABLE>'
+                if (len(sSABLERATE) == 0 and len(sSABLEPITCH) == 0):
+                    # Pass plain text (RECOMMENDED for most users)
+                    sTXT = readtexttools.cleanstr(sTXT, readtexttools.bFalse())
+                    sA = sTXT
+                else:
+                    # Prepare Sable XML (To SLOW DOWN speech use --RATE=75%)
+                    sTXT = readtexttools.cleanstr(sTXT, readtexttools.bFalse())
+                    sTXT = sTXT.replace("&", "&#38;")
+                    sTXT = sTXT.replace("<", "&#60;")
+                    sTXT = sTXT.replace(">", "&#62;")
+                    sA = ''
+                    sA = sA + '<SABLE>\n'
+                    sA = sA + '<SPEAKER NAME="' + sSABLESPEAKER + '">\n'
+                    sA = sA + '<RATE SPEED="' + sSABLERATE + '">\n'
+                    sA = sA + '<PITCH BASE="' + sSABLEPITCH + '">\n'
+                    sA = sA + sTXT
+                    sA = sA + '\n</PITCH>'
+                    sA = sA + '\n</RATE>'
+                    sA = sA + '\n</SPEAKER>'
+                    sA = sA + '\n</SABLE>'
+                    sFILEPATH = sFILEPATH + ".sable"
+                    oFILE2 = codecs.open(
+                        sFILEPATH,
+                        mode='w',
+                        encoding='iso8859_15')
+                    oFILE2.write(sA)
+                    oFILE2.close()
                 sB = readtexttools.checkmyartist(sART)
                 sC = readtexttools.checkmytitle(sTIT, 'festival')
-                sFILEPATH = sFILEPATH + ".sable"
-                oFILE2 = codecs.open(sFILEPATH, mode='w', encoding='iso8859_15')
-                oFILE2.write(sA)
-                oFILE2.close()
                 festivalread(sFILEPATH,
                              sVISIBLE,
                              sAUDIBLE,
                              sWAVE,
                              sIMG1,
-                             sA,
+                             sTXT,
                              sEVAL1,
                              sC,
                              sB,
