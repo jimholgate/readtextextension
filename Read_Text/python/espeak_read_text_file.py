@@ -69,7 +69,7 @@ or (save as a .wav file in the home directory):
 or (speak more slowly with a lowered pitch):
 
         "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
-          --rate=80% --pitch=80% "(HOME)(NOW).wav" "(TMP)"
+          --rate=80% --pitch=80% "(TMP)"
 
 See the manual page for `espeak` for more detailed information
 

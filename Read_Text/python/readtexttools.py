@@ -526,7 +526,7 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
             else:
                 if (os.path.isfile('/usr/bin/neroAacEnc') or
                         os.path.isfile('/usr/local/bin/neroAacEnc')):
-                    s1 = 'neroAacEnc -if "' & sTMP1 & '" -of "' & sOUT1 & '" '
+                    s1 = 'neroAacEnc -if "' + sTMP1 + '" -of "' + sOUT1 + '" '
                     print(s1)
                     myossystem(s1)
                     if (os.path.isfile('/usr/bin/neroAacTag') or
@@ -539,7 +539,7 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
                         s9 = s9 + '" -meta:track="' + sTN
                         s9 = s9 + '" -meta:year="' + sTY + u'"'
                         if (len(sIMG1) > 0 and os.path.isfile(sIMG1)):
-                            s9 = s9 + ' -add-cover:front:"' + sIMG1 & '" '
+                            s9 = s9 + ' -add-cover:front:"' + sIMG1 + '" '
                         s1 = 'neroAacTag "' + sOUT1 + '"' + s9
                         print(s1)
                         myossystem(s1)
