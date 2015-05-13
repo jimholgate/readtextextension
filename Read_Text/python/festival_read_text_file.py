@@ -47,6 +47,7 @@ from __future__ import (
     )
 import codecs
 import getopt
+import math
 import os
 import platform
 import sys
@@ -150,11 +151,77 @@ def festivalread(sFILEPATH,
         sys.exit(2)
 
 
+def festivalRateString(sA):
+    '''
+    Converts w3 Smil style percentage to Sable style percentage
+    sA - rate expressed as a percentage.
+    Use '100%' for default rate of 0% in Sable.
+    Returns Sable rate as string between -100% and 100%.
+    '''
+    i2 = 0
+    iMinVal = -99
+    iMaxVal = 100
+    retVal = 0
+    s1 = ''
+    
+    try:
+        if '%' in sA:
+            s1 = sA.replace('%', '')
+            s1 = s1.replace('-', '')
+            i2 = int(s1) - 100
+        else:
+            i2 = 0
+    except(TypeError):
+       print ('I was unable to determine festival rate!')
+    if i2 <= iMinVal:
+        retVal = iMinVal
+    elif i2 >= iMaxVal:
+        retVal = iMaxVal
+    else:
+        retVal = i2
+    myStr = str(retVal) + '%'
+    return myStr
+
+
+def festivalPitchString(sA):
+    '''
+    Converts w3 Smil style percentage to Sable percentage
+    sA - Pitch expressed as a percentage.
+    Use '100%' for default Pitch of 0% in Sable markup
+    Returns pitch value as string between -100% and 100%
+    '''
+    i2 = 0
+    iMinVal = -99
+    iMaxVal = 100
+    retVal = 0
+    s1 = ''
+    
+    try:
+        if '%' in sA:
+            s1 = sA.replace('%', '')
+            s1 = s1.replace('-', '')
+            i2 = int(s1) - 100
+        else:
+            i2 = 0
+    except(TypeError):
+       print ('I was unable to determine festival pitch!')
+    if i2 <= iMinVal:
+        retVal = iMinVal
+    elif i2 >= iMaxVal:
+        retVal = iMaxVal
+    else:
+        retVal = i2
+    myStr = str(retVal) + '%'
+    return myStr
+
+
 def main():
     sWAVE = ''
     sVISIBLE = ''
     sAUDIBLE = ''
     sTXTFILE = ''
+    sSABLERATE = '0%'
+    sSABLEPITCH = '0%'
     sRATE = '100%'
     sPITCH = '100%'
     sIMG1 = ''
@@ -203,8 +270,10 @@ def main():
                 sAUDIBLE = a
             elif o in ('-r', '--rate'):
                 sRATE = a
+                sSABLERATE = festivalRateString(sRATE)
             elif o in ('-p', '--pitch'):
                 sPITCH = a
+                sSABLEPITCH = festivalPitchString(sPITCH)
             elif o in ('-i', '--image'):
                 sIMG1 = a
             elif o in ('-e', '--eval'):
@@ -220,10 +289,12 @@ def main():
         try:
             # https://docs.python.org/3/library/codecs.html#standard-encodings
             #
-            # iso-8859-15 is for western European languages. Should festival
+            # iso-8859-15 is for western European languages.  Should festival
             # include a switch to allow Asian & complex languages to use utf-8?
-            # We were using `sys.getfilesystemencoding()`, but letting the
-            #  system choose could cause garbled or missing speech utterances.
+            #
+            # Festival does not use w3 speech markup.  Instead, it uses  
+            #  [sable](https://www.cs.cmu.edu/~awb/festival_demos/sable.html)
+            #
             oFILE = codecs.open(sFILEPATH, mode='r', encoding='iso8859_15')
         except (IOError):
             print ('I was unable to open the file you specified!')
@@ -233,11 +304,18 @@ def main():
             oFILE.close()
             if len(sTXT) != 0:
                 sTXT = readtexttools.cleanstr(sTXT, readtexttools.bFalse())
-                sA = '" <speed level = \'' + sRATE + '\'>'
-                sA = sA + "<pitch level = '" + sPITCH + '\'>'
-                sA = sA + sTXT + '</pitch></speed>"'
+                sA = ''
+                sA = sA + '<SABLE><RATE SPEED=\'' + sSABLERATE + '\'>'
+                sA = sA + '<PITCH BASE=\'' + sSABLEPITCH + '\'>'
+                sA = sA + sTXT
+                sA = sA + '</PITCH>'
+                sA = sA + '</RATE></SABLE>'
                 sB = readtexttools.checkmyartist(sART)
                 sC = readtexttools.checkmytitle(sTIT, 'festival')
+                sFILEPATH = sFILEPATH + ".sable"
+                oFILE2 = codecs.open(sFILEPATH, mode='w', encoding='iso8859_15')
+                oFILE2.write(sA)
+                oFILE2.close()
                 festivalread(sFILEPATH,
                              sVISIBLE,
                              sAUDIBLE,

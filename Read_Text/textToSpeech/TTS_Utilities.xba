@@ -1715,8 +1715,14 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 	If fileExists(&quot;/usr/bin/espeak&quot;) or _
 			fileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) or _
  			fileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
-		s2(0)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		s4= &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=&quot;&amp; s2(n) &amp; &quot; --rate=100% --pitch=100% &quot;
+ 		s2(0)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+ 		&apos;s1 = s1 &amp; _
+ 		&apos;		CR &amp; _
+ 		&apos;		&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+ 		&apos;		&quot; --language=&quot;&amp; _
+ 		&apos;		s2(n) &amp; _
+ 		&apos;		&quot; --rate=80% --pitch=80% --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
+		s4= &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=&quot;&amp; s2(n) &apos; &amp; &quot; --rate=100% --pitch=100% &quot;
 		s1= s1 &amp; fspyOutOptions(oDialog,s4)
 	Endif
 	n=6
@@ -1729,9 +1735,14 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 		s2(5)=&quot;de&quot;
 		s2(6)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s2(7)=&quot;(SELECTION_LANGUAGE_CODE)&quot;
-		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot;&amp; &quot; --language=&quot;&amp; s2(n) &amp; &quot; --rate=80% --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
+		&apos;s1 = s1 &amp; _
+		&apos;		CR &amp; _
+		&apos;		&quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+		&apos;		&quot; --language=&quot;&amp; _
+		&apos;		s2(n) &amp; _
+		&apos;		&quot; --rate=80% --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
 		s4= &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=&quot;&amp; s2(n)
-		s1= s1 &amp; fspyOutOptions(oDialog,s4)
+		s1= s1 &amp; fspyOutOptions(oDialog, s4)
 	Endif
 	if asc(left(s1,1)) = 10 Then
 		s1 = mid(s1,2)
@@ -1759,11 +1770,41 @@ Function fspyOutOptions(oDialog,byval s4)
 	if s4 = &quot;&quot; Then
 		s1 = &quot;&quot;
 	Else
+		s1=s1 &amp; CR &amp; s4 &amp; _
+				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).wav&quot;&quot;&quot; &amp; _
+				s3
+		If fileExists(&quot;/usr/bin/faac&quot;) or _
+				fileExists(&quot;C:\opt\neroAacEnc.exe&quot;) Then
+			&apos; Some players might not play faac output. Check firefox and
+			&apos; Android based music players.
+			s1=s1 &amp; CR &amp; s4 &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).m4a&quot;&quot;&quot; &amp; _
+					s2
+		Endif
+		If fileExists(&quot;/usr/bin/flac&quot;) or _
+				fileExists(&quot;C:\opt\flac.exe&quot;) or _
+				fbHaveFfmpeg Then
+			&apos; Free lossless audio codec
+			s1=s1 &amp; CR &amp; s4 &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).flac&quot;&quot;&quot; &amp; _
+					s3
+		Endif
+		If fbHaveFfmpeg Then
+			&apos; Apple Audio Interchange Format. Not compressed.
+			s1=s1 &amp; CR &amp; s4 &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).aif&quot;&quot;&quot; &amp; _
+					s2
+		Endif
 		If fbHaveFfmpeg Then
 			&apos; Webm is a modern cross platform web browser oriented video format. 
 			&apos; Works on google-chrome, chromium, and firefox, but not on Safari 
 			&apos; or Internet Explorer
 			s5 = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+			s1=s1 &amp; CR &amp; s4 &amp; _
+					&quot; --image &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;&amp; _
+					&quot; --dimensions &quot;&quot;1200x800&quot;&quot;&quot; &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot;&amp; _
+				s2
 			s1=s1 &amp; CR &amp; s4 &amp; _
 				&quot; --image &quot;&quot;(POSTER2_IMG)&quot;&quot;&quot;&amp; _
 				&quot; --dimensions &quot;&quot;600x400&quot;&quot;&quot; &amp; _
@@ -1774,15 +1815,7 @@ Function fspyOutOptions(oDialog,byval s4)
 				&quot; --dimensions &quot;&quot;600x600&quot;&quot;&quot; &amp; _
 				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot; &amp; _
 				s2
-			s1=s1 &amp; CR &amp; s4 &amp; _
-				&quot; --image &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;&amp; _
-				&quot; --dimensions &quot;&quot;1200x800&quot;&quot;&quot; &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot;&amp; _
-				s2
 		Endif
-		s1=s1 &amp; CR &amp; s4 &amp; _
-			&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).wav&quot;&quot;&quot; &amp; _
-			s3
 		If (fileExists(&quot;/usr/share/doc/libogg0/copyright&quot;) and _
 				fbHaveFfmpeg()) or _
 				fileExists(&quot;C:\opt\oggenc.exe&quot;) or _
@@ -1791,51 +1824,36 @@ Function fspyOutOptions(oDialog,byval s4)
 			&apos; on 64 bit systems.  avconv can convert wave to ogg files if the 
 			&apos; library exists.
 			s1=s1 &amp; CR &amp; s4 &amp; _
-				s5 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).ogg&quot;&quot;&quot; &amp; _
-				s2
+					s5 &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).ogg&quot;&quot;&quot; &amp; _
+					s2
 		Endif
 		If fileExists(&quot;/usr/share/doc/libmp3lame0/copyright&quot;) or _
 				fileExists(&quot;C:\opt\lame.exe&quot;) Then
 			&apos; Some players might not play lame mp3 output. Check firefox and 
 			&apos; Android based music players.
 			s1=s1 &amp; CR &amp; s4 &amp; _
-				s5 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
-				s2
+					s5 &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
+					s2
 		Elseif fileExists(&quot;/usr/share/doc/libtwolame0/copyright&quot;) or _
 				fileExists(&quot;C:\opt\twolame.exe&quot;) Then
 			&apos; doesn’t work with Rhythm box. Not a widely used export format.
 			s1=s1 &amp; CR &amp; s4 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp2&quot;&quot;&quot; &amp; _
-				s2
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp2&quot;&quot;&quot; &amp; _
+					s2
 		Endif
-		If fileExists(&quot;/usr/bin/faac&quot;) or _
-				fileExists(&quot;C:\opt\neroAacEnc.exe&quot;) Then
-			&apos; Some players might not play faac output. Check firefox and
-			&apos; Android based music players.
-			s1=s1 &amp; CR &amp; s4 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).m4a&quot;&quot;&quot; &amp; _
-				s2
-		Endif
-		If fileExists(&quot;/usr/bin/flac&quot;) or _
-				fileExists(&quot;C:\opt\flac.exe&quot;) or _
-				fbHaveFfmpeg Then
-			&apos; Free lossless audio codec
-			s1=s1 &amp; CR &amp; s4 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).flac&quot;&quot;&quot; &amp; _
+		s1=s1 &amp; CR &amp; s4 &amp; _
+				 &quot; --rate=75% --pitch=100% &quot; &amp; _
 				s3
-		Endif
-		If fbHaveFfmpeg Then
-			&apos; Apple Audio Interchange Format. Not compressed.
-			s1=s1 &amp; CR &amp; s4 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).aif&quot;&quot;&quot; &amp; _
-				s2
-		Endif
 		s1=s1 &amp; CR &amp; s4 &amp; _
-			s3
+				s3
+		&apos; Nominal rate and pitch is --rate=100% --pitch=100% &quot;
 		s1=s1 &amp; CR &amp; s4 &amp; _
-			&quot; --visible=false&quot; &amp; s3
+				 &quot; --rate=75% --pitch=100% &quot; &amp; _
+				&quot; --visible=false&quot; &amp; s3
+		s1=s1 &amp; CR &amp; s4 &amp; _
+				&quot; --visible=false&quot; &amp; s3
 	Endif
 	fspyOutOptions = s1
 End Function
@@ -1910,6 +1928,7 @@ Sub resetSpeech
 		fsMyTempLock(&quot;lock.track&quot;) &amp; CR &amp; _
 		fsFullPathOf(fsFestivalScriptName) &amp; CR &amp; _
 		fsFullPathOf(fsTemporaryTextDoc) &amp; CR &amp; _
+		fsFullPathOf(fsTemporaryTextDoc) &amp; &quot;.sable&quot; &amp; CR &amp; _
 		fsFullPathOf(fsTemporaryTtsAppleScript)
 	a1 = split(aFile, CR)
 	For n = Lbound(a1) to Ubound(a1)
@@ -5007,7 +5026,13 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 		if fileExists(fsMyTempLock) Then
 			kill fsMyTempLock
 		Endif
+		if fileExists(fsFullPathOf(fsTemporaryTextDoc) &amp; &quot;.sable&quot;) then
+			kill fsFullPathOf(fsTemporaryTextDoc) &amp; &quot;.sable&quot;
+		endif
 	Endif
+	if fileExists(fsFullPathOf(fsTemporaryTextDoc)) then
+		kill fsFullPathOf(fsTemporaryTextDoc)
+	endif
 	On Error Resume Next
 	oBar.End()
 	Exit Sub
