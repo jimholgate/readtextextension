@@ -364,6 +364,7 @@ def main():
                     sA = sA + '\n</RATE>'
                     sA = sA + '\n</SPEAKER>'
                     sA = sA + '\n</SABLE>'
+                    os.remove(sFILEPATH)
                     sFILEPATH = sFILEPATH + ".sable"
                     oFILE2 = codecs.open(
                         sFILEPATH,
