@@ -44,6 +44,11 @@ or (save as a .wav file in the home directory):
 
          "(PICO_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
            --output "(HOME)(NOW).wav" "(TMP)"
+           
+or (speak more slowly with a lowered pitch):
+
+        "(PICO_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
+          --rate=80% --pitch=80% "(TMP)"
 
 See the manual page for `pico2wave` for more detailed information
 
@@ -79,12 +84,13 @@ def usage():
     print(sB + ' "input.txt"')
     print(sB + ' --language [de|en|en-GB|es|fr|it] "input.txt"')
     print(sB + ' --visible "false" "input.txt"')
+    print(sB + ' --rate=100% --pitch=100% "input.txt"')
     print(sB + ' --output "output.wav" "input.txt"')
     print(sB + ' --output "output.[m4a|mp2|mp3|ogg]" "input.txt"')
     print(sB + ' --output "output.[avi|webm]" \ ')
     print('       --image "input.[png|jpg] "input.txt"')
     print(sB + ' --audible "false" --output "output.wav" \ ')
-    print('       "input.txt"\n\n')
+    print('       "input.txt"\n')
 
 
 def picoread(sTXT, sLANG, sVISIBLE, sAUDIBLE, sTMP0, sIMG1, sB, sART, sDIM):
