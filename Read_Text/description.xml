@@ -1,6 +1,6 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <description xmlns="http://openoffice.org/extensions/description/2006" xmlns:d="http://openoffice.org/extensions/description/2006"  xmlns:xlink="http://www.w3.org/1999/xlink">
-  <version value="0.8.24" />
+  <version value="0.8.26" />
     <identifier value="ca.bc.vancouver.holgate.james.readtextextension" />
   <display-name>
     <name lang="en">Read Text</name>
@@ -10,10 +10,6 @@
     <name lang="fr">Read Text</name>
   </display-name>
   <platform value="all" />
-   <dependencies>
-     <OpenOffice.org-minimal-version value="3.0" d:name="OpenOffice.org 3.0" />
-     <OpenOffice.org-maximal-version value="3.5" d:name="OpenOffice.org 3.5" />
-   </dependencies>
   <registration>
      <simple-license  accept-by="admin" suppress-on-update="true" >
        <license-text xlink:href="registration/LICENSE" lang="en" />
