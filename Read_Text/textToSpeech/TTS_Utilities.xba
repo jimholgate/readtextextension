@@ -2,7 +2,7 @@
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Utilities" script:language="StarBasic">REM  *****  BASIC  *****
 OPTION EXPLICIT
-&apos;&apos; #TTS_Utilities
+&apos;&apos; # TTS_Utilities
 &apos;&apos;
 &apos;&apos; These functions handle events, create combo box listings,
 &apos;&apos; read and write strings to files, get selected text, clean
@@ -218,7 +218,7 @@ End Sub
 
 Function fbUsingTouchScreen
 &apos;&apos;
-&apos;&apos; #Touch Screen
+&apos;&apos; # Touch Screen
 &apos;&apos;
 &apos;&apos; If you are using a touch screen or another pointing device that makes it difficult
 &apos;&apos; to manually select text, you can enable enhanced text selection by checking the
@@ -667,10 +667,48 @@ function fbGoToMark(MarkType)
 end function
 
 
+function fbClipBoardAvailable
+	fbClipBoardAvailable = true
+	if lcase(fsGetSetting(&quot;ooname&quot;)) = &quot;libreoffice&quot; and _
+			left(fsGetSetting(&quot;oosetupversion&quot;), 2) = &quot;5.&quot; then
+		fbClipBoardAvailable = fbOfficeSupports(_
+				&quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;)
+	endif
+end function
+
+
+function fbOfficeSupports(_
+		optional byval s1)
+	&apos; Based on code listing 3 on page 173 of 
+	&apos; Pitonyak, Andrew. *OpenOffice Macros Explained*. Milwaukee, Hentzenwerke, 2004.
+	&apos; ISBN:9781930919518
+	dim b1 : b1 = false
+	dim vManager
+	dim a1
+	dim i#
+	if ismissing(s1) then s1 = &quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;
+	vManager = GetProcessServiceManager()
+	a1 = vManager.getAvailableServiceNames()
+	for i = lbound(a1) to ubound(a1)
+		if a1(i) = s1 then
+			b1 = true
+			exit for
+		endif
+	next
+	fbOfficeSupports = b1
+end function
+
+
 function fsGetClipBoard as string
-	&apos;Based On listing Listing 5.64: View the clipboard As text.
-	&apos;by Andrew Pitonyak at http://www.pitonyak.org/AndrewMacro.odt 
-	&apos;October 28,2010
+	&apos; Based On listing Listing 5.64: View the clipboard As text.
+	&apos; by Andrew Pitonyak at http://www.pitonyak.org/AndrewMacro.odt 
+	&apos; October 28,2010
+	&apos;
+	&apos; **Don&apos;t modify order**
+	if not(fbClipBoardAvailable) then
+		fsGetClipBoard = &quot;&quot;
+		exit function
+	endif
 	dim oClip,oClipContents,oTypes
 	dim oConverter,convertedString$
 	dim i%,iPlainLoc%
@@ -679,7 +717,7 @@ function fsGetClipBoard as string
 	oClip=createUnoService(s$)
 	oConverter=createUnoService(&quot;com.sun.star.script.Converter&quot;) 
 	&apos;Print &quot;Clipboard name=&quot; &amp; oClip.getName()fsGetClipBoard
-	&apos;Print &quot;Implemantation name=&quot; &amp; oClip.getImplementationName()
+	&apos;Print &quot;Implementation name=&quot; &amp; oClip.getImplementationName()
 	oClipContents=oClip.getContents()
 	oTypes=oClipContents.getTransferDataFlavors()
 	dim msg$,iLoc%,outS
@@ -788,7 +826,7 @@ End Function
 
 Sub dialog1Combo2ShowSAPIChoices(oDialog)
 &apos;&apos;
-&apos;&apos; #Windows dialogue
+&apos;&apos; # Windows dialogue
 &apos;&apos; 
 &apos;&apos; Saving files
 &apos;&apos; ------------
@@ -840,7 +878,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 &apos;&apos; speech synthesizer if you haven’t installed a voice in the
 &apos;&apos; language.
 &apos;&apos; 
-&apos;&apos; #Optional formats
+&apos;&apos; # Optional formats
 &apos;&apos; 
 &apos;&apos; AAC Encoder
 &apos;&apos; -----------
@@ -1210,7 +1248,7 @@ End Function
 
 Sub dialog1Combo2ShowSAYChoices(oDialog)
 &apos;&apos;
-&apos;&apos; #Apple OSX
+&apos;&apos; # Apple OSX
 &apos;&apos; 
 &apos;&apos; **Read Text** reads text aloud, saves audio or video files
 &apos;&apos; from text, and can use resources from the web based on the
@@ -1480,7 +1518,7 @@ End Sub
 
 Sub dialog1Combo1ShowFESTIVALScripts(oDialog)
 &apos;&apos;
-&apos;&apos; #Linux 
+&apos;&apos; # Linux 
 &apos;&apos;
 &apos;&apos; Festival
 &apos;&apos; --------
@@ -1864,7 +1902,7 @@ Function AppleScriptPath() As String
 End Function
 
 &apos;&apos;
-&apos;&apos; #Cross Platform information
+&apos;&apos; # Cross Platform information
 &apos;&apos;
 
 Function fsMyTitleInputBox(optional byVal bSkipWindows, optional byval sA)
@@ -2255,20 +2293,20 @@ Sub ttsActuate(config() As Variant, _
 &apos;&apos; to punctuation and line breaks, but under some circumstances, an author
 &apos;&apos; of a speech document may need to add a break manually.
 &apos;&apos;
-&apos;&apos; ###Windows
+&apos;&apos; ### Windows
 &apos;&apos; 
 &apos;&apos; All currently supported versions of Windows can use 
 &apos;&apos; [W3 Synchronized Multimedia Integration Language][SMIL2]. 
 &apos;&apos; **SMIL** markup enables responsive speech as well as incorporating
 &apos;&apos; specific languages, pitch, volume, speed and pauses.
 &apos;&apos; 
-&apos;&apos; ###Linux
+&apos;&apos; ### Linux
 &apos;&apos;
 &apos;&apos; Linux support for SMIL varies by speech synthesizer.  In some speech
 &apos;&apos; synthesizers, it is disabled by default, but can be enabled using a
 &apos;&apos; command line switch.
 &apos;&apos;
-&apos;&apos; ###OSX
+&apos;&apos; ### OSX
 &apos;&apos;
 &apos;&apos; OSX uses a [custom markup][SMIL1] for speech synthesis
 &apos;&apos; instead of SMIL.  The markup can incorporate changes in pitch, speed
@@ -2782,7 +2820,7 @@ End Function
 Function fsSelectionLanguageAndRegion(optional bIgnoreInstalledVoices) As String
 	Dim sA, sB As String
 &apos;&apos;
-&apos;&apos; #Language and Region
+&apos;&apos; # Language and Region
 &apos;&apos; 
 &apos;&apos; The extension can determine the language of the selected text and pass the value
 &apos;&apos; to a speech synthesizer.  The languages on your computer vary depending on the
@@ -3643,7 +3681,7 @@ Function fsDrawProperty(strA) As String
 End Function
 
 &apos;&apos;
-&apos;&apos; #Reference
+&apos;&apos; # Reference
 &apos;&apos;
 
 Sub MsgSpeak(strA As String)
@@ -4930,7 +4968,7 @@ End Function
 
 
 sub resetSpeechDispatcher(optional bAll as boolean)
-&apos;&apos; #Stopping Speech
+&apos;&apos; # Stopping Speech
 &apos;&apos; 
 &apos;&apos; To stop speech, click the Read selection button while the voice is 
 &apos;&apos; speaking.
@@ -5180,7 +5218,7 @@ End Function
 
 function fsGetThisUsers(optional cType as string)
 &apos;&apos;
-&apos;&apos; #Your personal information
+&apos;&apos; # Your personal information
 &apos;&apos;
 &apos;&apos; Extensions run in the **trusted zone**.  All extensions have access to the
 &apos;&apos; information that you entered into *Tools – Options – User Data*.  Read Text 
@@ -6988,7 +7026,7 @@ End Sub
 
 function fsReleaseNotesCMD(optional byval sA)
 &apos;&apos;
-&apos;&apos; #Making release notes
+&apos;&apos; # Making release notes
 &apos;&apos; 
 &apos;&apos; Each xba script includes up-to-date notes as **markdown** text.
 &apos;&apos; To create an *About* document in Linux or OSX, use the terminal 

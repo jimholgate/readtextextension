@@ -11,7 +11,7 @@ Global s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle As String
 Global i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack As Integer
 Global s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage As String
 
-&apos;&apos; #Configuration tools
+&apos;&apos; # Configuration tools
 &apos;&apos;  
 &apos;&apos; These procedures make dialogues, get settings and write settings.
 &apos;&apos; Dialogues in Read Text Extension are updated each time that you
@@ -29,7 +29,7 @@ Sub SetWorkingCountryLanguage()
 End Sub
 
 Function fiMyCurrentAudioTrack(optional byval bIncrement)
-&apos;&apos; #Audio tracks
+&apos;&apos; # Audio tracks
 &apos;&apos;
 &apos;&apos; An mp3 album can have up to 255 tracks.  This extension uses
 &apos;&apos; the document *title* as the album title.  The track number is
@@ -110,7 +110,7 @@ Sub ConfigureReadTextAloud
 	Endif								 
 	&apos;Now apply the settings to the dialog box
 	f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).Model.State=config(fiAlwaysShowDialogCheckBox)
-	if fbEnhancedRTVersion then
+	if fbEnhancedRTVersion and fbClipBoardAvailable then
 		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Model.State=config(fiSmartSelectCheckBox)
 	else
 		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Model.State= 0
@@ -308,21 +308,30 @@ Sub AboutAddOn(config() As Variant, myText As String)
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl2&quot;).model.ImageURL = fsSpeakerLogo
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl3&quot;).model.helpText = Left(fsGetTextSelection(false, false),99) 
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl3&quot;).model.ImageURL = fsSelectionLogo
-	f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.helpText = Left(fsGetClipBoard(),99) 
-	f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
+
+	if not(fbClipBoardAvailable) then
+		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).Visible = false
+		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).Visible = false
+	else
+		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.helpText = Left(fsGetClipBoard(),99) 
+		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
+		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.helpText = Left(fsGetClipBoard(),99)
+		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.Label = Len(fsGetClipBoard())	
+	endif
 	If fileExists(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) or _
 		fileExists(s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) or _
 		fileExists(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;) or _
 		fileExists(fsProgramDirectory() &amp; &quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;) Then
-		f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm( &quot;s_speech-properties&quot;, s1)
+		f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm(_
+				&quot;s_speech-properties&quot;, s1)
 	Else
-		f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm( &quot;s_system-settings&quot;, s1)
+		f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm(_
+				&quot;s_system-settings&quot;, s1)
 	Endif
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.ImageURL = fsToolBoxLogo
 	f_dlgAboutReadSelection.GetControl(&quot;Label1&quot;).model.helpText = Left(fsGetTextSelection(false, false),99) 
 	f_dlgAboutReadSelection.GetControl(&quot;Label1&quot;).model.Label = Len(fsGetTextSelection(false, false))
-	f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.helpText = Left(fsGetClipBoard(),99)
-	f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.Label = Len(fsGetClipBoard())
+
 	&apos;Change the text in the information text boxes
 	If config(fiFestivalOption) Then
 		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=config(fiFestivalPath) &amp; &quot; &quot; &amp; _

@@ -3,7 +3,7 @@
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TextToSpeech" script:language="StarBasic">REM  *****  BASIC  *****
 OPTION EXPLICIT
 
-&apos;&apos; #Read Text Extension
+&apos;&apos; # Read Text Extension
 &apos;&apos;
 &apos;&apos; **Read Text** reads text aloud, saves audio or video files
 &apos;&apos; from text, and can use resources from the web based on the
@@ -116,7 +116,7 @@ OPTION EXPLICIT
 &apos;&apos; If Not, WRITE TO THE FREE SOFTWARE FOUNDATION,INC., 59 TEMPLE PLACE,SUITE 330,BOSTON,MA
 &apos;&apos; 02111-1307  USA
 &apos;&apos;
-&apos;&apos; #Procedures
+&apos;&apos; # Procedures
 &apos;&apos;
 &apos;&apos; Procedures are called from menu items or from the tool bar.
 &apos;&apos;

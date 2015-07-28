@@ -2,7 +2,7 @@
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="ThirdPartyCode" script:language="StarBasic">REM  *****  BASIC  *****
 OPTION EXPLICIT
-&apos;&apos; #Third Party Code
+&apos;&apos; # Third Party Code
 &apos;&apos;
 &apos;&apos; Code shown here is used or adapted from other sources with permission.
 &apos;&apos;
@@ -333,44 +333,6 @@ Function fsRetrieveCalcActiveCellProperty(strA) As String
 	&apos;restore the old selection (but loosing the previous active cell)
 	ThisComponent.CurrentController.Select(oOldSelection)
 		fsRetrieveCalcActiveCellProperty=sCellContent
-End Function
-
-
-Function fsGetClipBoard As String
-	&apos;Based On listing Listing 5.64: View the clipboard As text.
-	&apos;by Andrew Pitonyak at http://www.pitonyak.org/AndrewMacro.odt
-	&apos;October 28,2010
-	Dim oClip,oClipContents,oTypes
-	Dim oConverter,convertedString$
-	Dim i%,iPlainLoc%
-	iPlainLoc=-1
-	Dim s$ : s$=&quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;
-	Dim msg$,iLoc%,outS
-	
-	oClip=createUnoService(s$)
-	oConverter=createUnoService(&quot;com.sun.star.script.Converter&quot;)
-	&apos;Print &quot;Clipboard name=&quot; &amp; oClip.getName()
-	&apos;Print &quot;Implemantation name=&quot; &amp; oClip.getImplementationName()
-	oClipContents=oClip.getContents()
-	oTypes=oClipContents.getTransferDataFlavors()
-	msg=&quot;&quot;
-	iLoc=-1
-	For i=Lbound(oTypes) To Ubound(oTypes)
-		 If oTypes(i).MimeType=&quot;text/plain;charset=utf-16&quot; Then
-			iPlainLoc=i
-			Exit For
-		 Endif
-		 &apos; msg=msg &amp; &quot;Mime type=&quot; &amp; x(ii).MimeType &amp; &quot; normal=&quot; &amp; _
-		 &apos; x(ii).HumanPresentableName &amp; Chr$(10)
-	Next
-	If (iPlainLoc &gt;=0) Then
-		convertedString=oConverter.convertToSimpleType( _
-				oClipContents.getTransferData(oTypes(iPlainLoc)),_
-				com.sun.star.uno.TypeClass.STRING)
-		 fsGetClipBoard=convertedString
-	Else
-		 fsGetClipBoard=&quot;&quot;
-	Endif
 End Function
 
 
