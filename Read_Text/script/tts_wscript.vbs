@@ -64,7 +64,7 @@
 '' Optional formats
 '' ================
 '' 
-'' ##AAC Encoder
+'' ## AAC Encoder
 '' 
 '' [Nero m4a encoder](http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php)
 '' is a free command line M4A converter from [Nero](http://www.nero.com).
@@ -79,12 +79,12 @@
 ''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).m4a" "(TMP)"
 '' 
-'' ##Audacity
+'' ## Audacity
 '' 
 '' [Audacity](http://audacity.sourceforge.net/) is a free cross platform audio editor. It can
 '' use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.  
 '' 
-'' ###FFmpeg for Audacity
+'' ### FFmpeg for Audacity
 '' 
 '' Windows security policies may prevent you from installing the Audacity FFmpeg converter
 '' library using the `ffmpeg-win-2.2.2.exe` installer.  You can install the FFmpeg library
@@ -106,7 +106,7 @@
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
 '' 
-'' ##Flac
+'' ## Flac
 '' 
 '' Makes free lossless audio codec (FLAC) files.
 '' 
@@ -116,7 +116,7 @@
 '' 
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).flac" "(TMP)"
 '' 
-'' ##iTunes
+'' ## iTunes
 '' 
 '' **iTunes** is a visual music manager from Apple available at no cost.
 '' 
@@ -129,7 +129,7 @@
 ''     "(TTS_WSCRIPT_VBS)" /language:"en-US" /soundfile:"(HOME)en\(NOW).m4a" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /language:"en-US" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 '' 
-'' ##Lame
+'' ## Lame
 '' 
 '' Lame is a free command line file converter.
 '' 
@@ -141,7 +141,7 @@
 '' 
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 '' 
-'' ##Miro Video Converter (FFmpeg)
+'' ## Miro Video Converter (FFmpeg)
 '' 
 '' This is a free visual music and video converter from the Participatory 
 '' culture foundation.
@@ -161,7 +161,7 @@
 '' The direct link to the most recent version of Miro Video Converter is at osuosl.org -
 '' [`MiroConverterSetup.exe`](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/).
 '' 
-'' ##Ogg
+'' ## Ogg
 '' 
 '' Play ogg encoded sound files with firefox, chrome or chromium.
 '' Use `oggenc.exe` or `oggenc2.exe` to make an ogg file

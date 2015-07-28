@@ -3,7 +3,7 @@
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Indices" script:language="StarBasic">REM  *****  BASIC  *****
 OPTION EXPLICIT
 &apos;&apos;
-&apos;&apos; #TTS_Indices.xba
+&apos;&apos; # TTS_Indices.xba
 &apos;&apos;
 &apos;&apos; The `TTS_Indices.xba` file contains strings that can change according to
 &apos;&apos; the language.  The extension is designed to include language specific
@@ -948,6 +948,7 @@ Function fsGetOS() As String
 		Endif
 	End Select
 End Function
+
 
 Function fsGetSetting(sA) As String
 	Dim oProdNameAccess As Object
