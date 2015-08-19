@@ -250,7 +250,7 @@ End Sub
 sub PresentSelection
 &apos;&apos; Tools – Add-ons – Impress-View
 &apos;&apos; ------------------------------
-&apos;&apos; http://webcache.googleusercontent.com/search?q=cache:
+&apos;&apos; 
 &apos;&apos; Use this to open the selected text as an Impress document with the full 
 &apos;&apos; text in the notes and a summary on the slide itself. The font is big and
 &apos;&apos; the format is square to make it easy to export sounds using the image of
