@@ -139,10 +139,12 @@ Sub ConfigureReadTextAloud
 		if f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).Model.State Then
 			resetSpeechDispatcher(true)
 		Elseif f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).Model.State Then
-			Shell(&quot;killall&quot;,0,&quot;festival&quot;,true)
-			 if fileExists(fsMyTempLock) then
-			 	kill fsMyTempLock
-			 endif
+			if fileexists(&quot;/usr/bin/killall&quot;) or fileexists(&quot;/usr/local/bin/killall&quot;) then
+				Shell(&quot;killall&quot;,0,&quot;festival&quot;,true)
+			endif
+			if fileExists(fsMyTempLock) then
+				kill fsMyTempLock
+			endif
 		Endif
 	Endif
 	If f_dlgSpeechSetup.Execute() &lt;&gt; 0 Then
@@ -219,7 +221,7 @@ End Sub
 
 Sub ttsUpdateLabels
 	Dim s1 As String
-	
+	UpdatePoSettingsDone = -1
 	s1 = fsDisplayLanguage()
 	&apos;Update the labels with your language
 	f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).model.Label = fsLookUpTerm( &quot;s_always-show-this-dialog&quot;,s1)
@@ -282,10 +284,11 @@ Sub AboutAddOn(config() As Variant, myText As String)
 	Dim sA As String
 	Dim msgs() As Variant
 	Dim errorCode As Integer
-	Dim s1, s2 As String
+	Dim s1$ : s1 = fsDisplayLanguage()
+	Dim s2$ : s2=fsHomeDrive()
+	Dim s3$ : s3 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
+	Dim s4$ : s4 = &quot;&quot;
 	
-	s1 = fsDisplayLanguage()
-	s2=fsHomeDrive() 
 		&apos; Open up the dialog
 	DialogLibraries.LoadLibrary( &quot;textToSpeech&quot; )
 	f_dlgAboutReadSelection=CreateUnoDialog( DialogLibraries.textToSpeech.Dialog3)
@@ -309,14 +312,33 @@ Sub AboutAddOn(config() As Variant, myText As String)
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl3&quot;).model.helpText = Left(fsGetTextSelection(false, false),99) 
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl3&quot;).model.ImageURL = fsSelectionLogo
 
-	if not(fbClipBoardAvailable) then
-		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).Visible = false
-		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).Visible = false
-	else
-		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.helpText = Left(fsGetClipBoard(),99) 
+	if fbIsWin64Program and (not(_
+			fbClipBoardAvailable) or _
+			(fsGetSetting(_
+			&quot;oosetupversion&quot;) = &quot;5.0&quot; and _
+			lcase(_
+			fsGetSetting(_
+			&quot;ooName&quot;)) = &quot;libreoffice&quot;)) then
 		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
-		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.helpText = Left(fsGetClipBoard(),99)
-		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.Label = Len(fsGetClipBoard())	
+		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.Enabled = false
+		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.Enabled = false
+	else
+		CreateFile(s3, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)  &apos; lock clipboard
+		fsGetClipBoard(false)
+		&apos; To avoid a crash, the testing version of office 
+		&apos; needs a dummy run of function before evaluating
+		&apos; the results.
+		&apos; If it crashes, then we are left with a lock file.
+		If fileexists(s3) Then  &apos; unlock clipboard
+			kill s3
+		Endif
+		s4 = fsGetClipBoard(false)
+		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.helpText = Left(_
+				s4, 99)
+		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.helpText = Left(_
+				s4, 99)
+		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
+		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.Label = Len(s4)
 	endif
 	If fileExists(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) or _
 		fileExists(s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) or _

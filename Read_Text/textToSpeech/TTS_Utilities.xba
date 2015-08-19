@@ -196,8 +196,8 @@ End Sub
 
 
 Sub webHelpButton
-&apos; Dialog3 Button on LibreOffice can’t call webHelp directly because of input.
-&apos; parameter
+	&apos; Dialog3 Button on LibreOffice can’t call webHelp directly because of input
+	&apos; parameter
 	webHelp
 End Sub
 
@@ -209,8 +209,11 @@ Sub webHelp(optional sURL)
 	if ismissing(sURL) Then
 		sURL = fsLookUpTerm( &quot;s_http-help-url&quot;, fsDisplayLanguage())
 	Endif
-	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
-	oSvc.execute(sURL, &quot;&quot;, 0)
+
+	if len(sURL) &gt; len(&quot;http://a.com&quot;) then
+		oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+		oSvc.execute(sURL, &quot;&quot;, 0)
+	endif
 	exit sub
 	webHelpErr:
 End Sub
@@ -606,7 +609,7 @@ function fsGetSelectionAndCopy()
 	document = ThisComponent.CurrentController.Frame
 	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
 	dispatcher.executeDispatch(document, &quot;.uno:Copy&quot;, &quot;&quot;, 0, Array())
-	fsGetSelectionAndCopy = fsGetClipBoard
+	fsGetSelectionAndCopy = fsGetClipBoard(false)
 end function
 
 
@@ -668,11 +671,21 @@ end function
 
 
 function fbClipBoardAvailable
-	fbClipBoardAvailable = true
-	if lcase(fsGetSetting(&quot;ooname&quot;)) = &quot;libreoffice&quot; and _
-			left(fsGetSetting(&quot;oosetupversion&quot;), 2) = &quot;5.&quot; then
-		fbClipBoardAvailable = fbOfficeSupports(_
-				&quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;)
+	&apos; If program has crashed or is a version known to 
+	&apos; crash when reading the clipboard, provide
+	&apos; an alternative to reading the clipboard directly.
+	fbClipBoardAvailable = fbOfficeSupports(_
+			&quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;)
+	if fileexists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) then
+		fbClipBoardAvailable = false
+	endif
+	if fbIsWin64Program and _
+			(fsGetSetting(_
+			&quot;oosetupversion&quot;) = &quot;5.0&quot; and _
+			lcase(_
+			fsGetSetting(_
+			&quot;ooName&quot;)) = &quot;libreoffice&quot;) then
+		fbClipBoardAvailable = false
 	endif
 end function
 
@@ -680,7 +693,7 @@ end function
 function fbOfficeSupports(_
 		optional byval s1)
 	&apos; Based on code listing 3 on page 173 of 
-	&apos; Pitonyak, Andrew. *OpenOffice Macros Explained*. Milwaukee, Hentzenwerke, 2004.
+	&apos; Pitonyak, Andrew.  *OpenOffice Macros Explained*. Milwaukee, Hentzenwerke, 2004.
 	&apos; ISBN:9781930919518
 	dim b1 : b1 = false
 	dim vManager
@@ -699,45 +712,60 @@ function fbOfficeSupports(_
 end function
 
 
-function fsGetClipBoard as string
+function fsGetClipBoard(_
+		optional byval bSuggest) as string
+	&apos; If bSuggest is true, then show inputbox prompt if the clipboard
+	&apos; does not contain text data.
+	&apos;
 	&apos; Based On listing Listing 5.64: View the clipboard As text.
 	&apos; by Andrew Pitonyak at http://www.pitonyak.org/AndrewMacro.odt 
 	&apos; October 28,2010
 	&apos;
-	&apos; **Don&apos;t modify order**
+
+	fsGetClipBoard = &quot;&quot;
+	if ismissing(bSuggest) then bSuggest = false
 	if not(fbClipBoardAvailable) then
 		fsGetClipBoard = &quot;&quot;
 		exit function
 	endif
-	dim oClip,oClipContents,oTypes
-	dim oConverter,convertedString$
-	dim i%,iPlainLoc%
-	iPlainLoc=-1
+
+	dim oClip
+	dim oTypes
+	dim oClipContents
+	dim oConverter
+	dim convertedString$
+	dim i%
+	dim iPlainLoc% : iPlainLoc = -1
+	
 	dim s$ : s$=&quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;
-	oClip=createUnoService(s$)
-	oConverter=createUnoService(&quot;com.sun.star.script.Converter&quot;) 
+	oClip = createUnoService(s$)
+	oConverter = createUnoService(&quot;com.sun.star.script.Converter&quot;) 
 	&apos;Print &quot;Clipboard name=&quot; &amp; oClip.getName()fsGetClipBoard
 	&apos;Print &quot;Implementation name=&quot; &amp; oClip.getImplementationName()
-	oClipContents=oClip.getContents()
+	oClipContents = oClip.getContents()
 	oTypes=oClipContents.getTransferDataFlavors()
-	dim msg$,iLoc%,outS
-	msg=&quot;&quot;
-	iLoc=-1
+
 	for i=lbound(oTypes) To ubound(oTypes)
 		 if oTypes(i).MimeType=&quot;text/plain;charset=utf-16&quot; Then 
-			iPlainLoc=i
+			iPlainLoc = i
 			exit for
 		 endif
-		 &apos;msg=msg &amp; &quot;Mime type=&quot; &amp; x(ii).MimeType &amp; &quot; normal=&quot; &amp; _
-		 &apos;      x(ii).HumanPresentableName &amp; chr$(10)
 	next
-	if(iPlainLoc &gt;=0) Then
-		 convertedString=oConverter.convertToSimpleType( _
-			   oClipContents.getTransferData(oTypes(iPlainLoc)),_
-			   com.sun.star.uno.TypeClass.STRING)
-		 fsGetClipBoard=convertedString
+
+	if(iPlainLoc &gt;= 0) Then
+		convertedString = oConverter.convertToSimpleType( _
+				oClipContents.getTransferData(oTypes(iPlainLoc)),_
+				com.sun.star.uno.TypeClass.STRING)
+		fsGetClipBoard = convertedString
 	else
-		 fsGetClipBoard=&quot;&quot;
+		if bSuggest then
+			fsGetClipBoard = inputbox(_
+					fsLookUpTerm(_
+					fsSelectionLanguage), _
+					fsLookUpTerm(_
+					&quot;s_read-text&quot;), _
+					&quot; &quot;)
+		endif
 	endif
 end function
 
@@ -2401,10 +2429,14 @@ Sub ttsActuate(config() As Variant, _
 		On Error Goto errorHandler
 	Else
 		Msgbox( fsLookUpTerm(&quot;s_could-not-locate-the-program&quot;) &amp; _
+			&quot; &quot; &amp; _
 			fsLookUpTerm(&quot;s_string-cannot-be-analyzed&quot;), 64 ,_
 			fsLookUpTerm(&quot;s_read-text&quot;))
 		If fileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
 			kill fsFullPathOf(fsExtensionSettingsIni)
+		Endif
+		If fileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
+			kill fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
 		Endif
 		resetSpeech
 	Endif
@@ -2436,6 +2468,9 @@ Sub ttsActuate(config() As Variant, _
 			fsLookUpTerm( &quot;s_read-text&quot;))
 		If fileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
 			kill fsFullPathOf(fsExtensionSettingsIni)	
+		Endif
+		If fileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
+			kill fileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
 		Endif
 		resetSpeech
 End Sub
@@ -2486,7 +2521,6 @@ Function fbCreateMissingMediaDirectory(byval sCommandLine)
 	For n = Lbound(a1) to Ubound(a1)
 
 		For o = Lbound(a2) to Ubound(a2)
-			&apos;msgbox a2(o)
 			if instr(a1(n), a2(o)) &gt; 0 Then
 				&apos; Creating a text file in a location that doesn’t exist
 				&apos; creates a directory. We can then put a media file in it.
@@ -3554,7 +3588,7 @@ Function fsComplexAsiaOrWest(byval sA)
 &apos;&apos; Gurmukhi script is used for Punjabi.  Devanagari script is for
 &apos;&apos; Hindi and other Indic languages.  Other complex languages include
 &apos;&apos; Dogri, Bodo, Maithili, Khmer, Thaana, Dhiveh, Urdu,
-&apos;&apos; Farsi, Arabic, Kashmiri, Kurdish, Hebrew, ,Bengali, Gurjarti,
+&apos;&apos; Farsi, Arabic, Kashmiri, Kurdish, Hebrew, Bengali, Gurjarti,
 &apos;&apos; Oriya, Tamil, Telugu, Kannada, Malayalam, Burmese (Myanmar),
 &apos;&apos; Thai, Lao, Tibetan, Dzongkha, Ethiopic, Ethiopic Supplement,
 &apos;&apos; Limbu, and Ethopic Extended.  Some languages use either western
@@ -3764,7 +3798,9 @@ Sub MsgSpeak(strA As String)
 				strA)
 			end select
 		elseif fsGetOS()=&quot;OSX&quot; and _
-				fbCreatingMediaFile(&quot;airplay,AIRPLAY,AppleTV,attic,basement,BLUETOOTH,B&amp;W,Bose,Bowers,Creative,Dell,Harmon,Jambox,Jawbone,JBL,kitchen,LogiTech,Polk,Reflector,room,Soundcast,Ultimate,yard&quot;) then
+				fbCreatingMediaFile(&quot;airplay,AIRPLAY,AppleTV,attic,basement,bedroom,BLUETOOTH,B&amp;W,Bose,Bowers,&quot; &amp; _
+						&quot;Creative,Dell,Harmon,Jambox,Jawbone,JBL,kitchen,LogiTech,Polk,Reflector,room,&quot; &amp; _
+						&quot;Soundcast,Ultimate,yard&quot;) then
 			 &apos; Using say speech synthesis with a wireless  
 			 &apos; option could fail silently.  We show you the
 			 &apos; the configuration dialogue to check that you
@@ -3906,6 +3942,22 @@ Function fsInstallPath As String
 End Function
 
 
+function fbIsWin64Program(_
+		optional byval installPath)
+	if ismissing(installPath) or installPath = &quot;&quot; then
+		installPath = fsInstallPath
+	endif
+	
+	if fsGetOS = &quot;WINDOWS&quot; and _
+			Ucase(Environ(&quot;PROCESSOR_ARCHITECTURE&quot;)) = &quot;AMD64&quot; and _
+			instr(lcase(installPath), &quot;(x86)&quot;) &lt; 1 then
+		fbIsWin64Program = true
+	else
+		fbIsWin64Program = false
+	endif
+end function
+
+
 Function fbIsAMediaPlayer(s1 As String) As Boolean
 	Dim n As Integer
 
@@ -4009,7 +4061,8 @@ Function fbCreateFile(sFilePath, sWriteString, Optional sEncoding)
 	if ismissing(sEncoding) Then
 		Select Case fsGetOS()
 		Case &quot;WINDOWS&quot;
-			sEncoding = &quot;iso-8859-15&quot; &apos;iso-8859-15 is Windows &quot;western&quot; encoding
+			sEncoding = &quot;utf-8&quot; &apos; iso-8859-15 is Windows &quot;western&quot; encoding
+								&apos; It doesn&apos;t include Asian or Complex language support
 		Case Else
 			sEncoding = &quot;utf-8&quot; &apos; Posix standard
 		End Select
@@ -4103,6 +4156,104 @@ Function fsPrefixZeroes(s1, n1)
 		fsPrefixZeroes = s1
 	Endif
 End Function
+
+function fxStr(optional byval sA)
+	&apos; Unescapes Python or ECMAscript style line ending code.
+	&apos; https://www.random.org
+	&apos;
+	if ismissing(sA) then sA = &quot;&quot;
+	if not(sA = &quot;&quot;) then
+		sA = fsReplaceText(sA, &quot;\\n&quot;, &quot;[[%%ekuoC52bRp08c6noyqDy%%]]n&quot;)
+		sA = fsReplaceText(sA, &quot;\n&quot;, chr(10))
+		sA = fsReplaceText(sA, &quot;[[%%ekuoC52bRp08c6noyqDy%%]]n&quot;, &quot;\n&quot;)
+	endif
+	fxStr = sA
+end function
+
+
+Function fsAboutAbilityToolsApple()
+	dim s1$ : s1 = fxStr(&quot;Read Text\n&quot; &amp; _
+			&quot;=========\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;Summary\n&quot; &amp; _
+			&quot;-------\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;**Read Text** reads text aloud, saves audio or video files\n&quot; &amp; _
+			&quot;from text, and can use resources from the web based on the\n&quot; &amp; _
+			&quot;selected text.\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot; * Select text.\n&quot; &amp; _
+			&quot; * Click the *Read selection...* button.\n&quot; &amp; _
+			&quot; * To read aloud, accept the default in the dialogue, or choose\n&quot; &amp; _
+			&quot;   another action from the menus.\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;### Read Aloud ###\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;### Record ###\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;\n&quot; &amp; _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;Features\n&quot; &amp; _
+			&quot;--------\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot; * Automatically change languages according to the text language.\n&quot; &amp; _
+			&quot; * Create sound or still-image speech files for listening on the go.\n&quot; &amp; _
+			&quot; * Use web resources to translate, look up, listen, post, or\n&quot; &amp; _
+			&quot;   interface with web applications.\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;Installation\n&quot; &amp; _
+			&quot;------------\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;Get *Read Text* from the download page and install it by double-clicking it.\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;[Apache OpenOffice[1]  \n&quot; &amp; _
+			&quot;[LibreOffice][2]\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;### Miro video converter (optional) ###\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot; * **Miro Video Converter** can convert mp3, webm and other media using `ffmpeg`\n&quot; &amp; _
+			&quot; * Once installed, read text can use it to convert media files\n&quot; &amp; _
+			&quot;   for cross-platform web browsers like chromium, chrome, and firefox.\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;Record a jpeg or png image file with sound using `ffmpeg`\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot;\n&quot; &amp; _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;480x480&quot;&quot;\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot; [ffmpeg][3]  \n&quot; &amp; _
+			&quot; [Miro formats][4]  \n&quot; &amp; _
+			&quot; [Miro video converter][5]  \n&quot; &amp; _
+			&quot; [Participatory culture foundation][6]  \n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;License\n&quot; &amp; _
+			&quot;-------\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;The project is licensed under the [GNU 2.0][7] license.\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;Online help\n&quot; &amp; _
+			&quot;-----------\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;[Read Text][8]\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;\n&quot; &amp; _
+			&quot;  [1]: http://extensions.services.openoffice.org/en/project/read-text\n&quot; &amp; _
+			&quot;  [2]: http://extensions.libreoffice.org/extension-center/read-text\n&quot; &amp; _
+			&quot;  [3]: https://www.ffmpeg.org\n&quot; &amp; _
+			&quot;  [4]: http://develop.participatoryculture.org/index.php/ConversionMatrix\n&quot; &amp; _
+			&quot;  [5]: http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/mac/\n&quot; &amp; _
+			&quot;  [6]: http://pculture.org/\n&quot; &amp; _
+			&quot;  [7]: http://www.gnu.org/licenses/gpl-2.0.txt\n&quot; &amp; _
+			&quot;  [8]: https://sites.google.com/site/readtextextension/\n\n&quot;)
+	fsAboutAbilityToolsApple = s1
+end function
 
 
 Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional byVal ArtURL)
@@ -4263,72 +4414,7 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 	if fileExists(fsTemporaryTtsAppleScript) Then
 		kill fsTemporaryTtsAppleScript
 	Endif
-	sA = &quot;(*&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;Read Text&quot; &amp; CR &amp; _
-		&quot;=========&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;**Read Text** reads text aloud, saves audio or video files&quot; &amp; CR &amp; _
-		&quot;from text, and can use resources from the web based on the&quot; &amp; CR &amp; _
-		&quot;selected text.&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot; * Select text.&quot; &amp; CR &amp; _
-		&quot; * Click the *Read selection...* button.&quot; &amp; CR &amp; _
-		&quot; * To read aloud, accept the default in the dialogue, or choose&quot; &amp; CR &amp; _
-		&quot;   another action from the menus.&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;Read Aloud&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;Record&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;Features&quot; &amp; CR &amp; _
-		&quot;--------&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot; * Automatically change languages according to the text language.&quot; &amp; CR &amp; _
-		&quot; * Create sound or still-image speech files for listening on the go.&quot; &amp; CR &amp; _
-		&quot; * Use web resources to translate, look up, listen, post, or&quot; &amp; CR &amp; _
-		&quot;   interface with web application interfaces.&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;Installation&quot; &amp; CR &amp; _
-		&quot;------------&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;Get *Read Text* from the download page and install it by double-clicking it.&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;[Apache OpenOffice](http://extensions.services.openoffice.org/en/project/read-text)  &quot; &amp; CR &amp; _
-		&quot;[LibreOffice](http://extensions.libreoffice.org/extension-center/read-text) &quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;###Miro video converter (optional)&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot; * **Miro Video Converter** can convert mp3, webm and other media using `ffmpeg`&quot; &amp; CR &amp; _
-		&quot; * Once installed, read text can use it to convert media files&quot; &amp; CR &amp; _
-		&quot;   for cross-platform web browsers like chromium, chrome, and firefox.&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;Record a jpeg or png image file with sound using `ffmpeg`&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;     &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot; [ffmpeg](http://https://www.ffmpeg.org)  &quot; &amp; CR &amp; _
-		&quot; [Miro formats](http://develop.participatoryculture.org/index.php/ConversionMatrix)  &quot; &amp; CR &amp; _
-		&quot; [Miro video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/mac/)  &quot; &amp; CR &amp; _
-		&quot; [Participatory culture foundation](http://pculture.org/)  &quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;License&quot; &amp; CR &amp; _
-		&quot;-------&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;The project is licensed under the [GNU 2.0](http://www.gnu.org/licenses/gpl-2.0.txt) license.&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;Online help&quot; &amp; CR &amp; _
-		&quot;-----------&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;[Read Text](https://sites.google.com/site/readtextextension/)&quot; &amp; CR &amp; _
-		&quot;&quot; &amp; CR &amp; _
-		&quot;*)&quot; &amp; CR
+	sA = &quot;(*&quot; &amp; CR &amp; fsAboutAbilityToolsApple &amp; CR &amp; &quot;*)&quot; &amp; CR
 	if sArguments &lt;&gt; &quot;&quot; Then
 		if instr(sArguments, &quot;AirPlay&quot;) &lt;&gt; 0 Then
 			sA = &quot;(*&quot; &amp; CR &amp; _
@@ -5031,17 +5117,23 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 	Elseif fsGetOS()=&quot;OSX&quot; or fsGetOS = &quot;MAC&quot; Then
 		if fileExists(&quot;/usr/bin/say&quot;) Then
 			If Not (fbCreatingOSXMediaFile) and Not (fbSendingAirPlay) Then
-				errorCode=Shell(&quot;killall&quot;,0,&quot;say&quot;,true)
+				if fileexists(&quot;/usr/bin/killall&quot;) or fileexists(&quot;/usr/local/bin/killall&quot;) then
+					errorCode=Shell(&quot;killall&quot;,0,&quot;say&quot;,true)
+				endif
 				if fileExists(fsMyTempLock) Then
 					kill fsMyTempLock
 				Endif
 			Endif
 		Endif
-	Elseif fsGetOS()=&quot;UNIX&quot; Then
+	Elseif fsGetOS()=&quot;UNIX&quot; and (_
+			fileexists(_
+			&quot;/usr/bin/killall&quot;) or _
+			fileexists(_
+			&quot;/usr/local/bin/killall&quot;)) Then
 		if fileExists(&quot;/usr/bin/spd-say&quot;) Then
 			if bAll Then
-					errorCode=Shell(&quot;killall&quot;,0,&quot;speech-dispatcher&quot;,true)
-				Else
+				errorCode=Shell(&quot;killall&quot;,0,&quot;speech-dispatcher&quot;,true)
+			Else
 					errorCode=Shell(&quot;spd-say&quot;,0,&quot;--cancel&quot;,true)
 			Endif
 		Endif
@@ -6333,7 +6425,7 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 		
 		&apos; Set the text of the speaker notes for the title slide
 		if not(fbsetNote(x.getDrawPages().getByIndex(0), _
-		 			&quot;#&quot; &amp; sA &amp; _
+		 			&quot;# &quot; &amp; sA &amp; _
 					chr(10) &amp; _
 					chr(10) &amp; _
 					&quot;&gt; _&quot; &amp; s3 &amp; &quot;_&quot; &amp; _
@@ -6834,13 +6926,20 @@ function fsIsStringWesternAsianOrComplexTest(sA)
 end function
 
 
-function fsGetEscapedCode(optional byval sA)
+function fsGetEscapedCode(_
+		optional byval sA, _
+		optional byval bShowMe)
 	&apos; Show the string as it would be escaped for an
 	&apos; Internet address. Use as a string converter or
 	&apos; viewer of complex and Asian strings.
-	dim bShowMe
-	
-	bShowMe = false
+	&apos;
+	&apos; Remove ATX headers and hash tags
+	while left(sA, 1) = &quot;#&quot;
+		sA = right(sA, len(sA) - 1)
+	wend
+	if ismissing(bShowMe) then
+		bShowMe = false
+	endif
 	if ismissing(sA) then
 		sA = fsGetTextSelection(false)
 		bShowMe = true
@@ -6851,8 +6950,8 @@ function fsGetEscapedCode(optional byval sA)
 	endif
 end function 
 
-sub SetAllRightJustified()
 
+sub SetAllRightJustified()
 	&apos; Arabic, Hebrew and other right to left languages should be 
 	&apos; aligned to the right. 
 	dim document   as object
@@ -7180,6 +7279,5 @@ sub megaDoc
 				&quot;TTS_read-text-all&quot; &amp; _
 				&quot;.markdown&quot;))
 	endif		
-end sub 
-
+end sub
 </script:module>

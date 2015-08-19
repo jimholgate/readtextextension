@@ -1,0 +1,144 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-15 23:08-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "विदेश प्रोग्राम"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "का प्रयोग करें Festival एक स्क्रिप्ट के साथ"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "Festival स्क्रिप्ट"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "एक अलग कार्यक्रम का प्रयोग करें"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "कमांड लाइन विकल्प"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "प्रदर्शन"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "हमेशा इस संवाद शो"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "के बारे म"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "रद्द करें"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "ठीक है"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "कमान"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "स्क्रिप्ट"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "परीक्षण"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "मैं प्रोग्राम को नहीं ढूँढ सकते है."
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "मैं स्ट्रिंग का विश्लेषण नहीं कर सकता है!"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "ऑन लाइन मदद"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "अनुवाद और वेब उपकरणों के साथ पढ़ें"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "वाक् गुण"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "नियंत्रण कक्ष"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "टच स्क्रीन"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "भाषण संश्लेषण"
+
+#: template.src
+msgctxt ""
+msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
+msgstr "“पाठ पढ़ा – भाषण संश्लेषण”\n=========\n\n> लीब्रऑफ़िस एक मुफ्त तथा मुक्त स्रोत साफ्टवेयर है जो अनेक परिचालन तंत्रों के लिये उपलब्ध है।  [लीब्रऑफ़िस](http://hi.wikipedia.org/s/7y79)\n\nइंप्रेस – देखें\n--------------\n\n- जिस पाठ की नक़ल बनाना चाहते हैं, उसे चुनें\n- “औज़ार – सहयंत्र – इंप्रेस–देखें”, चुनें\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
+

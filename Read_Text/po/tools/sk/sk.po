@@ -1,0 +1,319 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-15 23:13-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: sk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "Externý program"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "Použiť Festival s skript"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "Script príkazy"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "Čítanie s externým programom"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "Parametre príkazového riadku"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "Zobraziť"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "Vždy zobraziť toto dialógové okno"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "O"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "Zrušiť"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "OK"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "Príkaz"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "Script"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "Test"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "Nemožno nájsť program."
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "Reťazec nemožno analyzovať!"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "On-line help"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "Preložiť a v spojení s webovou nástroje"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "Reč – vlastnosti"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "Ovládací panel"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "Dotyková obrazovka"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "Syntéza reči"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "Angličtina"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "Afrikánčina"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "Bulharčina"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "Katalánsky"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "Čeština"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "Dánsky"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "Nemec"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "Riek"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "Španielčina"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "Francúzsky"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "Estónčina"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "Fínsky"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "Írsky"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "Hindčina"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "Maďarčina"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "Indonézsky"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "Islandský"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "Talian"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "Japonec"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "Kórejčina"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "Lotyština"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "Litovský"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "Maltčina"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "Holandský"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "Poľský"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "Portugalčina"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "Rumunský"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "Ruský"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "Slovenčina"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "Slovinčina"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "Švédsky"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "Tagalog"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "Turečtina"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "Ukrajinský"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "Číňan"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "Arabčina"
+

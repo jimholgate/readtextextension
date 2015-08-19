@@ -2,314 +2,465 @@
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Indices" script:language="StarBasic">REM  *****  BASIC  *****
 OPTION EXPLICIT
+global UpdatePoSettingsDone as integer 
+
+global mMyTranslationId(0) as variant 
+global mMyTranslationIdPlur(0) as variant 
+global mMyTranslationStr(0,0) as variant 
 &apos;&apos;
-&apos;&apos; # TTS_Indices.xba
-&apos;&apos;
-&apos;&apos; The `TTS_Indices.xba` file contains strings that can change according to
-&apos;&apos; the language.  The extension is designed to include language specific
-&apos;&apos; phrases for the function in this file
-&apos;&apos;
-&apos;&apos; Can you add a language to the dialogs?
-&apos;&apos; --------------------------------------
-&apos;&apos;
-&apos;&apos; Yes! Please translate the dialogue strings into your language if you can!
-&apos;&apos;
-&apos;&apos; The `TTS_Indices.xba` file includes dialogue text and sample text. The dialog
-&apos;&apos; text is in the `fsLookUpTerm` function. Each term is divided by a semicolon
-&apos;&apos; (`;`). You can copy and paste the English string to translate the terms
-&apos;&apos; into your language.
-&apos;&apos;
-&apos;&apos; Language resources
-&apos;&apos; ------------------
-&apos;&apos;
-&apos;&apos; The wording of dialogues and menu items of LibreOffice and Apache OpenOffice 
-&apos;&apos; include a few differences, which reflect different program features or simply
-&apos;&apos; different writing styles.  If you notice a difference in your language, you
-&apos;&apos; should, if possible, use wording that works for either program.  
-&apos;&apos;
-&apos;&apos; LibreOffice help is available online on a [wiki][1] that reflects the menus 
-&apos;&apos; and dialogues of a recent version of the program.  As well, a comprehensive file
-&apos;&apos; that includes translations of phrases for all supported languages is maintained
-&apos;&apos; at the [download site][2].
-&apos;&apos;
-&apos;&apos; &gt; These samples are illustrative.  If you use them, you might
-&apos;&apos; &gt; get errors due to line breaks or spacing issues. Get the actual
-&apos;&apos; &gt; strings from the `TTS_Indices.xba` file.
-&apos;&apos;
-&apos;&apos;     Case &quot;en&quot;
-&apos;&apos;
-&apos;&apos;        s0 = &quot;Read Text;
-&apos;&apos;             External program;
-&apos;&apos;             Use Festival with a script;
-&apos;&apos;             Script commands;
-&apos;&apos;             Read with an external program;
-&apos;&apos;             Command line options;
-&apos;&apos;             Display;
-&apos;&apos;             Always show this dialog;
-&apos;&apos;             About;
-&apos;&apos;             Cancel;
-&apos;&apos;             OK;
-&apos;&apos;             Command;
-&apos;&apos;             Script;
-&apos;&apos;             © 2008­-2015 James Holgate;
-&apos;&apos;             Test;
-&apos;&apos;             Could not locate the program.;
-&apos;&apos;             String cannot be analyzed!;
-&apos;&apos;             Online help;
-&apos;&apos;             https://sites.google.com/site/readtextextension;
-&apos;&apos;             Use a web application;
-&apos;&apos;             Speech properties;
-&apos;&apos;             System settings;&quot;
-&apos;&apos;
-&apos;&apos;         s1 = &quot;Accessibility;
-&apos;&apos;             Speech;
-&apos;&apos;             English;
-&apos;&apos;             Afrikaans;
-&apos;&apos;             Bulgarian;
-&apos;&apos;             Catalan;
-&apos;&apos;             Czech;
-&apos;&apos;             Danish;
-&apos;&apos;             German;
-&apos;&apos;             Greek;
-&apos;&apos;             Spanish;
-&apos;&apos;             French;
-&apos;&apos;             Estonian;
-&apos;&apos;             Finnish;
-&apos;&apos;             Irish;
-&apos;&apos;             Hindi;
-&apos;&apos;             Hungarian;
-&apos;&apos;             Indonesian;
-&apos;&apos;             Icelandic;
-&apos;&apos;             Italian;
-&apos;&apos;             Japanese;
-&apos;&apos;             Korean;
-&apos;&apos;             Latvian;
-&apos;&apos;             Lithuanian;
-&apos;&apos;             Maltese;
-&apos;&apos;             Dutch;
-&apos;&apos;             Polish;
-&apos;&apos;             Portuguese;
-&apos;&apos;             Romanian;
-&apos;&apos;             Russian;
-&apos;&apos;             Slovak;
-&apos;&apos;             Slovenian;
-&apos;&apos;             Swedish;
-&apos;&apos;             Tagalog;
-&apos;&apos;             Turkish;
-&apos;&apos;             Ukrainian;
-&apos;&apos;             Chinese;
-&apos;&apos;             Arabic&quot;
-&apos;&apos;
-&apos;&apos;         s2 = &quot;;Album;
-&apos;&apos;             Artist;
-&apos;&apos;             Genre;
-&apos;&apos;             Image;
-&apos;&apos;             Lyrics;
-&apos;&apos;             Title;
-&apos;&apos;             Track;
-&apos;&apos;             Year;&quot;
-&apos;&apos;
-&apos;&apos; Dialog1.xdl
-&apos;&apos; -----------
-&apos;&apos;
-&apos;&apos; ComboBox3 of Dialog1 contains two letter strings of the ISO codes
-&apos;&apos; For currently supported languages. Add your language to the list.
-&apos;&apos;
+&apos;&apos; Language editing
+&apos;&apos; ================
+&apos;&apos;  
+&apos;&apos;  - [PoEdit][1] is an open source language string editor for Linux, OSX, and
+&apos;&apos;    Windows.
+&apos;&apos;  - [Virtaal][2] is another one.
+&apos;&apos;  
+&apos;&apos;  The format of **PO** translation files is described in the [PO Files Manual][3].
+&apos;&apos;  Having separate language files is best practice because it makes translating
+&apos;&apos;  easier and forces programs to have a single reliable method of getting text.
+&apos;&apos;  GetText is available in [Python][4] as a library. The [Invent with Python][5]
+&apos;&apos;  blog has a set of instructions.
+&apos;&apos;  
+&apos;&apos;  In [StarBasic][6], there is a script that does basic interpretation of PO files.
+&apos;&apos;  
+&apos;&apos;  The wording of dialogues and menu items of LibreOffice and Apache OpenOffice
+&apos;&apos;  include a few differences, which reflect different program features or simply
+&apos;&apos;  different writing styles.  If you notice a difference in your language, you
+&apos;&apos;  should, if possible, use wording that works for either program.
+&apos;&apos;  
+&apos;&apos;  Program help is available online on a [wiki][7] that reflects the menus
+&apos;&apos;  and dialogues of a recent version of the program.  As well, a comprehensive file
+&apos;&apos;  that includes translations of phrases for all supported languages is maintained
+&apos;&apos;  at the [download site][8].
+&apos;&apos;  
+&apos;&apos;  The `zzy` language is used internally in the code of the extension.  For
+&apos;&apos;  example, the phrase for &quot;&quot;English&quot;&quot; is `en`, and the code for &quot;&quot;Traditional
+&apos;&apos;  Chinese&quot;&quot; is `zh-tw`.
+&apos;&apos;  
 &apos;&apos; What other files include language strings?
 &apos;&apos; ------------------------------------------
-&apos;&apos;
-&apos;&apos;
-&apos;&apos;     /description/component.*
-&apos;&apos;     /help/*/help.tree
-&apos;&apos;     /help/*/[$unique.id]/install.xhp
-&apos;&apos;     /help/*/[$unique.id]/online.xhp
-&apos;&apos;     /help/*/[$unique.id]/read_clipboard.xhp
-&apos;&apos;     /help/*/[$unique.id]/read_selection.xhp
-&apos;&apos;     /help/*/[$unique.id]/set_up.xhp
-&apos;&apos;     /help/*/[$unique.id]/tokens.xhp
-&apos;&apos;     /registration/LICENSE.*
-&apos;&apos;     /registry/data/org/openoffice/Office/Addons.xcu
-&apos;&apos;     /script/tts_wscript.vbs
-&apos;&apos;     /textToSpeech/TTS_Indices.xba
-&apos;&apos;     /description.xml
-&apos;&apos;
-&apos;&apos; [1]: https://help.libreoffice.org/Writer/Edit#Select_Text
-&apos;&apos; [2]: http://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz
-&apos;&apos;
+&apos;&apos;  
+&apos;&apos; ### Dialog
+&apos;&apos;  
+&apos;&apos;  ```
+&apos;&apos;  /textToSpeech/Dialog1.xdl
+&apos;&apos;  ```
+&apos;&apos;  
+&apos;&apos;  ComboBox3 of Dialog1 contains two letter strings of the ISO codes
+&apos;&apos;  for currently supported languages.
+&apos;&apos;  
+&apos;&apos; ### Description files
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;      /description/component.*
+&apos;&apos;      /description.xml
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos; ### Help files
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;      /help/*/help.tree
+&apos;&apos;      /help/*/[$unique.id]/install.xhp
+&apos;&apos;      /help/*/[$unique.id]/online.xhp
+&apos;&apos;      /help/*/[$unique.id]/read_clipboard.xhp
+&apos;&apos;      /help/*/[$unique.id]/read_selection.xhp
+&apos;&apos;      /help/*/[$unique.id]/set_up.xhp
+&apos;&apos;      /help/*/[$unique.id]/tokens.xhp
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos; ### Registry files
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;      /registration/LICENSE.*
+&apos;&apos;      /registry/data/org/openoffice/Office/Addons.xcu
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos; ### Scripts
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;      /script/tts_wscript.vbs
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;  [1]: http://poedit.net/
+&apos;&apos;  [2]: http://virtaal.translatehouse.org/download.html
+&apos;&apos;  [3]: https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
+&apos;&apos;  [4]: https://docs.python.org/2/library/gettext.html
+&apos;&apos;  [5]: http://inventwithpython.com/blog/2014/12/20/translate-your-python-3-program-with-the-gettext-module/
+&apos;&apos;  [6]: http://www.oooforum.org/forum/viewtopic.phtml?t=85441
+&apos;&apos;  [7]: https://help.libreoffice.org/Writer/Edit#Select_Text
+&apos;&apos;  [8]: http://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz
+&apos;&apos;  
 
-Function fsLookUpTerm(byVal sTermCode, optional byval sMyLang )
+Function fsLookUpTerm(_
+		optional byVal sTermCode, _
+		optional byval sMyLang, _
+		optional byval bReverse)
+	&apos;
+	&apos;
+	&apos; Returns an indexed term from `zzy` style string (i. e.: `s_ok`).
+	&apos; If the `sTermCode` is in not the index, then the procedure
+	&apos; returns the original first argument.
+	&apos;
+	&apos; + sTermCode - the code to look up
+	&apos; + sMyLang - your requested language as two letter iso code (optional)
+	&apos;   i. e.: en for English, es for Spanish
+	&apos;
+	&apos; Example: Get the language of the selected text:
+	&apos; 
+	&apos;     fsLookUpTerm(fsSelectionLanguage())
+	&apos; 
+	&apos; Example: Get the language of the user interface:
+	&apos;
+	&apos; 
+	&apos;     fsLookUpTerm(fsGetLanguage())
+	&apos; 
+	&apos;
+	&apos;  ### Note ###
+	&apos;
+	&apos; Pierre Chef&apos;s PO lookup code stores the current
+	&apos; interface language resources in global variables.  To update
+	&apos; the language on the fly, you need to set the 
+	&apos; `UpdatePoSettingsDone` global variable to -1.
+	&apos;
+	fsLookUpTerm=&quot;&quot;
+	if ismissing(sTermCode) then sTermCode = &quot;s_cancel&quot;
+	if ismissing(sMyLang) then sMyLang = fsGetLanguage()
+	if ismissing(bReverse) then bReverse = false
+	dim s2$ : s2 = fsZzxToEnglish(_
+			sTermCode, _
+			&quot;en&quot;) &apos; Machine to English
+	fsLookUpTerm = _(s2, &quot;tools&quot;, sMyLang)
+end function
+
+
+Function _(_
+		msgid, _
+		optional byval sDirPo, _
+		optional byval sMyLang, _
+		optional byval iAlt)
+	_ = &quot;&quot;
+	&apos; msgid = string input
+	&apos; sDirPo = subdirectory path in local mo folder
+	&apos; sMyLang = language to match with English
+	&apos; iAlt = if false, then converts from English
+	&apos; and if true, then converts to English
+
+&apos;&apos; PO language function
+&apos;&apos; ====================
+&apos;&apos;  
+&apos;&apos;  This extension uses external **PO** files to index the
+&apos;&apos;  text in the dialogues to various languages.
+&apos;&apos;  
+&apos;&apos;  English text is used as the index string.  Therefore, English 
+&apos;&apos;  capitalization and spacing must be consistent for language
+&apos;&apos;  translation to work.
+&apos;&apos;
+&apos;&apos;  The function&apos;s name is a single underscore character `_(s1)`
+&apos;&apos;  
+&apos;&apos;  + [Virtaal][1] - Simple and responsive PO editor.
+&apos;&apos;  + [Poedit][2] - PO Editor with features.  On Linux, you
+&apos;&apos;    can use other program&apos;s language resources as models
+&apos;&apos;    and use installed dictionaries to check spelling.
+&apos;&apos;  
+&apos;&apos; Code
+&apos;&apos; ----
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;      sub poExample
+&apos;&apos;          REM Default language lookup
+&apos;&apos;          msgbox _(&quot;Cancel&quot;)
+&apos;&apos;          REM With specific arguments
+&apos;&apos;          REM You must reset UpdatePoSettingsDone before changing languages.
+&apos;&apos;          UpdatePoSettingsDone = -1
+&apos;&apos;          msgbox _(&quot;Read with an external program&quot;, &quot;tools&quot;, &quot;fr&quot;)
+&apos;&apos;          REM Setting the optional fourth parameter to 1 
+&apos;&apos;          REM does a reverse translation to English.
+&apos;&apos;          msgbox _(&quot;Le script du Festival&quot;, &quot;tools&quot;, &quot;fr&quot;, 1)
+&apos;&apos;          REM You must reset UpdatePoSettingsDone before changing languages.
+&apos;&apos;          UpdatePoSettingsDone = -1
+&apos;&apos;          msgbox _(&quot;s_cancel&quot;, &quot;tools&quot;, &quot;zzy&quot;, 1)
+&apos;&apos;      end sub
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;    [1]: http://sourceforge.net/projects/translate/files/Virtaal/
+&apos;&apos;    [2]: http://poedit.net/
+&apos;&apos;  
+	dim i as integer
+	dim iMax as integer
+	dim trad as string
+	
+	if ismissing(sDirPo) or sDirPo = &quot;&quot; then
+		sDirPo = &quot;tools&quot;
+	endif
+	If ismissing(sMyLang) or sMyLang = &quot;&quot; Then
+		sMyLang = fsDisplayLanguage()
+	Endif
+	if ismissing(iAlt) then iAlt = -1
+	if msgid = &quot;&quot; then
+		exit function
+	endif
+	dim sMyPoFile : sMyPoFile = &quot;&quot;
+	sMyPoFile = convertfromurl(_
+			fsMyURL &amp; _
+			&quot;/po/&quot; &amp; _
+			sDirPo &amp; _
+			&quot;/&quot; &amp; _
+			sMyLang)
+	if UpdatePoSettingsDone &lt;&gt; 1 then UpdatePoSettings(sMyPoFile, sMyLang)
+	if iAlt = 1 then
+		&apos; Reverse translation
+		for i = 0 to ubound(mMyTranslationStr)
+			if mMyTranslationStr(i,0)=msgid then 
+				 trad=mMyTranslationId(i)
+				Exit For 
+			end if 
+		next i
+		if trad=&quot;&quot; then trad=msgid
+	elseif iAlt = 0 then
+		&apos; Always return a blank for each term
+		trad=&quot;&quot;	
+	else
+		&apos; Normal translation (default)
+		for i = 0 to ubound(mMyTranslationId)
+			if mMyTranslationId(i)=msgid then 
+				 trad=mMyTranslationStr(i,0) 
+				Exit For 
+			elseif mMyTranslationIdPlur(i)=msgid then 
+				trad=mMyTranslationStr(i,1) 
+				Exit For 
+			end if 
+		next i
+		if trad=&quot;&quot; then trad=msgid
+	endif
+	&apos; Convert escaped quotes and remove unescaped quotes.
+	trad = fsReplaceText(trad, &quot;\&quot;&quot;&quot;, &quot;\&amp;dblquot;&quot;
+	trad = fsReplaceText(trad, &quot;&quot;&quot;&quot;, &quot;&quot;)
+	trad = fsReplaceText(trad, &quot;\&amp;dblquot;&quot;, &quot;&quot;&quot;&quot;)
+	_=trad 
+end Function 
+
+
+Function fbTranslateTable(_
+		message, _
+		cntMsg, _
+		sMyTranslationType, _
+		nbPlural)
+	dim a1
+	fbTranslateTable = false
+	on error goto fbTranslateTableErr
+	if message=&quot;&quot; then exit Function 
+	if sMyTranslationType=&quot;id&quot; then 
+		a1=mMyTranslationId(cntMsg)+message
+		mMyTranslationId(cntMsg) = a1
+	elseif sMyTranslationType=&quot;idPlur&quot; then 
+		a1=mMyTranslationIdPlur(cntMsg)+message 
+		mMyTranslationIdPlur(cntMsg) = a1
+	elseif sMyTranslationType=&quot;str&quot; then 
+		a1 = mMyTranslationStr(cntMsg,nbPlural)+message
+		mMyTranslationStr(cntMsg,nbPlural) = a1 
+	endif
+	fbTranslateTable = true
+	exit function
+	fbTranslateTableErr:
+	fbTranslateTable = false
+end Function
+
+
+Function UpdatePoSettings(_
+		podir as string, _
+		optional byval isoCode)
+	&apos; Adaptation du code écrit par « [Pierre Chef][UpdatePoSettings1] »
+	&apos; en juin, 2009. 
+	&apos;
+	&apos; + Ajouté une option pour le directoire `podir`
+	&apos; + Ajouté une option pour les langues `isoCode`.
+	&apos; + Avec les fichiers encodé en UTF-8, vous pouvez utiliser
+	&apos;   les langues complexes et asiatiques sur le platforme
+	&apos;   Windows. (`myTextFile.Encoding=&quot;UTF-8&quot;`)
+	&apos; + On ferme le fichier explicitement à la fin. 
+	&apos;   (`myTextFile.closeInput`)
+	&apos;
+	&apos; [UpdatePoSettings1]: http://www.oooforum.org/forum/viewtopic.phtml?t=85441
+	&apos;
+	UpdatePoSettings = false
+	on error goto UpdatePoSettingsErr
+	Dim lenLineRead# : lenLineRead = 0  &apos; &apos;length of line read
+	Dim cntMsg# : cntMsg = 0  &apos; &apos;message counter
+	Dim nbPlural# : nbPlural = 0  &apos; &apos;current plural
+	Dim nbPluralMax# : nbPluralMax = 0  &apos; &apos;how many plurals
+	Dim position# : position = 0  &apos; &apos;position in a string
+	Dim idquo# : idquo= 0  &apos; &apos;1 after first quotation mark
+	Dim iNumber# : iNumber = 0  &apos;for file access
+
+	Dim lineRead$ : lineRead = &quot;&quot;  &apos;line read in the po file
+	Dim TranslationType$ : TranslationType = &quot;&quot;  &apos;are we on msgctxt, msgid, msgid_plural, msgstr ?
+	Dim message$ : message = &quot;&quot;  &apos;string of msgid or msgstr
+	if ismissing(isoCode) or isoCode = &quot;&quot; then isoCode = fsDisplayLanguage()  &apos;fr, en, es, it, de, ...
+	Dim sFilePath$ : sFilePath = &quot;&quot;
+	Dim sf as Object
+	Dim myTextFile as Object
+	Dim fileStream as Object
+	
+	sf = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	&apos; check for existance of PO directory and file
+	if sf.isFolder(podir) then
+		if right(podir,1)&lt;&gt;&quot;/&quot; then podir=podir + &quot;/&quot;
+
+		sFilePath=podir + isoCode + &quot;.po&quot;
+		if sf.exists(sFilePath) then
+			&apos; Prepare to read the file
+			fileStream=sf.openFileRead(sFilePath)
+			myTextFile=createUnoService(&quot;com.sun.star.io.TextInputStream&quot;)
+			myTextFile.InputStream=fileStream
+			&apos; Office settings files are encoded as UTF-8
+			myTextFile.Encoding=&quot;UTF-8&quot;
+		else
+			exit Function
+		endif
+	else
+		exit Function
+	endif
+
+	cntMsg=-1
+	nbPluralMax=0
+	Do While Not myTextFile.IsEOF
+		lineRead = myTextFile.readLine
+		lenLineRead=len(lineRead)
+		idquo = InStr(lineRead,&quot;&quot;&quot;&quot;)+1
+		if lenLineRead&gt;2 then
+			Select Case left(lineRead,1)
+			Case &quot;#&quot;:
+				&apos; comment
+			Case &quot;m&quot;:
+			if left(lineRead,5) = &quot;msgid&quot; then
+				if left(lineRead,12) = &quot;msgid_plural&quot; then
+					if nbPluralMax&gt;0 then
+						TranslationType=&quot;idPlur&quot;
+					else
+						TranslationType=&quot;err&quot;  &apos; error
+					endif
+				else
+					TranslationType=&quot;id&quot;
+					cntMsg=cntMsg+1
+					redim Preserve mMyTranslationId(cntMsg)
+					redim Preserve mMyTranslationIdPlur(cntMsg)
+					redim Preserve mMyTranslationStr(cntMsg,nbPluralMax)
+				endif
+				message=mid(lineRead,idquo,lenLineRead-idquo)
+			elseif left(lineRead,6) = &quot;msgstr&quot; then
+				TranslationType=&quot;str&quot;
+				if left(lineRead,7) = &quot;msgstr[&quot; then
+					nbPlural=int(mid(lineRead,8,1))
+					if nbPlural&gt;nbPluralMax then
+						TranslationType=&quot;err&quot; &apos; error
+					endif
+				else
+					nbPlural=0
+				endif
+				message=mid(lineRead,idquo,lenLineRead-idquo)
+			elseif left(lineRead,7) = &quot;msgctxt&quot; then
+				TranslationType=&quot;ctxt&quot;
+			endif
+			fbTranslateTable(message,cntMsg,TranslationType,nbPlural)
+		Case &quot;&quot;&quot;&quot;:
+			&apos;idquo=1 obviously
+			message = mid(lineRead,idquo,lenLineRead-idquo)
+			fbTranslateTable(message,cntMsg,TranslationType,nbPlural)
+			if cntMsg=0 and left(lineRead,14) = &quot;&quot;&quot;Plural-Forms:&quot; then
+				position=InStr(lineRead,&quot;nplurals=&quot;)
+				nbPluralMax=int(mid(lineRead,position+9,1))-1
+				if nbPluralMax&lt;0 then nbPluralMax=0
+				&apos; Potential bugs : procedure can only use a single digit 
+				&apos; number of plurals (max is Arabic with 6)
+				&apos; if &quot;\n&quot; in readLine set the plural rule
+				&apos; or else you need to get next line(s) until you get &quot;\n&quot;
+				&apos;
+				&apos; The PO file must end with a chr(10)
+				&apos;
+				redim Preserve mMyTranslationStr(cntMsg,nbPluralMax)
+			endif
+			&apos; if cntMsg=0 and TranslationType=&quot;pluralset&quot; then
+			&apos;   &apos;update the plural rule then send it
+			&apos; if no &quot;\n&quot; TranslationType=&quot;pluralset&quot; else TranslationType=&quot;&quot;
+			&apos;endif
+		Case Else
+			&apos;error in the po file
+			End Select
+		endif
+	Loop
+	fileStream.closeInput
+	myTextFile.closeInput
+	UpdatePoSettingsDone=1
+	UpdatePoSettings = true
+	exit function
+	UpdatePoSettingsErr:
+	UpdatePoSettings = false
+end Function
+
+
+Function fsZzxToEnglish(_
+		byVal sTermCode, _
+		optional byval sMyLang)
 	&apos; returns an indexed term or &quot;&quot; If Not in index
 	&apos; sTermCode - the code to look up
-	&apos; sMyLang - your requested language as two letter iso code (optional)
-	&apos; i. e.: en for English, es for Spanish
-	&apos; Example: Get the language of the selected text:
-	&apos;     fsLookUpTerm(fsSelectionLanguage())
-	&apos; Example: Get the language of the user interface:
-	&apos;     fsLookUpTerm(fsGetLanguage())
-	Dim isoList0, isoList1, isolist2, s0, s1, s2 As String
-	Dim a1, a2
-	Dim n As Integer
-	Dim bFound as boolean
+	&apos; sMyLang - your requested language code (optional)
+	&apos; defaults to &quot;en&quot;.  Optionally, you can get the
+	&apos; internal code with &quot;zzy&quot;
+	&apos;
+	fsZzxToEnglish=&quot;&quot;
+	&apos; zzy
+	Dim isoList0$ : isoList0 = &quot;s_read-text;s_external-program;s_use-festival-with-a-script;s_script-commands;s_read-with-an-external-program;s_command-line-options;s_display;s_always-show-this-dialog;s_about;s_cancel;s_ok;s_command;s_script;s_c-james-holgate;s_test;s_could-not-locate-the-program;s_string-cannot-be-analyzed;s_on-line-help;s_http-help-url;s_use-a-web-application;s_speech-properties;s_system-settings;&quot;
+	Dim isoList1$ : isoList1 = &quot;s_touch-screen;s_speech-synthesis;en;af;bg;ca;cs;da;de;el;es;fr;et;fi;ga;hi;hu;id;is;it;ja;ko;lv;lt;mt;nl;pl;pt;ro;ru;sk;sl;sv;tl;tr;uk;zh;ar&quot;
+	Dim isolist2$ : isolist2= &quot;;s_album;s_artist;s_genre;s_imagedefault;s_lyrics;s_title;s_track;s_year;s_mdsample&quot;	
+	&apos; defaults
+	Dim s0$ : s0 = &quot;Read Text;External program;Use Festival with a script;Script commands;Read with an external program;Command line options;Display;Always show this dialog;About;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Could not locate the program.;String cannot be analyzed!;On-line help;https://sites.google.com/site/readtextextension/;Use a web application;Speech properties;System settings;&quot;
+	Dim s1$ : s1 = &quot;Touch screen;Speech;English;Afrikaans;Bulgarian;Catalan;Czech;Danish;German;Greek;Spanish;French;Estonian;Finnish;Irish;Hindi;Hungarian;Indonesian;Icelandic;Italian;Japanese;Korean;Latvian;Lithuanian;Maltese;Dutch;Polish;Portuguese;Romanian;Russian;Slovak;Slovenian;Swedish;Tagalog;Turkish;Ukrainian;Chinese;Arabic&quot;
+	Dim s2$ : s2 = &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;Read Text – Speech\n=========\n\n&gt;_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`&quot;
+	&apos; arrays
+	Dim a1
+	Dim a2
+	&apos; controls
+	Dim n# : n = 0
+	Dim bFound as boolean : bFound = not(true)
 
 	If ismissing(sMyLang) Then
-		sMyLang = fsGetLanguage()
+		sMyLang = &quot;en&quot;
 	Endif
-	on error goto fsLookUpTermErr
-	bFound = not(true)
-	fsLookUpTerm=&quot;&quot;
-	&apos; zzy
-	isoList0 = &quot;s_read-text;s_external-program;s_use-festival-with-a-script;s_script-commands;s_read-with-an-external-program;s_command-line-options;s_display;s_always-show-this-dialog;s_about;s_cancel;s_ok;s_command;s_script;s_c-james-holgate;s_test;s_could-not-locate-the-program;s_string-cannot-be-analyzed;s_on-line-help;s_http-help-url;s_use-a-web-application;s_speech-properties;s_system-settings;&quot;
-	isoList1 = &quot;s_touch-screen;s_speech-synthesis;en;af;bg;ca;cs;da;de;el;es;fr;et;fi;ga;hi;hu;id;is;it;ja;ko;lv;lt;mt;nl;pl;pt;ro;ru;sk;sl;sv;tl;tr;uk;zh;ar&quot;
-	isolist2 = &quot;;s_album;s_artist;s_genre;s_imagedefault;s_lyrics;s_title;s_track;s_year;&quot;
-	s2 = &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;&quot; &apos; defaults
+&apos;	on error goto fsZzxToEnglishErr
+
 	Select Case lcase(sMyLang)
-	Case &quot;en&quot; &apos;English
-		s0 = &quot;Read Text;External program;Use Festival with a script;Script commands;Read with an external program;Command line options;Display;Always show this dialog;About;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Could not locate the program. ;String cannot be analyzed!;On-line help;https://sites.google.com/site/readtextextension/;Use a web application;Speech properties;System settings;&quot;
-		s1 = &quot;Touch screen;Speech;English;Afrikaans;Bulgarian;Catalan;Czech;Danish;German;Greek;Spanish;French;Estonian;Finnish;Irish;Hindi;Hungarian;Indonesian;Icelandic;Italian;Japanese;Korean;Latvian;Lithuanian;Maltese;Dutch;Polish;Portuguese;Romanian;Russian;Slovak;Slovenian;Swedish;Tagalog;Turkish;Ukrainian;Chinese;Arabic&quot;
-		s2 = &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;&quot;
-	Case &quot;af&quot; &apos;Afrikaans
-		s0 = &quot;Read Text;Eksterne program;Gebruik Festival met &apos;n script;Script opdragte;Lees met &apos;n eksterne program;Commandoregel opsies;Vertoon;Wys altyd hierdie dialoog;About ;Kanselleer;OK;Command;Script;© 2008-2015 James Holgate;Toets;Kon nie die program.;String kan nie ontleed word!;On-line help;https://sites.google.com/site/readtextextension/;Vertaal en lees met web tools;Toespraak eienskappe;Beheerpaneel;&quot;
-		s1 = &quot;Touch Screen;Spraaksintese;Engels;Afrikaans;Bulgaarse;Katalaans;Tsjeggiese;Deense;Duitse;Griekse;Spanish;Franse;Estonian;Finse;Ierse;Hindi;Hungarian;Indonesiese;Icelandic;Italiaanse;Japanese;Koreaanse;Lets;Lithuanian;Maltese;Nederlandse;Pools;Portugees;Romanian;Russiese;Slowaakse;Slovenian;Sweedse;Tagalog;Turkish;Oekraïens;Chinese;Arabies&quot;
-	Case &quot;bg&quot; &apos;Bulgarian
-		s0 = &quot;Read Text;Външната програма;Използване на фестивал с ръкопис;Script команди;Чете се с външна програма;Команден ред възможности;Покажи;Винаги показвай този диалогов прозорец;За;Отказ;OK;управление;Скрипт;© 2008-2015 James Holgate;Тест;Не може да намерите на програмата.;String не може да се анализира!;Он-лайн помощ;https://sites.google.com/site/readtextextension/;Превод и четат с уеб инструменти;Свойства на речта;Контролен панел;&quot;
-		s1 = &quot;Тъч скрийн;Озвучаване;английски;африканс;български;каталонски;чешки;датски;немски;гръцки;испански;френски;естонски;фински;ирландски;хинди;унгарски;индонезийски;исландски;италиански;японски;корейски;латвийски;литовски;малтийски;холандски;полски;португалски;румънски;руски;словашки;словенски;шведски;Tagalog;турски;украински;китайски;арабски&quot;
-	Case &quot;ca&quot; &apos;Catalan
-		s0 = &quot;Read Text;Programa extern;Utilitza Festival amb una seqüència de comandaments;Script comandaments;Llegir amb un programa extern;Opcions de línia de comandaments;Mostra;Mostra sempre aquest quadre de diàleg;Informació;Cancel;OK;Comando;Script;© 2008-2015 James Holgate;Prova;No s&apos;ha pogut localitzar el programa.;La cadena no pot ser analitzat!;Ajuda en línia;https://sites.google.com/site/readtextextension/;Traduir i llegir amb eines de la web;Propietats de veu;Propietats;&quot;
-		s1 = &quot;Pantalla tàctil;Síntesi de veu;Anglès;Africaans;Búlgar;Català;Txec;Danès;Alemany;Grec;Espanyol;Francès;Estonià;Finès;Irlandès;Hindi;Hongarès;Indonesi;Islandès;Italià;Japonès;Coreà;Letó;Lituà;Maltès;Holandès;Polonès;Portuguès;Romanès;Rus;Eslovac;Eslovè;Suec;Tagalog;Turc;Ucraïnès;Xinès;Àrab&quot;
-		&apos; &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;&quot;
-		s2 = &quot;;Àlbum;Artista;Gènere;Imatge;Lletres;Títol;Pista;Any;&quot;
-	Case &quot;cs&quot; &apos;Czech
-		s0 = &quot;Read Text;Externí program;Použít Festival s skript;Script příkazy;Čtení s vnějším program ;Parametry příkazové řádky ;Zobrazit ;Vždy zobrazit toto dialogové okno ;O;Zrušit ;OK;Příkaz;Script;© 2008-2015 James Holgate;Test;Nelze najít programu.;Řetězec nelze analyzovat!;On-line help;https://sites.google.com/site/readtextextension/;Přeložit a ve spojení s webovou nástroje;Vlastnosti programu Speech;Vlastnosti programu;&quot;
-		s1 = &quot;Dotyková obrazovka;Syntéza řeči;Angličtina;Afrikánština;Bulharština;Katalánština;Čeština;Dánský;Němec;Řek;Španělština;Francouzština;Estonština;Finský;Irský;Hindština;Maďarština;Indonéský;Islandský;Ital;Japonec;Korejština;Lotyština;Litevský;Maltština;Holandský;Polský;Portugalština;Rumunský;Ruský;Slovenština;Slovinština;Švédský;Tagalog;Turečtina;Ukrajinský;Číňan;Arabština&quot;
-	Case &quot;da&quot; &apos;Danish
-		s0 = &quot;Read Text;Eksternt program;Brug Festival med et script;Script commands;Læs med et eksternt program;Kommandlinjetilvalg;Display;Vis altid denne dialog;Om;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Kunne ikke finde programmet.;String ikke kan analyseres!;On-line hjælp;https://sites.google.com/site/readtextextension/;Oversæt og læs med web værktøjer;Egenskaber for tale;Kontrolpanel;&quot;
-		s1 = &quot;Touch screen;Talesyntese;Engelsk;Afrikaans;Bulgarian;Catalan;Tjekkisk;Dansk;Tysk;Græsk;Spansk;Fransk;Estonian;Finsk;Irish;Hindi;Hungarian;Indonesisk;Islandsk;Italiensk;Japansk;Korean;Lettisk;Litauisk;Maltesisk;Hollandsk;Polsk;Portugisisk;Rumænsk;Russisk;Slovakisk;Slovensk;Svensk;Tagalog;Tyrkisk;Ukrainsk;Kinesisk;Arabic&quot;
-	Case &quot;de&quot; &apos;German
-		s0 = &quot;Read Text;Externes Programm;Festival mit Script verwenden;Script-Befehle;Vorlesen mit externem Programm;Befehlszeilen-Optionen;Anzeigen;Diesen Dialog immer zeigen;Info;Abbrechen;OK;Befehl;Script;© 2008-2015 James Holgate;Test;Programm nicht auffindbar.;Zeichenkette kann nicht analysiert werden!;Online-Hilfe;https://sites.google.com/site/readtextextension/;Web-Anwendung verwenden;Spracheigenschaften;Systemsteuerung;&quot;
-		s1 = &quot;Touch screen;Sprachsynthese;Englisch;Afrikaans;Bulgarisch;Katalanisch;Tschechisch;Dänisch;Deutsch;Griechisch;Spanisch;Französisch;Estnisch;Finnisch;Irisch;Hindi;Ungarisch;Indonesier;Isländisch;Italienisch;Japanisch;Koreanisch;Lettisch;Litauisch;Maltesisch;Holländisch;Polnisch;Portugiesisch;Rumänisch;Russisch;Slowakisch;Slowenisch;Schwedisch;Tagalog;Türkisch;Ukrainisch;Chinese;Arabisch&quot;
-		&apos; &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;&quot;
-		s2 = &quot;;Album;Künstler;Genre;Bild;Songtexte;Titel;Track;Jahr;&quot;
-	Case &quot;el&quot; &apos;Greek
-		s0 = &quot;Read Text;Πρόγραμμα Εξωτερικού;Χρήση Φεστιβάλ με ένα σενάριο;Σενάριο εντολές;Διαβάστε με ένα εξωτερικό πρόγραμμα;Επιλογές γραμμής εντολών;Εμφάνιση;Πάντα εμφάνιση αυτού του διαλόγου;Σχετικά;Άκυρο;OK;Εντολή;Σενάριο;© 2008-2015 James Holgate;Δοκιμή;Δεν μπόρεσα να βρώ το πρόγραμμα.;String δεν μπορεί να αναλυθεί!;Βοήθεια On-line;https://sites.google.com/site/readtextextension/;Μετάφραση και σε συνδυασμό με εργαλεία web;Ιδιότητες ομιλίας;Πίνακας ελέγχου;&quot;
-		s1 = &quot;Οθόνη αφής;Σύνθεση ομιλίας;Αγγλικά;Αφρικάανς;Βούλγαρος;Καταλανικά;Τσέχος;Δανός;Γερμανός;ελληνικά;ισπανικά;Γάλλος;εσθονική;φινλανδικός;ιρλανδικός;Χίντι;Ούγγρος;Ινδονησίας;ισλανδικός;ιταλικά;Ιαπωνικά;κορεάτης;της;Λετονίας;Λιθουανικά;μαλτέζος;Ολλανδός;Πολωνός;Πορτογάλος;ρουμανικός;ρωσικός;Σλοβάκος;Σλοβένικα;σουηδικά;Ταγκαλόγκ;Τουρκικά;Ουκρανός;κινέζικα;αραβικός&quot;
-	Case &quot;es&quot; &apos; Spanish
-		s0 = &quot;Read Text;Programa;Usar Festival con un script;Comandos script;Leer el texto con un programa distinto;Opciones adicionales en linea de comando;Cuadro de díalogo;Mostrar siempre este cuadro de dialogo al ejecutar;Acerca;Cancelar;Aceptar;Comando;Script;© 2008-2015 James Holgate;Prueba;No se encontró el programa.;La secuencia no se puede analizar!;Ayuda On-line;https://sites.google.com/site/readtextextension/;Usar las herramientas web;Propiedades de voz;Panel de control;&quot;
-		s1 = &quot;Pantalla táctil;Síntesis de voz;Inglés;Africaans;Búlgaro;Catalán;Checo;Danés;Alemán;Griego;Español;Francés;Estonio;Finlandés;Irlandés;Hindi;Húngaro;Indonesio;Islandés;Italiano;Japonés;Coreano;Letón;Lituano;Maltés;Holandés;Polaco;Portugués;Rumano;Ruso;Eslovaco;Esloveno;Sueco;Tagalo;Turco;Ucranio;Chino;Árabe&quot;
-		&apos; &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;&quot;
-		s2 = &quot;;Álbum;Artista;Género;Imagen;Letras;Título;Pista;Año;&quot;
-	Case &quot;et&quot; &apos;Estonian
-		s0 = &quot;Read Text;Väline programm;Kasuta Festival script;Script käsud;Loe välise programmi;Käsureavõtmed;Display;Alati näita seda dialoogi;Teave;Tühista;OK;Käsk;Script;© 2008-2015 James Holgate;Testi;Ei leia programmi.;String ei saa analüüsida!;On-line help;https://sites.google.com/site/readtextextension/;Tõlgi ja lugeda veebitööriistadega;Kõneatribuudid;Juhtpaneel;&quot;
-		s1 = &quot;Puutetundlik;Kõnesünteesi;Inglise;Afrikaans;Bulgaaria;Kataloonia;Tšehhi;Taani;Saksa;Kreeka;Hispaania;Prantsuse;Eesti;Soome;Iiri;Hindi;Ungari;Indoneesia;Islandi;Itaalia;Jaapani;Korea;Läti;Leedu;Malta;Hollandi;Poola;Portugali;Rumeenia;Vene;Slovaki;Sloveeni;Rootsi;Tagalogi;Türgi;Ukraina;Hiina;Araabia&quot;
-	Case &quot;fi&quot; &apos;Finnish
-		s0 = &quot;Lue ääneen;Ulkoinen ohjelma;Festival ja sen komentojono;Parametrit;Muu ulkoinen ohjelma;Parametrit;Valintaikkuna;Näytä aina tämä valintaikkuna;Tietoja;Peruuta;OK;Komento;Komentojono;© 2008-2015 James Holgate;Koekuuntele;Ohjelma ei ole käytettävissä.;Merkkijonoa ei voida tulkita;Ohje verkossa;https://sites.google.com/site/readtextextension/;Verkkosovellus;Puheominaisuudet;Ohjauspaneeli;&quot;
-		s1 = &quot;Kosketusnäyttö;Puhesynteesi;Englanti;Afrikaans;Bulgarialainen;Catalan;Tšekin;Tanska;Saksa;Kreikka;Espanja;Ranska;Virolainen;Suomi;Irlantilainen;Hindi;Unkari;Indonesialainen;Islantilainen;Italialainen;Japanilainen;Korealainen;Latvialainen;Liettualainen;Maltalainen;Hollantilainen;Puola;Portugali;Romanialainen;Venäjä;Slovakian;Slovenian;Ruotsi;Tagalog;Turkki;Ukrainalainen;Kiina;Arabialainen&quot;
-		&apos; &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;&quot;
-		s2 = &quot;;Albumi;Artisti;Laji;Kuva;Sanat;Osaston;Kappale;Vuosi;&quot;
-	Case &quot;fr&quot; &apos;French
-		s0 = &quot;Read Text;Application externe;Utiliser Festival avec un script;Le script du Festival;Lire avec une application externe;Les options sur la ligne de commande;Affichage;Toujours affiche cette boîte de dialogue;À propos;Annuler;OK;Commande;Script;© 2008-2015 James Holgate;Test;Application externe inconnue.;Une fonction BASIC ne peut pas analyser une chaîne de caractères.;L&apos;aide en ligne;https://sites.google.com/site/readtextextension/;Outils en ligne;Propriétés de la synthèse vocale;Préférences système;&quot;
-		s1 = &quot;Écran tactile;Synthèse vocale;Anglais;Afrikaans;Bulgare;Catalan;Tchèque;Danois;Allemand;Grecque;Espagnol;Français;Estonien;Finlandais;Irlandais;Hindi;Hongrois;Indonésien;Islandais;Italien;Japonais;Coréen;Letton;Lituanien;Maltais;Néerlandais;Polonais;Portugais;Roumain;Russe;Slovaque;Slovène;Suédois;Tagalog;Turc;Ukrainien;Chinois;Arabe&quot;
-		&apos; &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;&quot;
-		s2 = &quot;;Album;Artiste;Genre;Image;Paroles;Titre;Piste;Année;&quot;
-	Case &quot;ga&quot; &apos;Irish
-		s0 = &quot;Read Text;Relations clár;Bain úsáid As Festival le script;Orduithe Script;Léigh le clár seachtrach;Roghanna líne Ordaithe;Taispeáin;Thaispeáint i gcónaí leis an dialóg;About;Cancel;OK;Msgstr;Script;© 2008-2015 James Holgate;Tástáil;Níorbh fhéidir teacht ar an gclár.;Ní féidir anailís a dhéanamh String!;Ar-líne chabhrach;https://sites.google.com/site/readtextextension/;Aistrigh agus léifear le huirlisí gréasáin;Airíonna Cainte;Painéal Rialúcháin;&quot;
-		s1 = &quot;Scáileán tadhaill;Sintéis urlabhra;Béarla;Afrikaans;Bulgáiris;Catalóinis;Seice;Danmhairgis;Gearmáinis;Gréigis;Spáinnis;Fraincis;Eastóinis;Fionlainnis;Irish;Hiondúis;Ungáiris;Indinéisis;Íoslainnis;Iodáilis;Seapáinis;Cóiréis;Laitvis;Liotuáinis;Mháltais;Ollainnis;Polainnis;Portaingéilis;Rómáinis;Rúisis;Slóvaicis;Slóivéinis;Sualainnis;Tagálaigis;Tuircis;Úcráinis;Sínis;Araibis&quot;
-	Case &quot;hi&quot; &apos;Hindi
-		s0 = &quot;Read Text;विदेश प्रोग्राम;का प्रयोग करें Festival एक स्क्रिप्ट के साथ;Festival स्क्रिप्ट;एक अलग कार्यक्रम का प्रयोग करें;कमांड लाइन विकल्प;प्रदर्शन;हमेशा इस संवाद शो;के बारे म;रद्द करें ;ठीक है;कमान;स्क्रिप्ट;© 2008-2015 James Holgate;परीक्षण;मैं प्रोग्राम को नहीं ढूँढ सकते है.;मैं स्ट्रिंग का विश्लेषण नहीं कर सकता है!;ऑन लाइन मदद;https://sites.google.com/site/readtextextension/;अनुवाद और वेब उपकरणों के साथ पढ़ें;वाक् गुण;नियंत्रण कक्ष;&quot;
-		s1 = &quot;टच स्क्रीन;भाषण संश्लेषण;अंग्रेजी;अफ्रीकी;बल्गेरियाई;कैटलन;चेक;डेनिश;जर्मन;यूनानी;स्पेनिश;फ्रेंच;एस्तोनियावासी;फिनिश;आयरिश;हिंदी;हंगेरी;इंडोनेशियाई;आइसलैंड;का;इतालवी;जापानी;कोरियाई;लात्वीयावासी;लिथुआनियाई;मोलतिज़;डच;पोलिश;पुर्तगाली;रोमानियाई;रूसी;स्लोवाक;स्लोवेनियाई;स्वीडिश;तागालोग;तुर्की;यूक्रेनी;चीनी;अरबी&quot;
-	Case &quot;hu&quot; &apos;Hungarian
-		s0 = &quot;Read Text;Külső program;A Festival egy script;Script parancsok;Itt egy külső program;Parancssori;Display;Mindig jelenjen meg ez a párbeszédablak;Névjegy;Mégse;OK;Parancs;Script;© 2008-2015 James Holgate;Teszt;Nem találom a programot.;String nem lehet elemezni!;On-line segítség;https://sites.google.com/site/readtextextension/;Fordítás és olvassa el a webes eszközök;Beszéd tulajdonságai;Vezérlőpult;&quot;
-		s1 = &quot;Érintőkijelző;Beszédszintetizálás;Angol;Afrikaans;Bolgár;Katalán;Cseh;Dán;Német;Görög;Spanyol;Francia;Észt;Finn;Ír;Hindi;Magyar;Indonéz;Izlandi;Olasz;Japán;Koreai;Lett;Litván;Máltai;Holland;Lengyel;Portugál;Román;Orosz;Szlovák;Szlovén;Svéd;Tagalog;Török;Ukrán;Kínai;Arab&quot;
-	Case &quot;id&quot; &apos;Indonesian
-		s0 = &quot;Read Text;Program eksternal;Gunakan Festival dengan script;Script perintah;Baca dengan program eksternal;Perintah pilihan baris;Tampilkan;Selalu tampilkan dialog ini;Tentang;Batal;OK;Perintah;Script;© 2008-2015 James Holgate;Test;Tidak dapat menemukan program.;String tidak dapat dianalisis!;On-line help ;https://sites.google.com/site/readtextextension/;Terjemahkan dan membaca dengan alat-alat web;Properti Ucapan;Properti;&quot;
-		s1 = &quot;Layar sentuh;Sintesis pidato;Inggris;Afrikanas;Bulgaria;Catalan;Ceko;Denmark;Jerman;Yunani;Spanyol;Prancis;Estonia;Finlandia;Irlandia;Hindi;Hongaria;Indonesia;Islandia;Italia;Jepang;Korea;Latvia;Lithuania;Malta;Belanda;Polandia;Portugis;Rumania;Rusia;Slowakia;Slovenia;Swedia;Tagalog;Turki;Ukraina;Cina;Arab&quot;
-	Case &quot;is&quot; &apos;Icelandic
-		s0 = &quot;Lesa Texti Eftirnafn;Ytri program;Nota Festival með handrit;Script skipanir;Lestu með utanaðkomandi forrit;Command lína valkostur;Display;Alltaf sýna þessum glugga;Um;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Gat ekki fundið forritið.;String er ekki hægt að greina!;Á-hjálp;https://sites.google.com/site/readtextextension/;Þýða og lesa með verkfærum vefnum;Eiginleikar tals;Stjórnborð;&quot;
-		s1 = &quot;Snerta skjár;Talgervingu;English;Afrikaans;Bulgarian;Catalan;Czech;Danish;German;Greek;Spanish;French;Estonian;Finnish;Irish;Hindi;Hungarian;Indonesian;Icelandic;Italian;Japanese;Korean;Latvian;Lithuanian;Maltese;Dutch;Polish;Portuguese;Romanian;Russian;Slovak;Slovenian;Sænska;Tagalog;Turkish;Ukrainian;Chinese;Arabic&quot;
-	Case &quot;it&quot; &apos;Italian
-		s0 = &quot;Read Text;Programma esterno;Usa Festival con uno script;I comandi script;Leggere con un programma esterno;Opzioni sulla riga di comando;Vista;Mostra sempre questa finestra di dialogo;About;Annulla;OK;Ordine;Script;© 2008-2015 James Holgate;Test;External Application sconosciuto. ;Una funzione BASIC non può analizzare una stringa.;Help On-line;https://sites.google.com/site/readtextextension/;Tradurre e leggere con strumenti web;Proprietà riconoscimento vocale;Pannello di controllo;&quot;
-		s1 = &quot;Touch screen;Sintesi vocale;Inglese;Afrikaans;Bulgaro;Catalano;Ceco;Danese;Tedesco;Greco;Spagnolo;Francese;Estonian;Finlandese;Irlandese;Hindi;Ungherese;Indonesiano;Islandese;Italiano;Giapponese;Coreano;Lettone;Lituano;Maltese;Olandese;Polacco;Portoghese;Rumeno;Russo;Slovacco;Sloveno;Svedese;Tagalog;Turco;Ucraino;Cinese;Arabo&quot;
-		s2 = &quot;;Album;Artista;Genere;Immagine;Testo;Titolo;Traccia;Anno;&quot;
-	Case &quot;ja&quot; &apos;Japanese
-		s0 = &quot;Read Text;外部プログラム;スクリプトで使用するのFestival;スクリプトは、コマンド;外部プログラムで読む;コマンドラインオプション;ディスプレイ;常にこのダイアログを表示;について;キャンセル;OK;コマンド;スクリプト;© 2008-2015 James Holgate;テスト;プログラムを見つけることができませんでした;文字列を解析することはできません！;ラインで;https://sites.google.com/site/readtextextension/;オンラインツール;音声認識のプロパティ;コントロール パネル;&quot;
-		s1 = &quot;タッチスクリーン;音声合成;英語;アフリカーンス語;ブルガリア語;カタロニア語;チェコ語;デンマーク語;ドイツ語;ギリシャ語;スペイン語;フランス語;エストニア語;フィンランド語;アイリッシュ;ヒンディー語;ハンガリー語;インドネシアの;アイスランドの;イタリア語;日本人;韓国語;ラトビアの;リトアニア語;マルタ語;オランダ語;ポーランド語;ポルトガル語;ルーマニア語;ロシア;スロバキア語;スロベニア語;スウェーデン語;タガログ語;トルコ語;ウクライナ語;中国人;アラビア語&quot;
-	Case &quot;ko&quot; &apos;Korean
-		s0 = &quot;Read Text;외부 프로그램;스크립트 여기서 Festival 사용;스크립트 명령;외부 프로그램과 함께 읽기;커맨드 라인 옵션;디스플레이;항상이 대화 상자를 표시;정보;취소;확인;명령;스크립트;© 2008-2015 James Holgate;테스트;프로그램을 찾을 수 없습니다.;문자열을 분석할 수 없어!;온라인 도움말 ;https://sites.google.com/site/readtextextension/;번역 및 웹 도구와 읽기;음성 속성;제어판;&quot;
-		s1 = &quot;터치 스크린;음성-합성 영어 아프리카-어 불가리아-사람 카탈로니아의 체코의 덴마크의 독일어 그리스의 스페인어 프랑스의 에스토니아의 핀란드의 아일랜드 힌디어 헝가리의 인도네시아의 아이슬란드-어 이탈리아의 일본의 한국의 라트비아의 리투아니아의 몰타의 네덜란드어 폴란드어 포르투갈어 루마니아어 러시아어 슬로바키아의 슬로베니아 스웨덴어 타갈로그어 터키의 우크라이나의 중국어;아라비아 말&quot;
-	Case &quot;lv&quot; &apos;Latvian
-		s0 = &quot;Read Text;Ārējā programma;Lietot Festival ar skriptu;Script komandas;Lasīt ar ārēju programmu;Command line options;Display;Vienmēr rādīt šo dialogu;Par;Atcelt;OK;Komandu;Script;© 2008-2015 James Holgate;Test;Nevarēja atrast programmu.;Stīgu nevar analizēt!;On-line help;https://sites.google.com/site/readtextextension/;Tulkot un lasīt ar web rīkus;Runas rekvizīti;vadības panelis;&quot;
-		s1 = &quot;Touch screen;Runas sintēze;Angļu;Afrikandu;Bulgārijas;Katalāņu;Čehu;Dāņu;Vācu;Grieķu;Spāņu;Franču;Igauņu;Somu;Īrijas;Hindu Valoda;Ungārijas;Indonēzijas;Islandiešu;Itālijas;Japānas;Korejiešu;Latvijas;Lietuviešu;Maltiešu;Holandiešu;Poļu;Portugālis;Rumāņu;Krievu;Slovaku;Slovēņu;Zviedru;Tagalogu;Turku;Ukraiņu;Ķīniešu;Arābu&quot;
-	Case &quot;lt&quot; &apos;Lithuanian
-		s0 = &quot;Read Text;Išorės programa;Naudoti Festival scenarijų;Scenarijaus komandas;Skaityti su išorės programa;Komandų eilutės parinktis;Ekranas;Visada rodyti šį langą;Apie;Atšaukti;Gerai;Komanda;Scenarijus;© 2008-2015 James Holgate;Testas;Nepavyksta rasti programos;Styginių negali būti analizuojamas!;On-line help;https://sites.google.com/site/readtextextension/;Versti ir skaityti žiniatinklio įrankius;Kalbėjimo ypatybės;Valdymo skydas;&quot;
-		s1 = &quot;Liečiamas ekranas;Kalbėjimo Sintezė;Anglų;Afrikansas;Bulgarų;Katalonų;Čekijos;Danijos;Vokiečių;Graikų;Ispanų;Prancūzų;Estijos;Suomių;Airių;Hindi;Vengrų;Indoneziečių;Islandų;Italų;Japonijos;Korėjiečių;Latvijos;Lietuvos;Maltos;Olandų;Lenkų;Portugalų;Rumunų;Rusijos;Slovakų;Slovėnų;Švedų;Tagalų;Turkų;Ukrainiečių;Kinijos;Arabų&quot;
-	Case &quot;mt&quot; &apos;Maltese
-		s0 = &quot;Read Text;Programm Esterni;Użu Festival bil-iskrittura;Script kmandijiet;Aqra ma &apos;programm estern;Għażliet Linja ta &apos;Kmand;Display;Dejjem juru din dialog;Dwar;Ikkanċella;OK;Kmand;Script;© 2008-2015 James Holgate;Test;Ma kellekx jillokalizza l-programm.;String ma jistgħux jiġu analizzati!;On-line jgħinu;https://sites.google.com/site/readtextextension/;Ittraduċi u jinqraw bl-għodda tal-web;Proprjetajiet ta&apos; Diskors;Panew tal-Kontroll;&quot;
-		s1 = &quot;Touch screen;Sinteżi diskors;Ingliż;Afrikaans;Bulgaru;Katalan;Ċek;Danish;Ġermaniż;Grieg;Spanjol;Franċiż;Estonjan;Finlandiż;Irlandiż;Ħindi;Ungeriż;Indoneżjan;Iżlandiż;Taljan;Ġappuniż;Korean;Latvjan;Litwan;Malti;Olandiż;Pollakk;Portugiż;Rumen;Russu;Slovakk;Sloven;Svediż;Tagalog;Tork;Ukrain;Ċiniż;Għarbi&quot;
-	Case &quot;nl&quot; &apos;Dutch
-		s0 = &quot;Read Text;Externe programma;Gebruik Festival met een script;Scriptopdrachten;Lezen met een extern programma;Command line opties;Weergave;Altijd weergeven;About;Annuleren;OK;Command;Script;© 2008-2015 James Holgate;Test;Kan niet vinden het programma.;String kan niet worden geanalyseerd!;On-line help;https://sites.google.com/site/readtextextension/;Vertalen en lees met web tools;Eigenschappen van spraak;Configuratiescherm;&quot;
-		s1 = &quot;Aanraakscherm;Spraaksynthese;Engels;Afrikaans;Bulgarian;Catalaanse;Tsjechisch;Deens;Duitse;Grieks;Spaans;Frans;Estlands;Fins;Iers;Hindi;Hongaars;Indonesisch;IJslands;Italiaans;Japanse;Koreaans;Lets;Litouws;Maltees;Nederlands;Pools;Portugees;Roemeens;Russisch;Slowaaks;Sloveens;Zweedse;Tagalog;Turks;Oekraïens;Chinees;Arabisch&quot;
-	Case &quot;pl&quot; &apos;Polish
-		s0 = &quot;Read Text;Program zewnętrzne;Użyj Festival skrypt;Script polecenia;Czytaj z zewnętrznego programu;Opcje wiersza poleceń;Ekran;Zawsze pokazuj tego okna;O;Anuluj;OK;Command;Script;© 2008-2015 James Holgate;Test;Nie można odnaleźć programu.;Napis nie może być analizowana!;Pomoże On-line;https://sites.google.com/site/readtextextension/;Przetłumacz i czytać z narzędzi internetowych;Właściwości mowy;Panel sterowania;&quot;
-		s1 = &quot;Ekran dotykowy;Synteza mowy;Angielski;Afrikaans;Bułgarski;Kataloński;Czech;Duński;Niemiecki;Grecki;Hiszpański;Francuski;Estoński;Fiński;Irlandzki;Hinduski;Węgierski;Indonezyjski;Islandzki;Włoski;Japoński;Koreański;Łotewski;Litewski;Maltańczyk;Holenderski;Polski;Portugalski;Rumuński;Rosyjski;Słowacki;Słoweński;Szwedzki;Tagalog;Turecki;Ukraiński;Chiński;Arabski&quot;
-	Case &quot;pt&quot; &apos;Portuguese
-		s0 = &quot;Read Text;Aplicação Externa;Usando o Festival com um script;Script Festival;Seleção Tocar com a aplicação externa;As opções na linha de comando;Exibir;Sempre exibir este diálogo;Sobre;Cancelar;OK;Ordem;Script;© 2008-2015 James Holgate;Teste;Desconhecido aplicativo externo.;Uma função básica não é possível analisar uma seqüência.;Ajuda Online;https://sites.google.com/site/readtextextension/;Traduzir e ler ferramentas da Web;Propriedades de Fala;Painel de Controle;&quot;
-		s1 = &quot;Tela sensível ao toque;Síntese de fala;Inglês;Afrikaans;Búlgaro;Catalão;Tcheco;Dinamarquês;Alemão;Grego;Espanhol;Francês;Estoniano;Finlandês;Irlandês;Hindi;Húngaro;Indonésio;Islandês;Italiano;Japonês;Coreano;Letão;Lituano;Maltês;Holandês;Polonês;Português;Romeno;Russo;Eslovaco;Esloveno;Sueco;Tagalog;Turco;Ucraniano;Chinês;Árabe&quot;
-		&apos; &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;&quot;
-		s2 = &quot;;Album;Artista;Gênero;Imagem;Letras;Título;Faixa;Ano;&quot;
-	Case &quot;ro&quot; &apos;Romanian
-		s0 = &quot;Read Text;Externă program;Foloseste Festival cu un script;Script comenzi;Citeşte cu un program extern;Linia de comanda opţiuni;Display;Arată întotdeauna acest dialog;Despre;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Nu am putut localiza programul.;String nu poate fi analizată!;Ajutor On-line;https://sites.google.com/site/readtextextension/;Traduceţi şi citesc cu instrumente web;Proprietăți vorbire;Proprietăți;&quot;
-		s1 = &quot;Touch screen;Sinteza speech;Engleză;Afrikaans;Bulgar;Catalană;Cehă;Daneză;Germană;Grec;Spaniolă;Franceză;Eston;Finlandeză;Irlandez;Hindi;Maghiară;Indoneziană;Islandeză;Italiană;Japoneză;Coreeană;Letonă;Lituaniană;Maltez;Olandeză;Polonez;Portugheză;Român;Rusă;Slovacă;Sloven;Suedeză;Filipinez;Turc;Ucraineană;Chineză;Arab&quot;
-	Case &quot;ru&quot; &apos;Russian
-		s0 = &quot;Read Text;Наружное применение;Использование Festival со сценарием;Сценарий Festival;Использование Наружное применение;Параметры командной строки;Вид;Всегда показывать этот диалог;О программе;Отмена;OK;Заказать;Сценарий;(с) 2008-2015 James Holgate;Тест;Наружное применение неизвестно;Основная функция не может разобрать строку;Справка;https://sites.google.com/site/readtextextension/;веб-инструменты;Свойства речи;Панель управления;&quot;
-		s1 = &quot;Сенсорный экран;Синтез-речи;Английский;Африкаанс;Болгарский;Каталонский;Чешский;Датский;Немецкий;Греческий;Испанский;Французский;Эстонский;Финский;Ирландский;Хинди;Венгерский;Индонезийский;Исландский;Итальянский;Японский;Корейский;Латышский;Литовский;Мальтийский;Голландский;Польский;Португальский;Румынский;Русский;Словацкий;Словенский;Шведский;Тагальский;Турецкий;Украинский;Китайский;арабский&quot;
-		&apos; &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;&quot;
-		s2 = &quot;;Альбом;Художник;Жанр;Картина;Текст Песни;Название;Трек;Год;&quot;
-	Case &quot;sk&quot; &apos; Slovak
-		s0 = &quot;Read Text;Externý program;Použiť Festival s skript;Script príkazy;Čítanie s externým programom;Parametre príkazového riadku;Zobraziť;Vždy zobraziť toto dialógové okno;O;Zrušiť;OK;Príkaz;Script;© 2008-2015 James Holgate;Test;Nemožno nájsť program.;Reťazec nemožno analyzovať!;On-line help;https://sites.google.com/site/readtextextension/;Preložiť a v spojení s webovou nástroje;Reč – vlastnosti;Ovládací panel;&quot;
-		s1 = &quot;Dotyková obrazovka;Syntéza reči;Angličtina;Afrikánčina;Bulharčina;Katalánsky;Čeština;Dánsky;Nemec;Riek;Španielčina;Francúzsky;Estónčina;Fínsky;Írsky;Hindčina;Maďarčina;Indonézsky;Islandský;Talian;Japonec;Kórejčina;Lotyština;Litovský;Maltčina;Holandský;Poľský;Portugalčina;Rumunský;Ruský;Slovenčina;Slovinčina;Švédsky;Tagalog;Turečtina;Ukrajinský;Číňan;Arabčina&quot;
-	Case &quot;sl&quot; &apos; Slovenian
-		s0 = &quot;Read Text;Zunanji program;Uporabi Festival z skript;Script ukazi;Beri z zunanjim program;Možnosti ukazne vrstice;Display;Vedno prikaži tem pogovornem oknu;O;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Ni bilo mogoče najti program.;Niz ne more biti analizirana!;On-line pomoč;https://sites.google.com/site/readtextextension/;Prevedi in brati s spletnimi orodji;Lastnosti govora;Nadzorna plošča;&quot;
-		s1 = &quot;Zaslon na dotik;Sinteza-govora;Angleščina;Afrikaans;Bolgarski;Katalonski;Češki;Danish;Nemški;Greek;Španski;Francosko;Estonski;Finski;Irski;Hindi;Madžarski;Indonezijski;Islandski;Italijanski;Japonski;Korejski;Latvijski;Litvanski;Malteški;Dutch;Poljski;Portugalski;Romunski;Ruščina;Slovaški;Slovenščina;Švedski;Tagalog;Turška;Ukrajinski;Chinese;Arabic&quot;
-	Case &quot;sv&quot; &apos; Swedish
-		s0 = &quot;Read Text;Extern programmet;Använd Festival med ett manus;Skriptkommandon;Läs tillsammans med ett externt program;Kommandoradsväljare;Visa;Visa alltid den här dialogrutan;Om;Avbryt;OK;Kommando;Script;© 2008-2015 James Holgate;Test;Kunde inte hitta programmet.;Kan Sträng inte analyseras!;On-line hjälp;https://sites.google.com/site/readtextextension/;Översätt och läste med webbverktyg;Talegenskaper;Kontrollpanelen;&quot;
-		s1 = &quot;Pekskärm;Talsyntes;Engelska;Afrikaans;Bulgariska;Katalanska;Czech;Danska;Tysk;Grekisk;Spanska;Franska;Estniska;Finska;Irländsk;Hindi;Ungerska;Indonesiska;Isländska;Italiensk;Japansk;Koreanska;Lettiska;Litauiska;Maltesisk;Holländska;Polska;Portugisiska;Rumänska;Ryska;Slovakien;Slovenska;Svenska;Tagalog;Turkiska;Ukrainska;Kinesisk;Arabiska&quot;
-	Case &quot;tl&quot; &apos;Tagalog
-		s0 = &quot;Read Text;Panlabas na programa;Gamitin ang Festival sa isang script;Script command;Basahin ang sa isang panlabas na programa;Command linya ng opsyon;Ipakita;Laging ipakita ang dialog na ito;About;Kanselahin;OK;Command;Script;© 2008-2015 James Holgate;Test;Hindi mahanap ang programa.;String ay hindi maaaring aralan!;On-line help ;https://sites.google.com/site/readtextextension/;Isalin at basahin sa mga tool ng web;Pagsasalita katangian;Control Panel;&quot;
-		s1 = &quot;Touch screen;Speech;Ingles;Aprikaans;Bulgarian;Katalan;Tsek;Denmark;Aleman;Griyego;Espanyol;Pranses;Estonya;Finnish;Irlandes;Hindi;Hanggaryan;Indonesiyo;Icelandic;Italyano;Hapon;Koreano;Latvian;Lithuanian;Maltis;Olandes;Pampakintab;Portuges;Rumano;Ruso;Eslobako;Eslobenyan;Suweko;Tagalog;Turko;Ukranyo;Tsino;Arabe&quot;
-	Case &quot;tr&quot; &apos;Turkish
-		s0 = &quot;Read Text;Harici programı;Bir komut ile Festival kullan;komut dosyası komutları;Harici bir program ile oku;Komut satırı seçenekleri;Ekran;Her zaman bu iletişim göstermek;Hakkında;İptal;Tamam;Command;Script;© 2008-2015 James Holgate;Test;Programı bulunamıyor.;String analiz olamaz!;On-line yardım;https://sites.google.com/site/readtextextension/;Çevir ve web araçları ile oku ;Konuşma Özellikleri;Denetim Masası;&quot;
-		s1 = &quot;Dokunmatik ekran;Konuşma sentezi;Ingilizce;Afrikaans;Bulgar;Katalanca;Çek;Danimarkalı;Alman;Yunan;İspanyolca;Fransız;Estonyalı;Fince;İrlanda;Hintçe;Macar;Endonezya;İzlanda;İtalyan;Japon;Kore;Letonya;Litvanya;Malta;Hollandalı;Lehçe;Portekizce;Romen;Rus;Slovak;Slovence;İsveç;Tagalog;Türk;Ukrayna;Çin;Arapça&quot;
-	Case &quot;uk&quot; &apos;Ukrainian
-		s0 = &quot;Read Text;Зовнішні програми ;Використовувати Festival з сценарій ;Команди сценарію ;Читання з зовнішньою програмою;Параметри командного рядка;Показати ;Завжди показувати цей діалог;Про програму ;Скасувати ;OK;Команда;Сценарій ;© 2008-2015 James Holgate;Тест;Неможливо знайти програму. ;Рядок не може бути проаналізована!;Он-лайн допомогу ;https://sites.google.com/site/readtextextension/;Перекласти й читати з веб-інструментів;Властивості мовлення;Панель керування;&quot;
-		s1 = &quot;Сенсорний екран;Синтез-мови;Англійська;Африкаанс;Болгарський;Каталонський;Чеський;Данська;Німецький;Грецький;Іспанська;Французький;Естонська;Фінський;Ірландський;Хінді;Угорський;Індонезійська;Ісландський;Італійський;Японський;Корейська;Латвійська;Литовський;Мальтійська;Голландський;Польський;Португальська;Румунський;Російська;Словацька;Словенська;Шведський;Тагальська;Турецький;Український;Китайський;Арабська&quot;
-	Case &quot;zh&quot;, &quot;zh-cn&quot; &apos; Simplified Chinese
-		s0 = &quot;Read Text;外部程序;使用的脚本Festival计划;的Festival脚本;使用不同的程序;命令行选项;显示;宏观要始终显示此对话框;关于;取消;确定;命令;脚本;© 2008-2015 James Holgate;测试;宏无法找到该程序.;宏无法读取的字符串正确！;获得帮助在线;https://sites.google.com/site/readtextextension/;翻译和阅读网页工具;语音属性;控制面板;&quot;
-		s1 = &quot;触摸屏;语音合成;英语;南非荷兰语;保加利亚语;加泰罗尼亚;捷克;丹麦;德国;希腊人;西班牙语;法国;爱沙尼亚语;芬兰;爱尔兰的;印地文;匈牙利;印度尼西亚;冰岛;意大利;日本;朝鲜的;拉脱维亚;立陶宛;马耳他人;荷兰人;波兰语;葡萄牙;罗马尼亚;俄;斯洛伐克;斯洛文尼亚;瑞典;他加禄语;土耳其;乌克兰;中国;阿拉伯语&quot;
-	Case &quot;zh-tw&quot; &apos;Traditional Chinese
-		s0 = &quot;Read Text;外部程序;使用 Festival 程序的腳本;的 Festival 腳本;使用不同的程序;命令行選項;顯示;宏觀要始終顯示此對話框;關於;取消;確定;命令;腳本;© 2008-2015 James Holgate;測試;宏無法找到該程序.;宏無法讀取的字符串正確！;在線幫助;https://sites.google.com/site/readtextextension/;翻譯和閱讀網頁工具;語音內容;控制台;&quot;
-		s1 = &quot;觸摸屏;語音合成;英語;南非荷蘭語;保加利亞語;加泰羅尼亞;捷克;丹麥;德國;希臘人;西班牙語;法國;愛沙尼亞語;芬蘭;愛爾蘭的;印地文;匈牙利;印度尼西亞;冰島;意大利;日本;朝鮮的;拉脫維亞;立陶宛;馬耳他人;荷蘭人;波蘭語;葡萄牙;羅馬尼亞;俄;斯洛伐克;斯洛文尼亞;瑞典;他加祿語;土耳其;烏克蘭;中國;阿拉伯語&quot;
+	Case &quot;zzy&quot; &apos;Machine language
+		s0 = isolist0
+		s1 = isoList1
+		s2 = isolist2
 	Case Else
-		s0 = &quot;Read Text;External program;Use Festival with a script;Script commands;Read with an external program;Command line options;Display;Always show this dialog;About;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Could not locate the program. ;String cannot be analyzed!;On-line help;https://sites.google.com/site/readtextextension/;Use a web application;Speech properties;System settings;&quot;
-		s1 = &quot;Touch screen;Speech;English;Afrikaans;Bulgarian;Catalan;Czech;Danish;German;Greek;Spanish;French;Estonian;Finnish;Irish;Hindi;Hungarian;Indonesian;Icelandic;Italian;Japanese;Korean;Latvian;Lithuanian;Maltese;Dutch;Polish;Portuguese;Romanian;Russian;Slovak;Slovenian;Swedish;Tagalog;Turkish;Ukrainian;Chinese;Arabic&quot;
+		&apos; pass - use default English values
 	End Select
-	&apos; Look up the index number - n
-	a1 = split(isolist0 &amp; isoList1 &amp; isolist2,&quot;;&quot;
-	For n = Lbound(a1) to Ubound(a1)
-		if a1(n) = sTermCode Then
-			bFound = true
-			Exit For
+	if sTermCode = &quot;s_all_items&quot; then
+		&apos; Get a semicolon separated list of all valid tags
+		fsLookUpTerm = s0 &amp; s1 &amp; s2
+	else
+		a1 = split(isolist0 &amp; isoList1 &amp; isolist2,&quot;;&quot;)
+		For n = Lbound(a1) to Ubound(a1)
+			if a1(n) = sTermCode Then
+				bFound = true
+				Exit For
+			Endif
+		next
+		if bFound Then
+			a2 = split(s0 &amp; s1 &amp; s2, &quot;;&quot;)
+			fsZzxToEnglish = a2(n)
+		Else
+			fsZzxToEnglish = &quot;&quot;
 		Endif
-	next
-	if bFound Then
-		a2 = split(s0 &amp; s1 &amp; s2, &quot;;&quot;)
-		fsLookUpTerm = a2(n)
-	Else
-		fsLookUpTerm = &quot;&quot;
-	Endif
+	endif
 	Exit Function
-	fsLookUpTermErr:
+	fsZzxToEnglishErr:
 	&apos; Count the semicolons in the data strings for the new language.
 	&apos; It should should match the corresponding isoList
-	fsLookUpTerm = &quot;%fsLookUpTermErr%&quot;
+	fsZzxToEnglish = &quot;%fsZzxToEnglishErr%&quot;
 End Function
 
 
@@ -318,70 +469,32 @@ function fsSampleMd(optional byval hl)
 	&apos; Markdown sample code that creates presentations with heading
 	&apos; levels, block quotes and preformatted text.
 
-	dim cr
-	dim s1
-	dim s2
-	dim s3
-	dim s4
-
-	s1 = &quot;&quot;
-
-	cr = chr(10)
+	dim cr$ : cr = chr(10)
+	dim s1$ : s1 = &quot;&quot;
+	dim s2$ : s2 = &quot;&quot;
+	dim s3$ : s3 = &quot;&quot;
+	
 	if ismissing(hl) then
 		hl = fsSelectionLanguage()
 	endif
-	s4 = fsLookUpTerm(&quot;s_read-text&quot;, hl) &amp; _
-			&quot; – &quot; &amp; _
-			fsLookUpTerm(&quot;s_speech-synthesis&quot;, hl)
 	select case hl
 	case &quot;ar&quot;
 		&apos; Excerpt of a Wikipedia article about [Apache OpenOffice][1] accessed 2015-04-09&quot;.
 		&apos; [1]: https://ar.wikipedia.org/wiki/%D8%A3%D9%88%D8%A8%D9%86_%D8%A3%D9%88%D9%81%D9%8A%D8%B3.%D8%A3%D9%88%D8%B1%D8%AC 
 		&apos; Chr(8207) is the unicode rtl marker to switch the reading direction from left to right (LTR)
 		&apos; to right to left (RTL).
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				chr(8207) &amp; &quot;#أوبن أوفيس.أورج&quot; &amp; cr &amp; cr &amp; _
-				 &quot;&gt;المكتب المفتوح هي باقة تطبيقات مكتبية حرة ومتعددة المنصات&quot;  &amp; _
-				&quot; [أوبن أوفيس.أورج](http://ar.wikipedia.org) &quot; &amp; cr &amp; cr &amp; _
-				chr(8207) &amp; &quot;##&quot; &amp; &quot;بدء عرض&quot; &amp; cr &amp; cr &amp; _
-				chr(8207) &amp; &quot;- حدد بعض النص&quot; &amp; cr &amp; _
-				chr(8207) &amp; &quot;- حدد أدوات - الأدوات الإضافية&quot; &amp; _
-				chr(8207) &amp; &quot;بدء عرض - &quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
-				&quot;(http://creativecommons.ca/licenses)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setComplexDocLanguage(&quot;ar-SA&quot;)
 	case &quot;ca&quot;
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				&quot;&gt;_Obreu un document i seleccioneu el text.  &quot; &amp; _
-				&quot;Trieu “Eines – Complements – Impress-Visualització” &quot; &amp; _
-				&quot;per executar la presentació._&quot; &amp; cr &amp; cr &amp; _
-				&quot;Impress – View&quot; &amp; cr &amp; &quot;--------------&quot; &amp; cr &amp; cr &amp; _
-				&quot;- Seleccioneu el text.&quot; &amp; cr &amp; _
-				&quot;- Trieu “Eines – Complements – Impress-Visualització” &quot; &amp; _
-				&quot;per executar la presentació.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
-				&quot;(http://es.creativecommons.org/)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setWesternDocLanguage(&quot;ca-ES&quot;)		
 	case &quot;de&quot;
-		s1 =  s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				&quot;&gt;_Markieren Sie eine Textpassage.  Wählen Sie „Extras - Add-Ons - &quot; &amp; _
-				&quot;Impress-Ansicht”, um die Präsentation zu starten._&quot; &amp; cr &amp; cr &amp; _
-				&quot;##Impress – Ansicht&quot; &amp; cr &amp; cr &amp; _
-				&quot;- Markieren Sie eine Textpassage.&quot; &amp; cr &amp; _
-				&quot;- Wählen Sie „Extras - Add-Ons - &quot; &amp; _
-				&quot;Impress-Ansicht”, um die Präsentation zu starten.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0](http://de.creativecommons.org)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setWesternDocLanguage(&quot;de-DE&quot;)
 	case &quot;es&quot;
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				&quot;&gt;_Abra un documento y selecciona texto.  Elija “Herramientas - Complementos - &quot; &amp; _
-				&quot;Impress-Ver” para iniciar la presentación._&quot; &amp; cr &amp; cr &amp; _
-				&quot;##Impress – Ver&quot; &amp; cr &amp; cr &amp; _
-				&quot;- Selecciona texto.&quot; &amp; cr &amp; _
-				&quot;- Elija “Herramientas - Complementos - &quot; &amp; _
-				&quot;Impress-Ver” para iniciar la presentación.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0](http://es.creativecommons.org/)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		s2 = fsDocCountry
+		&apos; Use an approximate regional locale to enable speech
 		select case s2
 		case &quot;MX&quot;, &quot;AR&quot;
 			setWesternDocLanguage(&quot;es-&quot; &amp; s2)
@@ -393,89 +506,25 @@ function fsSampleMd(optional byval hl)
 			setWesternDocLanguage(&quot;es-ES&quot;)
 		end select
 	case &quot;fi&quot;
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-		&quot;&gt;_Avaten dokumentin ja valitse teksti.  &quot; &amp; _
-				&quot;Valitse “Työkalut - Lisäosat - Impress-Näytä” näytöksen suorittamiseksi._&quot; &amp; cr &amp; cr &amp; _
-				&quot;##Impress – Näytä&quot; &amp; cr &amp; cr &amp; _
-				&quot;- Avaten dokumentin ja valitse teksti.&quot; &amp; cr &amp; _
-				&quot;- Valitse “Työkalut - Lisäosat - Impress-Näytä” näytöksen suorittamiseksi.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.fi)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setWesternDocLanguage(&quot;fi-FI&quot;)
 	case &quot;fr&quot;
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				&quot;&gt;_Ouvrez un document et sélectionnez du texte. &quot; &amp; _
-				&quot;Appuyez sur « Outils – &quot; &amp; _
-				&quot;Add-ons – Impress-Afficher » pour démarrer la présentation._&quot; &amp; cr &amp; cr &amp; _
-				&quot;Impress – Afficher (Presentation du texte)&quot; &amp; cr &amp; &quot;------------------&quot; &amp; cr &amp; cr &amp; _
-				&quot;- Ouvrez un document et sélectionnez du texte.&quot; &amp; cr &amp; _
-				&quot;- Appuyez sur « Outils – Add-ons – Impress-Afficher » pour démarrer la &quot; &amp; _
-				&quot;présentation.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/node/24)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setWesternDocLanguage(&quot;fr-FR&quot;)
 	case &quot;hi&quot;
-		s1 = &quot;पाठ पढ़ा&quot; &amp; &quot; – &quot; &amp; _
-			fsLookUpTerm(&quot;s_speech-synthesis&quot;, hl) &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr
-		if  lcase(fsGetSetting(&quot;ooname&quot;)) = &quot;libreoffice&quot; then
-			s1 = s1 &amp; &quot;&gt; लीब्रऑफ़िस एक मुफ्त तथा मुक्त स्रोत साफ्टवेयर है जो अनेक परिचालन तंत्रों के लिये उपलब्ध है। &quot; &amp; _
-					&quot; [लीब्रऑफ़िस](http://hi.wikipedia.org/s/7y79)&quot;
-		else 
-			s1 = s1 &amp; &quot;&gt; ओपेनऑफिस.ओआरजी एक मुफ्त तथा मुक्त स्रोत साफ्टवेयर है जो अनेक परिचालन तंत्रों के लिये उपलब्ध है। &quot; &amp; _
-					&quot; [ओपेनआफिस](http://hi.wikipedia.org/s/ew6)&quot;
-		endif
-		s1 = s1 &amp; cr &amp; cr &amp; _
-				&quot;इंप्रेस – देखें&quot; &amp; cr &amp; &quot;--------------&quot; &amp; cr &amp; cr &amp; _
-				&quot;- जिस पाठ की नक़ल बनाना चाहते हैं, उसे चुनें&quot; &amp; cr &amp; _
-				&quot;- &quot;&quot;औज़ार – सहयंत्र – इंप्रेस–देखें&quot;&quot;, चुनें&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
-				&quot;(http://creativecommons.ca/licenses)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setComplexDocLanguage(&quot;hi-IN&quot;)
 	case &quot;it&quot;
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				&quot;&gt;_Aprite un un documento e seleziona testo. &quot; &amp; _
-				&quot;Selezionate “Strumenti – Add-on – Impress-Vista” &quot; &amp; _
-				&quot;per avviare la presentazione._&quot; &amp; cr &amp; cr &amp; _
-				&quot;##Impress – Vista&quot; &amp; cr &amp; cr &amp; _
-				&quot;- Aprite un un documento e seleziona testo.&quot; &amp; cr &amp; _
-				&quot;- Selezionate “Strumenti – Add-on – Impress-Vista” &quot; &amp; _
-				&quot;per avviare la presentazione.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
-				&quot;(http://www.creativecommons.it/)`&quot;	
+		s1 =fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setWesternDocLanguage(&quot;it-IT&quot;)
 	case &quot;nl&quot;
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				&quot;&gt;_U moet een document te openen en selecteer de tekst. &quot; &amp; _
-				&quot;Kies “Extra – Invoegtoepassingen – Impress-Weergave” &quot; &amp; _
-				&quot; om de voorstelling te starten._&quot; &amp; cr &amp; cr &amp; _
-				&quot;Impress – Weergave&quot; &amp; cr &amp; &quot;--------------&quot; &amp; cr &amp; cr &amp; _
-				&quot;- U moet een document te openen en selecteer de tekst.&quot; &amp; cr &amp; _
-				&quot;- Kies “Extra – Invoegtoepassingen – Impress-Weergave” &quot; &amp; _
-				&quot; om de voorstelling te starten.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
-				&quot;(http://creativecommons.nl/)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setWesternDocLanguage(&quot;nl-NL&quot;)
 	case &quot;pl&quot;
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				&quot;&gt;_Musisz otworzyć dokument i wybierz tekst. &quot; &amp; _
-				&quot;Wybierz “Narzędzia – Dodatki – Impress-Widok” &quot; &amp; _
-				&quot;aby uruchomić pokaz._&quot; &amp; cr &amp; cr &amp; _
-				&quot;Impress – Widok&quot; &amp; cr &amp; &quot;--------------&quot; &amp; cr &amp; cr &amp; _
-				&quot;- Musisz otworzyć dokument i wybierz tekst.&quot; &amp; cr &amp; _
-				&quot;- Wybierz “Narzędzia – Dodatki – Impress-Widok” &quot; &amp; _
-				&quot;aby uruchomić pokaz.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
-				&quot;(http://creativecommons.pl)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setWesternDocLanguage(&quot;pl-PL&quot;)
 	case &quot;pt&quot;
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				&quot;&gt;_Abri um documento e selecionai texto. &quot; &amp; _
-				&quot;Escolha “Ferramentas – Suplementos – Impress-Ver” &quot; &amp; _
-				&quot;para executar a apresentação._&quot; &amp; cr &amp; cr &amp; _
-				&quot;Impress – Ver&quot; &amp; cr &amp; &quot;--------------&quot; &amp; cr &amp; cr &amp; _
-				&quot;- Abri um documento e selecionai texto.&quot; &amp; cr &amp; _
-				&quot;- Escolha “Ferramentas – Suplementos – Impress-Ver” &quot; &amp; _
-				&quot;para executar a apresentação.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
-				&quot;(http://www.creativecommons.org.br/)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		s2 = fsGetCountry
 		select case s2
 		case &quot;PT&quot;
@@ -484,31 +533,12 @@ function fsSampleMd(optional byval hl)
 			setWesternDocLanguage(&quot;pt-BR&quot;)
 		end select
 	case &quot;ru&quot;
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				&quot;&gt;_Выделить текст.  &quot; &amp; _
-				&quot;Для запуска демонстрации выберите &quot; &amp; _
-				&quot;“Сервис  – Дополнения – Impress-Вид”._&quot; &amp; cr &amp; cr &amp; _
-				&quot;##Impress – Вид&quot; &amp; cr &amp; cr &amp; _
-				&quot;- Выделить текст.&quot; &amp; cr &amp; _
-				&quot;- Для запуска демонстрации выберите &quot; &amp; _
-				&quot;“Сервис  – Дополнения – Impress-Вид”._&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
-				&quot;(http://creativecommons.ru/)`&quot;	
+		s1 =fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setWesternDocLanguage(&quot;ru-RU&quot;)
 	case &quot;zh&quot;
 		&apos; 工具 – 函数 is &quot;Tools – Functions&quot;. Is &quot;Functions&quot; a correct
 		&apos; translation of &quot;Add-ons&quot;?
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-		&quot;&gt;_选择文字。&quot; &amp; _
-				&quot;选择 “工具 – 扩展 – 幻灯片放映-视图” &quot; &amp; _
-				&quot;以运行放映。_&quot; &amp; cr &amp; cr &amp; _
-				&quot;##幻灯片放映 – 视图&quot; &amp; cr &amp; cr &amp; _
-				&quot;- 选择文字。&quot; &amp; cr &amp; _
-				&quot;- 选择 “工具 – 扩展 – 幻灯片放映-视图” &quot; &amp; _
-				&quot;以运行放映。&quot; &amp; _
-				&quot;&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
-				&quot;(http://creativecommons.org)`&quot;	
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		setAsianDocLanguage(&quot;zh-CN&quot;)
 	case else
 		&apos; English is the reference language.
@@ -522,16 +552,7 @@ function fsSampleMd(optional byval hl)
 		&apos; [2]: https://help.libreoffice.org/Writer/Edit#Select_Text
 		&apos; [3]: https://help.libreoffice.org/Impress/Showing_a_Slide_Show
 		&apos; [4]: http://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz
-		s1 = s4 &amp; cr &amp; &quot;=========&quot; &amp; cr &amp; cr &amp; _
-				&quot;&gt;_Open a document and select some text. &quot; &amp; _
-				&quot;Choose “Tools – Add-ons – Impress-View” &quot; &amp; _
-				&quot;to run the show._&quot; &amp; cr &amp; cr &amp; _
-				&quot;Impress – View (Present selection)&quot; &amp; cr &amp; &quot;--------------&quot; &amp; cr &amp; cr &amp; _
-				&quot;- Open a document and select some text.&quot; &amp; cr &amp; _
-				&quot;- Choose “Tools – Add-ons – Impress-View” &quot; &amp; _
-				&quot;to run the show.&quot; &amp; cr &amp; cr &amp; _
-				&quot;`© 2015 James Holgate.  [cc by 4.0]&quot; &amp; _
-				&quot;(http://creativecommons.ca/licenses)`&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		s2 = fsGetCountry
 		select case s2
 		case &quot;GB&quot;
@@ -540,7 +561,7 @@ function fsSampleMd(optional byval hl)
 			setWesternDocLanguage(&quot;en-US&quot;)
 		end select
 	end select
-	fsSampleMd = s1
+	fsSampleMd = fxStr(s1)
 end function
 
 
@@ -973,12 +994,14 @@ End Function
 
 
 Function fsDisplayLanguage As String
-    On Error Goto DISPLAYLANGUAGEERROR
-	Select Case f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text
-	Case &quot;&quot;, &quot;...&quot;, &quot;Default&quot;, &quot;default&quot;
+	On Error Goto DISPLAYLANGUAGEERROR
+	dim s1$: s1 =  f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text
+
+	Select Case trim(s1)
+	Case &quot;&quot;, &quot;...&quot;, &quot;…&quot;, &quot;Default&quot;, &quot;default&quot;
 		fsDisplayLanguage = fsGetLanguage()
 	Case Else
-		fsDisplayLanguage = f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text
+		fsDisplayLanguage = s1
 	End Select
 	Exit Function
 	DISPLAYLANGUAGEERROR:
@@ -1512,18 +1535,19 @@ end function
 
 
 sub debugFsLookUpTerm
-    &apos; Check for missing or extra semicolon delimiters in a language string
-    &apos; look for two semicolons in a row, or for a missing semicolon at the
-    &apos; end of a substring
+    &apos; Check for missing language strings.  With po language files, you
+    &apos; might have a partial fill of language strings.  For example,
+    &apos; Korean has the main dialog strings, but not any strings
+    &apos; relating to adding tags to m4a exports.
     dim s1 As String
-
-    s1 = Inputbox(&quot;Enter the code to look up&quot;,&quot;Debug&quot;, &quot;zh&quot;)
-	msgBox &quot;&quot;&quot;&quot; &amp; fsLookupterm(s1, _
+	UpdatePoSettingsDone = -1
+    s1 = Inputbox(&quot;Enter the code to look up&quot;,&quot;Debug&quot;, &quot;s_mdsample&quot;)
+	msgBox fxStr(fsLookupterm(s1, _
 	Inputbox(&quot;Enter your language code&quot;, _
 			&quot;Debug&quot;, fsDisplayLanguage())) &amp; _
-			&quot;&quot;&quot; should be the word for &quot;&quot;&quot; &amp; _
+			&quot;\n\nshould be the string for &quot; &amp; _
 			s1 &amp; _
-			&quot;&quot;&quot; in your language.&quot;
+			&quot; in your language.&quot;)
 end sub
 
 </script:module>

@@ -1,0 +1,320 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-15 23:10-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: mt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : n==0 || ( n%100>1 && n%100<11) "
+"? 1 : (n%100>10 && n%100<20 ) ? 2 : 3);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "Programm Esterni"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "Użu Festival bil-iskrittura"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "Script kmandijiet"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "Aqra ma 'programm estern"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "Għażliet Linja ta 'Kmand"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "Display"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "Dejjem juru din dialog"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "Dwar"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "Ikkanċella"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "OK"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "Kmand"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "Script"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "Test"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "Ma kellekx jillokalizza l-programm."
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "String ma jistgħux jiġu analizzati!"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "On-line jgħinu"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "Ittraduċi u jinqraw bl-għodda tal-web"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "Proprjetajiet ta' Diskors"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "Panew tal-Kontroll"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "Touch screen"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "Sinteżi diskors"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "Ingliż"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "Afrikaans"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "Bulgaru"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "Katalan"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "Ċek"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "Danish"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "Ġermaniż"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "Grieg"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "Spanjol"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "Franċiż"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "Estonjan"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "Finlandiż"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "Irlandiż"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "Ħindi"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "Ungeriż"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "Indoneżjan"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "Iżlandiż"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "Taljan"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "Ġappuniż"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "Korean"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "Latvjan"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "Litwan"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "Malti"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "Olandiż"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "Pollakk"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "Portugiż"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "Rumen"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "Russu"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "Slovakk"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "Sloven"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "Svediż"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "Tagalog"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "Tork"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "Ukrain"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "Ċiniż"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "Għarbi"
+

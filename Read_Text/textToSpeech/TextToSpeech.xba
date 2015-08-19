@@ -46,6 +46,11 @@ OPTION EXPLICIT
 &apos;&apos;    [Miro Video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/)
 &apos;&apos;    with a ffmpeg plug-in.
 &apos;&apos;  * Complex language detection is simpler, faster and more reliable.
+&apos;&apos;  * Separate language **PO files**.  You can easily customize the
+&apos;&apos;    extension for a language or region by modifying en.po using a
+&apos;&apos;    language editor like Virtaal or Poedit or a normal code editor
+&apos;&apos;    that can save files as UTF-8 plain text and saving the file in the
+&apos;&apos;    extension `/po/tools/` directory.
 &apos;&apos;
 &apos;&apos; Installation
 &apos;&apos; ------------
@@ -169,28 +174,83 @@ End Sub
 
 
 Sub ReadClipBoard
+&apos;&apos;  
 &apos;&apos; Tools – Add-ons – Read Clipboard
 &apos;&apos; --------------------------------
-&apos;&apos; 
+&apos;&apos;  
 &apos;&apos; Use this to read the clipboard from any module that supports a
-&apos;&apos; text clipboard, including the Macro editor. You normally
+&apos;&apos; text clipboard, including the Macro editor.  You normally
 &apos;&apos; fill the clipboard by selecting some text, then using *Edit – Copy*.
 &apos;&apos; If this is useful, assign a key combination to the macro with
 &apos;&apos; *Tools – Customize*.
-&apos;&apos;
+&apos;&apos;  
+&apos;&apos; ### Clipboard disabled? ###
+&apos;&apos;  
+&apos;&apos; If the program shows an input box when you select *Tools - Read Clipboard*
+&apos;&apos; it is because the current version of the office suite or the computer 
+&apos;&apos; platform  doesn’t read the clipboard reliably.  Please paste text into 
+&apos;&apos; the input box.
+&apos;&apos;  
+&apos;&apos; ### Resetting the clipboard lock ###
+&apos;&apos;  
+&apos;&apos;  To reset the clipboard lock after a updating your office suite, type some
+&apos;&apos;  random characters into the *External program* box in the main dialogue.  The 
+&apos;&apos;  extension shows an error message and deletes the settings files that the 
+&apos;&apos;  extension creates.  When you click the *Read Selection* button, the settings 
+&apos;&apos;  are rebuilt from scratch.
+&apos;&apos;  
+	dim s1$ : s1 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
+	dim s2$ : s2 = &quot;&quot;
+	
+	on error goto ReadClipBoardErr
 	ClearWorkingCountryLanguage
-    if fileExists(fsMyTempLock) Then
+    If fileExists(fsMyTempLock) Then
 		resetSpeechDispatcher
 	Else
-		msgSpeak(fsGetClipBoard)
+		If fileexists(s1) or fbClipBoardAvailable = false Then
+			if fileexists(s1) then
+				if fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getTextFromFile(s1, &quot;UTF-8&quot;) then
+					&apos; You updated office after a crash, so resume
+					&apos; the normal operation on the next run.
+					kill s1
+				endif
+			endif
+			s2 = inputbox(_
+					fsLookUpTerm(_
+					fsSelectionLanguage), _
+					fsLookUpTerm(_
+					&quot;s_read-text&quot;), _
+					&quot; &quot;)
+			If not(s2 = &quot;&quot;) Then
+				msgSpeak(s2)
+			Endif		
+		Else
+			CreateFile(s1, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)
+			fsGetClipBoard(false)
+			&apos; Try it - if it crashes, then we are left with the lock file
+			If fileexists(s1) Then
+				kill s1
+			Endif
+			msgSpeak(fsGetClipBoard(true))
+		Endif
 	Endif
+	Exit Sub
+	ReadClipBoardErr:
+	msgbox fsLookupTerm(_
+			&quot;s_string-cannot-be-analyzed&quot;) &amp; _
+			chr(10) &amp; _
+			chr(10) &amp; _
+			&quot;`TextToSpeech:fsGetClipBoard()`&quot;, _
+			0, _
+			fsLookUpTerm(_
+			&quot;s_read-text&quot;)
 End Sub
 
 
 sub PresentSelection
 &apos;&apos; Tools – Add-ons – Impress-View
 &apos;&apos; ------------------------------
-&apos;&apos; 
+&apos;&apos; http://webcache.googleusercontent.com/search?q=cache:
 &apos;&apos; Use this to open the selected text as an Impress document with the full 
 &apos;&apos; text in the notes and a summary on the slide itself. The font is big and
 &apos;&apos; the format is square to make it easy to export sounds using the image of
@@ -237,7 +297,7 @@ sub PresentSelection2(optional byval sB)
 	&apos; sB = &quot;ru&quot;  &apos; Russian - Cyrillic script
 	&apos; sB = &quot;zh&quot;  &apos; Simplified Chinese - Asian characters
 	&apos;
-	&apos; #Show Help Template
+	&apos; # Show Help Template
 	&apos;
 	&apos; We put the complete sample text in the first slide’s note.
 	&apos; Normally, the first slide’s note includes a summary of

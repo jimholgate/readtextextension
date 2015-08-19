@@ -1,0 +1,319 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-15 23:14-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "Harici programı"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "Bir komut ile Festival kullan"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "komut dosyası komutları"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "Harici bir program ile oku"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "Komut satırı seçenekleri"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "Ekran"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "Her zaman bu iletişim göstermek"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "Hakkında"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "İptal"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "Tamam"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "Command"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "Script"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "Test"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "Programı bulunamıyor."
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "String analiz olamaz!"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "On-line yardım"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "Çevir ve web araçları ile oku "
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "Konuşma Özellikleri"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "Denetim Masası"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "Dokunmatik ekran"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "Konuşma sentezi"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "Ingilizce"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "Afrikaans"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "Bulgar"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "Katalanca"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "Çek"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "Danimarkalı"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "Alman"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "Yunan"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "İspanyolca"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "Fransız"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "Estonyalı"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "Fince"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "İrlanda"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "Hintçe"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "Macar"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "Endonezya"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "İzlanda"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "İtalyan"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "Japon"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "Kore"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "Letonya"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "Litvanya"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "Malta"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "Hollandalı"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "Lehçe"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "Portekizce"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "Romen"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "Rus"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "Slovak"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "Slovence"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "İsveç"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "Tagalog"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "Türk"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "Ukrayna"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "Çin"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "Arapça"
+

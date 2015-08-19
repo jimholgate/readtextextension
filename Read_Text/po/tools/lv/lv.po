@@ -1,0 +1,320 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-15 23:10-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: lv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "Ārējā programma"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "Lietot Festival ar skriptu"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "Script komandas"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "Lasīt ar ārēju programmu"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "Command line options"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "Display"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "Vienmēr rādīt šo dialogu"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "Par"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "Atcelt"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "OK"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "Komandu"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "Script"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "Test"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "Nevarēja atrast programmu."
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "Stīgu nevar analizēt!"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "On-line help"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "Tulkot un lasīt ar web rīkus"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "Runas rekvizīti"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "vadības panelis"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "Touch screen"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "Runas sintēze"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "Angļu"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "Afrikandu"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "Bulgārijas"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "Katalāņu"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "Čehu"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "Dāņu"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "Vācu"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "Grieķu"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "Spāņu"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "Franču"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "Igauņu"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "Somu"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "Īrijas"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "Hindu Valoda"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "Ungārijas"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "Indonēzijas"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "Islandiešu"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "Itālijas"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "Japānas"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "Korejiešu"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "Latvijas"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "Lietuviešu"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "Maltiešu"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "Holandiešu"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "Poļu"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "Portugālis"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "Rumāņu"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "Krievu"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "Slovaku"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "Slovēņu"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "Zviedru"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "Tagalogu"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "Turku"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "Ukraiņu"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "Ķīniešu"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "Arābu"
+
