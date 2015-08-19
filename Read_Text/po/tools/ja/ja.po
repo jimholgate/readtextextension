@@ -1,0 +1,319 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-15 23:10-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "外部プログラム"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "スクリプトで使用するのFestival"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "スクリプトは、コマンド"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "外部プログラムで読む"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "コマンドラインオプション"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "ディスプレイ"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "常にこのダイアログを表示"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "について"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "OK"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "コマンド"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "スクリプト"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "テスト"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "プログラムを見つけることができませんでした"
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "文字列を解析することはできません！"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "ラインで"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "オンラインツール"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "音声認識のプロパティ"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "コントロール パネル"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "タッチスクリーン"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "音声合成"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "英語"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "アフリカーンス語"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "ブルガリア語"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "カタロニア語"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "チェコ語"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "デンマーク語"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "ドイツ語"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "ギリシャ語"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "スペイン語"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "フランス語"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "エストニア語"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "フィンランド語"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "アイリッシュ"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "ヒンディー語"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "ハンガリー語"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "インドネシアの"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "アイスランドの"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "イタリア語"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "日本人"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "韓国語"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "ラトビアの"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "リトアニア語"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "マルタ語"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "オランダ語"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "ポーランド語"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "ポルトガル語"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "ルーマニア語"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "ロシア"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "スロバキア語"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "スロベニア語"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "スウェーデン語"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "タガログ語"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "トルコ語"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "ウクライナ語"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "中国人"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "アラビア語"
+

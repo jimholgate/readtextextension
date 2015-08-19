@@ -98,7 +98,6 @@
     <dlg:menuitem dlg:value="tr"/>
     <dlg:menuitem dlg:value="uk"/>
     <dlg:menuitem dlg:value="zh"/>
-    <dlg:menuitem dlg:value="zh-CN"/>
     <dlg:menuitem dlg:value="zh-TW"/>
    </dlg:menupopup>
    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateLabels?language=Basic&amp;location=application" script:language="Script"/>

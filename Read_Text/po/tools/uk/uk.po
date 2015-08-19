@@ -1,0 +1,320 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-15 23:14-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "Зовнішні програми "
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "Використовувати Festival з сценарій "
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "Команди сценарію "
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "Читання з зовнішньою програмою"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "Параметри командного рядка"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "Показати "
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "Завжди показувати цей діалог"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "Про програму "
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "Скасувати "
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "OK"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "Команда"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "Сценарій "
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "Тест"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "Неможливо знайти програму."
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "Рядок не може бути проаналізована!"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "Он-лайн допомогу "
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "Перекласти й читати з веб-інструментів"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "Властивості мовлення"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "Панель керування"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "Сенсорний екран"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "Синтез-мови"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "Англійська"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "Африкаанс"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "Болгарський"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "Каталонський"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "Чеський"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "Данська"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "Німецький"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "Грецький"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "Іспанська"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "Французький"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "Естонська"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "Фінський"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "Ірландський"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "Хінді"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "Угорський"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "Індонезійська"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "Ісландський"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "Італійський"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "Японський"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "Корейська"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "Латвійська"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "Литовський"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "Мальтійська"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "Голландський"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "Польський"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "Португальська"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "Румунський"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "Російська"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "Словацька"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "Словенська"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "Шведський"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "Тагальська"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "Турецький"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "Український"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "Китайський"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "Арабська"
+

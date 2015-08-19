@@ -1,0 +1,377 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-18 17:25-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "Programma esterno"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "Usa Festival con uno script"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "I comandi script"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "Leggere con un programma esterno"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "Opzioni sulla riga di comando"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "Vista"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "Mostra sempre questa finestra di dialogo"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "About"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "Annulla"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "OK"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "Ordine"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "Script"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "Test"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "External Application sconosciuto."
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "Una funzione BASIC non può analizzare una stringa."
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "Help On-line"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "Tradurre e leggere con strumenti web"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "Proprietà riconoscimento vocale"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "Pannello di controllo"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "Touch screen"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "Sintesi vocale"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "Inglese"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "Afrikaans"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "Bulgaro"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "Catalano"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "Ceco"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "Danese"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "Tedesco"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "Greco"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "Spagnolo"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "Francese"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "Estonian"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "Finlandese"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "Irlandese"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "Hindi"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "Ungherese"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "Indonesiano"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "Islandese"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "Italiano"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "Giapponese"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "Coreano"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "Lettone"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "Lituano"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "Maltese"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "Olandese"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "Polacco"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "Portoghese"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "Rumeno"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "Russo"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "Slovacco"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "Sloveno"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "Svedese"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "Tagalog"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "Turco"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "Ucraino"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "Cinese"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "Arabo"
+
+#: template.src
+msgctxt ""
+msgid "Album"
+msgstr "Album"
+
+#: template.src
+msgctxt ""
+msgid "Artist"
+msgstr "Artista"
+
+#: template.src
+msgctxt ""
+msgid "Genre"
+msgstr "Genere"
+
+#: template.src
+msgctxt ""
+msgid "Image"
+msgstr "Immagine"
+
+#: template.src
+msgctxt ""
+msgid "Lyrics"
+msgstr "Testo"
+
+#: template.src
+msgctxt ""
+msgid "Title"
+msgstr "Titolo"
+
+#: template.src
+msgctxt ""
+msgid "Track"
+msgstr "Traccia"
+
+#: template.src
+msgctxt ""
+msgid "Year"
+msgstr "Anno"
+
+#: template.src
+msgctxt ""
+msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
+msgstr ""
+"Read Text – Sintesi vocale\n"
+"=========\n"
+"\n"
+">_Aprite un documento e seleziona testo. Selezionate “Strumenti – Add-on – "
+"Impress-Vista” per avviare la presentazione._\n"
+"\n"
+"## Impress – Vista\n"
+"\n"
+"- Aprite un documento e seleziona testo.\n"
+"- Selezionate “Strumenti – Add-on – Impress-Vista” per avviare la "
+"presentazione.\n"
+"\n"
+"`© 2015 James Holgate.  [cc by 4.0](http://www.creativecommons.it/)`"
+

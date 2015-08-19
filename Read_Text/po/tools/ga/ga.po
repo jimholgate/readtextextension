@@ -1,0 +1,320 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-15 23:08-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: ga\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
+"4;\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "Relations clár"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "Bain úsáid As Festival le script"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "Orduithe Script"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "Léigh le clár seachtrach"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "Roghanna líne Ordaithe"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "Taispeáin"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "Thaispeáint i gcónaí leis an dialóg"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "About"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "Cancel"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "OK"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "Msgstr"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "Script"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "Tástáil"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "Níorbh fhéidir teacht ar an gclár."
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "Ní féidir anailís a dhéanamh String!"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "Ar-líne chabhrach"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "Aistrigh agus léifear le huirlisí gréasáin"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "Airíonna Cainte"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "Painéal Rialúcháin"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "Scáileán tadhaill"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "Sintéis urlabhra"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "Béarla"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "Afrikaans"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "Bulgáiris"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "Catalóinis"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "Seice"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "Danmhairgis"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "Gearmáinis"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "Gréigis"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "Spáinnis"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "Fraincis"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "Eastóinis"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "Fionlainnis"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "Irish"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "Hiondúis"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "Ungáiris"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "Indinéisis"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "Íoslainnis"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "Iodáilis"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "Seapáinis"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "Cóiréis"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "Laitvis"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "Liotuáinis"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "Mháltais"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "Ollainnis"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "Polainnis"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "Portaingéilis"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "Rómáinis"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "Rúisis"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "Slóvaicis"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "Slóivéinis"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "Sualainnis"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "Tagálaigis"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "Tuircis"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "Úcráinis"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "Sínis"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "Araibis"
+
