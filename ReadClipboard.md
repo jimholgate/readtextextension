@@ -1,0 +1,6 @@
+# Read Clipboard #
+
+You can read any text you can copy to the clipboard. For example, you can read macro code, the contents of text fields, data sources, captions and text in selected parts of tables. You can read text copied from external programs like web browsers, help or news feeds.
+  * Select some text.
+  * Use **Edit - Copy** or **Ctrl+C** .
+  * Use **Tools - Add-Ons - Read Clipboard** .
