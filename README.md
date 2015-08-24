@@ -1,8 +1,10 @@
+﻿
 # Read Text Extension
 
 ## About
 
 Read Text Extension uses an external program or a web service to read text. Read the selection with Calc, Draw, Impress, Web Writer and Writer. Read the contents of the clipboard. Use speech synthesis to help to edit documents. Compare computer documents with printed documents. Learn a new language. Learn how to pronounce words correctly. Easily transfer text to your mobile device using QR Codes.
+
 ## Download
 
 + [LibreOffice Extensions][1]
@@ -19,6 +21,7 @@ Read Text Extension uses an external program or a web service to read text. Read
 + [Read Text Extension - Multilingual support][5]
 
 ## Blog
+
 + [Read Text Software][6]
 
 ## Source Code
@@ -34,7 +37,7 @@ Read Text Extension uses an external program or a web service to read text. Read
 
 [1]: http://extensions.libreoffice.org/extension-center/read-text
 [2]: http://extensions.services.openoffice.org/en/project/read-text
-[3]: https://sites.google.com/site/readtextextension/_/rsrc/1383421635213/home/microsoft-windows/win8.PNG
+[3]: https://raw.githubusercontent.com/jimholgate/readtextextension/master/wiki/Default64.png
 [4]: https://www.youtube.com/watch?v=w5c5wUz9XSY
 [5]: https://www.youtube.com/watch?v=OCARVoZqC-s
 [6]: http://sites.google.com/site/readtextextension/
