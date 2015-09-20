@@ -81,7 +81,7 @@
 '' 
 '' ## Audacity
 '' 
-'' [Audacity](http://audacity.sourceforge.net/) is a free cross platform audio editor. It can
+'' [Audacity](http://audacityteam.org/) is a free cross platform audio editor. It can
 '' use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.  
 '' 
 '' ### FFmpeg for Audacity

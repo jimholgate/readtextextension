@@ -930,7 +930,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 &apos;&apos; Audacity
 &apos;&apos; --------
 &apos;&apos;
-&apos;&apos; [Audacity](http://audacity.sourceforge.net/) is a free cross platform audio editor. It can
+&apos;&apos; [Audacity](http://audacityteam.org/) is a free cross platform audio editor. It can
 &apos;&apos; use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.  
 &apos;&apos; 
 &apos;&apos; Windows security policies may prevent you from installing the Audacity FFmpeg converter
