@@ -5,7 +5,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
 "/readtextextension-discuss\n"
 "POT-Creation-Date: 2015-08-15T12:53:51\n"
-"PO-Revision-Date: 2015-08-15 23:10-0700\n"
+"PO-Revision-Date: 2015-08-26 23:06-0700\n"
 "Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
 "Language-Team: LANGUAGE\n"
 "Language: ko\n"
@@ -131,4 +131,230 @@ msgstr "제어판"
 msgctxt ""
 msgid "Touch screen"
 msgstr "터치 스크린"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "음성-합성"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "영어"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "아프리카 어"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "불가리아어"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "카탈루냐어"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "체코 어"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "덴마크어"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "독일어"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "그리스어"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "스페인어"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "프랑스어"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "에스토니아어"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "핀란드어"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "아일랜드어"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "힌디어"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "헝가리어"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "인도네시아어"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "아이슬란드 어"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "이탈리아어"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "일본어"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "한국어"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "라트비아어"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "리투아니아어"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "몰타어"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "네덜란드어"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "폴란드어"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "포르투갈어"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "루마니아어"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "러시아어"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "슬로바키아"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "슬로베니아어"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "스웨덴어"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "타갈로그어"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "터키어"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "우크라이나어"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "중국어"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "아랍어"
+
+#: template.src
+msgctxt ""
+msgid "Album"
+msgstr "앨범"
+
+#: template.src
+msgctxt ""
+msgid "Artist"
+msgstr "아티스트"
+
+#: template.src
+msgctxt ""
+msgid "Genre"
+msgstr "장르"
+
+#: template.src
+msgctxt ""
+msgid "Image"
+msgstr "이미지"
+
+#: template.src
+msgctxt ""
+msgid "Lyrics"
+msgstr "말"
+
+#: template.src
+msgctxt ""
+msgid "Title"
+msgstr "곡명"
+
+#: template.src
+msgctxt ""
+msgid "Track"
+msgstr "트랙 "
+
+#: template.src
+msgctxt ""
+msgid "Year"
+msgstr "년"
+
 
