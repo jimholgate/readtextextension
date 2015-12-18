@@ -176,7 +176,7 @@
 '' 
 '' [Read Text Extension](http://sites.google.com/site/readtextextension/)
 '' 
-'' Copyright © 2011 - 2015 James Holgate
+'' Copyright � 2011 - 2015 James Holgate
 '''
 Const ForReading = 1
 Const ForWriting = 3
@@ -216,6 +216,11 @@ Function EscapeReturnsAndReplaceQuotes(sA)
     ' with smart quotes and no carriage returns.
     '''
     Dim s1
+	Dim LQ
+	Dim RQ
+	LQ = Chr(147)
+	RQ = Chr(148)
+	
 
     EscapeReturnsAndReplaceQuotes = ""
     ' Not all audio players can show lyrics longer than 1000 characters.
@@ -225,14 +230,14 @@ Function EscapeReturnsAndReplaceQuotes(sA)
         Exit Function
     End If
     s1 = Replace(sA, Chr(13), "\n")  ' escaped CR
-    s1 = Replace(s1, " """, " “" )  ' SPACE, left double quote
-    s1 = Replace(s1, Chr(10) & """", Chr(10) & "“" )  ' LF, left double quote
-    s1 = Replace(s1, Chr(9) & """", Chr(9) & "“" )  ' TAB, left double quote
-    s1 = Replace(s1, "(" & """", "(“" )  ' left (, left double quote
-    s1 = Replace(s1, "[" & """", "[“" )  ' left [, left double quote
-    s1 = Replace(s1, "*" & """", "*“" )  ' *, left double quote from markdown
-    s1 = Replace(s1, "_" & """", "_“" )  ' _, left double quote from markdown
-    s1 = Replace(s1, """", "”" )  ' all others, right double quote
+    s1 = Replace(s1, " """, " " & LQ )  ' SPACE, left double quote
+    s1 = Replace(s1, Chr(10) & """", Chr(10) & "" & LQ )  ' LF, left double quote
+    s1 = Replace(s1, Chr(9) & """", Chr(9) & "" & LQ )  ' TAB, left double quote
+    s1 = Replace(s1, "(" & """", "(" & LQ )  ' left (, left double quote
+    s1 = Replace(s1, "[" & """", "[" & LQ )  ' left [, left double quote
+    s1 = Replace(s1, "*" & """", "*" & LQ )  ' *, left double quote from markdown
+    s1 = Replace(s1, "_" & """", "_" & LQ )  ' _, left double quote from markdown
+    s1 = Replace(s1, """", RQ )  ' all others, right double quote
     EscapeReturnsAndReplaceQuotes = s1
 End Function
 
@@ -1465,7 +1470,7 @@ Function fsDone(b)
         a1 = "Done"
     Case "es"
         a1 = "Finalizado"
-	Case "fr"
+    Case "fr"
         a1 = "Termin&#233;"
     Case "et"
         a1 = "&#76;&#245;&#112;&#101;&#116;&#97;&#115;"
@@ -2057,9 +2062,9 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s1 = "1000"  ' XP Not supported 
                 s2="Teke-Eboo"
                 s3 ="ebo-CG"
-        Case "ee","ee-gh", "éwé"
+        Case "ee","ee-gh", "�w�"
                 s1 = "1000"  ' XP Not supported 
-                s2="Éwé"
+                s2="�w�"
                 s3 ="ee-GH"
         Case "el","el-gr", "greek", "408"
                 s1 = "408"
@@ -2636,43 +2641,6 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
 End Function
 
 
-Function fbWindowsHasVoiceInThisLanguage(sLang)
-        ' Since Windows Vista, we can use Speech XML
-        ' http://www.w3.org/TR/speech-synthesis
-        ' Determine which SAPI voices are installed, then
-        ' if we have a modern voice from Windows Vista, Windows 7 or above
-        ' then return true, else if no voices found, then return false
-        Dim Sapi
-        Dim n
-        n = 0
-        Dim n1
-        n1 = 0
-        Dim s1
-        s1 = ""
-        Dim s2
-        s2 = ""
-        
-        sLang = LCase(sLang)
-        fbWindowsHasVoiceInThisLanguage = False
-        'on error goto VoiceTestError
-        Set Sapi=CreateObject("Sapi.SpVoice")
-        s1 =LCase(fsIsoToHumanReadable(sLang, 1))
-        'Let's see if we recognize the language s1
-        For n = 0 To Sapi.GetVoices.Count - 1
-                s2=LCase(Sapi.GetVoices.Item(n).GetDescription)
-                If InStr(s2, s1) <> 0 Then
-                        fbWindowsHasVoiceInThisLanguage = True
-                        Exit For
-                End If
-        Next
-        Set Sapi = Nothing
-        Exit Function
-        VoiceTestError:
-        fbWindowsHasVoiceInThisLanguage = False
-        On Error Resume Next
-End Function
-
-
 Function fsWindowsCloseMatchLanguage(s1)
         Dim s2
         s2 = fsWindowsCloseMatchVoice(s1)
@@ -2816,7 +2784,7 @@ Sub main()
                     s1 = "Las ein paar Worte..."
 			Case "es"
                     s1 = "Introduzca algunas palabras ..."
-			Case "fr"
+            Case "fr"
                     s1 = "Tapez quelques mots..."
             Case "pt"
                     s1 = "Tipo de poucas palavras..."
