@@ -81,7 +81,7 @@
 '' 
 '' ## Audacity
 '' 
-'' [Audacity](http://audacityteam.org/) is a free cross platform audio editor. It can
+'' [Audacity](http://audacity.sourceforge.net/) is a free cross platform audio editor. It can
 '' use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.  
 '' 
 '' ### FFmpeg for Audacity
@@ -176,7 +176,7 @@
 '' 
 '' [Read Text Extension](http://sites.google.com/site/readtextextension/)
 '' 
-'' Copyright © 2011 - 2015 James Holgate
+'' Copyright ¬© 2011 - 2015 James Holgate
 '''
 Const ForReading = 1
 Const ForWriting = 3
@@ -191,22 +191,22 @@ Sub Usage(sA)
     '''
     ' Shows usage in a dialog box when the program has a problem parsing a line.
     '''
-    s1 = sA & chr(10) & _
-            chr(10)& _
+    s1 = sA & Chr(10) & _
+            Chr(10)& _
             "tts_wscript.vbs [/language:""xxx"" | /voice:""xxx""] [/rate:"& _
-            "nn] [/soundfile:""c:\xxx.wav""] ""filename.txt""" & chr(10) & _
-            chr(10) & _
-            "/language:""fr"" - Language option" & chr(10)& _
+            "nn] [/soundfile:""c:\xxx.wav""] ""filename.txt""" & Chr(10) & _
+            Chr(10) & _
+            "/language:""fr"" - Language option" & Chr(10)& _
             "/voice:""Microsoft Hortense Desktop - French""" & _
-            chr(10) & _
-            "/rate:-3 - Minimum -10 & Maximum 10" & chr(10) & _
-            "/soundfile:""C:\xxx.wav"" - sound file path" & chr(10) & _
+            Chr(10) & _
+            "/rate:-3 - Minimum -10 & Maximum 10" & Chr(10) & _
+            "/soundfile:""C:\xxx.wav"" - sound file path" & Chr(10) & _
             "/imagefile:""C:\xxx.[png|jpg]"" - input png or jpg for album" & _
-            " cover" & chr(10) & _
+            " cover" & Chr(10) & _
             "/sDimensions = ""400x400"" - suggested album" & _
-            " cover size in pixels" & chr(10) & _
+            " cover size in pixels" & Chr(10) & _
             """filename.txt"" Text Document to read (required)"
-    msgBox s1, 0, APP_NAME
+    MsgBox s1, 0, APP_NAME
 End Sub
 
 
@@ -219,20 +219,20 @@ Function EscapeReturnsAndReplaceQuotes(sA)
 
     EscapeReturnsAndReplaceQuotes = ""
     ' Not all audio players can show lyrics longer than 1000 characters.
-    If len(sA) > 1000 then
-	sA = left(sA, 996) & " ..."
-    Elseif sA = "" then
+    If Len(sA) > 1000 Then
+        sA = Left(sA, 996) & " ..."
+    ElseIf sA = "" Then
         Exit Function
-    End if
-    s1 = Replace(sA, chr(13), "\n")  ' escaped CR
-    s1 = Replace(s1, " """, " ì" )  ' SPACE, left double quote
-    s1 = Replace(s1, chr(10) & """", chr(10) & "ì" )  ' LF, left double quote
-    s1 = Replace(s1, chr(9) & """", chr(9) & "ì" )  ' TAB, left double quote
-    s1 = Replace(s1, "(" & """", "(ì" )  ' left (, left double quote
-    s1 = Replace(s1, "[" & """", "[ì" )  ' left [, left double quote
-    s1 = Replace(s1, "*" & """", "*ì" )  ' *, left double quote from markdown
-    s1 = Replace(s1, "_" & """", "_ì" )  ' _, left double quote from markdown
-    s1 = Replace(s1, """", "î" )  ' all others, right double quote
+    End If
+    s1 = Replace(sA, Chr(13), "\n")  ' escaped CR
+    s1 = Replace(s1, " """, " ‚Äú" )  ' SPACE, left double quote
+    s1 = Replace(s1, Chr(10) & """", Chr(10) & "‚Äú" )  ' LF, left double quote
+    s1 = Replace(s1, Chr(9) & """", Chr(9) & "‚Äú" )  ' TAB, left double quote
+    s1 = Replace(s1, "(" & """", "(‚Äú" )  ' left (, left double quote
+    s1 = Replace(s1, "[" & """", "[‚Äú" )  ' left [, left double quote
+    s1 = Replace(s1, "*" & """", "*‚Äú" )  ' *, left double quote from markdown
+    s1 = Replace(s1, "_" & """", "_‚Äú" )  ' _, left double quote from markdown
+    s1 = Replace(s1, """", "‚Äù" )  ' all others, right double quote
     EscapeReturnsAndReplaceQuotes = s1
 End Function
 
@@ -252,18 +252,18 @@ Function doExecute(sA, bWaitTilDone)
     Dim oExec
     Dim WshShell
 
-    on error resume next
+    On Error Resume Next
     If Len(sA) > 0  Then
         Set WshShell = CreateObject("WScript.Shell")
         Set oExec = WshShell.Exec(sA)
-        If bWaitTilDone then
+        If bWaitTilDone Then
             Do While oExec.Status = 0
                  WScript.Sleep 100
             Loop
         End If
     End If
     If Err.Number <> 0 Then
-        msgBox Err.Description
+        MsgBox Err.Description
         doExecute = False
     Else
         doExecute = True
@@ -280,7 +280,7 @@ Function fbRemoveFile(sfilespec)
     If fso.FileExists(sfilespec) Then
         fso.DeleteFile sfilespec
     End If
-    fbRemoveFile = not(fso.FileExists(sfilespec))
+    fbRemoveFile = Not(fso.FileExists(sfilespec))
 End Function
 
 
@@ -295,7 +295,7 @@ Function fsMyInputBox(sA)
     Dim s4
     Dim s5
 
-    cr = chr(10)
+    cr = Chr(10)
     s1 = EscapeReturnsAndReplaceQuotes(fsMetaalbum)
     s2 = EscapeReturnsAndReplaceQuotes(fsMetaId)
     s3 = EscapeReturnsAndReplaceQuotes(fsMetagenre)
@@ -341,34 +341,34 @@ Function fbIsAppDataFile(sA, bTattle)
     Set WshShell = CreateObject("WScript.Shell")
     Set WshEnv = WshShell.Environment("Process")
     s2 = ""
-    s1 = WshEnv("ALLUSERSPROFILE") & chr(10) & _
-            WshEnv("APPDATA") & chr(10) & _
-            WshEnv("LOCALAPPDATA") & chr(10) & _
-            ".oxt" & chr(10) & _
-            WshEnv("ProgramData") & chr(10) & _
-            WshEnv("ProgramFiles(x86)") & chr(10) & _
-            WshEnv("ProgramFiles") & chr(10) & _
-            WshEnv("ProgramW6432") & chr(10) & _
-            WshEnv("SystemDrive") & "\opt" & chr(10) & _
-            WshEnv("SystemRoot") & chr(10) & _
-            "uno_packages" & chr(10) & _
-            WshEnv("USERPROFILE") & "\opt" & chr(10) & _
+    s1 = WshEnv("ALLUSERSPROFILE") & Chr(10) & _
+            WshEnv("APPDATA") & Chr(10) & _
+            WshEnv("LOCALAPPDATA") & Chr(10) & _
+            ".oxt" & Chr(10) & _
+            WshEnv("ProgramData") & Chr(10) & _
+            WshEnv("ProgramFiles(x86)") & Chr(10) & _
+            WshEnv("ProgramFiles") & Chr(10) & _
+            WshEnv("ProgramW6432") & Chr(10) & _
+            WshEnv("SystemDrive") & "\opt" & Chr(10) & _
+            WshEnv("SystemRoot") & Chr(10) & _
+            "uno_packages" & Chr(10) & _
+            WshEnv("USERPROFILE") & "\opt" & Chr(10) & _
             WshEnv("windir")
-    a1 = split(s1, (chr(10)))
-    If len(sA) > 0 Then
-        For n = Lbound(a1) to Ubound(a1)
-            If len(a1(n)) > 0 Then
-                If Instr(sA, a1(n)) > 0 Then
+    a1 = Split(s1, (Chr(10)))
+    If Len(sA) > 0 Then
+        For n = LBound(a1) To UBound(a1)
+            If Len(a1(n)) > 0 Then
+                If InStr(sA, a1(n)) > 0 Then
                     fbIsAppDataFile = True
                     s2 = a1(n)
                     Exit For
                 End If
-            End if
+            End If
         Next
     End If
-    if fbIsAppDataFile = True and bTattle = True Then
+    If fbIsAppDataFile = True And bTattle = True Then
         b1 = InputBox("Restricted path!", APP_NAME, sA)
-    end if
+    End If
 End Function
 
 
@@ -381,12 +381,12 @@ Function canUseSpeechXML
 
     canUseSpeechXML = False
     Set SystemSet = GetObject("winmgmts:").InstancesOf("Win32_OperatingSystem")
-    for each System in SystemSet 
+    For Each System in SystemSet 
         VerBig = Left(System.Version,3)
         If CLng(VerBig) > 5.1 Then
             canUseSpeechXML=True
         End If
-    next
+    Next
 End Function
 
 
@@ -409,7 +409,7 @@ Function myOptPath(appName)
     s2 = WshEnv("USERPROFILE") & "\opt\" & appName
     If fbFileExists(s1) Then
         myOptPath = s1
-    Elseif fbFileExists(s2) Then
+    ElseIf fbFileExists(s2) Then
         myOptPath = s2
     End If
 End Function
@@ -431,7 +431,7 @@ Function myAudacityLamePath
     s2 = WshEnv("ProgramFiles") & "\Lame For Audacity\lame.exe"
     If fbFileExists(s1) Then
         myAudacityLamePath = s1
-    Elseif fbFileExists(s2) Then
+    ElseIf fbFileExists(s2) Then
         myAudacityLamePath = s2
     End If
 End Function
@@ -458,7 +458,7 @@ Function wav2ogg(wavfile, outfile, sMyWords)
     If fbFileExists(s1) Then
         sPpath = s1
         sPname = s1
-    Elseif fbFileExists(s2) Then
+    ElseIf fbFileExists(s2) Then
         sPpath = s2
         sPname = s2
     Else
@@ -541,7 +541,7 @@ Function wav2flac(wavfile, outfile, sMyWords, sImage)
         Exit Function
     End If
     s2 = outfile
-    If Len(sImage) > 0 and fbFileExists(sImage) Then
+    If Len(sImage) > 0 And fbFileExists(sImage) Then
         s3 = " --picture=""" & sImage & """ " 
     Else
         s3 = ""
@@ -581,7 +581,7 @@ Function wav2m4a(wavfile, outFile, sMyWords, sImage)
     If fbFileExists(s1) Then
         sPpath = s1
         sPname = s1
-    Elseif fbFileExists(s2) Then
+    ElseIf fbFileExists(s2) Then
         sPpath = s2
         sPname = s2
     Else
@@ -623,10 +623,10 @@ Function fbTagM4a(s2, sMyWords, sImage)
     fbTagM4a = False
     s1 = myOptPath("neroAacTag.exe")
     s3 = fsVerifiedMetatitle
-    if s3 = "" then
-        exit function
-    end if
-    If fbFileExists(s1) and fbFileExists(s2) Then
+    If s3 = "" Then
+        Exit Function
+    End If
+    If fbFileExists(s1) And fbFileExists(s2) Then
         sMeta = " -meta:album="""& fsMetaalbum & _
                 """ -meta:artist=""" & fsMetaId & _
                 """ -meta:composer=""" & fsMetaId & _
@@ -634,9 +634,9 @@ Function fbTagM4a(s2, sMyWords, sImage)
                 """ -meta:genre=""" & fsMetagenre & _
                 """ -meta:title=""" & s3 & _
                 """ -meta:track=""" & fsMetatrack & _
-                """ -meta:year=""" & year(Now) & _
+                """ -meta:year=""" & Year(Now) & _
                 """ "
-        If Len(sImage) > 0 and fbFileExists(sImage) Then
+        If Len(sImage) > 0 And fbFileExists(sImage) Then
             sMeta = sMeta & "-add-cover:front:""" & sImage & """ "
         End If
         If Len(sMyWords) > 0 Then
@@ -665,7 +665,7 @@ Function wav2mp3(wavfile, outFile, sImage)
     wav2mp3 = False
     On Error Resume Next
     s1 = myOptPath("lame.exe")
-    If len(s1) = 0 then
+    If Len(s1) = 0 Then
         ' Look for lame.exe in the Audacity lame library
         s1 = myAudacityLamePath()
     End If
@@ -687,8 +687,8 @@ Function wav2mp3(wavfile, outFile, sImage)
                 """ --tg """ & fsMetagenre & _
                 """ "
     End If
-    If Len(sImage) > 0 and fbFileExists(sImage) Then
-        Select Case lcase(strExt(sImage))
+    If Len(sImage) > 0 And fbFileExists(sImage) Then
+        Select Case LCase(strExt(sImage))
         Case ".jpg", ".jpeg", ".png", ".gif"
             sMeta = sMeta & " --ti """ & simage & """ "
         Case Else
@@ -799,8 +799,8 @@ Sub removeMetaFiles()
     Dim n
 
     s1 = sLockPath("lock")
-    a1 = split(".album,.genre,.id,.title,.track", ",")
-    For n = Lbound(a1) To Ubound(a1)
+    a1 = Split(".album,.genre,.id,.title,.track", ",")
+    For n = LBound(a1) To UBound(a1)
         fbRemoveFile s1 & a1(n)
     Next
 End Sub
@@ -840,11 +840,11 @@ Function fsWhereIsFfmpeg()
     retval = ""
     If fbFileExists(c6) Then
         retval = c6
-    Elseif fbFileExists(c7) Then
+    ElseIf fbFileExists(c7) Then
         retval = c7
-    Elseif fbFileExists(c8) Then
+    ElseIf fbFileExists(c8) Then
         retval = c8
-    Elseif fbFileExists(c5) Then
+    ElseIf fbFileExists(c5) Then
         retval = c5
     ElseIf fbFileExists(c1 & c3) Then
         retval = c1 & c3
@@ -883,31 +883,31 @@ Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
     wav2iTunes = False
     On Error Resume Next
     vers = "Unknown version"
-    set iTunesApp = WScript.CreateObject("iTunes.Application.1")
+    Set iTunesApp = WScript.CreateObject("iTunes.Application.1")
     vers = iTunesApp.Version
-    set encoderCollection = iTunesApp.Encoders
+    Set encoderCollection = iTunesApp.Encoders
     oldEncoder = iTunesApp.CurrentEncoder
     myExt = strExt(sOut2file)
     Select Case myExt
         Case ".mp3"
-            set encoder = encoderCollection.ItemByName("MP3 Encoder")
+            Set encoder = encoderCollection.ItemByName("MP3 Encoder")
         Case ".aif",".aiff"
-            set encoder = encoderCollection.ItemByName("AIFF Encoder")
+            Set encoder = encoderCollection.ItemByName("AIFF Encoder")
         Case Else ' ".m4a",".aac", ""
-            set encoder = encoderCollection.ItemByName("AAC Encoder")
+            Set encoder = encoderCollection.ItemByName("AAC Encoder")
     End Select
     iTunesApp.CurrentEncoder = encoder
-    set fso = CreateObject("Scripting.FileSystemObject")  
-    set opStatus = iTunesApp.ConvertFile(wavfile)
-    while opStatus.InProgress
+    Set fso = CreateObject("Scripting.FileSystemObject")  
+    Set opStatus = iTunesApp.ConvertFile(wavfile)
+    While opStatus.InProgress
         WScript.Sleep 1000
-    wend
+    Wend
     WScript.Sleep 1000 'Make sure itunes is done
     iTunesApp.CurrentEncoder=oldEncoder
     s3 = fsVerifiedMetatitle
-    If len(s3) > 0 Then
+    If Len(s3) > 0 Then
        ' Add metadata
-       set track = opStatus.Tracks.Item(1)
+       Set track = opStatus.Tracks.Item(1)
        track.Album = fsMetaalbum()
        track.Artist = fsMetaId()
        track.Composer = fsMetaId()
@@ -916,19 +916,19 @@ Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
        track.Name = s3
        track.TrackNumber = fsMetatrack()
        track.Year = Year(Now)
-       If Len(sImage) > 0 and fbFileExists(sImage) Then
+       If Len(sImage) > 0 And fbFileExists(sImage) Then
            track.AddArtworkFromFile(sImage)
        End If
     End If
-    set outfile=fso.GetFile(track.Location)
+    Set outfile=fso.GetFile(track.Location)
     If Len(sOut2file) > 0 Then 
         outfile.copy(sOut2file)
     End If
     If bplay Then
         track.Play()
     End If
-    If Err <> 0 and Err <> 13 Then
-        Usage "Did not find a supported iTunes version" & chr(10) & vers & chr(10) & Err.Description
+    If Err <> 0 And Err <> 13 Then
+        Usage "Did not find a supported iTunes version" & Chr(10) & vers & Chr(10) & Err.Description
         Wscript.Exit(0)
     Else
         If fbFileExists(outfile) Then
@@ -968,7 +968,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
     Dim sFileNameExt
     Dim sPreProcess
 
-    cr= chr(10)
+    cr= Chr(10)
     wav2FFmpeg = False 'default when exiting Function before creating a file
     doJob = ""
     doJob1 = ""
@@ -983,7 +983,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
 
     myConverter = fsWhereIsFfmpeg()
     If Len(myConverter) = 0 Then
-        exit function
+        Exit Function
     End If
 
 ' ###Which codecs can skip the preflight check?
@@ -996,14 +996,14 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
              ' Nero is recommended for producing standards compliant m4a output.
              ' [Nero m4a encoder][2]
              ' [2]:(http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php)
-                 exit function
+                 Exit Function
             End If
         Case ".mp3"
             sPreProcess=""
             sPostProcess= ""
             If fbFileExists("C:\opt\lame.exe") Then
                 ' You appear to prefer the lame encoder.
-                exit function
+                Exit Function
             End If
         Case ".aif", ".aiff"
             ' Lossless audio interchange format
@@ -1016,14 +1016,14 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
             sPostProcess= ""
             If fbFileExists("C:\opt\flac.exe") Then
                 ' You appear to prefer the flac conversion utility.
-                exit function
+                Exit Function
             End If
         Case ".ogg"
             sPreProcess=""
             sPostProcess= ""
             If fbFileExists("C:\opt\oggenc2.exe") Then
                 ' You appear to prefer the oggenc2 conversion utility.
-                exit function
+                Exit Function
             End If
         Case ".webm"
             ' Webm - web media file for Chromium, Google Chrome and Firefox.
@@ -1035,7 +1035,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
             sPreProcess="preFlightCheck"
             sPostProcess= ""
         Case Else ' ".aac"
-            exit function
+            Exit Function
     End Select
 
 ' ###Ffmpeg metadata
@@ -1073,7 +1073,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
         If sPreProcess="preFlightCheck" Then
             retval = fsMyInputBox(doJob)
             If Len(retVal) = 0 Then
-                exit function
+                Exit Function
             Else
                 doJob = retVal
             End If
@@ -1081,11 +1081,11 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
         b1 = doExecute(doJob, True)
 
         ' Add the image
-        If Len(sImage) > 0 and fbFileExists(sImage) Then 
-            If sPreProcess="preFlightCheck" or sPreProcess="postFlightCheck" Then
+        If Len(sImage) > 0 And fbFileExists(sImage) Then 
+            If sPreProcess="preFlightCheck" Or sPreProcess="postFlightCheck" Then
                 retval = fsMyInputBox(doJob2)
                 If Len(retVal) = 0 Then
-                    exit function
+                    Exit Function
                 Else
                     doJob2 = retVal
                 End If
@@ -1101,7 +1101,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
         If sPreProcess="preFlightCheck" Then
             retval = fsMyInputBox( doJob )
             If Len(retVal) = 0 Then
-                exit function
+                Exit Function
             Else
                 doJob = retVal
             End If
@@ -1118,7 +1118,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
         If sPreProcess="preFlightCheck" Then
             retval = fsMyInputBox( doJob1 )
             If Len(retVal) = 0 Then
-                exit function
+                Exit Function
             Else
                 doJob1 = retVal
             End If
@@ -1139,10 +1139,10 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
                 " -maxrate 10000000 -bufsize 10000000 -f mp4" & _
                 " -threads 0 -strict experimental " & ffmeta & _
                 " -y """ & sOutName & """ "
-        If sPreProcess="preFlightCheck" or "postFlightCheck" Then
+        If sPreProcess="preFlightCheck" Or "postFlightCheck" Then
             retval = fsMyInputBox( doJob1 )
             If Len(retVal) = 0 Then
-                exit function
+                Exit Function
             Else
                 doJob1 = retVal
             End If
@@ -1152,7 +1152,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
         If sPreProcess="postFlightCheck" Then
             retval = fsMyInputBox( doJob2 )
             If Len(retVal) = 0 Then
-                exit function
+                Exit Function
             Else
                 doJob2 = retVal
             End If
@@ -1179,7 +1179,7 @@ Function AddLanguageCodes(s1, s4)
     Dim s2
     Dim s3
 
-    s1 = Lcase(s1)
+    s1 = LCase(s1)
     If canUseSpeechXML Then
         ' With Sapi 5.3 and above we use the ISO language code
         s3 = "<?xml version = ""1.0""?>"
@@ -1189,256 +1189,14 @@ Function AddLanguageCodes(s1, s4)
         s3 = s3 & " xsi:schemaLocation = ""http://www.w3.org/2001/10/synthesis"
         s3 = s3 & " http://www.w3.org/TR/speech-synthesis/synthesis.xsd"""
         s3 = s3 & " xml:lang = """
-        s3 = s3 & s1
+        s3 = s3 & fsWindowsCloseMatchLanguage(s1)
         s3 = s3 & """> "
         s3 = s3 & s4
         s3 = s3 & "</speak>"
     Else
         ' XP  Sapi 5.1- we look up the Microsoft language code
-        Select Case s1
-        Case "en"
-            s2 = "409"
-        Case "en-us","","zxx"
-            s2 = "409"
-        Case "en-gb","en-vg","en-io","en-gg"
-            s2 = "809"
-        Case "en-au"
-            s2 = "c09"
-        Case "en-bz"
-            s2 = "2809"
-        Case "en-ca"
-            s2 = "1009"
-        Case "en-bs"
-            s2 = "2409"
-        Case "en-hk"
-            s2 = "3c09"
-        Case "en-in"
-            s2 = "4009"
-        Case "en-id"
-            s2 = "3809"
-        Case "en-ie"
-            s2 = "1809"
-        Case "en-jm"
-            s2 = "2009"
-        Case "en-my"
-            s2 = "4409"
-        Case "en-nz"
-            s2 = "1409"
-        Case "en-ph"
-            s2 = "3409"
-        Case "en-sg"
-            s2 = "4809"
-        Case "en-za"
-            s2 = "1c09"
-        Case "en-tt"
-            s2 = "2c09"
-        Case "en-zw"
-            s2 = "3009"
-        Case "fr-be"
-            s2 = "80c"
-        Case "fr-ca"
-            s2 = "c0c"
-        Case "fr-cg"
-            s2 = "240c"
-        Case "fr-ch"
-            s2 = "100c"
-        Case "fr-ci"
-            s2 = "300c"
-        Case "fr-cm"
-            s2 = "2c0c"
-        Case "fr-fr","fr"
-            s2 = "40c"
-        Case "fr-ht"
-            s2 = "3c0c"
-        Case "fr-lu"
-            s2 = "140c"
-        Case "fr-ma"
-            s2 = "380c"
-        Case "fr-mc"
-            s2 = "180c"
-        Case "fr-ml"
-            s2 = "340c"
-        Case "fr-re"
-            s2 = "200c"
-        Case "fr-sn"
-            s2 = "280c"
-        Case "it","it-it"
-            s2 = "410"
-        Case "de-at"
-            s2 = "c07"
-        Case "de-ch"
-            s2 = "807"
-        Case "de-de","de"
-            s2 = "407"
-        Case "de-li"
-            s2 = "1407"
-        Case "de-lu"
-            s2 = "1007"
-        Case "es-es","es"
-            s2 = "c0a"
-        Case "es-ar"
-            s2 = "2c0a"
-        Case "es-bo"
-            s2 = "400a"
-        Case "es-cl"
-            s2 = "340a"
-        Case "es-co"
-            s2 = "240a"
-        Case "es-cr"
-            s2 = "140a"
-        Case "es-do"
-            s2 = "1c0a"
-        Case "es-ec"
-            s2 = "300a"
-        Case "es-sv"
-            s2 = "440a"
-        Case "es-gt"
-            s2 = "100a"
-        Case "es-hn"
-            s2 = "480a"
-        Case "es-mx"
-            s2 = "80a"
-        Case "es-ni"
-            s2 = "4c0a"
-        Case "es-pa"
-            s2 = "180a"
-        Case "es-py"
-            s2 = "3c0a"
-        Case "es-pe"
-            s2 = "280a"
-        Case "es-pr"
-            s2 = "500a"
-        Case "es-us"
-            s2 = "540a"
-        Case "es-uy"
-            s2 = "380a"
-        Case "es-ve"
-            s2 = "200a"
-        Case "ru","ru-ru"
-            s2 = "419" 
-        Case "hi", "hi-in"
-            s2 = "439"
-        Case "af","af-za"
-            s2 = "436"
-        Case "ar-sa","ar"
-            s2 = "401"
-        Case "ar-dz"
-            s2 = "1401"
-        Case "ar-bh"
-            s2 = "3c01"
-        Case "ar-eg"
-            s2 = "c01"
-        Case "ar-iq"
-            s2 = "801"
-        Case "ar-jo"
-            s2 = "2c01"
-        Case "ar-kw"
-            s2 = "3401"
-        Case "ar-lb"
-            s2 = "3001"
-        Case "ar-ly"
-            s2 = "1001"
-        Case "ar-ma"
-            s2 = "1801"
-        Case "ar-om"
-            s2 = "2001"
-        Case "ar-qa"
-            s2 = "4001"
-        Case "ar-sy"
-            s2 = "2801"
-        Case "ar-tn"
-            s2 = "1c01"
-        Case "ar-ae"
-            s2 = "3801"
-        Case "ar-ye"
-            s2 = "2401"
-        Case "eu","eu-fr","eu-es"
-            s2 = "42D"
-        Case "bg","bg-bg"
-            s2 = "402"
-        Case "ca","ca-es"
-            s2 = "403"
-        Case "cs","cs-cz"
-            s2 = "405"
-        Case "cy","cy-uk","cy-gb"
-            s2 = "452"
-        Case "da","da-dk"
-            s2 = "406"
-        Case "et","et-ee"
-            s2 = "425"
-        Case "fi","fi-fi"
-            s2 = "40b"
-        Case "ka","ka-ge"
-            s2 = "437"
-        Case "hl","hl-gr"
-            s2 = "408"
-        Case "he","he-il"
-            s2 = "40d"
-        Case "hr","hr-hr"
-            s2 = "41a"  
-        Case "hu","hu-hu"
-            s2 = "40e"
-        Case "is","is-is"
-            s2 = "40f"
-        Case "ga","ga-ie"
-            s2 = "83c"  
-        Case "gd","gd-uk","gd-gb"
-            s2 = "43c"
-        Case "id","id-id"
-            s2 = "421"
-        Case "ja","ja-jp"
-            s2 = "411"
-        Case "ko","ko-kp","ko-kr"
-            s2 = "412"
-        Case "ms","ms-sg","ms-my","ms-id","ms-bn"
-            s2 = "43E"
-        Case "mo-mn","mo"
-            s2 = "850"
-        Case "nl","nl-nl"
-            s2 = "413"
-        Case "nl","nl-be"
-            s2 = "813"
-        Case "no","no-no","nb","nb-no"
-            s2 = "414"
-        Case "nn","nn-no"
-            s2 = "814"
-        Case "pl","pl-pl"
-            s2 = "415"
-        Case "pt-br"
-            s2 = "416"
-        Case "pt-pt","pt"
-            s2 = "816"
-        Case "ro","ro-ro"
-            s2 = "418" 
-        Case "sk","sk-sk"
-            s2 = "41b"
-        Case "sl","sl-si"
-            s2 = "424"
-        Case "sv","sv-se"
-            s2 = "41D"
-        Case "th","th-th"
-            s2 = "41E"
-        Case "tl","tl-ph"
-            s2 = "464"
-        Case "tr","tr-tr"
-            s2 = "41f"
-        Case "uk","uk-ua"
-            s2 = "422"
-        Case "vi","vi-vn"
-            s2 = "42a"
-        Case "zh","zh-cn"
-            s2 = "804"
-        Case "zh-tw"
-            s2 = "404"
-        Case "zh-hk"
-            s2 = "c04"
-        Case "zh-sg"
-            s2 = "1004"
-        Case "zh-mo"
-            s2 = "1404"
-        Case Else
-            s2 = "9" 'en if XP (5.1) can`t tell language.
-        End Select
+                s2 = fsIsoToHumanReadable(s1, 3)
+                If s2 = "1000" Then s2 = "409"  ' Use en-US if undefined language
         s3 = "<speak><lang langid = """
         s3 = s3 & s2
         s3 = s3 & """> "
@@ -1515,20 +1273,20 @@ Function SayIt(s1, sRate, sVoice)
         Else
             n=0
             While n<Sapi.GetVoices.Count
-                If Instr(Lcase(Sapi.GetVoices.Item(n).GetDescription), _
-                        Lcase(sVoice)) > 0 Then
+                If InStr(LCase(Sapi.GetVoices.Item(n).GetDescription), _
+                        LCase(sVoice)) > 0 Then
                     Set Sapi.Voice=Sapi.GetVoices.Item(n)
                     n=Sapi.GetVoices.Count
                 Else
                     n=n+1
                 End If
-            WEnd
-            Sapi.Rate=int(sRate)
+            Wend
+            Sapi.Rate=Int(sRate)
             Sapi.Speak "", 1
             Sapi.Speak s1, 3
             Do
                 WScript.Sleep 100
-            Loop Until Sapi.WaitUntilDone(1) or _
+            Loop Until Sapi.WaitUntilDone(1) Or _
                     (objFSO.FileExists(TaskLock) = False)
             Set Sapi=Nothing 
         End If
@@ -1567,31 +1325,31 @@ Function WriteIt(s1, _
     Do
         WScript.Sleep 100
     Loop Until Sapi.WaitUntilDone(1)
-    bOK = false
+    bOK = False
     sLastProcess = APP_NAME
     If Sapi Is Nothing Then
         Usage "FAILED Sapi.SpVoice creation. SAPI ne pouvait pas faire une voix."
     Else
         n=0
         While n<Sapi.GetVoices.Count
-            If instr(Lcase(Sapi.GetVoices.Item(n).GetDescription),Lcase(sVoice)) > 0 Then
+            If InStr(LCase(Sapi.GetVoices.Item(n).GetDescription),LCase(sVoice)) > 0 Then
                 Set Sapi.Voice=Sapi.GetVoices.Item(n)
                 n=Sapi.GetVoices.Count
             Else
                 n=n+1
             End If
-        WEnd
-        Sapi.Rate=int(sRate)
+        Wend
+        Sapi.Rate=Int(sRate)
         If fbFileExists (sFileName) Then 
             fbRemoveFile sFileName
         End If
         sFileNameExt=strExt(sFileName)
-        select case sFileNameExt
-        case ".wav"
+        Select Case sFileNameExt
+        Case ".wav"
     sWavename = sFileName
-        case else
+        Case Else
     sWavename = sFileName & ".wav"
-        end select
+        End Select
         Set ss=CreateObject("Sapi.SpFileStream") 
         ss.Format.Type = AUDIO_FORMAT
         ss.Open sWaveName,ForWriting,False 
@@ -1601,60 +1359,60 @@ Function WriteIt(s1, _
         ss.Close 
         Set ss = Nothing
         sLastProcess = "ffmpeg"
-        if sFileNameExt = ".wav" then
+        If sFileNameExt = ".wav" Then
             sLastProcess = "Speech API"
-        elseif Lcase(sLibre) = "true" then
-            select case sFileNameExt
-            case ".aif", ".aiff"
+        ElseIf LCase(sLibre) = "true" Then
+            Select Case sFileNameExt
+            Case ".aif", ".aiff"
                 bOK = wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions)
-            case ".flac"
-                if wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions) = false then
+            Case ".flac"
+                If wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions) = False Then
                      sLastProcess = "flac"
                      bOK = wav2Flac(sWaveName, sFileName, sMyWords, sImage)
-                end if
-            case ".m4a"
+                End If
+            Case ".m4a"
                 sLastProcess = "M4A encoder"
-                if wav2m4a(sWaveName, sFileName, sMyWords, sImage) = false then
+                If wav2m4a(sWaveName, sFileName, sMyWords, sImage) = False Then
                      sLastProcess = "ffmpeg"
                      bOK = wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions)
-                end if  
-            case ".mp3"
-                if wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions) = false then
+                End If  
+            Case ".mp3"
+                If wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions) = False Then
                      sLastProcess = "lame"
                      bOK = wav2mp3(sWaveName, sFileName, sImage)
-                end if
-            case ".ogg"
+                End If
+            Case ".ogg"
                 sLastProcess = "OGG Encoder"
-                if wav2Ogg(sWaveName,sFileName, sMyWords) = false then
+                If wav2Ogg(sWaveName,sFileName, sMyWords) = False Then
                      sLastProcess = "ffmpeg"
                      bOK = wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions) 
-                end if
-            case else
+                End If
+            Case Else
                 ' Format was not tested, is experimental or is not normally used
                 ' with speech clips.
-                 bOK = false
-            end select
-        else
+                 bOK = False
+            End Select
+        Else
             ' use iTunes
             sLastProcess = "iTunes"
-            bPlay = false
-            select case sFileNameExt
-            case ".aac", ".aif", ".aiff", ".m4a", ".mp3"
+            bPlay = False
+            Select Case sFileNameExt
+            Case ".aac", ".aif", ".aiff", ".m4a", ".mp3"
                 bOK = wav2iTunes(sWaveName, sFileName, sMyWords, sImage, bPlay)
-            case else
-                bOK = false
-            end select
-        end if
-    end if
-    sLang = GetLocale()
-    If fbFileExists(sFileName) then
-        bOK = true
+            Case Else
+                bOK = False
+            End Select
+        End If
+    End If
+    sLang = fsIsoToHumanReadable(fsDec2Hex(Int(GetLocale())), 0)
+    If fbFileExists(sFileName) Then
+        bOK = True
         PlaySound "C:\Windows\Media\notify.wav"
         PopMsgBox sFileName, _
                 "<b>" & sLastProcess & "</b> : " & fsDone(sLang), _
                 APP_NAME
-    ElseIf fbFileExists(sWaveName) then
-        bOK = true
+    ElseIf fbFileExists(sWaveName) Then
+        bOK = True
         PlaySound "C:\Windows\Media\chord.wav"
         PopMsgBox "<i>" & sWaveName & "</i>", _
                 "<b>" & sLastProcess & "</b> : " & fsDone(sLang), _
@@ -1665,10 +1423,10 @@ Function WriteIt(s1, _
     fbRemoveFile s3 & ".album"
     fbRemoveFile s3 & ".id"
     fbRemoveFile s3 & ".title"
-    bTattle = false
-    if len(sImage) > 0 and not(fbIsAppDataFile(sImage, bTattle)) then
+    bTattle = False
+    If Len(sImage) > 0 And Not(fbIsAppDataFile(sImage, bTattle)) Then
         ' Remove the temporary song front cover art image created by Impress.
-        For n = 1 to 40
+        For n = 1 To 40
             fbRemoveFile sImage
             If fbFileExists(sImage) Then
                 ' File is in use and can't be deleted yet.
@@ -1677,104 +1435,94 @@ Function WriteIt(s1, _
                 Exit For
             End If
         Next
-    end if
+    End If
     WriteIt = bOK
 End Function
 
 
 Function fsDone(b)
     '''
-    ' b - the language name or decimal LCID of a culture group. Returns the 
+    ' b - the language name of a culture group. Returns the 
     ' word "Done"
-    ' http://0xcc.net/jsescape/
-    ' http://www.microsoft.com/resources/msdn/goglobal/default.mspx
-    ' MSDN lists the LCID Culture identifiers in hexidecimal, but VBA needs 
-    ' decimal codes.
     '''
-    Select Case b
-    Case "af", "1078"
+    Select Case Left(b, 2)
+    Case "af"
         a1 = "Klaar"
-    Case "bg", "1026"
+    Case "bg"
         a1 = "&#1043;&#1086;&#1090;&#1086;&#1074;&#1086;"
-    Case "ca", "1027"
+    Case "ca"
         a1 = "Finalitzada"
-    Case "cs", "1029"
+    Case "cs"
         a1 = "&#68;&#111;&#107;&#111;&#110;&#269;&#101;&#110;&#111;"
-    Case "da","1030"
+    Case "da"
         a1 = "&#102;&#230;&#114;&#100;&#105;&#103;"
-    Case "de", "1031", "3079", "5127", "4103", "2055"
+    Case "de"
         a1 = "Beendet"
-    Case "el", "1032"
+    Case "el"
         a1 = "&#927;&#955;&#959;&#954;&#955;&#951;&#961;&#974;&#952;&#951;"
         a1 = a1 & "&#954;&#949;"
-    Case "en", "3081", "10249", "4105", "9225", "2057", "16393", "6153"
+    Case "en"
         a1 = "Done"
-    Case "8201", "5129", "13321", "7177", "11273", "1033", "12297"
-        a1 = "Done"
-    Case "es","11274", "16394", "13322", "9226", "5130", "7178", "12298"
+    Case "es"
         a1 = "Finalizado"
-    Case "17418", "4106", "18442", "2058", "19466", "6154", "15370", "10250"
-        a1 = "Finalizado"
-    Case "20490", "1034", "14346", "8202"
-        a1 = "Finalizado"
-    Case "fr", "3084", "1036", "2060", "11276","9228","12300","5132","13324"
+	Case "fr"
         a1 = "Termin&#233;"
-    Case "6156", "14348", "10252", "4108", "7180"
-        a1 = "Termin&#233;"
-    Case "et", "1061"
+    Case "et"
         a1 = "&#76;&#245;&#112;&#101;&#116;&#97;&#115;"
-    Case "fi", "1035"
+    Case "fi"
         a1 = "Valmiit"
-    Case "ga", "2108"
+    Case "ga"
         a1 = "Cr&#237;ochnaithe"
-    Case "hi", "1081"
+    Case "hi"
         a1 = "&#2360;&#2350;&#2366;&#2346;&#2381;&#2340;"
-    Case "hu", "1038"
+    Case "hu"
         a1 = "K&#233;sz"
-    Case "id", "1057"
+    Case "id"
         a1 = "Selesai"
-    Case "is", "1039"
+    Case "is"
         a1 = "&#108;&#111;&#107;&#105;&#240;"
-    Case "it", "1040", "2064"
+    Case "it"
         a1 = "Terminato"
-    Case "ja", "1041"
+    Case "ja"
         a1 = "&#23436;&#25104;"
-    Case "ko", "1042"
+    Case "ko"
         a1 = "&#50756;&#47308;"
-    Case "lv", "1062"
+    Case "lv"
         a1 = "Pabeigts"
-    Case "lt", "1063"
+    Case "lt"
         a1 = "Baigta"
-    Case "mt", "1082"
+    Case "mt"
         a1 = "Lest"
-    Case "nl", "1043"
+    Case "nl"
         a1 = "Voltooid"
-    Case "pl", "1045"
+    Case "pl"
         a1 = "Zakonczono"
-    Case "pt", "1046", "2072"
+    Case "pt"
         a1 = "Conclu&#237;do"
-    Case "ro", "1048"
+    Case "ro"
         a1 = "&#238;&#110;&#99;&#101;&#116;&#97;&#116;"
-    Case "ru", "1049", "2073"
+    Case "ru"
         a1 = "&#1047;&#1072;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1086;"
-    Case "sk", "1051"
+    Case "sk"
         a1 = "&#68;&#111;&#107;&#111;&#110;&#269;&#101;&#110;&#233;"
-    Case "sl", "1060"
+    Case "sl"
         a1 = "&#75;&#111;&#110;&#269;&#97;&#110;&#111;"
-    Case "sv", "2077", "1053"
+    Case "sv"
         a1 = "Slutf&#246;rt"
-    Case "sr", "3098", "2074"
+    Case "sr"
         a1 = "&#1047;&#1072;&#1074;&#1088;&#1096;&#1077;&#1085;&#1086;"
-    Case "tl", "fil", "1124"
+    Case "tl"
         a1 = "Tapos"
-    Case "tr", "1055"
+    Case "tr"
         a1 = "Bitirdi"
-    Case "uk", "1058"
+    Case "uk"
         a1 = "&#1047;&#1072;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1086;"
-    Case "zh-TW", "1028"
-        a1 = "&#2360;&#2350;&#2366;&#2346;&#2381;&#2340;"
-    Case "zh", "2052", "3076", "5124", "4100"
-        a1 = "&#2360;&#2350;&#2366;&#2346;&#2381;&#2340;"
+    Case "zh"
+		If InStr(b1, "TW") > 0 Then
+		    a1 = "&#2360;&#2350;&#2366;&#2346;&#2381;&#2340;"
+		Else
+            a1 = "&#2360;&#2350;&#2366;&#2346;&#2381;&#2340;"
+		End If
     Case Else '"en" English (default)
         a1 = "Done"
     End Select
@@ -1789,8 +1537,8 @@ Function PlaySound(sURL)
     '''
     Dim b1
     Dim o1
-    if fbFileExists(sURL) then
-        b1 = true
+    If fbFileExists(sURL) Then
+        b1 = True
         Set o1 = CreateObject("WMPlayer.OCX")
         o1.URL = sURL
         o1.controls.play 
@@ -1798,9 +1546,9 @@ Function PlaySound(sURL)
             WScript.Sleep 100
         Wend
         o1.close
-    else
-        b1 = false
-    end if
+    Else
+        b1 = False
+    End If
     PlaySound = b1
 End Function
 
@@ -1827,7 +1575,7 @@ Function fLogoSrc
     ' Read Text logo base 64 encoded data
     '''
     fLogoSrc = "data:image/png;base64,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"
-End function
+End Function
 
 
 Function getTextFileContent (strFileName, strCharSet)
@@ -1871,6 +1619,1153 @@ Function readFile(s0)
     readFile=getTextFileContent (s0,"UTF-8")
 End Function
 
+Function fsIsoToHumanReadable(sA, iForceEnglish)
+        Dim s1
+        s1 = "409"
+        ' Returns name of language, if known
+        Dim s2
+        s2 = "English (United States)"
+        Dim s3
+        s3 = "en-US"
+        Select Case LCase(sA)
+
+        Case "en-us", "english (united states)", "409"
+                s1 = "409"
+                s2="English (United States)"
+                s3 ="en-US"
+        Case "en-gb", "english (great britain)", "809"
+                s1 = "809"
+                s2= "English (Great Britain)"
+                s3 ="en-GB"
+        Case "en-vg", "english (british virgin islands)"
+                s1 = "809"
+                s2= "English (British Virgin Islands)"
+                s3 ="en-VG"
+        Case "en-io"
+                s1 = "809"
+                s2= "English (Great Britain)"
+                s3 ="en-IO"
+        Case "en-gg", "english (guernsey)"
+                s1 = "809"
+                s2="English (Guernsey)"
+                s3 ="en-GG"
+        Case "en-au", "english (australia)", "c09"
+                s1 = "c09"
+                s2="English (Australia)"
+                s3 ="en-AU"
+        Case "en-bz", "english (belize)", "2809"
+                s1 = "2809"
+                s2="English (Belize)"
+                s3 ="en-BZ"
+        Case "en-ca", "english (canada)", "1009"
+                s1 = "1009"
+                s2="English (Canada)"
+                s3 ="en-CA"
+        Case "en-bs", "english (bahamas)", "2409"
+                s1 = "2409"
+                s2="English (Bahamas)"
+                s3 ="en-BS"
+        Case "en-hk", "english (hong kong)", "3c09"
+           s1 = "3c09"
+                s2="English (Hong Kong)"
+                s3 ="en-HK"
+        Case "en-in", "english (india)", "4009"
+                s1 = "4009"
+                s2="English (India)"
+                s3 ="en-IN"
+        Case "en-id", "english (indonesia)", "3809"
+                s1 = "3809"
+                s2="English (Indonesia)"
+                s3 ="en-ID"
+        Case "en-ie", "english (ireland)", "1809"
+                s1 = "1809"
+                s2="English (Ireland)"
+                s3 ="en-IE"
+        Case "en-jm", "english (jamaica)", "2009"
+                s1 = "2009"
+                s2="English (Jamaica)"
+                s3 ="en-JM"
+        Case "en-my", "english (malaysia)", "4409"
+                s1 = "4409"
+                s2="English (Malaysia)"
+                s3 ="en-MY"
+        Case "en-nz", "english (new zealand)", "1409"
+                s1 = "1409"
+                s2="English (New Zealand)"
+                s3 ="en-NZ"
+        Case "en-ph", "english (philippines)", "3409"
+                s1 = "3409"
+                s2="English (Philippines)"
+                s3 ="en-PH"
+        Case "en-sg", "english (singapore)", "4809"
+                s1 = "4809"
+                s2="English (Singapore)"
+                s3 ="en-SG"
+        Case "en-za", "english (south africa)", "1c09"
+                s1 = "1c09"
+                s2="English (South Africa)"
+                s3 ="en-ZA"
+        Case "en-tt", "english (trinidad ", "2c09"
+                s1 = "2c09"
+                s2="English (Trinidad " 'sic
+                s3 ="en-TT"
+        Case "en-zw", "english (zimbabwe)", "3009"
+                s1 = "3009"
+                s2="English (Zimbabwe)"
+                s3 ="en-ZW"
+        Case "en", "english", "409"
+                s1 = "409"
+                s2="English"
+                s3 ="en"
+        Case "fr-be", "french (belgium)", "80c"
+                s1 = "80c"
+                s2="French (Belgium)"
+                s3 ="fr-BE"
+        Case "fr-ca", "french (canada)", "c0c"
+                s1 = "c0c"
+                s2="French (Canada)"
+                s3 ="fr-CA"
+        Case "fr-cg", "french (congo)", "240c"
+                s1 = "240c"
+                s2="French (Congo)"
+                s3 ="fr-CG"
+        Case "fr-ch", "french (switzerland)", "100c"
+                s1 = "100c"
+                s2="French (Switzerland)"
+                s3 ="fr-CH"
+        Case "fr-ci", "french (ivory coast)", "300c"
+                s1 = "300c"
+                s2="French (Ivory Coast)"
+                s3 ="fr-CI"
+        Case "fr-cm", "french (cameroon)", "2c0c"
+                s1 = "2c0c"
+                s2="French (Cameroon)"
+                s3 ="fr-CM"
+        Case "fr-fr", "french (france)", "40c"
+                s1 = "40c"
+                s2="French (France)"
+                s3 ="fr-FR"
+        Case "fr-ht", "french (haiti)", "3c0c"
+                s1 = "3c0c"
+                s2="French (Haiti)"
+                s3 ="fr-HT"
+        Case "fr-lu", "french (luxembourg)", "140c"
+                s1 = "140c"
+                s2="French (Luxembourg)"
+                s3 ="fr-LU"
+        Case "fr-ma", "french (morocco)", "380c"
+                s1 = "380c"
+                s2="French (Morocco)"
+                s3 ="fr-MA"
+        Case "fr-mc", "french (monaco)", "180c"
+                s1 = "180c"
+                s2="French (Monaco)"
+                s3 ="fr-MC"
+        Case "fr-ml", "french (mali)", "340c"
+                s1 = "340c"
+                s2="French (Mali)"
+                s3 ="fr-ML"
+        Case "fr-re", "french (reunion)", "200c"
+                s1 = "200c"
+                s2="French (Reunion)"
+                s3 ="fr-RE"
+        Case "fr-sn", "french (senegal)", "280c"
+                s1 = "280c"
+                s2="French (Senegal)"
+                s3 ="fr-SN"
+        Case "fr", "french", "40c"
+                s1 = "40c"
+                s2="French"
+                s3 ="fr"
+        Case "it","it-it", "italian", "410"
+                s1 = "410"
+                s2="Italian"
+                s3 ="it-IT"
+        Case "de-at", "german (austria)", "c07"
+                s1 = "c07"
+                s2="German (Austria)"
+                s3 ="de-AT"
+        Case "de-ch", "german (switzerland)", "807"
+                s1 = "807"
+                s2="German (Switzerland)"
+                s3 ="de-CH"
+        Case "de-de", "german (germany)", "407"
+                s1 = "407"
+                s2="German (Germany)"
+                s3 ="de-DE"
+        Case "de-li", "german (lithuania)", "1407"
+                s1 = "1407"
+                s2="German (Lithuania)"
+                s3 ="de-LI"
+        Case "de-lu", "german (luxembourg)", "1007"
+                s1 = "1007"
+                s2="German (Luxembourg)"
+                s3 ="de-LU"
+        Case "de", "german", "407"
+                s1 = "407"
+                s2="German"
+                s3 ="de"
+        Case "es-es", "spanish (spain)", "c0a"
+                s1 = "c0a"
+                s2="Spanish (Spain)"
+                s3 ="es-ES"
+        Case "es-ar", "spanish (argentina)", "2c0a"
+                s1 = "2c0a"
+                s2="Spanish (Argentina)"
+                s3 ="es-AR"
+        Case "es-bo", "spanish (bolivia)", "400a"
+                s1 = "400a"
+                s2="Spanish (Bolivia)"
+                s3 ="es-BO"
+        Case "es-cl", "spanish (chile)", "340a"
+                s1 = "340a"
+                s2="Spanish (Chile)"
+                s3 ="es-CL"
+        Case "es-co", "spanish (colombia)", "240a"
+                s1 = "240a"
+                s2="Spanish (Colombia)"
+                s3 ="es-CO"
+        Case "es-cr", "spanish (costa rica)", "140a"
+                s1 = "140a"
+                s2="Spanish (Costa Rica)"
+                s3 ="es-CR"
+        Case "es-do", "spanish (dominican republic)", "1c0a"
+                s1 = "1c0a"
+                s2="Spanish (Dominican Republic)"
+                s3 ="es-DO"
+        Case "es-ec", "spanish (ecuador)", "300a"
+                s1 = "300a"
+                s2="Spanish (Ecuador)"
+                s3 ="es-EC"
+        Case "es-sv", "spanish (svalbard)", "440a"
+                s1 = "440a"
+                s2="Spanish (Svalbard)"
+                s3 ="es-SV"
+        Case "es-gt", "spanish (guatemala)", "100a"
+                s1 = "100a"
+                s2="Spanish (Guatemala)"
+                s3 ="es-GT"
+        Case "es-hn", "spanish (honduras)", "480a"
+                s1 = "480a"
+                s2="Spanish (Honduras)"
+                s3 ="es-HN"
+        Case "es-mx", "spanish (mexico)", "80a"
+                s1 = "80a"
+                s2="Spanish (Mexico)"
+                s3 ="es-MX"
+        Case "es-ni", "spanish (nicaragua)", "4c0a"
+                s1 = "4c0a"
+                s2="Spanish (Nicaragua)"
+                s3 ="es-NI"
+        Case "es-pa", "spanish (panama)", "180a"
+                s1 = "180a"
+                s2="Spanish (Panama)"
+                s3 ="es-PA"
+        Case "es-py", "spanish (paraguay)", "3c0a"
+                s1 = "3c0a"
+                s2="Spanish (Paraguay)"
+                s3 = "es-PY"
+        Case "es-pe", "spanish (peru)", "280a"
+                s1 = "280a"
+                s2="Spanish (Peru)"
+                s3 ="es-PE"
+        Case "es-pr", "spanish (puerto rico)", "500a"
+                s1 = "500a"
+                s2="Spanish (Puerto Rico)"
+                s3 ="es-PR"
+        Case "es-us", "spanish (united states)", "540a"
+                s1 = "540a"
+                s2="Spanish (United States)"
+                s3 ="es-US"
+        Case "es-uy", "spanish (uraguay)", "540a"
+                s1 = "540a"
+                s2="Spanish (Uraguay)"
+                s3 ="es-UR"
+        Case "es-ve", "spanish (venezuela)", "200a"
+                s1 = "200a"
+                s2="Spanish (Venezuela)"
+                s3 ="es-VE"
+        Case "es", "spanish", "c0a"
+                s1 = "c0a"
+                s2="Spanish"
+                s3 ="es"
+        Case "ru", "ru-ru", "russian", "419"
+                s1 = "419"
+                s2="Russian"
+                s3 ="ru-RU"
+        Case "hi", "hi-in", "hindi", "439"
+                s1 = "439"
+                s2="Hindi"
+                s3 ="hi-IN"
+        Case "af", "af-za", "afrikaans", "436"
+                s1 = "436"
+                s2="Afrikaans"
+                s3 ="af-ZA"
+        Case "ak","ak-gh", "akan"
+                s1 = "1000"  ' XP Not supported 
+                s2="Akan"
+                s3 ="ak-GH"
+        Case "an","an-es", "argonese"
+                s1 = "1000"  ' XP Not supported 
+                s2="Argonese"
+                s3 ="an-ES"
+        Case "az","az-az", "azerbaijani"
+                s1 = "1000"  ' XP Not supported 
+                s2="Azerbaijani"
+                s3 ="az=AZ"
+        Case "ar-sa", "arabic (saudi arabia)", "401"
+                s1 = "401"
+                s2="Arabic (Saudi Arabia)"
+                s3 ="ar-SA"
+        Case "ar-dz", "arabic (algeria)", "1401"
+                s1 = "1401"
+                s2="Arabic (Algeria)"
+                s3 ="ar-DZ"
+        Case "ar-bh", "arabic (bhutan)", "3c01"
+                s1 = "3c01"
+                s2="Arabic (Bhutan)"
+                s3 ="ar-BH"
+        Case "ar-eg", "arabic (egypt)", "c01"
+                s1 = "c01"
+                s2="Arabic (Egypt)"
+                s3 ="ar-EG"
+        Case "ar-iq", "arabic (iraq)", "801"
+                s1 = "801"
+                s2="Arabic (Iraq)"
+                s3 ="ar-IQ"
+        Case "ar-jo", "arabic (jordan)", "2c01"
+                s1 = "2c01"
+                s2="Arabic (Jordan)"
+                s3 ="ar-JO"
+        Case "ar-kw", "arabic (kuwait)", "3401"
+                s1 = "3401"
+                s2="Arabic (Kuwait)"
+                s3 ="ar-KW"
+        Case "ar-lb", "arabic (lebanon)", "3001"
+                s1 = "3001"
+                s2="Arabic (Lebanon)"
+                s3 ="ar-LB"
+        Case "ar-ly", "arabic (libya)", "1001"
+                s1 = "1001"
+                s2="Arabic (Libya)"
+                s3 ="ar-LY"
+        Case "ar-ma", "arabic (moroco)", "1801"
+                s1 = "1801"
+                s2 = "Arabic (Morocco)"
+                s3 = "ar-MA"
+        Case "ar-om", "arabic (oman)", "2001"
+                s1 = "2001"
+                s2="Arabic (Oman)"
+                s3 ="ar-OM"
+        Case "ar-qa", "arabic (qatar)", "4001"
+                s1 = "4001"
+                s2="Arabic (Qatar)"
+                s3 ="ar-QA"
+        Case "ar-sy", "arabic (syria)", "2801"
+                s1 = "2801"
+                s2="Arabic (Syria)"
+                s3 ="ar-SY"
+        Case "ar-tn", "arabic (tunisia)", "1c01"
+                s1 = "1c01"
+                s2="Arabic (Tunisia)"
+                s3 ="ar-TU"
+        Case "ar-ae", "arabic (united arab emirates)", "3801"
+                s1 = "3801"
+                s2="Arabic (United Arab Emirates)"
+                s3 ="ar-AE"
+        Case "ar-ye", "arabic (yemen)", "2401"
+                s1 = "2401"
+                s2="Arabic (Yemen)"
+                s3 ="ar-YE"
+        Case "ar", "arabic", "401"
+                s1 = "401"
+                s2="Arabic"
+                s3 ="ar"
+        Case "be","be-by", "belarusian", "0423"
+                s1 - "0423"
+                s2="Belarusian"
+                s3 ="be-BY"
+        Case "bm","bm-ml", "bambara"
+                s1 = "1000"  ' XP Not supported 
+                s2="Bambara"
+                s3 ="bm-ML"
+        Case "beq","beq-cg", "beembe"
+                s1 = "1000"  ' XP Not supported 
+                s2="Beembe"
+                s3 ="beq-CG"
+        Case "bk","bkw-cg", "bekwel"
+                s1 = "1000"  ' XP Not supported 
+                s2="Bekwel"
+                s3 ="bk-CG"
+        Case "bn","bn-bd", "bengali"
+                s1 = "1000"  ' XP Not supported 
+                s2="Bengali"
+                s3 ="bn-BD"
+        Case "bs","bs-bn", "bosnian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Bosnian"
+                s3 ="bs-BN"
+        Case "buc","buc-yt", "bushi"
+                s1 = "1000"  ' XP Not supported 
+                s2="Bushi"
+                s3 ="buc-YT"
+        Case "eu","eu-fr","eu-es", "basque"
+                s1 = "1000"  ' XP Not supported 
+                s2="Basque"
+                s3 ="eu"
+        Case "bg","bg-bg", "bulgarian", "402"
+                s1 = "402"
+                s2="Bulgarian"
+                s3 ="bg-BG"
+        Case "ca","ca-es", "catalan", "403"
+                s1 = "403"
+                s2="Catalan"
+                s3 ="ca-ES"
+        Case "ceb","ceb-ph", "cebuano"
+                s1 = "1000"  ' XP Not supported 
+                s2="Cebuano"
+                s3 ="ceb-PH"
+        Case "cop","cop-eg", "coptic"
+                s1 = "1000"  ' XP Not supported 
+                s2="Coptic"
+                s3 ="cop-EG"
+        Case "csb","csb-pl", "kashubian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Kashubian"
+                s3 ="csb-PL"
+        Case "cv","cv-ru", "chuvash"
+                s1 = "1000"  ' XP Not supported 
+                s2="Chuvash"
+                s3 ="cv-RU"
+        Case "cs","cs-cz", "czech", "405"
+                s1 = "405"
+                s2="Czech"
+                s3 ="cs-CZ"
+        Case "cy","cy-gb", "welsh", "452"
+                s1 = "452"
+                s2="Welsh"
+                s3 ="cy-GB"
+        Case "da","da-dk", "danish", "406"
+                s1 = "406"
+                s2="Danish"
+                s3 ="da-DK"
+        Case "dsb","dsb-de", "sorbian, lower", "425"
+                s1 = "425"
+                s2="Sorbian, Lower"
+                s3 ="dsb-DE"
+        Case "ebo","ebo-cg", "teke-eboo"
+                s1 = "1000"  ' XP Not supported 
+                s2="Teke-Eboo"
+                s3 ="ebo-CG"
+        Case "ee","ee-gh", "√©w√©"
+                s1 = "1000"  ' XP Not supported 
+                s2="√âw√©"
+                s3 ="ee-GH"
+        Case "el","el-gr", "greek", "408"
+                s1 = "408"
+                s2="Greek"
+                s3 ="el-GR"
+        Case "eo","eo-", "esperanto"
+                s1 = "1000"  ' XP Not supported 
+                s2="Esperanto"
+                s3 ="eo"
+        Case "et","et-ee", "estonian", "425"
+                s1 = "425"
+                s2="Estonian"
+                s3 ="et-EE"
+        Case "fa","fa-ir", "farsi"
+                s1 = "1000"  ' XP Not supported 
+                s2="Farsi"
+                s3 ="fa-IR"
+        Case "fi","fi-fi", "finnish", "40b"
+                s1 = "40b"
+                s2="Finnish"
+                s3 ="fi-FI"
+        Case "fj","fj-fj", "fijian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Fijian"
+                s3 ="fj-FJ"
+        Case "fu","fu-it", "friulian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Friulian"
+                s3 ="fu-IT"
+        Case "fy","fy-nl", "frisian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Frisian"
+                s3 ="fy-NL"
+        Case "ga","ga-ie", "irish", "83c"
+                s1 = "83c"
+                s2="Irish"
+                s3 ="ga-IE"
+        Case "gd","gd-gb", "gaelic", "43c" 
+                s1 = "43c" 
+                s2="Gaelic"
+                s3 ="gd-GB"
+        Case "gl","gl-es", "galician"
+                s1 = "1000"  ' XP Not supported 
+                s2="Galician"
+                s3 ="gl-ES"
+        Case "gu","gu-in", "gujarati"
+                s1 = "1000"  ' XP Not supported 
+                s2="Gujarati"
+                s3 ="gu-IN"
+        Case "gd","gd-gb", "gaelic"
+                s1 = "1000"  ' XP Not supported 
+                s2="Gaelic"
+                s3 ="gd-GB"
+        Case "gsc","gsc-fr", "gascon"
+                s1 = "1000"  ' XP Not supported 
+                s2="Gascon"
+                s3 ="gsc-FR"
+        Case "gug","gug-py", "guarani"
+                s1 = "1000"  ' XP Not supported 
+                s2="Guarani"
+                s3 ="fug-PY"
+        Case "haw","haw-us", "hawaiian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Hawaiian"
+                s3 ="haw-US"
+        Case "he","he-il", "hebrew", "40d"
+                s1 = "40d"
+                s2="Hebrew"
+                s3 ="he-IL"
+        Case "hr","hr-hr", "croatian", "41a"
+                s1 = "41a"
+                s2="Croatian"
+                s3 ="hr-HR"
+        Case "hsb","hsb-de","sorbian, upper"
+                s1 = "1000"  ' XP Not supported 
+                s2="Sorbian, Upper"
+                s3 ="hsb-DE"
+        Case "ht","ht-ht", "haitian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Haitian"
+                s3 ="ht-HT"
+        Case "hu","hu-hu", "hungarian", "40e"
+                s1 = "40e"
+                s2="Hungarian"
+                s3 ="hu-HU"
+        Case "ha","ha-gh","ha-ng", "hausa"
+                s1 = "1000"  ' XP Not supported 
+                s2="Hausa"
+                s3 ="ha"
+        Case "hil","hil-ph", "hiligaynon"
+                s1 = "1000"  ' XP Not supported 
+                s2="Hiligaynon"
+                s3 ="hil-PH"
+        Case "ia","ia-", "interlingua"
+                s1 = "1000"  ' XP Not supported 
+                s2="Interlingua"
+                s3 ="ia"
+        Case "id","id-id", "indonesian", "421" 
+                s1 = "421" 
+                s2="Indonesian"
+                s3 ="id-ID"
+        Case "is","is-is", "icelandic", "40f"
+                s1 = "40f"
+                s2="Icelandic"
+                s3 ="is-IS"
+        Case "jbo","jbo-", "lojban"
+                s1 = "1000"  ' XP Not supported 
+                s2="Lojban"
+                s3 ="jbo"
+        Case "ja", "ja-jp", "japanese", "411"
+                s1 = "411"
+                s2="Japanese"
+                s3 ="ja-JP"
+        Case "kab","kab-dz", "kabyle"
+                s1 = "1000"  ' XP Not supported 
+                s2="Kabyle"
+                s3 ="kab-DZ"
+        Case "ki","ki-ke", "gikuyu"
+                s1 = "1000"  ' XP Not supported 
+                s2="Gikuyu"
+                s3 ="ki-KE"
+        Case "kk","kk-kz", "kazak"
+                s1 = "1000"  ' XP Not supported 
+                s2="Kazak"
+                s3 ="kk-KZ"
+        Case "kl","kl-gl", "kalaallisut"
+                s1 = "1000"  ' XP Not supported 
+                s2="Kalaallisut"
+                s3 ="kl-GL"
+        Case "ksf","ksf-cm", "bafia"
+                s1 = "1000"  ' XP Not supported 
+                s2="Bafia"
+                s3 ="ksf-CM"
+        Case "ko","ko-kp","ko-kr", "korean", "412"
+                s1 = "412"
+                s2="Korean"
+                s3 ="ko"
+        Case "ka","ka-ge", "georgian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Georgian"
+                s3 ="ka-GE"
+        Case "km","km-kh", "khmer"
+                s1 = "1000"  ' XP Not supported 
+                s2="Khmer"
+                s3 ="km-KH"
+        Case "kn","kn-in", "kannada"
+                s1 = "1000"  ' XP Not supported 
+                s2="Kannada"
+                s3 ="kn-IN"
+        Case "kok","kok-in", "konkani"
+                s1 = "1000"  ' XP Not supported 
+                s2="Konkani"
+                s3 ="kok-IN"
+        Case "ku","ku-sy","ku-tr", "kurdish"
+                s1 = "1000"  ' XP Not supported 
+                s2="Kurdish"
+                s3 ="ku"
+        Case "ky","ky-kg", "kirghiz"
+                s1 = "1000"  ' XP Not supported 
+                s2="Kirghiz"
+                s3 ="ky-KG"
+        Case "la","la-va", "latin"
+                s1 = "1000"  ' XP Not supported 
+                s2="Latin"
+                s3 ="la-VA"
+        Case "lb","lb-lu", "luxembourgish"
+                s1 = "1000"  ' XP Not supported 
+                s2="Luxembourgish"
+                s3 ="lb-LU"
+        Case "ldi","ldi-cg", "lari"
+                s1 = "1000"  ' XP Not supported 
+                s2="Lari"
+                s3 ="ldi-CG"
+        Case "lg","lg-ug", "ganda"
+                s1 = "1000"  ' XP Not supported 
+                s2="Ganda"
+                s3 ="lg-UG"
+        Case "ln","ln-cd", "lingala"
+                s1 = "1000"  ' XP Not supported 
+                s2="Lingala"
+                s3 ="ln-CD"
+        Case "lo","lo-la", "lao"
+                s1 = "1000"  ' XP Not supported 
+                s2="Lao"
+                s3 ="lo-LA"
+        Case "lt","lt-lt", "lithuanian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Lithuanian"
+                s3 ="lt-LT"
+        Case "ltg","ltg-lv", "latgalian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Latgalian"
+                s3 ="ltg-LV"
+        Case "lv","lv-lv", "latvian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Latvian"
+                s3 ="lv-LV"
+        Case "mdw","mdw-cg", "mbochi"
+                s1 = "1000"  ' XP Not supported 
+                s2="Mbochi"
+                s3 ="mdw-CG"
+        Case "mi","mi-nz", "maori (new zealand)"
+                s1 = "1000"  ' XP Not supported 
+                s2="Maori (New Zealand)"
+                s3 ="mi-NZ"
+        Case "ms","ms-sg","ms-my","ms-id","ms-bn", "malay", "43E"
+                s1 = "43E"
+                s2="Malay"
+                s3 ="ms"
+        Case "mk","mk-mk", "macedonian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Macedonian"
+                s3 ="mk-MK"
+        Case "mkw","mkw-cg", "kituba", "mk-MK"
+                s1 = "1000"  ' XP Not supported 
+                s2="Kituba"
+                s3 ="mkw-CG"
+        Case "mn","mn-mn", "mongolian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Mongolian"
+                s3 ="mn-MN"
+        Case "mo-mn","mo", "moldavian", "850"
+                s1 = "850"
+                s2="Moldavian"
+                s3 ="mo-MN"
+        Case "mos","mos-bf", "moore"
+                s1 = "1000"  ' XP Not supported 
+                s2="Moore"
+                s3 ="mos-BF"
+        Case "mr","mr-in", "marathi"
+                s1 = "1000"  ' XP Not supported 
+                s2="Marathi"
+                s3 ="mr-IN"
+        Case "nds","nds-de", "low german"
+                s1 = "1000"  ' XP Not supported 
+                s2="Low German"
+                s3 ="nds-DE"
+        Case "nl","nl-nl", "dutch", "413"
+                s1 = "413"
+                s2="Dutch"
+                s3 ="nl-NL"
+        Case "nl-be", "dutch (belgium)", "813"
+                s1 = "813"
+                s2="Dutch (Belgium)"
+                s3 ="nl-BE"
+        Case "nn","nn-no", "norwegian norsk", "0814"
+                s1="0814"
+                s2="Norwegian Norsk"
+                s3 ="nn-NO"
+        Case "nb","nb-no", "norwegian bokmal", "0414"
+                s1 = "0414"
+                s2="Norwegian Bokmal"
+                s3 ="nb-NO"
+        Case "no","no-no", "norwegian", "0014"
+                s1="0014"
+                s2="Norwegian"
+                s3 ="no-NO"
+        Case "nr","nr-za", "ndebele, south"
+                s1 = "1000"  ' XP Not supported 
+                s2="Ndebele, South"
+                s3 ="nr-ZA"
+        Case "nso","nso-za", "northern sotho"
+                s1 = "1000"  ' XP Not supported 
+                s2="Northern Sotho"
+                s3 ="nso-ZA"
+        Case "ny","ny-mw", "nyanja"
+                s1 = "1000"  ' XP Not supported 
+                s2="Nyanja"
+                s3 ="ny-MW"
+        Case "oc","oc-fr", "occitan"
+                s1 = "1000"  ' XP Not supported 
+                s2="Occitan"
+                s3 ="oc-FR"
+        Case "om","om-et", "oromo"
+                s1 = "1000"  ' XP Not supported 
+                s2="Oromo"
+                s3 ="om-ET"
+        Case "pap","pap-aw","pap-an", "papiamento"
+                s1 = "1000"  ' XP Not supported 
+                s2="Papiamento"
+                s3 ="pap"
+        Case "pl","pl-pl", "polish", "415"
+                s1 = "415"
+                s2="Polish"
+                s3 ="pl-PL"
+        Case "pli","pli-", "pali"
+                s1 = "1000"  ' XP Not supported 
+                s2="Pali"
+                s3 ="pli"
+        Case "plt","plt-mg", "malagasy"
+                s1 = "1000"  ' XP Not supported 
+                s2="Malagasy"
+                s3 ="plt-MG"
+        Case "pt-br", "portuguese (brazil)", "416"
+                s1 = "416"
+                s2="Portuguese (Brazil)"
+                s3 ="pt-BR"
+        Case "pt-pt", "816"
+                s1 = "816"
+                s2="portuguese (portugal)"
+                s3 ="pt-PT"
+        Case "pt", "Portuguese"
+                s1 = "816"
+                s2="portuguese"
+                s3 ="pt"
+        Case "qtz","qtz-", "keyid"
+                s1 = "1000"  ' XP Not supported 
+                s2="KeyID"
+                s3 ="qtz"
+        Case "qul", _
+                        "quh",_
+                        "qu", _
+                        "qul-bo", _
+                        "qu-ec", _
+                        "quh-bo", _
+                        "quechua"
+                s1 = "1000"  ' XP Not supported 
+                s2="Quechua"
+                s3 ="qul"
+        Case "rm","rm-ch", "rhaeto-romance"
+                s1 = "1000"  ' XP Not supported 
+                s2="Rhaeto-Romance"
+                s3 ="rm-CH"
+        Case "ro","ro-ro", "romanian", "418"
+                s1 = "418"
+                s2="Romanian"
+                s3 ="ro-RO"
+        Case "ru","ru-ru", "russian", "0419"
+                s1 = "0419"
+                s2="Russian"
+                s3 ="ru-RU"
+        Case "rue","rue-sk","rue-ua", "rusyan"
+                s1 = "1000"  ' XP Not supported 
+                s2="Rusyan"
+                s3 ="rue"
+        Case "rw","rw-rw", "kinyarwanda"
+                s1 = "1000"  ' XP Not supported 
+                s2="Kinyarwanda"
+                s3 ="rw-RW"
+        Case "se-fi", _
+                        "se-no", _
+                        "se-se", _
+                        "se", _
+                        "sma-no", _
+                        "sma-se", _
+                        "sma", _
+                        "smj-no", _
+                        "smj-se", _
+                        "smj", _
+                        "smn-fi", _
+                        "smn-ru", _
+                        "smn", _
+                        "sms-fi", _
+                        "sami"
+                s1 = "1000"  ' XP Not supported 
+                s2="Sami"
+                s3 ="se-FI"
+        Case "sh-me", _
+                        "sh-rs", _
+                        "sh-su", _
+                        "sh-yu", _
+                        "sh", _
+                        "sr-me", _
+                        "sr-rs", _
+                        "sr-su", _
+                        "sr", _
+                        "serbian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Serbian"
+                s3 ="sh-RS"
+        Case "shs", _
+                        "shs-ca", _
+                        "shuswap"
+                s1 = "1000"  ' XP Not supported 
+                s2="Shuswap"
+                s3 ="shs-CA"
+        Case "sk", _
+                        "sk-sk", _
+                        "slovakian", _
+                        "41b"
+                s1 = "41b"
+                s2="Slovakian"
+                s3 ="sk-SK"
+        Case "sl","sl-si", "slovene", "424"
+                s1 = "424"
+                s2="Slovene"
+                s3 ="si-SI"
+        Case "so","so-so", "somali"
+                s1 = "1000"  ' XP Not supported 
+                s2="Somali"
+                s3 ="so-SO"
+        Case "sq","sq-al", "albanian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Albanian"
+                s3 ="sq-AL"
+        Case "src","src-it", "sardinian (logudorese)"
+                s1 = "1000"  ' XP Not supported 
+                s2="Sardinian (Logudorese)"
+                s3 ="src-IT"
+        Case "sdc","sdc-it", "sardinian (sassarese)"
+                s1 = "1000"  ' XP Not supported 
+                s2="Sardinian (Sassarese)"
+                s3 ="sdc-IT"
+        Case "ss","ss-za", "swazi"
+                s1 = "1000"  ' XP Not supported 
+                s2="Swazi"
+                s3 ="ss-ZA"
+        Case "st","st-za", "southern sotho"
+                s1 = "1000"  ' XP Not supported 
+                s2="Southern Sotho"
+                s3 ="st-ZA"
+        Case "sw","sw-tz","sw-ke", "swahili"
+                s1 = "1000"  ' XP Not supported 
+                s2="Swahili"
+                s3 ="sw"
+        Case "swb","swb-yt", "maore"
+                s1 = "1000"  ' XP Not supported 
+                s2="Maore"
+                s3 ="swb-YT"
+        Case "sv","sv-se", "swedish", "41D"
+                s1 = "41D"
+                s2="Swedish"
+                s3 ="sv-SE"
+        Case "tek","tek-cg", "teke-ibali"
+                s1 = "1000"  ' XP Not supported 
+                s2="Teke-Ibali"
+                s3 ="tek-CG"
+        Case "tet","tet-id","tet-tl", "tetun"
+                s1 = "1000"  ' XP Not supported 
+                s2="Tetun"
+                s3 ="tet"
+        Case "tg","tg-tj", "tajic"
+                s1 = "1000"  ' XP Not supported 
+                s2="Tajic"
+                s3 ="tg-TJ"
+        Case "th","th-th", "thai", "41E"
+                s1 = "41E"
+                s2="Thai"
+                s3 ="th-TH"
+        Case "ti","ti-er","ti-et", "tigrigna"
+        s1 = "1000"  ' XP Not supported 
+                s2="Tigrigna"
+                s3 ="ti"
+        Case "tk","tk-tm", "turkmen"
+                s1 = "1000"  ' XP Not supported 
+                s2="Turkmen"
+                s3 ="tk-TM"
+        Case "tl","tl-ph", "tagalog", "464"
+                s1 = "464"
+                s2="Tagalog"
+                s3 ="tk-PH"
+        Case "tn","tn-bw","tn-za", "tswana"
+                s1 = "1000"  ' XP Not supported 
+                s2="Tswana"
+                s3 ="tn"
+        Case "tpi","tpi-pg", "tok pisin"
+                s1 = "1000"  ' XP Not supported 
+                s2="Tok Pisin"
+                s3 ="tpi-PG"
+        Case "tr","tr-tr", "turkish", "41f"
+                s1 = "41f"
+                s2="Turkish"
+                s3 ="tr-TR"
+        Case "tt","tt-ru", "tatar"
+                s1 = "1000"  ' XP Not supported 
+                s2="Tatar"
+                s3 =""
+        Case "ts","ts-za", "tsonga"
+                s1 = "1000"  ' XP Not supported 
+                s2="Tsonga"
+                s3 ="ts-ZA"
+        Case "ty","ty-pf", "tahitian"
+                s1 = "1000"  ' XP Not supported 
+                s2="Tahitian"
+                s3 ="ty-PF"
+        Case "tyx","tyx-cg", "teke-tyee"
+                s1 = "1000"  ' XP Not supported 
+                s2="Teke-Tyee"
+                s3 ="tyx-CG"
+        Case "uk","uk-ua", "ukranian", "422"
+                s1 = "422"
+                s2="Ukranian"
+                s3 ="uk-UA"
+        Case "ur","ur-in","ur-pk", "urdu"
+                s1 = "1000"  ' XP Not supported 
+                s2="Urdu"
+                s3 ="ur"
+        Case "uz","uz-uz", "uzbec"
+                s1 = "1000"  ' XP Not supported 
+                s2="Uzbec"
+                s3 ="uz-UZ"
+        Case "ve","ve-za", "venda"
+                s1 = "1000"  ' XP Not supported 
+                s2="Venda"
+                s3 ="ve-ZA"
+        Case "vi","vi-vn", "vietnamese", "42a"
+                s1 = "42a"
+                s2="Vietnamese"
+                s3 ="vi-VN"
+        Case "vif","vif-cg", "vili"
+                s1 = "1000"  ' XP Not supported 
+                s2="Vili"
+                s3 ="vif-CG"
+        Case "wa","wa-be", "walloon"
+                s1 = "1000"  ' XP Not supported 
+                s2="Walloon"
+                s3 ="wa-BE"
+        Case "xh","xh-za", "xhosa"
+                s1 = "1000"  ' XP Not supported 
+                s2="Xhosa"
+                s3 ="xh-ZA"
+        Case "yi","yi-us", "yiddish"
+                s1 = "1000"  ' XP Not supported 
+                s2="Yiddish"
+                s3 ="yi-US"
+        Case "yo","yo-ng", "yoruba"
+                s1 = "1000"  ' XP Not supported 
+                s2="Yoruba"
+                s3 ="yo-NG"
+        Case "zh-cn", "chinese (simplified)", "804"
+                s1 = "804"
+                s2="Chinese (Simplified)"
+                s3 ="zh-CN"
+        Case "zh-tw", "chinese (traditional)", "404"
+                s1 = "404"
+                s2="Chinese (Traditional)"
+                s3 ="zh-TW"
+        Case "zh-hk", "chinese (hong kong)", "c04"
+                s1 = "c04"
+                s2="Chinese (Hong Kong)"
+                s3 ="zh-HK"
+        Case "zh-sg", "chinese (singapore)", "1004"
+                s1 = "1004"
+                s2="Chinese (Singapore)"
+                s3 ="zh-SG"
+        Case "zh-mo", "chinese (macau)", "1404"
+                s1 = "1404"
+                s2="Chinese (Macau)"
+                s3 ="zh-MO"
+        Case "zh-yue","zh-yu", "chinese (yue)"
+                s1 = "1000"  ' XP Not supported 
+                s2="Chinese (Yue)"
+                s3 ="zh-YUE"
+        Case "zh", "chinese", "804"
+                s1 = "804"
+                s2 = "Chinese"  
+                s3 ="zh"
+        Case "zu","zu-za", "zulu"
+                s1 = "1000"  ' XP Not supported 
+                s2="Zulu"
+                s3 ="zu-ZA"
+        Case "zxx", "zxx-", "ambiguous or missing language", "1000"
+                s1 = "1000"  ' XP Not supported 
+                s2 = "Ambiguous Or Missing Language"
+                s3 ="zxx"
+        Case Else
+                ' Not Found, So We Return ISO Language Code.
+                s1 = "1000"  ' XP Not supported 
+                s2=sA
+                s3=sA
+        End Select
+
+        If iForceEnglish = 1 Then
+        ' The system uses an English string for a path or process name. 
+        ' (i. e.: Festival, Windows SAPI)
+                fsIsoToHumanReadable = s2
+        ElseIf iForceEnglish = 2 Then
+        ' Use the Microsoft XP compatible language code
+                fsIsoToHumanReadable = s1
+        Else
+        ' Use the ISO language
+                fsIsoToHumanReadable = s3
+        End If
+End Function
+
+
+Function fbWindowsHasVoiceInThisLanguage(sLang)
+        ' Since Windows Vista, we can use Speech XML
+        ' http://www.w3.org/TR/speech-synthesis
+        ' Determine which SAPI voices are installed, then
+        ' if we have a modern voice from Windows Vista, Windows 7 or above
+        ' then return true, else if no voices found, then return false
+        Dim Sapi
+        Dim n
+        n = 0
+        Dim n1
+        n1 = 0
+        Dim s1
+        s1 = ""
+        Dim s2
+        s2 = ""
+        
+        sLang = LCase(sLang)
+        fbWindowsHasVoiceInThisLanguage = False
+        'on error goto VoiceTestError
+        Set Sapi=CreateObject("Sapi.SpVoice")
+        s1 =LCase(fsIsoToHumanReadable(sLang, 1))
+        'Let's see if we recognize the language s1
+        For n = 0 To Sapi.GetVoices.Count - 1
+                s2=LCase(Sapi.GetVoices.Item(n).GetDescription)
+                If InStr(s2, s1) <> 0 Then
+                        fbWindowsHasVoiceInThisLanguage = True
+                        Exit For
+                End If
+        Next
+        Set Sapi = Nothing
+        Exit Function
+        VoiceTestError:
+        fbWindowsHasVoiceInThisLanguage = False
+        On Error Resume Next
+End Function
+
+
+Function fsWindowsCloseMatchLanguage(s1)
+        Dim s2
+        s2 = fsWindowsCloseMatchVoice(s1)
+        Dim s3
+        s3 = " "
+        Dim s4
+        s4 = "en-US"
+        If Len(s2) > 1 Then
+                If InStr(s2, "-") > 4  Then
+                        ' Microsoft voice listing format lists the language
+                        ' in English following a dash
+                        s3 = "-"
+                End If
+                Dim a1 : a1 = Split(s2, s3)
+                s4 = Trim(a1(UBound(a1)))
+                fsWindowsCloseMatchLanguage = fsIsoToHumanReadable(s4, 0) 
+        Else
+                fsWindowsCloseMatchLanguage = s4
+        End If
+End Function
+
+
+Function fsWindowsCloseMatchVoice(s1)
+        ' s1 - iso language string in the form `es-ES` or `en-CA`
+        ' Returns a human readable string of a language that 
+        ' is installed and that closely matches the requested language
+        ' in the form `Spanish (Mexico)` or `English (USA)`
+        fsWindowsCloseMatchVoice = ""
+        Dim i 
+        i = 0
+        Dim s2
+        s2 = fsIsoToConciseHumanReadable(s1, 1)
+        Dim s3
+        s3 = ""
+        Dim s4
+        s4 = fsIsoToHumanReadable(s1, 1)
+        Dim Sapi
+        Set Sapi=CreateObject("Sapi.SpVoice")
+        ' Microsoft SAPI voices have a predictable naming pattern that includes 
+        ' the language name in the form - `Microsoft David Desktop - English (United States)
+
+        If Sapi.GetVoices.Count = 0 Then
+                fsWindowsCloseMatchVoice = "Ambiguous Or Missing Language"
+        Else
+                For i = 0 To Sapi.GetVoices.Count - 1
+                        s3=Sapi.GetVoices.Item(i).GetDescription
+                        If Len(s3) > 1 And InStr(s3, s4) > 1 Then
+                                fsWindowsCloseMatchVoice = s3
+                                        
+                                Exit For
+                        End If                  
+                Next
+                If fsWindowsCloseMatchVoice = "" Then
+                        For i = 0 To Sapi.GetVoices.Count - 1
+                                s3=Sapi.GetVoices.Item(i).GetDescription
+                                If Len(s3) > 1 And InStr(s3, s2) > 1 Then
+                                        fsWindowsCloseMatchVoice = s3
+                                        Exit For
+                                End If                  
+                        Next
+                End If
+        End If
+End Function
+
+
+Function fsIsoToConciseHumanReadable(s1, iForceEnglish)
+'  Returns name of language stripped of region
+        Dim a1
+        Dim s2
+        s2 = fsIsoToHumanReadable(s1, iForceEnglish)
+        Dim s3
+        s3 = s2
+        If InStr(s3, " (") > 0 Then
+                a1 = Split(s3, "(")
+                s2 = Trim(a1(LBound(a1)))
+        End If
+        fsIsoToConciseHumanReadable = s2
+End Function
+
+
+Function fsDec2Hex(i1)
+' Given an integer, returns a hex string
+    Dim s1
+
+    If i1 < 16 Then
+	    s1 = Mid("0123456789abcdef", i1 + 1, 1)
+    Else
+        s1 = fsDec2Hex(i1 \ 16) & _
+                fsDec2Hex(i1 Mod 16)
+    End If   
+    fsDec2Hex = s1    
+End Function
+
 
 Sub main()
     '''
@@ -1882,6 +2777,7 @@ Sub main()
     Dim s0
     Dim s1
     Dim s2
+	Dim s3
     Dim sVoice
     Dim srate
     Dim sLanguage
@@ -1890,7 +2786,7 @@ Sub main()
     Dim sDimensions
     Dim sOutFile
 
-    bOK = false
+    bOK = False
     On Error Resume Next
     'Decode the named arguments...
     sVoice = WScript.Arguments.Named.Item("voice")
@@ -1913,28 +2809,25 @@ Sub main()
             WScript.Exit(0)
         Case "" 
             s0 = Year(Date) & "-" & Month(Date) & "-" & Day(Date)
-            s0 = s0 & ", " & FormatDateTime(now,4)
-            Select Case GetLocale()
-                Case "de", "1031", "3079", "5127", "4103", "2055"
+            s0 = s0 & ", " & FormatDateTime(Now,4)
+			s3 = Left(fsIsoToHumanReadable(fsDec2Hex(Int(GetLocale())), 0), 2)
+            Select Case s3
+            Case "de"
                     s1 = "Las ein paar Worte..."
-                Case "en-CA", "4105"
-                    s1 = "Excuse me... Could you please type some text?"
-                Case "es","11274", "16394", "13322", "9226", "5130", "7178", "12298"
+			Case "es"
                     s1 = "Introduzca algunas palabras ..."
-                Case "17418", "4106", "18442", "2058", "19466", "6154", "15370"
-                    s1 = "Introduzca algunas palabras ..."
-                Case "10250", "20490", "1034", "14346", "8202"
-                    s1 = "Introduzca algunas palabras ..."
-                Case "fr", "3084", "1036", "2060", "11276","9228","12300","5132"
+			Case "fr"
                     s1 = "Tapez quelques mots..."
-                Case "13324", "6156", "14348", "10252", "4108", "7180"
-                    s1 = "Tapez quelques mots..."
-                Case "pt", "1046", "2072"
+            Case "pt"
                     s1 = "Tipo de poucas palavras..."
-                Case Else
+            Case Else
+			    If "CA" = Right(fsIsoToHumanReadable(fsDec2Hex(Int(GetLocale())), 0), 2) Then
+					s1 = "Excuse me... Could you please type some text?"
+				Else
                     s1 = "Enter a few words..."
+				End If
             End Select
-            s2=InputBox(s1,"Locale: " & GetLocale(),s0)
+            s2=InputBox(s1, fsIsoToHumanReadable(fsDec2Hex(Int(GetLocale())), 1), s0)
         Case Else
             s2=getTextFileContent(s0,"UTF-8")
             If Err <> 0 Then
@@ -1958,7 +2851,7 @@ Sub main()
                 sLibre, _
                 sImage, _
                 sDimensions)
-        If not(bOK) Then
+        If Not(bOK) Then
     bOK = sayIt (s1, sRate, sVoice)
         End If
     End If
@@ -1967,4 +2860,6 @@ Sub main()
     End If
 End Sub
 
+
 main
+
