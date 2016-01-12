@@ -1513,7 +1513,7 @@ Function fsTimeMyRegion(optional i As Integer) As String
 	Select Case s1()
 	Case &quot;es&quot;  &apos;la 1 y 40 de la mañana; las 2 y 40 de la tarde
 		If Hour(NOW)=0 Then
-			sL10N=&quot;medionoche y &quot; &amp; Minute(NOW
+			sL10N=&quot;medionoche y &quot; &amp; Minute(NOW)
 		Elseif Hour(NOW)=1 Then
 			sL10N=&quot;la &quot; &amp; Hour(NOW) &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la mañana&quot;
 		Elseif Hour(NOW) &lt; 12 Then
