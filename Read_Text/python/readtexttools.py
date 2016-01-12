@@ -100,13 +100,13 @@ def usage():
     print('===============\n')
     print('Reads a .wav sound file, converts it and plays copy with a player.')
     print('Requires a converter like `avconv`, `faac`, `lame` or `ffmpeg`.\n')
-    print('Usage')
-    print('-----\n')
-    print('###Audio:\n')
+    print('## Usage')
+    print('')
+    print('### Audio:\n')
     print(('    '+sA+u' --sound="xxx.wav" --output="xxx.ogg"'))
     print(('    '+sA+u' --visible="false" --audible="true"  \ '))
     print('       --sound="xxx.wav" --output="xxx.ogg"\n')
-    print('###Video:\n')
+    print('### Video:\n')
     print('Makes an audio with a poster image.  Uses `avconv` or `ffmpeg`.\n')
     print(('    '+sA+u' --image="xxx.png" --sound="xxx.wav" \ '))
     print(('      --output="xxx.webm"'))
@@ -320,10 +320,10 @@ def ProcessWaveMedia(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
                 if os.path.isfile(sOUT1):
                     os.remove(sTMP1)
                 else:
-                    print(u'Did not remove "' + sTMP1
-                          + u'" because the converter did not write "'
-                          + sOUT1
-                          + '"'
+                    print(u'Did not remove "' + sTMP1 +
+                          u'" because the converter did not write "' +
+                          sOUT1 +
+                          '"'
                           )
     except (OSError):
         print(u'Could not remove "' + sTMP1 + u'"')
@@ -840,7 +840,7 @@ def UnlockMyLock():
 
 def getMyLock(sLOCK):
     '''
-    Returns path to temporary directory plus a lock file name.
+    Returns path to a temporary directory plus a lock file name.
     Use an value like 'lock' for sLOCK.  You can use more than
     one lock if you use different values for sLOCK.
     '''
@@ -855,8 +855,21 @@ def getMyLock(sLOCK):
         s3 = os.path.join(os.getenv('TMPDIR'),
                           s2 + u'.' + os.getenv('USERNAME') + s1)
     else:
-        s3 = os.path.join('/tmp',
-                          fsAppSignature() + u'.' + os.getenv('USER') + s1)
+        if os.path.isdir('/tmp') and os.access('/tmp', os.W_OK):
+            s3 = os.path.join('/tmp',
+                              s2 + u'.' + os.getenv('USER') + s1)
+        elif os.path.isdir(
+            os.path.join(
+                os.getenv(
+                    'HOME'), '.config/')) and os.access(
+                        os.path.join(
+                            os.getenv(
+                                'HOME'), '.config/'), os.W_OK):
+            s3 = os.path.join(os.getenv('HOME'),
+                              '.config/' + s2 + u'.' + os.getenv('USER') + s1)
+        else:
+            s3 = os.path.join(os.getenv('HOME'),
+                              s2 + u'.' + os.getenv('USER') + s1)
     return s3
 
 
@@ -1034,6 +1047,14 @@ def PlayWaveInBackground(sOUT1):
             s1 = u'paplay "' + sOUT1 + u'" '
         elif os.path.isfile('/usr/bin/aplay'):
             s1 = u'aplay "' + sOUT1 + u'" '
+        elif os.path.isfile('/usr/bin/ossplay'):
+            s1 = u'ossplay "' + sOUT1 + u'" '
+        elif os.path.isfile('/usr/bin/artsplay'):
+            s1 = u'artsplay "' + sOUT1 + u'" '
+        elif os.path.isfile('/usr/bin/roarcatplay'):
+            s1 = u'roarcatplay "' + sOUT1 + u'" '
+        elif os.path.isfile('/usr/bin/roarcat'):
+            s1 = u'roarcat "' + sOUT1 + u'" '
         myossystem(s1)
 
 
@@ -1125,3 +1146,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

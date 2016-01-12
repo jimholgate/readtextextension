@@ -198,9 +198,9 @@ Sub ttsUpdateCombo2a(bRefreshText)
 	Elseif Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;text2wave&quot;) &gt; 0 Then
 		dialog1Combo2ShowTEXT2WAVEChoices(f_dlgSpeechSetup)
 	Elseif Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;/bin/python&quot;) &gt; 0 Then 
-		dialog1Combo2ShowMyPythonChoices(f_dlgSpeechSetup)
+		fiDialog1Combo2ShowMyPythonChoices(f_dlgSpeechSetup)
 	Elseif Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;python.exe&quot;) &gt; 0 Then 
-		dialog1Combo2ShowMyPythonChoices(f_dlgSpeechSetup)
+		fiDialog1Combo2ShowMyPythonChoices(f_dlgSpeechSetup)
 	Elseif Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;/bin/open&quot;) &gt; 0 And _
 		fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot; Then
 		&apos;The system chooses an application to open the file or URL (See man: gnome-open and xdg-open)

@@ -260,6 +260,57 @@ Function fbUsingTouchScreen
 end function
 
 
+Function fbUsingPosixTalkProgram(Optional ByVal s1)
+	fbUsingPosixTalkProgram = False
+	Dim i# : i = 0
+	Dim a1 : a1 = Split(&quot;espeak,festival,padsp,say&quot;, &quot;,&quot;)
+	If isMissing(s1) or s1 = &quot;&quot; Then
+		s1 = fsProgramCommand
+	EndIf
+	If s1 = &quot;&quot; Then Exit Function
+	For i = Lbound(a1) to Ubound(a1)
+		If Right(s1, Len(a1(i))) = a1(i) Then
+			fbUsingPosixTalkProgram = True
+			Exit For
+		EndIf
+	Next	
+End Function
+
+
+Function fsProgramCommand
+&apos;&apos;
+	dim sFile as string
+	dim sSmart as string
+	dim config
+	dim errorCode
+	dim msgs
+
+	on error goto fsProgramCommandErr
+	sFile=fsFullPathOf(fsExtensionSettingsIni)
+	&apos;Load default settings, so any settings undefined by settings file are Not empty
+	config()=fvTts_config_createDefaultConfig(msgs(), errorCode)
+	&apos;Load the settings you used last time
+	sFile=fsFullPathOf(fsExtensionSettingsIni)
+	If fileExists(sFile) Then
+		tts_config_parseFile(sFile, config(), errorCode)
+	Else
+		&apos; The &quot;About&quot; dialog needs this file to show current information
+		tts_config_writeFile(config(), sfile)
+	Endif
+
+	sSmart=config(fiExternalProgramPath)
+	
+	if not(sSmart = &quot;&quot;) and FileExists(sSmart) then
+		fsProgramCommand = sSmart
+	else
+		fsProgramCommand = &quot;&quot;
+	endif
+	exit function
+	fsProgramCommandErr:
+	fsProgramCommand = &quot;&quot;
+end Function
+
+
 function fiReportMetaData(optional byval bVerify)
 	&apos; bVerify - if bVerify is false, the function always 
 	&apos; returns 6 (&quot;Yes&quot;) but if bVerify is true, then the
@@ -930,7 +981,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 &apos;&apos; Audacity
 &apos;&apos; --------
 &apos;&apos;
-&apos;&apos; [Audacity](http://audacityteam.org/) is a free cross platform audio editor. It can
+&apos;&apos; [Audacity](http://audacity.sourceforge.net/) is a free cross platform audio editor. It can
 &apos;&apos; use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.  
 &apos;&apos; 
 &apos;&apos; Windows security policies may prevent you from installing the Audacity FFmpeg converter
@@ -1597,7 +1648,7 @@ Sub dialog1Combo1ShowFESTIVALScripts(oDialog)
 End Sub
 
 
-Sub dialog1Combo2ShowMyPythonChoices(oDialog)
+Function fiDialog1Combo2ShowMyPythonChoices(oDialog)
 &apos;&apos;
 &apos;&apos; Python
 &apos;&apos; ------
@@ -1648,7 +1699,7 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 		s1=s1 &amp; CR &amp; &quot;-c &quot;&quot;import os; os.startfile(&apos;http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&apos;)&quot;&quot;&quot;
 		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(OS_PY)&quot;&quot; &quot;&quot;notepad &apos;(TMP)&apos;&quot;&quot;&quot;
 	Case &quot;OSX&quot;,&quot;MAC&quot; &apos; Python silently fails on OSX
-		exit sub
+		exit Function
 	End Select
 	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
 	n=oComboBox.getItemCount()
@@ -1817,7 +1868,12 @@ Sub dialog1Combo2ShowMyPythonChoices(oDialog)
 	For n = Lbound(a1) + 1 to Ubound(a1)
 		oComboBox.addItem(a1(n),0)
 	next
-End Sub
+	n=oComboBox.getItemCount()
+	fiDialog1Combo2ShowMyPythonChoices = n
+	Exit Function
+	fiDialog1Combo2ShowMyPythonChoicesErr:
+	fiDialog1Combo2ShowMyPythonChoices = 0
+End Function
 
 
 Function fspyOutOptions(oDialog,byval s4)
@@ -2151,6 +2207,7 @@ Sub ttsActuate(config() As Variant, _
 		msgs() As Variant, _
 		errorCode As Integer, _
 		optional byval sTextToSpeak As String)
+	Dim a1
 	Dim bAddTime as Boolean
 	Dim s1 as String
 	Dim sArtLook as String
@@ -2189,21 +2246,12 @@ Sub ttsActuate(config() As Variant, _
 	If ismissing(sTextToSpeak) or sTextToSpeak = &quot;&quot; Then  
 		sTextToSpeak = fsGetTextSelection(false, true)
 	Endif
-	If fileexists(fsMyTempLock(&quot;lock.id&quot;)) Then
-		Kill fsMyTempLock(&quot;lock.id&quot;)
-	Endif
-	If fileexists(fsMyTempLock(&quot;lock.title&quot;)) Then
-		Kill fsMyTempLock(&quot;lock.title&quot;)
-	Endif
-	If fileexists(fsMyTempLock(&quot;lock.album&quot;)) Then
-		Kill fsMyTempLock(&quot;lock.album&quot;)
-	Endif
-	If fileexists(fsMyTempLock(&quot;lock.genre&quot;)) Then
-		Kill fsMyTempLock(&quot;lock.genre&quot;)
-	Endif
-	If fileexists(fsMyTempLock(&quot;lock.track&quot;)) Then
-		Kill fsMyTempLock(&quot;lock.track&quot;)
-	Endif
+	a1 = Split(&quot;id,title,album,genre,track&quot;, &quot;,&quot;)
+	For n = Lbound(a1) To Ubound(a1)
+		If fileexists(fsMyTempLock(&quot;lock.&quot; &amp; a1(n))) Then
+			Kill fsMyTempLock(&quot;lock.&quot; &amp; a1(n))
+		Endif	
+	Next
 	If Len(sTextToSpeak) = 0 then
 		Exit sub
 	Endif
@@ -2217,9 +2265,9 @@ Sub ttsActuate(config() As Variant, _
 	&apos;Get rid of the old files containing a script And/or plain text of selected String
 	resetSpeech
 	sArtLook = config(5)
-	if fbCreatingMediaFile(&quot;.3gp,.aac,.aif,.aiff,.au,.avi,.flac,.m4a,&quot; &amp; _
-			&quot;.m4v,.mov,.mkv,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,&quot; &amp; _
-			&quot;.wav,.webm,.wma,.wmv&quot;, _
+	if fbCreatingMediaFile(&quot;.3gp,.aac,.aif,.aiff,.alsa,.ape,.asf,.au,.avi,.caf,.dts,.flac,&quot; &amp; _
+			&quot;.m4a,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.oma,.opus,.riff,.rm,.smp,.snd,.sou,.spx,&quot; &amp; _
+			&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;, _
 					sArtLook) then
 		&apos; Get current track, then increment it by one to a maximum value of 255. 
 		&apos; (hex FF)
@@ -2244,6 +2292,7 @@ Sub ttsActuate(config() As Variant, _
 						exit sub
 					endif
 				endif
+				
 				CreateFile(fsMyTempLock(&quot;lock.id&quot;), fsThisDocAuthor(), &quot;UTF-8&quot;)
 				CreateFile(fsMyTempLock(&quot;lock.album&quot;), fsThisDocTitle(), &quot;UTF-8&quot;)
 				CreateFile(fsMyTempLock(&quot;lock.title&quot;), s1, &quot;UTF-8&quot;)
@@ -2297,6 +2346,17 @@ Sub ttsActuate(config() As Variant, _
 				sArtURL = fsExportAlbumCover()
 			endif
 		endif
+		If fsGetOS() = &quot;UNIX&quot; OR fsGetOS() = &quot;OSX&quot; Then
+			if fbUsingPosixTalkProgram(sProgram) Then
+				&apos; When using a posix speech command and not using a script,
+				&apos; the routine writes a lock file to use for toggling speech.
+				&apos; The speech toggle does not work with all speech synthesis
+				&apos; applications on all Posix platforms, because the `killall`
+				&apos; command may not work on some processes when it is invoked 
+				&apos; by a user with limited permissions.
+				fbCreateFile(fsMyTempLock, fsAppSignature, &quot;utf-8&quot;)
+			Endif
+		EndIf
 		
 		&apos; Remove audible markdown code symbols for blockquote, heading, emphasize 
 		&apos; when they occur at the beginning or the end of a line.
@@ -2421,6 +2481,15 @@ Sub ttsActuate(config() As Variant, _
 		&apos; program parameter strings,
 		&apos; False - tasks do Not wait until shell task ends
 		bWait=False
+		If fsGetOS() = &quot;UNIX&quot; Then
+			if right(sProgram, len(&quot;festival&quot;)) = &quot;festival&quot; Then
+				&apos; When festival is the external program, the routine pauses while
+				&apos; the computer is speaking to avoid the possibility of playing 
+				&apos; two voices at once.
+				bWait = True	
+			Endif
+		EndIf
+		
 	If sCommand &lt;&gt; &quot;&quot; Then 
 		errorCode=Shell(sProgram,0,sCommand,bWait)
 		Endif
@@ -2504,10 +2573,10 @@ Function fbCreateMissingMediaDirectory(byval sCommandLine)
 	Dim a1, a2, a3
 
 	s1 = &quot;&quot;
-	s2 = &quot;.3gp,.aac,.aif,.aiff,.au,.avi,.csv,.doc,.docx,.epub,.flac,.gif,&quot;
-	s2 = s2 &amp; &quot;.jpeg,.jpg,.m4a,.m4v,.mov,.mkv,.mp2,.mp3,.mp4,.mpeg,.oga,&quot;
-	s2 = s2 &amp; &quot;.ogg,.ogm,.ogv,.pdf,.png,.ppt,.pptx,.tif,.wav,.webm,.wma,&quot;
-	s2 = s2 &amp; &quot;.wmv,.xls,.xlsx,.zip&quot;
+	s2 = &quot;.3gp,.aac,.aif,.aiff,.au,.avi,.csv,.doc,.docx,.epub,.flac,.gif,&quot; &amp; _
+			&quot;.jpeg,.jpg,.m4a,.m4v,.mov,.mkv,.mp2,.mp3,.mp4,.mpeg,.oga,&quot; &amp; _
+			&quot;.ogg,.ogm,.ogv,.pdf,.png,.ppt,.pptx,.tif,.wav,.webm,.wma,&quot; &amp; _
+			&quot;.wmv,.xls,.xlsx,.zip&quot;
 	s3 = &quot;&quot;
 	on error goto fbCreateMissingMediaDirectoryErr
 	sCommandLine = fsReplaceText(sCommandLine, &quot;&quot;&quot;&quot;, &quot;&quot;)
@@ -5095,7 +5164,8 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 &apos;&apos;
 &apos;&apos; [fvTts1]: http://cvs.freebsoft.org/doc/speechd/speech-dispatcher.html
 &apos;&apos;
-
+	Dim a1
+	Dim i# : i = 0
 	Dim errorCode
 	Dim oBar
 	Dim oFrame
@@ -5130,28 +5200,27 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 			&quot;/usr/bin/killall&quot;) or _
 			fileexists(_
 			&quot;/usr/local/bin/killall&quot;)) Then
-		if fileExists(&quot;/usr/bin/spd-say&quot;) Then
+		if fileExists(&quot;/usr/bin/spd-say&quot;) OR _
+				fileExists(&quot;/usr/local/bin/spd-say&quot;) Then
 			if bAll Then
 				errorCode=Shell(&quot;killall&quot;,0,&quot;speech-dispatcher&quot;,true)
 			Else
-					errorCode=Shell(&quot;spd-say&quot;,0,&quot;--cancel&quot;,true)
+				errorCode=Shell(&quot;spd-say&quot;,0,&quot;--cancel&quot;,true)
 			Endif
 		Endif
-		If Not (fbLetButtonInterruptPosixPlayer) Then
-			if fileExists(&quot;/usr/bin/paplay&quot;) Then
-				errorCode=Shell(&quot;killall&quot;,0,&quot;paplay&quot;,true)
-			Endif
-			if fileExists(&quot;/usr/bin/esdplay&quot;) Then
-				errorCode=Shell(&quot;killall&quot;,0,&quot;esdplay&quot;,true)
-			Endif
-			if fileExists(&quot;/usr/bin/aplay&quot;) Then
-				errorCode=Shell(&quot;killall&quot;,0,&quot;aplay&quot;,true)
-			Endif
-		Endif
-		if fileExists(&quot;/usr/bin/espeak&quot;) Then
-			If Not (fbCreatingMediaFile) Then
-				errorCode=Shell(&quot;killall&quot;,0,&quot;espeak&quot;,true)
-			Endif
+
+		If Not (fbLetButtonInterruptPosixPlayer) OR fbUsingPosixTalkProgram Then
+			&apos; Stop the sound.
+			&apos; Check players before synthesizers.
+			a1 = Split(&quot;aplay,artsplay,esdplay,ossplay,paplay,play,roarcat,roarcatplay,&quot; &amp; _
+					&quot;espeak,festival,padsp,pico2wave,say,text2wave&quot;, _
+					&quot;,&quot;)
+			For i = Lbound(a1) to Ubound(a1)
+				If fileExists(&quot;/usr/bin/&quot; &amp; a1(i)) OR _
+						fileExists(&quot;/usr/local/bin/&quot; &amp; a1(i)) Then
+					errorCode=Shell(&quot;killall&quot;,0,a1(i),true)
+				Endif			
+			Next
 		Endif
 		if fileExists(fsMyTempLock) Then
 			kill fsMyTempLock
@@ -5175,7 +5244,9 @@ Function fbLetButtonInterruptPosixPlayer
 
 	b1 = false
 	&apos; don’t interrupt if we are writing a media file
-	b1 = fbCreatingMediaFile(&quot;.aif,.aiff,.flac,.m4a,.mp3,.ogg,.wav,.webm&quot;)
+	b1 = fbCreatingMediaFile(&quot;.3gp,.aac,.aif,.aiff,.alsa,.ape,.asf,.au,.avi,.caf,.dts,.flac,&quot; &amp; _
+			&quot;.m4a,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.oma,.opus,.riff,.rm,.smp,.snd,.sou,.spx,&quot; &amp; _
+			&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;)
 	&apos; don’t interrupt if we are using a graphical player.
 	if fbCreatingMediaFile(_
 			&quot;--visible=true,--visible=&apos;true&apos;,--visible=&quot;&quot;true&quot;&quot;&quot;) or _
@@ -5230,8 +5301,8 @@ Function fbCreatingMediaFile(optional byval sA, optional byVal sB)
 	Dim config(fiCountConfigOptions)As Variant
 
 	if ismissing(sA) Then
-		sA = &quot;.3gp,.aac,.aif,.aiff,.au,.avi,.flac,.m4a,.m4v,.mov,.mkv,.mp2,&quot;
-		sA = sA &amp; &quot;.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.wav,.webm,.wma,.wmv&quot;
+		sA = &quot;.3gp,.aac,.aif,.aiff,.au,.avi,.flac,.m4a,.m4v,.mov,.mkv,.mp2,&quot; &amp; _
+				&quot;.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.wav,.webm,.wma,.wmv&quot;
 	Endif
 	bTattle = false
 	fbCreatingMediaFile = false

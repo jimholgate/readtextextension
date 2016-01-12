@@ -347,7 +347,10 @@ End Function
 
 
 Function fsGetPicturePath()
-	Dim oDialog, oAllFiles, oFrame, oBar
+	Dim oDialog
+	Dim oAllFiles
+	Dim oFrame
+	Dim oBar
 	Dim sFilePickerArgs
 
 	on error goto fsGetPicturePathErr
@@ -376,8 +379,7 @@ End Function
 
 Function CreatePoint(ByVal x As Long,ByVal y As Long) As com.sun.star.awt.Point
 	&apos; OpenOffice.org Macros Explained, Third Ed., 2015. [Andrew Pitonyak](http://www.pitonyak.org)
-	Dim oPoint
-	oPoint = createUnoStruct( &quot;com.sun.star.awt.Point&quot; )
+	Dim oPoint : oPoint = createUnoStruct( &quot;com.sun.star.awt.Point&quot; )
 	oPoint.X = x : oPoint.Y = y
 	CreatePoint = oPoint
 End Function
@@ -385,8 +387,7 @@ End Function
 
 Function CreateSize(ByVal x As Long,ByVal y As Long) As com.sun.star.awt.Size
 	&apos; OpenOffice.org Macros Explained, Third Ed., 2015. [Andrew Pitonyak](http://www.pitonyak.org)
-	Dim oSize
-	oSize = createUnoStruct( &quot;com.sun.star.awt.Size&quot; )
+	Dim oSize : oSize = createUnoStruct( &quot;com.sun.star.awt.Size&quot; )
 	oSize.Width = x : oSize.Height = y
 	CreateSize = oSize
 End Function

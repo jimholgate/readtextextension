@@ -582,42 +582,96 @@ Function fsMyURL As String
 	fsMyURL=fsGetPackageDirURL(fsAppSignature)
 End Function
 
+Function fsUser()
+	Dim s1 : s1 = Environ(&quot;USER&quot;)
+	if s1 = &quot;&quot; Then
+		s1 = Environ(&quot;USERNAME&quot;)
+	Endif
+	if s1 = &quot;&quot; Then
+		s1 = &quot;UNKNOWN-USER&quot;
+	Endif
+	fsUser = s1
+End Function
+
 
 function fsMyTempLock(optional byval sExt)
-	Dim sTemp, sDiv, sUser As String
-
+	Dim a1
+	Dim a2
+	Dim sTemp$ : sTemp = &quot;&quot;
+	Dim sDiv$ : sDiv = &quot;&quot;
+	Dim sUser$ : sUser = fsUser
+	Dim i# : i = 0
+	Dim sHome$ : sHome = &quot;&quot;
+	
+	fsMyTempLock = &quot;&quot;
 	if isMissing(sExt) Then
 		sExt = &quot;lock&quot;
 	Endif
-	sUser = Environ(&quot;USER&quot;)
-	if sUser = &quot;&quot; Then
-		sUser = Environ(&quot;USERNAME&quot;)
-	Endif
-	if sUser = &quot;&quot; Then
-		sUser = &quot;UNKNOWN-USER&quot;
-	Endif
-	sTemp=Environ(&quot;TEMP&quot;)
-   	If sTemp = &quot;&quot; Then
-    	sTemp=Environ(&quot;TMP&quot;)
-    Endif
-   	If sTemp = &quot;&quot; Then
-    	sTemp=Environ(&quot;TMPDIR&quot;)
-    Endif
-   	If sTemp = &quot;&quot; Then
-    	if fileExists(&quot;/tmp/&quot;) Then
-    		sTemp = &quot;/tmp/&quot;
-    	Endif
-    Endif
-   	If sTemp = &quot;&quot; Then
-    	sTemp=Environ(&quot;HOME&quot;)
-    Endif
+	a1 = Split(&quot;TEMP,TMP,TMPDIR,TEMPDIR&quot;, &quot;,&quot;)
+	&apos; The preferred way of looking up a temporary directory is
+	&apos; to use an environmental variable.
+	For i = Lbound(a1) to Ubound(a1)
+		sTemp = Environ(a1(i))
+		If Len(sTemp) &gt; 0 Then
+			If fbTestDirRW(sTemp) Then
+				Exit For
+			Else
+				sTemp = &quot;&quot;
+			EndIf
+		EndIf
+	Next
+	If sTemp = &quot;&quot; Then
+		&apos; An environmental setting is missing or the directory is locked. 
+		&apos; The routine checks for an alternative directory using specific paths.
+		sHome = Environ(&quot;HOME&quot;)
+		a2 = Split(&quot;/tmp,&quot; &amp; _
+				sHome &amp; &quot;/.config,&quot; &amp; _
+				sHome &amp; &quot;/.tmp,&quot; &amp; _
+				sHome &amp; &quot;/.temp,&quot; &amp; _
+				CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;,&quot; &amp; _
+				sHome, _
+				&quot;,&quot;)
+		For i = Lbound(a2) to Ubound(a2)	
+			If FileExists(a2(i)) Then
+				If fbTestDirRW(a2(i)) Then
+					sTemp = a2(i)
+					Exit For
+				EndIf
+			EndIf
+		Next
+	EndIf
+	If sTemp = &quot;&quot; Then Exit Function
     if instr(&quot;/\&quot;,right(sTemp, 1)) = 0 Then
     	sDiv = &quot;/&quot;
     Else
     	sDiv = &quot;&quot;
     Endif
     fsMyTempLock = ConvertFromURL(converttourl(sTemp) &amp; _
-    		sDiv &amp; fsAppSignature &amp;&quot;.&quot; &amp; sUser &amp; &quot;.&quot; &amp; sExt )
+    		sDiv &amp; fsAppSignature &amp; &quot;.&quot; &amp; sUser &amp; &quot;.&quot; &amp; sExt )
+end function
+
+
+function fbTestDirRW(byVal sA)
+	fbTestDirRW = False
+	if sA = &quot;&quot; Then Exit Function
+	On Error Goto fbTestDirRWErr
+	Dim s1 : s1 = fsAppSignature &amp; &quot;.&quot; &amp; fsUser &amp; &quot;.test.txt&quot; 
+	If Instr(&quot;/\&quot;,right(sA, 1)) = 0 Then
+		If Instr(sA, &quot;/&quot;) &gt; 0 Then
+    		s1 = &quot;/&quot; &amp; s1
+    	Else
+    		s1 = &quot;\&quot; &amp; s1
+    	EndIf
+    Endif
+    fbCreateFile(sA &amp; s1, s1, &quot;utf-8&quot;)
+    If FileExists(sA &amp; s1) Then
+    	kill sA &amp; s1
+    	fbTestDirRW = True
+    EndIf
+    
+	Exit Function
+	fbTestDirRWErr:
+	fbTestDirRW = False
 end function
 
 
@@ -1459,7 +1513,7 @@ Function fsTimeMyRegion(optional i As Integer) As String
 	Select Case s1()
 	Case &quot;es&quot;  &apos;la 1 y 40 de la mañana; las 2 y 40 de la tarde
 		If Hour(NOW)=0 Then
-			sL10N=&quot;medionoche y &quot; &amp; Minute(NOW)
+			sL10N=&quot;medionoche y &quot; &amp; Minute(NOW
 		Elseif Hour(NOW)=1 Then
 			sL10N=&quot;la &quot; &amp; Hour(NOW) &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la mañana&quot;
 		Elseif Hour(NOW) &lt; 12 Then
