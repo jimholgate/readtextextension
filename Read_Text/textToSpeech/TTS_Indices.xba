@@ -1519,7 +1519,7 @@ Function fsTimeMyRegion(optional i As Integer) As String
 		Elseif Hour(NOW) &lt; 12 Then
 			sL10N=&quot;las &quot; &amp; Hour(NOW) &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la mañana&quot;
 		Elseif Hour(NOW)=12 Then
-			sL10N=&quot;mediodia y &quot; &amp; Minute(NOW
+			sL10N=&quot;mediodia y &quot; &amp; Minute(NOW)
 		Elseif Hour(NOW)=13 Then
 			sL10N=&quot;la &quot; &amp; Hour(NOW) Mod 12 &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la tarde&quot;
 		Elseif Hour(NOW) &lt; 20 Then
