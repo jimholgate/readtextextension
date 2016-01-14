@@ -4,13 +4,13 @@ Después de instalar esta extensión, cerrar la aplicación, a continuación, re
 
 Derechos de autor y de licencia
 
-(c) 2011-2015 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+(c) 2011-2016 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 
 <http://www.viti.es/gnu/licenses/gpl.html>
 
 Copyright and License 
 
-(c) 2011-2013 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+(c) 2011-2016 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 "Bubble" icon © 2013 icomoon.io Creative Commons 2.5 (Attribution) license.
 
 <http://www.gnu.org/licenses/gpl-2.0.txt>

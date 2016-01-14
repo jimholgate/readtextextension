@@ -1133,9 +1133,7 @@ End Function
 Function fsFestivalDirectory(n) As String
 	Dim s1, s2 As String
 	Dim a1
-
-	&apos; List of voices retrieved 2011-03-25 from
-	&apos; http://www.cstr.ed.ac.uk/projects/festival/manual/festival_24.html
+	fsFestivalDirectory = &quot;&quot;
 	&apos; Incorrectly installed voices will be silent. Some instructions on
 	&apos; the web for installing mbrola voices need to be updated to work
 	&apos; with the latest version of Festival.
@@ -1150,46 +1148,59 @@ Function fsFestivalDirectory(n) As String
 		s2 =  converttourl(&quot;/usr/share/festival/&quot;)
 	End Select
 	s1 = s2 &amp; &quot;lib/voices/english/en1_mbrola,&quot; &amp; _
-		s2 &amp; &quot;lib/voices/english/us1_mbrola,&quot; &amp; _
-		s2 &amp; &quot;lib/voices/english/us2_mbrola,&quot; &amp; _
-		s2 &amp; &quot;lib/voices/english/us3_mbrola,&quot; &amp; _
-		s2 &amp; &quot;voices/castilian/el_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/catalan/upc_ca_ona_hts,&quot; &amp; _
-		s2 &amp; &quot;voices/czech/czech_dita,&quot; &amp; _
-		s2 &amp; &quot;voices/czech/czech_krb&quot;  &amp; &quot;,&quot; &amp; _
-		s2 &amp; &quot;voices/czech/czech_machac,&quot; &amp; _
-		s2 &amp; &quot;voices/czech/czech_ph,&quot; &amp; _
-		s2 &amp; &quot;voices/english/don_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/english/en1_mbrola,&quot; &amp; _
-		s2 &amp; &quot;voices/english/gsw_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/english/kal_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/english/ked_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/english/rab_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/english/us1_mbrola,&quot; &amp; _
-		s2 &amp; &quot;voices/english/us2_mbrola,&quot; &amp; _
-		s2 &amp; &quot;voices/english/us3_mbrola,&quot; &amp; _
-		s2 &amp; &quot;voices/finnish/suo_fi_lj_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/finnish/suo_fi_mv_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/german/german_de2_os,&quot; &amp; _
-		s2 &amp; &quot;voices/hindi/hindi_NSK_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/italian/lp_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/italian/pc_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/marathi/marathi_NSK_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/russian/msu_ru_nsh_clunits,&quot; &amp; _
-		s2 &amp; &quot;voices/spanish/el_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/telugu/telugu_NSK_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/vietnamese/wow_vi_liz_diphone,&quot; &amp; _
-		s2 &amp; &quot;voices/vietnamese/wow_vi_ptn_diphone,&quot; &amp; _
-		&quot;,,,,&quot;
+			s2 &amp; &quot;lib/voices/english/nitech_us_slt_arctic_hts,&quot; &amp; _
+			s2 &amp; &quot;lib/voices/english/nitech_us_jmk_arctic_hts,&quot; &amp; _
+			s2 &amp; &quot;lib/voices/english/nitech_us_clb_arctic_hts,&quot; &amp; _
+			s2 &amp; &quot;lib/voices/english/nitech_us_rms_arctic_hts,&quot; &amp; _
+			s2 &amp; &quot;lib/voices/english/nitech_us_bdl_arctic_hts,&quot; &amp; _
+	 		s2 &amp; &quot;lib/voices/english/nitech_us_awb_arctic_hts,&quot; &amp; _	
+	 		s2 &amp; &quot;lib/voices/english/us1_mbrola,&quot; &amp; _
+			s2 &amp; &quot;lib/voices/english/us2_mbrola,&quot; &amp; _
+			s2 &amp; &quot;lib/voices/english/us3_mbrola,&quot; &amp; _	
+			s2 &amp; &quot;voices/castilian/el_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/catalan/upc_ca_ona_hts,&quot; &amp; _
+			s2 &amp; &quot;voices/czech/czech_dita,&quot; &amp; _
+			s2 &amp; &quot;voices/czech/czech_krb&quot;  &amp; &quot;,&quot; &amp; _
+			s2 &amp; &quot;voices/czech/czech_machac,&quot; &amp; _
+			s2 &amp; &quot;voices/czech/czech_ph,&quot; &amp; _
+			s2 &amp; &quot;voices/english/don_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/english/en1_mbrola,&quot; &amp; _
+			s2 &amp; &quot;voices/english/gsw_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/english/kal_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/english/ked_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/english/nitech_us_slt_arctic_hts,&quot; &amp; _
+			s2 &amp; &quot;voices/english/nitech_us_jmk_arctic_hts,&quot; &amp; _
+			s2 &amp; &quot;voices/english/nitech_us_clb_arctic_hts,&quot; &amp; _
+			s2 &amp; &quot;voices/english/nitech_us_rms_arctic_hts,&quot; &amp; _
+			s2 &amp; &quot;voices/english/nitech_us_bdl_arctic_hts,&quot; &amp; _
+	 		s2 &amp; &quot;voices/english/nitech_us_awb_arctic_hts,&quot; &amp; _	
+			s2 &amp; &quot;voices/english/rab_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/english/us1_mbrola,&quot; &amp; _
+			s2 &amp; &quot;voices/english/us2_mbrola,&quot; &amp; _
+			s2 &amp; &quot;voices/english/us3_mbrola,&quot; &amp; _
+			s2 &amp; &quot;voices/finnish/suo_fi_lj_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/finnish/suo_fi_mv_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/german/german_de2_os,&quot; &amp; _
+			s2 &amp; &quot;voices/hindi/hindi_NSK_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/italian/lp_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/italian/pc_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/marathi/marathi_NSK_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/russian/msu_ru_nsh_clunits,&quot; &amp; _
+			s2 &amp; &quot;voices/spanish/el_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/telugu/telugu_NSK_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/vietnamese/wow_vi_liz_diphone,&quot; &amp; _
+			s2 &amp; &quot;voices/vietnamese/wow_vi_ptn_diphone&quot;
 	a1 = split(s1,&quot;,&quot;)
-	fsFestivalDirectory=convertfromurl(a1(n))
+	If Not(n &gt; Ubound(a1)) Then 
+		fsFestivalDirectory = convertfromurl(a1(n))
+	EndIf
 End Function
 
 
 Function fiCountFestivalDirectory As Integer
 	dim n As Integer
 
-	For n = 0 to 40
+	For n = 0 to 50
 		if fsFestivalDirectory(n) = &quot;&quot; Then
 			Exit For
 		Else
