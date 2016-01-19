@@ -847,8 +847,19 @@ def getMyLock(sLOCK):
     s1 = '.' + sLOCK
     s2 = fsAppSignature()
     s3 = ''
+    s4 = os.getenv('READTEXTTEMP')
 
-    if 'windows' in platform.system().lower():
+    if s4 is not None and os.path.isdir(s4) and os.access(s4, os.W_OK):
+        if 'windows' in platform.system().lower():
+            s3 = os.path.join(s4,
+                              s2 + u'.' + os.getenv('USERNAME') + s1)
+        elif 'darwin' in platform.system().lower():
+            s3 = os.path.join(s4,
+                              s2 + u'.' + os.getenv('USERNAME') + s1)
+        else:
+            s3 = os.path.join(s4,
+                              s2 + u'.' + os.getenv('USER') + s1)
+    elif 'windows' in platform.system().lower():
         s3 = os.path.join(os.getenv('TMP'),
                           s2 + u'.' + os.getenv('USERNAME') + s1)
     elif 'darwin' in platform.system().lower():
