@@ -1569,9 +1569,33 @@ Function sLockPath(s1)
 
     Set WshShell = CreateObject("WScript.Shell")
     Set WshEnv = WshShell.Environment("Process")
-    tempFolder = WshEnv("TEMP")
+    If bValidEnvironVar("READTEXTTEMP") Then
+        tempFolder= WshEnv("READTEXTTEMP")
+    Else
+        tempFolder = WshEnv("TEMP")
+    End If
     userid = WshEnv("USERNAME")
     sLockPath = tempFolder & "\" & APP_SIGNATURE & "." & userid & "." & s1
+End Function
+
+
+Function bValidEnvironVar(sA)
+    '''
+    ' Is an optional system environment variable like `READTEXTTEMP` valid? 
+    '''
+    Dim s1
+    Dim userid
+    Dim WshEnv
+    Dim wshShell
+
+    Set WshShell = CreateObject("WScript.Shell")
+    Set WshEnv = WshShell.Environment("Process")
+    s1= WshEnv(sA)
+    If len(s1) = 0 Then
+        bValidEnvironVar = False
+    Else
+        bValidEnvironVar = True
+    End If
 End Function
 
 
@@ -2782,18 +2806,18 @@ Sub main()
             Select Case s3
             Case "de"
                     s1 = "Las ein paar Worte..."
-			Case "es"
+            Case "es"
                     s1 = "Introduzca algunas palabras ..."
             Case "fr"
                     s1 = "Tapez quelques mots..."
             Case "pt"
                     s1 = "Tipo de poucas palavras..."
             Case Else
-			    If "CA" = Right(fsIsoToHumanReadable(fsDec2Hex(Int(GetLocale())), 0), 2) Then
-					s1 = "Excuse me... Could you please type some text?"
-				Else
-                    s1 = "Enter a few words..."
-				End If
+                    If "CA" = Right(fsIsoToHumanReadable(fsDec2Hex(Int(GetLocale())), 0), 2) Then
+                        s1 = "Excuse me... Could you please type some text?"
+                    Else
+                        s1 = "Enter a few words..."
+                    End If
             End Select
             s2=InputBox(s1, fsIsoToHumanReadable(fsDec2Hex(Int(GetLocale())), 1), s0)
         Case Else
