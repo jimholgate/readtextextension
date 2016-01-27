@@ -6513,7 +6513,7 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 		x.getDrawPages().getByIndex(0).getByIndex(0).String = sA
 		x.getDrawPages().getByIndex(0).Name = sA
 		x.getDrawPages().getByIndex(0).getByIndex(1).String = sAuthor
-		x.Presentation.IsMouseVisible() = true
+		
 		&apos; For each paragraph, make a slide
 		oFrame=ThisComponent.getCurrentController().getFrame() 
 		oBar=oFrame.createStatusIndicator()
@@ -6559,6 +6559,8 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 	 	ResizeAsianComplexText(oShape1)
 		oBar.End()
 		&apos; We want to be able to close without an &quot;Are you sure?&quot; message.
+		On Error Resume Next
+		x.Presentation.IsMouseVisible() = true
 		x.setModified(False)
 	endif
 end sub

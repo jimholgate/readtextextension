@@ -608,8 +608,8 @@ function fsMyTempLock(optional byval sExt)
 		sExt = &quot;lock&quot;
 	Endif
 	a1 = Split(&quot;READTEXTTEMP,TEMP,TMP,TMPDIR,TEMPDIR&quot;, &quot;,&quot;)
-&apos;&apos;  
-&apos;&apos;  Use a custom environment variable
+&apos;&apos;
+&apos;&apos;  Allow custom environment variable
 &apos;&apos;  =================================
 &apos;&apos;  
 &apos;&apos;  The extension may use a system temporary directory to
