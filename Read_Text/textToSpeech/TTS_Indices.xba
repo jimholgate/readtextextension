@@ -607,9 +607,26 @@ function fsMyTempLock(optional byval sExt)
 	if isMissing(sExt) Then
 		sExt = &quot;lock&quot;
 	Endif
-	a1 = Split(&quot;TEMP,TMP,TMPDIR,TEMPDIR&quot;, &quot;,&quot;)
-	&apos; The preferred way of looking up a temporary directory is
-	&apos; to use an environmental variable.
+	a1 = Split(&quot;READTEXTTEMP,TEMP,TMP,TMPDIR,TEMPDIR&quot;, &quot;,&quot;)
+&apos;&apos;
+&apos;&apos;  Use a custom environment variable
+&apos;&apos;  =================================
+&apos;&apos;  
+&apos;&apos;  The extension may use a system temporary directory to
+&apos;&apos;  write temporary files like lock files.  On some systems,
+&apos;&apos;  the default temporary directory may be locked to users
+&apos;&apos;  or processes that do not have sufficient reading or writing 
+&apos;&apos;  privileges.
+&apos;&apos;  
+&apos;&apos;  The preferred way of looking up a temporary directory is
+&apos;&apos;  to use an environmental variable.  If you have a custom
+&apos;&apos;  platform, you can set the `READTEXTTEMP` variable using
+&apos;&apos;  the `env` or `set` command in a terminal to prioritize 
+&apos;&apos;  a specific directory as the temporary directory.  If the
+&apos;&apos;  `READTEXTTEMP` variable is set, then it is the first 
+&apos;&apos;  place that the extension looks to read and write temporary
+&apos;&apos;  files.
+&apos;&apos;  
 	For i = Lbound(a1) to Ubound(a1)
 		sTemp = Environ(a1(i))
 		If Len(sTemp) &gt; 0 Then
