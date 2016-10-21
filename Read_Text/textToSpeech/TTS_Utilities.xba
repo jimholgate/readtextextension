@@ -3541,6 +3541,7 @@ Function fsSelectionLanguage(optional byVal sFilter) As String
 		sB=oVC.GetString()
 		sC=oVC.CharLocaleAsian.Language
 		sD=oVC.CharLocaleComplex.Language
+		
 		svcErr:
 	Endif
 	&apos; The application’s built in CharLocale.Language property does not identify
@@ -3552,8 +3553,18 @@ Function fsSelectionLanguage(optional byVal sFilter) As String
 	elseif sFilter = &quot;COMPLEX&quot;  then
 		fsSelectionLanguage = sD
 	elseif sFilter = &quot;ASIA&quot; then
+		if fbIsKorean(sB) then
+			sC=&quot;ko&quot;
+		elseif fbIsJapanese(sB) then
+			sC=&quot;ja&quot;
+		endif
 		fsSelectionLanguage = sC
 	else
+		if fbIsKorean(sB) then
+			sC=&quot;ko&quot;
+		elseif fbIsJapanese(sB) then
+			sC=&quot;ja&quot;
+		endif
 		fsSelectionLanguage = fsUseLanguageType(sA,sB,sC,sD)
 	endif
 
@@ -3564,6 +3575,7 @@ Function fsSelectionLanguage(optional byVal sFilter) As String
 	SELECTLANGUAGEERROR:
 	fsSelectionLanguage=fsDocLanguage()
 End Function
+
 
 Function fsSelectionCountry(optional byval sFilter) As String
 	Dim longI
@@ -3626,8 +3638,18 @@ Function fsSelectionCountry(optional byval sFilter) As String
 	elseif sFilter = &quot;COMPLEX&quot;  then
 		fsSelectionCountry = sD
 	elseif sFilter = &quot;ASIA&quot; then
+		if fbIsKorean(sB) then
+			sC=&quot;KR&quot;
+		elseif fbIsJapanese(sB) then
+			sC=&quot;JP&quot;
+		endif
 		fsSelectionCountry = sC
 	else
+		if fbIsKorean(sB) then
+			sC=&quot;KR&quot;
+		elseif fbIsJapanese(sB) then
+			sC=&quot;JP&quot;
+		endif
 		fsSelectionCountry = fsUseLanguageType(sA,sB,sC,sD)
 	endif
 	if fsSelectionCountry = &quot;&quot; Then
@@ -3724,6 +3746,77 @@ Function fsComplexAsiaOrWest(byval sA)
 	Case Else
 		fsComplexAsiaOrWest=&quot;ASIA&quot;
 	End Select
+End Function
+
+
+Function fbIsJapanese(byval sA)
+	Dim longI as long
+	Dim sB As String
+	Dim x As Integer
+	sA = trim(sA)
+	&apos;
+	&apos; Ignore numbers, basic punctuation, telephone network code and 
+	&apos; western currency symbols that Asian languages commonly use
+	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤&quot; &amp; _
+			&quot;₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯₰₱₲₳₴₵₶₷₸₹₺⅓⅔⅛⅜⅝&quot; &amp; _
+			Chr$(10) &amp; _
+			Chr$(13)
+	for x = 1 to 100
+		if Len(sA) &lt;&gt; 0 and Instr(sB, left(sA,1)) &lt;&gt; 0 Then
+			sA = mid(sA,2)
+			sA = trim(sA)
+		Else
+			Exit For
+		Endif
+	next
+	if sA=&quot;&quot; Then
+		longI = 0
+	Else
+		longI = asc(sA)
+	Endif
+	if longI &gt;= cLng(&quot;&amp;H3040&quot;) AND longI &lt;= cLng(&quot;&amp;H31FF&quot;) Then
+		fbIsJapanese=true &apos; &quot;ja&quot;
+	Elseif llongI &gt;= Asc(&quot;･&quot;) AND longI &lt;= Asc(&quot;ﾟ&quot;) Then
+		fbIsJapanese=true &apos; &quot;ja&quot;
+	Else &apos; Complex, Western, Chinese, Korean or ambiguous language
+		fbIsJapanese=false
+	Endif
+End Function
+
+
+Function fbIsKorean(byval sA)
+	Dim longI as long
+	Dim sB As String
+	Dim x As Integer
+
+	sA = trim(sA)
+	&apos;
+	&apos; Ignore numbers, basic punctuation, telephone network code and 
+	&apos; western currency symbols that Asian languages commonly use
+	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤&quot; &amp; _
+			&quot;₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯₰₱₲₳₴₵₶₷₸₹₺⅓⅔⅛⅜⅝&quot; &amp; _
+			Chr$(10) &amp; _
+			Chr$(13)
+	for x = 1 to 100
+		if Len(sA) &lt;&gt; 0 and Instr(sB, left(sA,1)) &lt;&gt; 0 Then
+			sA = mid(sA,2)
+			sA = trim(sA)
+		Else
+			Exit For
+		Endif
+	next
+	if sA=&quot;&quot; Then
+		longI = 0
+	Else
+		longI = asc(sA)
+	Endif
+	if longI &gt;= clng(&quot;&amp;HAC00&quot;) And longI &lt;= clng(&quot;&amp;HD7A3&quot;) Then
+		fbIsKorean=true &apos; &quot;ko&quot;
+	Elseif longI &gt;=clng(&quot;&amp;HFFA0&quot;) And longI &lt;=clng(&quot;&amp;HFFDC&quot;) Then
+		fbIsKorean=true &apos; &quot;ko&quot;
+	Else &apos; Complex, Western, Chinese, Japanese or ambiguous language
+		fbIsKorean=false
+	Endif
 End Function
 
 
@@ -4326,6 +4419,7 @@ end function
 
 
 Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional byVal ArtURL)
+	fswriteOSXSpeechScript = &quot;&quot;
 	&apos; Writes an osascript to read a sound, or create and convert a sound.
 	&apos; Creates a lock file to prevent double talk and to silence the speaker
 	&apos; if the button is clicked while the synthesizer is speaking.
@@ -4368,10 +4462,19 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 	
 	fswriteOSXSpeechScript = &quot;&quot;
 	sFile=fsTemporaryTtsAppleScript
-	CreateFile(sFile, _
-			&quot;-- fswriteOSXSpeechScript: &quot; &amp; _
-			&quot;No actions are defined.&quot;, _
-			&quot;utf-8&quot;)
+	If fileExists(sFile) Then
+		kill sFile
+	Endif
+	If fileExists(sFile) Then
+		&apos; If we can&apos;t make a fresh file, then we don&apos;t want to run an
+		&apos; arbitrary script.
+		Exit Function
+	Else
+		CreateFile(sFile, _
+				&quot;-- fswriteOSXSpeechScript: &quot; &amp; _
+				&quot;No actions are defined.&quot;, _
+				&quot;utf-8&quot;)
+	EndIf
 	sLongTrack =  fsPrefixZeroes(trim(str(fiMyCurrentAudioTrack(false))), 3)
 	if isMissing(ArtURL) or _
 			ArtURL = &quot;&quot; or _
@@ -6513,7 +6616,7 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 		x.getDrawPages().getByIndex(0).getByIndex(0).String = sA
 		x.getDrawPages().getByIndex(0).Name = sA
 		x.getDrawPages().getByIndex(0).getByIndex(1).String = sAuthor
-		
+		x.Presentation.IsMouseVisible() = true
 		&apos; For each paragraph, make a slide
 		oFrame=ThisComponent.getCurrentController().getFrame() 
 		oBar=oFrame.createStatusIndicator()
@@ -6559,8 +6662,6 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 	 	ResizeAsianComplexText(oShape1)
 		oBar.End()
 		&apos; We want to be able to close without an &quot;Are you sure?&quot; message.
-		On Error Resume Next
-		x.Presentation.IsMouseVisible() = true
 		x.setModified(False)
 	endif
 end sub
