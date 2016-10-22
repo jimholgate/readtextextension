@@ -3633,7 +3633,6 @@ Function fsSelectionCountry(optional byval sFilter) As String
 	&apos; oriental or complex text locales so we use the UTF encoding for the first
 	&apos; character to evaluate the country. See http://www.utf8-chartable.de/
 	&apos; and http://unicode.org/Public/UNIDATA/Blocks.txt
-	print sFilter
 	if sFilter = &quot;WEST&quot; or sFilter = &quot;UNDEFINED&quot; then
 		fsSelectionCountry = sA
 	elseif sFilter = &quot;COMPLEX&quot;  then
