@@ -3633,23 +3633,25 @@ Function fsSelectionCountry(optional byval sFilter) As String
 	&apos; oriental or complex text locales so we use the UTF encoding for the first
 	&apos; character to evaluate the country. See http://www.utf8-chartable.de/
 	&apos; and http://unicode.org/Public/UNIDATA/Blocks.txt
+	print sFilter
 	if sFilter = &quot;WEST&quot; or sFilter = &quot;UNDEFINED&quot; then
 		fsSelectionCountry = sA
 	elseif sFilter = &quot;COMPLEX&quot;  then
 		fsSelectionCountry = sD
-	elseif sFilter = &quot;ASIA&quot; then
+	elseif sFilter = &quot;ASIA&quot; then 
 		if fbIsKorean(sB) then
 			sC=&quot;KR&quot;
 		elseif fbIsJapanese(sB) then
 			sC=&quot;JP&quot;
 		endif
-		fsSelectionCountry = sC
 	else
+		
 		if fbIsKorean(sB) then
 			sC=&quot;KR&quot;
 		elseif fbIsJapanese(sB) then
 			sC=&quot;JP&quot;
 		endif
+		
 		fsSelectionCountry = fsUseLanguageType(sA,sB,sC,sD)
 	endif
 	if fsSelectionCountry = &quot;&quot; Then
@@ -3774,9 +3776,9 @@ Function fbIsJapanese(byval sA)
 	Else
 		longI = asc(sA)
 	Endif
-	if longI &gt;= cLng(&quot;&amp;H3040&quot;) AND longI &lt;= cLng(&quot;&amp;H31FF&quot;) Then
+	if longI &gt;= 12352 AND longI &lt;= 12799 Then
 		fbIsJapanese=true &apos; &quot;ja&quot;
-	Elseif llongI &gt;= Asc(&quot;･&quot;) AND longI &lt;= Asc(&quot;ﾟ&quot;) Then
+	Elseif longI &gt;= 65381 AND longI &lt;= 65439 Then
 		fbIsJapanese=true &apos; &quot;ja&quot;
 	Else &apos; Complex, Western, Chinese, Korean or ambiguous language
 		fbIsJapanese=false
@@ -3810,9 +3812,9 @@ Function fbIsKorean(byval sA)
 	Else
 		longI = asc(sA)
 	Endif
-	if longI &gt;= clng(&quot;&amp;HAC00&quot;) And longI &lt;= clng(&quot;&amp;HD7A3&quot;) Then
+	if longI &gt;= 44032 And longI &lt;= 55203 Then
 		fbIsKorean=true &apos; &quot;ko&quot;
-	Elseif longI &gt;=clng(&quot;&amp;HFFA0&quot;) And longI &lt;=clng(&quot;&amp;HFFDC&quot;) Then
+	Elseif longI &gt;= 65440 And longI &lt;= 65500 Then
 		fbIsKorean=true &apos; &quot;ko&quot;
 	Else &apos; Complex, Western, Chinese, Japanese or ambiguous language
 		fbIsKorean=false
