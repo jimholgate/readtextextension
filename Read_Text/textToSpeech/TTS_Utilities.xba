@@ -3644,14 +3644,13 @@ Function fsSelectionCountry(optional byval sFilter) As String
 		elseif fbIsJapanese(sB) then
 			sC=&quot;JP&quot;
 		endif
-	else
-		
+		fsSelectionCountry = sC
+	else		
 		if fbIsKorean(sB) then
 			sC=&quot;KR&quot;
 		elseif fbIsJapanese(sB) then
 			sC=&quot;JP&quot;
 		endif
-		
 		fsSelectionCountry = fsUseLanguageType(sA,sB,sC,sD)
 	endif
 	if fsSelectionCountry = &quot;&quot; Then
