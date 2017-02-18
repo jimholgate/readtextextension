@@ -1,27 +1,44 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
 '''
-To read a plain text file using Python pyttsx speech.
-    Designed for reading text aloud with the Windows SAPI5 system.
-    For other systems, read documentation for pyttsx for installation help.
+Pyttsx
+======
 
-For Windows :
-    get Python 2.x from
-        http://www.python.org/
-    get Python Extensions for Windows from
-        http://sourceforge.net/projects/pywin32/files/
-    get the Speech assistive technology pyTTS module from:
-        http://pypi.python.org/pypi/pyttsx/1.0
+Read a plain text file in Windows using the Python `pyttsx` speech package.
 
-Read Text Extension for OpenOffice.org (for Windows) :
-    See: http://sites.google.com/site/readtextextension/
-    Tools > Add-Ons > Read Selection... Dialog setup:
-    External program: C:\Program Files\Python\python.exe
-    External program alternate: C:\Program Files\Python\pythonw.exe
-    Command line options: "(HOME)Downloads\read_text_file.py" "(TMP)"
-    or "(HOME)Downloads\read_text_file.py" --voice "Microsoft Sam" "(TMP)"
+  +  Designed for reading text aloud with the Windows SAPI5 system.
+  +  For other systems, read the
+     [documentation](https://github.com/parente/pyttsx)
+     for `pyttsx`.
 
-Copyright (c) 2010 - 2015 James Holgate
+Windows
+-------
+  1.  Install [Python 2.x](http://www.python.org/).
+  2.  Install [Python extensions for 
+        Windows](http://sourceforge.net/projects/pywin32/files/).
+  3.  Install the [pyttsx
+      1.0](http://pypi.python.org/pypi/pyttsx/1.0)
+      package.
+      
+
+Windows settings
+----------------
+
+1. Using [Read 
+   Text](http://sites.google.com/site/readtextextension/)
+   extension, choose *Tools > Add-Ons > Read Selection...*
+2. In the dialogue, enter the following information:
+   +  **External program**\
+      `"C:\Program Files\Python\python.exe"` **or**\
+      `"C:\Program Files\Python\pythonw.exe"`
+   +  **Command line options**\
+      `"(HOME)Downloads\read_text_file.py" "(TMP)"` **or**\
+      `"(HOME)Downloads\read_text_file.py" --voice "Microsoft Sam" "(TMP)"`
+
+Copyright
+---------
+
+`pyttsx_read_text_file.py` copyright (c) 2010 - 2016 James Holgate
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -49,21 +66,23 @@ import sys
 
 def usage():
     sA = '    ' + os.path.split(sys.argv[0])[1]
-    print ('\nPyttsx Read Text\n================\n')
-    print ('Reads a text file using the Windows pyttsx library.\n')
-    print ('Usage\n-----\n')
-    print ("To say the text with a specific voice")
-    print (sA + ' --voice "xxxxxx" "TextFile.txt"')
-    print ("")
-    print ("To say the text with the default voice")
-    print (sA + ' "TextFile.txt"')
-    print ("")
-    print ("To say the text slower")
-    print (sA + ' --rate "-20" "TextFile.txt"')
-    print ("")
-    print ("To say the text faster")
-    print (sA + ' --rate "20" "TextFile.txt"')
-    print ("")
+    print ('\n' +
+           'Pyttsx Read Text\n' +
+           '================\n' +
+           '\n' +
+           'Reads a text file using the Windows `pyttsx` library.\n' +
+           '\n' +
+           'Usage\n' +
+           '-----\n' +
+           '\n' +
+           '+ To say the text with a specific voice  \n' +
+           '  `pyttsx_read_text_file.py --voice "xxxxxx" "TextFile.txt"`\n' +
+           '+ To say the text with the default voice  \n' +
+           '  `pyttsx_read_text_file.py "TextFile.txt"`\n' +
+           '+ To say the text slower  \n' +
+           '  `pyttsx_read_text_file.py --rate "-20" "TextFile.txt"`\n' +
+           '+ To say the text faster  \n' +
+           '  `pyttsx_read_text_file.py --rate "20" "TextFile.txt"`)\n')
 
 
 def ReadTheStringAloud(voiceName, voiceRate, speechString):

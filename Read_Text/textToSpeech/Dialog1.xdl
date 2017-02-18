@@ -107,7 +107,6 @@
     <dlg:menuitem dlg:value="http://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="http://google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)"/>
     <dlg:menuitem dlg:value="http://m.dwds.de/?qu=(OOO_WEBTEXTDEFINITION)"/>
-    <dlg:menuitem dlg:value="http://tts.voicetech.yandex.net/tts?format=mp3&amp;quality=hi&amp;platform=web&amp;application=translate&amp;lang=(SELECTION_LANGUAGE_CODE)_(SELECTION_COUNTRY_CODE)&amp;text=&quot;(OOO_WEBTEXTSMALL)&quot;"/>
     <dlg:menuitem dlg:value="http://twitter.com/intent/tweet?text=(OOO_WEBTEXTSMALL)"/>
     <dlg:menuitem dlg:value="http://vozme.com/text2voice.php?lang=ca&amp;bookmarklet=1&amp;gn=ml&amp;default_language=ca&amp;text=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="http://vozme.com/text2voice.php?lang=en&amp;bookmarklet=1&amp;gn=ml&amp;default_language=en&amp;text=(OOO_WEBTEXT)"/>

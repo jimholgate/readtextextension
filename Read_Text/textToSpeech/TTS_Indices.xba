@@ -1004,7 +1004,7 @@ End Function
 
 
 Function fsKeyUSE_SMART_SELECT As String
-	fsKeyUSE_SMART_SELECT=&quot;text-To-speech.use.smart.select.integer&quot;
+	fsKeyUSE_SMART_SELECT=&quot;text-To-speech.use.smart.select.Integer&quot;
 End Function
 
 

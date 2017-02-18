@@ -5315,7 +5315,7 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 		If Not (fbLetButtonInterruptPosixPlayer) OR fbUsingPosixTalkProgram Then
 			&apos; Stop the sound.
 			&apos; Check players before synthesizers.
-			a1 = Split(&quot;aplay,artsplay,esdplay,ossplay,paplay,play,roarcat,roarcatplay,&quot; &amp; _
+			a1 = Split(&quot;gst-launch-1.0,aplay,artsplay,esdplay,ossplay,paplay,play,roarcat,roarcatplay,&quot; &amp; _
 					&quot;espeak,festival,padsp,pico2wave,say,text2wave&quot;, _
 					&quot;,&quot;)
 			For i = Lbound(a1) to Ubound(a1)

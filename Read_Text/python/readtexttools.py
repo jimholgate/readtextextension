@@ -72,7 +72,7 @@ Currently, python3 is *required* for `speech-dispatcher`.  Python2 requires the
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2015 James Holgate
+Copyright (c) 2011 - 2016 James Holgate
 '''
 import aifc
 import codecs
@@ -87,6 +87,19 @@ import sunau
 import sys
 import time
 import wave
+
+if sys.version_info >= (3, 0):
+    import urllib.parse as urlparse
+    import urllib.request as urllib
+else:
+    import urlparse
+    import urllib
+try:
+    import gi
+    gi.require_version('Gst', '1.0')
+    from gi.repository import Gst
+except:
+    pass
 
 
 def usage():
@@ -160,7 +173,6 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
         sTMP1 = getTempPrefix() + u'-speech.wav'
     sTMP1EXT = os.path.splitext(sTMP1)[1].lower()
     sIMG1EXT = os.path.splitext(sIMG1)[1].lower()
-
     mimetypes.init()
     if len(sTMP1EXT) == 0:
         sMIME = "xxz/xxz-do-not-match"
@@ -177,8 +189,8 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
                 sOUT1 = sTMP1 + u'.wav'
                 sTMP1 = sOUT1
     elif sMIME == mimetypes.types_map['.mp3']:
-            if ((ffMpegInstalled() and
-                    os.path.isfile('/usr/share/doc/liblame0/copyright')) or
+        if MediaConverterInstalled() != bFalse:
+            if (os.path.isfile('/usr/share/doc/liblame0/copyright') or
                     os.path.isfile('/usr/bin/lame') or
                     os.path.isfile(r'C:\opt\lame.exe')):
                 sOUT1 = sTMP1
@@ -187,29 +199,39 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
                 # Can't make mp3, so make wav
                 sOUT1 = sTMP1 + u'.wav'
                 sTMP1 = sOUT1
+        else:
+            # Can't make mp3, so make wav
+            sOUT1 = sTMP1 + u'.wav'
+            sTMP1 = sOUT1
     if sTMP1EXT == '.mp2':
-            if ((ffMpegInstalled() and
-                    os.path.isfile('/usr/share/doc/libtwolame0/copyright')) or
+        if MediaConverterInstalled() != bFalse:
+            if (os.path.isfile('/usr/share/doc/libtwolame0/copyright') or
                     os.path.isfile(r'C:\opt\twolame.exe')):
                 sOUT1 = sTMP1
                 sTMP1 = sOUT1 + u'.wav'
             else:
-                # Can't make mp3, so make wav
                 sOUT1 = sTMP1 + u'.wav'
                 sTMP1 = sOUT1
+        else:
+            # Can't make mp2, so make wav
+            sOUT1 = sTMP1 + u'.wav'
+            sTMP1 = sOUT1
     elif sMIME == mimetypes.types_map['.ogg']:
-            if ((ffMpegInstalled() and
-                    os.path.isfile('/usr/share/doc/libogg0/copyright')) or
+        if MediaConverterInstalled() != bFalse:
+            if (os.path.isfile('/usr/share/doc/libogg0/copyright') or
                     os.path.isfile(r'C:\opt\oggenc.exe') or
                     os.path.isfile(r'C:\opt\oggenc2.exe')):
                 sOUT1 = sTMP1
                 sTMP1 = sOUT1 + u'.wav'
             else:
-                # Can't make ogg, so make wav
                 sOUT1 = sTMP1 + u'.wav'
                 sTMP1 = sOUT1
+        else:
+            # Can't make ogg, so make wav
+            sOUT1 = sTMP1 + u'.wav'
+            sTMP1 = sOUT1
     elif sMIME == mimetypes.types_map['.aif']:
-            if ffMpegInstalled():
+            if MediaConverterInstalled() != bFalse:
                 sOUT1 = sTMP1
                 sTMP1 = sOUT1 + u'.wav'
             else:
@@ -217,7 +239,7 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
                 sOUT1 = sTMP1 + u'.wav'
                 sTMP1 = sOUT1
     elif sMIME == mimetypes.types_map['.flac']:
-            if (ffMpegInstalled() or
+            if (MediaConverterInstalled() != bFalse or
                     os.path.isfile(r'C:\opt\flac.exe')):
                 sOUT1 = sTMP1
                 sTMP1 = sOUT1 + u'.wav'
@@ -225,8 +247,16 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
                 # Can't make flac, so make wav
                 sOUT1 = sTMP1 + u'.wav'
                 sTMP1 = sOUT1
+    elif sMIME == mimetypes.types_map['.webm']:
+            if (MediaConverterInstalled() != bFalse):
+                sOUT1 = sTMP1
+                sTMP1 = sOUT1 + u'.wav'
+            else:
+                # Can't make webm, so make wav
+                sOUT1 = sTMP1 + u'.wav'
+                sTMP1 = sOUT1
     elif 'video/' in sMIME:
-            if (ffMpegInstalled() and
+            if (len(ffMpegPath()) > 4 and
                     sIMG1EXT in '.bmp;.gif;.jpeg;.jpg;.png;.tif;.tiff;.tga;'):
                 sOUT1 = sTMP1
                 sTMP1 = sOUT1 + u'.wav'
@@ -238,17 +268,6 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
         retVal = sTMP1
     else:
         retVal = sOUT1
-    return retVal
-
-
-def ffMpegInstalled():
-    '''
-    Can we use ffmpeg or avconv?
-    '''
-    retVal = not(0)
-
-    if len(ffMpegPath()) == 0:
-        retVal = not(1)
     return retVal
 
 
@@ -301,6 +320,34 @@ def ffMpegPath():
     return retVal
 
 
+def fGstLaunchPath():
+    '''
+    gst-launch is primarily a debugging tool for developers and users.
+    gst-launch-x.x may not be in the normal environment PATH,
+    so we look for it, and return the location.
+    '''
+    retVal = ''
+
+    if os.path.isfile('/usr/bin/gst-launch-1.0'):
+        retVal = '/usr/bin/gst-launch-1.0'
+    elif os.path.isfile('/usr/bin/gst-launch-1.0'):
+        retVal = '/usr/bin/gst-launch-1.0'
+    elif os.path.isfile('/usr/local/bin/gst-launch-0.10'):
+        retVal = '/usr/local/bin/gst-launch-0.10'
+    elif os.path.isfile('/usr/local/bin/gst-launch-0.10'):
+        retVal = '/usr/local/bin/gst-launch-0.10'
+    return retVal
+
+
+def MediaConverterInstalled():
+    retVal = bFalse
+    if len(ffMpegPath()) > 4:
+        retVal = bTrue
+    elif len(fGstLaunchPath()) > 4:
+        retVal = bTrue
+    return retVal
+
+
 def ProcessWaveMedia(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
     '''
     Converts audio file, plays copy and deletes original
@@ -311,7 +358,27 @@ def ProcessWaveMedia(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
     sAUDIBLE - Do we play the file after conversion?
     sVISIBLE - Do we use a GUI or the console?
     '''
-    Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM)
+    # Handle simply with Gstreamer
+    if ((os.path.splitext(sOUT1)[1].lower() == ".spx") and
+       (CheckForGSTPlugIn("libgstvorbis") != '')):
+        GstWav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM)
+    elif ((os.path.splitext(sOUT1)[1].lower() == ".opus") and
+          (CheckForGSTPlugIn("libgstopus") != '')):
+        GstWav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM)
+    # Handle with avconv, ffmpeg or a specific program
+    elif len(ffMpegPath()) > 4:
+        Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM)
+    elif os.path.splitext(sOUT1)[1].lower() == ".mp3":
+        if os.path.isfile('/usr/bin/lame'):
+            Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM)
+        else:
+            GstWav2Media(sB,
+                         sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM)
+    elif (os.path.splitext(sOUT1)[1].lower() == ".m4a"):
+        Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM)
+    else:
+        # Use Gstreamer if you are missing `ffmpeg`, `avconv` etc.
+        GstWav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM)
     try:
         if sOUT1 == '':
             print(u'Saved to: ' + sTMP1)
@@ -327,6 +394,247 @@ def ProcessWaveMedia(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
                           )
     except (OSError):
         print(u'Could not remove "' + sTMP1 + u'"')
+
+
+def CheckForGSTPlugIn(sA):
+    '''
+    Check directories for a named GST plugin (i. e.: `libgstvorbis`)
+    '''
+    # This does not check for plugin by pad name, mime type or extension
+    s1 = ''
+    s2 = '/usr/local/lib/x86_64-linux-gnu/'
+    s3 = '/usr/local/lib/'
+    s4 = '/usr/lib/x86_64-linux-gnu/'
+    s5 = '/usr/lib/'
+    s6 = '.so'
+    if 'darwin' in platform.system().lower():
+        s2 = os.path.join(
+                          os.getenv(
+                           'HOME'),
+                           '/.gstreamer-0.10/plugins/')
+        s4 = os.getenv('GST_PLUGIN_PATH')
+        s6 = '.dylib'
+    elif 'windows' in platform.system().lower():
+        s2 = os.path.join(
+                          os.getenv(
+                           'HOME'),
+                           '/.gstreamer-0.10/plugins/')
+        s3 = os.path.join(
+                          os.getenv(
+                           'HOMEDRIVE'),
+                           '/gstreamer-sdk/0.10/x86/lib/gstreamer-0.10/')
+        s4 = os.getenv('GST_PLUGIN_PATH')
+        s5 = os.path.join(
+                          os.getenv(
+                          'HOMEDRIVE'),
+                          '/opt/gstreamer-0.10/')
+        s6 = '.dll'
+
+    if os.path.isfile(os.path.join(s2 + 'gstreamer-1.0/', sA + s6)):
+        s1 = os.path.join(s2 + 'gstreamer-1.0/', sA + s6)
+    elif os.path.isfile(os.path.join(s2 + 'gstreamer-0.10/', sA + s6)):
+        s1 = os.path.join(s2 + 'gstreamer-0.10/', sA + s6)
+    elif os.path.isfile(os.path.join(s3 + 'gstreamer-1.0/', sA + s6)):
+        s1 = os.path.join(s3 + 'gstreamer-1.0/', sA + s6)
+    elif os.path.isfile(os.path.join(s3 + 'gstreamer-0.10/', sA + s6)):
+        s1 = os.path.join(s3 + 'gstreamer-0.10/', sA + s6)
+    elif os.path.isfile(os.path.join(s4 + 'gstreamer-1.0/', sA + s6)):
+        s1 = os.path.join(s4 + 'gstreamer-1.0/', sA + s6)
+    elif os.path.isfile(os.path.join(s4 + 'gstreamer-0.10/', sA + s6)):
+        s1 = os.path.join(s4 + 'gstreamer-0.10/', sA + s6)
+    elif os.path.isfile(os.path.join(s5 + 'gstreamer-1.0/', sA + s6)):
+        s1 = os.path.join(s5 + 'gstreamer-1.0/', sA + s6)
+    elif os.path.isfile(os.path.join(s5 + 'gstreamer-0.10/', sA + s6)):
+        s1 = os.path.join(s5 + 'gstreamer-0.10/', sA + s6)
+    print ('\n# Discovered GStreamer library # \n\n`' + s1 + "`")
+    return s1
+
+
+def ExecuteGSTCommand(sA):
+    '''
+    Execute a GStreamer command. This usually includes a source,
+    a series of pads, and a destination.
+
+    Example 1
+    ---------
+
+    Convert a wav file to an mp3 file.
+    ```
+    filesrc name='xx.wav' ! lamemp3enc ! filesink location='xx.mp3'
+    ```
+
+    Example 2
+    ---------
+
+    Play a sound file.
+    ```
+    playbin uri='file:///pathto/xx.mp3'
+    ```
+
+    Find examples of commands on the [Gstreamer cheat sheet
+    wiki](http://wiki.oz9aec.net/index.php/Gstreamer_cheat_sheet).
+    '''
+    i1 = 0
+    try:
+        Gst.init(None)
+        pl = Gst.parse_launch(sA)
+        pl.set_state(gst.STATE_NULL)
+        pl.set_state(gst.STATE_PLAYING)
+        i1 = 1
+    except:
+        i1 = 0
+    if i1 == 0:
+        try:
+            s1 = "gst-launch-1.0 " + sA
+            myossystem(s1)
+            i1 = 1
+        except:
+            i1 = 0
+    if i1 == 0:
+        try:
+            s1 = "gst-launch-0.10 " + sA
+            myossystem(s1)
+            i1 = 1
+        except:
+            i1 = 0
+    return i1
+
+
+def NullGSTCommand():
+    i1 = 0
+    try:
+        Gst.init(None)
+        pl = Gst.parse_launch("audiotestsrc ! audioconvert ! testsink")
+        pl.set_state(gst.STATE_NULL)
+        UnlockMyLock()
+        i1 = 1
+    except:
+        i1 = 0
+    return i1
+
+
+def GstWav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
+    '''
+    If `avconv` is not installed and `ffmpeg` is not installed, use
+    gst-launch for a **basic** media conversion.  Note: wav format
+    files do not contain metadata tags.  Some forms of metadata tagging
+    may be incompatible with legacy players.
+    '''
+    sTMP1EXT = os.path.splitext(sOUT1)[1].lower()
+    sMETADATA = ""
+    sPIPE = u'" ! decodebin ! audioconvert ! '
+    sFileView = sOUT1
+
+    print('\n# Using GStreamer #\n\nGStreamer writes common media formats.\n')
+    print (sTMP1EXT)
+
+    if sTMP1EXT == ".m4a":
+        # libgstisomp4 - Basic ISO MP4 container
+        if '' == CheckForGSTPlugIn('libgstisomp4'):
+            print('## gst-launch ##\n\nM4A is not supported. Using WAV.')
+            sPIPE = u''
+        else:
+            print('## libgstisomp4 ##\n\nQuickTime Muxer\n' +
+                  'Mono : Raw 16-bit PCM audio')
+            #sPIPE = sPIPE + u'qtmux !'
+            sPIPE = sPIPE + u'qtmux !'
+    elif sTMP1EXT == ".mp3":
+        # libgstlame - MP3 compatible compressed file.
+        if '' == CheckForGSTPlugIn('libgstlame'):
+            print('## gst-launch ##\n\nMP3 is not supported. Using WAV.')
+            sPIPE = u''
+        else:
+            print('## libgstlame ##\n\nL.A.M.E. mp3 encoder\n' +
+                  'GStreamer Ugly Plugins')
+            sPIPE = sPIPE + u'lamemp3enc !'
+    elif sTMP1EXT == ".flac":
+        sPIPE = sPIPE + u'flacenc !'
+    elif sTMP1EXT == ".oga":
+        sPIPE = sPIPE + u'vorbisenc ! oggmux !'
+    elif sTMP1EXT == ".ogg":
+        sPIPE = sPIPE + u'vorbisenc ! oggmux !'
+    elif sTMP1EXT == ".opus":
+        if '' == CheckForGSTPlugIn('libgstopus'):
+            print('## gst-launch ##\n\nOPUS is not supported.  Using WAV.')
+            sPIPE = u''
+        else:
+            print('## OPUS plugin library ##\n\nGStreamer Bad Plugins.')
+            sPIPE = sPIPE + u'opusenc ! oggmux !'
+    elif sTMP1EXT == ".spx":
+        sPIPE =  sPIPE + u'speexenc ! oggmux !'
+    elif sTMP1EXT == ".webm":
+        sPIPE = (sPIPE + u'vorbisenc ! webmmux !')
+    else:
+        sPIPE = ""
+    # Convert
+    if (sOUT1 != "") and (sPIPE != ""):
+        s1 = (u'filesrc location="' +
+                   sTMP1 +
+                   sPIPE +
+                  ' filesink location="' +
+                   sOUT1 +
+                   u'"')
+        print('\n## Using GStreamer command ##\n\n```\n' + s1 + '\n```\n')
+        sFileView = writeXspfPlayList(sOUT1, sART, sIMG1)
+        print(s1)
+        ExecuteGSTCommand(s1)
+    else:
+        # Play the file
+        print ("Play the file")
+        v1 = '.avi;.flv;.webm;.m4v;.mov;.mpg;.mp4;.wmv'
+        if sTMP1EXT == '':
+            sTMP1EXT = ".wav"
+        if (sVISIBLE.lower() == 'false' and
+                sTMP1EXT not in v1):
+            LockMyLock()
+            PlayWaveInBackground(sTMP1)
+        else:
+            ShowWithApp(sTMP1)
+        exit()
+    # Playback with or without GUI
+    try:
+        if os.path.isfile(sFileView):
+            if sAUDIBLE.lower() == 'false':
+                print('Play is off - file will not play.')
+                print(('The file was saved to:  ' + sOUT1))
+                if os.path.isfile("/usr/bin/notify-send"):
+                    s1 = u'notify-send "' + fsAppName() + '" "' + sOUT1 + u'"'
+                    myossystem(s1)
+            else:
+                # Play the file
+                v1 = '.avi;.flv;.webm;.m4v;.mov;.mpg;.mp4;.wmv'
+                if sTMP1EXT == '':
+                    sTMP1EXT = ".wav"
+                if (sVISIBLE.lower() == 'false' and
+                        sTMP1EXT not in v1):
+                    LockMyLock()
+                    PlayWaveInBackground(sOUT1)
+                else:
+                    ShowWithApp(sFileView)
+        elif os.path.isfile(sOUT1):
+            if sAUDIBLE.lower() == 'false':
+                print('Play is off - file will not play.')
+                print(('The file was saved to:  ' + sOUT1))
+                if os.path.isfile("/usr/bin/notify-send"):
+                    s1 = u'notify-send "' + fsAppName() + '" "' + sOUT1 + u'"'
+                    myossystem(s1)
+            else:
+                # Play the file
+                v1 = '.avi;.flv;.webm;.m4v;.mov;.mpg;.mp4;.wmv'
+                if sTMP1EXT == '':
+                    sTMP1EXT = ".wav"
+                if (sVISIBLE.lower() == 'false' and
+                        sTMP1EXT not in v1):
+                    LockMyLock()
+                    PlayWaveInBackground(sOUT1)
+                else:
+                    ShowWithApp(sOUT1)
+        else:
+            print('`GstWav2Media` finished with no errors.')
+    except:
+        print('Error in `GstWav2Media`.')
+        sys.exit(2)
+    UnlockMyLock()
 
 
 def SoundLenInSeconds(sTMP1):
@@ -367,6 +675,163 @@ def WavtoSeconds(sTMP1):
     return retVal
 
 
+def GetAMetaDataStr(i1, sART2):
+    # Set defaults
+    sTT = ""
+    sTL = ""
+    sTG = ""
+    sTN = ""
+    sTY = time.strftime('%Y')
+    iNone = 0
+    iAvconv = 1
+    iOggEnc2 = 2
+    iNeroMp4 = 3
+    iWinLame = 4
+    iUnixLame = 5
+    iVLCxspfTrack = 6
+    iVLCxspfTitle = 7
+    iVLCxspfAuthor = 8
+    iVLCxspfAlbum = 9
+    iVLCxspfGenre = 10
+    iXSPF = 11
+    iM3U = 12
+
+    # Look up data
+    try:
+        if len(sTT) == 0:
+            sTT = cleanstr(getMySongName(), bFalse())
+        else:
+            sTT = cleanstr(sTT, bFalse())
+    except (UnicodeDecodeError):
+        sTT = timefortitle()
+    try:
+        if len(sTN) == 0:
+            sTN = getMyTrackNo()
+        else:
+            sTN = '1'
+    except (UnicodeDecodeError):
+        sTN = '1'
+    try:
+        if len(sTG) == 0:
+            sTG = getMyGenreName()
+        else:
+            sTG = 'Speech'
+    except (UnicodeDecodeError):
+        sTG = 'Speech'
+    try:
+        s1 = sART2
+        print ("ART2", s1)
+        if len(s1) == 0:
+            sART2 = cleanstr(getMyUserName(), bFalse)
+        else:
+            sART2 = cleanstr(s1, bFalse())
+        print(sART2)
+    except (UnicodeDecodeError):
+        sART2 = fsAppName()
+        print ("Error finding ART2")
+    try:
+        sTL = cleanstr(getMyAlbumName(), bFalse())
+    except:
+        sTL = "Untitled album"
+    # Format the string with tags
+    try:
+        if i1 == iNone:
+            # Print data, but do not return a string.
+            s1 = ''
+        elif i1 == iAvconv:
+            # Vorbis - flac, ogg, opus, spx
+            # avconv, ffmpeg
+            # Double quotes must be cleaned from strings but UTF-8 is okay
+            s1 = (u" -metadata album='" + cleanstr(sTL, bTrue()) +
+                  u"' -metadata artist='" + cleanstr(sART2, bTrue()) +
+                  u"' -metadata genre='" + sTG +
+                  u"' -metadata title='" + cleanstr(sTT, bTrue()) +
+                  u"' -metadata track='" + sTN +
+                  u"' -metadata Year='" + sTY + u"' ")
+        elif i1 == iOggEnc2:
+            # oggenc2 and oggenc2.exe command line sequence
+            # Double quotes must be cleaned from strings but UTF-8 is okay
+            s1 = (u" -metadata album='" + cleanstr(sTL, bTrue()) +
+                  u"' -metadata artist='" + cleanstr(sART2, bTrue()) +
+                  u"' -metadata genre='" + sTG +
+                  u"' -metadata title='" + cleanstr(sTT, bTrue()) +
+                  u"' -metadata track='" + sTN +
+                  u"' -metadata Year='" + sTY + u"' ")
+        elif i1 == iNeroMp4:
+            s1 = (u' -meta:album="' + cleanstr(sTL, bTrue()) +
+                  u'" -meta:artist="' + cleanstr(sART2, bTrue()) +
+                  u'" -meta:genre="' + sTG +
+                  u'" -meta:title="' + cleanstr(sTT, bTrue()) +
+                  u'" -meta:track="' + sTN +
+                  u'" -meta:year="' + sTY + u'" ')
+        elif i1 == iWinLame:
+            s1 = (u' --tl "' + sTL +
+                  u'" --ta "' + sART2 +
+                  u'" --tt "' + sTT +
+                  u'" --tg "' + sTG +
+                  u'" --tn "' + sTN +
+                  u'" --ty ' + sTY)
+        elif i1 == iUnixLame:
+            s1 = (u' --tl "' + sTL +
+                  u'" --ta "' + sART2 +
+                  u'" --tt "' + sTT +
+                  u'" --tg "' + sTG +
+                  u'" --tn "' + sTN +
+                  u'" --ty ' + sTY)
+        elif i1 == iVLCxspfTrack:
+            s1 = cleanstr(sTT, bTrue())
+        elif i1 == iVLCxspfTitle:
+            s1 = cleanstr(sTL, bTrue())
+        elif i1 == iVLCxspfAuthor:
+            s1 = cleanstr(sART2, bTrue())
+        elif i1 == iVLCxspfAlbum:
+            s1 = cleanstr(sTL, bTrue())
+        elif i1 == iVLCxspfGenre:
+            s1 = cleanstr(sTG, bTrue())
+        elif i1 == iXSPF:
+            s1 = ('<?xml version="1.0" encoding="UTF-8"?>\n' +
+                  '<playlist version="1" xmlns="http://xspf.org/ns/0/">\n' +
+                  '<!-- xspf.org playlist for videolan.org player -->\n' +
+                  '<trackList>\n' +
+                  '<track>\n' +
+                  '<location>' + '[%%LOCATION%%]' +
+                  '</location>\n' +
+                  '<creator>' + (sART2) +
+                  '</creator>\n' +
+                  '<album>' + (sTL) +
+                  '</album>\n' +
+                  '<title>' + (sTT) +
+                  '</title>\n' +
+                  '<annotation>' + (sTG) +
+                  '</annotation>\n' +
+                  '<image>' + '[%%IMAGE%%]' +
+                  '</image>\n' +
+                  '</track>\n' +
+                  '</trackList>\n' +
+                  '</playlist>')
+
+        elif i1 == iM3U:
+            s1 = ('#EXTM3U\n' +
+                  'EXTINF:[%%SECONDS%%],' +
+                  sART2 +
+                  ' - ' +
+                  sTT +
+                  '\n' +
+                  '[%%LOCATION%%]' +
+                  '\n')
+        else:
+            # Print data, but do not return a string.
+            s1 = ''
+    except:
+        s1 = ''
+        print("Error in `GetAMetaDataStr(n, sART2)`")
+    if s1 != '':
+        print('\n## Metadata ##\n```')
+        print(s1)
+        print(u'```\n')
+    return s1
+
+
 def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
     '''
     Wav2Media
@@ -390,6 +855,13 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
     sOUT1EXT = os.path.splitext(sOUT1)[1].lower()
     sTMP1EXT = os.path.splitext(sTMP1)[1].lower()
     sIMG1EXT = os.path.splitext(sIMG1)[1].lower()
+    # GetAMetaDataStr(iUnixLame, sART)
+    iNone = 0
+    iAvconv = 1
+    iOggEnc2 = 2
+    iNeroMp4 = 3
+    iWinLame = 4
+    iUnixLame = 5
 
     LockMyLock()
     if len(sDIM) == 0:
@@ -400,70 +872,10 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
         sOUT1MIME = 'zxx/zxx-does-not-match'
     else:
         sOUT1MIME = mimetypes.types_map[sOUT1EXT]
-    sART2 = ""
-    sTT = ""
-    sTL = ""
-    sTG = ""
-    sTN = ""
-    sTY = time.strftime('%Y')
     # getMySongName() is normally the first few words of the selection.
     try:
-        if len(sTT) == 0:
-            sTT = cleanstr(getMySongName(), bFalse())
-        else:
-            sTT = cleanstr(sTT, bFalse())
-    except (UnicodeDecodeError):
-        sTT = timefortitle()
-    try:
-        if len(sTN) == 0:
-            sTN = getMyTrackNo()
-        else:
-            sTN = '1'
-    except (UnicodeDecodeError):
-        sTN = '1'
-    try:
-        if len(sTG) == 0:
-            sTG = getMyGenreName()
-        else:
-            sTG = 'Speech'
-    except (UnicodeDecodeError):
-        sTG = 'Speech'
-    try:
-        s1 = sART
-        if len(s1) == 0:
-            sART2 = cleanstr(getMyUserName(), bFalse)
-        else:
-            sART2 = cleanstr(s1, bFalse())
-    except (UnicodeDecodeError):
-        sART2 = fsAppName()
-    try:
-        sTL = cleanstr(getMyAlbumName(), bFalse())
-        print(u'-----------------------------------------------------')
-        print(fsAppName())
-        print(u'')
-        print((u'Title: ' + sTT))
-        print((u'Working File Name: ' + sTMP1))
-        print((u'File Name: ' + sOUT1))
-        print((u'Duration in seconds: ' + sTIME))
-        print((u'Track: ' + sTN))
-        if 'video/' in sOUT1MIME:
-            print((u'Poster Dimensions: ' + sDIM))
-        print(u'-----------------------------------------------------')
-    except (UnicodeDecodeError):
-        sART2 = " "
-        sTT = " "
-        sTL = " "
-        sTG = " "
-        sTY = " "
-    try:
         # Double quotes must be cleaned from strings but UTF-8 is okay
-        sData1 = u" -metadata album='" + cleanstr(sTL, bTrue())
-        sData1 = sData1 + u"' -metadata artist='" + cleanstr(sART2, bTrue())
-        sData1 = sData1 + u"' -metadata genre='" + sTG
-        sData1 = sData1 + u"' -metadata title='" + cleanstr(sTT, bTrue())
-        sData1 = sData1 + u"' -metadata track='" + sTN
-        sData1 = sData1 + u"' -metadata Year='" + sTY + u"' "
-        print(sData1)
+        sData1 = GetAMetaDataStr(iAvconv, sART)
     except(UnicodeDecodeError):
         sData1 = u''
     try:
@@ -477,13 +889,22 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
                 s0 = getWinFullPath('/opt/oggenc2.exe')
                 if len(s0) == 0:
                     s0 = getWinFullPath('/opt/oggenc.exe')
-                s1 = s0 + u' -o "' + sOUT1 + u'" "' + sTMP1 + u'"'
+                s1 = (s0 +
+                      u' -o "' +
+                      sOUT1 +
+                      u'" "' +
+                      sTMP1 + u'"')
                 myossystem(s1)
             else:
                 sCmdA = sData1
-                s1 = u'"' + sFFcommand
-                s1 = s1 + u'" -i "' + sTMP1 + u'" ' + sCmdA + u' -y "'
-                s1 = s1 + sOUT1 + u'"'
+                s1 = (u'"' +
+                      sFFcommand +
+                      u'" -i "' +
+                      sTMP1 +
+                      u'" ' +
+                      sCmdA +
+                      u' -y "' +
+                      sOUT1 + u'"')
                 myossystem(s1)
                 print(s1)
         elif sOUT1EXT == '.m4a':
@@ -508,20 +929,30 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
             #
             # Note: The Linux binary is for 32 bit Intel systems.
             #
-            # Faac
-            # ====
+            # GStreamer
+            # =========
             #
-            # Faac is  an aac muxer.  For cross-platform sound files
-            # you may need to compile it with optional plugins.
+            # GStreamer includes a basic m4a muxer, but the file is not
+            # compressed or optimized.
             #
             if 'windows' in platform.system().lower():
                 # C:/opt/neroAacEnc.exe
                 s0 = getWinFullPath('/opt/neroAacEnc.exe')
                 if len(s0) == 0:
                     s0 = getWinFullPath('/opt/faac.exe')
-                    s1 = s0 + u' -o "' + sOUT1 + u'" "' + sTMP1 + u'"'
+                    s1 = (s0 +
+                          u' -o "' +
+                          sOUT1 +
+                          u'" "' +
+                          sTMP1 +
+                          u'"')
                 else:
-                    s1 = s0 + u' -if "' + sTMP1 + u'" -of "' + sOUT1 + u'"'
+                    s1 = (s0 +
+                          u' -if "' +
+                          sTMP1 +
+                          u'" -of "' +
+                          sOUT1 +
+                          u'"')
                 myossystem(s1)
             else:
                 if (os.path.isfile('/usr/bin/neroAacEnc') or
@@ -531,39 +962,38 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
                     myossystem(s1)
                     if (os.path.isfile('/usr/bin/neroAacTag') or
                             os.path.isfile('/usr/local/bin/neroAacTag')):
-                        s9 = ''
-                        s9 = s9 + '" -meta:album="' + cleanstr(sTL, bTrue())
-                        s9 = s9 + '" -meta:artist="' + cleanstr(sART2, bTrue())
-                        s9 = s9 + '" -meta:genre="' + sTG
-                        s9 = s9 + '" -meta:title="' + cleanstr(sTT, bTrue())
-                        s9 = s9 + '" -meta:track="' + sTN
-                        s9 = s9 + '" -meta:year="' + sTY + u'"'
+                        s9 = GetAMetaDataStr(iNeroMp4, sART)
                         if (len(sIMG1) > 0 and os.path.isfile(sIMG1)):
-                            s9 = s9 + ' -add-cover:front:"' + sIMG1 + '" '
-                        s1 = 'neroAacTag "' + sOUT1 + '"' + s9
+                            s9 = (s9 +
+                                  ' -add-cover:front:"' +
+                                  sIMG1 +
+                                  '" ')
+                        s1 = ('neroAacTag "' +
+                              sOUT1 +
+                              '"' + s9)
                         print(s1)
                         myossystem(s1)
-                elif os.path.isfile('/usr/bin/faac'):
-                    s1 = u'faac -o "' + sOUT1 + u'" "' + sTMP1 + '"'
-                    print(s1)
-                    myossystem(s1)
                 else:
+                    # Freeware Advanced Audio Coder
+                    # FAAC 1.28
+                    # faac is disabled March, 2016 because
+                    # WARNING: MP4 support unavailable!
+                    #
                     # ffmpeg or avconv are disabled March, 2015 because
                     # `Unable to find a suitable output format for 'pipe:'`
-                    try:
-                        sCmdA = sData1
-                        sCmdA = sCmdA + ' -strict experimental -acodec aac'
-                        sCmdA = sCmdA + ' -ab 96k  -preset slow -f m4a'
-                        sCmdA = sCmdA + ' -crf 22 '
-                    except(UnicodeDecodeError):
-                        sCmdA = ""
-                    s1 = u'"' + sFFcommand + u'" - y -i "' + sTMP1 + u'" '
-                    s1 = s1 + sCmdA + u' "' + sOUT1 + u'"'
-                    print("-----------------------------------")
-                    print("m4a output with avconv is disabled.")
-                    print("-----------------------------------")
-                    print(s1)
-                    # myossystem(s1)
+                    #
+                    # Create a mono Raw 16-bit PCM audio ISO M4A file in
+                    # a QuickTime container. (Not optimal...)
+                    print('# WARNING #\n\n Could not locate Nero AAC encoder')
+                    GstWav2Media(sB,
+                                 sTMP1,
+                                 sIMG1,
+                                 sOUT1,
+                                 sAUDIBLE,
+                                 sVISIBLE,
+                                 sART,
+                                 sDIM)
+
         elif sOUT1MIME == mimetypes.types_map['.mp3']:
             # Try lame for mp3 or 'audio/mpeg' files that haven't been
             #  dealt with above.
@@ -573,14 +1003,13 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
                 # C:/opt/lame.exe
                 # See: http://www.rarewares.org/mp3-lame-bundle.php
                 s0 = getWinFullPath('/opt/lame.exe')
-                s1 = s0 + u' -V 4 --tl "' + sTL
-                s1 = s1 + u'" --ta "' + sART2
-                s1 = s1 + u'" --tt "' + sTT
-                s1 = s1 + u'" --tg "' + sTG
-                s1 = s1 + u'" --tn "' + sTN
-                s1 = s1 + u'" --ty ' + sTY
-                s1 = s1 + u' "' + sTMP1
-                s1 = s1 + u'" "' + sOUT1 + u'"'
+                s1 = (s0 + u' -V 4 ' +
+                           GetAMetaDataStr(iWinLame, sART) +
+                           u' "' +
+                           sTMP1 +
+                           u'" "' +
+                           sOUT1 +
+                           u'"')
                 myossystem(s1)
             else:
                 if len(sIMG1) > 0 and len(sFFcommand) > 0:
@@ -589,44 +1018,53 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
                     sOUT2 = sOUT1
                 if os.path.isfile('/usr/bin/lame'):
                     try:
-                        sCmdA = '--tl "' + sTL
-                        sCmdA = sCmdA + u'" --ta "' + sART2
-                        sCmdA = sCmdA + u'" --tt "' + sTT
-                        sCmdA = sCmdA + u'" --tg "' + sTG
-                        sCmdA = sCmdA + u'" --tn "' + sTN
-                        sCmdA = sCmdA + u'" --ty ' + sTY
+                        sCmdA = GetAMetaDataStr(iUnixLame, sART)
                     except(UnicodeDecodeError, TypeError):
                         sCmdA = ""
                     # lame default setting of `--vbr-new` causes a crash in
                     # avconv, so use `--vbr-old`
-                    s1 = 'lame --vbr-old ' + sCmdA + ' "' + sTMP1
-                    s1 = s1 + '" "' + sOUT2 + '"'
+                    s1 = ('lame --vbr-old ' +
+                          sCmdA +
+                          ' "' +
+                          sTMP1 +
+                          '" "' + 
+                          sOUT2 + '"')
                     print(s1)
                     myossystem(s1)
                 else:
                     try:
                         # We must use these -acodec settings or
                         # avconv crashes when this script runs.
-                        sCmdA = sData1
-                        sCmdA = sCmdA + u' -acodec libmp3lame -ab 320k'
-                        sCmdA = sCmdA + u' -aq 0 '
+                        sCmdA = (sData1 +
+                                 u' -acodec libmp3lame -ab 320k' +
+                                 u' -aq 0 ')
                     except(UnicodeDecodeError, TypeError):
                         sCmdA = u""
-                    s1 = sFFcommand + u' -i "' + sTMP1 + u'" ' + sCmdA
-                    s1 = s1 + u' -y "' + sOUT2 + u'"'
+                    s1 = (sFFcommand +
+                         u' -i "' +
+                         sTMP1 +
+                         u'" ' +
+                         sCmdA +
+                         u' -y "' +
+                         sOUT2 +
+                         u'"')
                     print(s1)
                     myossystem(s1)
                 if len(sIMG1) > 0 and len(sFFcommand) > 0:
                     # Add image.  Make a straight copy of the audio
                     # so the quality remains the same.
                     sCmdA = u' -acodec copy '
-                    s1 = sFFcommand + ' -i "' + sOUT2 + '" -i "' + sIMG1
-                    s1 = s1 + u'" -map 0:0 -map 1:0 -c copy'
-                    s1 = s1 + u' -id3v2_version 3 -metadata:s:v'
-                    s1 = s1 + u' title="Album cover"'
-                    s1 = s1 + u' -metadata:s:v comment="Cover (Front)" '
-                    s1 = s1 + sCmdA + u' -y "'
-                    s1 = s1 + sOUT1 + '" '
+                    s1 = (sFFcommand +
+                          ' -i "' +
+                          sOUT2 +
+                          '" -i "' +
+                          sIMG1 +
+                          u'" -map 0:0 -map 1:0 -c copy' +
+                          u' -id3v2_version 3 -metadata:s:v' +
+                          u' title="Album cover"' +
+                          u' -metadata:s:v comment="Cover (Front)" ' +
+                          sCmdA + u' -y "' +
+                          sOUT1 + '" ')
                     print(s1)
                     myossystem(s1)
                     if os.path.isfile(sOUT1):
@@ -636,9 +1074,15 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
         elif sOUT1MIME == mimetypes.types_map['.aif']:
             # .aif converted with avconv doesn't have metadata.
             sCmdA = sData1
-            s1 = u'"' + sFFcommand + u'" -i "' + sTMP1 + u'" '
-            s1 = s1 + sCmdA + u' -y "'
-            s1 = s1 + sOUT1 + u'"'
+            s1 = (u'"' +
+                  sFFcommand +
+                  u'" -i "' +
+                  sTMP1 +
+                  u'" ' +
+                  sCmdA +
+                  u' -y "' +
+                  sOUT1 +
+                  u'"')
             myossystem(s1)
         elif sOUT1MIME == mimetypes.types_map['.flac']:
             # flac - free lossless audio codec.
@@ -648,25 +1092,46 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
                 # C:/opt/flac.exe
                 # See: http://flac.sourceforge.net/
                 s0 = getWinFullPath('/opt/flac.exe')
-                s1 = s0 + u' -f -o "' + sOUT1 + u'" "' + sTMP1 + u'"'
+                s1 = (s0 +
+                      u' -f -o "' +
+                      sOUT1 +
+                      u'" "' +
+                      sTMP1 +
+                      u'"')
                 myossystem(s1)
             else:
                 sCmdA = sData1
-                s1 = u'"' + sFFcommand + u'" -i "' + sTMP1 + u'" '
-                s1 = s1 + sCmdA + u' -y "'
-                s1 = s1 + sOUT1 + u'"'
+                s1 = (u'"' +
+                      sFFcommand +
+                      u'" -i "' +
+                      sTMP1 +
+                      u'" ' +
+                      sCmdA +
+                      u' -y "' +
+                      sOUT1 +
+                      u'"')
                 myossystem(s1)
         elif sOUT1MIME == mimetypes.types_map['.webm']:
             # Chrome, Firefox (Linux) and totem can open webm directly.
             sCmdA = sData1
-            s1 = u'"' + sFFcommand + u'" -i "'
-            s1 = s1 + sTMP1 + u'" -f image2 -i "' + sIMG1
-            s1 = s1 + u'" -s "' + sDIM + '" -t "' + sTIME
-            s1 = s1 + u'" -vcodec libvpx -g 120 -lag-in-frames 16'
-            s1 = s1 + u' -deadline good -cpu-used 0 -vprofile 0'
-            s1 = s1 + u' -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis'
-            s1 = s1 + u' -ab 112k -ar 44100 -f webm '
-            s1 = s1 + sCmdA + u' -y "' + sOUT1 + u'"'
+            s1 = (u'"' +
+                  sFFcommand +
+                  u'" -i "' +
+                  sTMP1 +
+                  u'" -f image2 -i "' +
+                  sIMG1 +
+                  u'" -s "' +
+                  sDIM +
+                  '" -t "' +
+                  sTIME +
+                  u'" -vcodec libvpx -g 120 -lag-in-frames 16' +
+                  u' -deadline good -cpu-used 0 -vprofile 0' +
+                  u' -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis' +
+                  u' -ab 112k -ar 44100 -f webm ' +
+                  sCmdA +
+                  u' -y "' +
+                  sOUT1 +
+                  u'"')
             myossystem(s1)
         else:
             sOUT1 = sTMP1
@@ -676,7 +1141,6 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
         print(fsAppName() + ' Wav2Media')
         print(u'=================== ')
         print(u' ')
-        print('    ' + s1)
         print(u' ')
         if os.path.isfile(sOUT1):
             if sAUDIBLE.lower() == 'false':
@@ -748,23 +1212,31 @@ def cleanstr(sIN, bBeautifyQuotes):
 
             sA = readtexttools.cleanstr(sB, readtexttools.bTrue())
     '''
-    retval = " "
+    s1 = " "
 
     try:
-        retval = sIN
-        retval = retval.replace('\n', u' ')
-        retval = retval.replace('\f', u'')
-        retval = retval.replace('\r', u'')
-        retval = retval.replace('\t', u' ')
+        s1 = sIN
+        s1 = s1.replace('\n', u' ')
+        s1 = s1.replace('\f', u'')
+        s1 = s1.replace('\r', u'')
+        s1 = s1.replace('\t', u' ')
         if bBeautifyQuotes:
-            retval = retval.replace(" '", u" ‘")  # &lsquo;
-            retval = retval.replace("'", u"’")  # &rsquo;
-            retval = retval.replace(' "', u' “')  # &ldquo;
-            retval = retval.replace('"', u"”")  # &rdquo;
-        retval = retval.replace('"', u' ')
+            s1 = s1.replace(" '", u" ‘")  # &lsquo;
+            s1 = s1.replace("'", u"’")  # &rsquo;
+            s1 = s1.replace(' "', u' “')  # &ldquo;
+            s1 = s1.replace('"', u"”")  # &rdquo;
+        s1 = s1.replace('"', u' ')
     except(UnicodeDecodeError):
-        print(retval + ' error in readtexttools.cleanstr')
-    return retval
+        print(s1 + ' error in readtexttools.cleanstr')
+    return s1
+
+
+def cleanstrforXml(sA):
+    s1 = sA
+    s1 = s1.replace("&", "&#38;")
+    s1 = s1.replace(">", "&#62;")
+    s1 = s1.replace("<", "&#60;")
+    return s1
 
 
 def timefortitle():
@@ -815,16 +1287,93 @@ def checkmyartist(sART):
     return sC
 
 
+def WriteAnUTF8TextFile(sPath, sText):
+    '''
+    Create a simple 'utf-8' plain text file.
+    `WriteAnUTF8TextFile("/path/file.txt", "Hello world")`
+    '''
+    sCodeco = 'utf-8'
+    try:
+        if os.path.isfile(sPath):
+            os.remove(sPath)
+        
+        f2 = codecs.open(sPath, mode='w', encoding=sCodeco, errors='replace')
+        f2.write(sText)
+        f2.close
+    except:
+        print('`WriteAnUTF8TextFile` error in readtexttools.py')
+    return os.path.isfile(sPath)
+
+
+def writeXspfPlayList(sA, sART, sIMG):
+    '''
+    Write a [XSPF.ORG](http://xspf.org/) playlist.  Let a media player 
+    read metadata information for a sound file that has no metadata.
+    Optimized for [VLC media player](https://videolan.org).
+    '''
+
+    iXSPF = 11
+    sFile = sA + '.xspf'
+    sURI = sA
+    sIMGURI = sIMG
+    # Look in system icons to generate a URI if available. 
+    sIMGERRLOC = ('/usr/share/icons/HighContrast/scalable/' +
+                  'mimetypes/audio-x-generic.svg')
+    sPLAYLOC = ('/usr/share/icons/HighContrast/scalable/' +
+                'places-extra/playlist.svg')
+    sBALLOONLOC = ('/usr/share/icons/HighContrast/scalable/' +
+                   'apps-extra/pidgin.svg')
+
+
+    if os.path.isfile(sIMGERRLOC):
+        sIMGERR = path2url(sIMGERRLOC)
+    elif os.path.isfile(sPLAYLOC):
+        sIMGERR = path2url(sPLAYLOC)
+    elif os.path.isfile(sBALLOONLOC):
+        sIMGERR = path2url(sBALLOONLOC)
+    else:
+        sIMGERR = ''
+
+    if os.path.isfile(sA + '.wav'):
+        # Temporary file `/path/name.ogg.wav`
+        sURI = path2url(sA)
+    elif os.path.isfile(sA):
+        sURI = path2url(sA)
+    else:
+        sFile = getMyLock('lock.xspf')
+
+    if urllib.pathname2url(sIMG) == '':
+        print (1)
+        # This should **not** normally happen - choose a default graphic!
+        sIMGURI = sIMGERR
+    elif os.path.isfile(sIMG):
+        # Offline URI - Convert local file name
+        if sIMG[:7] == 'file://':
+            sIMGURI = sIMG
+        else:
+            sIMGURI = path2url(sIMG)
+    elif sIMG[:4] == 'http':
+        sIMGURI = sIMG
+    else:
+        sIMGURL = sIMGERR
+    s1 = GetAMetaDataStr(iXSPF, sART)
+    s1 = s1.replace('[%%LOCATION%%]', sURI, 1)
+    s1 = s1.replace('[%%IMAGE%%]', sIMGURI, 1)
+    
+    WriteAnUTF8TextFile(sFile, s1)
+    if os.path.isfile(sFile):
+        return sFile
+    else:
+        return sA
+
+
 def LockMyLock():
     '''
     Create a file that informs the world that the application.
     is at work.
     '''
     s1 = getMyLock('lock')
-
-    fileh = open(s1, 'w')
-    fileh.write(fsAppSignature())
-    fileh.close()
+    WriteAnUTF8TextFile(s1, fsAppSignature())
 
 
 def UnlockMyLock():
@@ -1039,6 +1588,11 @@ def ShowWithApp(sOUT1):
         myossystem(s1)
 
 
+def path2url(s1):
+    return urlparse.urljoin('file:',
+                             urllib.pathname2url(s1))
+
+
 def PlayWaveInBackground(sOUT1):
     '''
     Opens using command line shell.
@@ -1049,10 +1603,24 @@ def PlayWaveInBackground(sOUT1):
         myossystem(s1)
     elif 'windows' in platform.system().lower():
         # Windows
-        import winsound
-        winsound.PlaySound(sOUT1, winsound.SND_FILENAME | winsound.SND_NOWAIT)
+        try:
+            import winsound
+            winsound.PlaySound(sOUT1, 
+                               winsound.SND_FILENAME
+                               | 
+                               winsound.SND_NOWAIT)
+        except:
+            os.startfile(sOUT1)
     else:
-        if os.path.isfile('/usr/bin/esdplay'):
+        if os.path.isfile('/usr/bin/gst-launch-1.0'):
+            s1 = (u'gst-launch-1.0 playbin uri="' +
+                   path2url(sOUT1) + '"')
+        elif os.path.isfile('/usr/bin/gst-launch-0.10'):
+            s1 = (u'gst-launch-0.10 playbin uri="' +
+                   path2url(sOUT1) + u'"')
+        elif os.path.isfile('/usr/bin/vlc'):
+            s1 = u'/usr/bin/vlc I "dummy" "' + sOUT1 + u'" '
+        elif os.path.isfile('/usr/bin/esdplay'):
             s1 = u'esdplay "' + sOUT1 + u'" '
         elif os.path.isfile('/usr/bin/paplay'):
             s1 = u'paplay "' + sOUT1 + u'" '

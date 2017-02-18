@@ -101,7 +101,7 @@ def usage():
     sB = '    ' + sA
     print ('\nEspeak Read Text\n===============\n')
     print ('Reads a text file using espeak and a media player.\n')
-    print ('Converts format with `avconv`, `lame`, `faac` or `ffmpeg`.\n')
+    print ('Converts format with `avconv`, `lame`, `ffmpeg` or `gstreamer`.\n')
     print ('Usage\n-----\n')
     print(sB + ' "input.txt"')
     print(sB + ' --language [de|en|en-GB|es|fr|it] "input.txt"')
