@@ -6143,7 +6143,7 @@ sub setWesternDocLanguage(sA)
 		exit sub
 	else
 		sB = lcase(left(sA, x - 1))
-		sC = ucase(mid(sA, x + 1)
+		sC = ucase(mid(sA, x + 1))
 	endif
 	sLocale.Language = sB
 	sLocale.Country = sC
@@ -6169,7 +6169,7 @@ sub setAsianDocLanguage(sA)
 		exit sub
 	else
 		sB = lcase(left(sA, x - 1))
-		sC = ucase(mid(sA, x + 1)
+		sC = ucase(mid(sA, x + 1))
 	endif
 	sLocale.Language = sB
 	sLocale.Country = sC
@@ -6197,7 +6197,7 @@ sub setComplexDocLanguage(sA)
 		exit sub
 	else
 		sB = lcase(left(sA, x - 1))
-		sC = ucase(mid(sA, x + 1)
+		sC = ucase(mid(sA, x + 1))
 	endif
 	sLocale.Language = sB
 	sLocale.Country = sC
