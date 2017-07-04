@@ -381,15 +381,14 @@ Function canUseSpeechXML
     '''
     ' Can the installed version of SAPI use XML?
     '''
-    Dim SystemSet
-    Dim VerBig
-
     canUseSpeechXML = False
-    Set SystemSet = GetObject("winmgmts:").InstancesOf("Win32_OperatingSystem")
-    For Each System in SystemSet 
-        VerBig = Left(System.Version,3)
-        If CLng(VerBig) > 5.1 Then
-            canUseSpeechXML=True
+    Dim x
+    Set SystemSet = GetObject("winmgmts:").InstancesOf ("Win32_OperatingSystem") 
+    For each System in SystemSet
+        x = Int(Split(System.Version, ".")(0))
+        If x > 6 Then
+            canUseSpeechXML = True
+            Exit For
         End If
     Next
 End Function
