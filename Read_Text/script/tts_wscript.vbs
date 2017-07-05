@@ -1,181 +1,181 @@
 '''
 '' Read text
 '' =========
-'' 
+''
 '' **Read text** reads text aloud, saves audio files and
 '' can use resources from the web based on the selected
 '' text.
-'' 
+''
 '' * Select text.
 '' * Click the *Read selection* button.
 '' * To read aloud, accept the default in the dialogue, or choose
 ''   another action from the menus.
-'' 
+''
 '' Saving files
 '' ------------
-'' 
-'' Windows lets you save sound files in an uncompressed`.wav` format. 
-'' To convert `.wav` files to small `.m4a` files that you can share 
-'' on most mobile phones, music players and tablets, download 
+''
+'' Windows lets you save sound files in an uncompressed`.wav` format.
+'' To convert `.wav` files to small `.m4a` files that you can share
+'' on most mobile phones, music players and tablets, download
 '' [Nero m4a encoder][1]
 '' [1]:http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php
 '' and save ' `neroAacEnc.exe` and `neroAacTag.exe` in `C:\opt\`
 '' The extension adds writing `.m4a` files to the list of options
 '' in the dialogue.
-'' 
+''
 '' Language support
 '' ----------------
-'' 
+''
 '' This script uses the Windows speech application programming
 '' interface (`SAPI`). Depending on the version and locale of
 '' Windows, voices in different languages may be available.
-'' 
+''
 '' Examples:
 '' ---------
-'' 
+''
 '' External program:
-'' 
+''
 ''     C:\Windows\SysWOW64\wscript.exe
-'' 
+''
 '' Command line options (default):
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" "(TMP)"
-'' 
+''
 '' or (save as a .wav file in the home directory):
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" /soundfile:"(HOME)(NOW).wav" "(TMP)"
-'' 
+''
 '' or (use a named voice)
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" /voice:"Microsoft Hortense Desktop - French" "(TMP)"
-'' 
+''
 '' or (read a little slower)
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" /rate:-3 "(TMP)"
-'' 
+''
 '' or (change voice by language)
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" /language:"(SELECTION_LANGUAGE_COUNTRY_CODE)" "(TMP)"
-'' 
+''
 '' **Note**: Selecting this option doesn't work with the SAPI
 '' speech synthesizer if you haven't installed a voice in the
 '' language.
-'' 
+''
 '' Optional formats
 '' ================
-'' 
+''
 '' ## AAC Encoder
-'' 
+''
 '' [Nero m4a encoder](http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php)
 '' is a free command line M4A converter from [Nero](http://www.nero.com).
-'' 
+''
 '' You can play m4a AAC encoded sound files with most music players.
 '' Use `neroAacEnc.exe` to make an m4a file.
-'' 
-''  * If the directory `C:\opt` doesn't exist, create it. 
+''
+''  * If the directory `C:\opt` doesn't exist, create it.
 ''  * Copy `neroAacEnc.exe` to `C:\opt\`
 ''  * Copy `neroAacTag.exe` to `C:\opt\`
 ''  * The `neroAacTag.exe` program adds metadata like author, genre, title and year.
 ''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).m4a" "(TMP)"
-'' 
+''
 '' ## Audacity
-'' 
+''
 '' [Audacity](http://audacity.sourceforge.net/) is a free cross platform audio editor. It can
-'' use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.  
-'' 
+'' use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.
+''
 '' ### FFmpeg for Audacity
-'' 
+''
 '' Windows security policies may prevent you from installing the Audacity FFmpeg converter
 '' library using the `ffmpeg-win-2.2.2.exe` installer.  You can install the FFmpeg library
 '' by downloading the `ffmpeg-win-2.2.2.zip` archive and copying the contents to a
 '' directory that is available to all users.
-'' 
+''
 '' 1. Log in with an administrator account.
-'' 2. Go to the [MP3 for Audacity page](http://lame.buanzo.org/#lamewindl). 
+'' 2. Go to the [MP3 for Audacity page](http://lame.buanzo.org/#lamewindl).
 '' 3. Directly underneath "For FFmpeg/LAME on Windows click below:", left-click the link
 ''   `ffmpeg-win-2.2.2.zip` and save the file anywhere on your computer.
-'' 4. Double-click `ffmpeg-win-2.2.2.zip` to open the archive. 
-'' 5. If the directory `C:\opt` doesn't exist, create it. Copy the contents of the zip 
+'' 4. Double-click `ffmpeg-win-2.2.2.zip` to open the archive.
+'' 5. If the directory `C:\opt` doesn't exist, create it. Copy the contents of the zip
 ''    file to `C:\opt`.
-'' 6. Any user can now set up Audacity to use ffmpeg by opening Audacity, then setting 
+'' 6. Any user can now set up Audacity to use ffmpeg by opening Audacity, then setting
 ''    *Edit - Preferences... - Libraries - FFmpeg library* to `C:\opt`.
 '' 7. Read text extension now shows .mp3 and .ogg formats as export options.
 '' 8. You can use Audacity to add music or special effects to your sound files.
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
-'' 
+''
 '' ## Flac
-'' 
+''
 '' Makes free lossless audio codec (FLAC) files.
-'' 
+''
 ''  * Install `flac.exe` in `C:\opt\`
 ''  * [flac encoder](http://flac.sourceforge.net/links.html#software)
 ''  * [Players and plugins](http://flac.sourceforge.net/)
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).flac" "(TMP)"
-'' 
+''
 '' ## iTunes
-'' 
+''
 '' **iTunes** is a visual music manager from Apple available at no cost.
-'' 
+''
 '' Use [iTunes](http://www.apple.com/itunes/) to convert sound files with metadata
 '' and album cover art. The first time you use it, iTunes takes a few moments to start.
-'' iTunes creates the audio file in it's own directory and signals you with a sound. 
+'' iTunes creates the audio file in it's own directory and signals you with a sound.
 '' Read Text Extension puts a copy in a sound directory in your home directory.
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" /language:"en-US" /soundfile:"(HOME)en\(NOW).aif" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /language:"en-US" /soundfile:"(HOME)en\(NOW).m4a" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /language:"en-US" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
-'' 
+''
 '' ## Lame
-'' 
+''
 '' Lame is a free command line file converter.
-'' 
+''
 '' Play mp3 compatible encoded sound files with most music players
 '' Use `lame.exe` to make an mp3 compatible file.
-'' 
+''
 ''  * Install `lame.exe` in `C:\opt\`
 ''  * [Lame encoder](http://www.rarewares.org/mp3-lame-bundle.php)
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
-'' 
+''
 '' ## Miro Video Converter (FFmpeg)
-'' 
-'' This is a free visual music and video converter from the Participatory 
+''
+'' This is a free visual music and video converter from the Participatory
 '' culture foundation.
-'' 
+''
 '' Miro Video Converter can convert mp3, ogg and other media using `ffmpeg`
 '' Once installed, read text can use FFmpeg to make audio and video media files
 '' for cross-platform applications.
-'' 
+''
 ''  * [ffmpeg](https://www.ffmpeg.org)
 ''  * [Miro formats](http://develop.participatoryculture.org/index.php/ConversionMatrix)
 ''  * [Miro video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/)
 ''  * [Participatory culture foundation](http://pculture.org/)
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
-'' 
+''
 '' The direct link to the most recent version of Miro Video Converter is at osuosl.org -
 '' [`MiroConverterSetup.exe`](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/).
-'' 
+''
 '' ## Ogg
-'' 
+''
 '' Play ogg encoded sound files with firefox, chrome or chromium.
 '' Use `oggenc.exe` or `oggenc2.exe` to make an ogg file
-'' 
+''
 ''  * The ogg converter program must be installed in `C:\opt\`.
 ''  * [oggenc2 encoder](http://www.rarewares.org/ogg-oggenc.php)
 ''  * [Players and plugins](http://www.vorbis.com/setup_windows/)
-'' 
+''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
-'' 
+''
 '' ----------------------------------------------------------------------------
-'' 
+''
 '' [Read Text Extension](http://sites.google.com/site/readtextextension/)
-'' 
+''
 '' Copyright © 2011 - 2015 James Holgate
 '''
 Const ForReading = 1
@@ -216,11 +216,11 @@ Function EscapeReturnsAndReplaceQuotes(sA)
     ' with smart quotes and no carriage returns.
     '''
     Dim s1
-	Dim LQ
-	Dim RQ
-	LQ = Chr(147)
-	RQ = Chr(148)
-	
+    Dim LQ
+    Dim RQ
+    LQ = Chr(147)
+    RQ = Chr(148)
+
 
     EscapeReturnsAndReplaceQuotes = ""
     ' Not all audio players can show lyrics longer than 1000 characters.
@@ -383,10 +383,17 @@ Function canUseSpeechXML
     '''
     canUseSpeechXML = False
     Dim x
-    Set SystemSet = GetObject("winmgmts:").InstancesOf ("Win32_OperatingSystem") 
+    Dim y
+    x = 0
+    y = 0
+    Set SystemSet = GetObject("winmgmts:").InstancesOf("Win32_OperatingSystem")
     For each System in SystemSet
-        x = Int(Split(System.Version, ".")(0))
-        If x > 6 Then
+        a1 = Split(System.Version, ".")
+        x = Int(a1(0))
+        If Ubound(a1) > 0 Then
+            y = 0.1 * Int(a1(1))
+        End If
+        If x + y > 5.1 Then
             canUseSpeechXML = True
             Exit For
         End If
@@ -456,7 +463,7 @@ Function wav2ogg(wavfile, outfile, sMyWords)
 
     wav2ogg = False
     On Error Resume Next
-    s1 = myOptPath("oggenc2.exe") 
+    s1 = myOptPath("oggenc2.exe")
     s2 = myOptPath("oggenc.exe")
     sLyrics = ""
     If fbFileExists(s1) Then
@@ -486,7 +493,7 @@ Function wav2ogg(wavfile, outfile, sMyWords)
              sMeta = sMeta & " --lyrics=""" & sLyrics & """ "
         End If
         sA = sPpath & " """ & wavfile & """ " & sMeta & " --quiet -o """
-        sA = sA & outfile & """ " 
+        sA = sA & outfile & """ "
     Else
         sA=sPpath & " --quiet -o """ & outfile & """ """ & wavfile & """"
     End If
@@ -506,7 +513,7 @@ Function fsVorbisMeta
     '''
     ' [Tag specifications](http://www.xiph.org/vorbis/doc/v-comment.html)
     ' [About flac converter](http://linux.die.net/man/1/flac)
-    ' Depending on version of ffmpeg or other player, these tags may be 
+    ' Depending on version of ffmpeg or other player, these tags may be
     ' ignored.
     '''
     Dim s3
@@ -537,7 +544,7 @@ Function wav2flac(wavfile, outfile, sMyWords, sImage)
     Dim sMeta
 
     wav2flac = False
-    s1 = myOptPath("flac.exe") 
+    s1 = myOptPath("flac.exe")
     If fbFileExists(s1) Then
         sPpath = s1
         sPname = s1
@@ -546,7 +553,7 @@ Function wav2flac(wavfile, outfile, sMyWords, sImage)
     End If
     s2 = outfile
     If Len(sImage) > 0 And fbFileExists(sImage) Then
-        s3 = " --picture=""" & sImage & """ " 
+        s3 = " --picture=""" & sImage & """ "
     Else
         s3 = ""
     End If
@@ -579,7 +586,7 @@ Function wav2m4a(wavfile, outFile, sMyWords, sImage)
     Dim sPpath
     Dim sPname
 
-    s1 = myOptPath("neroAacEnc.exe") 
+    s1 = myOptPath("neroAacEnc.exe")
     s2 = myOptPath("faac.exe")
     wav2m4a = False
     If fbFileExists(s1) Then
@@ -590,13 +597,13 @@ Function wav2m4a(wavfile, outFile, sMyWords, sImage)
         sPname = s2
     Else
         Exit Function
-    End If 
+    End If
     s3 = outFile
     s4 = ""
     If Len(s3) > 0  Then
         If sPname = s1 Then
             sA = sPpath & " -if """ & wavfile & """ -of """ & s3 & """"
-            b1 = doExecute(sA, False) 
+            b1 = doExecute(sA, False)
         Else 'faac.exe
             sA = sPpath & " -o """ & s3 & """ """ & wavfile & """"
             b1 = doExecute(sA, True)
@@ -615,8 +622,8 @@ Function fbTagM4a(s2, sMyWords, sImage)
     ' Use a downloaded command line program to tag a sound file.
     ' `neroAacEnc` can't process long wav files if the function waits for
     ' the shell result to equal 0.  This dialog shows when the encoder is
-    ' running.  While you wait for the file to convert, check the title.  
-    ' If you click *Cancel*, the function skips adding metadata. 
+    ' running.  While you wait for the file to convert, check the title.
+    ' If you click *Cancel*, the function skips adding metadata.
     ' If you click *OK* it adds metadata.
     '''
     Dim b1
@@ -779,7 +786,7 @@ Function fsVerifiedMetatitle()
 
     s1 = fsMetatitle
     PlaySound "C:\Windows\Media\notify.wav"
-    s1 = fsMyInputBox(s1)  
+    s1 = fsMyInputBox(s1)
     fsVerifiedMetatitle = EscapeReturnsAndReplaceQuotes(s1)
 End Function
 
@@ -796,6 +803,7 @@ Function fsMetatrack
     End If
     fsMetatrack = EscapeReturnsAndReplaceQuotes(s1)
 End Function
+
 
 Sub removeMetaFiles()
     Dim a1
@@ -867,7 +875,7 @@ End Function
 
 Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
     '''
-    ' iTunes makes a mp3, aac or m4a in the iTunes Music Library 
+    ' iTunes makes a mp3, aac or m4a in the iTunes Music Library
     ' if Length of sOutFile is not zero, Then saves to sOutFile Path
     ' [iTunes Interface Reference][1]
     ' [1]: (http://www.joshkunz.com/iTunesControl/interfaceIiTunes.html)
@@ -901,7 +909,7 @@ Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
             Set encoder = encoderCollection.ItemByName("AAC Encoder")
     End Select
     iTunesApp.CurrentEncoder = encoder
-    Set fso = CreateObject("Scripting.FileSystemObject")  
+    Set fso = CreateObject("Scripting.FileSystemObject")
     Set opStatus = iTunesApp.ConvertFile(wavfile)
     While opStatus.InProgress
         WScript.Sleep 1000
@@ -925,7 +933,7 @@ Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
        End If
     End If
     Set outfile=fso.GetFile(track.Location)
-    If Len(sOut2file) > 0 Then 
+    If Len(sOut2file) > 0 Then
         outfile.copy(sOut2file)
     End If
     If bplay Then
@@ -945,7 +953,7 @@ End Function
 
 Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
     '''
-    '' 
+    ''
     '' wav2FFmpeg
     '' ========
     ''
@@ -959,7 +967,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
     ''       value is ignored for muxers and codecs that don't support it.
     ''     sDimensions - suggested dimensions for video output `400x400`
     ''       value is ignored for audio
-    '''  
+    '''
     Dim b1
     Dim cout2
     Dim cr
@@ -1034,7 +1042,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
             sPreProcess=""
             sPostProcess= ""
         Case ".m4v",".mp4"
-            ' uses `-strict experimental`. **Do not enable by default**. 
+            ' uses `-strict experimental`. **Do not enable by default**.
             ' May produce bad results.
             sPreProcess="preFlightCheck"
             sPostProcess= ""
@@ -1044,7 +1052,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
 
 ' ###Ffmpeg metadata
 '
-' A muxer may ignore some or all metadata tags. For example if the format 
+' A muxer may ignore some or all metadata tags. For example if the format
 ' doesn't support a field, ffmpeg ignores the tag.
 
     ffmeta = " -metadata album=""" & fsMetaalbum & _
@@ -1056,7 +1064,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
             """ -metadata year=""" & Year(Now) & """ "
 
 ' ###Default muxer settings
-' 
+'
     doJob = """" & myConverter & """ -i """ & sWaveName
     doJob = doJob & """ " & ffmeta & " -y """ & sOutName & """"
     Select Case sFileNameExt
@@ -1085,7 +1093,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
         b1 = doExecute(doJob, True)
 
         ' Add the image
-        If Len(sImage) > 0 And fbFileExists(sImage) Then 
+        If Len(sImage) > 0 And fbFileExists(sImage) Then
             If sPreProcess="preFlightCheck" Or sPreProcess="postFlightCheck" Then
                 retval = fsMyInputBox(doJob2)
                 If Len(retVal) = 0 Then
@@ -1128,7 +1136,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
             End If
         End If
         b1 = doExecute(doJob1, True)
-    Case ".m4v" 
+    Case ".m4v"
         ' -strict experimental may produce bad results...
         cout2 = sWaveName & ".webm"
         doJob1 ="""" & myConverter & """ -i """ & sImage & """ -i """ & _
@@ -1205,7 +1213,7 @@ Function AddLanguageCodes(s1, s4)
         s3 = s3 & s2
         s3 = s3 & """> "
         s3 =  s3 & s4
-        s3 = s3 & " <break strength=""strong"" /></lang></speak>" 
+        s3 = s3 & " <break strength=""strong"" /></lang></speak>"
     End If
     AddLanguageCodes = s3
 End Function
@@ -1292,7 +1300,7 @@ Function SayIt(s1, sRate, sVoice)
                 WScript.Sleep 100
             Loop Until Sapi.WaitUntilDone(1) Or _
                     (objFSO.FileExists(TaskLock) = False)
-            Set Sapi=Nothing 
+            Set Sapi=Nothing
         End If
     End If
     fbRemoveFile TaskLock
@@ -1344,7 +1352,7 @@ Function WriteIt(s1, _
             End If
         Wend
         Sapi.Rate=Int(sRate)
-        If fbFileExists (sFileName) Then 
+        If fbFileExists (sFileName) Then
             fbRemoveFile sFileName
         End If
         sFileNameExt=strExt(sFileName)
@@ -1354,13 +1362,13 @@ Function WriteIt(s1, _
         Case Else
     sWavename = sFileName & ".wav"
         End Select
-        Set ss=CreateObject("Sapi.SpFileStream") 
+        Set ss=CreateObject("Sapi.SpFileStream")
         ss.Format.Type = AUDIO_FORMAT
-        ss.Open sWaveName,ForWriting,False 
-        Set Sapi.AudioOutputStream=ss 
+        ss.Open sWaveName,ForWriting,False
+        Set Sapi.AudioOutputStream=ss
         Sapi.Speak s1
-        Set Sapi=Nothing 
-        ss.Close 
+        Set Sapi=Nothing
+        ss.Close
         Set ss = Nothing
         sLastProcess = "ffmpeg"
         If sFileNameExt = ".wav" Then
@@ -1379,7 +1387,7 @@ Function WriteIt(s1, _
                 If wav2m4a(sWaveName, sFileName, sMyWords, sImage) = False Then
                      sLastProcess = "ffmpeg"
                      bOK = wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions)
-                End If  
+                End If
             Case ".mp3"
                 If wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions) = False Then
                      sLastProcess = "lame"
@@ -1389,7 +1397,7 @@ Function WriteIt(s1, _
                 sLastProcess = "OGG Encoder"
                 If wav2Ogg(sWaveName,sFileName, sMyWords) = False Then
                      sLastProcess = "ffmpeg"
-                     bOK = wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions) 
+                     bOK = wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions)
                 End If
             Case Else
                 ' Format was not tested, is experimental or is not normally used
@@ -1446,7 +1454,7 @@ End Function
 
 Function fsDone(b)
     '''
-    ' b - the language name of a culture group. Returns the 
+    ' b - the language name of a culture group. Returns the
     ' word "Done"
     '''
     Select Case Left(b, 2)
@@ -1522,11 +1530,11 @@ Function fsDone(b)
     Case "uk"
         a1 = "&#1047;&#1072;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1086;"
     Case "zh"
-		If InStr(b1, "TW") > 0 Then
-		    a1 = "&#2360;&#2350;&#2366;&#2346;&#2381;&#2340;"
-		Else
+        If InStr(b1, "TW") > 0 Then
             a1 = "&#2360;&#2350;&#2366;&#2346;&#2381;&#2340;"
-		End If
+        Else
+            a1 = "&#2360;&#2350;&#2366;&#2346;&#2381;&#2340;"
+        End If
     Case Else '"en" English (default)
         a1 = "Done"
     End Select
@@ -1545,7 +1553,7 @@ Function PlaySound(sURL)
         b1 = True
         Set o1 = CreateObject("WMPlayer.OCX")
         o1.URL = sURL
-        o1.controls.play 
+        o1.controls.play
         While o1.playState <> 1
             WScript.Sleep 100
         Wend
@@ -1580,7 +1588,7 @@ End Function
 
 Function bValidEnvironVar(sA)
     '''
-    ' Is an optional system environment variable like `READTEXTTEMP` valid? 
+    ' Is an optional system environment variable like `READTEXTTEMP` valid?
     '''
     Dim s1
     Dim userid
@@ -1930,15 +1938,15 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Afrikaans"
                 s3 ="af-ZA"
         Case "ak","ak-gh", "akan"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Akan"
                 s3 ="ak-GH"
         Case "an","an-es", "argonese"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Argonese"
                 s3 ="an-ES"
         Case "az","az-az", "azerbaijani"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Azerbaijani"
                 s3 ="az=AZ"
         Case "ar-sa", "arabic (saudi arabia)", "401"
@@ -2014,31 +2022,31 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Belarusian"
                 s3 ="be-BY"
         Case "bm","bm-ml", "bambara"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Bambara"
                 s3 ="bm-ML"
         Case "beq","beq-cg", "beembe"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Beembe"
                 s3 ="beq-CG"
         Case "bk","bkw-cg", "bekwel"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Bekwel"
                 s3 ="bk-CG"
         Case "bn","bn-bd", "bengali"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Bengali"
                 s3 ="bn-BD"
         Case "bs","bs-bn", "bosnian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Bosnian"
                 s3 ="bs-BN"
         Case "buc","buc-yt", "bushi"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Bushi"
                 s3 ="buc-YT"
         Case "eu","eu-fr","eu-es", "basque"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Basque"
                 s3 ="eu"
         Case "bg","bg-bg", "bulgarian", "402"
@@ -2050,19 +2058,19 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Catalan"
                 s3 ="ca-ES"
         Case "ceb","ceb-ph", "cebuano"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Cebuano"
                 s3 ="ceb-PH"
         Case "cop","cop-eg", "coptic"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Coptic"
                 s3 ="cop-EG"
         Case "csb","csb-pl", "kashubian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Kashubian"
                 s3 ="csb-PL"
         Case "cv","cv-ru", "chuvash"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Chuvash"
                 s3 ="cv-RU"
         Case "cs","cs-cz", "czech", "405"
@@ -2082,11 +2090,11 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Sorbian, Lower"
                 s3 ="dsb-DE"
         Case "ebo","ebo-cg", "teke-eboo"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Teke-Eboo"
                 s3 ="ebo-CG"
         Case "ee","ee-gh", "éwé"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Éwé"
                 s3 ="ee-GH"
         Case "el","el-gr", "greek", "408"
@@ -2094,7 +2102,7 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Greek"
                 s3 ="el-GR"
         Case "eo","eo-", "esperanto"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Esperanto"
                 s3 ="eo"
         Case "et","et-ee", "estonian", "425"
@@ -2102,7 +2110,7 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Estonian"
                 s3 ="et-EE"
         Case "fa","fa-ir", "farsi"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Farsi"
                 s3 ="fa-IR"
         Case "fi","fi-fi", "finnish", "40b"
@@ -2110,47 +2118,47 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Finnish"
                 s3 ="fi-FI"
         Case "fj","fj-fj", "fijian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Fijian"
                 s3 ="fj-FJ"
         Case "fu","fu-it", "friulian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Friulian"
                 s3 ="fu-IT"
         Case "fy","fy-nl", "frisian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Frisian"
                 s3 ="fy-NL"
         Case "ga","ga-ie", "irish", "83c"
                 s1 = "83c"
                 s2="Irish"
                 s3 ="ga-IE"
-        Case "gd","gd-gb", "gaelic", "43c" 
-                s1 = "43c" 
+        Case "gd","gd-gb", "gaelic", "43c"
+                s1 = "43c"
                 s2="Gaelic"
                 s3 ="gd-GB"
         Case "gl","gl-es", "galician"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Galician"
                 s3 ="gl-ES"
         Case "gu","gu-in", "gujarati"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Gujarati"
                 s3 ="gu-IN"
         Case "gd","gd-gb", "gaelic"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Gaelic"
                 s3 ="gd-GB"
         Case "gsc","gsc-fr", "gascon"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Gascon"
                 s3 ="gsc-FR"
         Case "gug","gug-py", "guarani"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Guarani"
                 s3 ="fug-PY"
         Case "haw","haw-us", "hawaiian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Hawaiian"
                 s3 ="haw-US"
         Case "he","he-il", "hebrew", "40d"
@@ -2162,11 +2170,11 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Croatian"
                 s3 ="hr-HR"
         Case "hsb","hsb-de","sorbian, upper"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Sorbian, Upper"
                 s3 ="hsb-DE"
         Case "ht","ht-ht", "haitian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Haitian"
                 s3 ="ht-HT"
         Case "hu","hu-hu", "hungarian", "40e"
@@ -2174,19 +2182,19 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Hungarian"
                 s3 ="hu-HU"
         Case "ha","ha-gh","ha-ng", "hausa"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Hausa"
                 s3 ="ha"
         Case "hil","hil-ph", "hiligaynon"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Hiligaynon"
                 s3 ="hil-PH"
         Case "ia","ia-", "interlingua"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Interlingua"
                 s3 ="ia"
-        Case "id","id-id", "indonesian", "421" 
-                s1 = "421" 
+        Case "id","id-id", "indonesian", "421"
+                s1 = "421"
                 s2="Indonesian"
                 s3 ="id-ID"
         Case "is","is-is", "icelandic", "40f"
@@ -2194,7 +2202,7 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Icelandic"
                 s3 ="is-IS"
         Case "jbo","jbo-", "lojban"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Lojban"
                 s3 ="jbo"
         Case "ja", "ja-jp", "japanese", "411"
@@ -2202,23 +2210,23 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Japanese"
                 s3 ="ja-JP"
         Case "kab","kab-dz", "kabyle"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Kabyle"
                 s3 ="kab-DZ"
         Case "ki","ki-ke", "gikuyu"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Gikuyu"
                 s3 ="ki-KE"
         Case "kk","kk-kz", "kazak"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Kazak"
                 s3 ="kk-KZ"
         Case "kl","kl-gl", "kalaallisut"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Kalaallisut"
                 s3 ="kl-GL"
         Case "ksf","ksf-cm", "bafia"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Bafia"
                 s3 ="ksf-CM"
         Case "ko","ko-kp","ko-kr", "korean", "412"
@@ -2226,71 +2234,71 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Korean"
                 s3 ="ko"
         Case "ka","ka-ge", "georgian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Georgian"
                 s3 ="ka-GE"
         Case "km","km-kh", "khmer"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Khmer"
                 s3 ="km-KH"
         Case "kn","kn-in", "kannada"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Kannada"
                 s3 ="kn-IN"
         Case "kok","kok-in", "konkani"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Konkani"
                 s3 ="kok-IN"
         Case "ku","ku-sy","ku-tr", "kurdish"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Kurdish"
                 s3 ="ku"
         Case "ky","ky-kg", "kirghiz"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Kirghiz"
                 s3 ="ky-KG"
         Case "la","la-va", "latin"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Latin"
                 s3 ="la-VA"
         Case "lb","lb-lu", "luxembourgish"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Luxembourgish"
                 s3 ="lb-LU"
         Case "ldi","ldi-cg", "lari"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Lari"
                 s3 ="ldi-CG"
         Case "lg","lg-ug", "ganda"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Ganda"
                 s3 ="lg-UG"
         Case "ln","ln-cd", "lingala"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Lingala"
                 s3 ="ln-CD"
         Case "lo","lo-la", "lao"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Lao"
                 s3 ="lo-LA"
         Case "lt","lt-lt", "lithuanian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Lithuanian"
                 s3 ="lt-LT"
         Case "ltg","ltg-lv", "latgalian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Latgalian"
                 s3 ="ltg-LV"
         Case "lv","lv-lv", "latvian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Latvian"
                 s3 ="lv-LV"
         Case "mdw","mdw-cg", "mbochi"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Mbochi"
                 s3 ="mdw-CG"
         Case "mi","mi-nz", "maori (new zealand)"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Maori (New Zealand)"
                 s3 ="mi-NZ"
         Case "ms","ms-sg","ms-my","ms-id","ms-bn", "malay", "43E"
@@ -2298,15 +2306,15 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Malay"
                 s3 ="ms"
         Case "mk","mk-mk", "macedonian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Macedonian"
                 s3 ="mk-MK"
         Case "mkw","mkw-cg", "kituba", "mk-MK"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Kituba"
                 s3 ="mkw-CG"
         Case "mn","mn-mn", "mongolian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Mongolian"
                 s3 ="mn-MN"
         Case "mo-mn","mo", "moldavian", "850"
@@ -2314,15 +2322,15 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Moldavian"
                 s3 ="mo-MN"
         Case "mos","mos-bf", "moore"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Moore"
                 s3 ="mos-BF"
         Case "mr","mr-in", "marathi"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Marathi"
                 s3 ="mr-IN"
         Case "nds","nds-de", "low german"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Low German"
                 s3 ="nds-DE"
         Case "nl","nl-nl", "dutch", "413"
@@ -2346,27 +2354,27 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Norwegian"
                 s3 ="no-NO"
         Case "nr","nr-za", "ndebele, south"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Ndebele, South"
                 s3 ="nr-ZA"
         Case "nso","nso-za", "northern sotho"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Northern Sotho"
                 s3 ="nso-ZA"
         Case "ny","ny-mw", "nyanja"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Nyanja"
                 s3 ="ny-MW"
         Case "oc","oc-fr", "occitan"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Occitan"
                 s3 ="oc-FR"
         Case "om","om-et", "oromo"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Oromo"
                 s3 ="om-ET"
         Case "pap","pap-aw","pap-an", "papiamento"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Papiamento"
                 s3 ="pap"
         Case "pl","pl-pl", "polish", "415"
@@ -2374,11 +2382,11 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Polish"
                 s3 ="pl-PL"
         Case "pli","pli-", "pali"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Pali"
                 s3 ="pli"
         Case "plt","plt-mg", "malagasy"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Malagasy"
                 s3 ="plt-MG"
         Case "pt-br", "portuguese (brazil)", "416"
@@ -2394,7 +2402,7 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="portuguese"
                 s3 ="pt"
         Case "qtz","qtz-", "keyid"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="KeyID"
                 s3 ="qtz"
         Case "qul", _
@@ -2404,11 +2412,11 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                         "qu-ec", _
                         "quh-bo", _
                         "quechua"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Quechua"
                 s3 ="qul"
         Case "rm","rm-ch", "rhaeto-romance"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Rhaeto-Romance"
                 s3 ="rm-CH"
         Case "ro","ro-ro", "romanian", "418"
@@ -2420,11 +2428,11 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Russian"
                 s3 ="ru-RU"
         Case "rue","rue-sk","rue-ua", "rusyan"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Rusyan"
                 s3 ="rue"
         Case "rw","rw-rw", "kinyarwanda"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Kinyarwanda"
                 s3 ="rw-RW"
         Case "se-fi", _
@@ -2442,7 +2450,7 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                         "smn", _
                         "sms-fi", _
                         "sami"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Sami"
                 s3 ="se-FI"
         Case "sh-me", _
@@ -2455,13 +2463,13 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                         "sr-su", _
                         "sr", _
                         "serbian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Serbian"
                 s3 ="sh-RS"
         Case "shs", _
                         "shs-ca", _
                         "shuswap"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Shuswap"
                 s3 ="shs-CA"
         Case "sk", _
@@ -2476,35 +2484,35 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Slovene"
                 s3 ="si-SI"
         Case "so","so-so", "somali"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Somali"
                 s3 ="so-SO"
         Case "sq","sq-al", "albanian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Albanian"
                 s3 ="sq-AL"
         Case "src","src-it", "sardinian (logudorese)"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Sardinian (Logudorese)"
                 s3 ="src-IT"
         Case "sdc","sdc-it", "sardinian (sassarese)"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Sardinian (Sassarese)"
                 s3 ="sdc-IT"
         Case "ss","ss-za", "swazi"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Swazi"
                 s3 ="ss-ZA"
         Case "st","st-za", "southern sotho"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Southern Sotho"
                 s3 ="st-ZA"
         Case "sw","sw-tz","sw-ke", "swahili"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Swahili"
                 s3 ="sw"
         Case "swb","swb-yt", "maore"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Maore"
                 s3 ="swb-YT"
         Case "sv","sv-se", "swedish", "41D"
@@ -2512,15 +2520,15 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Swedish"
                 s3 ="sv-SE"
         Case "tek","tek-cg", "teke-ibali"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Teke-Ibali"
                 s3 ="tek-CG"
         Case "tet","tet-id","tet-tl", "tetun"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Tetun"
                 s3 ="tet"
         Case "tg","tg-tj", "tajic"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Tajic"
                 s3 ="tg-TJ"
         Case "th","th-th", "thai", "41E"
@@ -2528,11 +2536,11 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Thai"
                 s3 ="th-TH"
         Case "ti","ti-er","ti-et", "tigrigna"
-        s1 = "1000"  ' XP Not supported 
+        s1 = "1000"  ' XP Not supported
                 s2="Tigrigna"
                 s3 ="ti"
         Case "tk","tk-tm", "turkmen"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Turkmen"
                 s3 ="tk-TM"
         Case "tl","tl-ph", "tagalog", "464"
@@ -2540,11 +2548,11 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Tagalog"
                 s3 ="tk-PH"
         Case "tn","tn-bw","tn-za", "tswana"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Tswana"
                 s3 ="tn"
         Case "tpi","tpi-pg", "tok pisin"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Tok Pisin"
                 s3 ="tpi-PG"
         Case "tr","tr-tr", "turkish", "41f"
@@ -2552,19 +2560,19 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Turkish"
                 s3 ="tr-TR"
         Case "tt","tt-ru", "tatar"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Tatar"
                 s3 =""
         Case "ts","ts-za", "tsonga"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Tsonga"
                 s3 ="ts-ZA"
         Case "ty","ty-pf", "tahitian"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Tahitian"
                 s3 ="ty-PF"
         Case "tyx","tyx-cg", "teke-tyee"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Teke-Tyee"
                 s3 ="tyx-CG"
         Case "uk","uk-ua", "ukranian", "422"
@@ -2572,15 +2580,15 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Ukranian"
                 s3 ="uk-UA"
         Case "ur","ur-in","ur-pk", "urdu"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Urdu"
                 s3 ="ur"
         Case "uz","uz-uz", "uzbec"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Uzbec"
                 s3 ="uz-UZ"
         Case "ve","ve-za", "venda"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Venda"
                 s3 ="ve-ZA"
         Case "vi","vi-vn", "vietnamese", "42a"
@@ -2588,23 +2596,23 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Vietnamese"
                 s3 ="vi-VN"
         Case "vif","vif-cg", "vili"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Vili"
                 s3 ="vif-CG"
         Case "wa","wa-be", "walloon"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Walloon"
                 s3 ="wa-BE"
         Case "xh","xh-za", "xhosa"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Xhosa"
                 s3 ="xh-ZA"
         Case "yi","yi-us", "yiddish"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Yiddish"
                 s3 ="yi-US"
         Case "yo","yo-ng", "yoruba"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Yoruba"
                 s3 ="yo-NG"
         Case "zh-cn", "chinese (simplified)", "804"
@@ -2628,30 +2636,30 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s2="Chinese (Macau)"
                 s3 ="zh-MO"
         Case "zh-yue","zh-yu", "chinese (yue)"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Chinese (Yue)"
                 s3 ="zh-YUE"
         Case "zh", "chinese", "804"
                 s1 = "804"
-                s2 = "Chinese"  
+                s2 = "Chinese"
                 s3 ="zh"
         Case "zu","zu-za", "zulu"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2="Zulu"
                 s3 ="zu-ZA"
         Case "zxx", "zxx-", "ambiguous or missing language", "1000"
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2 = "Ambiguous Or Missing Language"
                 s3 ="zxx"
         Case Else
                 ' Not Found, So We Return ISO Language Code.
-                s1 = "1000"  ' XP Not supported 
+                s1 = "1000"  ' XP Not supported
                 s2=sA
                 s3=sA
         End Select
 
         If iForceEnglish = 1 Then
-        ' The system uses an English string for a path or process name. 
+        ' The system uses an English string for a path or process name.
         ' (i. e.: Festival, Windows SAPI)
                 fsIsoToHumanReadable = s2
         ElseIf iForceEnglish = 2 Then
@@ -2679,7 +2687,7 @@ Function fsWindowsCloseMatchLanguage(s1)
                 End If
                 Dim a1 : a1 = Split(s2, s3)
                 s4 = Trim(a1(UBound(a1)))
-                fsWindowsCloseMatchLanguage = fsIsoToHumanReadable(s4, 0) 
+                fsWindowsCloseMatchLanguage = fsIsoToHumanReadable(s4, 0)
         Else
                 fsWindowsCloseMatchLanguage = s4
         End If
@@ -2688,11 +2696,11 @@ End Function
 
 Function fsWindowsCloseMatchVoice(s1)
         ' s1 - iso language string in the form `es-ES` or `en-CA`
-        ' Returns a human readable string of a language that 
+        ' Returns a human readable string of a language that
         ' is installed and that closely matches the requested language
         ' in the form `Spanish (Mexico)` or `English (USA)`
         fsWindowsCloseMatchVoice = ""
-        Dim i 
+        Dim i
         i = 0
         Dim s2
         s2 = fsIsoToConciseHumanReadable(s1, 1)
@@ -2702,7 +2710,7 @@ Function fsWindowsCloseMatchVoice(s1)
         s4 = fsIsoToHumanReadable(s1, 1)
         Dim Sapi
         Set Sapi=CreateObject("Sapi.SpVoice")
-        ' Microsoft SAPI voices have a predictable naming pattern that includes 
+        ' Microsoft SAPI voices have a predictable naming pattern that includes
         ' the language name in the form - `Microsoft David Desktop - English (United States)
 
         If Sapi.GetVoices.Count = 0 Then
@@ -2712,9 +2720,9 @@ Function fsWindowsCloseMatchVoice(s1)
                         s3=Sapi.GetVoices.Item(i).GetDescription
                         If Len(s3) > 1 And InStr(s3, s4) > 1 Then
                                 fsWindowsCloseMatchVoice = s3
-                                        
+
                                 Exit For
-                        End If                  
+                        End If
                 Next
                 If fsWindowsCloseMatchVoice = "" Then
                         For i = 0 To Sapi.GetVoices.Count - 1
@@ -2722,7 +2730,7 @@ Function fsWindowsCloseMatchVoice(s1)
                                 If Len(s3) > 1 And InStr(s3, s2) > 1 Then
                                         fsWindowsCloseMatchVoice = s3
                                         Exit For
-                                End If                  
+                                End If
                         Next
                 End If
         End If
@@ -2749,12 +2757,12 @@ Function fsDec2Hex(i1)
     Dim s1
 
     If i1 < 16 Then
-	    s1 = Mid("0123456789abcdef", i1 + 1, 1)
+        s1 = Mid("0123456789abcdef", i1 + 1, 1)
     Else
         s1 = fsDec2Hex(i1 \ 16) & _
                 fsDec2Hex(i1 Mod 16)
-    End If   
-    fsDec2Hex = s1    
+    End If
+    fsDec2Hex = s1
 End Function
 
 
@@ -2768,7 +2776,7 @@ Sub main()
     Dim s0
     Dim s1
     Dim s2
-	Dim s3
+    Dim s3
     Dim sVoice
     Dim srate
     Dim sLanguage
@@ -2798,10 +2806,10 @@ Sub main()
         Case "-h","--help","/h","-?"
             Usage "Help"
             WScript.Exit(0)
-        Case "" 
+        Case ""
             s0 = Year(Date) & "-" & Month(Date) & "-" & Day(Date)
             s0 = s0 & ", " & FormatDateTime(Now,4)
-			s3 = Left(fsIsoToHumanReadable(fsDec2Hex(Int(GetLocale())), 0), 2)
+            s3 = Left(fsIsoToHumanReadable(fsDec2Hex(Int(GetLocale())), 0), 2)
             Select Case s3
             Case "de"
                     s1 = "Las ein paar Worte..."
@@ -2828,8 +2836,8 @@ Sub main()
     End Select
     If sLanguage = "" Then
         s1 = s2
-    Else 
-        s1 = AddLanguageCodes(sLanguage,s2)  
+    Else
+        s1 = AddLanguageCodes(sLanguage,s2)
     End If
     If sOutFile = "" Then
         bOK = sayIt(s1, sRate, sVoice)
