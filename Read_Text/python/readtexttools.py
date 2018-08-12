@@ -88,18 +88,69 @@ import sys
 import time
 import wave
 
-if sys.version_info >= (3, 0):
+try:
     import urllib.parse as urlparse
     import urllib.request as urllib
-else:
+except ImportError:
     import urlparse
     import urllib
+
 try:
     import gi
     gi.require_version('Gst', '1.0')
     from gi.repository import Gst
 except:
     pass
+
+try:
+    from HTMLParser import HTMLParser
+except ImportError:
+    # python 3
+    from html.parser import HTMLParser
+
+
+class ClassRemoveXML(HTMLParser):
+    ''' Remove XML using python HTML parsing. '''
+    def __init__(self):
+        self.reset()
+        self.fed = []
+        self.convert_charrefs = []
+    def handle_data(self, d):
+        ''' Handle string data. '''
+        self.fed.append(d)
+    def get_fed_data(self):
+        ''' Return fed data. '''
+        return ''.join(self.fed)
+
+
+def stripxml(str1):
+    '''
+    `stripxml(str1)`
+
+    Plain text output
+    =================
+
+    When `stripxml` is applied to a string, python converts the
+    xml input into plain text with no special codes.  This is
+    for speech synthesis and other applications that require a
+    sanitized string.
+
+    Application note
+    ----------------
+
+    With python 3, the function fails if this file is placed in a
+    directory that contains a file called `html.py`. This is
+    because the python tries to find the `HTMLParser` library
+    from the local `html.py` file.
+    '''
+    try:
+        mydata = ClassRemoveXML()
+        mydata.feed(str1)
+        retval = mydata.get_fed_data()
+    except Exception:
+        # unexpected error
+        retval = str1
+    return retval
 
 
 def usage():
@@ -117,11 +168,11 @@ def usage():
     print('')
     print('### Audio:\n')
     print(('    '+sA+u' --sound="xxx.wav" --output="xxx.ogg"'))
-    print(('    '+sA+u' --visible="false" --audible="true"  \ '))
+    print(('    '+sA+u' --visible="false" --audible="true"  \\ '))
     print('       --sound="xxx.wav" --output="xxx.ogg"\n')
     print('### Video:\n')
     print('Makes an audio with a poster image.  Uses `avconv` or `ffmpeg`.\n')
-    print(('    '+sA+u' --image="xxx.png" --sound="xxx.wav" \ '))
+    print(('    '+sA+u' --image="xxx.png" --sound="xxx.wav" \\ '))
     print(('      --output="xxx.webm"'))
     print(('    '+sA+u' --visible="true" --audible="true" --image="x.png" \\'))
     print('       --sound="x.wav"--title="Title" --output="x.webm"\n')
@@ -180,8 +231,8 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
         sMIME = mimetypes.types_map[sTMP1EXT]
     if sTMP1EXT == '.m4a':
             if (os.path.isfile('/usr/bin/faac') or
-                    os.path.isfile(r'C:\opt\neroAacEnc.exe') or
-                    os.path.isfile(r'C:\opt\faac.exe')):
+                    os.path.isfile('C:\\opt\\neroAacEnc.exe') or
+                    os.path.isfile('C:\\opt\\faac.exe')):
                 sOUT1 = sTMP1
                 sTMP1 = sOUT1 + u'.wav'
             else:
@@ -192,7 +243,7 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
         if MediaConverterInstalled() != bFalse:
             if (os.path.isfile('/usr/share/doc/liblame0/copyright') or
                     os.path.isfile('/usr/bin/lame') or
-                    os.path.isfile(r'C:\opt\lame.exe')):
+                    os.path.isfile('C:\\opt\\lame.exe')):
                 sOUT1 = sTMP1
                 sTMP1 = sOUT1 + u'.wav'
             else:
@@ -206,7 +257,7 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
     if sTMP1EXT == '.mp2':
         if MediaConverterInstalled() != bFalse:
             if (os.path.isfile('/usr/share/doc/libtwolame0/copyright') or
-                    os.path.isfile(r'C:\opt\twolame.exe')):
+                    os.path.isfile('C:\\opt\\twolame.exe')):
                 sOUT1 = sTMP1
                 sTMP1 = sOUT1 + u'.wav'
             else:
@@ -219,8 +270,8 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
     elif sMIME == mimetypes.types_map['.ogg']:
         if MediaConverterInstalled() != bFalse:
             if (os.path.isfile('/usr/share/doc/libogg0/copyright') or
-                    os.path.isfile(r'C:\opt\oggenc.exe') or
-                    os.path.isfile(r'C:\opt\oggenc2.exe')):
+                    os.path.isfile('C:\\opt\\oggenc.exe') or
+                    os.path.isfile('C:\\opt\\oggenc2.exe')):
                 sOUT1 = sTMP1
                 sTMP1 = sOUT1 + u'.wav'
             else:
@@ -240,7 +291,7 @@ def fsGetSoundFileName(sTMP1, sIMG1, sType1):
                 sTMP1 = sOUT1
     elif sMIME == mimetypes.types_map['.flac']:
             if (MediaConverterInstalled() != bFalse or
-                    os.path.isfile(r'C:\opt\flac.exe')):
+                    os.path.isfile('C:\\opt\\flac.exe')):
                 sOUT1 = sTMP1
                 sTMP1 = sOUT1 + u'.wav'
             else:
@@ -521,7 +572,6 @@ def GstWav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
     may be incompatible with legacy players.
     '''
     sTMP1EXT = os.path.splitext(sOUT1)[1].lower()
-    sMETADATA = ""
     sPIPE = u'" ! decodebin ! audioconvert ! '
     sFileView = sOUT1
 
@@ -849,14 +899,11 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
             sDIM - Dimensions of poster image '600x600'
     '''
 
-    sTT = sB
     iTIME = WavtoSeconds(sTMP1)
     sTIME = repr(iTIME)
     sOUT1EXT = os.path.splitext(sOUT1)[1].lower()
     sTMP1EXT = os.path.splitext(sTMP1)[1].lower()
-    sIMG1EXT = os.path.splitext(sIMG1)[1].lower()
     # GetAMetaDataStr(iUnixLame, sART)
-    iNone = 0
     iAvconv = 1
     iOggEnc2 = 2
     iNeroMp4 = 3
@@ -882,7 +929,6 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
         sCmdA = u''
         sFFcommand = ffMpegPath()
         if sOUT1MIME == mimetypes.types_map['.ogg']:
-            sTY = time.strftime('%Y-%m-%d')
             if 'windows' in platform.system().lower():
                 # C:/opt/oggenc2.exe
                 # Get oggenc2.exe: http://www.rarewares.org/ogg-oggenc.php
@@ -1355,7 +1401,7 @@ def writeXspfPlayList(sA, sART, sIMG):
     elif sIMG[:4] == 'http':
         sIMGURI = sIMG
     else:
-        sIMGURL = sIMGERR
+        sIMGURI = sIMGERR
     s1 = GetAMetaDataStr(iXSPF, sART)
     s1 = s1.replace('[%%LOCATION%%]', sURI, 1)
     s1 = s1.replace('[%%IMAGE%%]', sIMGURI, 1)

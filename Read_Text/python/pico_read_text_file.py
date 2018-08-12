@@ -44,7 +44,7 @@ or (save as a .wav file in the home directory):
 
          "(PICO_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
            --output "(HOME)(NOW).wav" "(TMP)"
-           
+
 or (speak more slowly with a lowered pitch):
 
         "(PICO_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
@@ -70,27 +70,30 @@ import platform
 import sys
 import readtexttools
 
-
 def usage():
     '''
     Command line help
     '''
-    sA = ' ' + os.path.split(sys.argv[0])[1]
-    sB = '    ' + sA
-    print ('\nPico Read Text\n==============\n')
-    print ('Reads a text file using pico2wave and a media player.\n')
-    print ('Converts format with `avconv`, `lame`, `ffmpeg` or `gstreamer`.\n')
-    print ('Usage\n-----\n')
-    print(sB + ' "input.txt"')
-    print(sB + ' --language [de|en|en-GB|es|fr|it] "input.txt"')
-    print(sB + ' --visible "false" "input.txt"')
-    print(sB + ' --rate=100% --pitch=100% "input.txt"')
-    print(sB + ' --output "output.wav" "input.txt"')
-    print(sB + ' --output "output.[m4a|mp2|mp3|ogg]" "input.txt"')
-    print(sB + ' --output "output.[avi|webm]" \ ')
-    print('       --image "input.[png|jpg] "input.txt"')
-    print(sB + ' --audible "false" --output "output.wav" \ ')
-    print('       "input.txt"\n')
+    print('''Pico Read Text
+==============
+
+Reads a text file using pico2wave and a media player.
+
+Converts format with `avconv`, `lame`, `faac` or `ffmpeg`.
+
+Usage
+-----
+
+     pico_read_text_file.py "input.txt"
+     pico_read_text_file.py --language [de|en|en-GB|es|fr|it] "input.txt"
+     pico_read_text_file.py --visible "false" "input.txt"
+     pico_read_text_file.py --rate=100% --pitch=100% "input.txt"
+     pico_read_text_file.py --output "output.wav" "input.txt"
+     pico_read_text_file.py --output "output.[m4a|mp2|mp3|ogg]" "input.txt"
+     pico_read_text_file.py --output "output.[avi|webm]"
+       --image "input.[png|jpg] "input.txt"
+     pico_read_text_file.py --audible "false" --output "output.wav"
+       "input.txt" ''')
 
 
 def picoread(sTXT, sLANG, sVISIBLE, sAUDIBLE, sTMP0, sIMG1, sB, sART, sDIM):
@@ -136,12 +139,31 @@ def picoread(sTXT, sLANG, sVISIBLE, sAUDIBLE, sTMP0, sIMG1, sB, sART, sDIM):
         if 'windows' in platform.system().lower():
             sCommand = readtexttools.getWinFullPath('opt/picosh.exe')
             if "de" in s.lower():
-                s1 = sCommand + ' –v de-DE_gl0 "' + sTXT + '" "' + sTMP1 + '"'
+                s1 =''.join([
+                        sCommand,
+                        ' –v de-DE_gl0 "',
+                        sTXT,
+                        '" "',
+                        sTMP1,
+                        '"'])
             else:  # Pico for Windows defaults to British English
-                s1 = sCommand + ' "' + sTXT+'" "' + sTMP1 + '"'
+                s1 = ''.join([
+                        sCommand,
+                        ' "',
+                        sTXT,
+                        '" "',
+                        sTMP1,
+                        '"']) 
         else:
             sCommand = 'pico2wave'
-            s1 = sCommand + ' -l ' + s + ' -w "' + sTMP1 + '"  ' + sTXT
+            s1 = ''.join([
+                    sCommand,
+                    ' -l ',
+                    s,
+                    ' -w "',
+                    sTMP1,
+                    '"  ',
+                    sTXT])
         readtexttools.myossystem(s1)
         readtexttools.ProcessWaveMedia(sB,
                                        sTMP1,
@@ -175,8 +197,7 @@ def main():
         if sys.argv[-1] == sys.argv[0]:
             usage()
             sys.exit(0)
-        elif (os.path.isfile('/usr/bin/pico2wave')
-              != os.path.isfile('/usr/bin/python')):
+        elif not os.path.isfile('/usr/bin/pico2wave'):
             print('Please install libttspico-utils.')
             usage()
             sys.exit(0)
@@ -235,10 +256,18 @@ def main():
             sTXT = oFILE.read()
             oFILE.close()
             if len(sTXT) != 0:
+                sTXT = readtexttools.stripxml(sTXT)
+            if len(sTXT) != 0:
                 sTXT = readtexttools.cleanstr(sTXT, readtexttools.bFalse())
-                sA = '" <speed level = \'' + sRATE + '\'>'
-                sA = sA + "<pitch level = '" + sPITCH + '\'>'
-                sA = sA + sTXT + '</pitch></speed>"'
+                sA = ''.join([
+                        '" <speed level = \'',
+                        sRATE,
+                        '\'>',
+                        "<pitch level = '",
+                        sPITCH,
+                        '\'>',
+                        sTXT,
+                        '</pitch></speed>"'])
                 sB = readtexttools.checkmyartist(sART)
                 sC = readtexttools.checkmytitle(sTIT, "pico")
                 picoread(sA,

@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python
 # -*- coding: UTF-8-*-
-'''
+r'''
 Espeak
 ======
 
@@ -92,27 +92,32 @@ import platform
 import sys
 import readtexttools
 
-
 def usage():
     '''
     Command line help
     '''
-    sA = ' ' + os.path.split(sys.argv[0])[1]
-    sB = '    ' + sA
-    print ('\nEspeak Read Text\n===============\n')
-    print ('Reads a text file using espeak and a media player.\n')
-    print ('Converts format with `avconv`, `lame`, `ffmpeg` or `gstreamer`.\n')
-    print ('Usage\n-----\n')
-    print(sB + ' "input.txt"')
-    print(sB + ' --language [de|en|en-GB|es|fr|it] "input.txt"')
-    print(sB + ' --visible="false" "input.txt"')
-    print(sB + ' --rate=100% --pitch=100% "input.txt"')
-    print(sB + ' --output="output.wav" "input.txt"')
-    print(sB + ' --output="output.[m4a|mp2|mp3|ogg]" "input.txt"')
-    print(sB + ' --output="output.[avi|webm]" \ ')
-    print('       --image="input.[png|jpg] "input.txt"')
-    print(sB + ' --audible="false" --output="output.wav" \ ')
-    print('       "input.txt"\n')
+    print ('''
+Espeak Read Text
+===============
+
+Reads a text file using espeak and a media player.
+
+Converts format with `avconv`, `lame`, `faac` or `ffmpeg`.
+
+Usage
+-----
+
+     espeak_read_text_file.py "input.txt"
+     espeak_read_text_file.py --language [de|en|en-GB|es|fr|it] "input.txt"
+     espeak_read_text_file.py --visible="false" "input.txt"
+     espeak_read_text_file.py --rate=100% --pitch=100% "input.txt"
+     espeak_read_text_file.py --output="output.wav" "input.txt"
+     espeak_read_text_file.py --output="output.[m4a|mp2|mp3|ogg]" "input.txt"
+     espeak_read_text_file.py --output="output.[avi|webm]" \\ 
+       --image="input.[png|jpg] "input.txt"
+     espeak_read_text_file.py --audible="false" --output="output.wav" \\ 
+       "input.txt"
+''')
 
 
 def espkread(sTXTFILE,
@@ -128,53 +133,102 @@ def espkread(sTXTFILE,
              iPITCH,
              iRATE):
     '''
-    sTXTFILE - Name of text file to speak
-    sLANG - Supported two or four letter language code - defaults to US English
-    sVISIBLE- Use a graphic media player, or False for invisible player
-    sTMP0 - Name of desired output media file
-    sAUDIBLE - If false, then don't play the sound file
-    sIMG1 - a .png or .jpg file if required.
-    sB - Commentary or title for post processing
-    sPOSTPROCESS - Get information, play file, or convert a file
-    sART - Artist or Author
-    sDIM - Dimensions to scale photo '600x600'
-    iPITCH - pitch value from 5 to 100, default 50
-    iRATE - rate value from 20 to 640, default 160
+Creates a temporary speech-synthesis sound file and optionally
+reads the file aloud.
+
++ `sTXTFILE` - Name of text file to speak
++ `sLANG` - Supported two or four letter language code - defaults to US English
++ `sVISIBLE` - Use a graphic media player, or False for invisible player
++ `sTMP0` - Name of desired output media file
++ `sAUDIBLE` - If false, then don't play the sound file
++ `sIMG1` - a .png or .jpg file if required.
++ `sB` - Commentary or title for post processing
++ `sPOSTPROCESS` - Get information, play file, or convert a file
++ `sART` - Artist or Author
++ `sDIM` - Dimensions to scale photo '600x600'
++ `iPITCH` - pitch value from 5 to 100, default 50
++ `iRATE` - rate value from 20 to 640, default 160
     '''
     sOUT1 = ''
-    sOTHER = 'af;bs;ca;cs;cy;da;de;el;eo;fi;fr;hi;hr;hu;hy;id;is;it;ku;la;lv;'
-    sOTHER = sOTHER + 'mk;nl;pl;ro;ru;sk;sq;sr;sv;sw;ta;tr;vi'
 
-    if sLANG[:2].lower() == 'de':
+    if sLANG[:2].lower() in ['de']:
         s = 'de'
-    elif sLANG[:2].lower() == 'en':
-        if sLANG[-2:].upper() in 'AU;BD;BS;CA;GB;GH;HK;IE;IN;JM;NZ;PK;SA;TT':
+    elif sLANG[:2].lower() in ['en']:
+        if sLANG[-2:].upper() in [
+                'AU', 
+                'BD', 
+                'BS', 
+                'CA', 
+                'GB', 
+                'GH', 
+                'HK', 
+                'IE', 
+                'IN', 
+                'JM', 
+                'NZ', 
+                'PK', 
+                'SA', 
+                'TT']:
             s = 'en'
         else:
             s = 'en-us'
-    elif sLANG[:2].lower() == 'es':
-        if sLANG[-2:].upper() in 'ES':
+    elif sLANG[:2].lower() in ['es']:
+        if sLANG[-2:].upper() in ['ES']:
             s = 'es'
-        elif sLANG[-2:].upper() in 'MX':
+        elif sLANG[-2:].upper() in ['MX']:
             s = 'es-mx'
         else:
             s = 'es-la'
-    elif sLANG[:2].lower() == 'nb':
+    elif sLANG[:2].lower() in ['nb']:
         # *Office uses language code for Norwegian Bokmal - nb
         #  NO is the country code for Norway, not an official language code.
         s = 'no'
-    elif sLANG[:2].lower() == 'pt':
-        if sLANG[-2:].upper() in 'PT':
+    elif sLANG[:2].lower() in ['pt']:
+        if sLANG[-2:].upper() in ['PT']:
             s = 'pt-pt'
         else:
             s = 'pt'
-    elif sLANG[:2].lower() == 'zh':
-        if sLANG[-2:].upper() in 'HK;MO':
+    elif sLANG[:2].lower() in ['zh']:
+        if sLANG[-2:].upper() in ['HK','MO']:
             # Yue is official language in Hong Kong & Macau
             s = 'zh-yue'
         else:
             s = 'zh'
-    elif sLANG[:2].lower() in sOTHER:
+    elif sLANG[:2].lower() in [
+            'af', 
+            'bs', 
+            'ca', 
+            'cs', 
+            'cy', 
+            'da', 
+            'de', 
+            'el', 
+            'eo', 
+            'fi', 
+            'fr', 
+            'hi', 
+            'hr', 
+            'hu', 
+            'hy', 
+            'id', 
+            'is', 
+            'it', 
+            'ku', 
+            'la', 
+            'lv', 
+            'mk', 
+            'nl', 
+            'pl', 
+            'ro', 
+            'ru', 
+            'sk', 
+            'sq', 
+            'sr', 
+            'sv', 
+            'sw', 
+            'ta', 
+            'tr', 
+            'vi']:
         s = sLANG[:2].lower()
     else:
         s = 'en'
@@ -183,81 +237,56 @@ def espkread(sTXTFILE,
         # Check if an mbrola voice is available for the language, otherwise use
         # the default espeak voice.  If there are several compatible mbrola
         # voices, this python script will choose the first one - for example:
-        # de2 instead of de7
-        ambrola = ['af1',
-                   'br1',
-                   'br3',
-                   'br4',
-                   'cr1',
-                   'cz2',
-                   'de2',
-                   'de4',
-                   'de5',
-                   'de6',
-                   'de7',
-                   'en1',
-                   'es1',
-                   'es2',
-                   'fr1',
-                   'fr4',
-                   'gr2',
-                   'hu1',
-                   'id1',
-                   'it3',
-                   'it4',
-                   'la1',
-                   'nl2',
-                   'pl1',
-                   'pt1',
-                   'ro1',
-                   'sw1',
-                   'sw2',
-                   'tr1',
-                   'tr2',
-                   'us1',
-                   'us2',
-                   'us3']
-        aespeak = ['af',
-                   'pt',
-                   'pt',
-                   'pt',
-                   'hr',
-                   'cs',
-                   'de',
-                   'de',
-                   'de',
-                   'de',
-                   'de',
-                   'en',
-                   'es',
-                   'es',
-                   'fr',
-                   'fr',
-                   'el',
-                   'hu',
-                   'id',
-                   'it',
-                   'it',
-                   'la',
-                   'nl',
-                   'pl',
-                   'pt-pt',
-                   'ro',
-                   'sv',
-                   'sv',
-                   'tr',
-                   'tr',
-                   'en-us',
-                   'en-us',
-                   'en-us']
-        for i in range(len(aespeak)):
+        # de2 instead of de7.
+        #
+        # Dictionary : `a2` is the locally installed language abbreviation;
+        # `a1` is the equivalent ISO 639-1 standard for languages, except in
+        # the cases of pt-PT and en-US, which include a regional ISO code.
+        a0 = [
+            {'a2': 'af1', 'a1': 'af'},
+            {'a2': 'br1', 'a1': 'pt'},
+            {'a2': 'br3', 'a1': 'pt'},
+            {'a2': 'br4', 'a1': 'pt'},
+            {'a2': 'cr1', 'a1': 'hr'},
+            {'a2': 'cz2', 'a1': 'cs'},
+            {'a2': 'de2', 'a1': 'de'},
+            {'a2': 'de4', 'a1': 'de'},
+            {'a2': 'de5', 'a1': 'de'},
+            {'a2': 'de6', 'a1': 'de'},
+            {'a2': 'de7', 'a1': 'de'},
+            {'a2': 'en1', 'a1': 'en'},
+            {'a2': 'es1', 'a1': 'es'},
+            {'a2': 'es2', 'a1': 'es'},
+            {'a2': 'fr1', 'a1': 'fr'},
+            {'a2': 'fr4', 'a1': 'fr'},
+            {'a2': 'gr2', 'a1': 'el'},
+            {'a2': 'hu1', 'a1': 'hu'},
+            {'a2': 'id1', 'a1': 'id'},
+            {'a2': 'it3', 'a1': 'it'},
+            {'a2': 'it4', 'a1': 'it'},
+            {'a2': 'la2', 'a1': 'la'},
+            {'a2': 'nl2', 'a1': 'nl'},
+            {'a2': 'pl1', 'a1': 'pl'},
+            {'a2': 'pt1', 'a1': 'pt-pt'},
+            {'a2': 'ro1', 'a1': 'ro'},
+            {'a2': 'sw1', 'a1': 'sv'},
+            {'a2': 'sw2', 'a1': 'sv'},
+            {'a2': 'tr1', 'a1': 'tr'},
+            {'a2': 'tr2', 'a1': 'tr'},
+            {'a2': 'us1', 'a1': 'en-us'},
+            {'a2': 'us2', 'a1': 'en-us'},
+            {'a2': 'us3', 'a1': 'en-us'},
+            {'a2': 'en1', 'a1': 'en-us'}]
+
+        for i in range(len(a0)):
             # Identify an mbrola voice if it is installed
-            if aespeak[i] == s:
+            
+            if a0[i]['a1'] == s:
                 if 'windows' in platform.system().lower():
                     if os.path.isfile(os.path.join(os.getenv('ProgramFiles'),
                                                    'eSpeak/espeak-data/mbrola',
-                                                   ambrola[i])):
-                        sVoice = 'mb-' + ambrola[i]
+                                                   a0[i]['a2'])):
+                        sVoice = 'mb-' + a0[i]['a2']
                         break
                     elif os.getenv('ProgramFiles(x86)'):
                         sPFX86 = os.getenv('ProgramFiles(x86)')
@@ -265,18 +294,20 @@ def espkread(sTXTFILE,
                         if (
                            os.path.isfile(os.path.join(sPFX86,
                                                        sEEDM,
-                                                       ambrola[i]))):
-                            sVoice = 'mb-' + ambrola[i]
+                                                       a0[i]['a2']))):
+                            sVoice = 'mb-' + a0[i]['a2']
                             break
                 else:
+                    print(os.path.join('/usr/share/mbrola/voices',
+                                                   a0[i]['a2']))
                     if os.path.isfile(os.path.join('/usr/share/mbrola/voices',
-                                                   ambrola[i])):
-                        sVoice = 'mb-' + ambrola[i]
+                                                   a0[i]['a2'])):
+                        sVoice = 'mb-' + a0[i]['a2']
                         break
                     elif os.path.isfile(os.path.join('/usr/share/mbrola/',
-                                                     ambrola[i],
-                                                     ambrola[i])):
-                        sVoice = 'mb-' + ambrola[i]
+                                                     a0[i]['a2'],
+                                                     a0[i]['a2'])):
+                        sVoice = 'mb-' + a0[i]['a2']
                         break
     # Determine the output file name
     sOUT1 = readtexttools.fsGetSoundFileName(sTMP0, sIMG1, 'OUT')
@@ -295,9 +326,20 @@ def espkread(sTXTFILE,
         sSub = 'eSpeak/command_line/espeak.exe'
         if 'windows' in platform.system().lower():
             sApp = readtexttools.getWinFullPath(sSub)
-        s1 = '"' + sApp + '" -b 1 -p ' + str(iPITCH) + ' -s ' + str(iRATE)
-        s1 = s1 + ' -v ' + sVoice + ' -w "' + sTMP1
-        s1 = s1 + '" -f "' + sTXTFILE + '"'
+        s1 = ''.join([
+                '"',
+                sApp,
+                '" -b 1 -p ',
+                str(iPITCH),
+                ' -s ',
+                str(iRATE),
+                ' -v ',
+                sVoice,
+                ' -w "',
+                sTMP1,
+                '" -f "',
+                sTXTFILE,
+                '"'])
         readtexttools.myossystem(s1)
         print ("-----------------------------------------------------")
         print (s1)
@@ -343,7 +385,7 @@ def eSpeakRate(sA):
             i1 = (float(sA) if '.' in sA else int(sA))
             i2 = math.ceil(i1)
     except(TypeError):
-       print ('I was unable to determine espeak rate!')
+        print ('I was unable to determine espeak rate!')
     if i2 <= iMinVal:
         retVal = iMinVal
     elif i2 >= iMaxVal:
@@ -375,8 +417,8 @@ def eSpeakPitch(sA):
         else:
             i1 = (float(sA) if '.' in sA else int(sA))
             i2 = math.ceil(i1)
-    except(TypeError):
-       print ('I was unable to determine espeak pitch!')
+    except TypeError:
+        print ('I was unable to determine espeak pitch!')
     if i2 <= iMinVal:
         retVal = iMinVal
     elif i2 >= iMaxVal:
@@ -406,13 +448,12 @@ def main():
         if sys.argv[-1] == sys.argv[0]:
             usage()
             sys.exit(0)
-        elif (os.path.isfile('/usr/bin/espeak')
-              != os.path.isfile('/usr/bin/python')):
+        elif not os.path.isfile('/usr/bin/espeak'):
             print('Please install espeak.  Use `sudo apt-get install espeak`')
             usage()
             sys.exit(0)
         try:
-                    opts, args = getopt.getopt(
+            opts, args = getopt.getopt(
                         sys.argv[1:],
                         'hovalrpitnd',
                         ['help',
@@ -426,7 +467,7 @@ def main():
                          'title=',
                          'artist=',
                          'dimensions='])
-        except (getopt.GetoptError):
+        except getopt.GetoptError:
             # print help information and exit
             print('option -a not recognized')
             usage()
@@ -461,12 +502,14 @@ def main():
                 assert False, 'unhandled option'
         try:
             oFILE = codecs.open(sFILEPATH, mode='r', encoding='utf-8')
-        except (IOError):
+        except IOError:
             print ('I was unable to open the file you specified!')
             usage()
         else:
             sTXT = oFILE.read()
             oFILE.close()
+            if len(sTXT) != 0:
+                sTXT = readtexttools.stripxml(sTXT)
             if len(sTXT) != 0:
                 sTXT = readtexttools.cleanstr(sTXT, readtexttools.bFalse())
                 sA = '" <speed level = \'' + sRATE + '\'>'
@@ -487,7 +530,7 @@ def main():
                          sDIM,
                          iEspeechPitch,
                          iEspeechRate
-                         )
+                        )
     sys.exit(0)
 
 

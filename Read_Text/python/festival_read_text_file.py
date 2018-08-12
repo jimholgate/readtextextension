@@ -68,26 +68,32 @@ import platform
 import sys
 import readtexttools
 
-
 def usage():
     '''
     Command line help
     '''
-    sA = ' ' + os.path.split(sys.argv[0])[1]
-    sB = '    ' + sA
-    print ('\nFestival Read Text\n==================\n')
-    print ('Reads a text file using text2wave and a media player.\n')
-    print ('Converts format with `avconv`, `lame`, `ffmpeg` or `gstreamer`.\n')
-    print ('Usage\n-----\n')
-    print(sB + ' "input.txt"')
-    print(sB + ' --language [de|en|en-GB|es|fr|it] "input.txt"')
-    print(sB + ' --visible "false" "input.txt"')
-    print(sB + ' --output "output.wav" "input.txt"')
-    print(sB + ' --output "output.[m4a|mp2|mp3|ogg]" "input.txt"')
-    print(sB + ' --output "output.[avi|webm]" \ ')
-    print('       --image "input.[png|jpg] "input.txt"')
-    print(sB + ' --audible "false" --output "output.wav" \ ')
-    print('       "input.txt"\n\n')
+
+    print(r'''
+Festival Read Text
+==================
+
+Reads a text file using text2wave and a media player.
+
+Converts format with `avconv`, `lame`, `faac` or `ffmpeg`.
+
+Usage
+-----
+
+     festival_read_text_file.py "input.txt"
+     festival_read_text_file.py --language [de|en|en-GB|es|fr|it] "input.txt"
+     festival_read_text_file.py --visible "false" "input.txt"
+     festival_read_text_file.py --output "output.wav" "input.txt"
+     festival_read_text_file.py --output "output.[m4a|mp2|mp3|ogg]" "input.txt"
+     festival_read_text_file.py --output "output.[avi|webm]" \ 
+       --image "input.[png|jpg] "input.txt"
+     festival_read_text_file.py --audible "false" --output "output.wav" \ 
+       "input.txt"
+''')
 
 
 def festivalread(sFILEPATH,
@@ -101,16 +107,19 @@ def festivalread(sFILEPATH,
                  sART,
                  sDIM):
     '''
-        sTXTFILE - Text File to speak
-        sVISIBLE- Use a graphic media player, or False for invisible player
-        sTMP0 - Name of desired output file
-        sAUDIBLE - If false, then don't play the sound file
-        sIMG1 - a .png or .jpg file if required.
-        sC - text
-        sEVAL1 - Linux text2wave command prefix, like '(voice_upc_ca_ona_hts)'
-        sB - title
-        sART - artist or author
-        sDIM - Dimensions to scale photo '600x600'
+Creates a temporary speech-synthesis sound file and optionally
+reads the file aloud.
+
++ `sTXTFILE` - Text File to speak
++ `sVISIBLE`- Use a graphic media player, or False for invisible player
++ `sTMP0` - Name of desired output file
++ `sAUDIBLE` - If false, then don't play the sound file
++ `sIMG1` - a .png or .jpg file if required.
++ `sC` - text
++ `sEVAL1` - Linux text2wave command prefix, like `(voice_upc_ca_ona_hts)`
++ `sB` - title
++ `sART` - artist or author
++ `sDIM` - Dimensions to scale photo '600x600'
     '''
     # Determine the output file name
     sOUT1 = readtexttools.fsGetSoundFileName(sTMP0, sIMG1, "OUT")
@@ -147,10 +156,22 @@ def festivalread(sFILEPATH,
             sApp = 'text2wave'
             # text2wave is an executable festival script
             if len(sEVAL1) == 0:
-                s1 = sApp + ' "' + sFILEPATH + '" -o "' + sTMP1 + '"'
+                s1 = ''.join([
+                        sApp, ' "',
+                        sFILEPATH,
+                        '" -o "',
+                        sTMP1,
+                        '"'])
             else:
-                s1 = sApp + ' -eval "' + sEVAL1
-                s1 = s1 + '" "' + sFILEPATH + '" -o "' + sTMP1 + '"'
+                s1 = ''.join([
+                        sApp,
+                        ' -eval "',
+                        sEVAL1,
+                        '" "',
+                        sFILEPATH,
+                        '" -o "',
+                        sTMP1,
+                        '"'])
             readtexttools.myossystem(s1)
             readtexttools.ProcessWaveMedia(sB,
                                            sTMP1,
@@ -255,10 +276,13 @@ def festivalPitchString(sA):
 
 
 def main():
+    '''
+Creates a temporary speech-synthesis sound file and optionally
+reads the file aloud.
+    '''
     sWAVE = ''
     sVISIBLE = ''
     sAUDIBLE = ''
-    sTXTFILE = ''
     sSABLESPEAKER = ''
     sSABLERATE = ''
     sSABLEPITCH = ''
@@ -275,8 +299,7 @@ def main():
         if (sys.argv[-1] == sys.argv[0]):
             usage()
             sys.exit(0)
-        elif (os.path.isfile('/usr/bin/text2wave') !=
-              os.path.isfile('/usr/bin/python')):
+        elif not os.path.isfile('/usr/bin/text2wave'):
             usage()
             sys.exit(0)
         try:
@@ -344,9 +367,14 @@ def main():
             sTXT = oFILE.read()
             oFILE.close()
             if len(sTXT) != 0:
+                sTXT = readtexttools.stripxml(sTXT)
+            if len(sTXT) != 0:
+                sTXT = readtexttools.stripxml(sTXT)
                 if (len(sSABLERATE) == 0 and len(sSABLEPITCH) == 0):
                     # Pass plain text (RECOMMENDED for most users)
-                    sTXT = readtexttools.cleanstr(sTXT, readtexttools.bFalse())
+                    sTXT = readtexttools.cleanstr(
+                            sTXT,
+                            readtexttools.bFalse())
                     sA = sTXT
                 else:
                     # Prepare Sable XML (To SLOW DOWN speech use --RATE=75%)
@@ -354,16 +382,19 @@ def main():
                     sTXT = sTXT.replace("&", "&#38;")
                     sTXT = sTXT.replace("<", "&#60;")
                     sTXT = sTXT.replace(">", "&#62;")
-                    sA = ''
-                    sA = sA + '<SABLE>\n'
-                    sA = sA + '<SPEAKER NAME="' + sSABLESPEAKER + '">\n'
-                    sA = sA + '<RATE SPEED="' + sSABLERATE + '">\n'
-                    sA = sA + '<PITCH BASE="' + sSABLEPITCH + '">\n'
-                    sA = sA + sTXT
-                    sA = sA + '\n</PITCH>'
-                    sA = sA + '\n</RATE>'
-                    sA = sA + '\n</SPEAKER>'
-                    sA = sA + '\n</SABLE>'
+                    sA = ''.join([
+                            '<SABLE>\n',
+                            '<SPEAKER NAME="',
+                            sSABLESPEAKER + '">\n',
+                            '<RATE SPEED="',
+                            sSABLERATE + '">\n',
+                            '<PITCH BASE="',
+                            sSABLEPITCH,
+                            '">\n',
+                            sTXT,
+                            '\n</PITCH>',
+                            '\n</SPEAKER>',
+                            '\n</SABLE>'])
                     os.remove(sFILEPATH)
                     sFILEPATH = sFILEPATH + ".sable"
                     oFILE2 = codecs.open(
