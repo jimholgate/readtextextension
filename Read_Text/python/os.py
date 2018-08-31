@@ -23,7 +23,7 @@ See the manual page for `python` for more detailed information
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2015 James Holgate
+Copyright (c) 2011 - 2018 James Holgate
 
 '''
 from __future__ import (

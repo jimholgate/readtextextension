@@ -74,7 +74,5 @@
                 Die ersten 999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXT)</listitem>
             <listitem>
                 Die ersten 9999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXTBIG)</listitem></list>
-        <section id="relatedtopics">
-            <embed href="text/shared/guide/accessibility.xhp#accessibility"/></section>
     </body>
 </helpdocument>

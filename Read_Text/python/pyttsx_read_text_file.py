@@ -38,7 +38,7 @@ Windows settings
 Copyright
 ---------
 
-`pyttsx_read_text_file.py` copyright (c) 2010 - 2016 James Holgate
+`pyttsx_read_text_file.py` copyright (c) 2010 - 2018 James Holgate
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above

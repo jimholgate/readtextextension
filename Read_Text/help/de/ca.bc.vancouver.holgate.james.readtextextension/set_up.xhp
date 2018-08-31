@@ -119,8 +119,5 @@
             <listitem>Zum Dialogfeld zum Ändern der Einstellungen gelangen Sie über <emph>Extras - Add-Ons – Markierten Text vorlesen...</emph>
             </listitem>
         </list>
-        <section id="relatedtopics">
-            <embed href="text/shared/guide/accessibility.xhp#accessibility"/>
-        </section>
     </body>
 </helpdocument>

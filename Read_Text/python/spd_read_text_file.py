@@ -69,7 +69,6 @@ from __future__ import (
 import codecs
 import getopt
 import os
-import platform
 import sys
 import espeak_read_text_file
 import readtexttools
@@ -82,7 +81,7 @@ def usage():
     print('Speech-dispatcher Read Text\n=========================== \n')
     print('Reads a text file using the speech-dispatcher.\n')
     print('Usage\n-----\n')
-    print(sA + ' [--output_module="xx"] [--language="xx"] \ ')
+    print(sA + ' [--output_module="xx"] [--language="xx"] \n ')
     print(sB + ' [--voice="xx"] [--rate="nn"] input.txt \n')
     print('Use a specific output module')
     print(sA + ' --output_module "espeak-generic" "TextFile.txt" \n')
@@ -105,7 +104,7 @@ def guessTime(sSTR, sRATE, sFILEPATH, sLANG):
     retval = iRATE * iSecs
     if iSecs < 60:
         sCommand = "/usr/bin/espeak"
-        if "windows" in platform.system().lower():
+        if 'nt' in os.name.lower():
             sECE = "eSpeak/command_line/espeak.exe"
             sCommand = readtexttools.getWinFullPath(sECE)
         if os.path.isfile(sCommand):

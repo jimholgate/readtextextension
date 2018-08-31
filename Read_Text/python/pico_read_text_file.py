@@ -54,7 +54,7 @@ See the manual page for `pico2wave` for more detailed information
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2015 James Holgate
+Copyright (c) 2011 - 2018 James Holgate
 
 '''
 from __future__ import (
@@ -66,7 +66,6 @@ from __future__ import (
 import codecs
 import getopt
 import os
-import platform
 import sys
 import readtexttools
 
@@ -136,7 +135,7 @@ def picoread(sTXT, sLANG, sVISIBLE, sAUDIBLE, sTMP0, sIMG1, sB, sART, sDIM):
     if os.path.isfile(sOUT1):
         os.remove(sOUT1)
     try:
-        if 'windows' in platform.system().lower():
+        if 'nt' in os.name.lower():
             sCommand = readtexttools.getWinFullPath('opt/picosh.exe')
             if "de" in s.lower():
                 s1 =''.join([

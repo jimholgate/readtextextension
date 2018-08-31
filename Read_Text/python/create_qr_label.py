@@ -53,7 +53,7 @@ See the manual page for `qrencode` for more detailed information.
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2010 - 2015 James Holgate
+Copyright (c) 2010 - 2018 James Holgate
 
 '''
 import getopt
@@ -110,7 +110,7 @@ def qrencode(sTXT, sOUT1, sSIZE, sLEVEL):
 def main():
     sSIZE = ""
     sLEVEL = ""
-    sOUT = ""
+    sOUT1 = ""
 
     try:
         sOUT1 = readtexttools.getTempPrefix()+"-qr-code.png"

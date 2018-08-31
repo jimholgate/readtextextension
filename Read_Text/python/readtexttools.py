@@ -12,7 +12,7 @@ from __future__ import (
 #
 # Copyright And License
 #
-# (c) 2015 [James Holgate Vancouver, CANADA](readtextextension(a)outlook.com)
+# (c) 2018 [James Holgate Vancouver, CANADA](readtextextension(a)outlook.com)
 #
 # THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE
 # TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE
@@ -72,7 +72,7 @@ Currently, python3 is *required* for `speech-dispatcher`.  Python2 requires the
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2016 James Holgate
+Copyright (c) 2011 - 2018 James Holgate
 '''
 import aifc
 import codecs
@@ -80,20 +80,29 @@ import getopt
 import math
 import mimetypes
 import os
-import platform
 import shlex
-import subprocess
 import sunau
 import sys
 import time
-import wave
+
+try:
+    import subprocess
+except ImportError:
+    pass
+try:
+    import wave
+except ImportError:
+    pass
 
 try:
     import urllib.parse as urlparse
     import urllib.request as urllib
 except ImportError:
-    import urlparse
-    import urllib
+    try:
+        import urlparse
+        import urllib
+    except ImportError:
+        pass
 
 try:
     import gi
@@ -339,7 +348,7 @@ def ffMpegPath():
         retVal = '/usr/local/bin/avconv'
     elif os.path.isfile('/usr/local/bin/ffmpeg'):
         retVal = '/usr/local/bin/ffmpeg'
-    elif 'darwin' in platform.system().lower():
+    elif os.path.isfile('/usr/bin/osascript'):
         if os.path.isfile('Applications/Miro.app/Contents/Helpers/ffmpeg'):
             retVal = 'Applications/Miro.app/Contents/Helpers/ffmpeg'
         elif os.path.isfile(
@@ -348,7 +357,7 @@ def ffMpegPath():
             retVal = 'Applications/' + mvc + '.app/Contents/Helpers/ffmpeg'
         elif os.path.isfile('/opt/Shotcut/Shotcut.app/bin/ffmpeg'):
             retVal = '/opt/Shotcut/Shotcut.app/bin/ffmpeg'
-    elif 'windows' in platform.system().lower():
+    elif 'nt' in os.name.lower():
         if len(os.path.isfile(getWinFullPath('opt/ffmpeg.exe'))) != 0:
             retVal = getWinFullPath('opt/ffmpeg.exe')
         elif len(os.path.isfile(getWinFullPath(
@@ -458,14 +467,14 @@ def CheckForGSTPlugIn(sA):
     s4 = '/usr/lib/x86_64-linux-gnu/'
     s5 = '/usr/lib/'
     s6 = '.so'
-    if 'darwin' in platform.system().lower():
+    if os.path.isfile('/usr/bin/osascript'):
         s2 = os.path.join(
                           os.getenv(
                            'HOME'),
                            '/.gstreamer-0.10/plugins/')
         s4 = os.getenv('GST_PLUGIN_PATH')
         s6 = '.dylib'
-    elif 'windows' in platform.system().lower():
+    elif 'nt' in os.name.lower():
         s2 = os.path.join(
                           os.getenv(
                            'HOME'),
@@ -701,9 +710,12 @@ def SoundLenInSeconds(sTMP1):
         sMIME = mimetypes.types_map[sTMP1EXT]
     retVal = 0
     if sMIME == mimetypes.types_map['.wav']:
-        snd_read = wave.open(sTMP1, 'r')
-        retVal = math.ceil(snd_read.getnframes()//snd_read.getframerate()) + 1
-        snd_read.close()
+        try:
+            snd_read = wave.open(sTMP1, 'r')
+            retVal = math.ceil(snd_read.getnframes()//snd_read.getframerate()) + 1
+            snd_read.close()
+        except NameError:
+            pass
     elif sMIME == mimetypes.types_map['.au']:
         snd_read = sunau.open(sTMP1, 'r')
         retVal = math.ceil(snd_read.getnframes()//snd_read.getframerate()) + 1
@@ -929,7 +941,7 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
         sCmdA = u''
         sFFcommand = ffMpegPath()
         if sOUT1MIME == mimetypes.types_map['.ogg']:
-            if 'windows' in platform.system().lower():
+            if 'nt' in os.name.lower():
                 # C:/opt/oggenc2.exe
                 # Get oggenc2.exe: http://www.rarewares.org/ogg-oggenc.php
                 s0 = getWinFullPath('/opt/oggenc2.exe')
@@ -981,7 +993,7 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
             # GStreamer includes a basic m4a muxer, but the file is not
             # compressed or optimized.
             #
-            if 'windows' in platform.system().lower():
+            if 'nt' in os.name.lower():
                 # C:/opt/neroAacEnc.exe
                 s0 = getWinFullPath('/opt/neroAacEnc.exe')
                 if len(s0) == 0:
@@ -1043,7 +1055,7 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
         elif sOUT1MIME == mimetypes.types_map['.mp3']:
             # Try lame for mp3 or 'audio/mpeg' files that haven't been
             #  dealt with above.
-            if 'windows' in platform.system().lower():
+            if 'nt' in os.name.lower():
                 # The program is supplied in a zip file.  To use it,
                 #  you need to extract it to the directory shown.
                 # C:/opt/lame.exe
@@ -1132,7 +1144,7 @@ def Wav2Media(sB, sTMP1, sIMG1, sOUT1, sAUDIBLE, sVISIBLE, sART, sDIM):
             myossystem(s1)
         elif sOUT1MIME == mimetypes.types_map['.flac']:
             # flac - free lossless audio codec.
-            if 'windows' in platform.system().lower():
+            if 'nt' in os.name.lower():
                 # The programs is supplied in a zip file.  To use it,
                 # extract it to the directory shown.
                 # C:/opt/flac.exe
@@ -1445,19 +1457,19 @@ def getMyLock(sLOCK):
     s4 = os.getenv('READTEXTTEMP')
 
     if s4 is not None and os.path.isdir(s4) and os.access(s4, os.W_OK):
-        if 'windows' in platform.system().lower():
+        if 'nt' in os.name.lower():
             s3 = os.path.join(s4,
                               s2 + u'.' + os.getenv('USERNAME') + s1)
-        elif 'darwin' in platform.system().lower():
+        elif os.path.isfile('/usr/bin/osascript'):
             s3 = os.path.join(s4,
                               s2 + u'.' + os.getenv('USERNAME') + s1)
         else:
             s3 = os.path.join(s4,
                               s2 + u'.' + os.getenv('USER') + s1)
-    elif 'windows' in platform.system().lower():
+    elif 'nt' in os.name.lower():
         s3 = os.path.join(os.getenv('TMP'),
                           s2 + u'.' + os.getenv('USERNAME') + s1)
-    elif 'darwin' in platform.system().lower():
+    elif os.path.isfile('/usr/bin/osascript'):
         s3 = os.path.join(os.getenv('TMPDIR'),
                           s2 + u'.' + os.getenv('USERNAME') + s1)
     else:
@@ -1487,9 +1499,9 @@ def getMyUserName():
     '''
     sOUT1 = ""
 
-    if 'windows' in platform.system().lower():
+    if 'nt' in os.name.lower():
         sOUT1 = os.getenv('USERNAME')
-    elif 'darwin' in platform.system().lower():
+    elif os.path.isfile('/usr/bin/osascript'):
         sOUT1 = os.getenv('USERNAME')
     else:
         sOUT1 = os.getenv('USER')
@@ -1569,9 +1581,9 @@ def getTempPrefix():
      -sound.wav for sound
      -image.png for image
     '''
-    if 'windows' in platform.system().lower():
+    if 'nt' in os.name.lower():
         sOUT1 = os.path.join(os.getenv('TMP'), os.getenv('USERNAME'))
-    elif 'darwin' in platform.system().lower():
+    elif os.path.isfile('/usr/bin/osascript'):
         sOUT1 = os.path.join(os.getenv('TMPDIR'), os.getenv('USER'))
     else:
         sOUT1 = os.path.join('/tmp', os.getenv('USER'))
@@ -1606,7 +1618,7 @@ def getWinFullPath(s1):
             sCommand = os.path.join(os.getenv('HOMEDRIVE'), s1)
     else:
         sCommand = ''
-    if 'windows' in platform.system().lower():
+    if 'nt' in os.name.lower():
         return sCommand
     else:
         return ''
@@ -1617,11 +1629,11 @@ def ShowWithApp(sOUT1):
     Same as double clicking the document - opens in default
     application.
     '''
-    if 'darwin' in platform.system().lower():
+    if os.path.isfile('/usr/bin/osascript'):
         # MacOS
         s1 = u'open "' + sOUT1 + u'" '
         myossystem(s1)
-    elif 'windows' in platform.system().lower():
+    elif 'nt' in os.name.lower():
         # Windows
         os.startfile(sOUT1)
     else:
@@ -1635,19 +1647,24 @@ def ShowWithApp(sOUT1):
 
 
 def path2url(s1):
-    return urlparse.urljoin('file:',
-                             urllib.pathname2url(s1))
+    '''Convert a file path to a file URL'''
+    try:
+        return urlparse.urljoin('file:',
+                                urllib.pathname2url(s1))
+    except NameError:
+        # Fall back works on Posix
+        return ''.join(['file://', s1.replace(' ', '%20')])
 
 
 def PlayWaveInBackground(sOUT1):
     '''
     Opens using command line shell.
     '''
-    if 'darwin' in platform.system().lower():
+    if os.path.isfile('/usr/bin/osascript'):
         # MacOS
         s1 = u'afplay "' + sOUT1 + u'" '
         myossystem(s1)
-    elif 'windows' in platform.system().lower():
+    elif 'nt' in os.name.lower():
         # Windows
         try:
             import winsound
@@ -1689,14 +1706,14 @@ def myossystem(s1):
     Replaced os.system(s1) to avoid Windows path errors.
     '''
     s1 = s1.encode('utf-8')
-    if 'windows' in platform.system().lower():
+    if 'nt' in os.name.lower():
         try:
             retcode = subprocess.call(s1, shell=False)
             if retcode < 0:
                 print('Process was terminated by signal')
             else:
                 print('Process returned')
-        except (OSError, e):
+        except (NameError, OSError, e):
             print('Execution failed')
     else:
         os.system(s1)

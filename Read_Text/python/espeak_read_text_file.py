@@ -75,7 +75,7 @@ See the manual page for `espeak` for more detailed information
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2015 James Holgate
+Copyright (c) 2011 - 2018 James Holgate
 
 '''
 from __future__ import (
@@ -88,7 +88,6 @@ import codecs
 import getopt
 import math
 import os
-import platform
 import sys
 import readtexttools
 
@@ -282,7 +281,7 @@ reads the file aloud.
             # Identify an mbrola voice if it is installed
             
             if a0[i]['a1'] == s:
-                if 'windows' in platform.system().lower():
+                if 'nt' in os.name.lower():
                     if os.path.isfile(os.path.join(os.getenv('ProgramFiles'),
                                                    'eSpeak/espeak-data/mbrola',
                                                    a0[i]['a2'])):
@@ -324,7 +323,7 @@ reads the file aloud.
         # for example: /usr/bin/ or /usr/local/bin/
         sApp = 'espeak'
         sSub = 'eSpeak/command_line/espeak.exe'
-        if 'windows' in platform.system().lower():
+        if 'nt' in os.name.lower():
             sApp = readtexttools.getWinFullPath(sSub)
         s1 = ''.join([
                 '"',

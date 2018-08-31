@@ -47,7 +47,7 @@ a free multi-track audio editor and recorder.
 
 [Read Text Extension][3]
 
-Copyright (c) 2011 - 2015 James Holgate
+Copyright (c) 2011 - 2018 James Holgate
 
   [1]: https://www.cs.cmu.edu/~awb/festival_demos/sable.html
   [2]: http://sourceforge.net/projects/audacity/
@@ -64,7 +64,6 @@ import codecs
 import getopt
 import math
 import os
-import platform
 import sys
 import readtexttools
 
@@ -132,7 +131,7 @@ reads the file aloud.
     if os.path.isfile(sOUT1):
         os.remove(sOUT1)
     try:
-        if "windows" in platform.system().lower():
+        if 'nt' in os.name.lower():
             if readtexttools.getWinFullPath('festival/text2wave'):
                 sBasApp = readtexttools.getWinFullPath('festival/festival.exe')
                 sBasScr = readtexttools.getWinFullPath('festival/text2wave')

@@ -417,7 +417,7 @@ Function fsZzxToEnglish(_
 	&apos; defaults
 	Dim s0$ : s0 = &quot;Read Text;External program;Use Festival with a script;Script commands;Read with an external program;Command line options;Display;Always show this dialog;About;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Could not locate the program.;String cannot be analyzed!;On-line help;https://sites.google.com/site/readtextextension/;Use a web application;Speech properties;System settings;&quot;
 	Dim s1$ : s1 = &quot;Touch screen;Speech;English;Afrikaans;Bulgarian;Catalan;Czech;Danish;German;Greek;Spanish;French;Estonian;Finnish;Irish;Hindi;Hungarian;Indonesian;Icelandic;Italian;Japanese;Korean;Latvian;Lithuanian;Maltese;Dutch;Polish;Portuguese;Romanian;Russian;Slovak;Slovenian;Swedish;Tagalog;Turkish;Ukrainian;Chinese;Arabic&quot;
-	Dim s2$ : s2 = &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;Read Text – Speech\n=========\n\n&gt;_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`&quot;
+	Dim s2$ : s2 = &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;Read Text – Speech\n=========\n\n&gt;_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2018 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`&quot;
 	&apos; arrays
 	Dim a1
 	Dim a2
