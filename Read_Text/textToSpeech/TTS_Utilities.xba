@@ -1861,8 +1861,10 @@ Function fiDialog1Combo2ShowMyPythonChoices(oDialog)
 		s4= &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=&quot;&amp; s2(n)
 		s1= s1 &amp; fspyOutOptions(oDialog, s4)
 	Endif
-	if asc(left(s1,1)) = 10 Then
-		s1 = mid(s1,2)
+	if len(s1) &gt; 0 Then
+		if asc(left(s1,1)) = 10 Then
+			s1 = mid(s1,2)
+		end if
 	end if
 	a1=Split(s1,CR)
 	For n = Lbound(a1) + 1 to Ubound(a1)
