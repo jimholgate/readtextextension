@@ -15,13 +15,8 @@
 '' ------------
 ''
 '' Windows lets you save sound files in an uncompressed`.wav` format.
-'' To convert `.wav` files to small `.m4a` files that you can share
-'' on most mobile phones, music players and tablets, download
-'' [Nero m4a encoder][1]
-'' [1]:http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php
-'' and save ' `neroAacEnc.exe` and `neroAacTag.exe` in `C:\opt\`
-'' The extension adds writing `.m4a` files to the list of options
-'' in the dialogue.
+'' To save space, convert `.wav` files to small `.m4a` or `mp3` files
+'' that you can share on most mobile phones, music players and tablets.
 ''
 '' Language support
 '' ----------------
@@ -64,24 +59,9 @@
 '' Optional formats
 '' ================
 ''
-'' ## AAC Encoder
-''
-'' [Nero m4a encoder](http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php)
-'' is a free command line M4A converter from [Nero](http://www.nero.com).
-''
-'' You can play m4a AAC encoded sound files with most music players.
-'' Use `neroAacEnc.exe` to make an m4a file.
-''
-''  * If the directory `C:\opt` doesn't exist, create it.
-''  * Copy `neroAacEnc.exe` to `C:\opt\`
-''  * Copy `neroAacTag.exe` to `C:\opt\`
-''  * The `neroAacTag.exe` program adds metadata like author, genre, title and year.
-''
-''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).m4a" "(TMP)"
-''
 '' ## Audacity
 ''
-'' [Audacity](http://audacity.sourceforge.net/) is a free cross platform audio editor. It can
+'' [Audacity](https://sourceforge.net/projects/audacity/) is a free cross platform audio editor. It can
 '' use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.
 ''
 '' ### FFmpeg for Audacity
@@ -92,7 +72,7 @@
 '' directory that is available to all users.
 ''
 '' 1. Log in with an administrator account.
-'' 2. Go to the [MP3 for Audacity page](http://lame.buanzo.org/#lamewindl).
+'' 2. Go to the [MP3 for Audacity page](https://lame.buanzo.org/#lamewindl).
 '' 3. Directly underneath "For FFmpeg/LAME on Windows click below:", left-click the link
 ''   `ffmpeg-win-2.2.2.zip` and save the file anywhere on your computer.
 '' 4. Double-click `ffmpeg-win-2.2.2.zip` to open the archive.
@@ -111,8 +91,8 @@
 '' Makes free lossless audio codec (FLAC) files.
 ''
 ''  * Install `flac.exe` in `C:\opt\`
-''  * [flac encoder](http://flac.sourceforge.net/links.html#software)
-''  * [Players and plugins](http://flac.sourceforge.net/)
+''  * [flac encoder](https://xiph.org/flac/links.html#software)
+''  * [Players and plugins](https://xiph.org/flac/)
 ''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).flac" "(TMP)"
 ''
@@ -120,7 +100,7 @@
 ''
 '' **iTunes** is a visual music manager from Apple available at no cost.
 ''
-'' Use [iTunes](http://www.apple.com/itunes/) to convert sound files with metadata
+'' Use [iTunes](https://www.apple.com/itunes/) to convert sound files with metadata
 '' and album cover art. The first time you use it, iTunes takes a few moments to start.
 '' iTunes creates the audio file in it's own directory and signals you with a sound.
 '' Read Text Extension puts a copy in a sound directory in your home directory.
@@ -141,25 +121,12 @@
 ''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 ''
-'' ## Miro Video Converter (FFmpeg)
+'' ## FFmpeg
 ''
-'' This is a free visual music and video converter from the Participatory
-'' culture foundation.
-''
-'' Miro Video Converter can convert mp3, ogg and other media using `ffmpeg`
-'' Once installed, read text can use FFmpeg to make audio and video media files
-'' for cross-platform applications.
-''
-''  * [ffmpeg](https://www.ffmpeg.org)
-''  * [Miro formats](http://develop.participatoryculture.org/index.php/ConversionMatrix)
-''  * [Miro video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/)
-''  * [Participatory culture foundation](http://pculture.org/)
+'' [ffmpeg](https://www.ffmpeg.org) is a free visual music and video converter.
 ''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
-''
-'' The direct link to the most recent version of Miro Video Converter is at osuosl.org -
-'' [`MiroConverterSetup.exe`](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/).
 ''
 '' ## Ogg
 ''
@@ -168,13 +135,13 @@
 ''
 ''  * The ogg converter program must be installed in `C:\opt\`.
 ''  * [oggenc2 encoder](http://www.rarewares.org/ogg-oggenc.php)
-''  * [Players and plugins](http://www.vorbis.com/setup_windows/)
+''  * [Players and plugins](https://xiph.org/vorbis/)
 ''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
 ''
 '' ----------------------------------------------------------------------------
 ''
-'' [Read Text Extension](http://sites.google.com/site/readtextextension/)
+'' [Read Text Extension](https://sites.google.com/site/readtextextension/)
 ''
 '' Copyright � 2011 - 2018 James Holgate
 '''
@@ -511,8 +478,8 @@ End Function
 
 Function fsVorbisMeta
     '''
-    ' [Tag specifications](http://www.xiph.org/vorbis/doc/v-comment.html)
-    ' [About flac converter](http://linux.die.net/man/1/flac)
+    ' [Tag specifications](https://www.xiph.org/vorbis/doc/v-comment.html)
+    ' [About flac converter](https://linux.die.net/man/1/flac)
     ' Depending on version of ffmpeg or other player, these tags may be
     ' ignored.
     '''
@@ -641,7 +608,7 @@ Function fbTagM4a(s2, sMyWords, sImage)
         sMeta = " -meta:album="""& fsMetaalbum & _
                 """ -meta:artist=""" & fsMetaId & _
                 """ -meta:composer=""" & fsMetaId & _
-                """ -meta:comment=""" & "[Nero AAC Encoder](http://www.nero.com)" & _
+                """ -meta:comment=""" & "[Nero AAC Encoder](https://www.nero.com)" & _
                 """ -meta:genre=""" & fsMetagenre & _
                 """ -meta:title=""" & s3 & _
                 """ -meta:track=""" & fsMetatrack & _
@@ -820,9 +787,8 @@ End Sub
 
 Function fsWhereIsFfmpeg()
     '''
-    ' If you installed Miro Video Converter in the default location, this
-    ' function points to ffmpeg. If you just have ffmpeg, install it or link
-    ' to it in `c:\opt\ffmpeg.exe`
+    ' This looks for the ffmpeg application.  To use ffmpeg, install it or
+    ' link to it in `c:\opt\ffmpeg.exe`
     '''
     Dim c1
     Dim c2
@@ -843,8 +809,8 @@ Function fsWhereIsFfmpeg()
     Set WshEnv = WshShell.Environment("Process")
     c1 = WshEnv("ProgramFiles(x86)")
     c2 = WshEnv("ProgramFiles")
-    c3 = "\Participatory Culture Foundation\Miro Video Converter\ffmpeg\ffmpeg.exe"
-    c4 = "\Participatory Culture Foundation\Miro\ffmpeg\ffmpeg.exe"
+    c3 = "\Audacity\ffmpeg-win-2.2.2\ffmpeg.exe"
+    c4 = "\Audacity\lib\avconv.exe"
     c5 = WshEnv("HOMEDRIVE") & "\opt\ffmpeg.exe"
     c6 = WshEnv("USERPROFILE") & "\opt\ffmpeg.exe"
     c7 = WshEnv("HOMEDRIVE") & "\opt\avconv.exe"
@@ -878,7 +844,7 @@ Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
     ' iTunes makes a mp3, aac or m4a in the iTunes Music Library
     ' if Length of sOutFile is not zero, Then saves to sOutFile Path
     ' [iTunes Interface Reference][1]
-    ' [1]: (http://www.joshkunz.com/iTunesControl/interfaceIiTunes.html)
+    ' [1]: (https://www.joshkunz.com/iTunesControl/interfaceIiTunes.html)
     '''
     Dim encoder
     Dim encoderCollection
@@ -1005,9 +971,8 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
             sPreProcess=""
             sPostProcess= ""
             If fbFileExists("C:\opt\neroAacEnc.exe") Then
-             ' Nero is recommended for producing standards compliant m4a output.
-             ' [Nero m4a encoder][2]
-             ' [2]:(http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php)
+             '[Nero](https://www.nero.com/) m4a encoder produces standards
+             ' compliant m4a output.
                  Exit Function
             End If
         Case ".mp3"
@@ -1318,8 +1283,8 @@ Function WriteIt(s1, _
         sDimensions)
     '''
     ' Writes the spoken text as a wave sound file, or if a
-    ' converter like iTunes, ffmpeg or Nero AAC encoder
-    ' is available, in a compressed sound format that
+    ' converter like iTunes, ffmpeg or [avconv](https://libav.org/avconv.html)
+    ' encoder is available, in a compressed sound format that
     ' includes metadata.
     '''
     Dim bOK
@@ -1545,7 +1510,7 @@ End Function
 Function PlaySound(sURL)
     '''
     ' Plays a sound in the background
-    ' http://stackoverflow.com/questions/22367004/vbs-play-sound-with-no-dialogue '
+    ' https://stackoverflow.com/questions/22367004/vbs-play-sound-with-no-dialogue '
     '''
     Dim b1
     Dim o1
@@ -1619,7 +1584,7 @@ Function getTextFileContent (strFileName, strCharSet)
     ' Open a text file using a particular character set.
     ' Stefan Thelenius "VBScript: Reading text files" Friday, 11 April 2008
     ' Accessed September 11, 2013.
-    ' http://abouttesting.blogspot.ca/2008/04/vbscript-reading-text-files.html
+    ' https://abouttesting.blogspot.com/2008/04/vbscript-reading-text-files.html
     '''
     Const adTypeBinary = 1 'not used
     Const adTypeText = 2

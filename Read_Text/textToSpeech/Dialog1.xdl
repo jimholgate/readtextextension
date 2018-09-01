@@ -106,6 +106,7 @@
    <dlg:menupopup>
     <dlg:menuitem dlg:value="http://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="http://google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)"/>
+    <dlg:menuitem dlg:value="https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="http://m.dwds.de/?qu=(OOO_WEBTEXTDEFINITION)"/>
     <dlg:menuitem dlg:value="http://twitter.com/intent/tweet?text=(OOO_WEBTEXTSMALL)"/>
     <dlg:menuitem dlg:value="http://vozme.com/text2voice.php?lang=ca&amp;bookmarklet=1&amp;gn=ml&amp;default_language=ca&amp;text=(OOO_WEBTEXT)"/>
@@ -118,6 +119,7 @@
     <dlg:menuitem dlg:value="https://(SELECTION_LANGUAGE_CODE).wiktionary.org/wiki/(OOO_WEBTEXTDEFINITION)"/>
     <dlg:menuitem dlg:value="https://simple.wikipedia.org/wiki/(OOO_WEBTEXTDEFINITION)"/>
     <dlg:menuitem dlg:value="https://simple.wiktionary.org/wiki/(OOO_WEBTEXTDEFINITION)"/>
+    <dlg:menuitem dlg:value="https://translate.yandex.com/?lang=(SELECTION_LANGUAGE_CODE)-(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)"/>
    </dlg:menupopup>
   </dlg:combobox>
   <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="17" dlg:left="158" dlg:top="175" dlg:width="69" dlg:height="10" dlg:value="CheckBox2" dlg:checked="false">

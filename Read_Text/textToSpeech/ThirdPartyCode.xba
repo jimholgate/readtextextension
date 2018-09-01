@@ -22,7 +22,7 @@ Function fbTts_util_stringToBoolean(value As String) As Boolean
 		or strComp(v,&quot;yes&quot;,0)=0 _
 		or val(v) &lt;&gt; 0 Then
 		b=True
-	Endif
+	end if
 	fbTts_util_stringToBoolean=b
 End Function
 
@@ -37,7 +37,7 @@ Function fsTts_util_booleanToString(value As Boolean) As String
 		s=&quot;True&quot;
 	Else
 		s=&quot;False&quot;
-	Endif
+	end if
 	fsTts_util_booleanToString=s
 End Function
 
@@ -64,12 +64,12 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 			config(fiFestivalPath)=fsProgramDirectoryx86 &amp; &quot;festival\festival.exe&quot;
 		Else
 			config(fiFestivalPath)=fsProgramDirectory &amp; &quot;festival\festival.exe&quot;
-		Endif
+		end if
 		config(fiFestivalComboChoice)=&quot;(tts&quot;&quot;(TMP)&quot;&quot;nil) (quit)&quot;
 		config(fiExternalOption)=True
 		config(fiHtmlOption)=False
 		config(fiSmartSelectCheckBox)=0
-		config(fiHtmlComboURL)=&quot;http://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+		config(fiHtmlComboURL)=&quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
 		config(fiExternalProgramPath)=WinSpeechProgramPath()
 		config(fiExternalCommand)=WinSpeechArgument()
 		config(fiAlwaysShowDialogCheckBox)=1
@@ -81,7 +81,7 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 		config(fiExternalOption)=True
 		config(fiHtmlOption)=False
 		config(fiSmartSelectCheckBox)=0
-		config(fiHtmlComboURL)=&quot;http://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+		config(fiHtmlComboURL)=&quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
 		If fsGetOS()=&quot;UNIX&quot; Then &apos; Linux
 			If fileexists(&quot;/usr/bin/python3&quot;) Then
 				config(fiExternalProgramPath)=&quot;/usr/bin/python3&quot;
@@ -91,7 +91,7 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 				config(fiExternalProgramPath)=&quot;/usr/bin/python2&quot;
 			Else
 				config(fiExternalProgramPath)=&quot;/usr/bin/python&quot;
-			Endif
+			end if
 			If fileexists(&quot;/usr/bin/pico2wave&quot;) Then
 				config(fiExternalCommand)=&quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
@@ -107,14 +107,14 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 			Else
 				config(fiExternalCommand)=&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
-			Endif
+			end if
 		Else &apos;Mac (OSX)
 			config(fiExternalProgramPath)= AppleScriptPath()
 			config(fiExternalCommand)=&quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
-		Endif
+		end if
 		config(fiAlwaysShowDialogCheckBox)=1
 		config(fiDialogLanguageCombo)=fsGetLanguage()
-	Endif
+	end if
 	fvTts_config_createDefaultConfig()=config()
 End Function
 
@@ -155,8 +155,8 @@ Sub tts_config_parseLine(byval l As String,_
 		Else
 			key=Left(l,iEq - 1)
 			value=Mid(l,iEq + 1)
-		Endif
-	Endif
+		end if
+	end if
 End Sub
 
 
@@ -220,7 +220,7 @@ Sub tts_config_parseFile(byval configFilePath As String,_
 	if instr(sA, CR2) &lt; instr(sA, CR) Then
 		&apos; choose character return or line feed
 		CR = CR2
-	Endif
+	end if
 	l = sA
 	do while Len(l) &gt; 0
 		l = fsSuperTrim(left(sA, instr(sA, CR)))
@@ -264,7 +264,7 @@ Sub tts_config_parseFile(byval configFilePath As String,_
 			Case Else
 
 			End Select
-		Endif
+		end if
 	loop
 end sub
 
@@ -281,7 +281,7 @@ Function fsSuperTrim(byval sA )
 			sA = trim(sA)
 		Else
 			Exit For
-		Endif
+		end if
 	next
 	For n = 1 to 100
 		if len(sA) = 0 then
@@ -291,7 +291,7 @@ Function fsSuperTrim(byval sA )
 			sA = trim(sA)
 		Else
 			Exit For
-		Endif
+		end if
 	next
 	fsSuperTrim = sA
 
@@ -301,7 +301,7 @@ End Function
 Function fsRetrieveCalcActiveCellProperty(strA) As String
 	&apos; Modified from Sub from: Paolo Mantovani
 	&apos; email: mantovani.paolo@tin.it
-	&apos; published at http://sourceforge.net/projects/ooomacros/files/Andrew%20Pitonyak_s%20Macro%20Doc/2006-01-25/AndrewMacro_2006-01-25.zip/download
+	&apos; published at https://sourceforge.net/projects/ooomacros/files/Andrew%20Pitonyak_s%20Macro%20Doc/2006-01-25/AndrewMacro_2006-01-25.zip/download
 	&apos; Gets property of the active cell.
 	Dim oOldSelection  &apos;The original selection of cell ranges
 	Dim oRanges  &apos;A blank range created by the document
@@ -401,16 +401,16 @@ Sub ChangeBackground(optional byval i, optional r1, optional g1, optional b1)
 	
 	if ismissing(i) then
 		i = 0
-	endif
+	end if
 	if ismissing(r1) then
 		r1 = 0
-	endif	
+	end if	
 	if ismissing(g1) then
 		g1 = 0
-	endif
+	end if
 	if ismissing(b1) then
 		b1 = 0
-	endif
+	end if
 	oDoc = ThisComponent
 	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or _
 			oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
@@ -419,7 +419,7 @@ Sub ChangeBackground(optional byval i, optional r1, optional g1, optional b1)
 		oBackground = oDoc.createInstance(&quot;com.sun.star.drawing.Background&quot;)
 		oBackground.FillColor = RGB(r1, g1, b1)
 		oDrawPage.Background = oBackground
-	endif
+	end if
 End Sub
 
 </script:module>

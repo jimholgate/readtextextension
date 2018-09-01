@@ -7,88 +7,89 @@ global UpdatePoSettingsDone as integer
 global mMyTranslationId(0) as variant 
 global mMyTranslationIdPlur(0) as variant 
 global mMyTranslationStr(0,0) as variant 
-&apos;&apos;
-&apos;&apos; Language editing
-&apos;&apos; ================
+
+&apos;&apos;  Language editing
+&apos;&apos;  ================
+&apos;&apos;   
+&apos;&apos;   - [PoEdit][1] is an open source language string editor for Linux, OSX, and
+&apos;&apos;     Windows.
+&apos;&apos;   - [Virtaal][2] is another one.
+&apos;&apos;   
+&apos;&apos;   The format of **PO** translation files is described in the [PO Files Manual][3].
+&apos;&apos;   Having separate language files is best practice because it makes translating
+&apos;&apos;   easier and forces programs to have a single reliable method of getting text.
+&apos;&apos;   GetText is available in [Python][4] as a library. The [Invent with Python][5]
+&apos;&apos;   blog has a set of instructions.
+&apos;&apos;   
+&apos;&apos;   In [StarBasic][6], there is a script that does basic interpretation of PO files.
+&apos;&apos;   
+&apos;&apos;   The wording of dialogues and menu items of %PRODUCTNAME and Apache %PRODUCTNAME
+&apos;&apos;   include a few differences, which reflect different program features or simply
+&apos;&apos;   different writing styles.  If you notice a difference in your language, you
+&apos;&apos;   should, if possible, use wording that works for either program.
+&apos;&apos;   
+&apos;&apos;   Program help is available online on a [wiki][7] that reflects the menus
+&apos;&apos;   and dialogues of a recent version of the program.  As well, a comprehensive file
+&apos;&apos;   that includes translations of phrases for all supported languages is maintained
+&apos;&apos;   at the [download site][8].
+&apos;&apos;   
+&apos;&apos;   The `zzy` language is used internally in the code of the extension.  For
+&apos;&apos;   example, the phrase for &quot;&quot;English&quot;&quot; is `en`, and the code for &quot;&quot;Traditional
+&apos;&apos;   Chinese&quot;&quot; is `zh-tw`.
+&apos;&apos;   
+&apos;&apos;  What other files include language strings?
+&apos;&apos;  ------------------------------------------
+&apos;&apos;   
+&apos;&apos;  ### Dialog
+&apos;&apos;   
+&apos;&apos;   ```
+&apos;&apos;   /textToSpeech/Dialog1.xdl
+&apos;&apos;   ```
+&apos;&apos;   
+&apos;&apos;   ComboBox3 of Dialog1 contains two letter strings of the ISO codes
+&apos;&apos;   for currently supported languages.
+&apos;&apos;   
+&apos;&apos;  ### Description files
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;       /description/component.*
+&apos;&apos;       /description.xml
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;  ### Help files
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;       /help/*/help.tree
+&apos;&apos;       /help/*/[$unique.id]/install.xhp
+&apos;&apos;       /help/*/[$unique.id]/online.xhp
+&apos;&apos;       /help/*/[$unique.id]/read_clipboard.xhp
+&apos;&apos;       /help/*/[$unique.id]/read_selection.xhp
+&apos;&apos;       /help/*/[$unique.id]/set_up.xhp
+&apos;&apos;       /help/*/[$unique.id]/tokens.xhp
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;  ### Registry files
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;       /registration/LICENSE.*
+&apos;&apos;       /registry/data/org/openoffice/Office/Addons.xcu
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;  ### Scripts
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;       /script/tts_wscript.vbs
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;   [1]: https://poedit.net/
+&apos;&apos;   [2]: https://virtaal.translatehouse.org/download.html
+&apos;&apos;   [3]: https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
+&apos;&apos;   [4]: https://docs.python.org/2/library/gettext.html
+&apos;&apos;   [5]: https://inventwithpython.com/blog/2014/12/20/translate-your-python-3-program-with-the-gettext-module/
+&apos;&apos;   [6]: http://www.oooforum.org/forum/viewtopic.phtml?t=85441
+&apos;&apos;   [7]: https://help.libreoffice.org/Writer/Edit#Select_Text
+&apos;&apos;   [8]: https://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz
 &apos;&apos;  
-&apos;&apos;  - [PoEdit][1] is an open source language string editor for Linux, OSX, and
-&apos;&apos;    Windows.
-&apos;&apos;  - [Virtaal][2] is another one.
-&apos;&apos;  
-&apos;&apos;  The format of **PO** translation files is described in the [PO Files Manual][3].
-&apos;&apos;  Having separate language files is best practice because it makes translating
-&apos;&apos;  easier and forces programs to have a single reliable method of getting text.
-&apos;&apos;  GetText is available in [Python][4] as a library. The [Invent with Python][5]
-&apos;&apos;  blog has a set of instructions.
-&apos;&apos;  
-&apos;&apos;  In [StarBasic][6], there is a script that does basic interpretation of PO files.
-&apos;&apos;  
-&apos;&apos;  The wording of dialogues and menu items of LibreOffice and Apache OpenOffice
-&apos;&apos;  include a few differences, which reflect different program features or simply
-&apos;&apos;  different writing styles.  If you notice a difference in your language, you
-&apos;&apos;  should, if possible, use wording that works for either program.
-&apos;&apos;  
-&apos;&apos;  Program help is available online on a [wiki][7] that reflects the menus
-&apos;&apos;  and dialogues of a recent version of the program.  As well, a comprehensive file
-&apos;&apos;  that includes translations of phrases for all supported languages is maintained
-&apos;&apos;  at the [download site][8].
-&apos;&apos;  
-&apos;&apos;  The `zzy` language is used internally in the code of the extension.  For
-&apos;&apos;  example, the phrase for &quot;&quot;English&quot;&quot; is `en`, and the code for &quot;&quot;Traditional
-&apos;&apos;  Chinese&quot;&quot; is `zh-tw`.
-&apos;&apos;  
-&apos;&apos; What other files include language strings?
-&apos;&apos; ------------------------------------------
-&apos;&apos;  
-&apos;&apos; ### Dialog
-&apos;&apos;  
-&apos;&apos;  ```
-&apos;&apos;  /textToSpeech/Dialog1.xdl
-&apos;&apos;  ```
-&apos;&apos;  
-&apos;&apos;  ComboBox3 of Dialog1 contains two letter strings of the ISO codes
-&apos;&apos;  for currently supported languages.
-&apos;&apos;  
-&apos;&apos; ### Description files
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos;      /description/component.*
-&apos;&apos;      /description.xml
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos; ### Help files
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos;      /help/*/help.tree
-&apos;&apos;      /help/*/[$unique.id]/install.xhp
-&apos;&apos;      /help/*/[$unique.id]/online.xhp
-&apos;&apos;      /help/*/[$unique.id]/read_clipboard.xhp
-&apos;&apos;      /help/*/[$unique.id]/read_selection.xhp
-&apos;&apos;      /help/*/[$unique.id]/set_up.xhp
-&apos;&apos;      /help/*/[$unique.id]/tokens.xhp
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos; ### Registry files
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos;      /registration/LICENSE.*
-&apos;&apos;      /registry/data/org/openoffice/Office/Addons.xcu
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos; ### Scripts
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos;      /script/tts_wscript.vbs
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos;  [1]: http://poedit.net/
-&apos;&apos;  [2]: http://virtaal.translatehouse.org/download.html
-&apos;&apos;  [3]: https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
-&apos;&apos;  [4]: https://docs.python.org/2/library/gettext.html
-&apos;&apos;  [5]: http://inventwithpython.com/blog/2014/12/20/translate-your-python-3-program-with-the-gettext-module/
-&apos;&apos;  [6]: http://www.oooforum.org/forum/viewtopic.phtml?t=85441
-&apos;&apos;  [7]: https://help.libreoffice.org/Writer/Edit#Select_Text
-&apos;&apos;  [8]: http://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz
 &apos;&apos;  
 
 Function fsLookUpTerm(_
@@ -184,8 +185,8 @@ Function _(_
 &apos;&apos;  
 &apos;&apos;  
 &apos;&apos;  
-&apos;&apos;    [1]: http://sourceforge.net/projects/translate/files/Virtaal/
-&apos;&apos;    [2]: http://poedit.net/
+&apos;&apos;    [1]: https://sourceforge.net/projects/translate/files/Virtaal/
+&apos;&apos;    [2]: https://poedit.net/
 &apos;&apos;  
 	dim i as integer
 	dim iMax as integer
@@ -193,14 +194,14 @@ Function _(_
 	
 	if ismissing(sDirPo) or sDirPo = &quot;&quot; then
 		sDirPo = &quot;tools&quot;
-	endif
+	end if
 	If ismissing(sMyLang) or sMyLang = &quot;&quot; Then
 		sMyLang = fsDisplayLanguage()
-	Endif
+	end if
 	if ismissing(iAlt) then iAlt = -1
 	if msgid = &quot;&quot; then
 		exit function
-	endif
+	end if
 	dim sMyPoFile : sMyPoFile = &quot;&quot;
 	sMyPoFile = convertfromurl(_
 			fsMyURL &amp; _
@@ -233,7 +234,7 @@ Function _(_
 			end if 
 		next i
 		if trad=&quot;&quot; then trad=msgid
-	endif
+	end if
 	&apos; Convert escaped quotes and remove unescaped quotes.
 	trad = fsReplaceText(trad, &quot;\&quot;&quot;&quot;, &quot;\&amp;dblquot;&quot;
 	trad = fsReplaceText(trad, &quot;&quot;&quot;&quot;, &quot;&quot;)
@@ -260,7 +261,7 @@ Function fbTranslateTable(_
 	elseif sMyTranslationType=&quot;str&quot; then 
 		a1 = mMyTranslationStr(cntMsg,nbPlural)+message
 		mMyTranslationStr(cntMsg,nbPlural) = a1 
-	endif
+	end if
 	fbTranslateTable = true
 	exit function
 	fbTranslateTableErr:
@@ -318,10 +319,10 @@ Function UpdatePoSettings(_
 			myTextFile.Encoding=&quot;UTF-8&quot;
 		else
 			exit Function
-		endif
+		end if
 	else
 		exit Function
-	endif
+	end if
 
 	cntMsg=-1
 	nbPluralMax=0
@@ -340,14 +341,14 @@ Function UpdatePoSettings(_
 						TranslationType=&quot;idPlur&quot;
 					else
 						TranslationType=&quot;err&quot;  &apos; error
-					endif
+					end if
 				else
 					TranslationType=&quot;id&quot;
 					cntMsg=cntMsg+1
 					redim Preserve mMyTranslationId(cntMsg)
 					redim Preserve mMyTranslationIdPlur(cntMsg)
 					redim Preserve mMyTranslationStr(cntMsg,nbPluralMax)
-				endif
+				end if
 				message=mid(lineRead,idquo,lenLineRead-idquo)
 			elseif left(lineRead,6) = &quot;msgstr&quot; then
 				TranslationType=&quot;str&quot;
@@ -355,14 +356,14 @@ Function UpdatePoSettings(_
 					nbPlural=int(mid(lineRead,8,1))
 					if nbPlural&gt;nbPluralMax then
 						TranslationType=&quot;err&quot; &apos; error
-					endif
+					end if
 				else
 					nbPlural=0
-				endif
+				end if
 				message=mid(lineRead,idquo,lenLineRead-idquo)
 			elseif left(lineRead,7) = &quot;msgctxt&quot; then
 				TranslationType=&quot;ctxt&quot;
-			endif
+			end if
 			fbTranslateTable(message,cntMsg,TranslationType,nbPlural)
 		Case &quot;&quot;&quot;&quot;:
 			&apos;idquo=1 obviously
@@ -380,15 +381,15 @@ Function UpdatePoSettings(_
 				&apos; The PO file must end with a chr(10)
 				&apos;
 				redim Preserve mMyTranslationStr(cntMsg,nbPluralMax)
-			endif
+			end if
 			&apos; if cntMsg=0 and TranslationType=&quot;pluralset&quot; then
 			&apos;   &apos;update the plural rule then send it
 			&apos; if no &quot;\n&quot; TranslationType=&quot;pluralset&quot; else TranslationType=&quot;&quot;
-			&apos;endif
+			&apos;end if
 		Case Else
 			&apos;error in the po file
 			End Select
-		endif
+		end if
 	Loop
 	fileStream.closeInput
 	myTextFile.closeInput
@@ -427,7 +428,7 @@ Function fsZzxToEnglish(_
 
 	If ismissing(sMyLang) Then
 		sMyLang = &quot;en&quot;
-	Endif
+	end if
 &apos;	on error goto fsZzxToEnglishErr
 
 	Select Case lcase(sMyLang)
@@ -447,15 +448,15 @@ Function fsZzxToEnglish(_
 			if a1(n) = sTermCode Then
 				bFound = true
 				Exit For
-			Endif
+			end if
 		next
 		if bFound Then
 			a2 = split(s0 &amp; s1 &amp; s2, &quot;;&quot;)
 			fsZzxToEnglish = a2(n)
 		Else
 			fsZzxToEnglish = &quot;&quot;
-		Endif
-	endif
+		end if
+	end if
 	Exit Function
 	fsZzxToEnglishErr:
 	&apos; Count the semicolons in the data strings for the new language.
@@ -476,7 +477,7 @@ function fsSampleMd(optional byval hl)
 	
 	if ismissing(hl) then
 		hl = fsSelectionLanguage()
-	endif
+	end if
 	select case hl
 	case &quot;ar&quot;
 		&apos; Excerpt of a Wikipedia article about [Apache OpenOffice][1] accessed 2015-04-09&quot;.
@@ -551,7 +552,7 @@ function fsSampleMd(optional byval hl)
 		&apos; [1]: https://help.libreoffice.org/
 		&apos; [2]: https://help.libreoffice.org/Writer/Edit#Select_Text
 		&apos; [3]: https://help.libreoffice.org/Impress/Showing_a_Slide_Show
-		&apos; [4]: http://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz
+		&apos; [4]: https://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz
 		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
 		s2 = fsGetCountry
 		select case s2
@@ -586,10 +587,10 @@ Function fsUser()
 	Dim s1 : s1 = Environ(&quot;USER&quot;)
 	if s1 = &quot;&quot; Then
 		s1 = Environ(&quot;USERNAME&quot;)
-	Endif
+	end if
 	if s1 = &quot;&quot; Then
 		s1 = &quot;UNKNOWN-USER&quot;
-	Endif
+	end if
 	fsUser = s1
 End Function
 
@@ -606,7 +607,7 @@ function fsMyTempLock(optional byval sExt)
 	fsMyTempLock = &quot;&quot;
 	if isMissing(sExt) Then
 		sExt = &quot;lock&quot;
-	Endif
+	end if
 	a1 = Split(&quot;READTEXTTEMP,TEMP,TMP,TMPDIR,TEMPDIR&quot;, &quot;,&quot;)
 &apos;&apos;
 &apos;&apos;  Use a custom environment variable
@@ -634,8 +635,8 @@ function fsMyTempLock(optional byval sExt)
 				Exit For
 			Else
 				sTemp = &quot;&quot;
-			EndIf
-		EndIf
+			end if
+		end if
 	Next
 	If sTemp = &quot;&quot; Then
 		&apos; An environmental setting is missing or the directory is locked. 
@@ -653,16 +654,16 @@ function fsMyTempLock(optional byval sExt)
 				If fbTestDirRW(a2(i)) Then
 					sTemp = a2(i)
 					Exit For
-				EndIf
-			EndIf
+				end if
+			end if
 		Next
-	EndIf
+	end if
 	If sTemp = &quot;&quot; Then Exit Function
     if instr(&quot;/\&quot;,right(sTemp, 1)) = 0 Then
     	sDiv = &quot;/&quot;
     Else
     	sDiv = &quot;&quot;
-    Endif
+    end if
     fsMyTempLock = ConvertFromURL(converttourl(sTemp) &amp; _
     		sDiv &amp; fsAppSignature &amp; &quot;.&quot; &amp; sUser &amp; &quot;.&quot; &amp; sExt )
 end function
@@ -678,13 +679,13 @@ function fbTestDirRW(byVal sA)
     		s1 = &quot;/&quot; &amp; s1
     	Else
     		s1 = &quot;\&quot; &amp; s1
-    	EndIf
-    Endif
+    	end if
+    end if
     fbCreateFile(sA &amp; s1, s1, &quot;utf-8&quot;)
     If FileExists(sA &amp; s1) Then
     	kill sA &amp; s1
     	fbTestDirRW = True
-    EndIf
+    end if
     
 	Exit Function
 	fbTestDirRWErr:
@@ -708,7 +709,7 @@ Function fsExtensionVersion As String
 		Line Input #iNumber, sLine
 		If Instr(sLine, &quot;&lt;version value=&quot;) &gt; 0 Then
 			s2=sLine
-		Endif
+		end if
 	Wend
 	Close #iNumber
 	s2=Mid(sLine,Instr(s2,&quot;&quot;&quot;&quot;)+1)
@@ -755,11 +756,11 @@ Function fsPosterImg As String
 					s2 = s3 &amp; a1(n) &amp; &quot;/poster-001&quot; &amp; + a2(o)
 				Elseif fileexists(fsMyURL &amp; &quot;/images/poster-&quot; &amp; a1(n) &amp; a2(o)) Then
 					s2 = fsMyURL &amp; &quot;/images/poster-&quot; &amp; a1(n) &amp; a2(o)
-				Endif
+				end if
 				if Len(s2) &gt; 0 Then
 					fsPosterImg = s2
 					Exit For
-				Endif
+				end if
 			next
 		next
 	fsPosterImg = convertfromurl(fsPosterImg)
@@ -810,7 +811,7 @@ Function fsLicenseDoc As String
 		fsLicenseDoc=s1 &amp; &quot;.&quot; &amp; fsGetLanguage()
 	Else
 		fsLicenseDoc=s1
-	Endif
+	end if
 End Function
 
 
@@ -859,7 +860,7 @@ Function fsDescriptionDoc As String
 		fsDescriptionDoc=s1 &amp; &quot;.&quot; &amp; fsGetLanguage()
 	Else
 		fsDescriptionDoc=s1
-	Endif
+	end if
 End Function
 
 
@@ -1031,13 +1032,13 @@ Function fsGetOS() As String
 			fsGetOS = &quot;ANDROID&quot;
 		Else
 			fsGetOS=&quot;UNIX&quot;
-		Endif
+		end if
 	Case Else
 		if Len(Environ(&quot;ANDROID_ROOT&quot;)) &gt; 0 then
 			fsGetOS = &quot;ANDROID&quot;
 		Else 
 			fsGetOS=&quot;UNKNOWN&quot;
-		Endif
+		end if
 	End Select
 End Function
 
@@ -1047,7 +1048,7 @@ Function fsGetSetting(sA) As String
 
 	If Not GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
-	Endif
+	end if
 	oProdNameAccess=GetRegistryKeyContent(&quot;org.openoffice.Setup/Product&quot;)
     Select Case Lcase(sA)
     Case &quot;language&quot;
@@ -1121,7 +1122,7 @@ Function fiCountMediaPlayers As Integer
 			Exit For
 		Else
 			fiCountMediaPlayers=n
-		Endif
+		end if
 	next
 End Function
 
@@ -1134,7 +1135,7 @@ Function fsSubStringToRight(byval x,byval y)
 	if instr(x,y) Then
 		a1 = split(x,y)
 		z = a1(Ubound(a1))
-	Endif
+	end if
 	fsSubStringToRight = z
 End Function
 
@@ -1160,7 +1161,7 @@ Function fsFestivalDirectory(n) As String
 			s2 = converttourl(fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;)
 		Else
 			s2 = converttourl(fsProgramDirectory &amp; &quot;Festival\voices\&quot;)
-		Endif
+		end if
 	Case Else
 		s2 =  converttourl(&quot;/usr/share/festival/&quot;)
 	End Select
@@ -1210,7 +1211,7 @@ Function fsFestivalDirectory(n) As String
 	a1 = split(s1,&quot;,&quot;)
 	If Not(n &gt; Ubound(a1)) Then 
 		fsFestivalDirectory = convertfromurl(a1(n))
-	EndIf
+	end if
 End Function
 
 
@@ -1222,7 +1223,7 @@ Function fiCountFestivalDirectory As Integer
 			Exit For
 		Else
 			fiCountFestivalDirectory=n
-		Endif
+		end if
 	next
 End Function
 
@@ -1231,8 +1232,8 @@ Function fsGetEspeakMbrolaLanguage(i As Integer, j As Integer) As String
 	&apos;Values for j
 	&apos;1 is mbrola voice file name
 	&apos;2 is language and country code
-	&apos; See http://www.loc.gov/standards/iso639-2/php/English_list.php
-	&apos; and http://www.iso.org/iso/english_country_names_and_code_elements
+	&apos; See &lt;https://www.loc.gov/standards/iso639-2/php/English_list.php&gt;
+	&apos; and &lt;https://www.iso.org/iso-3166-country-codes.html&gt;
 	&apos;3 is gender
 	&apos;4 is name of voice in English
 	Dim s(fiCountEspeakMbrolaLanguage(), 4)
@@ -1468,7 +1469,7 @@ Function fsDateMyRegion(optional i As Integer) As String
 	
 	if ismissing(i) then
 		i = 1
-	endif
+	end if
 	
 	if i = 0 then
 		&apos; Use language of doc
@@ -1479,7 +1480,7 @@ Function fsDateMyRegion(optional i As Integer) As String
 	else
 		&apos; Use language of UI
 		s1 = fsGetLanguage()
-	endif
+	end if
 	Select case s1
 	Case &quot;es&quot;  &apos;el 1 de enero, 2009
 		sL10N=&quot;el &quot; &amp; Format(Now,&quot;D&quot; ) &amp; &quot; de &quot; &amp; Format(Now,&quot;MMMM, YYYY&quot;)
@@ -1525,7 +1526,7 @@ Function fsTimeMyRegion(optional i As Integer) As String
 	
 	if ismissing(i) then
 		i = 1
-	endif
+	end if
 	
 	if i = 0 then
 		&apos; Use language of doc
@@ -1536,7 +1537,7 @@ Function fsTimeMyRegion(optional i As Integer) As String
 	else
 		&apos; Use language of UI
 		s1 = fsGetLanguage()
-	endif
+	end if
 
 	Select Case s1()
 	Case &quot;es&quot;  &apos;la 1 y 40 de la mañana; las 2 y 40 de la tarde
@@ -1554,13 +1555,13 @@ Function fsTimeMyRegion(optional i As Integer) As String
 			sL10N=&quot;las &quot; &amp; Hour(NOW) Mod 12 &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la tarde&quot;
 		Else
 			sL10N=&quot;las &quot; &amp; Hour(NOW) Mod 12 &amp; &quot; y &quot; &amp; Minute(NOW) &amp; &quot;de la noche&quot;
-		Endif
+		end if
 	Case &quot;fr&quot;
 		If Hour(NOW)=1 Then
 			sL10N=&quot; &quot; &amp; Hour(NOW) &amp; &quot; heure &quot; &amp; Minute(NOW)
 		Else
 			sL10N=&quot; &quot; &amp; Hour(NOW) &amp; &quot; heures &quot; &amp; Minute(NOW)
-		Endif
+		end if
 	Case &quot;en&quot; &apos;1:40 AM ; 2:40 PM (One forty A M; Two forty P M)
 		sL10N=Format(Now,&quot;h:mm AM/PM&quot;)
 	Case Else &apos;1:40 ; 14:4
@@ -1579,7 +1580,7 @@ Function fsUserName
     fsUserName=environ(&quot;USERNAME&quot;)
     if fsUserName=&quot;&quot; Then
     	fsUserName=environ(&quot;USER&quot;)
-    Endif
+    end if
 End Function
 
 
@@ -1609,10 +1610,10 @@ function fsGetHomeDir()
 				kill a1(n) &amp; &quot;log.txt&quot;
 				fsGetHomeDir = a1(n)
 				Exit For
-			Endif
-		Endif
+			end if
+		end if
         next
-	Endif
+	end if
 end function
 
 

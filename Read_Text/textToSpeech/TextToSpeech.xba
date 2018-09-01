@@ -42,8 +42,7 @@ OPTION EXPLICIT
 &apos;&apos;  * Python for Linux is now Python 2 and Python 3 compatible.
 &apos;&apos;  * Linux now can use either avconv or ffmpeg to convert files.
 &apos;&apos;  * Windows and OSX users can use ffmpeg to convert files by installing
-&apos;&apos;    [Audacity](http://audacityteam.org/) or
-&apos;&apos;    [Miro Video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/)
+&apos;&apos;    [Audacity](https://audacityteam.org/)
 &apos;&apos;    with a ffmpeg plug-in.
 &apos;&apos;  * Complex language detection is simpler, faster and more reliable.
 &apos;&apos;  * Separate language **PO files**.  You can easily customize the
@@ -57,8 +56,8 @@ OPTION EXPLICIT
 &apos;&apos;
 &apos;&apos; Get *Read Text* from the download page and install it by double-clicking it.
 &apos;&apos;
-&apos;&apos; [Apache OpenOffice](http://extensions.services.openoffice.org/en/project/read-text)  
-&apos;&apos; [LibreOffice](http://extensions.libreoffice.org/extension-center/read-text)
+&apos;&apos; [Apache OpenOffice](https://extensions.services.openoffice.org/en/project/read-text)  
+&apos;&apos; [LibreOffice](https://extensions.libreoffice.org/extension-center/read-text)
 &apos;&apos;
 &apos;&apos; Read text speech API
 &apos;&apos; --------------------
@@ -88,7 +87,7 @@ OPTION EXPLICIT
 &apos;&apos;                 &quot;Read Text&quot;) &lt;&gt; 7 then
 &apos;&apos;             oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 &apos;&apos;             oSvc.execute(sURL,&quot;&quot;,0)
-&apos;&apos;         endif
+&apos;&apos;         end if
 &apos;&apos;     end sub
 &apos;&apos;
 &apos;&apos; Mixed Asian, Complex and Western Text
@@ -155,11 +154,11 @@ Sub ReadTextAloud
 						msgs(),_
 						errorCode,_
 						&quot;&quot;)
-			Endif
-		Endif
+			end if
+		end if
 	Else
 		ConfigureReadTextAloud()
-	Endif
+	end if
 End Sub
 
 
@@ -213,8 +212,8 @@ Sub ReadClipBoard
 					&apos; You updated office after a crash, so resume
 					&apos; the normal operation on the next run.
 					kill s1
-				endif
-			endif
+				end if
+			end if
 			s2 = inputbox(_
 					fsLookUpTerm(_
 					fsSelectionLanguage), _
@@ -223,17 +222,17 @@ Sub ReadClipBoard
 					&quot; &quot;)
 			If not(s2 = &quot;&quot;) Then
 				msgSpeak(s2)
-			Endif		
+			end if		
 		Else
 			CreateFile(s1, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)
 			fsGetClipBoard(false)
 			&apos; Try it - if it crashes, then we are left with the lock file
 			If fileexists(s1) Then
 				kill s1
-			Endif
+			end if
 			msgSpeak(fsGetClipBoard(true))
-		Endif
-	Endif
+		end if
+	end if
 	Exit Sub
 	ReadClipBoardErr:
 	msgbox fsLookupTerm(_
@@ -258,7 +257,7 @@ sub PresentSelection
 &apos;&apos; art requires a compatible converter program like [Nero AAC Encoder][PS1],
 &apos;&apos; [avconv][PS2], [FFmpeg][PS3] or [iTunes][PS4].
 &apos;&apos;
-&apos;&apos; [PS1]: http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php
+&apos;&apos; [PS1]: https://www.nero.com
 &apos;&apos; [PS2]: https://libav.org/
 &apos;&apos; [PS3]: https://www.ffmpeg.org
 &apos;&apos; [PS4]: https://www.apple.com/itunes/
@@ -319,17 +318,17 @@ sub PresentSelection2(optional byval sB)
 	ClearWorkingCountryLanguage
 	if ismissing(sB) then
 		sB = fsGetLanguage()
-	endif
+	end if
 	if ThisComponent.supportsService(&quot;com.sun.star.formula.FormulaProperties&quot;) or _
 			ThisComponent.supportsService(&quot;com.sun.star.sdb.DatabaseContext&quot;) then
 		b1 = false
 	else
 		b1 = true
-	endif
+	end if
 	sA = fsGetTextSelection()
     if fileExists(fsMyTempLock) Then
 		resetSpeechDispatcher
-	endif
+	end if
 	if len(sA) &gt; 1 then
 		NewPresentionFromSelection()
 		if b1 then
@@ -337,7 +336,7 @@ sub PresentSelection2(optional byval sB)
 			wait 1000
 			ThisComponent.getcurrentcontroller().setCurrentPage(ThisComponent.drawpages(1))
 			ThisComponent.Presentation.Start
-		endif
+		end if
 	else
 		NewPresentionFromSelection(fsLookUpTerm(&quot;s_read-text&quot;, sB) &amp; _
 				&quot; – &quot; &amp; _
@@ -350,8 +349,8 @@ sub PresentSelection2(optional byval sB)
 		if b1 then
 			wait 1000
 			ThisComponent.Presentation.Start
-		endif
-	endif
+		end if
+	end if
 	ThisComponent.setModified(False)
 end sub
 
@@ -379,7 +378,7 @@ sub ReadTheSlideNote
 &apos;&apos; that Impress displays when a computer that doesn’t have read text
 &apos;&apos; extension calls the procedure. 
 &apos;&apos; 
-&apos;&apos; [1]: http://extensions.services.openoffice.org/en/project/read-text
+&apos;&apos; [1]: https://extensions.services.openoffice.org/en/project/read-text
 &apos;&apos;
 	dim s1 as string
 	dim nPage as integer
@@ -410,9 +409,9 @@ sub ReadTheSlideNote
 				end select
 			else
 				msgSpeak(s1)
-			endif
-		endif
-	endif
+			end if
+		end if
+	end if
 end sub
 
 </script:module>

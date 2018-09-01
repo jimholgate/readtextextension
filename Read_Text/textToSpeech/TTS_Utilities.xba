@@ -47,7 +47,7 @@ Sub OK_MouseUp(Event As Object)
 				msgs(), _
 				errorCode, _
 				f_dlgSpeechSetup.GetControl(&quot;CommandButton1&quot;).model.Label)
-	Endif
+	end if
 End Sub
 
 
@@ -60,7 +60,7 @@ Sub Cancel_MouseUp(Event As Object)
 				msgs(),_
 				errorCode,_
 				f_dlgSpeechSetup.GetControl(&quot;CommandButton2&quot;).model.Label)
-	Endif
+	end if
 End Sub
 
 
@@ -76,7 +76,7 @@ Sub Reset_MouseUp(Event As Object)
 	Elseif Event.Buttons AND com.sun.star.awt.MouseButton.LEFT Then
 		resetSpeech()
 
-	Endif
+	end if
 End Sub
 
 
@@ -91,7 +91,7 @@ Sub About_MouseUp(Event As Object)
 				f_dlgSpeechSetup.GetControl(&quot;CommandButton3&quot;).model.Label)
 	Else
 		aboutReadTextDialog()
-	Endif
+	end if
 End Sub
 
 
@@ -106,7 +106,7 @@ Sub UseFestival_MouseUp(Event As Object)
 				f_dlgSpeechSetup.GetControl(&quot;FrameControl1&quot;).model.Label &amp; _
 				&quot;,&quot; &amp; _
 				f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).model.Label)
-	Endif
+	end if
 End Sub
 
 
@@ -119,7 +119,7 @@ Sub Label1_MouseUp(Event As Object)
 				,msgs(),_
 				errorCode,_
 				f_dlgSpeechSetup.GetControl(&quot;Label1&quot;).model.Label)
-	Endif
+	end if
 End Sub
 
 
@@ -132,7 +132,7 @@ Sub Label2_MouseUp(Event As Object)
 				msgs(),_
 				errorCode,_
 				f_dlgSpeechSetup.GetControl(&quot;Label2&quot;).model.Label)
-	Endif
+	end if
 End Sub
 
 
@@ -147,7 +147,7 @@ Sub UseExternal_MouseUp(Event As Object)
 				f_dlgSpeechSetup.GetControl(&quot;FrameControl1&quot;).model.Label &amp; _
 				&quot;,&quot; &amp; _
 				f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).model.Label)
-	Endif
+	end if
 End Sub
 
 
@@ -162,7 +162,7 @@ Sub UseWeb_MouseUp(Event As Object)
 				f_dlgSpeechSetup.GetControl(&quot;FrameControl1&quot;).model.Label &amp; _
 				&quot;,&quot; &amp; _
 				f_dlgSpeechSetup.GetControl(&quot;OptionButton3&quot;).model.Label)
-	Endif
+	end if
 End Sub
 
 
@@ -177,7 +177,7 @@ Sub UseAlwaysShow_MouseUp(Event As Object)
 				f_dlgSpeechSetup.GetControl(&quot;FrameControl2&quot;).model.Label &amp; _
 				&quot;,&quot; &amp; _
 				f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).model.Label)
-	Endif
+	end if
 End Sub
 
 
@@ -190,8 +190,8 @@ Sub AboutButton_MouseUp(Event As Object)
 			resetSpeechDispatcher
 		Else
 			ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,fsAbout())
-		Endif
-	Endif
+		end if
+	end if
 End Sub
 
 
@@ -208,12 +208,12 @@ Sub webHelp(optional sURL)
 	on error goto webHelpErr
 	if ismissing(sURL) Then
 		sURL = fsLookUpTerm( &quot;s_http-help-url&quot;, fsDisplayLanguage())
-	Endif
+	end if
 
-	if len(sURL) &gt; len(&quot;http://a.com&quot;) then
+	if len(sURL) &gt; 12 then
 		oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 		oSvc.execute(sURL, &quot;&quot;, 0)
-	endif
+	end if
 	exit sub
 	webHelpErr:
 End Sub
@@ -248,12 +248,12 @@ Function fbUsingTouchScreen
 		iSmart=config(fiSmartSelectCheckBox)
 	Else
 		iSmart = 0
-	Endif
+	end if
 	if iSmart = 0 then
 		fbUsingTouchScreen = false
 	else
 		fbUsingTouchScreen = true
-	endif
+	end if
 	exit function
 	fbUsingTouchScreenErr:
 	fbUsingTouchScreen = false
@@ -266,13 +266,13 @@ Function fbUsingPosixTalkProgram(Optional ByVal s1)
 	Dim a1 : a1 = Split(&quot;espeak,festival,padsp,say&quot;, &quot;,&quot;)
 	If isMissing(s1) or s1 = &quot;&quot; Then
 		s1 = fsProgramCommand
-	EndIf
+	end if
 	If s1 = &quot;&quot; Then Exit Function
 	For i = Lbound(a1) to Ubound(a1)
 		If Right(s1, Len(a1(i))) = a1(i) Then
 			fbUsingPosixTalkProgram = True
 			Exit For
-		EndIf
+		end if
 	Next	
 End Function
 
@@ -296,7 +296,7 @@ Function fsProgramCommand
 	Else
 		&apos; The &quot;About&quot; dialog needs this file to show current information
 		tts_config_writeFile(config(), sfile)
-	Endif
+	end if
 
 	sSmart=config(fiExternalProgramPath)
 	
@@ -304,7 +304,7 @@ Function fsProgramCommand
 		fsProgramCommand = sSmart
 	else
 		fsProgramCommand = &quot;&quot;
-	endif
+	end if
 	exit function
 	fsProgramCommandErr:
 	fsProgramCommand = &quot;&quot;
@@ -333,7 +333,7 @@ function fiReportMetaData(optional byval bVerify)
 	n = iYes
 	if ismissing(bVerify) then
 		bVerify = true
-	endif
+	end if
 	CR = chr(10)
 	sA = &quot;&quot; &amp; _
 			fsLookUpTerm(&quot;s_album&quot;) &amp; &quot; : &quot;&quot;&quot; &amp; fsThisDocTitle() &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
@@ -352,7 +352,7 @@ function fiReportMetaData(optional byval bVerify)
 				&quot; - &quot; &amp; _
 				fsLookUpTerm(&quot;s_ok&quot;) &amp; _
 				&quot; ? &quot;)
-	endif
+	end if
 	fiReportMetaData = n
 	exit function
 	fiReportMetaDataErr:
@@ -383,7 +383,7 @@ function fiReportOnlineRequest(optional byval bVerify)
 	n = iYes
 	if ismissing(bVerify) then
 		bVerify = true
-	endif
+	end if
 	CR = chr(10)
 	sA = &quot;&quot; &amp; _
 			fsLookUpTerm(&quot;s_use-a-web-application&quot;) &amp; _
@@ -394,7 +394,7 @@ function fiReportOnlineRequest(optional byval bVerify)
 		n = msgbox(sA, _
 				iYesNoCancel, _
 				fsLookUpTerm(&quot;s_read-text&quot;)
-	endif
+	end if
 	fiReportOnlineRequest = n
 	exit function
 	fiReportOnlineRequestErr:
@@ -417,7 +417,7 @@ Function fbHelpIsInstalled as Boolean
 		fbHelpIsInstalled=True
 	Else
 		fbHelpIsInstalled=False
-	Endif
+	end if
 End Function
 
 
@@ -431,7 +431,7 @@ Function soundsDirectory() As String
 	If intA &lt;&gt; 0 Then
 		strA=Left(strA,intA - 1)
 		&apos; We don’t want the semi-colon or the String that follows it
-	Endif
+	end if
 	soundsDirectory=ConvertFromURL(strA &amp; &quot;/sounds/&quot;)
 End Function
 
@@ -448,10 +448,10 @@ End Function
 Function fsGetTextSelection(optional byval bHideMDCode as Boolean, optional bgoRight as Boolean) As String
 	if ismissing(bHideMDCode) then
 		bHideMDCode = true
-	endif
+	end if
 	if ismissing(bgoRight) then
 		bgoRight = false
-	endif
+	end if
 	&apos; Check whether extension should use fsGetSmartTextSelection or
 	&apos; fsGetOnlySelectedText.  The fsGetSmartTextSelection tries more
 	&apos; strategies to determine the selected text and can automatically
@@ -464,7 +464,7 @@ Function fsGetTextSelection(optional byval bHideMDCode as Boolean, optional bgoR
 		fsGetTextSelection = fsGetSmartTextSelection(bHideMDCode, bgoRight)
 	else
 		fsGetTextSelection = fsGetOnlySelectedText()
-	endif
+	end if
 End Function
 
 
@@ -493,13 +493,13 @@ Function fsGetOnlySelectedText() As String
 			Next
 		Else 
 			sSelectedText=oSelection.getByIndex(0).getString()
-		Endif
+		end if
 		If sSelectedText=&quot; &quot; Then
 			sSelectedText=fsgetCursorWord()
-		Endif
+		end if
 	Else &apos;unsupported document format
 		sSelectedText=&quot;&quot;  
-	Endif
+	end if
 	fsGetOnlySelectedText=Trim(sSelectedText)
 	Exit Function
 	fsGetOnlySelectedTextErr:
@@ -511,7 +511,7 @@ Function fsGetSmartTextSelection(optional byval bHideMDCode as Boolean, optional
 	&apos; For audio presentations we lightly clean [Markdown][1] code.
 	&apos; (Imagine a computer voice saying &quot;equals&quot; 79 times in a row.)
 	&apos; For visual presentation, we can show it.
-	&apos; [1]: http://daringfireball.net/projects/markdown/
+	&apos; [1]: https://daringfireball.net/projects/markdown/
 	Dim oDoc As Object
 	Dim oSelection As Object
 	Dim sSelectedText As String
@@ -520,10 +520,10 @@ Function fsGetSmartTextSelection(optional byval bHideMDCode as Boolean, optional
 	&apos;On Error Goto fsGetSmartTextSelectionErr
 	if ismissing(bHideMDCode) then
 		bHideMDCode = true
-	endif
+	end if
 	if ismissing(bgoRight) then
 		bgoRight = false
-	endif
+	end if
 	oDoc=thisComponent
 	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
 		sSelectedText=fsRetrieveCalcActiveCellText()
@@ -538,8 +538,8 @@ Function fsGetSmartTextSelection(optional byval bHideMDCode as Boolean, optional
 			If sSelectedText = &quot;&quot; Then
 				&apos; Read the text of the slide
 				sSelectedText = fsSlidePlainText()
-			Endif
-		Endif
+			end if
+		end if
 	Elseif oDoc.supportsService(&quot;com.sun.star.text.TextDocument&quot;) or _
 			oDoc.supportsService(&quot;com.sun.star.text.WebDocument&quot;) or _
 			oDoc.supportsService(&quot;com.sun.star.text.GlobalDocument&quot;) Then
@@ -552,16 +552,16 @@ Function fsGetSmartTextSelection(optional byval bHideMDCode as Boolean, optional
 			next
 		else 
 			sSelectedText = fsGetSelectionAndCopy()
-		endif
+		end if
 		if sSelectedText = &quot; &quot; then
 				if bgoRight then
 					sSelectedText = fsGetTextSelectiontoEnd(true)
 					fbGoRight
-				endif
-		endif
+				end if
+		end if
 	Else &apos; unsupported document format
 		sSelectedText=&quot;&quot;
-	Endif
+	end if
 
 	if fbCreatingMediaFile(&quot;.aif,.aiff,.ogg,.m4a,.mp3&quot;) then
 		&apos; Gapless music players make sentences run into each other.
@@ -570,13 +570,13 @@ Function fsGetSmartTextSelection(optional byval bHideMDCode as Boolean, optional
 		&apos; Select Case fsGetOS()
 		&apos;Case &quot;WINDOWS&quot;
 			&apos; Do we have a modern system that understands speech markup language?
-			&apos; [ssml](http://www.w3.org/TR/speech-synthesis/)
+			&apos; [ssml](https://www.w3.org/TR/speech-synthesis/)
 			&apos; if fbWindowsHasAnInternationalVoice and _
 			&apos;		not(fsSelectionLanguage() = fsGetLanguage()) then
 			&apos;	sSelectedText = sSelectedText &amp; chr(10) &amp; &quot;&lt;break strength=&quot;&quot;strong&quot;&quot; /&gt;&quot;
 			&apos; else
 			&apos;	sSelectedText = sSelectedText &amp; chr(10) &amp; &quot; ... &quot;
-			&apos; endif
+			&apos; end if
 		&apos;Case &quot;OSX&quot;,&quot;MAC&quot;
 			&apos; Uses system specific speech markup, not ssml
 			&apos; [Guide](https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/FineTuning/FineTuning.html)
@@ -589,7 +589,7 @@ Function fsGetSmartTextSelection(optional byval bHideMDCode as Boolean, optional
 			&apos; To do - Check Svox Pico - most likely to have support.
 			&apos; sSelectedText = sSelectedText &amp; chr(10) &amp; &quot; &quot;
 		&apos;End Select
-	endif
+	end if
 	fsGetSmartTextSelection = sSelectedText
 	Exit Function
 	fsGetSmartTextSelectionErr:
@@ -605,7 +605,7 @@ function fsgetTextSelectiontoEnd(optional bAsPara as boolean) as string
 	on error resume next
 	if ismissing(bAsPara) then
 		bAsPara  =  false
-	endif
+	end if
 	if bAsPara then
 		sA = fsSupertrim(fsgetCursorWord(false))	
 		fbSelecttoEndofParagraph()
@@ -613,11 +613,11 @@ function fsgetTextSelectiontoEnd(optional bAsPara as boolean) as string
 		sB = fsGetSelectionAndCopy
 		if len(sA) = 0 then
 			fbGoLeft
-		endif
+		end if
 	else
 		fbSelecttoEndofDoc()
 		sB = fsGetSelectionAndCopy
-	endif
+	end if
 	fsgetTextSelectiontoEnd = sB
 	
 	exit function
@@ -629,7 +629,7 @@ end function
 function fsgetCursorWord(optional bSelectWord as boolean) as string
 	&apos; function to get a word under the current cursor position.
 	&apos; Adapted from code contributed On 2009-04-25  by JohnV To 
-	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t = 83411&amp;highlight = 
+	&apos; http://www.oooforum.org/
 	Dim oDoc
 	Dim oTC
 	Dim oTCtring
@@ -637,7 +637,7 @@ function fsgetCursorWord(optional bSelectWord as boolean) as string
 
 	if ismissing(bSelectWord) then 
 		bSelectWord  =  true
-	endif
+	end if
 	oDoc = ThisComponent
 	oVC = oDoc.getCurrentController.getViewCursor
 	oTC = oDoc.getText.createTextCursorByRange(oVC,False)
@@ -646,7 +646,7 @@ function fsgetCursorWord(optional bSelectWord as boolean) as string
 	fsgetCursorWord = oTC.String
 	if bSelectWord then 
 		selectAWord()
-	endif
+	end if
 end function
 
 
@@ -729,7 +729,7 @@ function fbClipBoardAvailable
 			&quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;)
 	if fileexists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) then
 		fbClipBoardAvailable = false
-	endif
+	end if
 	if fbIsWin64Program and _
 			(fsGetSetting(_
 			&quot;oosetupversion&quot;) = &quot;5.0&quot; and _
@@ -737,7 +737,7 @@ function fbClipBoardAvailable
 			fsGetSetting(_
 			&quot;ooName&quot;)) = &quot;libreoffice&quot;) then
 		fbClipBoardAvailable = false
-	endif
+	end if
 end function
 
 
@@ -757,7 +757,7 @@ function fbOfficeSupports(_
 		if a1(i) = s1 then
 			b1 = true
 			exit for
-		endif
+		end if
 	next
 	fbOfficeSupports = b1
 end function
@@ -778,7 +778,7 @@ function fsGetClipBoard(_
 	if not(fbClipBoardAvailable) then
 		fsGetClipBoard = &quot;&quot;
 		exit function
-	endif
+	end if
 
 	dim oClip
 	dim oTypes
@@ -800,7 +800,7 @@ function fsGetClipBoard(_
 		 if oTypes(i).MimeType=&quot;text/plain;charset=utf-16&quot; Then 
 			iPlainLoc = i
 			exit for
-		 endif
+		 end if
 	next
 
 	if(iPlainLoc &gt;= 0) Then
@@ -816,8 +816,8 @@ function fsGetClipBoard(_
 					fsLookUpTerm(_
 					&quot;s_read-text&quot;), _
 					&quot; &quot;)
-		endif
-	endif
+		end if
+	end if
 end function
 
 
@@ -832,7 +832,7 @@ Function WinSpeechProgramPath() As String
 		s1=&quot;C:\Windows\SysWOW64\wscript.exe&quot;
 	Else
 		s1=&quot;C:\WINDOWS\system32\wscript.exe&quot;
-	Endif
+	end if
 	WinSpeechProgramPath=s1
 End Function
 
@@ -851,7 +851,7 @@ Function fbWindowsHasAnInternationalVoice(optional byval bShow, optional byval s
 	&apos;	if fbWindowsHasAnInternationalVoice (false, &quot;United States&quot;) then
 	&apos; 		&apos; We have another country’s voice
 	&apos;		Do stuff
-	&apos;	endif
+	&apos;	end if
 	Dim b1 as boolean
 	Dim n As Integer
 	Dim s1 As String
@@ -860,10 +860,10 @@ Function fbWindowsHasAnInternationalVoice(optional byval bShow, optional byval s
 
 	If ismissing (bShow) then
 		bShow = false
-	endif
+	end if
 	If ismissing (sSearch) then
 		sSearch = &quot;united states&quot;
-	endif
+	end if
 	s2 = &quot;&quot;
 	cr = chr(10)
 	on error goto fbWindowsHasAnInternationalVoiceErr
@@ -883,8 +883,8 @@ Function fbWindowsHasAnInternationalVoice(optional byval bShow, optional byval s
 				b1 = True
 				If Not(bShow) Then
 					Exit For
-				Endif
-			Endif
+				end if
+			end if
 		Next
 		If bShow Then
 			msgBox (s2, _
@@ -894,8 +894,8 @@ Function fbWindowsHasAnInternationalVoice(optional byval bShow, optional byval s
 					fsLookUpTerm(&quot;s_test&quot;) &amp; _
 					&quot; - &quot; &amp; _
 					b1)
-		Endif
-	Endif
+		end if
+	end if
 	fbWindowsHasAnInternationalVoice = b1
 	Exit Function
 	fbWindowsHasAnInternationalVoiceErr:
@@ -907,188 +907,143 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 &apos;&apos;
 &apos;&apos; # Windows dialogue
 &apos;&apos; 
+&apos;&apos; **Read text** reads text aloud, saves audio files and
+&apos;&apos; can use resources from the web based on the selected
+&apos;&apos; text.
+&apos;&apos;
+&apos;&apos; * Select text.
+&apos;&apos; * Click the *Read selection* button.
+&apos;&apos; * To read aloud, accept the default in the dialogue, or choose
+&apos;&apos;   another action from the menus.
+&apos;&apos;
 &apos;&apos; Saving files
 &apos;&apos; ------------
-&apos;&apos; 
-&apos;&apos; Windows lets you save sound files in an uncompressed`.wav` format. 
-&apos;&apos; To convert `.wav` files to small `.m4a` files that you can share 
-&apos;&apos; on most mobile phones, music players and tablets, download 
-&apos;&apos; [Nero m4a encoder][1]
-&apos;&apos; [1]:http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php
-&apos;&apos; and save &apos; `neroAacEnc.exe` and `neroAacTag.exe` in `C:\opt\`
-&apos;&apos; The extension adds writing `.m4a` files to the list of options
-&apos;&apos; in the dialogue.
-&apos;&apos; 
+&apos;&apos;
+&apos;&apos; Windows lets you save sound files in an uncompressed`.wav` format.
+&apos;&apos; To save space, convert `.wav` files to small `.m4a` or `mp3` files
+&apos;&apos; that you can share on most mobile phones, music players and tablets.
+&apos;&apos;
 &apos;&apos; Language support
 &apos;&apos; ----------------
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos; This script uses the Windows speech application programming
 &apos;&apos; interface (`SAPI`). Depending on the version and locale of
 &apos;&apos; Windows, voices in different languages may be available.
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos; Examples:
 &apos;&apos; ---------
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos; External program:
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos;     C:\Windows\SysWOW64\wscript.exe
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos; Command line options (default):
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; &quot;(TMP)&quot;
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos; or (save as a .wav file in the home directory):
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /soundfile:&quot;(HOME)(NOW).wav&quot; &quot;(TMP)&quot;
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos; or (use a named voice)
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /voice:&quot;Microsoft Hortense Desktop - French&quot; &quot;(TMP)&quot;
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos; or (read a little slower)
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /rate:-3 &quot;(TMP)&quot;
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos; or (change voice by language)
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &quot;(TMP)&quot;
-&apos;&apos; 
-&apos;&apos; **Note**: Selecting this option doesn’t work with the SAPI
-&apos;&apos; speech synthesizer if you haven’t installed a voice in the
+&apos;&apos;
+&apos;&apos; **Note**: Selecting this option doesn&apos;t work with the SAPI
+&apos;&apos; speech synthesizer if you haven&apos;t installed a voice in the
 &apos;&apos; language.
-&apos;&apos; 
-&apos;&apos; # Optional formats
-&apos;&apos; 
-&apos;&apos; AAC Encoder
-&apos;&apos; -----------
-&apos;&apos; 
-&apos;&apos; [Nero m4a encoder](http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php)
-&apos;&apos; is a free command line M4A converter from [Nero](http://www.nero.com).
-&apos;&apos; 
-&apos;&apos; You can play m4a AAC encoded sound files with most music players.
-&apos;&apos; Use `neroAacEnc.exe` to make an m4a file.
-&apos;&apos; 
-&apos;&apos;  * If the directory `C:\opt` doesn’t exist, create it. 
-&apos;&apos;  * Copy `neroAacEnc.exe` to `C:\opt\`
-&apos;&apos;  * Copy `neroAacTag.exe` to `C:\opt\`
-&apos;&apos;  * The `neroAacTag.exe` program adds metadata like author, genre, title and year.
 &apos;&apos;
-&apos;&apos; To use neroAacEnc and neroAacTag, enable the `/use-optional-app` option.
+&apos;&apos; Optional formats
+&apos;&apos; ================
 &apos;&apos;
-&apos;&apos;      &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).m4a&quot; &quot;(TMP)&quot;
-&apos;&apos; 
-&apos;&apos; 
-&apos;&apos; Audacity
-&apos;&apos; --------
+&apos;&apos; ## Audacity
 &apos;&apos;
-&apos;&apos; [Audacity](http://audacityteam.org/) is a free cross platform audio editor. It can
-&apos;&apos; use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.  
-&apos;&apos; 
+&apos;&apos; [Audacity](https://sourceforge.net/projects/audacity/) is a free cross platform audio editor. It can
+&apos;&apos; use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.
+&apos;&apos;
+&apos;&apos; ### FFmpeg for Audacity
+&apos;&apos;
 &apos;&apos; Windows security policies may prevent you from installing the Audacity FFmpeg converter
 &apos;&apos; library using the `ffmpeg-win-2.2.2.exe` installer.  You can install the FFmpeg library
 &apos;&apos; by downloading the `ffmpeg-win-2.2.2.zip` archive and copying the contents to a
 &apos;&apos; directory that is available to all users.
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos; 1. Log in with an administrator account.
-&apos;&apos; 2. Go to the [MP3 for Audacity page](http://lame.buanzo.org/#lamewindl). 
+&apos;&apos; 2. Go to the [MP3 for Audacity page](https://lame.buanzo.org/#lamewindl).
 &apos;&apos; 3. Directly underneath &quot;For FFmpeg/LAME on Windows click below:&quot;, left-click the link
 &apos;&apos;   `ffmpeg-win-2.2.2.zip` and save the file anywhere on your computer.
-&apos;&apos; 4. Double-click `ffmpeg-win-2.2.2.zip` to open the archive. 
-&apos;&apos; 5. If the directory `C:\opt` doesn’t exist, create it. Copy the contents of the zip 
+&apos;&apos; 4. Double-click `ffmpeg-win-2.2.2.zip` to open the archive.
+&apos;&apos; 5. If the directory `C:\opt` doesn&apos;t exist, create it. Copy the contents of the zip
 &apos;&apos;    file to `C:\opt`.
-&apos;&apos; 6. Any user can now set up Audacity to use ffmpeg by opening Audacity, then setting 
-&apos;&apos;    *Edit – Preferences... – Libraries – FFmpeg library* to `C:\opt`.
+&apos;&apos; 6. Any user can now set up Audacity to use ffmpeg by opening Audacity, then setting
+&apos;&apos;    *Edit - Preferences... - Libraries - FFmpeg library* to `C:\opt`.
 &apos;&apos; 7. Read text extension now shows .mp3 and .ogg formats as export options.
 &apos;&apos; 8. You can use Audacity to add music or special effects to your sound files.
 &apos;&apos;
-&apos;&apos; To use ffmpeg, enable the `/use-optional-app` option. 
-&apos;&apos;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
-&apos;&apos; 
-&apos;&apos; Flac
-&apos;&apos; ----
-&apos;&apos; 
-&apos;&apos; Makes free lossless audio codec (FLAC) files.
-&apos;&apos; 
-&apos;&apos;  * Install `flac.exe` in `C:\opt\`
-&apos;&apos;  * [flac encoder](http://flac.sourceforge.net/links.html#software)
-&apos;&apos;  * [Players and plugins](http://flac.sourceforge.net/)
 &apos;&apos;
-&apos;&apos; To use flac, enable the `/use-optional-app` option.
-&apos;&apos; 
+&apos;&apos; ## Flac
+&apos;&apos;
+&apos;&apos; Makes free lossless audio codec (FLAC) files.
+&apos;&apos;
+&apos;&apos;  * Install `flac.exe` in `C:\opt\`
+&apos;&apos;  * [flac encoder](https://xiph.org/flac/links.html#software)
+&apos;&apos;  * [Players and plugins](https://xiph.org/flac/)
+&apos;&apos;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).flac&quot; &quot;(TMP)&quot;
-&apos;&apos; 
-&apos;&apos; iTunes
-&apos;&apos; ------
-&apos;&apos; 
+&apos;&apos;
+&apos;&apos; ## iTunes
+&apos;&apos;
 &apos;&apos; **iTunes** is a visual music manager from Apple available at no cost.
-&apos;&apos; 
-&apos;&apos; Use [iTunes](http://www.apple.com/itunes/) to convert sound files with metadata
+&apos;&apos;
+&apos;&apos; Use [iTunes](https://www.apple.com/itunes/) to convert sound files with metadata
 &apos;&apos; and album cover art. The first time you use it, iTunes takes a few moments to start.
-&apos;&apos; iTunes creates the audio file in it’s own directory and signals you with a sound. 
+&apos;&apos; iTunes creates the audio file in it&apos;s own directory and signals you with a sound.
 &apos;&apos; Read Text Extension puts a copy in a sound directory in your home directory.
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).aif&quot; &quot;(TMP)&quot;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).m4a&quot; &quot;(TMP)&quot;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
-&apos;&apos; 
-&apos;&apos; Lame
-&apos;&apos; ----
-&apos;&apos; 
+&apos;&apos;
+&apos;&apos; ## Lame
+&apos;&apos;
 &apos;&apos; Lame is a free command line file converter.
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos; Play mp3 compatible encoded sound files with most music players
 &apos;&apos; Use `lame.exe` to make an mp3 compatible file.
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos;  * Install `lame.exe` in `C:\opt\`
 &apos;&apos;  * [Lame encoder](http://www.rarewares.org/mp3-lame-bundle.php)
 &apos;&apos;
-&apos;&apos; To use lame, enable the `/use-optional-app` option.
-&apos;&apos; 
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
-&apos;&apos; 
-&apos;&apos; Miro Video Converter (FFmpeg)
-&apos;&apos; -----------------------------
-&apos;&apos; 
-&apos;&apos; This is a free visual music and video converter from the Participatory 
-&apos;&apos; culture foundation.
-&apos;&apos; 
-&apos;&apos; Miro Video Converter can convert mp3, ogg and other media using `ffmpeg`
-&apos;&apos; Once installed, read text can use FFmpeg to make audio and video media files
-&apos;&apos; for cross-platform applications.
-&apos;&apos; 
-&apos;&apos;  * [ffmpeg](https://www.ffmpeg.org)
-&apos;&apos;  * [Miro formats](http://develop.participatoryculture.org/index.php/ConversionMatrix)
-&apos;&apos;  * [Miro video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/)
-&apos;&apos;  * [Participatory culture foundation](http://pculture.org/)
-&apos;&apos; 
-&apos;&apos; To use ffmpeg, enable the `/use-optional-app` option.
+&apos;&apos;
+&apos;&apos; ## FFmpeg
+&apos;&apos;
+&apos;&apos; [ffmpeg](https://www.ffmpeg.org) is a free visual music and video converter.
 &apos;&apos;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
-&apos;&apos; 
-&apos;&apos; The direct link to the most recent version of Miro Video Converter is at osuosl.org -
-&apos;&apos; [`MiroConverterSetup.exe`](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/).
-&apos;&apos; 
-&apos;&apos; Ogg
-&apos;&apos; ---
+&apos;&apos;
+&apos;&apos; ## Ogg
 &apos;&apos;
 &apos;&apos; Play ogg encoded sound files with firefox, chrome or chromium.
 &apos;&apos; Use `oggenc.exe` or `oggenc2.exe` to make an ogg file
-&apos;&apos; 
+&apos;&apos;
 &apos;&apos;  * The ogg converter program must be installed in `C:\opt\`.
 &apos;&apos;  * [oggenc2 encoder](http://www.rarewares.org/ogg-oggenc.php)
-&apos;&apos;  * [Players and plugins](http://www.vorbis.com/setup_windows/)
+&apos;&apos;  * [Players and plugins](https://xiph.org/vorbis/)
 &apos;&apos;
-&apos;&apos; To use oggenc2, enable the `/use-optional-app` option. 
-&apos;&apos; 
-&apos;&apos;      &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
-&apos;&apos; 
-
-	&apos; Determine which SAPI voices are installed, Then
-	&apos; populate the Combo Box with the names of the voices. This script is only
-	&apos; invoked If you show dialog1 And you use TTS_WSCRIPT_VBS As the speech method
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
+&apos;&apos;
 	Dim Sapi As Object
 	Dim n As Integer
 	Dim aLineOfText As String,myScriptPath As String
@@ -1109,7 +1064,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 	Else
 		sSelectionLangCountryTag = &quot; /language:&quot;&quot;en-US&quot;&quot;&quot;
 		sSelectionLanguageTag = &quot;en&quot;
-	Endif
+	end if
 
 	While n &lt; Sapi.GetVoices.Count
 		s1 = Sapi.GetVoices.Item(n).GetDescription
@@ -1133,7 +1088,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).ogg&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
-	Endif
+	end if
 
 	If fbHaveFfmpeg() or Len(fsLamePath) &gt; 0 Then
 		s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
@@ -1143,7 +1098,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
-	Endif
+	end if
 
 	If fileExists(fsOptDirectory() &amp; &quot;neroAacTag.exe&quot;) and _
 			fileExists(fsOptDirectory() &amp; &quot;neroAacEnc.exe&quot;) Then
@@ -1162,7 +1117,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
-	Endif
+	end if
 
 	If fileExists(fsOptDirectory() &amp; &quot;flac.exe&quot;) Then
 		s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
@@ -1172,7 +1127,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).flac&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
-	Endif
+	end if
 
 	If fileExists(fsProgramDirectory() &amp; &quot;iTunes&quot;) or _
 			fileExists(fsProgramDirectoryx86() &amp; &quot;iTunes&quot;) Then
@@ -1181,9 +1136,8 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 		&apos; copy the file to our sound directory. You can delete either copy
 		&apos; if you don’t need one, but if speed is important, and you don’t
 		&apos; want a copy every time use [Nero m4a encoder][2]
-		&apos; [1]: http://www.apple.com/itunes/
-		&apos; [2]: http://www.nero.com/enu/downloads-nerodigital-nero-aac-codec.php
-
+		&apos; [1]: https://www.apple.com/itunes/
+		&apos; [2]: https://www.nero.com/
 		s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
@@ -1202,7 +1156,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
-	Endif
+	end if
 	s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 	sSelectionLangCountryTag &amp; _
 	&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).wav&quot;&quot;&quot; &amp; _
@@ -1219,7 +1173,7 @@ Sub dialog1Combo2ShowSAPIChoices(oDialog)
 
 	If fileExists(myTextPath) Then
 		Kill myTextPath
-	Endif
+	end if
 	Exit Sub
 	FichierKO:
 	Resume FichierKO2
@@ -1234,7 +1188,7 @@ Function fsMacVoice(n, optional s2)
 
 	if ismissing(s2) Then
 		s2 = fsSelectionLanguageAndRegion(true)
-	Endif
+	end if
 	Select Case s2
 		Case &quot;ar-SA&quot;
 			s1 = &quot;Tarik&quot;
@@ -1347,22 +1301,15 @@ Sub dialog1Combo2ShowSAYChoices(oDialog)
 &apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).aiff&quot;
 &apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).m4a&quot;
 &apos;&apos; 
-&apos;&apos; Miro video converter (optional)
-&apos;&apos; -------------------------------
-&apos;&apos; 
-&apos;&apos;  * **Miro Video Converter** can convert mp3, webm and other media using `ffmpeg`
-&apos;&apos;  * Once installed, read text can use it to convert media files
-&apos;&apos;    for cross-platform web browsers like chromium, chrome, and firefox.
+&apos;&apos; FFMPEG (optional)
+&apos;&apos; -----------------
 &apos;&apos; 
 &apos;&apos; Record a jpeg or png image file with sound using `ffmpeg`
 &apos;&apos; 
 &apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).webm&quot; &quot;(MY_IMAGE)&quot;
 &apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).webm&quot; &quot;(MY_IMAGE)&quot; &quot;640x480&quot;
 &apos;&apos; 
-&apos;&apos;  [ffmpeg](http://https://www.ffmpeg.org)  
-&apos;&apos;  [Miro formats](http://develop.participatoryculture.org/index.php/ConversionMatrix)  
-&apos;&apos;  [Miro video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/mac/)  
-&apos;&apos;  [Participatory culture foundation](http://pculture.org/)  
+&apos;&apos;  [ffmpeg](https://https://www.ffmpeg.org)
 &apos;&apos; 
 	Dim n, o As Integer
 	Dim s1 As String
@@ -1389,7 +1336,7 @@ Sub dialog1Combo2ShowSAYChoices(oDialog)
 			s1=&quot;-v &quot;&quot;&quot; &amp; fsMacVoice(n) &amp; &quot;&quot;&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
 			oComboBox.addItem(s1,0)
 			n=n+1
-		Endif
+		end if
 	next
 
 	s1=&quot;-f &quot;&quot;(TMP)&quot;&quot;&quot;
@@ -1415,7 +1362,7 @@ Sub dialog1Combo2ShowAppleScriptChoices(oDialog)
 		s2 = s2 &amp; &quot;.wav,.ogg,&quot;
 		s2 = s2 &amp; &quot;.mp4&quot;&quot; &quot;&quot;(POSTER2_IMG)&quot;&quot; &quot;&quot;600x400&quot;&quot;,.mp4&quot;&quot; &quot;&quot;(POSTER_IMG)&quot;&quot; &quot;&quot;400x400&quot;&quot;,&quot;
 		s2 = s2 &amp; &quot;.mp4&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480,.mp4&quot;&quot; &quot;&quot;(MY_IMAGE),.mp4,.mp3,&quot;
-	Endif
+	end if
 	s2 = s2 &amp; &quot;.aif,.m4a&quot;
 	a2 = split(s2, &quot;,&quot;)
 	s1= &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR &amp; _
@@ -1508,7 +1455,7 @@ Sub dialog1Combo2ShowESPEAKChoices(oDialog)
 				fileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Then
 			s1=s3 &amp; &quot;-v mb-(SELECTION_LANGUAGE_CODE)1 &quot; &amp; s2(n)
 &apos;fsTTSListVoicesVBS			oComboBox.addItem(s1,0)
-		Endif
+		end if
 		For n2=0 To fiCountEspeakMbrolaLanguage()
 			s4=fsGetEspeakMbrolaLanguage(n2,1)
 			If fileExists(&quot;/usr/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) or _
@@ -1519,7 +1466,7 @@ Sub dialog1Combo2ShowESPEAKChoices(oDialog)
 				fileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Then
 				s1=s3 &amp; &quot;-v mb-&quot; &amp; s4 &amp; &quot; &quot; &amp; s2(n)
 				oComboBox.addItem(s1,0)
-			Endif
+			end if
 		Next
 		s1=s3 &amp; s2(n)
 		oComboBox.addItem(s1,0)
@@ -1537,21 +1484,12 @@ Sub dialog1Combo2ShowMEDIAChoices(oDialog)
 	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
 	REM first remove all old items from the list
 	n1=oComboBox.getItemCount()
-	oComboBox.removeItems( 0,n1)
-	s1=&quot;http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
+	oComboBox.removeItems(0,n1)
+	s1=&quot;https://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
 	oComboBox.addItem(s1,0)
-	s1=&quot;http://translate.google.com/translate_tts?tl=(LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
+	s1=&quot;https://translate.google.com/translate_tts?tl=(LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
 	oComboBox.addItem(s1,0)
-	s1=&quot;http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=en-us&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)...&quot;
-	oComboBox.addItem(s1,0)
-	s1=&quot;http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=EkhoMandarin&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)...&quot;
-	oComboBox.addItem(s1,0)
-	s1=&quot;http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=EkhoCantonese&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)...&quot;
-	oComboBox.addItem(s1,0)
-	s1=&quot;http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=(SELECTION_LANGUAGE_CODE)&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)...&quot;
-	oComboBox.addItem(s1,0)
-	s1=&quot;http://wa.eguidedog.net/cgi-bin/ekho.pl?voice=(LANGUAGE_CODE)&amp;speedDelta=0&amp;pitchDelta=0&amp;volumeDelta=0&amp;text=(OOO_WEBTEXT)...&quot;
-	oComboBox.addItem(s1,0)
+
 End Sub
 
 
@@ -1632,15 +1570,15 @@ Sub dialog1Combo1ShowFESTIVALScripts(oDialog)
 		s2(0)=&quot;(set! utt1 (Utterance Wave (SOUND_GALLERY)apert.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
 	Else
 		s2(0)=&quot;(set! utt1 (Utterance Wave /usr/share/sounds/alsa/Noise.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
-	Endif
+	end if
 	For n2 = 0 to fiCountFestivalDirectory
 		For n=0 To 4
 			if fileExists(fsFestivalDirectory(n2)) Then
 				if n = 4 or instr(fsFestivalDirectory(n2) ,&quot;english&quot;) &lt;&gt; 0 Then
 					s1= &quot;(voice_&quot; &amp; fsFestivalVoice(n2) &amp; &quot;)&quot;
 					oComboBox.addItem(s1 &amp; s2(n),0)
-				Endif
-			Endif
+				end if
+			end if
 		Next
 	Next
 	n= 4
@@ -1672,7 +1610,7 @@ Function fiDialog1Combo2ShowMyPythonChoices(oDialog)
 &apos;&apos; Click the *About...* button in the extension dialogue for information about
 &apos;&apos; specific options available to you.
 &apos;&apos;
-&apos;&apos; [SMPC1]: http://python.org
+&apos;&apos; [SMPC1]: https://python.org
 &apos;&apos; [SMPC2]: https://libav.org/avconv.html
 &apos;&apos; [SMPC3]: https://ffmpeg.org
 &apos;&apos;
@@ -1695,8 +1633,8 @@ Function fiDialog1Combo2ShowMyPythonChoices(oDialog)
 	sLanguage=Lcase(fsGetLanguage())
 	Select Case fsGetOS()
 	Case &quot;WINDOWS&quot; &apos; Show examples
-		s1=s1 &amp; CR &amp; &quot;-c &quot;&quot;import os; os.startfile(&apos;http://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
-		s1=s1 &amp; CR &amp; &quot;-c &quot;&quot;import os; os.startfile(&apos;http://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&apos;)&quot;&quot;&quot;
+		s1=s1 &amp; CR &amp; &quot;-c &quot;&quot;import os; os.startfile(&apos;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
+		s1=s1 &amp; CR &amp; &quot;-c &quot;&quot;import os; os.startfile(&apos;https://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&apos;)&quot;&quot;&quot;
 		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(OS_PY)&quot;&quot; &quot;&quot;notepad &apos;(TMP)&apos;&quot;&quot;&quot;
 	Case &quot;OSX&quot;,&quot;MAC&quot; &apos; Python silently fails on OSX
 		exit Function
@@ -1716,7 +1654,7 @@ Function fiDialog1Combo2ShowMyPythonChoices(oDialog)
 		For n=0 To 7
 			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(PYTTSX_READ_TEXT_PY)&quot;&quot;&quot;&amp; s2(n) &amp; &quot;&quot;&quot;(TMP)&quot;&quot;&quot;
 		Next
-	Endif
+	end if
 	if Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/python3&quot;) &gt; 0 Then
 		If fileExists(&quot;/usr/lib/python3/dist-packages/speechd/client.py&quot;) Then
 			s2(0)=&quot;MALE3&quot;
@@ -1740,8 +1678,8 @@ Function fiDialog1Combo2ShowMyPythonChoices(oDialog)
 			&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot;&amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Endif
-	Endif
+		end if
+	end if
 	If fileExists(&quot;/usr/bin/qrencode&quot;) Then
 	 	s2(0)=&quot;12&quot;
 		s2(1)=&quot;9&quot;
@@ -1769,7 +1707,7 @@ Function fiDialog1Combo2ShowMyPythonChoices(oDialog)
 				fsLookUpTerm( &quot;s_read-text&quot;,_
 				fsGetLanguage()) &amp; _
 				&quot;.png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-	Endif
+	end if
 	If fileExists(&quot;/usr/bin/espeak&quot;) Then
 		&apos; doesn’t work in Windows, only Linux...
 		s2(0)=&quot; -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;&quot;&quot;
@@ -1812,11 +1750,11 @@ Function fiDialog1Combo2ShowMyPythonChoices(oDialog)
 					fileExists(&quot;/usr/share/mbrola/voices/&quot; &amp; s4) or _
 					fileExists(&quot;/usr/local/share/mbrola/voices/&quot; &amp; s4) Then
 					s1=s1 &amp; CR &amp; s3 &amp; &quot;-v mb-&quot; &amp; s4 &amp; &quot; &quot; &amp; s2(n)
-				Endif
+				end if
 			Next
 			s1=s1 &amp; CR &amp; s3 &amp; s2(n)
 		Next
-	Endif
+	end if
 	n=0
 	If fileExists(&quot;/usr/bin/text2wave&quot;) or _
 			fileExists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave&quot;) or _
@@ -1825,23 +1763,17 @@ Function fiDialog1Combo2ShowMyPythonChoices(oDialog)
 			if fileExists(fsFestivalDirectory(n)) Then
 				s4=&quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(voice_&quot; &amp; fsFestivalVoice(n) &amp; &quot;)&quot;&quot;&quot;
 				s1= s1 &amp; fspyOutOptions(oDialog,s4)
-			Endif
+			end if
 		Next
-	Endif
+	end if
 	n=0
 	If fileExists(&quot;/usr/bin/espeak&quot;) or _
 			fileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) or _
  			fileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
  		s2(0)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
- 		&apos;s1 = s1 &amp; _
- 		&apos;		CR &amp; _
- 		&apos;		&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
- 		&apos;		&quot; --language=&quot;&amp; _
- 		&apos;		s2(n) &amp; _
- 		&apos;		&quot; --rate=80% --pitch=80% --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
 		s4= &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=&quot;&amp; s2(n) &apos; &amp; &quot; --rate=100% --pitch=100% &quot;
 		s1= s1 &amp; fspyOutOptions(oDialog,s4)
-	Endif
+	end if
 	n=6
 	If fileExists(&quot;/usr/bin/pico2wave&quot;) Then
 		s2(0)=&quot;it&quot;
@@ -1852,24 +1784,20 @@ Function fiDialog1Combo2ShowMyPythonChoices(oDialog)
 		s2(5)=&quot;de&quot;
 		s2(6)=&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s2(7)=&quot;(SELECTION_LANGUAGE_CODE)&quot;
-		&apos;s1 = s1 &amp; _
-		&apos;		CR &amp; _
-		&apos;		&quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-		&apos;		&quot; --language=&quot;&amp; _
-		&apos;		s2(n) &amp; _
-		&apos;		&quot; --rate=80% --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
+
 		s4= &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=&quot;&amp; s2(n)
 		s1= s1 &amp; fspyOutOptions(oDialog, s4)
-	Endif
+	end if
 	if len(s1) &gt; 0 Then
 		if asc(left(s1,1)) = 10 Then
 			s1 = mid(s1,2)
 		end if
+	
+		a1=Split(s1,CR)
+		For n = Lbound(a1) + 1 to Ubound(a1)
+			oComboBox.addItem(a1(n),0)
+		next
 	end if
-	a1=Split(s1,CR)
-	For n = Lbound(a1) + 1 to Ubound(a1)
-		oComboBox.addItem(a1(n),0)
-	next
 	n=oComboBox.getItemCount()
 	fiDialog1Combo2ShowMyPythonChoices = n
 	Exit Function
@@ -1888,7 +1816,7 @@ Function fspyOutOptions(oDialog,byval s4)
 		s2 = &quot;&quot; &amp; s3 &apos; Customize for python 2 - legacy libraries
 	Else
 		s2 = &quot;&quot; &amp; s3 &apos; Customize for python 3 - for example, new speech libraries
-	Endif
+	end if
 	CR=Chr$(10)
 	s5 = &quot;&quot;
 	if s4 = &quot;&quot; Then
@@ -1904,7 +1832,7 @@ Function fspyOutOptions(oDialog,byval s4)
 			s1=s1 &amp; CR &amp; s4 &amp; _
 					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).m4a&quot;&quot;&quot; &amp; _
 					s2
-		Endif
+		end if
 		If fileExists(&quot;/usr/bin/flac&quot;) or _
 				fileExists(&quot;C:\opt\flac.exe&quot;) or _
 				fbHaveFfmpeg Then
@@ -1912,22 +1840,22 @@ Function fspyOutOptions(oDialog,byval s4)
 			s1=s1 &amp; CR &amp; s4 &amp; _
 					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).flac&quot;&quot;&quot; &amp; _
 					s3
-		Endif
+		end if
 		If fbHaveFfmpeg Then
 			&apos; Apple Audio Interchange Format. Not compressed.
 			s1=s1 &amp; CR &amp; s4 &amp; _
 					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).aif&quot;&quot;&quot; &amp; _
 					s2
-		Endif
+		end if
 		If fbHaveFfmpeg Then
 			&apos; Webm is a modern cross platform web browser oriented video format. 
 			&apos; Works on google-chrome, chromium, and firefox, but not on Safari 
 			&apos; or Internet Explorer
 			s5 = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
 			s1=s1 &amp; CR &amp; s4 &amp; _
-					&quot; --image &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;&amp; _
+					&quot; --image &quot;&quot;(MY_IMAGE)&quot;&quot;&quot; &amp; _
 					&quot; --dimensions &quot;&quot;1200x800&quot;&quot;&quot; &amp; _
-					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot;&amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot; &amp; _
 				s2
 			s1=s1 &amp; CR &amp; s4 &amp; _
 				&quot; --image &quot;&quot;(POSTER2_IMG)&quot;&quot;&quot;&amp; _
@@ -1939,7 +1867,7 @@ Function fspyOutOptions(oDialog,byval s4)
 				&quot; --dimensions &quot;&quot;600x600&quot;&quot;&quot; &amp; _
 				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot; &amp; _
 				s2
-		Endif
+		end if
 		If (fileExists(&quot;/usr/share/doc/libogg0/copyright&quot;) and _
 				fbHaveFfmpeg()) or _
 				fileExists(&quot;C:\opt\oggenc.exe&quot;) or _
@@ -1951,7 +1879,7 @@ Function fspyOutOptions(oDialog,byval s4)
 					s5 &amp; _
 					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).ogg&quot;&quot;&quot; &amp; _
 					s2
-		Endif
+		end if
 		If fileExists(&quot;/usr/share/doc/libmp3lame0/copyright&quot;) or _
 				fileExists(&quot;C:\opt\lame.exe&quot;) Then
 			&apos; Some players might not play lame mp3 output. Check firefox and 
@@ -1966,7 +1894,7 @@ Function fspyOutOptions(oDialog,byval s4)
 			s1=s1 &amp; CR &amp; s4 &amp; _
 					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp2&quot;&quot;&quot; &amp; _
 					s2
-		Endif
+		end if
 		s1=s1 &amp; CR &amp; s4 &amp; _
 				 &quot; --rate=75% --pitch=100% &quot; &amp; _
 				s3
@@ -1978,7 +1906,7 @@ Function fspyOutOptions(oDialog,byval s4)
 				&quot; --visible=false&quot; &amp; s3
 		s1=s1 &amp; CR &amp; s4 &amp; _
 				&quot; --visible=false&quot; &amp; s3
-	Endif
+	end if
 	fspyOutOptions = s1
 End Function
 
@@ -2008,16 +1936,16 @@ Function fsMyTitleInputBox(optional byVal bSkipWindows, optional byval sA)
 	
 	If isMissing(bSkipWindows) Then
 		sA = bSkipWindows = true
-	Endif
+	end if
 	If isMissing(sA) Then
 		sA = fsThisSoundTitle()
-	Endif
+	end if
 	if bSkipWindows then
 		if fsGetOS = (&quot;WINDOWS&quot;) then
 			fsMyTitleInputBox = sA
 			exit function
-		endif
-	endif
+		end if
+	end if
 	if true then
 		cr = chr(10)
 		s1 = fsThisDocTitle()
@@ -2026,7 +1954,7 @@ Function fsMyTitleInputBox(optional byVal bSkipWindows, optional byval sA)
 		s4 = fsThisSoundTitle()
 		s5 = trim(str(fiMyCurrentAudioTrack(false)))
 		fsMyTitleInputBox = InputBox(s1 &amp; cr &amp; s2 &amp; cr &amp; cr &amp; s5 &amp; &quot;. &quot; &amp; s4, s3, sA)
-	endif
+	end if
 End Function
 
 Sub resetSpeech
@@ -2058,7 +1986,7 @@ Sub resetSpeech
 	For n = Lbound(a1) to Ubound(a1)
 		If fileExists(a1(n)) Then
 			kill a1(n)
-		Endif
+		end if
 	next
 End Sub
 
@@ -2076,7 +2004,7 @@ Sub writeScript(myscript As String,msgs() As Variant,errorCode As Integer)
 		fbCreateFile(aFile, myscript, &quot;iso-8859-15&quot;)
 	Else
 		fbCreateFile(aFile, myscript, &quot;utf-8&quot;)
-	Endif
+	end if
 End Sub
 
 
@@ -2187,13 +2115,13 @@ Sub writeSpeech(byval sA As String,_
 	
 	if isMissing(bForceISO885915) Then
 		bForceISO885915 = false
-	Endif
+	end if
 	bFile=fsFullPathOf(fsTemporaryTextDoc)
 	If(bForceISO885915) Then
  		fbCreateFile(bFile, sA, &quot;iso-8859-15&quot;)
  	Else
 		fbCreateFile(bFile, sA, &quot;utf-8&quot;)
-	Endif
+	end if
 End Sub
 
 
@@ -2247,16 +2175,16 @@ Sub ttsActuate(config() As Variant, _
 	&apos;Choose what to speak
 	If ismissing(sTextToSpeak) or sTextToSpeak = &quot;&quot; Then  
 		sTextToSpeak = fsGetTextSelection(false, true)
-	Endif
+	end if
 	a1 = Split(&quot;id,title,album,genre,track&quot;, &quot;,&quot;)
 	For n = Lbound(a1) To Ubound(a1)
 		If fileexists(fsMyTempLock(&quot;lock.&quot; &amp; a1(n))) Then
 			Kill fsMyTempLock(&quot;lock.&quot; &amp; a1(n))
-		Endif	
+		end if	
 	Next
 	If Len(sTextToSpeak) = 0 then
 		Exit sub
-	Endif
+	end if
 	On Error Resume Next
 	oFrame=ThisComponent.getCurrentController().getFrame() 
 	oBar=oFrame.createStatusIndicator() 
@@ -2292,22 +2220,22 @@ Sub ttsActuate(config() As Variant, _
 					s1 = fsMyTitleInputBox(true, fsThisSoundTitle())
 					if s1 = &quot;&quot; then
 						exit sub
-					endif
-				endif
+					end if
+				end if
 				
 				CreateFile(fsMyTempLock(&quot;lock.id&quot;), fsThisDocAuthor(), &quot;UTF-8&quot;)
 				CreateFile(fsMyTempLock(&quot;lock.album&quot;), fsThisDocTitle(), &quot;UTF-8&quot;)
 				CreateFile(fsMyTempLock(&quot;lock.title&quot;), s1, &quot;UTF-8&quot;)
 				CreateFile(fsMyTempLock(&quot;lock.genre&quot;), fsThisDocGenre(), &quot;UTF-8&quot;)
 				CreateFile(fsMyTempLock(&quot;lock.track&quot;), trim(Str(n)), &quot;UTF-8&quot;)
-			endif
-		endif
+			end if
+		end if
 	else
 		&apos; Set the global variable holding the track counter to zero
 		&apos; if we aren’t creating a media file.
  		&apos; 
 		i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 0
-	endif
+	end if
 	On Error Resume Next
 	oBar.Value=70
 	On Error Goto errorHandler
@@ -2327,7 +2255,7 @@ Sub ttsActuate(config() As Variant, _
 			&apos; use utf-8 - Complex and Asian characters may not be supported by your version of Festival
 			writeScript(sScript,msgs(),errorCode, false)
 			writeSpeech(sTextToSpeak,msgs(),errorCode, false)
-		endif
+		end if
 	Elseif config(fiExternalOption) Then
 		sProgram=config(fiExternalProgramPath)
 		sCommand=config(fiExternalCommand)
@@ -2338,16 +2266,16 @@ Sub ttsActuate(config() As Variant, _
 				&apos; &quot;Read with external program&quot; set to /usr/bin/padsp and 
 				&apos; &quot;Command line options&quot; to swift -e utf-8 -m text -f &quot;(TMP)&quot;
 				sTextToSpeak=fsStripSmartQuotes(sTextToSpeak)
-			endif
-		endif
+			end if
+		end if
 		if ThisComponent.supportsService(_
 			&quot;com.sun.star.presentation.PresentationDocument&quot;) Then
 			&apos; Write a song cover image in the output directory.
 		 	sArtLook = config(5)
 			if fbCreatingMediaFile(&quot;.aif,.aiff,.m4a,.mp3,.oga,.webm,.mp4&quot;, sArtLook) then
 				sArtURL = fsExportAlbumCover()
-			endif
-		endif
+			end if
+		end if
 		If fsGetOS() = &quot;UNIX&quot; OR fsGetOS() = &quot;OSX&quot; Then
 			if fbUsingPosixTalkProgram(sProgram) Then
 				&apos; When using a posix speech command and not using a script,
@@ -2357,8 +2285,8 @@ Sub ttsActuate(config() As Variant, _
 				&apos; command may not work on some processes when it is invoked 
 				&apos; by a user with limited permissions.
 				fbCreateFile(fsMyTempLock, fsAppSignature, &quot;utf-8&quot;)
-			Endif
-		EndIf
+			end if
+		end if
 		
 		&apos; Remove audible markdown code symbols for blockquote, heading, emphasize 
 		&apos; when they occur at the beginning or the end of a line.
@@ -2367,7 +2295,7 @@ Sub ttsActuate(config() As Variant, _
 		sTextToSpeak = fsCleanMdCode(sTextToSpeak)
 		if bAddTime then 
 			sTextToSpeak = sTextToSpeak &amp; &quot; [[slnc 400]]&quot;
-		endif
+		end if
 &apos;&apos;
 &apos;&apos; Customizing speech
 &apos;&apos; ------------------
@@ -2416,7 +2344,7 @@ Sub ttsActuate(config() As Variant, _
 &apos;&apos; to include 400 milliseconds of silence. 
 &apos;&apos;
 &apos;&apos; [SMIL1]: https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/Introduction/Introduction.html
-&apos;&apos; [SMIL2]: http://www.w3.org/TR/SMIL3/
+&apos;&apos; [SMIL2]: https://www.w3.org/TR/SMIL3/
 &apos;&apos; [SMIL3]: https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/FineTuning/FineTuning.html#//apple_ref/doc/uid/TP40004365-CH5-SW10
 &apos;&apos; 
 		writeSpeech(&quot; &quot; &amp; sTextToSpeak, _
@@ -2445,13 +2373,13 @@ Sub ttsActuate(config() As Variant, _
 			else
 				fswriteOSXSpeechScript(&quot;&quot;, _
 						fsSelectionLanguageAndRegion(true), sArtURL)
-			endif
-		endif
+			end if
+		end if
 		if instr(sCommand,&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot;)=1 then
 			&apos;only consider SAPI voices
 			
 			sCommand= fsReplaceText(sCommand,&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,fsSelectionLanguageAndRegion(false))
-		endif
+		end if
 		sCommand=replaceLocalTokensWithStr(sCommand)
 		sCommand=replacePublicTokensWithStr(sCommand)
 		sCommand=replaceWebTokensWithStr(sCommand,sTextToSpeak) &apos;for online content with media player
@@ -2467,16 +2395,16 @@ Sub ttsActuate(config() As Variant, _
 		if Len(sCommand) &lt;&gt; 0 Then
 			If (Instr(sCommand,&quot;http://&quot;)&lt;&gt;1 And Instr(sCommand,&quot;https://&quot;)&lt;&gt;1 And Instr(sCommand,&quot;mailto:&quot;)&lt;&gt;1) Then
 				sCommand=&quot;http://&quot; &amp; sCommand
-			Endif
+			end if
 			Dim oSvc As Object
 			oSvc=createUnoService(sProgram)
 			oSvc.execute(sCommand, &quot;&quot; ,0)
 		Else
 			ErrorDisplay()
-		Endif
+		end if
 		oBar.End()
 		Exit Sub
-	Endif
+	end if
 	If fileExists(sProgram) Then
 		&apos; program path
 		&apos; 0 - focus is On the hidden program window,
@@ -2489,12 +2417,12 @@ Sub ttsActuate(config() As Variant, _
 				&apos; the computer is speaking to avoid the possibility of playing 
 				&apos; two voices at once.
 				bWait = True	
-			Endif
-		EndIf
+			end if
+		end if
 		
 	If sCommand &lt;&gt; &quot;&quot; Then 
 		errorCode=Shell(sProgram,0,sCommand,bWait)
-		Endif
+		end if
 		On Error Resume Next
 		oBar.Value=80
 		On Error Goto errorHandler
@@ -2505,12 +2433,12 @@ Sub ttsActuate(config() As Variant, _
 			fsLookUpTerm(&quot;s_read-text&quot;))
 		If fileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
 			kill fsFullPathOf(fsExtensionSettingsIni)
-		Endif
+		end if
 		If fileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
 			kill fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
-		Endif
+		end if
 		resetSpeech
-	Endif
+	end if
 	On Error Resume Next	
 	oBar.Value=90
 	If Len(sArtURL) &gt; 0 Then
@@ -2524,13 +2452,13 @@ Sub ttsActuate(config() As Variant, _
 					If not(fileExists(fsMyTempLock)) then
 					    If fileExists(sArtURL) then
 							Kill sArtURL
-						Endif
+						end if
 						Exit For
-					Endif
+					end if
 				Next
-			Endif
-		Endif
-	Endif
+			end if
+		end if
+	end if
 	oBar.Value=100
 	oBar.End()
 	Exit Sub
@@ -2539,10 +2467,10 @@ Sub ttsActuate(config() As Variant, _
 			fsLookUpTerm( &quot;s_read-text&quot;))
 		If fileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
 			kill fsFullPathOf(fsExtensionSettingsIni)	
-		Endif
+		end if
 		If fileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
 			kill fileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
-		Endif
+		end if
 		resetSpeech
 End Sub
 
@@ -2604,8 +2532,8 @@ Function fbCreateMissingMediaDirectory(byval sCommandLine)
 				fbCreateMissingMediaDirectory = true
 				if fileexists(s5 &amp; &quot;temp.lock&quot;) Then
 					kill s5 &amp; &quot;temp.lock&quot;
-				Endif
-			Endif
+				end if
+			end if
 		next
 	next
 	Exit Function
@@ -2619,7 +2547,7 @@ Function fsReplaceText(sA As String,_
 		sReplace As String) As String
 	If Not GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
-	Endif
+	end if
 	fsReplaceText = ReplaceString(sA, sReplace, sFind)
 End Function
 
@@ -2748,7 +2676,7 @@ Function replaceLocalTokensWithStr(sA As String) As String
 			sFind=&quot;(MY_IMAGE)&quot;
 			sReplace=fsGetPicturePath()
 			sA=fsReplaceText(sA,sFind,sReplace)
-		Endif
+		end if
 		&apos;New line
 		sFind=&quot;(/NL)&quot;
 		sReplace=Chr$(13)
@@ -2786,10 +2714,6 @@ Function ReplaceWebTokensWithStr(sA As String,sB As String) As String
     
     sFind = &quot;(OOO_WEBTEXTDEFINITION)&quot;
     &apos; Use with an on-line dictionary.
-    &apos; The *Real Academia Española* on-line dictionary requires a single
-    &apos; word in lower case.
-    &apos;
-    &apos; http://lema.rae.es/drae/srv/search?key=(OOO_WEBTEXTDEFINITION)
     &apos;
     sReplace= lcase(fsEscapeStr(fsQuickTitle(1, 99, fsTrimSpecial(sB,  &quot; `_-*#&gt;_&quot;))
    &apos; sReplace = fsTrimSpecial(sReplace, &quot; `_-*#&gt;_&quot;)
@@ -2810,7 +2734,7 @@ Function replacePublicTokensWithStr(sA As String) As String
 	sReplace=fsReplaceText(fsThisDocTitle,&quot; &quot;,chr$(160)) &apos;&amp;nbsp;
 	If sReplace=&quot;&quot; Then
 		sReplace=fsDateMyRegion() &amp; &quot;_&quot; &amp; fsTimeMyRegion()
-	Endif
+	end if
 	sA=fsReplaceText(sA,sFind,sReplace)
 
 	&apos;Current date
@@ -2886,8 +2810,8 @@ Function fsPathSettings(sPathType As String,_
 		If bShowAll Then
 			ShowPropertyValues(oPS)
 			Exit Function
-		Endif
-	Endif
+		end if
+	end if
  	sPath=oPS.getPropertyValue(sPathType)
 	If Not IsMissing(ListIndex) Then
 		&apos; Share And User-Directory
@@ -2898,14 +2822,14 @@ Function fsPathSettings(sPathType As String,_
 			Else
 				Msgbox( fsLookUpTerm( &quot;s_string-cannot-be-analyzed&quot;), 48, _
 					fsLookUpTerm( &quot;s_read-text&quot;, fsGetLanguage()))
-			Endif
-		Endif
-	Endif
+			end if
+		end if
+	end if
 	If Instr(1,sPath,&quot;;&quot;)=0 Then
 		fsPathSettings=ConvertToUrl(sPath)
 	Else
 		fsPathSettings=sPath
-	Endif
+	end if
 End Function
 
 
@@ -2939,7 +2863,7 @@ Function fsSelectionLanguageAndRegion(optional bIgnoreInstalledVoices) As String
 	if s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot; then
 		if isMissing(bIgnoreInstalledVoices) Then
 			bIgnoreInstalledVoices = true
-		Endif
+		end if
 		sA = fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
 		sB = fsSelectionLanguage
 		if bIgnoreInstalledVoices Then
@@ -2956,20 +2880,20 @@ Function fsSelectionLanguageAndRegion(optional bIgnoreInstalledVoices) As String
 				Else
 				&apos; try using the language only...
 					fsSelectionLanguageAndRegion=sB
-				Endif
+				end if
 			Case Else
 				fsSelectionLanguageAndRegion=sA
 			End Select
-		Endif
+		end if
 	Else
 		fsSelectionLanguageAndRegion = s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage
-	Endif
+	end if
 End Function
 
 
 Function fbWindowsHasVoiceInThisLanguage(Optional byval sLang)
 	&apos; Since Windows Vista, we can use Speech XML
-	&apos; http://www.w3.org/TR/speech-synthesis
+	&apos; https://www.w3.org/TR/speech-synthesis
 	&apos; Determine which SAPI voices are installed, then
 	&apos; if we have a modern voice from Windows Vista, Windows 7 or above
 	&apos; then return true, else if no voices found, then return false
@@ -2979,7 +2903,7 @@ Function fbWindowsHasVoiceInThisLanguage(Optional byval sLang)
 
 	if ismissing(sLang) Then
 		sLang = fsGetSetting(&quot;language&quot;)
-	Endif
+	end if
 	sLang = lCase(sLang)
 	fbWindowsHasVoiceInThisLanguage = false
 	&apos;on Error goto VoiceTestError
@@ -2991,7 +2915,7 @@ Function fbWindowsHasVoiceInThisLanguage(Optional byval sLang)
 		if instr(s2,s1) &lt;&gt; 0 Then
 			fbWindowsHasVoiceInThisLanguage = true
 			Exit For
-		Endif
+		end if
 	next
 	Set Sapi = Nothing
 	Exit Function
@@ -3007,7 +2931,7 @@ Function isoToEnglish(byval s1)
 
 	if right(s1,1) = &quot;-&quot; Then
 		s1 = left(s1,Len(s1-1))
-	Endif
+	end if
 	Select Case lCase(s1)
 	Case &quot;en-us&quot;
 		S2=&quot;English (United States)&quot;
@@ -3506,7 +3430,7 @@ Function fsSelectionLanguage(optional byVal sFilter) As String
 	if isMissing(sFilter) then
 	&apos; Consider western, Asian, complex or all languages(&quot;&quot;)?
 		sFilter = &quot;&quot;
-	endif
+	end if
 
 	on error resume next
 	sA = &quot;&quot;
@@ -3535,7 +3459,7 @@ Function fsSelectionLanguage(optional byVal sFilter) As String
 			myLocale = ThisComponent.CharLocaleComplex
 			sD = myLocale.Language
 			PresentErr:
-		endif
+		end if
 	Else
 		on error resume next
 		oVC=oDoc.getCurrentController.getViewCursor
@@ -3545,11 +3469,11 @@ Function fsSelectionLanguage(optional byVal sFilter) As String
 		sD=oVC.CharLocaleComplex.Language
 		
 		svcErr:
-	Endif
+	end if
 	&apos; The application’s built in CharLocale.Language property does not identify
 	&apos; oriental or complex text locales so we use the UTF encoding for the first
-	&apos; character to evaluate the language. See http://www.utf8-chartable.de/
-	&apos; and http://unicode.org/Public/UNIDATA/Blocks.txt
+	&apos; character to evaluate the language. See &lt;https://www.utf8-chartable.de/unicode-utf8-table.pl&gt;
+	&apos; and &lt;https://unicode.org/Public/UNIDATA/Blocks.txt&gt;
 	if sFilter = &quot;WEST&quot; or sFilter = &quot;UNDEFINED&quot; then
 		fsSelectionLanguage = sA
 	elseif sFilter = &quot;COMPLEX&quot;  then
@@ -3559,20 +3483,20 @@ Function fsSelectionLanguage(optional byVal sFilter) As String
 			sC=&quot;ko&quot;
 		elseif fbIsJapanese(sB) then
 			sC=&quot;ja&quot;
-		endif
+		end if
 		fsSelectionLanguage = sC
 	else
 		if fbIsKorean(sB) then
 			sC=&quot;ko&quot;
 		elseif fbIsJapanese(sB) then
 			sC=&quot;ja&quot;
-		endif
+		end if
 		fsSelectionLanguage = fsUseLanguageType(sA,sB,sC,sD)
-	endif
+	end if
 
 	if fsSelectionLanguage = &quot;&quot; Then
 		fsSelectionLanguage=fsDocLanguage()
-	Endif
+	end if
 	Exit Function
 	SELECTLANGUAGEERROR:
 	fsSelectionLanguage=fsDocLanguage()
@@ -3592,7 +3516,7 @@ Function fsSelectionCountry(optional byval sFilter) As String
 	if isMissing(sFilter) then
 	&apos; Consider western, Asian, complex, or all?
 		sFilter = &quot;&quot;
-	endif
+	end if
 	on error resume next
 	&apos;On Error Goto SELECTCOUNTRYERROR
 	sA = &quot;&quot;
@@ -3621,7 +3545,7 @@ Function fsSelectionCountry(optional byval sFilter) As String
 			myLocale = ThisComponent.CharLocaleComplex
 			sD = myLocale.Country
 			CountryErr:
-		endif
+		end if
 	Else
 		on error resume next
 		oVC=oDoc.getCurrentController.getViewCursor
@@ -3630,11 +3554,11 @@ Function fsSelectionCountry(optional byval sFilter) As String
 		sC=oVC.CharLocaleAsian.Country
 		sD=oVC.CharLocaleComplex.Country
 		svcCountryErr:
-	Endif
+	end if
 	&apos; The application’s built in CharLocale.Country property does not identify
 	&apos; oriental or complex text locales so we use the UTF encoding for the first
-	&apos; character to evaluate the country. See http://www.utf8-chartable.de/
-	&apos; and http://unicode.org/Public/UNIDATA/Blocks.txt
+	&apos; character to evaluate the country.  See &lt;https://www.utf8-chartable.de/unicode-utf8-table.pl&gt;
+	&apos; and &lt;https://unicode.org/Public/UNIDATA/Blocks.txt&gt;
 	if sFilter = &quot;WEST&quot; or sFilter = &quot;UNDEFINED&quot; then
 		fsSelectionCountry = sA
 	elseif sFilter = &quot;COMPLEX&quot;  then
@@ -3644,19 +3568,19 @@ Function fsSelectionCountry(optional byval sFilter) As String
 			sC=&quot;KR&quot;
 		elseif fbIsJapanese(sB) then
 			sC=&quot;JP&quot;
-		endif
+		end if
 		fsSelectionCountry = sC
 	else		
 		if fbIsKorean(sB) then
 			sC=&quot;KR&quot;
 		elseif fbIsJapanese(sB) then
 			sC=&quot;JP&quot;
-		endif
+		end if
 		fsSelectionCountry = fsUseLanguageType(sA,sB,sC,sD)
-	endif
+	end if
 	if fsSelectionCountry = &quot;&quot; Then
 		fsSelectionCountry=fsDocCountry()
-	Endif
+	end if
 	Exit Function
 	SELECTCOUNTRYERROR:
 	fsSelectionCountry=fsDocCountry()
@@ -3691,7 +3615,7 @@ Function fsComplexAsiaOrWest(byval sA)
 	if fbHasLTRMarker(sA) or fbHasRTLMarker(sA) then
 		fsComplexAsiaOrWest = &quot;COMPLEX&quot;
 		exit function
-	endif
+	end if
 &apos;&apos;
 &apos;&apos; Asian languages
 &apos;&apos; ---------------
@@ -3716,13 +3640,13 @@ Function fsComplexAsiaOrWest(byval sA)
 			sA = trim(sA)
 		Else
 			Exit For
-		Endif
+		end if
 	next
 	if sA=&quot;&quot; Then
 		longI = 0
 	Else
 		longI = asc(sA)
-	Endif
+	end if
 	if longI &gt;= clng(&quot;&amp;H0000&quot;) And longI &lt;= clng(&quot;&amp;H058F&quot;) Then
 		iLocale = 0 &apos; western
 	Elseif longI &gt;=clng(&quot;&amp;H3400&quot;) And longI &lt;= clng(&quot;&amp;H9FFF&quot;) Then
@@ -3737,14 +3661,14 @@ Function fsComplexAsiaOrWest(byval sA)
 		iLocale = 1 &apos; &quot;ko&quot;
 	Else &apos; western
 		iLocale = 0
-	Endif
+	end if
 	Select Case iLocale
 	Case 0
 		if fbIsAnURL(sA) Then
 			fsComplexAsiaOrWest=&quot;UNDEFINED&quot;
 		Else
 			fsComplexAsiaOrWest=&quot;WEST&quot;
-		Endif
+		end if
 	Case Else
 		fsComplexAsiaOrWest=&quot;ASIA&quot;
 	End Select
@@ -3769,20 +3693,20 @@ Function fbIsJapanese(byval sA)
 			sA = trim(sA)
 		Else
 			Exit For
-		Endif
+		end if
 	next
 	if sA=&quot;&quot; Then
 		longI = 0
 	Else
 		longI = asc(sA)
-	Endif
+	end if
 	if longI &gt;= 12352 AND longI &lt;= 12799 Then
 		fbIsJapanese=true &apos; &quot;ja&quot;
 	Elseif longI &gt;= 65381 AND longI &lt;= 65439 Then
 		fbIsJapanese=true &apos; &quot;ja&quot;
 	Else &apos; Complex, Western, Chinese, Korean or ambiguous language
 		fbIsJapanese=false
-	Endif
+	end if
 End Function
 
 
@@ -3805,20 +3729,20 @@ Function fbIsKorean(byval sA)
 			sA = trim(sA)
 		Else
 			Exit For
-		Endif
+		end if
 	next
 	if sA=&quot;&quot; Then
 		longI = 0
 	Else
 		longI = asc(sA)
-	Endif
+	end if
 	if longI &gt;= 44032 And longI &lt;= 55203 Then
 		fbIsKorean=true &apos; &quot;ko&quot;
 	Elseif longI &gt;= 65440 And longI &lt;= 65500 Then
 		fbIsKorean=true &apos; &quot;ko&quot;
 	Else &apos; Complex, Western, Chinese, Japanese or ambiguous language
 		fbIsKorean=false
-	Endif
+	end if
 End Function
 
 
@@ -3871,7 +3795,7 @@ Function fsDrawProperty(strA) As String
 	Case Else
 	s1r=oSelection.getString()
 		End Select
-	Endif
+	end if
 	fsDrawProperty=s1r
 	Exit Function
 	fsDrawPropertyErr:
@@ -3919,7 +3843,7 @@ Sub MsgSpeak(strA As String)
 &apos;&apos;                 &quot;Read Text&quot;) &lt;&gt; 7 then
 &apos;&apos;             oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 &apos;&apos;             oSvc.execute(sURL,&quot;&quot;,0)
-&apos;&apos;         endif
+&apos;&apos;         end if
 &apos;&apos;     end sub
 &apos;&apos;
 	Dim sFile As String
@@ -3947,14 +3871,14 @@ Sub MsgSpeak(strA As String)
 					&apos; because the graphics exporter doesn’t
 					&apos; work when the presentation is running.
 					ThisComponent.Presentation.End
-				endif
+				end if
 				ConfigureReadTextAloud()
 			case else
 				&apos; (&quot;Yes&quot;) Process using the settings
 				If ThisComponent.supportsService(_
 					&quot;com.sun.star.presentation.PresentationDocument&quot;) Then
 					ThisComponent.Presentation.End
-				endif
+				end if
 				tts_config_parseFile(sFile,config(),errorCode)
 				ttsActuate(config(),_
 				msgs(),_
@@ -3991,24 +3915,24 @@ Sub MsgSpeak(strA As String)
 				strA)
 			else
 				ConfigureReadTextAloud()
-			endif
-		endif
+			end if
+		end if
 	Else
 		&apos; Show the settings dialogue
 		ConfigureReadTextAloud
-	Endif
+	end if
 End Sub
 
 
 Function fsEscapeStr(sA As String, optional byval bIgnoreOS) As String
 	if ismissing(bIgnoreOS) then
 		bIgnoreOS = false
-	endif
+	end if
 	if (fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot;) and not(bIgnoreOS) Then
 		sA=fsreplaceText(sA,&quot;+&quot;,&quot;＋&quot;)
-		&apos;http://www.fileformat.info/info/unicode/char/ff0b/index.htm
+		&apos;https://www.fileformat.info/info/unicode/char/ff0b/index.htm
 		sA=fsreplaceText(sA,&quot;&amp;&quot;,&quot;＆&quot;)
-		&apos;http://www.fileformat.info/info/unicode/char/ff06/index.htm
+		&apos;https://www.fileformat.info/info/unicode/char/ff06/index.htm
 		fsEscapeStr=sA
 	Else
 		sA=fsreplaceText(sA,&quot;+&quot;,&quot;%2B&quot;)
@@ -4019,7 +3943,7 @@ Function fsEscapeStr(sA As String, optional byval bIgnoreOS) As String
 		Case Else
 			fsEscapeStr=sA
 		End Select
-	Endif
+	end if
 End Function
 
 Function fsLang As String
@@ -4038,7 +3962,7 @@ Function fsOptDirectory As String
 		fsOptDirectory= fsHomeDrive() &amp; &quot;\opt\&quot;
 	Else
 		fsOptDirectory=&quot;/opt/&quot;
-	Endif
+	end if
 End Function
 
 
@@ -4049,8 +3973,8 @@ Function fsHomeDrive As String
 			fsHomeDrive=&quot;C:&quot;
 		Else
 			fsHomeDrive=&quot;&quot;
-		Endif
-	Endif
+		end if
+	end if
 End Function
 
 
@@ -4062,7 +3986,7 @@ Function fsProgramDirectory As String
 		fsProgramDirectory=c &amp; &quot;\&quot;
 	Else
 		fsProgramDirectory=&quot;/usr/bin/&quot;
-	Endif
+	end if
 End Function
 
 
@@ -4074,7 +3998,7 @@ Function fsProgramDirectoryx86 As String
 		fsProgramDirectoryx86=c &amp; &quot;\&quot;
 	Else
 		fsProgramDirectoryx86=&quot;/usr/bin/&quot;
-	Endif
+	end if
 End Function
 
 Function fsLamePath
@@ -4110,7 +4034,7 @@ function fbIsWin64Program(_
 		optional byval installPath)
 	if ismissing(installPath) or installPath = &quot;&quot; then
 		installPath = fsInstallPath
-	endif
+	end if
 	
 	if fsGetOS = &quot;WINDOWS&quot; and _
 			Ucase(Environ(&quot;PROCESSOR_ARCHITECTURE&quot;)) = &quot;AMD64&quot; and _
@@ -4118,7 +4042,7 @@ function fbIsWin64Program(_
 		fbIsWin64Program = true
 	else
 		fbIsWin64Program = false
-	endif
+	end if
 end function
 
 
@@ -4131,7 +4055,7 @@ Function fbIsAMediaPlayer(s1 As String) As Boolean
 		If Instr(s1,fsMediaPlayer(n)) &gt; 0 Then
 			fbIsAMediaPlayer=True
 			Exit For
-		Endif
+		end if
 	Next
 End Function
 
@@ -4147,7 +4071,7 @@ Sub myBeep
 		sA=convertToURL(&quot;/usr/share/sounds/alsa/Noise.wav&quot;)
 	Else
 		sA=convertToURL(&quot;/usr/share/sounds/speech-dispatcher/test.wav&quot;)
-	Endif
+	end if
 	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 	oSvc.execute(sA,&quot;&quot;,1)
 End Sub
@@ -4181,7 +4105,7 @@ Sub windowsSAPIControl
 		Shell(&quot;/usr/bin/unity-control-center&quot;,0,&quot;&quot;,False)
 	Elseif fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot; Then &apos;osx
 		Shell(&quot;open&quot;,0,&quot;-b com.apple.systempreferences&quot;,False)
-	Endif
+	end if
 End Sub
 
 
@@ -4230,12 +4154,12 @@ Function fbCreateFile(sFilePath, sWriteString, Optional sEncoding)
 		Case Else
 			sEncoding = &quot;utf-8&quot; &apos; Posix standard
 		End Select
-	Endif
+	end if
 	on Error goto fbCreateFileError
 	CR = Chr$(13)
 	if fileExists(sFilePath) Then
 		kill sFilePath
-	Endif
+	end if
 	oOutputAccess = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
 	oOutputStream = CreateUnoService(&quot;com.sun.star.io.TextOutputStream&quot;)
 	vOutputData = oOutputAccess.openFileWrite( sFilePath )
@@ -4263,12 +4187,12 @@ Function fbcreateDirectory(sPath)
 			sA = sPath &amp; &quot;temp-&quot; &amp; trim(second(now)) &amp; &quot;.txt&quot;
 		Else
 			sA = sPath &amp; &quot;/&quot; &amp; &quot;temp-&quot; &amp; trim(second(now)) &amp; &quot;.txt&quot;
-		Endif
+		end if
 		fbcreateDirectory = fbCreateFile( sA, fsAppSignature(), &quot;UTF-8&quot;)
 		if fileexists(sA) Then
 			kill sA
-		Endif
-	Endif
+		end if
+	end if
 	Exit Function
 	fbcreateDirectoryErr:
 	fbcreateDirectory = false
@@ -4294,7 +4218,7 @@ Function fsNow
 &apos;&apos;     date -u +%F-T%X-00:00 &gt; &quot;$HOME/date.txt&quot;
 &apos;&apos;
 &apos;&apos;
-&apos;&apos; [RFC1]: http://www.ietf.org/rfc/rfc3339.txt
+&apos;&apos; [RFC1]: https://www.ietf.org/rfc/rfc3339.txt
 &apos;&apos;
 	Dim sA As String
 
@@ -4318,10 +4242,11 @@ Function fsPrefixZeroes(s1, n1)
 		fsPrefixZeroes = right(s2,n1)
 	Else
 		fsPrefixZeroes = s1
-	Endif
+	end if
 End Function
 
-function fxStr(optional byval sA)
+
+Function fxStr(optional byval sA)
 	&apos; Unescapes Python or ECMAscript style line ending code.
 	&apos; https://www.random.org
 	&apos;
@@ -4330,92 +4255,84 @@ function fxStr(optional byval sA)
 		sA = fsReplaceText(sA, &quot;\\n&quot;, &quot;[[%%ekuoC52bRp08c6noyqDy%%]]n&quot;)
 		sA = fsReplaceText(sA, &quot;\n&quot;, chr(10))
 		sA = fsReplaceText(sA, &quot;[[%%ekuoC52bRp08c6noyqDy%%]]n&quot;, &quot;\n&quot;)
-	endif
+	end if
 	fxStr = sA
-end function
+end Function
 
 
 Function fsAboutAbilityToolsApple()
-	dim s1$ : s1 = fxStr(&quot;Read Text\n&quot; &amp; _
-			&quot;=========\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;Summary\n&quot; &amp; _
-			&quot;-------\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;**Read Text** reads text aloud, saves audio or video files\n&quot; &amp; _
-			&quot;from text, and can use resources from the web based on the\n&quot; &amp; _
-			&quot;selected text.\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot; * Select text.\n&quot; &amp; _
-			&quot; * Click the *Read selection...* button.\n&quot; &amp; _
-			&quot; * To read aloud, accept the default in the dialogue, or choose\n&quot; &amp; _
-			&quot;   another action from the menus.\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;### Read Aloud ###\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;### Record ###\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;\n&quot; &amp; _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;Features\n&quot; &amp; _
-			&quot;--------\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot; * Automatically change languages according to the text language.\n&quot; &amp; _
-			&quot; * Create sound or still-image speech files for listening on the go.\n&quot; &amp; _
-			&quot; * Use web resources to translate, look up, listen, post, or\n&quot; &amp; _
-			&quot;   interface with web applications.\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;Installation\n&quot; &amp; _
-			&quot;------------\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;Get *Read Text* from the download page and install it by double-clicking it.\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;[Apache OpenOffice[1]  \n&quot; &amp; _
-			&quot;[LibreOffice][2]\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;### Miro video converter (optional) ###\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot; * **Miro Video Converter** can convert mp3, webm and other media using `ffmpeg`\n&quot; &amp; _
-			&quot; * Once installed, read text can use it to convert media files\n&quot; &amp; _
-			&quot;   for cross-platform web browsers like chromium, chrome, and firefox.\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;Record a jpeg or png image file with sound using `ffmpeg`\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot;\n&quot; &amp; _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;480x480&quot;&quot;\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot; [ffmpeg][3]  \n&quot; &amp; _
-			&quot; [Miro formats][4]  \n&quot; &amp; _
-			&quot; [Miro video converter][5]  \n&quot; &amp; _
-			&quot; [Participatory culture foundation][6]  \n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;License\n&quot; &amp; _
-			&quot;-------\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;The project is licensed under the [GNU 2.0][7] license.\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;Online help\n&quot; &amp; _
-			&quot;-----------\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;[Read Text][8]\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;\n&quot; &amp; _
-			&quot;  [1]: http://extensions.services.openoffice.org/en/project/read-text\n&quot; &amp; _
-			&quot;  [2]: http://extensions.libreoffice.org/extension-center/read-text\n&quot; &amp; _
-			&quot;  [3]: https://www.ffmpeg.org\n&quot; &amp; _
-			&quot;  [4]: http://develop.participatoryculture.org/index.php/ConversionMatrix\n&quot; &amp; _
-			&quot;  [5]: http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/mac/\n&quot; &amp; _
-			&quot;  [6]: http://pculture.org/\n&quot; &amp; _
-			&quot;  [7]: http://www.gnu.org/licenses/gpl-2.0.txt\n&quot; &amp; _
-			&quot;  [8]: https://sites.google.com/site/readtextextension/\n\n&quot;)
+	dim s1$ : s1 = Join(_
+			Array(_
+			&quot;Read Text&quot;, _
+			&quot;=========&quot;, _
+			&quot;&quot;, _
+			&quot;Summary&quot;, _
+			&quot;-------&quot;, _
+			&quot;&quot;, _
+			&quot;**Read Text** reads text aloud, saves audio or video files&quot;, _
+			&quot;from text, and can use resources from the web based on the&quot;, _
+			&quot;selected text.&quot;, _
+			&quot;&quot;, _
+			&quot; * Select text.&quot;, _
+			&quot; * Click the *Read selection...* button.&quot;, _
+			&quot; * To read aloud, accept the default in the dialogue, or choose&quot;, _
+			&quot;   another action from the menus.&quot;, _
+			&quot;&quot;, _
+			&quot;### Read Aloud ###&quot;, _
+			&quot;&quot;, _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;, _
+			&quot;&quot;, _
+			&quot;### Record ###&quot;, _
+			&quot;&quot;, _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;&quot;, _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;&quot;, _
+			&quot;&quot;, _
+			&quot;Features&quot;, _
+			&quot;--------&quot;, _
+			&quot;&quot;, _
+			&quot; * Automatically change languages according to the text language.&quot;, _
+			&quot; * Create sound or still-image speech files for listening on the go.&quot;, _
+			&quot; * Use web resources to translate, look up, listen, post, or&quot;, _
+			&quot;   interface with web applications.&quot;, _
+			&quot;&quot;, _
+			&quot;Installation&quot;, _
+			&quot;------------&quot;, _
+			&quot;&quot;, _
+			&quot;Get *Read Text* from the download page and install it by double-clicking it.&quot;, _
+			&quot;&quot;, _
+			&quot;[Apache %PRODUCTNAME][1]  &quot;, _
+			&quot;[%PRODUCTNAME][2]&quot;, _
+			&quot;&quot;, _
+			&quot;### FFMPEG ###&quot;, _
+			&quot;&quot;, _
+			&quot;Record a [jpeg][3] or [png][4] image file with sound using `ffmpeg`&quot;, _
+			&quot;&quot;, _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;, _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;480x480&quot;&quot;&quot;, _
+			&quot;&quot;, _
+			&quot; [ffmpeg][5]  &quot;, _
+			&quot;&quot;, _
+			&quot;License&quot;, _
+			&quot;-------&quot;, _
+			&quot;&quot;, _
+			&quot;The project is licensed under the [GNU 2.0][6] license.&quot;, _
+			&quot;&quot;, _
+			&quot;Online help&quot;, _
+			&quot;-----------&quot;, _
+			&quot;&quot;, _
+			&quot;[Read Text][7]&quot;, _
+			&quot;&quot;, _
+			&quot;&quot;, _
+			&quot;  [1]: https://extensions.services.openoffice.org/en/project/read-text&quot;, _
+			&quot;  [2]: https://extensions.libreoffice.org/extension-center/read-text&quot;, _
+			&quot;  [3]: https://www.w3.org/Graphics/JPEG/&quot;, _
+			&quot;  [4]: https://www.w3.org/Graphics/PNG/&quot;, _
+			&quot;  [5]: https://www.ffmpeg.org&quot;, _
+			&quot;  [6]: https://www.gnu.org/licenses/gpl-2.0.txt&quot;, _
+			&quot;  [7]: https://sites.google.com/site/readtextextension/&quot;, _
+			&quot;&quot;), _
+			Chr(10))
+
 	fsAboutAbilityToolsApple = s1
 end function
 
@@ -4448,8 +4365,8 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 &apos;&apos; If the AirPlay device is playing another program, then using the speak 
 &apos;&apos; program will interrupt the program.
 &apos;&apos; 
-&apos;&apos; [Troubleshooting AirPlay](http://support.apple.com/en-us/HT203822)  
-&apos;&apos; [Troubleshooting Apple TV](http://support.apple.com/en-us/HT200197)  
+&apos;&apos; [Troubleshooting AirPlay](https://support.apple.com/en-us/HT203822)  
+&apos;&apos; [Troubleshooting Apple TV](https://support.apple.com/en-us/HT200197)  
 &apos;&apos; 
 
 	Dim sLang, sLangLocale, sBaseCountry, sLyrics, sTitle As String
@@ -4466,7 +4383,7 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 	sFile=fsTemporaryTtsAppleScript
 	If fileExists(sFile) Then
 		kill sFile
-	Endif
+	end if
 	If fileExists(sFile) Then
 		&apos; If we can&apos;t make a fresh file, then we don&apos;t want to run an
 		&apos; arbitrary script.
@@ -4476,7 +4393,7 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 				&quot;-- fswriteOSXSpeechScript: &quot; &amp; _
 				&quot;No actions are defined.&quot;, _
 				&quot;utf-8&quot;)
-	EndIf
+	end if
 	sLongTrack =  fsPrefixZeroes(trim(str(fiMyCurrentAudioTrack(false))), 3)
 	if isMissing(ArtURL) or _
 			ArtURL = &quot;&quot; or _
@@ -4484,7 +4401,7 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 		s1 = trim(convertfromURL(fsPosterImg))
 	else
 		s1 = trim(convertfromURL(ArtURL))
-	endif
+	end if
 
 	CR = Chr$(13)
 
@@ -4496,7 +4413,7 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 		sLyrics = fsThisSoundLyrics()
 	else
 		sLyrics = &quot;&quot;
-	endif
+	end if
 	&apos; Check generated  title 
 
 	if fbCreatingMediaFile(&quot;.3gp,.aac,.aif,.aiff,.au,.avi,.flac,.m4a,&quot; &amp; _
@@ -4512,10 +4429,10 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 					&quot;utf-8&quot;)
 			fswriteOSXSpeechScript = s1 
 			exit function
-		endif
+		end if
 	else
 		sTitle = fsThisSoundTitle()
-	endif
+	end if
 	 
 	if sLyrics &lt;&gt; &quot;&quot; then
 		&apos; don’t use lyrics if lyrics contain only a
@@ -4528,8 +4445,8 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 				instr(sLyrics, &quot;。&quot;) &lt; 1) or _
 				len(sLyrics) &lt; 32 then
 			sLyrics = &quot;&quot;
-		endif
-	endif
+		end if
+	end if
 &apos;&apos;
 &apos;&apos; Graphic sizes
 &apos;&apos; -------------
@@ -4563,7 +4480,7 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 &apos;&apos;
 &apos;&apos; - **600x600** Small square format for audio players
 &apos;&apos;
-&apos;&apos; [WOSXSS1]: http://develop.participatoryculture.org/index.php/ConversionMatrix
+&apos;&apos; [WOSXSS1]: https://web.archive.org/web/20160526113720/http://develop.participatoryculture.org/index.php/ConversionMatrix
 &apos;&apos;
 	sSize = &quot;600x600&quot; &apos; Small square format for audio players
 
@@ -4571,48 +4488,55 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 		sBNative = &quot;true&quot;
 	Else
 		sBNative = &quot;false&quot;
-	Endif
+	end if
 	&apos; Some or all metadata information may be ignored, depending on output format
 	&apos; m4a format can include lyrics.
 	&apos;
 	&apos; M4A - album, artist, genre, language, lyrics, title, track and year plus more.
 	&apos; MP3 - album, artist, genre, language, title, track and year
 	&apos; OGA - album, artist, genre, language, title, track and year
-	sMeta = &quot; -metadata album=&quot;&quot; &amp; (quoted form of sAlbum) &amp; &quot;&quot;&quot; &amp; _
-		&quot; -metadata artist=&quot;&quot; &amp; (quoted form of sArtist) &amp; &quot;&quot;&quot; &amp; _
-		&quot; -metadata genre=&quot;&quot; &amp; (quoted form of sGenre) &amp; &quot;&quot;&quot; &amp; _
-		&quot; -metadata language=&quot;&quot; &amp; (quoted form of myLang) &amp; &quot;&quot;&quot; &amp; _
-		&quot; -metadata title=&quot;&quot; &amp; (quoted form of sTitle) &amp; &quot;&quot;&quot; &amp; _
-		&quot; -metadata track=&quot;&quot; &amp; (quoted form of sTrack) &amp; &quot;&quot;&quot; &amp; _
-		&quot; -metadata year=&quot;&quot; &amp; (quoted form of sYear) &amp; &quot;&quot; &quot;&quot;&quot;
+	sMeta = Join(_
+			Array(_
+			&quot; -metadata album=&quot;&quot; &amp; (quoted form of sAlbum) &amp; &quot;&quot;&quot;,  _
+			&quot; -metadata artist=&quot;&quot; &amp; (quoted form of sArtist) &amp; &quot;&quot;&quot;,  _
+			&quot; -metadata genre=&quot;&quot; &amp; (quoted form of sGenre) &amp; &quot;&quot;&quot;,  _
+			&quot; -metadata language=&quot;&quot; &amp; (quoted form of myLang) &amp; &quot;&quot;&quot;,  _
+			&quot; -metadata title=&quot;&quot; &amp; (quoted form of sTitle) &amp; &quot;&quot;&quot;,  _
+			&quot; -metadata track=&quot;&quot; &amp; (quoted form of sTrack) &amp; &quot;&quot;&quot;,  _
+			&quot; -metadata year=&quot;&quot; &amp; (quoted form of sYear) &amp; &quot;&quot; &quot;&quot;&quot;), _
+	 		&quot;&quot;)
 	if fileExists(fsTemporaryTtsAppleScript) Then
 		kill fsTemporaryTtsAppleScript
-	Endif
+	end if
 	sA = &quot;(*&quot; &amp; CR &amp; fsAboutAbilityToolsApple &amp; CR &amp; &quot;*)&quot; &amp; CR
-	if sArguments &lt;&gt; &quot;&quot; Then
+	if Len(sArguments) &lt;&gt; 0 Then
 		if instr(sArguments, &quot;AirPlay&quot;) &lt;&gt; 0 Then
-			sA = &quot;(*&quot; &amp; CR &amp; _
-				&quot;AirPlay&quot; &amp; CR &amp; _
-				&quot;=======&quot; &amp; CR &amp; _
-				&quot;&quot; &amp; CR &amp; _
-				&quot;     &quot;&quot;(SAY_APPLESCRIPT_AIRPLAY)&quot;&quot;&quot;  &amp; CR &amp; _
-				&quot;&quot; &amp; CR &amp; _
-				&quot;The AirPlay option lets you send the audio output of your computer’s &quot; &amp; _
-				&quot;speech synthesizer to a compatible player without sharing your desktop screen. &quot; &amp; CR &amp; _
-				&quot;&quot; &amp; CR &amp; _
-				&quot;Make sure that your AirPlay monitor is on and that your computer is &quot; &amp; _
-				&quot;set to use the *correct* AirPlay device. Check the AirPlay device &quot; &amp; _
-				&quot;by clicking the *AirPlay* monitor icon on your computer’s menu bar.&quot; &amp; CR &amp; _
-				&quot;&quot; &amp; CR &amp; _
-				&quot;Online help&quot; &amp; CR &amp; _
-				&quot;-----------&quot; &amp; CR &amp; _
-				&quot;&quot; &amp; CR &amp; _
-				&quot;[Troubleshooting AirPlay](http://support.apple.com/en-us/HT203822)  &quot; &amp; CR &amp; _
-				&quot;[Troubleshooting Apple TV](http://support.apple.com/en-us/HT200197)  &quot; &amp; CR &amp; _
-				&quot;&quot; &amp; CR &amp; _
-				&quot;*)&quot; &amp; CR
-		Endif
-	Endif
+			sA = Join(_
+					Array(_
+					&quot;(*&quot;, _
+					&quot;AirPlay&quot;, _
+					&quot;=======&quot;, _
+					&quot;&quot;, _
+					&quot;     &quot;&quot;(SAY_APPLESCRIPT_AIRPLAY)&quot;&quot;&quot; , _
+					&quot;&quot;, _
+					&quot;The AirPlay option lets you send the audio output of your computer’s &quot; &amp; _
+					&quot;speech synthesizer to a compatible player without sharing your desktop screen. &quot;, _
+					&quot;&quot;, _
+					&quot;Make sure that your AirPlay monitor is on and that your computer is &quot; &amp; _
+					&quot;set to use the *correct* AirPlay device. Check the AirPlay device &quot; &amp; _
+					&quot;by clicking the *AirPlay* monitor icon on your computer’s menu bar.&quot;, _
+					&quot;&quot;, _
+					&quot;Online help&quot;, _
+					&quot;-----------&quot;, _
+					&quot;&quot;, _
+					&quot;[Troubleshooting AirPlay](https://support.apple.com/en-us/HT203822)  &quot;, _
+					&quot;[Troubleshooting Apple TV](https://support.apple.com/en-us/HT200197)  &quot;, _
+					&quot;&quot;, _
+					&quot;*)&quot;, _
+					&quot;&quot;), _
+	 				CR)
+		end if
+	end if
 	sF = ConvertFromURL(fsFullPathOf(fsTemporaryTextDoc))
 	&apos; We use the system voice if the selected language is the same as the user
 	&apos; interface language. You can choose a specific voice for your primary
@@ -4632,348 +4556,367 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 		Case Else
 			sLangLocale=fsReplaceText(sArgLangLocale,&quot;-&quot;,&quot;_&quot;)
 		End Select
-	Endif
-	sB =&quot;#/usr/bin/osascript&quot; &amp; CR &amp; sA &amp; _
-		&quot;-- ------------------------------------------------------&quot; &amp; CR &amp; _
-		&quot;-- Read Text Extension created this script&quot; &amp; CR &amp; _
-		&quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; &quot; &amp; fsNow &amp; CR &amp; _
-		&quot;-- ------------------------------------------------------&quot; &amp; CR &amp; _
-		&quot;on run (arguments)&quot; &amp; CR &amp; _
-		&quot;	set argv1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set argv2 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set argv3 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set astring to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set b to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set bPostPlay to &quot; &amp; sBNative &amp; CR &amp; _
-		&quot;	set c to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set cout1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set cout2 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set defaultImg to &quot;&quot;&quot; &amp; s1 &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set defaultSize to &quot;&quot;&quot; &amp; sSize &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set doPostProcess to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set doPostProcess2 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set err1 to &quot;&quot;Apple Script&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set ffMeta to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set myConverter to &quot;&quot;&quot; &amp; fsMyFfmpeg &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; fsMyTempLock &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set myOption to &quot;&quot;&quot; &amp; sArguments &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set mySys to &quot;&quot;&quot; &amp; fsGetOS() &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set myURL to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set sGenre to &quot;&quot;&quot; &amp; fsThisDocGenre() &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set sImageURL to defaultImg&quot; &amp; CR &amp; _
-		&quot;	set sTrack to &quot;&quot;&quot; &amp; fiMyCurrentAudioTrack(false) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set sYear to &quot;&quot;&quot; &amp; year(now) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set textFile to &quot;&quot;&quot; &amp; sF &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set sAlbum to &quot;&quot;&quot; &amp; fsThisDocTitle() &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set sArtist to &quot;&quot;&quot; &amp; fsThisDocAuthor() &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set sTitle to &quot;&quot;&quot; &amp; sTitle &amp; string(2, chr(0)) &amp; &quot;&quot;&quot;&quot; &amp; _
-		&quot; -- Title of the selected text.&quot; &amp; _
-		&quot; Check the title if it is Asian or Complex.&quot; &amp; CR &amp; _
-		&quot;	set myVoice to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set sLyrics to &quot;&quot;&quot; &amp; sLyrics &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;-- ------------------------------------------------------&quot; &amp; CR &amp; _
-		&quot;	set b to (do shell script &quot;&quot;touch &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;	try&quot; &amp; CR &amp; _
-		&quot;		set argv1 to (item 1 of arguments)&quot; &amp; CR &amp; _
-		&quot;		set astring to fsChangeCase(getExtension(argv1),&quot;&quot;lower&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;	on error&quot; &amp; CR &amp; _
-		&quot;		set argv1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	end try&quot; &amp; CR &amp; _
-		&quot;	try&quot; &amp; CR &amp; _
-		&quot;		set argv2 to (item 2 of arguments)&quot; &amp; CR &amp; _
-		&quot;	on error&quot; &amp; CR &amp; _
-		&quot;		set argv2 to defaultImg&quot; &amp; CR &amp; _
-		&quot;	end try&quot; &amp; CR &amp; _
-		&quot;	try&quot; &amp; CR &amp; _
-		&quot;		set argv3 to (item 3 of arguments)&quot; &amp; CR &amp; _
-		&quot;	on error&quot; &amp; CR &amp; _
-		&quot;		set argv3 to defaultSize&quot; &amp; CR &amp; _
-		&quot;	end try&quot; &amp; CR &amp; _
-		&quot;	if astring is &quot;&quot;aif&quot;&quot; or astring is &quot;&quot;aiff&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;		set doPostProcess to &quot;&quot;tag&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	else if astring is &quot;&quot;m4a&quot;&quot; Then&quot; &amp; CR &amp; _
-		&quot;		set doPostProcess to &quot;&quot;tag&quot;&quot;&quot; &amp; CR
+	end if
+	sB = Join(Array(&quot;#/usr/bin/osascript&quot;, _
+			sA &amp; _
+			&quot;-- ------------------------------------------------------&quot;, _
+			&quot;-- Read Text Extension created this script&quot;, _
+			&quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; &quot; &amp; fsNow, _
+			&quot;-- ------------------------------------------------------&quot;, _
+			&quot;on run (arguments)&quot;, _
+			&quot;	set argv1 to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set argv2 to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set argv3 to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set astring to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set b to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set bPostPlay to &quot; &amp; sBNative, _
+			&quot;	set c to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set cout1 to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set cout2 to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set defaultImg to &quot;&quot;&quot; &amp; s1 &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set defaultSize to &quot;&quot;&quot; &amp; sSize &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set doPostProcess to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set doPostProcess2 to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set err1 to &quot;&quot;Apple Script&quot;&quot;&quot;, _
+			&quot;	set ffMeta to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set myConverter to &quot;&quot;&quot; &amp; fsMyFfmpeg &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; fsMyTempLock &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set myOption to &quot;&quot;&quot; &amp; sArguments &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set mySys to &quot;&quot;&quot; &amp; fsGetOS() &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set myURL to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set sGenre to &quot;&quot;&quot; &amp; fsThisDocGenre() &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set sImageURL to defaultImg&quot;, _
+			&quot;	set sTrack to &quot;&quot;&quot; &amp; fiMyCurrentAudioTrack(false) &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set sYear to &quot;&quot;&quot; &amp; year(now) &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set textFile to &quot;&quot;&quot; &amp; sF &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set sAlbum to &quot;&quot;&quot; &amp; fsThisDocTitle() &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set sArtist to &quot;&quot;&quot; &amp; fsThisDocAuthor() &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	set sTitle to &quot;&quot;&quot; &amp; sTitle &amp; string(2, chr(0)) &amp; &quot;&quot;&quot;&quot; &amp; _
+			&quot; -- Title of the selected text.&quot; &amp; _
+			&quot; Check the title if it is Asian or Complex.&quot;, _
+			&quot;	set myVoice to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	set sLyrics to &quot;&quot;&quot; &amp; sLyrics &amp; &quot;&quot;&quot;&quot;, _
+			&quot;-- ------------------------------------------------------&quot;, _
+			&quot;	set b to (do shell script &quot;&quot;touch &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+			&quot;	try&quot;, _
+			&quot;		set argv1 to (item 1 of arguments)&quot;, _
+			&quot;		set astring to fsChangeCase(getExtension(argv1),&quot;&quot;lower&quot;&quot;)&quot;, _
+			&quot;	on error&quot;, _
+			&quot;		set argv1 to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	end try&quot;, _
+			&quot;	try&quot;, _
+			&quot;		set argv2 to (item 2 of arguments)&quot;, _
+			&quot;	on error&quot;, _
+			&quot;		set argv2 to defaultImg&quot;, _
+			&quot;	end try&quot;, _
+			&quot;	try&quot;, _
+			&quot;		set argv3 to (item 3 of arguments)&quot;, _
+			&quot;	on error&quot;, _
+			&quot;		set argv3 to defaultSize&quot;, _
+			&quot;	end try&quot;, _
+			&quot;	if astring is &quot;&quot;aif&quot;&quot; or astring is &quot;&quot;aiff&quot;&quot; then&quot;, _
+			&quot;		set doPostProcess to &quot;&quot;tag&quot;&quot;&quot;, _
+			&quot;	else if astring is &quot;&quot;m4a&quot;&quot; Then&quot;, _
+			&quot;		set doPostProcess to &quot;&quot;tag&quot;&quot;&quot;, _
+			&quot;&quot;), _
+			CR)
 
 		if bGotFFmpeg Then
-			sB = sB &amp; &quot;	else if myConverter is not &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-			&quot;		-- add ffmpeg metadata commands&quot; &amp; CR &amp; _
-			&quot;		set ffmeta to &quot;&quot;&quot; &amp; sMeta &amp; CR &amp; _
-			&quot;		if astring is &quot;&quot;mp3&quot;&quot; then&quot; &amp; CR &amp; _
-			&quot;			set cout1 to argv1&quot; &amp; CR &amp; _
-			&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;			set cout2 to cout1 &amp; &quot;&quot;.mp3&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;			set err1 to cout2&quot; &amp; CR &amp; _
-			&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout2)&quot; &amp; CR &amp; _
-			&quot;			set doPostProcess2 to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of cout2) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of defaultImg) &amp; &quot;&quot; -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title=\&quot;&quot;Album cover\&quot;&quot; -metadata:s:v comment=\&quot;&quot;Cover (Front)\&quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot; &amp; CR &amp; _
-			&quot;		else if astring is &quot;&quot;ogg&quot;&quot; then&quot; &amp; CR &amp; _
-			&quot;			set cout1 to argv1&quot; &amp; CR &amp; _
-			&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot; &amp; CR &amp; _
-			&quot;		else if astring is &quot;&quot;wav&quot;&quot; then&quot; &amp; CR &amp; _
-			&quot;			set cout1 to argv1&quot; &amp; CR &amp; _
-			&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot; &amp; CR &amp; _
-			&quot; 			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot; &amp; CR &amp; _
-			&quot;		else if astring is &quot;&quot;webm&quot;&quot; then&quot; &amp; CR &amp; _
-			&quot;			set cout1 to argv1&quot; &amp; CR &amp; _
-			&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -f image2 -i &quot;&quot; &amp; (quoted form of POSIX path of argv2) &amp; &quot;&quot; -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot; &amp; CR &amp; _
-			&quot;		else if astring is &quot;&quot;mp4&quot;&quot; then&quot; &amp; CR &amp; _
-			&quot;			set cout1 to argv1&quot; &amp; CR &amp; _
-			&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;			set cout2 to cout1 &amp; &quot;&quot;.webm&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;			set err1 to cout2&quot; &amp; CR &amp; _
-			&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -f image2 -i &quot;&quot; &amp; (quoted form of POSIX path of argv2) &amp; &quot;&quot; -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot; &amp; (quoted form of POSIX path of cout2)&quot; &amp; CR &amp; _
-			&quot;			set doPostProcess2 to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of cout2) &amp; &quot;&quot; -acodec aac -ab 160k -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libx264 -preset slow -profile:v baseline -level 30 -maxrate 10000000 -bufsize 10000000 -f mp4 -threads 0 -strict experimental &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot; &amp; CR &amp; _
-			&quot;		else&quot; &amp; CR &amp; _
-			&quot;			set argv1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;		end if&quot; &amp; CR
-		Endif
-		sB = sB &amp; &quot;	else&quot; &amp; CR &amp; _
-		&quot;		set argv1 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;		set doPostProcess to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	end if&quot; &amp; CR &amp; _
-		&quot;	if myLang is &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;		set myVoice to &quot;&quot;System&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;		set myLang to &quot;&quot;Default Language&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;		set myVoiceCommand to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	else&quot; &amp; CR &amp; _
-		&quot;		set myVoice to fsGetthevoice(myLang)&quot; &amp; CR &amp; _
-		&quot;		set myVoiceCommand to &quot;&quot; --voice &apos;&quot;&quot; &amp; myVoice &amp; &quot;&quot;&apos;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	end if&quot; &amp; CR &amp; _
-		&quot;	try&quot; &amp; CR &amp; _
-		&quot;		if argv1 is &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;			set err1 to &quot;&quot;Say command&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;			if isInString(myOption, &quot;&quot;AirPlay&quot;&quot;) then&quot; &amp; CR &amp; _
-		&quot;				set err1 to &quot;&quot;AirPlay&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;				theMsg (&quot;&quot;AirPlay&quot;&quot;, myVoice, myLang, &quot;&quot;Purr&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;			end if&quot; &amp; CR &amp; _
-		&quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;		else&quot; &amp; CR &amp; _
-		&quot;			set err1 to &quot;&quot;Audio file&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; &quot;&quot; -o &quot;&quot; &amp; argv1 &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;			if doPostProcess is not &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;				if doPostProcess is &quot;&quot;tag&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;					set err1 to &quot;&quot;iTunes &quot;&quot; &amp; astring &amp; &quot;&quot; metadata &quot;&quot;&quot; &amp; CR &amp; _
-		&quot;					set b to setItunesMetaData(argv1, sAlbum, sArtist, sGenre, sImageURL, sTitle, sTrack, sYear, mySys &amp; &quot;&quot; &quot; &amp; _
+			sB = sB &amp; Join(Array(&quot;	else if myConverter is not &quot;&quot;&quot;&quot; then&quot;, _
+					&quot;		-- add ffmpeg metadata commands&quot;, _
+					&quot;		set ffmeta to &quot;&quot;&quot; &amp; sMeta, _
+					&quot;		if astring is &quot;&quot;mp3&quot;&quot; then&quot;, _
+					&quot;			set cout1 to argv1&quot;, _
+					&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
+					&quot;			set cout2 to cout1 &amp; &quot;&quot;.mp3&quot;&quot;&quot;, _
+					&quot;			set err1 to cout2&quot;, _
+					&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout2)&quot;, _
+					&quot;			set doPostProcess2 to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of cout2) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of defaultImg) &amp; &quot;&quot; -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title=\&quot;&quot;Album cover\&quot;&quot; -metadata:s:v comment=\&quot;&quot;Cover (Front)\&quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
+					&quot;		else if astring is &quot;&quot;ogg&quot;&quot; then&quot;, _
+					&quot;			set cout1 to argv1&quot;, _
+					&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
+					&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
+					&quot;		else if astring is &quot;&quot;wav&quot;&quot; then&quot;, _
+					&quot;			set cout1 to argv1&quot;, _
+					&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
+					&quot; 			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
+					&quot;		else if astring is &quot;&quot;webm&quot;&quot; then&quot;, _
+					&quot;			set cout1 to argv1&quot;, _
+					&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
+					&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -f image2 -i &quot;&quot; &amp; (quoted form of POSIX path of argv2) &amp; &quot;&quot; -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
+					&quot;		else if astring is &quot;&quot;mp4&quot;&quot; then&quot;, _
+					&quot;			set cout1 to argv1&quot;, _
+					&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
+					&quot;			set cout2 to cout1 &amp; &quot;&quot;.webm&quot;&quot;&quot;, _
+					&quot;			set err1 to cout2&quot;, _
+					&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -f image2 -i &quot;&quot; &amp; (quoted form of POSIX path of argv2) &amp; &quot;&quot; -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot; &amp; (quoted form of POSIX path of cout2)&quot;, _
+					&quot;			set doPostProcess2 to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of cout2) &amp; &quot;&quot; -acodec aac -ab 160k -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libx264 -preset slow -profile:v baseline -level 30 -maxrate 10000000 -bufsize 10000000 -f mp4 -threads 0 -strict experimental &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
+					&quot;		else&quot;, _
+					&quot;			set argv1 to &quot;&quot;&quot;&quot;&quot;, _
+					&quot;		end if&quot;, _
+					&quot;&quot;), _
+	 				CR)
+		end if
+		sB = sB &amp; Join(Array(&quot;	else&quot;, _
+				&quot;		set argv1 to &quot;&quot;&quot;&quot;&quot;, _
+				&quot;		set doPostProcess to &quot;&quot;&quot;&quot;&quot;, _
+				&quot;	end if&quot;, _
+				&quot;	if myLang is &quot;&quot;&quot;&quot; then&quot;, _
+				&quot;		set myVoice to &quot;&quot;System&quot;&quot;&quot;, _
+				&quot;		set myLang to &quot;&quot;Default Language&quot;&quot;&quot;, _
+				&quot;		set myVoiceCommand to &quot;&quot;&quot;&quot;&quot;, _
+				&quot;	else&quot;, _
+				&quot;		set myVoice to fsGetthevoice(myLang)&quot;, _
+				&quot;		set myVoiceCommand to &quot;&quot; --voice &apos;&quot;&quot; &amp; myVoice &amp; &quot;&quot;&apos;&quot;&quot;&quot;, _
+				&quot;	end if&quot;, _
+				&quot;	try&quot;, _
+				&quot;		if argv1 is &quot;&quot;&quot;&quot; then&quot;, _
+				&quot;			set err1 to &quot;&quot;Say command&quot;&quot;&quot;, _
+				&quot;			if isInString(myOption, &quot;&quot;AirPlay&quot;&quot;) then&quot;, _
+				&quot;				set err1 to &quot;&quot;AirPlay&quot;&quot;&quot;, _
+				&quot;				theMsg (&quot;&quot;AirPlay&quot;&quot;, myVoice, myLang, &quot;&quot;Purr&quot;&quot;)&quot;, _
+				&quot;			end if&quot;, _
+				&quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot;, _
+				&quot;		else&quot;, _
+				&quot;			set err1 to &quot;&quot;Audio file&quot;&quot;&quot;, _
+				&quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; &quot;&quot; -o &quot;&quot; &amp; argv1 &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot;, _
+				&quot;			if doPostProcess is not &quot;&quot;&quot;&quot; then&quot;, _
+				&quot;				if doPostProcess is &quot;&quot;tag&quot;&quot; then&quot;, _
+				&quot;					set err1 to &quot;&quot;iTunes &quot;&quot; &amp; astring &amp; &quot;&quot; metadata &quot;&quot;&quot;, _
+				&quot;					set b to setItunesMetaData(argv1, sAlbum, sArtist, sGenre, sImageURL, sTitle, sTrack, sYear, mySys &amp; &quot;&quot; &quot; &amp; _
 				fsLookUpTerm(&quot;s_speech-synthesis&quot;) &amp; _
 				&quot; – &quot;&quot; &amp; myVoice &amp; &quot;&quot; (&quot; &amp; _
 				fsGetSetting(&quot;ooname&quot;) &amp; _
 				&quot; – &quot; &amp; _
 				fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
-				&quot;)&quot;&quot;, sLyrics)&quot; &amp; _
-				CR
+				&quot;)&quot;&quot;, sLyrics)&quot;, _
+				&quot;&quot;), _
+ 				CR)
 		if bGotFFmpeg then
-			sB = sB &amp; &quot;				else&quot; &amp; CR &amp; _
-			&quot;					set err1 to &quot;&quot;ffmpeg &quot;&quot; &amp; astring &amp; &quot;&quot; encode&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;					set b to (do shell script doPostProcess)&quot; &amp; CR &amp; _
-			&quot;					if doPostProcess2 is not &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-			&quot;						set err1 to &quot;&quot;ffmpeg [2] &quot;&quot; &amp; astring &amp; &quot;&quot; encode&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;						set b to (do shell script doPostProcess2)&quot; &amp; CR &amp; _
-			&quot;						set c to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; cout2 &amp; &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _
-			&quot;					end if&quot; &amp; CR &amp; _
-			&quot;					set c to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; argv1 &amp; &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _
-			&quot;					set argv1 to cout1&quot; &amp; CR
-		Endif
-		sB = sB &amp; &quot;				end if&quot; &amp; CR &amp; _
-		&quot;			end if&quot; &amp; CR &amp; _
-		&quot;			if bPostplay is true then&quot; &amp; CR &amp; _
-		&quot;				set d to (do shell script &quot;&quot;open &quot;&quot; &amp; quoted form of (argv1))&quot; &amp; CR &amp; _
-		&quot;			else&quot; &amp; CR &amp; _
-		&quot;				theMsg (argv1, myVoice, myLang, &quot;&quot;Purr&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;			end if&quot; &amp; CR &amp; _
-		&quot;		end if&quot; &amp; CR &amp; _
-		&quot;	on error&quot; &amp; CR &amp; _
-		&quot;	--	set b to (do shell script &quot;&quot;rm -f &quot;&quot; &amp; argv1)&quot; &amp; CR &amp; _
-		&quot;		if argv1 is not &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;			theMsg (err1 &amp; &quot;&quot;: &quot; &amp; fsLookUpTerm(&quot;s_cancel&quot;) &amp; &quot;&quot;&quot;, myVoice, myLang, &quot;&quot;Sosumi&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;		end if&quot; &amp; CR &amp; _
-		&quot;		return doPostProcess2&quot; &amp; CR &amp; _
-		&quot;		set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;	end try&quot; &amp; CR &amp; _
-		&quot;	set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;end run&quot; &amp; CR &amp; _
-		&quot;-- ------------------------------------------------------&quot; &amp; CR &amp; _
-		&quot;on theMsg(sA, sVoz, myLang, sBeep)&quot; &amp; CR &amp; _
-		&quot;	try&quot; &amp; CR &amp; _
-		&quot;		display notification sA with title &quot;&quot;Read Text: &quot;&quot; &amp; sVoz &amp; &quot;&quot; (&quot;&quot; &amp; myLang &amp; &quot;&quot;)&quot;&quot; sound name sBeep&quot; &amp; CR &amp; _
-		&quot;	end try&quot; &amp; CR &amp; _
-		&quot;end theMsg&quot; &amp; CR &amp; _
-		&quot;on getExtension(sA)&quot; &amp; CR &amp; _
-		&quot;	if sA is &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;		set a3 to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	else&quot; &amp; CR &amp; _
-		&quot;		set a1 to theSplit(sA, &quot;&quot;.&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;		set s1 to the last item of a1&quot; &amp; CR &amp; _
-		&quot;		set a2 to theSplit(s1, &quot;&quot;&apos;&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;		set s2 to first item of a2&quot; &amp; CR &amp; _
-		&quot;		set a3 to theSplit(s2, &quot;&quot;\&quot;&quot;&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;		set s3 to first item of a3&quot; &amp; CR &amp; _
-		&quot;	end if&quot; &amp; CR &amp; _
-		&quot;	return a3 as Unicode text&quot; &amp; CR &amp; _
-		&quot;end getExtension&quot; &amp; CR &amp; _
-		&quot;on theSplit(theString, theDelimiter)&quot; &amp; CR &amp; _
-		&quot;	set oldDelimiters to AppleScript&apos;s text item delimiters&quot; &amp; CR &amp; _
-		&quot;	set AppleScript&apos;s text item delimiters to theDelimiter&quot; &amp; CR &amp; _
-		&quot;	set theArray to every text item of theString&quot; &amp; CR &amp; _
-		&quot;	set AppleScript&apos;s text item delimiters to oldDelimiters&quot; &amp; CR &amp; _
-		&quot;	return theArray&quot; &amp; CR &amp; _
-		&quot;end theSplit&quot; &amp; CR &amp; _
-		&quot;on extractVoice(str0)&quot; &amp; CR &amp; _
-		&quot;	set iIndex to offset of &quot;&quot;  &quot;&quot; in str0&quot; &amp; CR &amp; _
-		&quot;	return characters 1 thru (iIndex - 1) of str0 as text&quot; &amp; CR &amp; _
-		&quot;end extractVoice&quot; &amp; CR &amp; _
-		&quot;on isInString(str0, str1)&quot; &amp; CR &amp; _
-		&quot;	set retval to true&quot; &amp; CR &amp; _
-		&quot;	set iIndex to offset of str1 in str0&quot; &amp; CR &amp; _
-		&quot;	if iIndex is 0 then&quot; &amp; CR &amp; _
-		&quot;		set retval to false&quot; &amp; CR &amp; _
-		&quot;	end if&quot; &amp; CR &amp; _
-		&quot;	return retval&quot; &amp; CR &amp; _
-		&quot;end isInString&quot; &amp; CR &amp; _
-		&quot;on fsChangeCase ( s1 , s2 )&quot; &amp; CR &amp; _
-		&quot;	if s2 is &quot;&quot;lower&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;		set s3 to &quot;&quot;A-Z a-z&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	else&quot; &amp; CR &amp; _
-		&quot;		set s3 to &quot;&quot;a-z A-Z&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	end if&quot; &amp; CR &amp; _
-		&quot;	set s4 to (do shell script &quot;&quot;echo &quot;&quot; &amp; quoted form of ( s1 ) &amp; &quot;&quot; | tr &quot;&quot; &amp; s3 &amp; &quot;&quot; &quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;	return s4&quot; &amp; CR &amp; _
-		&quot;end fsChangeCase&quot; &amp; CR &amp; _
-		&quot;on testTheString(myArray, sLang, sDiv)&quot; &amp; CR &amp; _
-		&quot;	set retval to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	if sDiv is &quot;&quot; &quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;		set sLang2 to sLang&quot; &amp; CR &amp; _
-		&quot;	else&quot; &amp; CR &amp; _
-		&quot;		set iIndex to offset of sDiv in sLang&quot; &amp; CR &amp; _
-		&quot;		set sLang2 to characters 1 thru (iIndex) of sLang as text&quot; &amp; CR &amp; _
-		&quot;	end if&quot; &amp; CR &amp; _
-		&quot;	repeat with theItem in myArray&quot; &amp; CR &amp; _
-		&quot;		If (isInString(theItem, sLang2)) then&quot; &amp; CR &amp; _
-		&quot;			set retval to extractVoice(theItem)&quot; &amp; CR &amp; _
-		&quot;			exit repeat&quot; &amp; CR &amp; _
-		&quot;		end if&quot; &amp; CR &amp; _
-		&quot;	end repeat&quot; &amp; CR &amp; _
-		&quot;	return retval&quot; &amp; CR &amp; _
-		&quot;end testTheString&quot; &amp; CR &amp; _
-		&quot;on fsGetthevoice(sLang)&quot; &amp; CR &amp; _
-		&quot;	try&quot; &amp; CR &amp; _
-		&quot;		set str0 to (do shell script &quot;&quot;say --voice ?&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;		set myArray to my theSplit(str0, (ASCII character 13))&quot; &amp; CR &amp; _
-		&quot;		set retval to testTheString(myArray, sLang, &quot;&quot; &quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;		if retval is &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;			set retval to testTheString(myArray, sLang, &quot;&quot;_&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;		end if&quot; &amp; CR &amp; _
-		&quot;		if retval is &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;			set retval to testTheString(myArray, sLang, &quot;&quot;-&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;		end if&quot; &amp; CR &amp; _
-		&quot;		if retval is &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;			set retval to &quot;&quot;Alex&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;		end if&quot; &amp; CR &amp; _
-		&quot;	on error&quot; &amp; CR &amp; _
-		&quot;		set retval to &quot;&quot;Alex&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	end try&quot; &amp; CR &amp; _
-		&quot;	if retval is &quot;&quot;Agnes&quot;&quot; or retval is &quot;&quot;Albert&quot;&quot; or retval is &quot;&quot;&quot;&quot; then&quot; &amp; CR &amp; _
-		&quot;		set retval to &quot;&quot;Alex&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	end if&quot; &amp; CR &amp; _
-		&quot;	return retval&quot; &amp; CR &amp; _
-		&quot;end fsGetthevoice&quot; &amp; CR &amp; _
-		&quot;on setItunesMetaData(myURL, sAlbum, sArtist, sGenre, sImageURL, sTitle, sTrack, sYear, sComment, sLyrics)&quot; &amp; CR &amp; _
-		&quot;	set aFile to POSIX file myURL&quot; &amp; CR &amp; _
-		&quot;	try&quot; &amp; CR &amp; _
-		&quot;		set aImage to POSIX file sImageURL&quot; &amp; CR &amp; _
-		&quot;	end try&quot; &amp; CR &amp; _
-		&quot;	set currentAlbum to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set sTaggedURL to &quot;&quot;&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;	set n to 0&quot; &amp; CR &amp; _
-		&quot;	if length of sLyrics is 0 then&quot; &amp; CR &amp; _
-		&quot;		delay 0.400&quot; &amp; CR &amp; _
-		&quot;	else&quot; &amp; CR &amp; _
-		&quot;		delay 0.250&quot; &amp; CR &amp; _		
-		&quot;	end if&quot; &amp; CR &amp; _
-		&quot;	tell application &quot;&quot;iTunes&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;		set myTune to open (aFile)&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _
-		&quot;			set x to CheckiTunesOK()&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;		set str0 to (do shell script &quot;&quot;ls &quot;&quot; &amp; quoted form of sImageURL)&quot; &amp; CR &amp; _
-		&quot;		repeat while currentAlbum is &quot;&quot;&quot;&quot; and n is less than 10&quot; &amp; CR &amp; _
-		&quot;		delay 1&quot; &amp; CR &amp; _
-		&quot;			try&quot; &amp; CR &amp; _
-		&quot;				set the album of the current track to sAlbum&quot; &amp; CR &amp; _
-		&quot;				set currentAlbum to the album of the current track&quot; &amp; CR &amp; _
-		&quot;			end try&quot; &amp; CR &amp; _
-		&quot;			set n to 1 + n&quot; &amp; CR &amp; _
-		&quot;		end repeat&quot; &amp; CR &amp; _
-		&quot;		set theTrack to the current track&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _
-		&quot;			set the artist of theTrack to sArtist&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _
-		&quot;			set the genre of theTrack to sGenre&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _
-		&quot;			set the track number of theTrack to sTrack&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _
-		&quot;			set the year of theTrack to sYear&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _	
-		&quot;			set data of artwork 1 of theTrack to (read (file aImage) as picture)&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _
-		&quot;			set the name of theTrack to sTitle&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _
-		&quot;			set sTaggedURL to quoted form of POSIX path of (get location of theTrack)&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _
-		&quot;			set the comment of theTrack to sComment&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _
-		&quot;			set the lyrics of theTrack to sLyrics&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;		try&quot; &amp; CR &amp; _
-		&quot;			set myURL to quoted form of POSIX path of aFile&quot; &amp; CR &amp; _
-		&quot;			set str0 to (do shell script &quot;&quot;cp -f &quot;&quot; &amp; sTaggedURL &amp; &quot;&quot; &quot;&quot; &amp; myURL)&quot; &amp; CR &amp; _
-		&quot;		on error&quot; &amp; CR &amp; _
-		&quot;			set sTaggedURL to quoted form of myURL&quot; &amp; CR &amp; _
-		&quot;		end try&quot; &amp; CR &amp; _
-		&quot;	end tell&quot; &amp; CR &amp; _
-		&quot;	return sTaggedURL&quot; &amp; CR &amp; _
-		&quot;end setItunesMetaData&quot; &amp; CR &amp; _
-		&quot;on readUtf8File(sURL)&quot; &amp; CR &amp; _
-		&quot;	set x to read POSIX file sURL as «class utf8»&quot; &amp; CR &amp; _
-		&quot;	return x&quot; &amp; CR &amp; _
-		&quot;end readUtf8File&quot; &amp; CR &amp; _
-		&quot;on RemoveLastCharacter(s1)&quot; &amp; CR &amp; _
-		&quot;	set s4 to (do shell script &quot;&quot;echo &quot;&quot; &amp; quoted form of (s1) &amp; &quot;&quot; | sed &apos;s/.$//&apos;&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;	return s4&quot; &amp; CR &amp; _
-		&quot;end RemoveLastCharacter&quot; &amp; CR &amp; _
-		&quot;on CheckiTunesOK()&quot; &amp; CR &amp; _
-		&quot;	-- Pause up to 30 seconds or until iTunes is an active process&quot; &amp; CR &amp; _
- 		&quot;	set b4 to false&quot; &amp; CR &amp; _
-  		&quot;	set n to 0&quot; &amp; CR &amp; _
-		&quot;	try&quot; &amp; CR &amp; _
-		&quot;		repeat while b4 is false and n is less than 30&quot; &amp; CR &amp; _
-		&quot;			set s4 to (do shell script &quot;&quot;ps aux -c&quot;&quot;)&quot; &amp; CR &amp; _
-		&quot;			-- ignore iTunesHelper&quot; &amp; CR &amp; _
- 		&quot;			set b4 to isInString(s4, &quot;&quot;iTunes&quot;&quot; &amp; (ASCII character 13))&quot; &amp; CR &amp; _
-		&quot;			set n to 1 + n&quot; &amp; CR &amp; _
- 		&quot;			if b4 is false then&quot; &amp; CR &amp; _
-		&quot;				delay 1&quot; &amp; CR &amp; _
- 		&quot;			end if&quot; &amp; CR &amp; _
-		&quot;		end repeat&quot; &amp; CR &amp; _
-		&quot;	on error&quot; &amp; CR &amp; _
- 		&quot;		set b4 to false&quot; &amp; CR &amp; _
-		&quot;	end	try&quot; &amp; CR &amp; _
-		&quot;	return b4&quot; &amp; CR &amp; _
-		&quot;end CheckiTunesOK&quot; &amp; CR &amp; _
-		&quot;&quot;
+			sB = sB &amp; Join(_
+					Array(_
+					&quot;				else&quot;, _
+					&quot;					set err1 to &quot;&quot;ffmpeg &quot;&quot; &amp; astring &amp; &quot;&quot; encode&quot;&quot;&quot;, _
+					&quot;					set b to (do shell script doPostProcess)&quot;, _
+					&quot;					if doPostProcess2 is not &quot;&quot;&quot;&quot; then&quot;, _
+					&quot;						set err1 to &quot;&quot;ffmpeg [2] &quot;&quot; &amp; astring &amp; &quot;&quot; encode&quot;&quot;&quot;, _
+					&quot;						set b to (do shell script doPostProcess2)&quot;, _
+					&quot;						set c to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; cout2 &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+					&quot;					end if&quot;, _
+					&quot;					set c to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; argv1 &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+					&quot;					set argv1 to cout1&quot;, _
+					&quot;&quot;), _
+		 			CR)
+		end if
+		sB = sB &amp; Join(_
+				Array(_
+				&quot;				end if&quot;, _
+				&quot;			end if&quot;, _
+				&quot;			if bPostplay is true then&quot;, _
+				&quot;				set d to (do shell script &quot;&quot;open &quot;&quot; &amp; quoted form of (argv1))&quot;, _
+				&quot;			else&quot;, _
+				&quot;				theMsg (argv1, myVoice, myLang, &quot;&quot;Purr&quot;&quot;)&quot;, _
+				&quot;			end if&quot;, _
+				&quot;		end if&quot;, _
+				&quot;	on error&quot;, _
+				&quot;	--	set b to (do shell script &quot;&quot;rm -f &quot;&quot; &amp; argv1)&quot;, _
+				&quot;		if argv1 is not &quot;&quot;&quot;&quot; then&quot;, _
+				&quot;			theMsg (err1 &amp; &quot;&quot;: &quot; &amp; fsLookUpTerm(&quot;s_cancel&quot;) &amp; &quot;&quot;&quot;, myVoice, myLang, &quot;&quot;Sosumi&quot;&quot;)&quot;, _
+				&quot;		end if&quot;, _
+				&quot;		return doPostProcess2&quot;, _
+				&quot;		set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+				&quot;	end try&quot;, _
+				&quot;	set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+				&quot;end run&quot;, _
+				&quot;-- ------------------------------------------------------&quot;, _
+				&quot;on theMsg(sA, sVoz, myLang, sBeep)&quot;, _
+				&quot;	try&quot;, _
+				&quot;		display notification sA with title &quot;&quot;Read Text: &quot;&quot; &amp; sVoz &amp; &quot;&quot; (&quot;&quot; &amp; myLang &amp; &quot;&quot;)&quot;&quot; sound name sBeep&quot;, _
+				&quot;	end try&quot;, _
+				&quot;end theMsg&quot;, _
+				&quot;on getExtension(sA)&quot;, _
+				&quot;	if sA is &quot;&quot;&quot;&quot; then&quot;, _
+				&quot;		set a3 to &quot;&quot;&quot;&quot;&quot;, _
+				&quot;	else&quot;, _
+				&quot;		set a1 to theSplit(sA, &quot;&quot;.&quot;&quot;)&quot;, _
+				&quot;		set s1 to the last item of a1&quot;, _
+				&quot;		set a2 to theSplit(s1, &quot;&quot;&apos;&quot;&quot;)&quot;, _
+				&quot;		set s2 to first item of a2&quot;, _
+				&quot;		set a3 to theSplit(s2, &quot;&quot;\&quot;&quot;&quot;&quot;)&quot;, _
+				&quot;		set s3 to first item of a3&quot;, _
+				&quot;	end if&quot;, _
+				&quot;	return a3 as Unicode text&quot;, _
+				&quot;end getExtension&quot;, _
+				&quot;on theSplit(theString, theDelimiter)&quot;, _
+				&quot;	set oldDelimiters to AppleScript&apos;s text item delimiters&quot;, _
+				&quot;	set AppleScript&apos;s text item delimiters to theDelimiter&quot;, _
+				&quot;	set theArray to every text item of theString&quot;, _
+				&quot;	set AppleScript&apos;s text item delimiters to oldDelimiters&quot;, _
+				&quot;	return theArray&quot;, _
+				&quot;end theSplit&quot;, _
+				&quot;on extractVoice(str0)&quot;, _
+				&quot;	set iIndex to offset of &quot;&quot;  &quot;&quot; in str0&quot;, _
+				&quot;	return characters 1 thru (iIndex - 1) of str0 as text&quot;, _
+				&quot;end extractVoice&quot;, _
+				&quot;on isInString(str0, str1)&quot;, _
+				&quot;	set retval to true&quot;, _
+				&quot;	set iIndex to offset of str1 in str0&quot;, _
+				&quot;	if iIndex is 0 then&quot;, _
+				&quot;		set retval to false&quot;, _
+				&quot;	end if&quot;, _
+				&quot;	return retval&quot;, _
+				&quot;end isInString&quot;, _
+				&quot;on fsChangeCase ( s1 , s2 )&quot;, _
+				&quot;	if s2 is &quot;&quot;lower&quot;&quot; then&quot;, _
+				&quot;		set s3 to &quot;&quot;A-Z a-z&quot;&quot;&quot;, _
+				&quot;	else&quot;, _
+				&quot;		set s3 to &quot;&quot;a-z A-Z&quot;&quot;&quot;, _
+				&quot;	end if&quot;, _
+				&quot;	set s4 to (do shell script &quot;&quot;echo &quot;&quot; &amp; quoted form of ( s1 ) &amp; &quot;&quot; | tr &quot;&quot; &amp; s3 &amp; &quot;&quot; &quot;&quot;)&quot;, _
+				&quot;	return s4&quot;, _
+				&quot;end fsChangeCase&quot;, _
+				&quot;on testTheString(myArray, sLang, sDiv)&quot;, _
+				&quot;	set retval to &quot;&quot;&quot;&quot;&quot;, _
+				&quot;	if sDiv is &quot;&quot; &quot;&quot; then&quot;, _
+				&quot;		set sLang2 to sLang&quot;, _
+				&quot;	else&quot;, _
+				&quot;		set iIndex to offset of sDiv in sLang&quot;, _
+				&quot;		set sLang2 to characters 1 thru (iIndex) of sLang as text&quot;, _
+				&quot;	end if&quot;, _
+				&quot;	repeat with theItem in myArray&quot;, _
+				&quot;		If (isInString(theItem, sLang2)) then&quot;, _
+				&quot;			set retval to extractVoice(theItem)&quot;, _
+				&quot;			exit repeat&quot;, _
+				&quot;		end if&quot;, _
+				&quot;	end repeat&quot;, _
+				&quot;	return retval&quot;, _
+				&quot;end testTheString&quot;, _
+				&quot;on fsGetthevoice(sLang)&quot;, _
+				&quot;	try&quot;, _
+				&quot;		set str0 to (do shell script &quot;&quot;say --voice ?&quot;&quot;)&quot;, _
+				&quot;		set myArray to my theSplit(str0, (ASCII character 13))&quot;, _
+				&quot;		set retval to testTheString(myArray, sLang, &quot;&quot; &quot;&quot;)&quot;, _
+				&quot;		if retval is &quot;&quot;&quot;&quot; then&quot;, _
+				&quot;			set retval to testTheString(myArray, sLang, &quot;&quot;_&quot;&quot;)&quot;, _
+				&quot;		end if&quot;, _
+				&quot;		if retval is &quot;&quot;&quot;&quot; then&quot;, _
+				&quot;			set retval to testTheString(myArray, sLang, &quot;&quot;-&quot;&quot;)&quot;, _
+				&quot;		end if&quot;, _
+				&quot;		if retval is &quot;&quot;&quot;&quot; then&quot;, _
+				&quot;			set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
+				&quot;		end if&quot;, _
+				&quot;	on error&quot;, _
+				&quot;		set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
+				&quot;	end try&quot;, _
+				&quot;	if retval is &quot;&quot;Agnes&quot;&quot; or retval is &quot;&quot;Albert&quot;&quot; or retval is &quot;&quot;&quot;&quot; then&quot;, _
+				&quot;		set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
+				&quot;	end if&quot;, _
+				&quot;	return retval&quot;, _
+				&quot;end fsGetthevoice&quot;, _
+				&quot;on setItunesMetaData(myURL, sAlbum, sArtist, sGenre, sImageURL, sTitle, sTrack, sYear, sComment, sLyrics)&quot;, _
+				&quot;	set aFile to POSIX file myURL&quot;, _
+				&quot;	try&quot;, _
+				&quot;		set aImage to POSIX file sImageURL&quot;, _
+				&quot;	end try&quot;, _
+				&quot;	set currentAlbum to &quot;&quot;&quot;&quot;&quot;, _
+				&quot;	set sTaggedURL to &quot;&quot;&quot;&quot;&quot;, _
+				&quot;	set n to 0&quot;, _
+				&quot;	if length of sLyrics is 0 then&quot;, _
+				&quot;		delay 0.400&quot;, _
+				&quot;	else&quot;, _
+				&quot;		delay 0.250&quot;, _		
+				&quot;	end if&quot;, _
+				&quot;	tell application &quot;&quot;iTunes&quot;&quot;&quot;, _
+				&quot;		set myTune to open (aFile)&quot;, _
+				&quot;		try&quot;, _
+				&quot;			set x to CheckiTunesOK()&quot;, _
+				&quot;		end try&quot;, _
+				&quot;		set str0 to (do shell script &quot;&quot;ls &quot;&quot; &amp; quoted form of sImageURL)&quot;, _
+				&quot;		repeat while currentAlbum is &quot;&quot;&quot;&quot; and n is less than 10&quot;, _
+				&quot;		delay 1&quot;, _
+				&quot;			try&quot;, _
+				&quot;				set the album of the current track to sAlbum&quot;, _
+				&quot;				set currentAlbum to the album of the current track&quot;, _
+				&quot;			end try&quot;, _
+				&quot;			set n to 1 + n&quot;, _
+				&quot;		end repeat&quot;, _
+				&quot;		set theTrack to the current track&quot;, _
+				&quot;		try&quot;, _
+				&quot;			set the artist of theTrack to sArtist&quot;, _
+				&quot;		end try&quot;, _
+				&quot;		try&quot;, _
+				&quot;			set the genre of theTrack to sGenre&quot;, _
+				&quot;		end try&quot;, _
+				&quot;		try&quot;, _
+				&quot;			set the track number of theTrack to sTrack&quot;, _
+				&quot;		end try&quot;, _
+				&quot;		try&quot;, _
+				&quot;			set the year of theTrack to sYear&quot;, _
+				&quot;		end try&quot;, _
+				&quot;		try&quot;, _	
+				&quot;			set data of artwork 1 of theTrack to (read (file aImage) as picture)&quot;, _
+				&quot;		end try&quot;, _
+				&quot;		try&quot;, _
+				&quot;			set the name of theTrack to sTitle&quot;, _
+				&quot;		end try&quot;, _
+				&quot;		try&quot;, _
+				&quot;			set sTaggedURL to quoted form of POSIX path of (get location of theTrack)&quot;, _
+				&quot;		end try&quot;, _
+				&quot;		try&quot;, _
+				&quot;			set the comment of theTrack to sComment&quot;, _
+				&quot;		end try&quot;, _
+				&quot;		try&quot;, _
+				&quot;			set the lyrics of theTrack to sLyrics&quot;, _
+				&quot;		end try&quot;, _
+				&quot;		try&quot;, _
+				&quot;			set myURL to quoted form of POSIX path of aFile&quot;, _
+				&quot;			set str0 to (do shell script &quot;&quot;cp -f &quot;&quot; &amp; sTaggedURL &amp; &quot;&quot; &quot;&quot; &amp; myURL)&quot;, _
+				&quot;		on error&quot;, _
+				&quot;			set sTaggedURL to quoted form of myURL&quot;, _
+				&quot;		end try&quot;, _
+				&quot;	end tell&quot;, _
+				&quot;	return sTaggedURL&quot;, _
+				&quot;end setItunesMetaData&quot;, _
+				&quot;on readUtf8File(sURL)&quot;, _
+				&quot;	set x to read POSIX file sURL as «class utf8»&quot;, _
+				&quot;	return x&quot;, _
+				&quot;end readUtf8File&quot;, _
+				&quot;on RemoveLastCharacter(s1)&quot;, _
+				&quot;	set s4 to (do shell script &quot;&quot;echo &quot;&quot; &amp; quoted form of (s1) &amp; &quot;&quot; | sed &apos;s/.$//&apos;&quot;&quot;)&quot;, _
+				&quot;	return s4&quot;, _
+				&quot;end RemoveLastCharacter&quot;, _
+				&quot;on CheckiTunesOK()&quot;, _
+				&quot;	-- Pause up to 30 seconds or until iTunes is an active process&quot;, _
+		 		&quot;	set b4 to false&quot;, _
+		  		&quot;	set n to 0&quot;, _
+				&quot;	try&quot;, _
+				&quot;		repeat while b4 is false and n is less than 30&quot;, _
+				&quot;			set s4 to (do shell script &quot;&quot;ps aux -c&quot;&quot;)&quot;, _
+				&quot;			-- ignore iTunesHelper&quot;, _
+		 		&quot;			set b4 to isInString(s4, &quot;&quot;iTunes&quot;&quot; &amp; (ASCII character 13))&quot;, _
+				&quot;			set n to 1 + n&quot;, _
+		 		&quot;			if b4 is false then&quot;, _
+				&quot;				delay 1&quot;, _
+		 		&quot;			end if&quot;, _
+				&quot;		end repeat&quot;, _
+				&quot;	on error&quot;, _
+		 		&quot;		set b4 to false&quot;, _
+				&quot;	end	try&quot;, _
+				&quot;	return b4&quot;, _
+				&quot;end CheckiTunesOK&quot;, _
+				&quot;&quot;), _
+ 				CR)
 	sFile=fsTemporaryTtsAppleScript
 	CreateFile(sFile,sB,&quot;utf-8&quot;)
 	fswriteOSXSpeechScript = sB
+	print sFile
 End Function
+
+sub x
+fswriteOSXSpeechScript(&quot;&quot;, &quot;en-CA&quot;, &quot;&quot;)
+
+end sub
 
 
 Function fsTemporaryTtsAppleScript()
@@ -5007,11 +4950,11 @@ Function CreateFile(sFilePath, sWriteString, Optional sEncoding)
 		Case Else
 			sEncoding = &quot;utf-8&quot; &apos; Posix standard
 		End Select
-	Endif
+	end if
 	on Error goto CreateFileError
 	if fileExists(sFilePath) Then
 		kill sFilePath
-	Endif
+	end if
 	oOutputAccess = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
 	oOutputStream = CreateUnoService(&quot;com.sun.star.io.TextOutputStream&quot;)
 	vOutputData  = oOutputAccess.openFileWrite( sFilePath )
@@ -5040,7 +4983,7 @@ Function fbIsAnURL(sA)
 		fbIsAnURL = true
 	Else
 		fbIsAnURL = false
-	Endif
+	end if
 End Function
 
 
@@ -5117,7 +5060,7 @@ sub WarnNoSpeech()
 				webHelp()
 			End Select
 		End Select
-	Endif
+	end if
 	exit sub
 	WarnNoSpeechErr:
 	webHelp()
@@ -5134,12 +5077,12 @@ sub CheckUnixSpeech
 					If Not(fileexists(&quot;/usr/bin/pico2wave&quot;)) Then
 						If Not(fileexists(&quot;/usr/bin/spd-say&quot;)) Then
 							WarnNoSpeech
-						Endif
-					Endif
-				Endif
-			Endif
-		Endif
-	Endif
+						end if
+					end if
+				end if
+			end if
+		end if
+	end if
 end sub
 
 
@@ -5158,26 +5101,8 @@ Function fsMyFfmpeg()
 &apos;&apos; Windows.  Read Text can use it to convert speech recordings
 &apos;&apos; to different formats.
 &apos;&apos;
-&apos;&apos;
-&apos;&apos; Miro Video computer is a graphical interface that makes it easy to use
-&apos;&apos; ffmpeg on Windows and OSX computers.
-&apos;&apos;
-&apos;&apos; Miro Video Converter can convert mp3, ogg, webm and other media using
-&apos;&apos; `ffmpeg`.  Once installed, read text can use it to make audio and video
-&apos;&apos; media files for cross-platform web browsers like chromium, chrome, and
-&apos;&apos; firefox.
-&apos;&apos;
-&apos;&apos;  * [ffmpeg](https://www.ffmpeg.org)
-&apos;&apos;  * [Miro formats](http://develop.participatoryculture.org/index.php/ConversionMatrix)
-&apos;&apos;  * [Miro video converter](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/)
-&apos;&apos;  * [Participatory culture foundation](http://pculture.org/)
-&apos;&apos;
-&apos;&apos;  The most direct download for Miro video converter is at osuosl.org.
-&apos;&apos;  Download
-&apos;&apos;  [`MiroConvertorSetup.exe`](http://ftp.osuosl.org/pub/pculture.org/mirovideoconverter/).
-&apos;&apos;
 &apos;&apos; [AVconv](https://libav.org/avconv.html) is a *fork* of FFmpeg, and shares many
-&apos;&apos;  of the same commands and capabilities.  On [Ubuntu Linux](http://ubuntu.com),
+&apos;&apos;  of the same commands and capabilities.  On [Ubuntu Linux](https://ubuntu.com),
 &apos;&apos; the `avconv` project is included in the repository instead of `ffmpeg`. 
 &apos;&apos; Read text can use either.
 &apos;&apos;
@@ -5194,21 +5119,9 @@ Function fsMyFfmpeg()
 	sProgramPaths = &quot;&quot;
 	For i = Lbound(aC) to Ubound(aC)
 		sProgramPaths = sProgramPaths &amp; &quot;file:///usr/bin/&quot; &amp; aC(i) &amp; cR &amp; _
-		&quot;file:///Applications/Miro.app/Contents/Helpers/&quot; &amp; aC(i) &amp; cR &amp; _
-		&quot;file:///Applications/Miro%20Video%20Converter.app/Contents/Helpers/&quot; &amp; aC(i) &amp; cR &amp; _
 		&quot;file:///Applications/Shotcut.app/Contents/MacOS/&quot; &amp; aC(i) &amp; cR &amp; _
 		converttourl(Environ(&quot;HOMEDRIVE&quot;)) &amp; &quot;/opt/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
 		converttourl(Environ(&quot;USERPROFILE&quot;)) &amp; &quot;/opt/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
-		converttourl(sA) &amp; &quot;Participatory%20Culture%20Foundation/Miro/ffmpeg/&quot; &amp; _
-				aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
-		converttourl(sB) &amp; &quot;Participatory%20Culture%20Foundation/Miro/ffmpeg/&quot; &amp; _
-				 aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
-		converttourl(sA) &amp; _
-				&quot;Participatory%20Culture%20Foundation/Miro%20Video%20Converter/ffmpeg/&quot; &amp; _
-				aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
-		converttourl(sB) &amp; _
-				&quot;Participatory%20Culture%20Foundation/Miro%20Video%20Converter/ffmpeg/&quot; &amp; _
-				aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
 		&quot;file:///usr/local/bin/&quot; &amp; aC(i) &amp; cR &amp; _
 		&quot;file:///opt/&quot; &amp; aC(i) &amp; cR &amp; _
 		&quot;file:///opt/local/&quot; &amp; aC(i) &amp; cR &amp; _
@@ -5221,7 +5134,7 @@ Function fsMyFfmpeg()
 		if fileExists(aD(i)) Then
 			sE = (aD(i))
 			Exit For
-		Endif
+		end if
 	next
 	fsMyFfmpeg = convertfromurl(sE)
 End Function
@@ -5267,7 +5180,7 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 &apos;&apos;
 &apos;&apos;     sudo apt-get install speech-dispatcher
 &apos;&apos;
-&apos;&apos; [fvTts1]: http://cvs.freebsoft.org/doc/speechd/speech-dispatcher.html
+&apos;&apos; [fvTts1]: https://www.unix.com/man-page/all/1/speech-dispatcher/
 &apos;&apos;
 	Dim a1
 	Dim i# : i = 0
@@ -5278,7 +5191,7 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 
 	if isMissing(bAll) Then
 		bAll = false
-	Endif
+	end if
 	On Error Resume Next
 	oFrame=ThisComponent.getCurrentController().getFrame() 
 	oBar=oFrame.createStatusIndicator() 
@@ -5288,18 +5201,18 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 	if fsGetOS()=&quot;WINDOWS&quot; Then
 		if fileExists(fsMyTempLock) Then
 			kill fsMyTempLock
-		Endif
+		end if
 	Elseif fsGetOS()=&quot;OSX&quot; or fsGetOS = &quot;MAC&quot; Then
 		if fileExists(&quot;/usr/bin/say&quot;) Then
 			If Not (fbCreatingOSXMediaFile) and Not (fbSendingAirPlay) Then
 				if fileexists(&quot;/usr/bin/killall&quot;) or fileexists(&quot;/usr/local/bin/killall&quot;) then
 					errorCode=Shell(&quot;killall&quot;,0,&quot;say&quot;,true)
-				endif
+				end if
 				if fileExists(fsMyTempLock) Then
 					kill fsMyTempLock
-				Endif
-			Endif
-		Endif
+				end if
+			end if
+		end if
 	Elseif fsGetOS()=&quot;UNIX&quot; and (_
 			fileexists(_
 			&quot;/usr/bin/killall&quot;) or _
@@ -5311,8 +5224,8 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 				errorCode=Shell(&quot;killall&quot;,0,&quot;speech-dispatcher&quot;,true)
 			Else
 				errorCode=Shell(&quot;spd-say&quot;,0,&quot;--cancel&quot;,true)
-			Endif
-		Endif
+			end if
+		end if
 
 		If Not (fbLetButtonInterruptPosixPlayer) OR fbUsingPosixTalkProgram Then
 			&apos; Stop the sound.
@@ -5324,19 +5237,19 @@ sub resetSpeechDispatcher(optional bAll as boolean)
 				If fileExists(&quot;/usr/bin/&quot; &amp; a1(i)) OR _
 						fileExists(&quot;/usr/local/bin/&quot; &amp; a1(i)) Then
 					errorCode=Shell(&quot;killall&quot;,0,a1(i),true)
-				Endif			
+				end if			
 			Next
-		Endif
+		end if
 		if fileExists(fsMyTempLock) Then
 			kill fsMyTempLock
-		Endif
+		end if
 		if fileExists(fsFullPathOf(fsTemporaryTextDoc) &amp; &quot;.sable&quot;) then
 			kill fsFullPathOf(fsTemporaryTextDoc) &amp; &quot;.sable&quot;
-		endif
-	Endif
+		end if
+	end if
 	if fileExists(fsFullPathOf(fsTemporaryTextDoc)) then
 		kill fsFullPathOf(fsTemporaryTextDoc)
-	endif
+	end if
 	On Error Resume Next
 	oBar.End()
 	Exit Sub
@@ -5357,7 +5270,7 @@ Function fbLetButtonInterruptPosixPlayer
 			&quot;--visible=true,--visible=&apos;true&apos;,--visible=&quot;&quot;true&quot;&quot;&quot;) or _
 			not (fbCreatingMediaFile(&quot;--visible=&quot;)) Then
 		b1 = false
-	Endif
+	end if
 	fbLetButtonInterruptPosixPlayer = b1
 End Function
 
@@ -5387,7 +5300,7 @@ Function fbCreatingOSXMediaFile
 		sA = &quot;.mp3,.mp4,.ogg,.wav,.webm,&quot;
 	Else
 		sA = &quot;&quot;
-	Endif
+	end if
 	fbCreatingOSXMediaFile = fbCreatingMediaFile(sA &amp; &quot;.aiff,.aif,.m4a&quot;)
 End Function
 
@@ -5408,17 +5321,17 @@ Function fbCreatingMediaFile(optional byval sA, optional byVal sB)
 	if ismissing(sA) Then
 		sA = &quot;.3gp,.aac,.aif,.aiff,.au,.avi,.flac,.m4a,.m4v,.mov,.mkv,.mp2,&quot; &amp; _
 				&quot;.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.wav,.webm,.wma,.wmv&quot;
-	Endif
+	end if
 	bTattle = false
 	fbCreatingMediaFile = false
 	sFile=fsFullPathOf(fsExtensionSettingsIni)
 	tts_config_parseFile(sFile, config(), errorCode)
 	if isMissing (sB) then
 		sB = lcase(config(5))
-	endif
+	end if
 	if bTattle then
 		msgbox sB &amp; chr(10) &amp; sA
-	endif
+	end if
 	if not(config(fiExternalOption)) then
 	&apos; If the external option button in the main dialogue is not selected, then return
 	&apos;     fbCreatingMediaFile = false
@@ -5432,9 +5345,9 @@ Function fbCreatingMediaFile(optional byval sA, optional byVal sB)
 			Elseif instr(sB, aA(n)) &gt; 0 Then
 				fbCreatingMediaFile = true
 				Exit For
-			Endif
+			end if
 		next
-	Endif
+	end if
 End Function
 
 
@@ -5448,7 +5361,7 @@ Function fbGoingOnline()
 	tts_config_parseFile(sFile, config(), errorCode)
 	if config(fiHtmlOption) then
 		fbGoingOnline = true
-	Endif
+	end if
 End Function
 
 
@@ -5460,7 +5373,7 @@ Function fsThisDocAuthor
 	s1 = ThisComponent.DocumentProperties.Author
 	if Len(trim(s1)) = 0 Then
 		s1 = fsGetThisUsers(&quot;fullname&quot;)
-	Endif
+	end if
 	if Len(trim(s1)) = 0 Then
 	&apos; Fallback - system user name
 		select case fsGetOS()
@@ -5471,12 +5384,12 @@ Function fsThisDocAuthor
 		case else  &apos; UNIX
 			s1 = Environ(&quot;USER&quot;)
 		end select
-	Endif
+	end if
 	&apos; Final fallback - extension name and version.
 	if Len(trim(s1)) = 0 Then
 		s1 = fsLookUpTerm( &quot;s_read-text&quot;) &amp; &quot; &quot; &amp; _
 				fsExtensionVersion()
-	Endif
+	end if
 	fsThisDocAuthor = fsSmarten(fsQuickTitle(12, 60, s1))
 	Exit Function
 	fsThisDocAuthorErr:
@@ -5517,10 +5430,10 @@ function fsGetThisUsers(optional cType as string)
 
 	If Not GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
-	Endif
+	end if
 	if ismissing(cType) then
 		cType = &quot;fn&quot;
-	endif
+	end if
 	oNode = foGetOOoSetupNode(sNodePath$)
 	snval = oNode.getByName(&quot;sn&quot;)
 	gnval = oNode.getByName(&quot;givenname&quot;)
@@ -5604,18 +5517,19 @@ Function fsThisSoundLyrics
 	fsThisSoundLyrics = &quot;&quot;
 End Function
 
+
 Function fsThisDocTitle
 	Dim sA, sB, sC As String
 
 	on error goto fsThisDocTitleErr
 	If Not GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
-	Endif
+	end if
 	sC = ThisComponent.DocumentProperties.Title
 	if Len(sC) = 0 Then
 		sA = ThisComponent.getURL()
 		sC = GetFileNameWithoutExtension(FileNameoutofPath(sA))
-	Endif
+	end if
 	fsThisDocTitle = fsSuperTrim(sC)
 	Exit Function
 	fsThisDocTitleErr:
@@ -5628,7 +5542,7 @@ End Function
 function fsViewAndEditEscapedText(optional byval sA)
 	if ismissing(sA) then
 		sA = fsThisDocTitle
-	endif
+	end if
 	fsViewAndEditEscapedText = inputbox(sA, _
 			&quot;Test&quot;, _
 			fsEscapeStr(fsThisDocTitle, true))
@@ -5651,13 +5565,13 @@ Function fsThisDocGenre
 			&apos; Use language and region for Traditional Chinese (zh-TW)
 			&apos; and Simplified Chinese (zh-CN)
 			sB = fsLookUpTerm(fsSelectionLanguage())
-		Endif
-	Endif
+		end if
+	end if
 	if Len(sB) = 0 Then
 		fsThisDocGenre = sA
 	Else
 		fsThisDocGenre = sA &amp; &quot; – &quot; &amp; sB &apos; &amp;emdash;
-	Endif
+	end if
 	Exit Function
 	fsThisDocGenreErr:
 	fsThisDocGenre = &quot;Speech&quot;
@@ -5674,7 +5588,7 @@ function fsSmarten(byval a, optional sCheckCode)
 	
 	if ismissing(sCheckCode) then
 		sCheckCode = fsGetOS()
-	endif
+	end if
 	CR = chr$(10)
 	b = chr$(13) &amp; &quot;,-,*,_,–,—,(,),[,], ,&quot; &amp; CR &amp; &quot;,&quot; &amp; chr$(9)
 	aB = split (b, &quot;,&quot;)
@@ -5733,14 +5647,14 @@ Function fsQuickTitle(optional iWords, optional iMaxLength, optional sText)
 	
 	if ismissing(iWords) Then
 		iWords = 6
-	Endif
+	end if
 	if ismissing(iMaxLength) Then
 	iMaxLength = 30
-	Endif
+	end if
 	if ismissing(sText) Then
 		a4 = split(fsGetTextSelection(true, false), chr(10))
 		sText = a4(lbound(a4))
-	Endif
+	end if
 	on error goto fsQuickTitleErr
 	If fsComplexAsiaOrWest(sText) = &quot;ASIA&quot; then	
 		&apos; Use the greater of word count or string length.
@@ -5754,12 +5668,12 @@ Function fsQuickTitle(optional iWords, optional iMaxLength, optional sText)
 			n = iMaxLength
 		else
 			n = iWords
-		endif
+		end if
 		if len(s3) &gt; n then
 			fsQuickTitle = left(s3, n)
 		else
 			fsQuickTitle = s3
-		endif
+		end if
 	Else
 		&apos; We avoid splitting in the middle of a word.
 		s1 = sText
@@ -5776,7 +5690,7 @@ Function fsQuickTitle(optional iWords, optional iMaxLength, optional sText)
 				if Len(a3(n)) &gt; 1 and not(fbMdCode(a3(n))) Then
 					s1 = a3(n)
 					Exit For
-				Endif
+				end if
 			next
 			s2 = &quot;&quot;
 			a1 = split(s1, &quot; &quot;)
@@ -5788,17 +5702,17 @@ Function fsQuickTitle(optional iWords, optional iMaxLength, optional sText)
 				s3 = s3 &amp; a2(n) &amp; &quot; &quot;
 					if Len(s3) &gt; iMaxLength Then
 						Exit For
-					Endif
+					end if
 					s2 = s3
 			next
 			s2 = fsSuperTrim(s2)
 			s2 = fsReplaceText(s2, chr$(13),&quot;&quot;)
 			s2 = fsReplaceText(s2, chr$(10), &quot; &quot;)
 			s2 = fsReplaceText(s2, chr$(9), &quot;&quot;)
-		Endif
+		end if
 
 		fsQuickTitle = trim(s2)
-	Endif
+	end if
 	Exit Function
 	fsQuickTitleErr:
 		fsQuickTitle = &quot;&quot;
@@ -5820,7 +5734,7 @@ Function fbMdCode(byval sA)
 		if string(n, a1(o)) = sA Then
 			fbMdCode = true
 			Exit For
-		Endif
+		end if
 	next
 End Function
 
@@ -5839,7 +5753,7 @@ Function fsSlidePlainText(optional byval i)
 			&quot;com.sun.star.presentation.PresentationDocument&quot;) Then
 		if ismissing(i) Then
 			i = ThisComponent.getCurrentController.getCurrentPage().Number() - 1
-		Endif
+		end if
 		oDrawPages=oDoc.getDrawPages()
 		oDrawPage=oDrawPages.getByIndex(i)
 		nNumShapes=oDrawPage.getCount()
@@ -5853,8 +5767,8 @@ Function fsSlidePlainText(optional byval i)
 				fsSlidePlainTextErr1:
 				if Len(sA) &lt;&gt; 0 Then
 					sB = sB &amp; sA &amp; chr$(10)
-				Endif
-			Endif
+				end if
+			end if
 		next
 	end if
 	fsSlidePlainText = sB
@@ -5880,7 +5794,7 @@ Function fsCleanMdCode(byval sA)
 			s1 = s1 &amp; CR
 		Else
 			s1 = s1 &amp; a1(n) &amp; CR
-		Endif
+		end if
 	next
 	fsCleanMdCode = s1
 End Function
@@ -5898,10 +5812,10 @@ Function fbIsAPowerPointToken(sA)
 			if instr(sA,&quot; &quot;) = 0 Then
 				if instr(sA,&quot;&lt;&quot;) = 1 Then
 					fbIsAPowerPointToken = true
-				Endif
-			Endif
-		Endif
-	Endif
+				end if
+			end if
+		end if
+	end if
 End Function
 
 Function fsGetSlideNote(optional bClean, optional byval nPage)
@@ -5911,14 +5825,14 @@ Function fsGetSlideNote(optional bClean, optional byval nPage)
 
 	if ismissing(bClean) Then
 		bClean = true
-	Endif
+	end if
 	oDoc = ThisComponent
 	sA = &quot;&quot;
 	fsGetSlideNote = &quot;&quot;
 	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) Then
 		if ismissing(nPage) Then
 		nPage=oDoc.getCurrentController.getCurrentPage().Number - 1
-			Endif
+			end if
 		i = fiGetSlideNoteIndex(nPage)
 		if i &lt;&gt; -1 Then
 			if HasUnoInterfaces(oDoc.getDrawPages().getByIndex(nPage).getNotesPage.getByIndex(i),_
@@ -5933,14 +5847,14 @@ Function fsGetSlideNote(optional bClean, optional byval nPage)
 							fsGetSlideNote = fsCleanMdCode(sA)
 						Else
 							fsGetSlideNote = sA
-						Endif
-					Endif
-				Endif
-			Endif
-		Endif
+						end if
+					end if
+				end if
+			end if
+		end if
 	Else
 		fsGetSlideNote = &quot;&quot;
-	Endif
+	end if
 End Function
 
 
@@ -5957,7 +5871,7 @@ Function fiGetSlideNoteIndex(optional nPage)
 	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) Then
 		if ismissing(nPage) Then
 			nPage=oDoc.getCurrentController.getCurrentPage().Number - 1
-		Endif
+		end if
 		iNotesCount = oDoc.getDrawPages().getByIndex( nPage ).getNotesPage.getCount
 		if iNotesCount = 2 Then
 			&apos; a native Impress document
@@ -5967,7 +5881,7 @@ Function fiGetSlideNoteIndex(optional nPage)
 						&quot;com.sun.star.text.XText&quot;) Then
 					fiGetSlideNoteIndex = i
 					Exit For
-				Endif
+				end if
 			next
 		Else
 			&apos; Presentation probably originated from PowerPoint, so note
@@ -5989,16 +5903,16 @@ Function fiGetSlideNoteIndex(optional nPage)
 							&apos; ignore PowerPoint page number display field
 							fiGetSlideNoteIndex = i
 							Exit For
-						Endif
-					Endif
-				Endif
+						end if
+					end if
+				end if
 			next
-		Endif
+		end if
 	Else
 		&apos; We didn’t find a valid presentation text field.
 		&apos; Signal the calling routine.
 		fiGetSlideNoteIndex = -1
-	Endif
+	end if
 	Exit Function
 	fiGetSlideNoteIndexErr:
 	fiGetSlideNoteIndex = -1
@@ -6021,14 +5935,14 @@ function fsExportAlbumCover(optional sPath, optional iScale)
 			&apos; image doesn’t increase the audio file size much.
 			&apos; This makes an image of 600x450 pixels for a normal slide.
 			iScale = 28000/600
-		endif
+		end if
 		if ismissing(sPath) or sPath = &quot;&quot; then
 			sPath = converttourl(fsGetHomeDir) &amp; fsSelectionLanguage &amp; _
 					&quot;/poster-&quot; &amp; _
 					right(&quot;000&quot; &amp; _
 					trim(str(fiMyCurrentAudioTrack(false))), 3) &amp; _
 					&quot;.jpg&quot;
-		endif
+		end if
 		&apos; Make sure we have a writable folder
 		&apos;on error goto ExportAlbumCoverErr
 		fbCreateFile(sPath &amp; &quot;.txt&quot; , fsAppSignature(), &quot;utf-8&quot;)
@@ -6036,11 +5950,11 @@ function fsExportAlbumCover(optional sPath, optional iScale)
 			kill sPath &amp; &quot;.txt&quot;
 			if fileexists(sPath) then
 				kill sPath
-			endif
+			end if
 		else
 			fsExportAlbumCover = &quot;&quot;
 			exit function
-		endif		
+		end if		
 	   &apos; describe image properties
 		aFD1(0).Name  = &quot;PixelWidth&quot;        &apos;
 		aFD1(0).Value = int((fsImpressDimension(&quot;Width&quot;) / iScale) +.5)
@@ -6058,7 +5972,7 @@ function fsExportAlbumCover(optional sPath, optional iScale)
 		xObj = xView.currentPage
 		ExportJpeg(xObj, sPath, aFD1())
 		fsExportAlbumCover = sPath 
-	endif
+	end if
 	&apos; msgbox &quot;fsExportAlbumCover :&quot; &amp; fsExportAlbumCover
 	exit function
 	
@@ -6068,7 +5982,7 @@ end function
 
 
 sub ExportJpeg( xobject, sFileUrl as string, aFD1 )
-	&apos; http://codesnippets.services.openoffice.org/Office/Office.GraphicExport.snip
+	&apos; https://web.archive.org/web/20130529074927/http://codesnippets.services.openoffice.org/Office/Office.GraphicExport.snip
 	&apos; Export JPEG by Olivier Samyn (initial), Sven Jacobi, Michael Hoennig, Tom Schindl
 	&apos; revised February 24, 2013 for LibreOffice 4
 	dim xExporter
@@ -6089,7 +6003,7 @@ end sub
 	
 
 sub viewNormal 
-	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t=74996
+	&apos; View a presentation in Normal view
 	dim aURL, oController, oDisp
 
 	on error resume next	
@@ -6100,8 +6014,8 @@ sub viewNormal
 	oController = ThisComponent.getCurrentController() 
 	oDisp = oController.queryDispatch(aURL, &quot;_self&quot;, 0) 
 	if not IsNull(oDisp) then 
-		oDisp.dispatch(aURL, array()) 
-	endif 
+		oDisp.dispatch(aURL, array())
+	end if 
 end sub
 
 
@@ -6114,7 +6028,7 @@ function fsImpressDimension(optional byval sType)
 		
 	if ismissing(sType) then
 		sType = &quot;Height&quot;
-	endif
+	end if
 	xDoc = thiscomponent
 	xView = xDoc.currentController
 	xSelection = xView.selection
@@ -6139,14 +6053,14 @@ sub setWesternDocLanguage(sA)
 	
 	if len(sA) &lt; 2 then
 		exit sub
-	endif
+	end if
 	x = instr(sA, &quot;-&quot;)
 	if x = 0 then
 		exit sub
 	else
 		sB = lcase(left(sA, x - 1))
 		sC = ucase(mid(sA, x + 1))
-	endif
+	end if
 	sLocale.Language = sB
 	sLocale.Country = sC
 	on error resume next
@@ -6165,14 +6079,14 @@ sub setAsianDocLanguage(sA)
 	
 	if len(sA) &lt; 2 then
 		exit sub
-	endif
+	end if
 	x = instr(sA, &quot;-&quot;)
 	if x = 0 then
 		exit sub
 	else
 		sB = lcase(left(sA, x - 1))
 		sC = ucase(mid(sA, x + 1))
-	endif
+	end if
 	sLocale.Language = sB
 	sLocale.Country = sC
 	&apos; msgBox &quot;Asian language :&quot; &amp; sB &amp; &quot;-&quot; &amp; sC
@@ -6193,14 +6107,14 @@ sub setComplexDocLanguage(sA)
 	
 	if len(sA) &lt; 2 then
 		exit sub
-	endif
+	end if
 	x = instr(sA, &quot;-&quot;)
 	if x = 0 then
 		exit sub
 	else
 		sB = lcase(left(sA, x - 1))
 		sC = ucase(mid(sA, x + 1))
-	endif
+	end if
 	sLocale.Language = sB
 	sLocale.Country = sC
 	&apos; msgBox &quot;Complex language :&quot; &amp; sB &amp; &quot;-&quot; &amp; sC
@@ -6232,14 +6146,14 @@ function fsTrimSpecial(byVal sA, byval sTrim, optional byval iMax)
 
 	if ismissing(iMax) then
 		iMax = 80
-	endif
+	end if
 	if len(sA) &lt; iMax then
 		iMax = len(sA)
-	endif
+	end if
 	fsTrimSpecial = sA
 	if len(sA) = 0 or len(sTrim) = 0 then
 		exit function
-	endif
+	end if
 	
 	&apos; Edit sTrim to minimize processing time or
 	&apos; to exit before looping if possible.
@@ -6248,13 +6162,13 @@ function fsTrimSpecial(byVal sA, byval sTrim, optional byval iMax)
 	for n = 1 to len(sTrim)
 		if instr(sA, mid(sTrim, n, 1)) &gt; 0 then
 			s2 = s2 &amp; mid(sTrim, n, 1)
-		endif
+		end if
 	next
 	if s2 = &quot;&quot; then
 		exit function
 	else
 		sTrim = s2
-	endif
+	end if
 	
 	&apos; Left loop	
 	for n = 1 to iMax
@@ -6265,7 +6179,7 @@ function fsTrimSpecial(byVal sA, byval sTrim, optional byval iMax)
 			end if
 			if len(sA) &lt; 2 then 
 				exit for
-			endif
+			end if
 		next
 	next
 	if len(sA) = 0 then
@@ -6273,7 +6187,7 @@ function fsTrimSpecial(byVal sA, byval sTrim, optional byval iMax)
 		exit function
 	elseif len(sA) &lt; iMax then
 		iMax = len(sA)
-	endif
+	end if
 	&apos; Right loop
 	for n = 1 to iMax
 		for m = 1 to len(sTrim)
@@ -6283,7 +6197,7 @@ function fsTrimSpecial(byVal sA, byval sTrim, optional byval iMax)
 			end if
 			if len(sA) &lt; 2 then 
 				exit for
-			endif
+			end if
 		next	
 	next
 	fsTrimSpecial = sA	
@@ -6317,10 +6231,10 @@ function fsGetTopicSentence(byval sA)
 			s1 = fsQuickTitle(100, 200, a1(lbound(a1)) &amp; &quot;。&quot;		
 		else
 			s1 = &quot;&quot;					
-		endif
+		end if
 	else
 		s1 = &quot;&quot;
-	endif
+	end if
 	fsGetTopicSentence = s1
 end function
 
@@ -6367,7 +6281,7 @@ function fbsetNote(oPage, sA)
 		fbsetNote = true
 	else
 		fbsetNote = false
-	endif
+	end if
 	exit function
 	fbsetNoteErr:
 	fbsetNote = false
@@ -6394,8 +6308,8 @@ sub BgSystemColor(i)
 	if fsGetOS() = &quot;UNIX&quot; Then
 		&apos; [Ubuntu Orange &amp; Aubergine][1]
 		&apos; [Ubuntu Design][2]
-		&apos; [1]: http://design.canonical.com/2011/07/ubuntu-orange-is-dd4814/
-		&apos; [2]: http://design.ubuntu.com/brand/colour-palette
+		&apos; [1]: https://design.canonical.com/2011/07/ubuntu-orange-is-dd4814/
+		&apos; [2]: https://design.ubuntu.com/brand/colour-palette
 		ChangeBackground(i, 119, 72, 83)
 	elseif fsGetOS() = &quot;WINDOWS&quot; then
 		&apos; [Teal][3]
@@ -6404,7 +6318,7 @@ sub BgSystemColor(i)
 	else
 		&apos; Background Grey
 		ChangeBackground(i, 153, 153, 153)
-	endif
+	end if
 end sub
 
 function flSystemColor()
@@ -6414,12 +6328,12 @@ function flSystemColor()
 	if fsGetOS() = &quot;UNIX&quot; Then
 		&apos; [Ubuntu Orange &amp; Aubergine][1]
 		&apos; [Ubuntu Design][2]
-		&apos; [1]: http://design.canonical.com/2011/07/ubuntu-orange-is-dd4814/
-		&apos; [2]: http://design.ubuntu.com/brand/colour-palette
+		&apos; [1]: https://design.canonical.com/2011/07/ubuntu-orange-is-dd4814/
+		&apos; [2]: https://design.ubuntu.com/brand/colour-palette
 		l1 = rgb(221, 72, 20)  &apos; orange
 	elseif fsGetOS() = &quot;WINDOWS&quot; then
 		&apos; [Teal][3]
-		&apos; [3]: http://colorlib.com/etc/metro-colors/
+		&apos; [3]: https://colorlib.com/etc/metro-colors/
 		l1 = rgb(0, 171, 169)
 	elseif fsGetOS() = &quot;ANDROID&quot; then
 		l1 = rgb(255, 196, 13) &apos; medium yellow accent
@@ -6428,7 +6342,7 @@ function flSystemColor()
 		&apos; l1 = rgb(221, 72, 20)  &apos; orange
 		&apos; l1 = rgb(0, 171, 169)  &apos; teal
 		l1 = rgb(49, 131, 251) &apos; Yosemite blue accent
-	endif
+	end if
 	flSystemColor = l1
 end function
 
@@ -6453,7 +6367,7 @@ function fsSetexttoAtx(byval sA, byval sB)
 	&apos; Convert [Markdown][1] [Setext-style][2] headers 
 	&apos; to [atx][3].
 	&apos;
-	&apos; [1]: http://daringfireball.net/projects/markdown/syntax
+	&apos; [1]: https://daringfireball.net/projects/markdown/syntax
 	&apos; [2]: http://docutils.sourceforge.net/mirror/setext.html
 	&apos; [3]: http://www.aaronsw.com/2002/atx/
 	dim s5 as string
@@ -6464,8 +6378,8 @@ function fsSetexttoAtx(byval sA, byval sB)
 			s5 = &quot;#&quot;
 		elseif string(len(sB), &quot;-&quot;) = sB then
 			s5 = &quot;##&quot;
-		endif
-	endif
+		end if
+	end if
 	fsSetexttoAtx = s5 &amp; sA
 end Function
 
@@ -6501,13 +6415,13 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 
 	If Not GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
-	Endif
+	end if
 	if ismissing(sA) then
 		sA = fsThisDocTitle()
-	endif
+	end if
 	if ismissing(sB) then
 		sB = fsGetTextSelection(false)
-	endif
+	end if
 	sAsianLanguage = &quot;&quot;
 	sAsianCountry = &quot;&quot;
 	sComplexLanguage = &quot;&quot;
@@ -6554,7 +6468,7 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 			s5 = &quot;&quot;
 			if ubound(a1) &lt; k then
 				k = ubound(a1)
-			endif
+			end if
 			for j = lbound(a1) to k
 				s5 = &quot;&quot;
 				if len(a1(j)) &gt; 3 then
@@ -6566,13 +6480,13 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 						s1 = fsSetexttoAtx(a2(j), a2(L))
 					else
 						s1 = a2(j)
-					endif
+					end if
 					if left(trim(s1), 1) = &quot;#&quot; Then
 						&apos; Looks like a heading. Demote one level and add extra LFs.
 						if left(trim(s1), 7) = string(7, &quot;#&quot;) then
 							&apos; Markdown can’t use more than 6 &quot;#&quot; symbols.
 							s1 = string(6,&quot;#&quot;) &amp; fsTrimSpecial(trim(s1), &quot;#&quot;)
-						endif
+						end if
 						s2 = s2 &amp; chr(10) &amp; &quot;#&quot; &amp; fsQuickTitle(7, 35, trim(s1)) &amp; chr(10) &amp; chr(10)
 					elseif left(s1, 2) = &quot; -&quot; or _
 							left(s1, 2) = &quot; *&quot; or _
@@ -6583,21 +6497,21 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 					else
 						s2 = s2 &amp; &quot;- &quot; &amp; fsTrimSpecial(fsQuickTitle(7, 35, s1), &quot;`_-*#&gt;&quot;) &amp; chr(10)
 						&apos; Clean string up and add a markdown unordered list symbol.
-					endif
+					end if
 					if len(s3) = 0 then
 						&apos; Determine the first sentence of the body text.
 						s3 = fsGetTopicSentence(a1(j))
-					endif
-				endif
+					end if
+				end if
 			next
 		else
 			s2 = sAuthor
 			s3 = s2
-		endif
+		end if
 		
 		if s3 = &quot;&quot; then
 			s3 = fsDateMyRegion(1)
-		endif
+		end if
 		
 		&apos; Set the text of the speaker notes for the title slide
 		if not(fbsetNote(x.getDrawPages().getByIndex(0), _
@@ -6610,7 +6524,7 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 					s2)) then
 			&apos; incompatible document format
 			exit sub
-		endif
+		end if
 		&apos;  Record the first sentence of the body text in the description
 		s4 = s3
 		s4 = fsTrimSpecial(s4, &quot;`-#&gt;_ &quot; &amp; chr(13) &amp; chr(10))
@@ -6630,7 +6544,7 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 			setComplexDocLanguage(sComplexLanguage &amp; &quot;-&quot; &amp; sComplexCountry)
 		else
 			setWesternDocLanguage(sLanguage &amp; &quot;-&quot; &amp; sCountry)
-		endif
+		end if
 		for j = lbound(a1) to ubound(a1)
 			s1 = &quot;&quot;
 			if len(a1(j)) &gt; 0 then
@@ -6642,7 +6556,7 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 					s1 = fsSetexttoAtx(a1(j), a2(L))
 				else
 					s1 = a1(j)
-				endif	
+				end if	
 				x.getDrawPages().InsertNewByIndex(k)
 				if len(s1) &gt; 0 and _
 						(not(string(len(s1), &quot;=&quot;) = s1) and _
@@ -6650,8 +6564,8 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 					&apos; The string is not empty and is not a simple
 					&apos; markdown &lt;h1&gt;, &lt;h2&gt; or &lt;hr /&gt; code string.
 					addTextToSlide(x, s1, k, sComplexLanguage)
-				endif
-			endif
+				end if
+			end if
 			oBar.Value = j
 		next
 		oShape1 = x.getDrawPages().getByIndex(x.GetDrawPages.getCount()-1).getByIndex(1)
@@ -6667,7 +6581,7 @@ sub NewPresentionFromSelection(optional sA, optional sB)
 		x.Presentation.IsMouseVisible() = true
 		&apos; We want to be able to close without an &quot;Are you sure?&quot; message.
 		x.setModified(False)
-	endif
+	end if
 end sub
 
 
@@ -6712,7 +6626,7 @@ Sub addTextToSlide(optional o1, _
 	&apos; [Andrew Pitonyak][2]
 	&apos; for a description of createPoint and createSize
 	&apos;
-	&apos; [1]: http://daringfireball.net/projects/markdown/
+	&apos; [1]: https://daringfireball.net/projects/markdown/
 	&apos; [2]: http://www.pitonyak.org
 	Dim oPage
 	Dim oShape
@@ -6730,7 +6644,7 @@ Sub addTextToSlide(optional o1, _
 
 	If Not GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
-	Endif
+	end if
 	iITALIC = 2
 	&apos; on error goto addTextToSlideErr
 	If ismissing(o1) then
@@ -6738,23 +6652,23 @@ Sub addTextToSlide(optional o1, _
 				&quot;_blank&quot;, _
 				0, _
 				dimarray())	
-	Endif
+	end if
 	if ismissing(sA) then
 		sA = fsSampleMd()
-	endif
+	end if
 	if ismissing(sComplexLanguage) then
 		sComplexLanguage = &quot;hi&quot;
-	endif
+	end if
 	if ismissing(sStyle) then
 		sStyle = &quot;&quot;
-	endif
+	end if
 	if ismissing(bLiveText) then
 		bLiveText = true
-	endif
+	end if
  	iMaxLength = 185 * fmyFontWidthIndex(sA)
 	if ismissing (i) then
 		i = 0
-	endif
+	end if
 	oPage = o1.getDrawPages().getByIndex(i)
 	oShape = o1.createInstance(&quot;com.sun.star.drawing.TextShape&quot;)
 	oShape1 = o1.createInstance(&quot;com.sun.star.drawing.EllipseShape&quot;)
@@ -6808,7 +6722,7 @@ Sub addTextToSlide(optional o1, _
 		s1 = trim(fsTrimSpecial(s1, &quot;#&quot;))
 		s1 = &quot;######&quot; &amp; s1
 		s1 = trim(fsQuickTitle(42, iMaxLength, s1))
-	endif
+	end if
 	if left(s1c, 6) = &quot;######&quot; or sStyle = &quot;h6&quot; then
 		&apos; Heading 6 
 		BgSystemColor(i)
@@ -6892,7 +6806,7 @@ Sub addTextToSlide(optional o1, _
 			s1 = s1 &amp; &quot; …&quot;
 		end if
 		oShape.CharHeight = lhigh / 420
-	endif
+	end if
 	
 	&apos;###Colors or posture
 
@@ -6902,7 +6816,7 @@ Sub addTextToSlide(optional o1, _
 	if left(s2, 1) = &quot;*&quot; or  left(s2, 1) = &quot;_&quot; then
 		&apos; You included markdown code for italics
 		oShape.CharPosture = iITALIC		
-	endif
+	end if
 	if left(s1c, 1) = &quot;#&quot; then
 		&apos; Heading
 		oShape.CharPosture = iITALIC
@@ -6917,13 +6831,13 @@ Sub addTextToSlide(optional o1, _
 		s1 = fsTrimSpecial(s1, &quot;_*# &quot;)
 	else
 		oShape.CharPosture = 0
-	endif
+	end if
 	
 	&apos; ##Replace the temporary text of main text shape with the final text.
 	if oShape.getString = &quot;%NO_VALUE%&quot; or oShape.getString = &quot;&quot; then
 		oShape.setString(s1)
 		ResizeAsianComplexText(oShape)
-	endif
+	end if
 	select case fsGetOS()
 	case &quot;OSX&quot;, &quot;MAC&quot;
 		m = 15
@@ -6958,7 +6872,7 @@ Sub addTextToSlide(optional o1, _
 			&apos; the markdown formatting following the LTR marker, then
 			&apos; prepend the string with the LTR marker `chr(8206)`.
 			s1 = chr(8206) &amp; fsTrimSpecial(s1, chr(8206) &amp; &quot;*#_&gt; &quot;)
-		endif
+		end if
 		&apos; add bubble to lower right
 		&apos; msgbox  10 / 70 &apos; convert fraction to decimal
 		&apos; wide, high, x-axis, y-axis
@@ -6970,7 +6884,7 @@ Sub addTextToSlide(optional o1, _
 				lhigh \ m, _
 				lwide * 0.8214, _
 				lhigh * 0.902)
-	endif
+	end if
 	if bLiveText then
 		&apos; The computer needs read text extension to execute this procedure.
 		&apos; If the computer doesn’t have the extension, clicking the shape
@@ -6982,7 +6896,7 @@ Sub addTextToSlide(optional o1, _
 		oShape.Bookmark = &quot;vnd.sun.star.script:&quot; &amp; _
 				&quot;textToSpeech.TextToSpeech.ReadTheSlideNote&quot; &amp; _
 				&quot;?language=Basic&amp;location=application&quot;
-	endif
+	end if
 	Exit Sub
 	addTextToSlideErr:
 	msgBox fsLookUpTerm(&quot;s_cancel&quot;), _
@@ -7022,8 +6936,8 @@ function fbHasAsianCharacters(sA)
 			b1 = true
 		else
 			b1 = false
-		endif
-	endif
+		end if
+	end if
 	fbHasAsianCharacters = b1
 end function
 
@@ -7032,7 +6946,7 @@ function fbHasRTLMarker(byval sA)
 	&apos; Languages that read right to left like Arabic, Farsi, and Hebrew
 	&apos; include a [Unicode Character &quot;RIGHT-TO-LEFT MARK (U+200F)][1]
 	&apos; 
-	&apos; [1]: http://www.fileformat.info/info/unicode/char/200f/index.htm 
+	&apos; [1]: https://www.fileformat.info/info/unicode/char/200f/index.htm 
 	dim s1 as string
 	dim b1 as boolean
 	
@@ -7042,8 +6956,8 @@ function fbHasRTLMarker(byval sA)
 		s1 = converttourl(left(trim(sA), 15))
 		if instr(s1, &quot;%D8&quot;) &gt; 0 then
 			b1 = true
-		endif
-	endif
+		end if
+	end if
 	fbHasRTLMarker = b1
 end function
 
@@ -7052,7 +6966,7 @@ function fbHasLTRMarker(byval sA)
 	&apos; Languages that are complex like Hindi, Gujarati and Punjabi may
 	&apos; include a [Unicode Character &quot;LEFT-TO-RIGHT MARK (U+200E)][1]
 	&apos; 
-	&apos; [1]: http://www.fileformat.info/info/unicode/char/200e/index.htm 
+	&apos; [1]: https://www.fileformat.info/info/unicode/char/200e/index.htm 
 	dim s1 as string
 	dim b1 as boolean
 	
@@ -7062,8 +6976,8 @@ function fbHasLTRMarker(byval sA)
 		s1 = converttourl(left(trim(sA), 15))
 		if instr(s1, &quot;%E0&quot;) &gt; 0 then
 			b1 = true
-		endif
-	endif
+		end if
+	end if
 	fbHasLTRMarker = b1
 end function
 
@@ -7075,7 +6989,7 @@ function fiWesternAsianComplex(optional byval sA)
 	if ismissing(sA) or sA = &quot;&quot; then
 		fiWesternAsianComplex = 0
 		exit function
-	endif
+	end if
 	if fbHasAsianCharacters(sA) then
 		i1 = 1
 	elseif fbHasLTRMarker(sA) then
@@ -7084,7 +6998,7 @@ function fiWesternAsianComplex(optional byval sA)
 		i1 = 2
 	else
 		i1 = 0
-	endif
+	end if
 	fiWesternAsianComplex = i1
 end function
 
@@ -7117,15 +7031,15 @@ function fsGetEscapedCode(_
 	wend
 	if ismissing(bShowMe) then
 		bShowMe = false
-	endif
+	end if
 	if ismissing(sA) then
 		sA = fsGetTextSelection(false)
 		bShowMe = true
-	endif
+	end if
 	fsGetEscapedCode = mid(converttourl(sA), 9)
 	if bShowMe then
 		msgBox sA &amp; chr(10) &amp; chr(10) &amp; fsGetEscapedCode
-	endif
+	end if
 end function 
 
 
@@ -7192,40 +7106,40 @@ Sub addBubbleToSlide(optional oDoc, _
 	
 	if ismissing(oDoc) then  
 	   oDoc = ThisComponent
-	endif
+	end if
 	if ismissing(sA) then
 		sA =&quot; ► &quot;
-	endif
+	end if
 	if isMissing(i) then
 		i = 0
-	endif
+	end if
 	if isMissing(width) then
 		width = 1400  &apos; 2 cm
 	end if
 	if isMissing(height) then
 		height = width
-	endif
+	end if
 	if isMissing(sType) then
 		sType = &quot;round-callout&quot;
 		&apos; sType = &quot;circle&quot;
-	endif
+	end if
 	if ismissing(lBackgroundColor) then
 		lBackgroundColor = rgb(238, 17, 17)  &apos; Windows 8 red
-	endif
+	end if
 	if ismissing(lcharacterColor) then
 		lcharacterColor = rgb(255, 255, 255)  &apos; White 
-	endif
+	end if
 	if ismissing(sMacroBookMark) then 
 		sMacroBookMark = &quot;vnd.sun.star.script:&quot; &amp; _
 			&quot;textToSpeech.TextToSpeech.ReadTheSlideNote&quot; &amp; _
 			&quot;?language=Basic&amp;location=application&quot;
-	endif
+	end if
 	&apos; The following list is not complete. A shape that is not included could raise an error.
 	&apos; See the [Drawing Shape][ABTS1] reference for an complete list of regular drawing shapes
 	&apos; and the [Custom Shape][ABTS2] reference for a list of custom shapes.
 	&apos;
-	&apos; [ABTS1]: http://www.openoffice.org/api/docs/common/ref/com/sun/star/drawing/module-ix.html 
-	&apos; [ABTS2]: http://www.openoffice.org/api/docs/common/ref/com/sun/star/drawing/XEnhancedCustomShapeDefaulter.html
+	&apos; [ABTS1]: https://www.openoffice.org/api/docs/common/ref/com/sun/star/drawing/module-ix.html 
+	&apos; [ABTS2]: https://www.openoffice.org/api/docs/common/ref/com/sun/star/drawing/XEnhancedCustomShapeDefaulter.html
 	&apos;
 	oDrawPage = oDoc.DrawPages(i)
 	select case lcase(sType)
@@ -7261,7 +7175,7 @@ Sub addBubbleToSlide(optional oDoc, _
 	end if
 	if isMissing(yval) then
 		yval =  (oDrawPage.height - oSize.height) \ 2  &apos; Center 
-	endif
+	end if
 
 	ShapePos.X = xVal
 	ShapePos.Y = yVal
@@ -7316,14 +7230,14 @@ function fsReleaseNotesCMD(optional byval sA)
 &apos;&apos; to many other formats.
 &apos;&apos;
 &apos;&apos;  [MAHF0]: https://pypi.python.org/pypi/Markdown
-&apos;&apos;  [MAHF1]: http://daringfireball.net/projects/markdown/dingus
-&apos;&apos;  [MAHF2]: http://calibre-ebook.com/
+&apos;&apos;  [MAHF1]: https://daringfireball.net/projects/markdown/dingus
+&apos;&apos;  [MAHF2]: https://calibre-ebook.com/
 &apos;&apos;
 &apos;&apos;
 &apos;&apos; About Markdown
 &apos;&apos; --------------
 &apos;&apos;
-&apos;&apos; [Markdown](http://daringfireball.net/projects/markdown/) is a
+&apos;&apos; [Markdown](https://daringfireball.net/projects/markdown/) is a
 &apos;&apos; simple way to format text for blogs, email, news, education
 &apos;&apos; and technical support documentation.
 &apos;&apos;
@@ -7332,7 +7246,7 @@ function fsReleaseNotesCMD(optional byval sA)
 &apos;&apos; markdown that is compatible with python-markdown.
 &apos;&apos;
 &apos;&apos; [Python-markdown](https://pypi.python.org/pypi/Markdown) comes
-&apos;&apos; with [calibre-ebook](http://calibre-ebook.com/) or is available
+&apos;&apos; with [calibre-ebook](https://calibre-ebook.com/) or is available
 &apos;&apos; on Debian and Ubuntu Linux with:
 &apos;&apos;
 &apos;&apos;     sudo apt-get install python-markdown
@@ -7355,12 +7269,12 @@ function fsReleaseNotesCMD(optional byval sA)
 	if fsGetOS() = &quot;WINDOWS&quot; then
 		fsReleaseNotesCMD =&quot;&quot;
 		exit function
-	endif
+	end if
 	s5 = &quot;&quot;
 	fsReleaseNotesCMD = &quot;&quot;
 	if isMissing(sA) then
 		sA = &quot;TextToSpeech,ThirdPartyCode,TTS_Config,TTS_Indices,TTS_Utilities&quot;
-	endif
+	end if
 	select case sA
 	case &quot;ThirdPartyCode&quot;, &quot;TTS_Config&quot;, &quot;TTS_Indices&quot;, &quot;TTS_Utilities&quot;, _
 			&quot;TextToSpeech,ThirdPartyCode,TTS_Config,TTS_Indices,TTS_Utilities&quot;
@@ -7399,8 +7313,8 @@ function fsReleaseNotesCMD(optional byval sA)
 				webhelp(converttourl(fsGetHomeDir &amp; _
 						a1(lbound(a1)) &amp; _
 						&quot;.markdown&quot;))
-			endif
-		endif
+			end if
+		end if
 	next	 
 end function
 
@@ -7456,6 +7370,6 @@ sub megaDoc
 		webhelp(converttourl(fsGetHomeDir &amp; _
 				&quot;TTS_read-text-all&quot; &amp; _
 				&quot;.markdown&quot;))
-	endif		
+	end if		
 end sub
 </script:module>

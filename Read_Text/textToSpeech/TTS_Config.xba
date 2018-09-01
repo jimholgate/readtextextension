@@ -52,7 +52,7 @@ Function fiMyCurrentAudioTrack(optional byval bIncrement)
 	on error goto fiMyCurrentAudioTrackErr
 	if ismissing(bIncrement) Then
 		bIncrement = false
-	Endif
+	end if
 	if bIncrement Then
 		&apos; Add one to the track index
 		if s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle = fsThisDocTitle Then
@@ -62,17 +62,17 @@ Function fiMyCurrentAudioTrack(optional byval bIncrement)
 				i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack + 1
 			Else
 				i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 1
-			Endif
+			end if
 		Else
 			i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 1
 			s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle = fsThisDocTitle
-		Endif
+		end if
 	Else
 		if not(s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle = fsThisDocTitle) Then
 			i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 1
 			s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle = fsThisDocTitle
-		Endif
-	Endif
+		end if
+	end if
 	fiMyCurrentAudioTrack = i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack
 	exit function
 	fiMyCurrentAudioTrackErr:
@@ -97,7 +97,7 @@ Sub ConfigureReadTextAloud
 		f_dlgSpeechSetup.model.HelpURL= fsAppSignature &amp; &quot;/set_up.xhp&quot;
 	Else 
 		f_dlgSpeechSetup.model.HelpURL=&quot;&quot;
-	Endif
+	end if
 	&apos;Load default settings, so any settings undefined by settings file are Not empty
 	config()=fvTts_config_createDefaultConfig(msgs(), errorCode)
 	&apos;Load the settings you used last time
@@ -107,7 +107,7 @@ Sub ConfigureReadTextAloud
 	Else
 		&apos; The &quot;About&quot; dialog needs this file to show current information
 		tts_config_writeFile(config(), sfile)
-	Endif								 
+	end if								 
 	&apos;Now apply the settings to the dialog box
 	f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).Model.State=config(fiAlwaysShowDialogCheckBox)
 	if fbEnhancedRTVersion and fbClipBoardAvailable then
@@ -115,7 +115,7 @@ Sub ConfigureReadTextAloud
 	else
 		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Model.State= 0
 		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Visible = false
-	endif
+	end if
 	f_dlgSpeechSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiFestivalComboChoice)
 	f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).Model.Text=config(fiExternalCommand)
 	f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text=config(fiDialogLanguageCombo)
@@ -141,26 +141,26 @@ Sub ConfigureReadTextAloud
 		Elseif f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).Model.State Then
 			if fileexists(&quot;/usr/bin/killall&quot;) or fileexists(&quot;/usr/local/bin/killall&quot;) then
 				Shell(&quot;killall&quot;,0,&quot;festival&quot;,true)
-			endif
+			end if
 			if fileExists(fsMyTempLock) then
 				kill fsMyTempLock
-			endif
-		Endif
-	Endif
+			end if
+		end if
+	end if
 	If f_dlgSpeechSetup.Execute() &lt;&gt; 0 Then
 		&apos;Replace the old settings file
 		config()=fvCurrentDialogConfig()
 		f_dlgSpeechSetup.Dispose()
 		If fileExists(sFile) Then
 			kill sFile
-		Endif	
+		end if	
 		tts_config_writeFile(config(), sfile)
 		&apos;Call the shell to execute the program specified with the commands specified
 		ttsActuate(config(),_
 				msgs(),_
 				errorCode,_
 				&quot;&quot;)
-	Endif
+	end if
 End Sub
 
 
@@ -204,18 +204,18 @@ Sub ttsUpdateCombo2a(bRefreshText)
 	Elseif Instr(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;/bin/open&quot;) &gt; 0 And _
 		fsGetOS()=&quot;OSX&quot; Or fsGetOS()=&quot;MAC&quot; Then
 		&apos;The system chooses an application to open the file or URL (See man: gnome-open and xdg-open)
-		&apos;There are some examples at http://ss64.com/osx/open.html and 
-		&apos;http://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man1/open.1.html
+		&apos;There are some examples at https://ss64.com/osx/open.html and 
+		&apos;https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man1/open.1.html
 		dialog1Combo2ShowMEDIAChoices(f_dlgSpeechSetup)
 	&apos; You entered a media player
 	Elseif fbIsAMediaPlayer(Lcase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text)) Then
 		dialog1Combo2ShowMEDIAChoices(f_dlgSpeechSetup)
 	Else
 	
-	Endif
+	end if
 	If bRefreshText and FileExists(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text) Then
 		f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).Model.Text=f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).GetItem(0)
-	Endif
+	end if
 End Sub
 
 
@@ -298,7 +298,7 @@ Sub AboutAddOn(config() As Variant, myText As String)
 		&quot; &quot; &amp; fsExtensionVersion
 	If fbHelpIsInstalled Then
 		f_dlgAboutReadSelection.model.HelpURL= fsAppSignature &amp; &quot;/set_up.xhp&quot;
-	Endif
+	end if
 	f_dlgAboutReadSelection.GetControl(&quot;CommandButton1&quot;).model.Label = fsLookUpTerm( &quot;s_ok&quot;, s1)
 	f_dlgAboutReadSelection.GetControl(&quot;CommandButton2&quot;).model.helpText = fsLookUpTerm( &quot;s_http-help-url&quot;, s1)
 	f_dlgAboutReadSelection.GetControl(&quot;CommandButton2&quot;).model.Label = fsLookUpTerm( &quot;s_on-line-help&quot;, s1) &amp; &quot;...&quot;
@@ -331,7 +331,7 @@ Sub AboutAddOn(config() As Variant, myText As String)
 		&apos; If it crashes, then we are left with a lock file.
 		If fileexists(s3) Then  &apos; unlock clipboard
 			kill s3
-		Endif
+		end if
 		s4 = fsGetClipBoard(false)
 		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.helpText = Left(_
 				s4, 99)
@@ -339,7 +339,7 @@ Sub AboutAddOn(config() As Variant, myText As String)
 				s4, 99)
 		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
 		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.Label = Len(s4)
-	endif
+	end if
 	If fileExists(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) or _
 		fileExists(s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) or _
 		fileExists(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;) or _
@@ -349,7 +349,7 @@ Sub AboutAddOn(config() As Variant, myText As String)
 	Else
 		f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm(_
 				&quot;s_system-settings&quot;, s1)
-	Endif
+	end if
 	f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.ImageURL = fsToolBoxLogo
 	f_dlgAboutReadSelection.GetControl(&quot;Label1&quot;).model.helpText = Left(fsGetTextSelection(false, false),99) 
 	f_dlgAboutReadSelection.GetControl(&quot;Label1&quot;).model.Label = Len(fsGetTextSelection(false, false))
@@ -404,7 +404,7 @@ Sub AboutAddOn(config() As Variant, myText As String)
 					&quot;&quot;)
 		Else
 			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=&quot;&quot;
-		Endif
+		end if
 	Else &apos; If config(fiHtmlOption) Then
 		sA=replacePublicTokensWithStr(config(fiHtmlComboURL))
 		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=&quot;[com.sun.star.system.SystemShellExecute]&quot;
@@ -412,9 +412,9 @@ Sub AboutAddOn(config() As Variant, myText As String)
 			sA=sA &amp; Chr$(13) &amp; Chr$(13) &amp; &quot;Powered by Google ™&quot;
 		Elseif instr(sA,&quot;vozme.com&quot;) Then
 			sA=sA &amp; Chr$(13) &amp; Chr$(13) &amp; &quot;Powered by Vozme ™&quot;
-		Endif
+		end if
 		f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=sA		
-	Endif
+	end if
 	f_dlgAboutReadSelection.GetControl(&quot;TextField1&quot;).model.Text=fsAbout
 	&apos; Show the dialog
 	 f_dlgAboutReadSelection.Execute()
