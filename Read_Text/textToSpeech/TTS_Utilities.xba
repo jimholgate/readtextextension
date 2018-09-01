@@ -4910,13 +4910,7 @@ Function fswriteOSXSpeechScript(byval sArguments, byval sArgLangLocale, optional
 	sFile=fsTemporaryTtsAppleScript
 	CreateFile(sFile,sB,&quot;utf-8&quot;)
 	fswriteOSXSpeechScript = sB
-	print sFile
 End Function
-
-sub x
-fswriteOSXSpeechScript(&quot;&quot;, &quot;en-CA&quot;, &quot;&quot;)
-
-end sub
 
 
 Function fsTemporaryTtsAppleScript()
