@@ -75,24 +75,32 @@ import readtexttools
 
 
 def usage():
-    sA = '    ' + os.path.split(sys.argv[0])[1]
-    sB = '      '
+    '''Show the usage options'''
+    print('''Speech-dispatcher Read Text
+===========================
 
-    print('Speech-dispatcher Read Text\n=========================== \n')
-    print('Reads a text file using the speech-dispatcher.\n')
-    print('Usage\n-----\n')
-    print(sA + ' [--output_module="xx"] [--language="xx"] \n ')
-    print(sB + ' [--voice="xx"] [--rate="nn"] input.txt \n')
-    print('Use a specific output module')
-    print(sA + ' --output_module "espeak-generic" "TextFile.txt" \n')
-    print ('Use a specific language - en, fr, es...')
-    print(sA + ' --language "fr" "TextFile.txt" \n')
-    print('Use a specific voice - MALE1, FEMALE1, ... CHILD_FEMALE')
-    print(sA + ' --voice "MALE1" "TextFile.txt" \n')
-    print ("To say the text slower - minimum -100")
-    print(sA + ' --rate "-20" "TextFile.txt" \n')
-    print ("To say the text faster - maximum 100")
-    print(sA + ' --rate "20" "TextFile.txt"')
+Reads a text file using the speech-dispatcher.
+
+Usage
+-----
+
+`spd_read_text_file.py [--output_module="xx"] [--language="xx"]
+[--voice="xx"] [--rate="nn"] input.txt`
+
+Use a specific output module: 
+`spd_read_text_file.py --output_module "espeak-generic" "TextFile.txt"`
+
+Use a specific language - en, fr, es...
+`spd_read_text_file.py --language "fr" "TextFile.txt"`
+
+Use a specific voice - MALE1, FEMALE1, ... CHILD_FEMALE:
+`spd_read_text_file.py --voice "MALE1" "TextFile.txt"`
+
+To say the text slower - minimum -100:
+`spd_read_text_file.py --rate "-20" "TextFile.txt"`
+
+To say the text faster - maximum 100:
+`spd_read_text_file.py --rate "20" "TextFile.txt"`''')
 
 
 def guessTime(sSTR, sRATE, sFILEPATH, sLANG):
