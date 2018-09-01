@@ -16,7 +16,7 @@ Read Text Extension uses an external program or a web service to read text. Read
 
 ## Tutorials
 
-<a href='http://www.youtube.com/watch?feature=player_embedded&v=OCARVoZqC-s' target='_blank'><img src='http://img.youtube.com/vi/OCARVoZqC-s/0.jpg' width='425' height=344 /></a>
+<a href="https://www.youtube.com/watch?feature=player_embedded&v=OCARVoZqC-s" target="_blank"><img src="https://img.youtube.com/vi/OCARVoZqC-s/0.jpg" width="425" height="344" /></a>
 
 + [Read Text Extension LibreOffice 3.5.1 & Windows 8][4]
 + [Read Text Extension - Multilingual support][5]
@@ -35,13 +35,11 @@ Read Text Extension uses an external program or a web service to read text. Read
 
 + [Accessibility in LibreOffice][8]
 
-
 [1]: https://extensions.libreoffice.org/extensions/read-text
-[2]: http://extensions.services.openoffice.org/en/project/read-text
+[2]: https://extensions.services.openoffice.org/en/project/read-text
 [3]: https://raw.githubusercontent.com/jimholgate/readtextextension/master/wiki/Default64.png
 [4]: https://www.youtube.com/watch?v=w5c5wUz9XSY
 [5]: https://www.youtube.com/watch?v=OCARVoZqC-s
-[6]: http://sites.google.com/site/readtextextension/
+[6]: https://sites.google.com/site/readtextextension/
 [7]: https://github.com/jimholgate/readtextextension/
-[8]: http://help.libreoffice.org/Common/Accessibility_in
-
+[8]: https://help.libreoffice.org/Common/Accessibility_in
