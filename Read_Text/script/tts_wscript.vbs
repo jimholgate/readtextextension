@@ -2058,9 +2058,9 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s1 = "1000"  ' XP Not supported
                 s2="Teke-Eboo"
                 s3 ="ebo-CG"
-        Case "ee","ee-gh", "ewe"
+        Case "ee","ee-gh", "ewe", Chr(233) & "w" & Chr(233)
                 s1 = "1000"  ' XP Not supported
-                s2="Ewe"
+                s2=Chr(201) & "w" & Chr(233)
                 s3 ="ee-GH"
         Case "el","el-gr", "greek", "408"
                 s1 = "408"

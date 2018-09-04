@@ -22,7 +22,7 @@ OPTION EXPLICIT
 &apos;&apos; * Use web resources to translate, look up, listen, post, or
 &apos;&apos;   interface with web applications.
 &apos;&apos;
-&apos;&apos; What’s new?
+&apos;&apos; What&apos;s new?
 &apos;&apos; -----------
 &apos;&apos;
 &apos;&apos; *Read Text Extension* Versions 0.9.0 and 0.9.1 have many bug fixes and 
@@ -33,8 +33,8 @@ OPTION EXPLICIT
 &apos;&apos;    organize your sound clips.
 &apos;&apos;  * In writer, you can select text in a table.
 &apos;&apos;  * You can show a text selection using large high contrast text by
-&apos;&apos;    selecting some text, then using *Tools – Add-ons – Impress-View*.
-&apos;&apos;    If you click the text in the presentation, it will read the note
+&apos;&apos;    selecting some text, then using *Tools - Add-ons - Impress-View*.
+&apos;&apos;    if you click the text in the presentation, it will read the note
 &apos;&apos;    aloud.
 &apos;&apos;  * By default, the extension now puts the clips in a folder labelled
 &apos;&apos;    with your language code - i.e.: *en* for English, *de* for German etc.
@@ -62,15 +62,15 @@ OPTION EXPLICIT
 &apos;&apos; Read text speech API
 &apos;&apos; --------------------
 &apos;&apos;
-&apos;&apos; If you want to include speech in your own scripts, use `msgSpeak(sString)`.
+&apos;&apos; if you want to include speech in your own scripts, use `msgSpeak(sString)`.
 &apos;&apos; This sample shows how to handle a scripting error if a computer does not 
 &apos;&apos; have the extension.
 &apos;&apos;
 &apos;&apos;     sub OnClickMySlide1Image1()
 &apos;&apos;         &apos; Read text aloud. 
-&apos;&apos;         Dim oSvc
-&apos;&apos;         Dim sURL
-&apos;&apos;         Dim sArg
+&apos;&apos;         dim oSvc
+&apos;&apos;         dim sURL
+&apos;&apos;         dim sArg
 &apos;&apos; 
 &apos;&apos;         sArg = &quot;Hello world!&quot;
 &apos;&apos;         sURL = &quot;https://sites.google.com/site/readtextextension/&quot;
@@ -78,7 +78,7 @@ OPTION EXPLICIT
 &apos;&apos;         msgSpeak(sArg)
 &apos;&apos;         exit sub
 &apos;&apos;         OnClickMySlide1Image1Err:
-&apos;&apos;         if Msgbox(&quot;The button couldn’t find a &quot;&quot;text to speech&quot;&quot; add-on.&quot; &amp; _
+&apos;&apos;         if msgbox(&quot;The button couldn&apos;t find a &quot;&quot;text to speech&quot;&quot; add-on.&quot; &amp; _
 &apos;&apos;                 chr(10) &amp; _
 &apos;&apos;                 sArg &amp; _
 &apos;&apos;                 chr(10) &amp; _
@@ -99,7 +99,7 @@ OPTION EXPLICIT
 &apos;&apos; * In writer, you can check the language of the selected text
 &apos;&apos;   in the status bar. *Mixed* text includes an ambiguous or
 &apos;&apos;   undefined text string. 
-&apos;&apos; * If mixed text is interpreted as undefined or western,
+&apos;&apos; * if mixed text is interpreted as undefined or western,
 &apos;&apos;   the speech synthesizer might be silent or it might spell 
 &apos;&apos;   our character codes instead of using Asian or complex
 &apos;&apos;   speech synthesis.
@@ -107,7 +107,7 @@ OPTION EXPLICIT
 &apos;&apos; Copyright And License
 &apos;&apos; ---------------------
 &apos;&apos;
-&apos;&apos; © 2008-2018 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+&apos;&apos; (c) 2008-2018 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 &apos;&apos;
 &apos;&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS
 &apos;&apos; OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION;
@@ -117,7 +117,7 @@ OPTION EXPLICIT
 &apos;&apos; SEE THE GNU GENERAL PUBLIC LICENSE FOR MORE DETAILS.
 &apos;&apos;
 &apos;&apos; YOU SHOULD HAVE RECEIVED A COPY OF THE GNU GENERAL PUBLIC LICENSE ALONG WITH THIS SOFTWARE;
-&apos;&apos; If Not, WRITE TO THE FREE SOFTWARE FOUNDATION,INC., 59 TEMPLE PLACE,SUITE 330,BOSTON,MA
+&apos;&apos; if not, WRITE TO THE FREE SOFTWARE FOUNDATION,INC., 59 TEMPLE PLACE,SUITE 330,BOSTON,MA
 &apos;&apos; 02111-1307  USA
 &apos;&apos;
 &apos;&apos; # Procedures
@@ -125,69 +125,69 @@ OPTION EXPLICIT
 &apos;&apos; Procedures are called from menu items or from the tool bar.
 &apos;&apos;
 
-Sub ReadTextAloud
+sub ReadTextAloud
 &apos;&apos; Use *Read Selection* on the tool bar
 &apos;&apos; ------------------------------------
 &apos;&apos;
 &apos;&apos; The first time you use the extension, you can use this button to set it up.
 &apos;&apos; Once you uncheck *Always show this dialogue*, in the dialogue, this button
-&apos;&apos; will simply do the action that you set up, like – for example – reading text
+&apos;&apos; will simply do the action that you set up, like, for example, reading text
 &apos;&apos; aloud.
 &apos;&apos;
-	Dim sFile As String
-	Dim msgs()As Variant
-	Dim errorCode As Integer
-	Dim config(fiCountConfigOptions)As Variant
+	dim sFile as string
+	dim msgs()as variant
+	dim errorCode as integer
+	dim config(fiCountConfigOptions)as variant
 
 	sFile=fsFullPathOf(fsExtensionSettingsIni)
-	If fileExists(sFile)Then
+	if fileexists(sFile)then
 		tts_config_parseFile(sFile,config(),errorCode)
-		If config(fiAlwaysShowDialogCheckBox) = 1 Then
+		if config(fiAlwaysShowDialogCheckBox) = 1 then
 			ConfigureReadTextAloud()
-		Else
+		else
 			ClearWorkingCountryLanguage
-		    if fileExists(fsMyTempLock) Then
+		    if fileexists(fsMyTempLock) then
 		    	kill fsMyTempLock
 				resetSpeechDispatcher
-			Else
+			else
 				ttsActuate(config(),_
 						msgs(),_
 						errorCode,_
 						&quot;&quot;)
 			end if
 		end if
-	Else
+	else
 		ConfigureReadTextAloud()
 	end if
-End Sub
+end sub
 
 
-Sub SetupReadTextAloud
-&apos;&apos; Tools – Add-ons – Read Selection...
+sub SetupReadTextAloud
+&apos;&apos; Tools - Add-ons - Read Selection...
 &apos;&apos; -----------------------------------
 &apos;&apos;
 &apos;&apos; Use this to setup the text conversion options and to read the text aloud.
 &apos;&apos;
 	ConfigureReadTextAloud()
-End Sub
+end sub
 
 
-Sub ReadClipBoard
+sub ReadClipBoard
 &apos;&apos;  
-&apos;&apos; Tools – Add-ons – Read Clipboard
+&apos;&apos; Tools - Add-ons - Read Clipboard
 &apos;&apos; --------------------------------
 &apos;&apos;  
 &apos;&apos; Use this to read the clipboard from any module that supports a
 &apos;&apos; text clipboard, including the Macro editor.  You normally
-&apos;&apos; fill the clipboard by selecting some text, then using *Edit – Copy*.
-&apos;&apos; If this is useful, assign a key combination to the macro with
-&apos;&apos; *Tools – Customize*.
+&apos;&apos; fill the clipboard by selecting some text, then using *Edit - Copy*.
+&apos;&apos; if this is useful, assign a key combination to the macro with
+&apos;&apos; *Tools - Customize*.
 &apos;&apos;  
 &apos;&apos; ### Clipboard disabled? ###
 &apos;&apos;  
-&apos;&apos; If the program shows an input box when you select *Tools - Read Clipboard*
+&apos;&apos; if the program shows an input box when you select *Tools - Read Clipboard*
 &apos;&apos; it is because the current version of the office suite or the computer 
-&apos;&apos; platform  doesn’t read the clipboard reliably.  Please paste text into 
+&apos;&apos; platform  doesn&apos;t read the clipboard reliably.  Please paste text into 
 &apos;&apos; the input box.
 &apos;&apos;  
 &apos;&apos; ### Resetting the clipboard lock ###
@@ -203,10 +203,10 @@ Sub ReadClipBoard
 	
 	on error goto ReadClipBoardErr
 	ClearWorkingCountryLanguage
-    If fileExists(fsMyTempLock) Then
+    if fileexists(fsMyTempLock) then
 		resetSpeechDispatcher
-	Else
-		If fileexists(s1) or fbClipBoardAvailable = false Then
+	else
+		if fileexists(s1) or fbClipBoardAvailable = False then
 			if fileexists(s1) then
 				if fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getTextFromFile(s1, &quot;UTF-8&quot;) then
 					&apos; You updated office after a crash, so resume
@@ -220,20 +220,20 @@ Sub ReadClipBoard
 					fsLookUpTerm(_
 					&quot;s_read-text&quot;), _
 					&quot; &quot;)
-			If not(s2 = &quot;&quot;) Then
+			if not(s2 = &quot;&quot;) then
 				msgSpeak(s2)
 			end if		
-		Else
+		else
 			CreateFile(s1, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)
-			fsGetClipBoard(false)
+			fsGetClipBoard(False)
 			&apos; Try it - if it crashes, then we are left with the lock file
-			If fileexists(s1) Then
+			if fileexists(s1) then
 				kill s1
 			end if
 			msgSpeak(fsGetClipBoard(true))
 		end if
 	end if
-	Exit Sub
+	Exit sub
 	ReadClipBoardErr:
 	msgbox fsLookupTerm(_
 			&quot;s_string-cannot-be-analyzed&quot;) &amp; _
@@ -243,11 +243,11 @@ Sub ReadClipBoard
 			0, _
 			fsLookUpTerm(_
 			&quot;s_read-text&quot;)
-End Sub
+end sub
 
 
 sub PresentSelection
-&apos;&apos; Tools – Add-ons – Impress-View
+&apos;&apos; Tools - Add-ons - Impress-View
 &apos;&apos; ------------------------------
 &apos;&apos; 
 &apos;&apos; Use this to open the selected text as an Impress document with the full 
@@ -263,7 +263,7 @@ sub PresentSelection
 &apos;&apos; [PS4]: https://www.apple.com/itunes/
 &apos;&apos;
 	PresentSelection2()
-end Sub
+end sub
 
 sub testRtl
 	PresentSelection2(&quot;ar&quot;)
@@ -277,7 +277,8 @@ sub testLTR
 	PresentSelection2(&quot;hi&quot;)
 end sub
 
-sub PresentSelection2(optional byval sB)
+sub PresentSelection2(_
+		optional byval sB)
 	&apos; sB - the language to show.  Defaults to interface language or 
 	&apos; English if the interface language is not available.
 	&apos;
@@ -298,13 +299,13 @@ sub PresentSelection2(optional byval sB)
 	&apos;
 	&apos; # Show Help Template
 	&apos;
-	&apos; We put the complete sample text in the first slide’s note.
-	&apos; Normally, the first slide’s note includes a summary of
+	&apos; We put the complete sample text in the first slide&apos;s note.
+	&apos; Normally, the first slide&apos;s note includes a summary of
 	&apos; the selected text contents in point note form and the
 	&apos; subsequent slides include a summary on the slide with
 	&apos; the full text of each paragraph in the notes.
 	&apos;
-	&apos; - If there is no specific language selection, the presentation 
+	&apos; - if there is no specific language selection, the presentation 
 	&apos;   routines use the user interface language.
 	&apos; - As a result,  Right to left languages will only be aligned
 	&apos;   to the right margin in the help template if the language of
@@ -319,14 +320,14 @@ sub PresentSelection2(optional byval sB)
 	if ismissing(sB) then
 		sB = fsGetLanguage()
 	end if
-	if ThisComponent.supportsService(&quot;com.sun.star.formula.FormulaProperties&quot;) or _
+	if ThisComponent.supportsService(&quot;com.sun.star.formula.formulaProperties&quot;) or _
 			ThisComponent.supportsService(&quot;com.sun.star.sdb.DatabaseContext&quot;) then
-		b1 = false
+		b1 = False
 	else
-		b1 = true
+		b1 = True
 	end if
 	sA = fsGetTextSelection()
-    if fileExists(fsMyTempLock) Then
+    if fileexists(fsMyTempLock) then
 		resetSpeechDispatcher
 	end if
 	if len(sA) &gt; 1 then
@@ -339,13 +340,15 @@ sub PresentSelection2(optional byval sB)
 		end if
 	else
 		NewPresentionFromSelection(fsLookUpTerm(&quot;s_read-text&quot;, sB) &amp; _
-				&quot; – &quot; &amp; _
+				&quot; &quot; &amp; _
+				chr(8211) &amp; _
+				&quot; &quot; &amp; _
 				fsLookUpTerm(&quot;s_speech-synthesis&quot;, sB), _
 				fsSampleMd(sB))
 		i = 1  &apos; presenter note on a new LibreOffice or OpenOffice odp document.
 		j = 0  &apos; first slide on any odp document.
 		ThisComponent.getcurrentcontroller().setCurrentPage(ThisComponent.drawpages(1))
-		ThisComponent.getDrawPages().getByIndex(j).getNotesPage.getByIndex(i).String = fsSampleMd(sB)
+		ThisComponent.getDrawPages().getByIndex(j).getnotesPage.getByIndex(i).String = fsSampleMd(sB)
 		if b1 then
 			wait 1000
 			ThisComponent.Presentation.Start
@@ -355,15 +358,15 @@ sub PresentSelection2(optional byval sB)
 end sub
 
 
-sub ReadTheSlideNote
+sub ReadTheSlidenote
 &apos;&apos;
 &apos;&apos; Read the note
 &apos;&apos; -------------
 &apos;&apos;
-&apos;&apos; If you created a presentation using *Tools – Add-ons – Impress-View*,
+&apos;&apos; if you created a presentation using *Tools - Add-ons - Impress-View*,
 &apos;&apos; you can show a presentation and read the text of the note aloud.
 &apos;&apos;
-&apos;&apos; * If the slideshow isn’t showing, use *Slide Show - Start from first slide*
+&apos;&apos; * if the slideshow isn&apos;t showing, use *Slide Show - Start from first slide*
 &apos;&apos; * Click the text to read the text aloud.
 &apos;&apos; * Click the text while the speech synthesizer is talking to switch the
 &apos;&apos;   speech synthesizer off. 
@@ -371,11 +374,11 @@ sub ReadTheSlideNote
 &apos;&apos;   keyboard.
 &apos;&apos; 
 &apos;&apos; The computer needs [read text extension][1] to execute this procedure.
-&apos;&apos; If the computer doesn’t have the extension, clicking the shape
-&apos;&apos; will show a dialogue telling you that it couldn’t find the script.
+&apos;&apos; if the computer doesn&apos;t have the extension, clicking the shape
+&apos;&apos; will show a dialogue telling you that it couldn&apos;t find the script.
 &apos;&apos; 
-&apos;&apos; The name of the function `ReadTheSlideNote` shows in the dialogue
-&apos;&apos; that Impress displays when a computer that doesn’t have read text
+&apos;&apos; The name of the function `ReadTheSlidenote` shows in the dialogue
+&apos;&apos; that Impress displays when a computer that doesn&apos;t have read text
 &apos;&apos; extension calls the procedure. 
 &apos;&apos; 
 &apos;&apos; [1]: https://extensions.services.openoffice.org/en/project/read-text
@@ -386,15 +389,15 @@ sub ReadTheSlideNote
 	nPage = fiCurrentSlideIndex
 	if nPage = -1 or _
 			not(ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;)) then
-		&apos; Not a valid index or document
+		&apos; not a valid index or document
 		exit sub
 	else
 		if fileexists(fsMyTempLock(&quot;lock&quot;)) then
-			resetSpeechDispatcher(false)
+			resetSpeechDispatcher(False)
 		else
 			s1 = ThisComponent.getDrawPages( _
 					).getByIndex(nPage _
-					).getNotesPage.getByIndex(fiGetSlideNoteIndex _
+					).getnotesPage.getByIndex(fiGetSlidenoteIndex _
 					).getText( _
 					).getString( _
 					)
@@ -413,5 +416,6 @@ sub ReadTheSlideNote
 		end if
 	end if
 end sub
+
 
 </script:module>

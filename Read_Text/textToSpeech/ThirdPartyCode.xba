@@ -7,62 +7,66 @@ OPTION EXPLICIT
 &apos;&apos; Code shown here is used or adapted from other sources with permission.
 &apos;&apos;
 &apos; Unless otherwise attributed, the functions and subs below are adapted
-&apos; from Extended PDF 1.4 © 2006 [Martin Brown](martin.brown@3bview.com)
+&apos; from Extended PDF 1.4 (c) 2006 [Martin Brown](martin.brown@3bview.com)
 &apos; and are distributed under the GNU General Public License
 &apos;
 
-Function fbTts_util_stringToBoolean(value As String) As Boolean
+function fbTts_util_stringToBoolean(_
+		value as string) as boolean
 	&apos; Converts a String to a boolean value.
 	&apos; True=&gt; &quot;True&quot;
 	&apos; False=&gt; &quot;False&quot;
-	Dim b As Boolean: b=False
-	Dim v As String: v=Trim(value)
+	dim b as boolean: b=False
+	dim v as string: v=Trim(value)
 
-	If strComp(v,&quot;True&quot;,0)=0 _
-		or strComp(v,&quot;yes&quot;,0)=0 _
-		or val(v) &lt;&gt; 0 Then
+	if strComp(v,&quot;True&quot;,0)=0 _
+			or strComp(v,&quot;yes&quot;,0)=0 _
+			or val(v) &lt;&gt; 0 then
 		b=True
 	end if
 	fbTts_util_stringToBoolean=b
-End Function
+end function
 
 
-Function fsTts_util_booleanToString(value As Boolean) As String
+function fsTts_util_booleanToString(_
+		value as boolean) as string
 	&apos; Converts a boolean value to a String.
 	&apos; True=&gt; &quot;True&quot;
 	&apos; False=&gt; &quot;False&quot;
-	Dim s As String
+	dim s as string
 
-	If value Then
+	if value then
 		s=&quot;True&quot;
-	Else
+	else
 		s=&quot;False&quot;
 	end if
 	fsTts_util_booleanToString=s
-End Function
+end function
 
 
-Function fsFullPathOf(filename As String) As String
-	&apos;This macro sets a complete path For the user directory For the temporary file
-	Dim pathSettings As Variant
+function fsFullPathOf(_
+		filename as string) as string
+	&apos;This macro sets a complete path for the user directory for the temporary file
+	dim pathSettings as variant
 
 	pathSettings=createUnoService(&quot;com.sun.star.util.PathSettings&quot;)
 	fsFullPathOf=pathSettings.userConfig &amp; &quot;/&quot; &amp; filename
-End Function
+end function
 
 
-Function fvTts_config_createDefaultConfig(msgs() As Variant,_
-		errorCode As Integer) As Variant
+function fvTts_config_createDefaultConfig(_
+		msgs() as variant,_
+		errorCode as integer) as variant
 
 	&apos; The place to store the configuration data
-	Dim config(fiCountConfigOptions) As Variant
+	dim config(fiCountConfigOptions) as variant
 
-	&apos; Create default values For variables
-	If GetGUIType()=1 Then &apos; Windows
+	&apos; Create default values for variables
+	if GetGUIType()=1 then &apos; Windows
 		config(fiFestivalOption)=False
-		If fileExists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) Then
+		if fileexists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) then
 			config(fiFestivalPath)=fsProgramDirectoryx86 &amp; &quot;festival\festival.exe&quot;
-		Else
+		else
 			config(fiFestivalPath)=fsProgramDirectory &amp; &quot;festival\festival.exe&quot;
 		end if
 		config(fiFestivalComboChoice)=&quot;(tts&quot;&quot;(TMP)&quot;&quot;nil) (quit)&quot;
@@ -74,7 +78,7 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 		config(fiExternalCommand)=WinSpeechArgument()
 		config(fiAlwaysShowDialogCheckBox)=1
 		config(fiDialogLanguageCombo)=fsGetLanguage()
-	Else &apos; *n*x or Mac
+	else &apos; *n*x or Mac
 		config(fiFestivalOption)=False
 		config(fiFestivalPath)=&quot;/usr/bin/festival&quot;
 		config(fiFestivalComboChoice)=&quot;(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
@@ -82,33 +86,33 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 		config(fiHtmlOption)=False
 		config(fiSmartSelectCheckBox)=0
 		config(fiHtmlComboURL)=&quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
-		If fsGetOS()=&quot;UNIX&quot; Then &apos; Linux
-			If fileexists(&quot;/usr/bin/python3&quot;) Then
+		if fsGetOS()=&quot;UNIX&quot; then &apos; Linux
+			if fileexists(&quot;/usr/bin/python3&quot;) then
 				config(fiExternalProgramPath)=&quot;/usr/bin/python3&quot;
-			Elseif fileexists(&quot;/usr/bin/python2.7&quot;) Then
+			elseif fileexists(&quot;/usr/bin/python2.7&quot;) then
 				config(fiExternalProgramPath)=&quot;/usr/bin/python2.7&quot;
-			Elseif fileexists(&quot;/usr/bin/python2&quot;) Then
+			elseif fileexists(&quot;/usr/bin/python2&quot;) then
 				config(fiExternalProgramPath)=&quot;/usr/bin/python2&quot;
-			Else
+			else
 				config(fiExternalProgramPath)=&quot;/usr/bin/python&quot;
 			end if
-			If fileexists(&quot;/usr/bin/pico2wave&quot;) Then
+			if fileexists(&quot;/usr/bin/pico2wave&quot;) then
 				config(fiExternalCommand)=&quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
-			Elseif fileexists(&quot;/usr/bin/text2wave&quot;) Then
+				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
+			elseif fileexists(&quot;/usr/bin/text2wave&quot;) then
 				config(fiExternalCommand)=&quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;--visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
-			Elseif fileexists(&quot;/usr/lib/python3/dist-packages/speechd/client.py&quot;) and _
-					fileexists(Environ(&quot;HOME&quot;) &amp; _
-					&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Then
+				&quot;--visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
+			elseif fileexists(&quot;/usr/lib/python3/dist-packages/speechd/client.py&quot;) and _
+					fileexists(environ(&quot;HOME&quot;) &amp; _
+					&quot;/.speech-dispatcher/conf/speechd.conf&quot;) then
 				config(fiExternalCommand)=&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot; &amp; _
 					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			Else
+			else
 				config(fiExternalCommand)=&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false &quot;&quot;(TMP)&quot;&quot;&quot;
+				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
 			end if
-		Else &apos;Mac (OSX)
+		else &apos;Mac (OSX)
 			config(fiExternalProgramPath)= AppleScriptPath()
 			config(fiExternalCommand)=&quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
 		end if
@@ -116,58 +120,60 @@ Function fvTts_config_createDefaultConfig(msgs() As Variant,_
 		config(fiDialogLanguageCombo)=fsGetLanguage()
 	end if
 	fvTts_config_createDefaultConfig()=config()
-End Function
+end function
 
 
-Sub tts_config_parseLine(byval l As String,_
-		key As String,_
-		value As String)
+sub tts_config_parseLine(_
+		byval l as string,_
+		key as string,_
+		value as string)
 	&apos; Parses one line from the configuration file.
 	&apos;
 	&apos; Parameters:
 	&apos; l (in) line of input to parse
-	&apos; key (out) Place to put the key; &quot;&quot; If comment.
-	&apos; value (out) Place to put the value; &quot;&quot; If none.
+	&apos; key (out) Place to put the key; &quot;&quot; if comment.
+	&apos; value (out) Place to put the value; &quot;&quot; if none.
 	&apos;
-	&apos; If the line is a comment line then the key will
+	&apos; if the line is a comment line then the key will
 	&apos; be &quot;&quot;.
 	&apos;
-	Dim iEq As Integer
+	dim iEq as integer
 	
 	&apos; Initialise return values
 	key=&quot;&quot;
 	value=&quot;&quot;
 
 	&apos; Is this an empty line?
-	If Len(Trim(l))=0 Then
+	if len(Trim(l))=0 then
 		&apos; Empty - ignore
 
 	&apos; Is this a comment line?
-	Elseif Left(Trim(l),1)=&quot;#&quot; Then
+	elseif left(Trim(l),1)=&quot;#&quot; then
 		&apos; Comment
 
-	Else
+	else
 		&apos; Parse into key=value
 		iEq=inStr(l,&quot;=&quot;)
-		If iEq=0 Then
-			&apos; Not found - assume whole thing is key
+		if iEq=0 then
+			&apos; not found - assume whole thing is key
 			key=l
-		Else
-			key=Left(l,iEq - 1)
-			value=Mid(l,iEq + 1)
+		else
+			key=left(l,iEq - 1)
+			value=mid(l,iEq + 1)
 		end if
 	end if
-End Sub
+end sub
 
 
-sub tts_config_writeFile(config() As Variant,byval configFilePath As String)
+sub tts_config_writeFile(_
+		config() as variant,byval configFilePath as string)
 	&apos; Writes a configuration file from an array.
 	&apos; This function updated 2013-08-29 - always write as UTF-8
-	Dim sA As String
-	Dim CR As String
+	dim sA as string
+	dim CR as string
 
-	CR = Chr$(10)
-	sA = &quot;# Configuration file For Read Text Extension&quot; &amp; CR
+	CR = chr(10)
+	sA = &quot;# Configuration file for Read Text Extension&quot; &amp; CR
 	sA = fsKeyUSE_FESTIVAL_BOOLEAN &amp; &quot;=&quot; _
 		&amp; fsTts_util_booleanToString(config(fiFestivalOption)) &amp; CR
 	sA = sA &amp; fsKeyFESTIVAL_PATH_STRING &amp; &quot;=&quot; _
@@ -194,9 +200,10 @@ sub tts_config_writeFile(config() As Variant,byval configFilePath As String)
 end sub
 
 
-Sub tts_config_parseFile(byval configFilePath As String,_
-		config() As Variant,_
-		errorCode As Integer)
+sub tts_config_parseFile(_
+		byval configFilePath as string,_
+		config() as variant,_
+		errorCode as integer)
 	&apos; Parses the configuration file into an array.
 	&apos;
 	&apos; Parameters:
@@ -205,108 +212,110 @@ Sub tts_config_parseFile(byval configFilePath As String,_
 	&apos;                   from the file.
 	&apos; errorCode (in out) The Error parameter.
 	&apos;
-	Dim sA As String
-	Dim CR As String
-	Dim CR2 As String
-	Dim l As String
-	Dim key As String
-	Dim value As String
-	Dim n1 As Integer
-	Dim n2 As Integer
+	dim sA as string
+	dim CR as string
+	dim CR2 as string
+	dim l as string
+	dim key as string
+	dim value as string
+	dim n1 as integer
+	dim n2 as integer
 
-	CR = Chr$(13)
-	CR2 = Chr$(10)
+	CR = chr(13)
+	CR2 = chr(10)
 	sA = getTextFromFile(configFilePath, &quot;UTF-8&quot;)
-	if instr(sA, CR2) &lt; instr(sA, CR) Then
+	if instr(sA, CR2) &lt; instr(sA, CR) then
 		&apos; choose character return or line feed
 		CR = CR2
 	end if
 	l = sA
-	do while Len(l) &gt; 0
+	do while len(l) &gt; 0
 		l = fsSuperTrim(left(sA, instr(sA, CR)))
 		sA = fsSuperTrim(mid(sA, instr(sA, CR) + 1 ))
 		tts_config_parseLine(l,key,value)
-		if Len(key) &gt; 0 Then
-			Select Case key
-			Case fsKeyUSE_FESTIVAL_BOOLEAN
+		if len(key) &gt; 0 then
+			select case lcase(key)
+			case fsKeyUSE_FESTIVAL_BOOLEAN
 				config(fiFestivalOption)=fbTts_util_stringToBoolean(value)
 
-			Case fsKeyFESTIVAL_PATH_STRING
+			case fsKeyFESTIVAL_PATH_STRING
 				config(fiFestivalPath)=value
 
-			Case fsKeyFESTIVAL_SCRIPT_STRING
+			case fsKeyFESTIVAL_SCRIPT_STRING
 				config(fiFestivalComboChoice)=value
 
-			Case fsKeyUSE_ESPEAK_BOOLEAN
+			case fsKeyUSE_ESPEAK_BOOLEAN
 				config(fiExternalOption)=fbTts_util_stringToBoolean(value)
 
-			Case fsKeyESPEAK_PATH_STRING
+			case fsKeyESPEAK_PATH_STRING
 				config(fiExternalProgramPath)=value
 
-			Case fsKeyESPEAK_COMMANDS_STRING
+			case fsKeyESPEAK_COMMANDS_STRING
 				config(fiExternalCommand)=value
 
-			Case fsKeyUSE_HTML_BOOLEAN
+			case fsKeyUSE_HTML_BOOLEAN
 				config(fiHtmlOption)=fbTts_util_stringToBoolean(value)
 
-			Case fsKeyHTML_STRING
+			case fsKeyHTML_STRING
 				config(fiHtmlComboURL)=value
 
-			Case fsKeyDISPLAY_INFO_INTEGER
+			case fsKeyDISPLAY_INFO_INTEGER
 				config(fiAlwaysShowDialogCheckBox)=fiStringToInteger(value)
 
-			Case fsKeyDISPLAY_LANGUAGE_STRING
+			case fsKeyDISPLAY_LANGUAGE_STRING
 				config(fiDialogLanguageCombo)=value
 
-			Case fsKeyUSE_SMART_SELECT
+			case fsKeyUSE_SMART_SELECT
 				config(fiSmartSelectCheckBox)=value
 
-			Case Else
+			case else
 
-			End Select
+			end select
 		end if
 	loop
 end sub
 
 
-Function fsSuperTrim(byval sA )
+function fsSuperTrim(_
+		byval sA )
 	&apos; Remove extra line feeds and character returns
-	Dim n As Integer
+	dim n as integer
 
-	For n = 1 to 100
+	for n = 1 to 100
 		if len(sA) = 0 then
 			exit for
-		elseif right(sA, 1) = Chr$(10) or right(sA, 1) = Chr$(13) Then
-			sA = left(sA, Len(sA) - 1 )
+		elseif right(sA, 1) = chr(10) or right(sA, 1) = chr(13) then
+			sA = left(sA, len(sA) - 1 )
 			sA = trim(sA)
-		Else
-			Exit For
+		else
+			exit for
 		end if
 	next
-	For n = 1 to 100
+	for n = 1 to 100
 		if len(sA) = 0 then
 			exit for
-		elseif left(sA, 1) = Chr$(10) or left(sA, 1) = Chr$(13) Then
+		elseif left(sA, 1) = chr(10) or left(sA, 1) = chr(13) then
 			sA = mid(sA, 2 )
 			sA = trim(sA)
-		Else
-			Exit For
+		else
+			exit for
 		end if
 	next
 	fsSuperTrim = sA
 
-End Function
+end function
 
 
-Function fsRetrieveCalcActiveCellProperty(strA) As String
-	&apos; Modified from Sub from: Paolo Mantovani
+function fsRetrieveCalcActiveCellProperty(_
+		strA) as string
+	&apos; Modified from sub from: Paolo Mantovani
 	&apos; email: mantovani.paolo@tin.it
 	&apos; published at https://sourceforge.net/projects/ooomacros/files/Andrew%20Pitonyak_s%20Macro%20Doc/2006-01-25/AndrewMacro_2006-01-25.zip/download
 	&apos; Gets property of the active cell.
-	Dim oOldSelection  &apos;The original selection of cell ranges
-	Dim oRanges  &apos;A blank range created by the document
-	Dim oActiveCell  &apos;The current active cell
-	Dim sCellContent As String
+	dim oOldSelection  &apos;The original selection of cell ranges
+	dim oRanges  &apos;A blank range created by the document
+	dim oActiveCell  &apos;The current active cell
+	dim sCellContent as string
 
 	REM store the current selection
 	oOldSelection=ThisComponent.CurrentSelection
@@ -314,44 +323,45 @@ Function fsRetrieveCalcActiveCellProperty(strA) As String
 	ThisComponent.CurrentController.Select(oRanges)
 	&apos;get the active cell!
 	oActiveCell=ThisComponent.CurrentSelection
-	Select Case strA
-	Case &quot;country&quot;
+	select case strA
+	case &quot;country&quot;
 		sCellContent=oActiveCell.CharLocale.Country
-	Case &quot;language&quot;
+	case &quot;language&quot;
 		sCellContent=oActiveCell.CharLocale.Language
-	Case &quot;asian-language&quot;
+	case &quot;asian-language&quot;
 		sCellContent=oActiveCell.CharLocaleAsian.Language
-	Case &quot;complex-language&quot;
+	case &quot;complex-language&quot;
 		sCellContent=oActiveCell.CharLocaleComplex.Language
-	Case &quot;asian-country&quot;
+	case &quot;asian-country&quot;
 		sCellContent=oActiveCell.CharLocaleAsian.Country
-	Case &quot;complex-country&quot;
+	case &quot;complex-country&quot;
 		sCellContent=oActiveCell.CharLocaleComplex.Country
-	Case Else
+	case else
 		 sCellContent=oActiveCell.getString()
-	End Select
+	end select
 	&apos;restore the old selection (but loosing the previous active cell)
 	ThisComponent.CurrentController.Select(oOldSelection)
 		fsRetrieveCalcActiveCellProperty=sCellContent
-End Function
+end function
 
 
-Function fsGetPackageDirURL(sIdentifier As String) As String
+function fsGetPackageDirURL(_
+		sIdentifier as string) as string
 	&apos;http://www.oooforum.org/forum/viewtopic.phtml?t=72633
-	Dim oPIP As Object
+	dim oPIP As Object
 
 	oPIP=GetDefaultContext().getByName( _
 		 &quot;/singletons/com.sun.star.deployment.PackageInformationProvider&quot;)
 	fsGetPackageDirURL=oPIP.getPackageLocation(sIdentifier)
-End Function
+end function
 
 
-Function fsGetPicturePath()
-	Dim oDialog
-	Dim oAllFiles
-	Dim oFrame
-	Dim oBar
-	Dim sFilePickerArgs
+function fsGetPicturePath()
+	dim oDialog
+	dim oAllFiles
+	dim oFrame
+	dim oBar
+	dim sFilePickerArgs
 
 	on error goto fsGetPicturePathErr
 	oDialog = createUnoService(&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
@@ -363,41 +373,49 @@ Function fsGetPicturePath()
 			&quot;jpeg;*.jpg;*.png;*.tif;*.tiff;*.tga&quot;)
 	oDialog.setTitle(fsLookUpTerm( &quot;s_read-text&quot;, fsGetLanguage())&amp; _
 		&quot; - &quot; &amp;&quot; (MY_IMAGE)&quot;)
-	if oDialog.execute = 0 Then
+	if oDialog.execute = 0 then
 		fsGetPicturePath=ConvertFromURL(fsPosterImg) &apos;Default picture
 	end if
 	oAllFiles() = oDialog.getFiles()
 	fsGetPicturePath = ConvertFromURL(oAllFiles(0))
-	if fsGetPicturePath = &quot;&quot; Then
+	if fsGetPicturePath = &quot;&quot; then
 		fsGetPicturePath=ConvertFromURL(fsPosterImg) &apos;Default picture
-	end If
-	Exit Function
+	end if
+	exit function
 	fsGetPicturePathErr:
 	fsGetPicturePath = &quot;&quot;
-End Function
+end function
 
 
-Function CreatePoint(ByVal x As Long,ByVal y As Long) As com.sun.star.awt.Point
+function CreatePoint(_
+		byval x as long, _
+		byval y as long) As com.sun.star.awt.Point
 	&apos; OpenOffice.org Macros Explained, Third Ed., 2015. [Andrew Pitonyak](http://www.pitonyak.org)
-	Dim oPoint : oPoint = createUnoStruct( &quot;com.sun.star.awt.Point&quot; )
+	dim oPoint : oPoint = createUnoStruct( &quot;com.sun.star.awt.Point&quot; )
 	oPoint.X = x : oPoint.Y = y
 	CreatePoint = oPoint
-End Function
+end function
 
 
-Function CreateSize(ByVal x As Long,ByVal y As Long) As com.sun.star.awt.Size
+function CreateSize(_
+		byval x as long, _
+		byval y as long) As com.sun.star.awt.Size
 	&apos; OpenOffice.org Macros Explained, Third Ed., 2015. [Andrew Pitonyak](http://www.pitonyak.org)
-	Dim oSize : oSize = createUnoStruct( &quot;com.sun.star.awt.Size&quot; )
+	dim oSize : oSize = createUnoStruct( &quot;com.sun.star.awt.Size&quot; )
 	oSize.Width = x : oSize.Height = y
 	CreateSize = oSize
-End Function
+end function
 
-Sub ChangeBackground(optional byval i, optional r1, optional g1, optional b1)
+sub ChangeBackground(_
+		optional byval i, _
+		optional r1, _
+		optional g1, _
+		optional b1)
 	&apos;AndrewMacro.odt - [Andrew Pitonyak](http://www.pitonyak.org)
-	Dim oDoc as Object
-	Dim oDrawPages as Object
-	Dim oDrawPage as Object
-	Dim oBackground as Object
+	dim oDoc as object
+	dim oDrawPages as object
+	dim oDrawPage as object
+	dim oBackground as object
 	
 	if ismissing(i) then
 		i = 0
@@ -413,13 +431,13 @@ Sub ChangeBackground(optional byval i, optional r1, optional g1, optional b1)
 	end if
 	oDoc = ThisComponent
 	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or _
-			oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
+			oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) then
 		oDrawPages = oDoc.getDrawPages()   
 		oDrawPage = oDrawPages.getByIndex(i)
 		oBackground = oDoc.createInstance(&quot;com.sun.star.drawing.Background&quot;)
 		oBackground.FillColor = RGB(r1, g1, b1)
 		oDrawPage.Background = oBackground
 	end if
-End Sub
+end sub
 
 </script:module>
