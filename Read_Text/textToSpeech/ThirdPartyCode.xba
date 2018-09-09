@@ -348,7 +348,7 @@ end function
 function fsGetPackageDirURL(_
 		sIdentifier as string) as string
 	&apos;http://www.oooforum.org/forum/viewtopic.phtml?t=72633
-	dim oPIP As Object
+	dim oPIP as object
 
 	oPIP=GetDefaultContext().getByName( _
 		 &quot;/singletons/com.sun.star.deployment.PackageInformationProvider&quot;)

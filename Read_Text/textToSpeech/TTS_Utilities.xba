@@ -32,7 +32,7 @@ OPTION EXPLICIT
 &apos;&apos;
 
 sub OK_MouseUp(_
-		Event As Object)
+		Event as object)
 	&apos; This sub uses the current dialog settings without dismissing
 	&apos; the dialog if you right click the OK button.
 	dim msgs() as variant
@@ -53,7 +53,7 @@ end sub
 
 
 sub Cancel_MouseUp(_
-		Event As Object)
+		Event as object)
 	dim msgs() as variant
 	dim errorCode as integer
 
@@ -67,7 +67,7 @@ end sub
 
 
 sub Reset_MouseUp(_
-		Event As Object)
+		Event as object)
 	dim msgs() as variant
 	dim errorCode as integer
 
@@ -84,7 +84,7 @@ end sub
 
 
 sub About_MouseUp(_
-		Event As Object)
+		Event as object)
 	dim msgs() as variant
 	dim errorCode as integer
 
@@ -100,7 +100,7 @@ end sub
 
 
 sub UseFestival_MouseUp(_
-		Event As Object)
+		Event as object)
 	dim msgs() as variant
 	dim errorCode as integer
 
@@ -116,7 +116,7 @@ end sub
 
 
 sub Label1_MouseUp(_
-		Event As Object)
+		Event as object)
 	dim msgs() as variant
 	dim errorCode as integer
 
@@ -130,7 +130,7 @@ end sub
 
 
 sub Label2_MouseUp(_
-		Event As Object)
+		Event as object)
 	dim msgs() as variant
 	dim errorCode as integer
 
@@ -144,7 +144,7 @@ end sub
 
 
 sub UseExternal_MouseUp(_
-		Event As Object)
+		Event as object)
 	dim msgs() as variant
 	dim errorCode as integer
 
@@ -160,7 +160,7 @@ end sub
 
 
 sub UseWeb_MouseUp(_
-		Event As Object)
+		Event as object)
 	dim msgs() as variant
 	dim errorCode as integer
 
@@ -176,7 +176,7 @@ end sub
 
 
 sub UseAlwaysShow_MouseUp(_
-		Event As Object)
+		Event as object)
 	dim msgs() as variant
 	dim errorCode as integer
 
@@ -192,7 +192,7 @@ end sub
 
 
 sub AboutButton_MouseUp(_
-		Event As Object)
+		Event as object)
 	dim msgs() as variant
 	dim errorCode as integer
 
@@ -486,11 +486,11 @@ end function
 
 
 function fsGetOnlySelectedText() as string
-	dim oDoc   As Object
-	dim oSelection As Object
+	dim oDoc   as object
+	dim oSelection as object
 	dim sSelectedText as string
 	dim n as integer
-	On Error Goto fsGetOnlySelectedTextErr
+	on error goto fsGetOnlySelectedTextErr
 	oDoc=thisComponent
 	if oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) then
 		sSelectedText=fsRetrieveCalcActiveCellText()
@@ -531,12 +531,12 @@ function fsGetSmartTextSelection(_
 	&apos; (Imagine a computer voice saying &quot;equals&quot; 79 times in a row.)
 	&apos; for visual presentation, we can show it.
 	&apos; [1]: https://daringfireball.net/projects/markdown/
-	dim oDoc As Object
-	dim oSelection As Object
+	dim oDoc as object
+	dim oSelection as object
 	dim sSelectedText as string
 	dim n as integer
 
-	&apos;On Error Goto fsGetSmartTextSelectionErr
+	&apos;on error goto fsGetSmartTextSelectionErr
 	if ismissing(bHideMDCode) then
 		bHideMDCode = True
 	end if
@@ -664,36 +664,36 @@ end function
 
 
 function fbGoRight()
-	fbGoRight = fbGoToMark(&quot;right&quot;)
+	fbGoRight = fbgotoMark(&quot;right&quot;)
 end function
 
 
 function gotoend()
-	gotoend = fbGoToMark(&quot;end&quot;)
+	gotoend = fbgotoMark(&quot;end&quot;)
 end function
 
 
 function fbGoLeft()
-	fbGoLeft = fbGoToMark(&quot;left&quot;)
+	fbGoLeft = fbgotoMark(&quot;left&quot;)
 end function
 
 
 function fbSelecttoendofParagraph()
-	fbSelecttoendofParagraph  =  fbGoToMark(&quot;paragraphselect&quot;)
+	fbSelecttoendofParagraph  =  fbgotoMark(&quot;paragraphselect&quot;)
 end function
 
 
 function fbSelecttoendofDoc()
-	fbSelecttoendofDoc  =  fbGoToMark(&quot;endselect&quot;)
+	fbSelecttoendofDoc  =  fbgotoMark(&quot;endselect&quot;)
 end function
 
 
-function fbGoToMark(MarkType)
+function fbgotoMark(MarkType)
 	dim document   as object
 	dim dispatcher as object
 	dim args1(1) as new com.sun.star.beans.PropertyValue
 
-	on error goto fbGoToMarkErr
+	on error goto fbgotoMarkErr
 	document = ThisComponent.CurrentController.Frame
 	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
 	args1(0).Name  = &quot;Count&quot;
@@ -708,15 +708,15 @@ function fbGoToMark(MarkType)
 	case &quot;paragraphselect&quot;
 		dispatcher.executeDispatch(document, &quot;.uno:endOfParaSel&quot;, &quot;&quot;, 0, Array())
 	case &quot;endselect&quot;
-		dispatcher.executeDispatch(document, &quot;.uno:GoToPrevWord&quot;, &quot;&quot;, 0, Array())
+		dispatcher.executeDispatch(document, &quot;.uno:gotoPrevWord&quot;, &quot;&quot;, 0, Array())
 		dispatcher.executeDispatch(document, &quot;.uno:endOfDocumentSel&quot;, &quot;&quot;, 0, Array())
 	case else  &apos; &quot;end&quot;
-		dispatcher.executeDispatch(document, &quot;.uno:GoToendOfDoc&quot;, &quot;&quot;, 0, Array())
+		dispatcher.executeDispatch(document, &quot;.uno:gotoendOfDoc&quot;, &quot;&quot;, 0, Array())
 	end select
-	fbGoToMark  =  true
+	fbgotoMark  =  true
 	exit function
-	fbGoToMarkErr:
-	fbGoToMark  =  False
+	fbgotoMarkErr:
+	fbgotoMark  =  False
 end function
 
 
@@ -870,7 +870,7 @@ function fbWindowsHasAnInternationalVoice(_
 	on error goto fbWindowsHasAnInternationalVoiceErr
 	b1=true
 	if fsGetOS=&quot;WINDOWS&quot; then
-		dim sapi As Object
+		dim sapi as object
 		Set Sapi=CreateObject(&quot;Sapi.SpVoice&quot;)
 		b1 = False
 		for n = 0 to Sapi.GetVoices.Count - 1
@@ -1046,12 +1046,16 @@ sub dialog1Combo2ShowSAPIChoices(_
 &apos;&apos;
 &apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(now).ogg&quot; &quot;(TMP)&quot;
 &apos;&apos;
-	dim Sapi As Object
+	dim Sapi as object
 	dim n as integer
-	dim aLineOfText as string,myScriptPath as string
-	dim n1 as integer,s1 as string,oComboBox as variant
-	dim sProgram as string,myTextPath as string
-	dim sSelectionLangCountryTag, sSelectionLanguageTag as string
+	dim aLineOfText as string
+	dim myScriptPath as string
+	dim n1 as integer,s1 as string
+	dim oComboBox as variant
+	dim sProgram as string
+	dim myTextPath as string
+	dim sSelectionLangCountryTag
+	dim sSelectionLanguageTag as string
 
 	Set Sapi=CreateObject(&quot;Sapi.SpVoice&quot;)
 	REM get control
@@ -1076,7 +1080,7 @@ sub dialog1Combo2ShowSAPIChoices(_
 		Next
 		n=n+1
 	wend
-	On Error Goto 0
+	on error goto 0
 	for n1 = 10 To -10 step -2
 		oComboBox.addItem( &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
@@ -1180,7 +1184,7 @@ sub dialog1Combo2ShowSAPIChoices(_
 	FichierKO:
 	Resume FichierKO2
 	FichierKO2:
-	On Error Resume Next
+	on error Resume Next
 end sub
 
 
@@ -2088,31 +2092,36 @@ function getTextFromFile(_
 	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t=53813
 	&apos; Use simpleFileAccess instead of Basic file handling to 
 	&apos; translate encoded text
-	dim myTextFile As Object,sf As Object,fileStream As Object
-	dim aLineOfText as string,myFilePath as string
-
-	myFilePath=convertToURL(sFilePath)
-	sf=createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
-	On Error Goto fichierKO
-	fileStream=sf.openFileRead(myFilePath)
-	myTextFile=createUnoService(&quot;com.sun.star.io.TextInputStream&quot;)
+	
+	on error goto fichierKO
+	dim a1 : a1 = array()
+	dim i as double : i = ubound(a1)
+	dim myFilePath as string : myFilePath=convertToURL(sFilePath)
+	dim sf as object : sf=createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	dim fileStream as object : fileStream=sf.openFileRead(myFilePath)
+	dim myTextFile as object : myTextFile=createUnoService(&quot;com.sun.star.io.TextInputStream&quot;)
+	
 	myTextFile.InputStream=fileStream
 	myTextFile.Encoding=sEncoding
 	do while not myTextFile.IsEOF
-		getTextFromFile=getTextFromFile &amp; myTextFile.readLine &amp; chr(13)
-	Loop
+		i = i + 1
+		redim preserve a1(i)
+		a1(i) = myTextFile.readLine
+	loop
+	getTextFromFile=join(a1,chr(13))
 	fileStream.closeInput
 	myTextFile.closeInput
-	On Error Goto 0
+	on error goto 0
 	exit function
 	FichierKO:
 		Resume FichierKO2
 	FichierKO2:
-	On Error Resume Next
+	on error Resume Next
 	msgbox(&quot;File read Error !&quot;,16)
 	fileStream.closeInput
 	myTextFile.closeInput
-	On Error Goto 0
+	getTextFromFile = &quot;&quot;
+	on error goto 0
 end function
 
 
@@ -2195,7 +2204,7 @@ sub ttsActuate(_
 	bAddTime = False
 	sArtURL = &quot;&quot;
 	n = 0
-	On Error Goto errorHandler
+	on error goto errorHandler
 	&apos;Choose what to speak
 	if ismissing(sTextToSpeak) or sTextToSpeak = &quot;&quot; then  
 		sTextToSpeak = fsGetTextSelection(False, true)
@@ -2209,11 +2218,11 @@ sub ttsActuate(_
 	if len(sTextToSpeak) = 0 then
 		Exit sub
 	end if
-	On Error Resume Next
+	on error Resume Next
 	oFrame=ThisComponent.getCurrentController().getFrame() 
 	oBar=oFrame.createStatusIndicator() 
 	oBar.start(fsLookUpTerm( &quot;s_read-text&quot;, fsGetLanguage()),100)
-	On Error Goto ErrorHandler
+	on error goto ErrorHandler
 	sCommand=&quot;&quot;
 	sScript=&quot;&quot;
 	&apos;Get rid of the old files containing a script And/or plain text of selected String
@@ -2260,9 +2269,9 @@ sub ttsActuate(_
  		&apos; 
 		i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 0
 	end if
-	On Error Resume Next
+	on error Resume Next
 	oBar.Value=70
-	On Error Goto errorHandler
+	on error goto errorHandler
 	if config(fiFestivalOption) then
 		&apos;Write the Festival script and the file to read aloud
 		sProgram=config(fiFestivalPath)
@@ -2420,7 +2429,7 @@ sub ttsActuate(_
 			if (Instr(sCommand,&quot;http://&quot;)&lt;&gt;1 And Instr(sCommand,&quot;https://&quot;)&lt;&gt;1 And Instr(sCommand,&quot;mailto:&quot;)&lt;&gt;1) then
 				sCommand=&quot;http://&quot; &amp; sCommand
 			end if
-			dim oSvc As Object
+			dim oSvc as object
 			oSvc=createUnoService(sProgram)
 			oSvc.execute(sCommand, &quot;&quot; ,0)
 		else
@@ -2447,9 +2456,9 @@ sub ttsActuate(_
 	if sCommand &lt;&gt; &quot;&quot; then 
 		errorCode=Shell(sProgram,0,sCommand,bWait)
 		end if
-		On Error Resume Next
+		on error Resume Next
 		oBar.Value=80
-		On Error Goto errorHandler
+		on error goto errorHandler
 	else
 		msgbox( fsLookUpTerm(&quot;s_could-not-locate-the-program&quot;) &amp; _
 			&quot; &quot; &amp; _
@@ -2463,7 +2472,7 @@ sub ttsActuate(_
 		end if
 		resetSpeech
 	end if
-	On Error Resume Next	
+	on error Resume Next	
 	oBar.Value=90
 	if len(sArtURL) &gt; 0 then
 	    if (fsGetOS = &quot;WINDOWS&quot;) then
@@ -2828,11 +2837,11 @@ function fsPathSettings(_
 		Optional bshowall as boolean,_
 		Optional ListIndex as integer) as string
 	&apos; Gets a special configured PathSetting
-	dim oSettings,oPathSettings As Object
+	dim oSettings,oPathSettings as object
 	dim sPath as string
 	dim PathList() as string
 	dim MaxIndex as integer
-	dim oPS As Object
+	dim oPS as object
 
 	oPS=createUnoService(&quot;com.sun.star.util.PathSettings&quot;)
 
@@ -2868,7 +2877,7 @@ function fiStringToInteger(_
 	dim b as integer: b=0
 	dim v as string: v=Trim(value)
 
-	On Error Goto CONVERSIONERROR
+	on error goto CONVERSIONERROR
 	b=value
 	fiStringToInteger=b
 	exit function
@@ -2930,7 +2939,7 @@ function fbWindowsHasVoiceInThisLanguage(_
 	&apos; Determine which SAPI voices are installed, then
 	&apos; if we have a modern voice from Windows Vista, Windows 7 or above
 	&apos; then return true, else if no voices found, then return False
-	dim Sapi As Object
+	dim Sapi as object
 	dim n,n1 as integer
 	dim s1, s2 as string
 
@@ -2939,7 +2948,7 @@ function fbWindowsHasVoiceInThisLanguage(_
 	end if
 	sLang = lcase(sLang)
 	fbWindowsHasVoiceInThisLanguage = False
-	&apos;on Error goto VoiceTestError
+	&apos;on error goto VoiceTestError
 	Set Sapi=Createobject(&quot;Sapi.SpVoice&quot;)
 	s1 =lcase(isoToEnglish(sLang))
 	&apos;let&apos;s see if we recognize the language s1
@@ -2954,7 +2963,7 @@ function fbWindowsHasVoiceInThisLanguage(_
 	exit function
 	VoiceTestError:
 	fbWindowsHasVoiceInThisLanguage = False
-	on Error resume next
+	on error resume next
 end function
 
 
@@ -3554,7 +3563,7 @@ function fsSelectionCountry(_
 		sFilter = &quot;&quot;
 	end if
 	on error resume next
-	&apos;On Error Goto SELECTCOUNTRYERROR
+	&apos;on error goto SELECTCOUNTRYERROR
 	sA = &quot;&quot;
 	sB = &quot;&quot;
 	sC = &quot;&quot;
@@ -3812,12 +3821,12 @@ end function
 
 function fsDrawProperty(_
 		strA) as string
-	dim oDoc As Object
-	dim oController As Object
-	dim oSelection As Object
+	dim oDoc as object
+	dim oController as object
+	dim oSelection as object
 	dim s1r as string
 
-	On error goto fsDrawPropertyErr
+	on error goto fsDrawPropertyErr
 	s1r=&quot;&quot;
 	oDoc=ThisComponent
 	oController=oDoc.getCurrentController()
@@ -4145,7 +4154,7 @@ end function
 
 sub myBeep()
 	dim sA as string
-	dim oSvc As Object
+	dim oSvc as object
 
 	sA=soundsDirectory()&amp;&quot;apert.wav&quot;
 	if fileexists(sA) then
@@ -4162,7 +4171,7 @@ end sub
 
 sub windowsSAPIControl()
 	dim s2 as string
-	dim oSvc As Object
+	dim oSvc as object
 
 	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 	s2=fsHomeDrive()
@@ -4227,8 +4236,8 @@ function fbCreateFile(_
 &apos;&apos; you have a problem saving or opening a file, try renaming the
 &apos;&apos; directories in the file path with Western characters.
 &apos;&apos;
-	dim oOutputAccess As Object
-	dim oOutputStream As Object
+	dim oOutputAccess as object
+	dim oOutputStream as object
 	dim vOutputData, UDP, PV as variant
  	dim CR as string
 	
@@ -4241,7 +4250,7 @@ function fbCreateFile(_
 			sEncoding = &quot;utf-8&quot; &apos; Posix standard
 		end select
 	end if
-	on Error goto fbCreateFileError
+	on error goto fbCreateFileError
 	CR = chr(13)
 	if fileexists(sFilePath) then
 		kill sFilePath
@@ -5028,8 +5037,8 @@ function CreateFile(_
 	&apos; This sub will create the file and all the nested directories
 	&apos; in the path in a single step.
  	dim CR as string
-	dim oOutputAccess As Object
-	dim oOutputStream As Object
+	dim oOutputAccess as object
+	dim oOutputStream as object
 	dim vOutputData, UDP, PV as variant	
 	
 	CR = chr(13)
@@ -5041,7 +5050,7 @@ function CreateFile(_
 			sEncoding = &quot;utf-8&quot; &apos; Posix standard
 		end select
 	end if
-	on Error goto CreateFileError
+	on error goto CreateFileError
 	if fileexists(sFilePath) then
 		kill sFilePath
 	end if
@@ -5284,12 +5293,12 @@ sub resetSpeechDispatcher(_
 	if ismissing(bAll) then
 		bAll = False
 	end if
-	On Error Resume Next
+	on error Resume Next
 	oFrame=ThisComponent.getCurrentController().getFrame() 
 	oBar=oFrame.createStatusIndicator() 
 	oBar.start(fsLookUpTerm( &quot;s_read-text&quot;, fsGetLanguage()),100)
 	oBar.Value=70
-	On Error Goto resetSpeechDispatcherErr
+	on error goto resetSpeechDispatcherErr
 	if fsGetOS()=&quot;WINDOWS&quot; then
 		if fileexists(fsMyTempLock) then
 			kill fsMyTempLock
@@ -5342,7 +5351,7 @@ sub resetSpeechDispatcher(_
 	if fileexists(fsFullPathOf(fsTemporaryTextDoc)) then
 		kill fsFullPathOf(fsTemporaryTextDoc)
 	end if
-	On Error Resume Next
+	on error Resume Next
 	oBar.end()
 	Exit sub
 	resetSpeechDispatcherErr:
@@ -5966,7 +5975,7 @@ end function
 function fsGetSlidenote(_
 		optional bClean, _
 		optional byval nPage)
-	dim oDoc As Object
+	dim oDoc as object
 	dim sA as string
 	dim i as integer
 
@@ -6008,7 +6017,7 @@ end function
 function fiGetSlidenoteIndex(_
 		optional nPage)
 	on error goto fiGetSlidenoteIndexErr
-	dim oDoc As Object
+	dim oDoc as object
 	dim nPage As Double
 	dim i as integer
 	dim sA as string
@@ -6750,7 +6759,7 @@ sub NewPresentionFromSelection(_
 	 	oShape1.CharHeight = x.getDrawPages().getByIndex(0).Height / 1000
 	 	ResizeAsianComplexText(oShape1)
 		oBar.end()
-		On Error Resume Next
+		on error Resume Next
 		x.Presentation.IsMouseVisible() = True
 		&apos; We want to be able to close without an &quot;Are you sure?&quot; message.
 		x.setModified(False)
@@ -7279,8 +7288,8 @@ sub addBubbleToSlide(_
 	&apos; by Charlie Young - Sat Jan 07, 2012 5:30 am
 	&apos; [ABTS1]: https://forum.openoffice.org/en/forum/viewtopic.php?f=45&amp;t=46682#p215798
 	&apos;
-	dim oDrawPage As Object
-	dim oShape As Object
+	dim oDrawPage as object
+	dim oShape as object
 	dim shapeGeometry(0) as new com.sun.star.beans.PropertyValue
 	dim oSize As new com.sun.star.awt.Size
 	dim ShapePos As new com.sun.star.awt.Point
