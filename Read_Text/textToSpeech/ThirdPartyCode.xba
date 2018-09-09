@@ -166,36 +166,63 @@ end sub
 
 
 sub tts_config_writeFile(_
-		config() as variant,byval configFilePath as string)
+		config() as variant, _
+		byval configFilePath as string)
 	&apos; Writes a configuration file from an array.
-	&apos; This function updated 2013-08-29 - always write as UTF-8
-	dim sA as string
-	dim CR as string
+	&apos; This function updated 2018-09-09 - always write as UTF-8
+	dim sA as string : sA = &quot;&quot;
+	dim CR as string : CR = chr(10)
+	
+	sA = join(_
+            array(_
+            &quot;# Configuration file for Read Text Extension&quot;, _
+            CR, _
+            fsKeyUSE_FESTIVAL_BOOLEAN(), _
+            &quot;=&quot;, _
+            fsTts_util_booleanToString(config(fiFestivalOption)), _
+            CR, _
+            fsKeyFESTIVAL_PATH_STRING(), _
+            &quot;=&quot;, _
+            config(fiFestivalPath), _
+            CR, _
+            fsKeyFESTIVAL_SCRIPT_STRING(), _
+            &quot;=&quot;, _
+            config(fiFestivalComboChoice), _
+            CR, _
+            fsKeyUSE_ESPEAK_BOOLEAN(), _
+            &quot;=&quot;, _
+            fsTts_util_booleanToString(config(fiExternalOption)), _
+            CR, _
+            fsKeyUSE_HTML_BOOLEAN(), _
+            &quot;=&quot;, _
+            fsTts_util_booleanToString(config(fiHtmlOption)), _
+            CR, _
+            fsKeyHTML_STRING(), _
+            &quot;=&quot;, _
+            config(fiHtmlComboURL), _
+            CR, _
+            fsKeyESPEAK_PATH_STRING(), _
+            &quot;=&quot;, _
+            config(fiExternalProgramPath), _
+            CR, _
+            fsKeyESPEAK_COMMANDS_STRING(), _
+            &quot;=&quot;, _
+            config(fiExternalCommand), _
+            CR, _
+            fsKeyDISPLAY_INFO_INTEGER(), _
+            &quot;=&quot;, _
+            config(fiAlwaysShowDialogCheckBox), _
+            CR, _
+            fsKeyUSE_SMART_SELECT(), _
+            &quot;=&quot;, _
+            config(fiSmartSelectCheckBox), _
+            CR, _
+            fsKeyDISPLAY_LANGUAGE_STRING(), _
+            &quot;=&quot;, _
+            config(fiDialogLanguageCombo), _
+            CR), _
+            &quot;&quot;)
 
-	CR = chr(10)
-	sA = &quot;# Configuration file for Read Text Extension&quot; &amp; CR
-	sA = fsKeyUSE_FESTIVAL_BOOLEAN &amp; &quot;=&quot; _
-		&amp; fsTts_util_booleanToString(config(fiFestivalOption)) &amp; CR
-	sA = sA &amp; fsKeyFESTIVAL_PATH_STRING &amp; &quot;=&quot; _
-		&amp; config(fiFestivalPath) &amp; CR
-	sA = sA &amp; fsKeyFESTIVAL_SCRIPT_STRING &amp; &quot;=&quot; _
-		&amp; config(fiFestivalComboChoice) &amp; CR
-	sA = sA &amp; fsKeyUSE_ESPEAK_BOOLEAN &amp; &quot;=&quot; _
-		&amp; fsTts_util_booleanToString(config(fiExternalOption)) &amp; CR
-	sA = sA &amp; fsKeyUSE_HTML_BOOLEAN &amp; &quot;=&quot; _
-		&amp; fsTts_util_booleanToString(config(fiHtmlOption)) &amp; CR
-	sA = sA &amp; fsKeyHTML_STRING &amp; &quot;=&quot; _
-		&amp; config(fiHtmlComboURL) &amp; CR
-	sA = sA &amp; fsKeyESPEAK_PATH_STRING &amp; &quot;=&quot; _
-		&amp; config(fiExternalProgramPath) &amp; CR
-	sA = sA &amp; fsKeyESPEAK_COMMANDS_STRING &amp; &quot;=&quot; _
-		&amp; config(fiExternalCommand) &amp; CR
-	sA = sA &amp; fsKeyDISPLAY_INFO_INTEGER &amp; &quot;=&quot; _
-		&amp; config(fiAlwaysShowDialogCheckBox) &amp; CR
-	sA = sA &amp; fsKeyUSE_SMART_SELECT &amp; &quot;=&quot; _
-		&amp; config(fiSmartSelectCheckBox) &amp; CR
-	sA = sA &amp; fsKeyDISPLAY_LANGUAGE_STRING &amp; &quot;=&quot; _
-		&amp; config(fiDialogLanguageCombo) &amp; CR
 	CreateFile(configFilePath, sA, &quot;UTF-8&quot;)
 end sub
 
