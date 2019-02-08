@@ -143,7 +143,7 @@
 ''
 '' [Read Text Extension](https://sites.google.com/site/readtextextension/)
 ''
-'' Copyright (c) 2011 - 2018 James Holgate
+'' Copyright � 2011 - 2018 James Holgate
 '''
 Const ForReading = 1
 Const ForWriting = 3

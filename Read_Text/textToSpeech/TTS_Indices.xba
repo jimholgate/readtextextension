@@ -390,7 +390,7 @@ function UpdatePoSettings(_
 			&apos;error in the po file
 			end select
 		end if
-	loop
+	Loop
 	fileStream.closeInput
 	myTextFile.closeInput
 	UpdatePoSettingsDone=1
@@ -673,7 +673,7 @@ function fbTestDirRW(_
 		byVal sA)
 	fbTestDirRW = False
 	if sA = &quot;&quot; then exit function
-	on error goto fbTestDirRWErr
+	On Error Goto fbTestDirRWErr
 	dim s1 : s1 = fsAppSignature &amp; &quot;.&quot; &amp; fsUser &amp; &quot;.test.txt&quot; 
 	if Instr(&quot;/\&quot;,right(sA, 1)) = 0 then
 		if Instr(sA, &quot;/&quot;) &gt; 0 then
@@ -1043,7 +1043,7 @@ end function
 
 
 function fsGetSetting(sA) as string
-	dim oProdNameAccess as object
+	dim oProdNameAccess As Object
 
 	if not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then
 		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)

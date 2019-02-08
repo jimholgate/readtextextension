@@ -19,7 +19,6 @@ global s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage as str
 &apos;&apos; the display preferences field of the main dialogue.
 &apos;&apos; 
 
-
 sub ClearWorkingCountryLanguage()
 	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot;
 end sub
@@ -94,74 +93,79 @@ sub ConfigureReadTextAloud ()
 	ClearWorkingCountryLanguage
 	DialogLibraries.LoadLibrary( &quot;textToSpeech&quot; )
 	f_dlgSpeechSetup=CreateUnoDialog( DialogLibraries.textToSpeech.Dialog1 )
-	if fbHelpIsInstalled then
-		f_dlgSpeechSetup.model.HelpURL= fsAppSignature &amp; &quot;/set_up.xhp&quot;
-	else 
-		f_dlgSpeechSetup.model.HelpURL=&quot;&quot;
-	end if
-	&apos;Load default settings, so any settings undefined by settings file are not empty
-	config()=fvTts_config_createDefaultConfig(msgs(), errorCode)
-	&apos;Load the settings you used last time
-	sFile=fsFullPathOf(fsExtensionSettingsIni)
-	if fileexists(sFile) then
-		tts_config_parseFile(sFile, config(), errorCode)
-	else
-		&apos; The &quot;About&quot; dialog needs this file to show current information
-		tts_config_writeFile(config(), sfile)
-	end if								 
-	&apos;Now apply the settings to the dialog box
-	f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).Model.State=config(fiAlwaysShowDialogCheckBox)
-	if fbEnhancedRTVersion and fbClipBoardAvailable then
-		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Model.State=config(fiSmartSelectCheckBox)
-	else
-		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Model.State= 0
-		f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).Visible = False
-	end if
-	f_dlgSpeechSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiFestivalComboChoice)
-	f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).Model.Text=config(fiExternalCommand)
-	f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text=config(fiDialogLanguageCombo)
-	f_dlgSpeechSetup.GetControl(&quot;ComboBox4&quot;).Model.Text=config(fiHtmlComboURL)
-	f_dlgSpeechSetup.GetControl(&quot;FileControl1&quot;).Model.Text=config(fiFestivalPath)
-	f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text=config(fiExternalProgramPath)
-	f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).Model.State=config(fiFestivalOption)
-	f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).Model.State=config(fiExternalOption)
-	f_dlgSpeechSetup.GetControl(&quot;OptionButton3&quot;).Model.State=config(fiHtmlOption)
-	ttsUpdateCombo2a(False)
-	ttsUpdateCombo1()
-	&apos;Default choices are for custom scripts or apps - Win, Mac, Linux, Unix etc.
-	&apos;Update the labels with your language
-	ttsUpdateLabels
-	ttsUpdateDisplay
-	&apos; Stop Linux or OSX speech daemon from continuing to speak
-	&apos; or delete the Windows temporary lock file so speech ends.
-	&apos; The speech only stops if you use the one of the scripts shown
-	&apos; by default in the extension dialogue.
-	if fileexists(sFile) or fileexists(fsMyTempLock) then
-		if f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).Model.State then
-			resetSpeechDispatcher(true)
-		elseif f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).Model.State then
-			if fileexists(&quot;/usr/bin/killall&quot;) or fileexists(&quot;/usr/local/bin/killall&quot;) then
-				Shell(&quot;killall&quot;,0,&quot;festival&quot;,true)
-			end if
-			if fileexists(fsMyTempLock) then
-				kill fsMyTempLock
+    with f_dlgSpeechSetup
+        if fbHelpIsInstalled then
+            .model.HelpURL= fsAppSignature &amp; &quot;/set_up.xhp&quot;
+        else 
+            .model.HelpURL=&quot;&quot;
+        end if
+        &apos;Load default settings, so any settings undefined by settings file are not empty
+        config()=fvTts_config_createDefaultConfig(msgs(), errorCode)
+        &apos;Load the settings you used last time
+        sFile=fsFullPathOf(fsExtensionSettingsIni)
+        if fileexists(sFile) then
+            tts_config_parseFile(sFile, config(), errorCode)
+        else
+            &apos; The &quot;About&quot; dialog needs this file to show current information
+            tts_config_writeFile(config(), sfile)
+        end if								 
+        &apos;Now apply the settings to the dialog box
+        .GetControl(&quot;CheckBox1&quot;).Model.State=config(fiAlwaysShowDialogCheckBox)
+        if fbEnhancedRTVersion and fbClipBoardAvailable then
+            .GetControl(&quot;CheckBox2&quot;).Model.State=config(fiSmartSelectCheckBox)
+        else
+            .GetControl(&quot;CheckBox2&quot;).Model.State= 0
+            .GetControl(&quot;CheckBox2&quot;).Visible = False
+        end if
+        ttsUpdateCombo2a(False)
+        &apos;Update the labels with your language
+		ttsUpdateLabels
+        .GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiFestivalComboChoice)
+        .GetControl(&quot;ComboBox2&quot;).Model.Text=config(fiExternalCommand)
+        .GetControl(&quot;ComboBox3&quot;).Model.Text=config(fiDialogLanguageCombo)
+        .GetControl(&quot;ComboBox4&quot;).Model.Text=config(fiHtmlComboURL)
+        .GetControl(&quot;FileControl1&quot;).Model.Text=config(fiFestivalPath)
+        .GetControl(&quot;FileControl2&quot;).Model.Text=config(fiExternalProgramPath)
+        .GetControl(&quot;OptionButton1&quot;).Model.State= config(fiFestivalOption)
+        .GetControl(&quot;OptionButton2&quot;).Model.State= config(fiExternalOption)
+        .GetControl(&quot;OptionButton3&quot;).Model.State=config(fiHtmlOption)
+
+        ttsUpdateCombo1()
+    
+		&apos;Default choices are for custom scripts or apps - Win, Mac, Linux, Unix etc.
+
+		ttsUpdateDisplay
+		&apos; Stop Linux or OSX speech daemon from continuing to speak
+		&apos; or delete the Windows temporary lock file so speech ends.
+		&apos; The speech only stops if you use the one of the scripts shown
+		&apos; by default in the extension dialogue.
+		if fileexists(sFile) or fileexists(fsMyTempLock) then
+			if .GetControl(&quot;OptionButton2&quot;).Model.State then
+				resetSpeechDispatcher(true)
+			elseif .GetControl(&quot;OptionButton1&quot;).Model.State then
+				if fileexists(&quot;/usr/bin/killall&quot;) or fileexists(&quot;/usr/local/bin/killall&quot;) then
+					Shell(&quot;killall&quot;,0,&quot;festival&quot;,true)
+				end if
+				if fileexists(fsMyTempLock) then
+					kill fsMyTempLock
+				end if
 			end if
 		end if
-	end if
-	if f_dlgSpeechSetup.Execute() &lt;&gt; 0 then
-		&apos;Replace the old settings file
-		config()=fvCurrentDialogConfig()
-		f_dlgSpeechSetup.Dispose()
-		if fileexists(sFile) then
-			kill sFile
-		end if	
-		tts_config_writeFile(config(), sfile)
-		&apos;Call the shell to execute the program specified with the commands specified
-		ttsActuate(config(),_
-				msgs(),_
-				errorCode,_
-				&quot;&quot;)
-	end if
+		if .Execute() &lt;&gt; 0 then
+			&apos;Replace the old settings file
+			config()=fvCurrentDialogConfig()
+			.Dispose()
+			if fileexists(sFile) then
+				kill sFile
+			end if	
+			tts_config_writeFile(config(), sfile)
+			&apos;Call the shell to execute the program specified with the commands specified
+			ttsActuate(config(),_
+					msgs(),_
+					errorCode,_
+					&quot;&quot;)
+		end if
+	end with
 end sub
 
 
@@ -226,48 +230,74 @@ sub ttsUpdateLabels()
 	UpdatePoSettingsDone = -1
 	s1 = fsDisplayLanguage()
 	&apos;Update the labels with your language
-	f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).model.Label = fsLookUpTerm( &quot;s_always-show-this-dialog&quot;,s1)
-	f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).model.Label = fsLookUpTerm( &quot;s_touch-screen&quot;,s1)
-	f_dlgSpeechSetup.GetControl(&quot;CommandButton1&quot;).model.Label = fsLookUpTerm( &quot;s_ok&quot;, s1)
-	f_dlgSpeechSetup.GetControl(&quot;CommandButton2&quot;).model.Label = fsLookUpTerm( &quot;s_cancel&quot;, s1)
-	f_dlgSpeechSetup.GetControl(&quot;CommandButton3&quot;).model.Label = fsLookUpTerm( &quot;s_about&quot;, s1) &amp; &quot;...&quot;
-	f_dlgSpeechSetup.GetControl(&quot;FrameControl1&quot;).model.Label = fsLookUpTerm( &quot;s_external-program&quot;, s1)
-	f_dlgSpeechSetup.GetControl(&quot;FrameControl2&quot;).model.Label = fsLookUpTerm( &quot;s_display&quot;, s1)
-	f_dlgSpeechSetup.GetControl(&quot;Label1&quot;).model.Label = fsLookUpTerm( &quot;s_script-commands&quot;, s1)
-	f_dlgSpeechSetup.GetControl(&quot;Label2&quot;).model.Label = fsLookUpTerm( &quot;s_command-line-options&quot;, s1)
-	f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).model.Label = fsLookUpTerm( &quot;s_use-festival-with-a-script&quot;, s1)
-	f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).model.Label = fsLookUpTerm( &quot;s_external-program&quot;, s1)
-	f_dlgSpeechSetup.GetControl(&quot;OptionButton3&quot;).model.Label = fsLookUpTerm( &quot;s_use-a-web-application&quot;, s1)
-	f_dlgSpeechSetup.model.Title = fsLookUpTerm( &quot;s_read-text&quot;, s1)
+	with f_dlgSpeechSetup
+		.GetControl(&quot;CheckBox1&quot;).model.Label = fsLookUpTerm( &quot;s_always-show-this-dialog&quot;,s1)
+		.GetControl(&quot;CheckBox2&quot;).model.Label = fsLookUpTerm( &quot;s_touch-screen&quot;,s1)
+		.GetControl(&quot;CommandButton1&quot;).model.Label = fsLookUpTerm( &quot;s_ok&quot;, s1)
+		.GetControl(&quot;CommandButton2&quot;).model.Label = fsLookUpTerm( &quot;s_cancel&quot;, s1)
+		.GetControl(&quot;CommandButton3&quot;).model.Label = fsLookUpTerm( &quot;s_about&quot;, s1) &amp; &quot;...&quot;
+		.GetControl(&quot;FrameControl1&quot;).model.Label = fsLookUpTerm( &quot;s_external-program&quot;, s1)
+		.GetControl(&quot;FrameControl2&quot;).model.Label = fsLookUpTerm( &quot;s_display&quot;, s1)
+		.GetControl(&quot;Label1&quot;).model.Label = fsLookUpTerm( &quot;s_script-commands&quot;, s1)
+		.GetControl(&quot;Label2&quot;).model.Label = fsLookUpTerm( &quot;s_command-line-options&quot;, s1)
+		.GetControl(&quot;OptionButton1&quot;).model.Label = fsLookUpTerm( &quot;s_use-festival-with-a-script&quot;, s1)
+		.GetControl(&quot;OptionButton2&quot;).model.Label = fsLookUpTerm( &quot;s_external-program&quot;, s1)
+		.GetControl(&quot;OptionButton3&quot;).model.Label = fsLookUpTerm( &quot;s_use-a-web-application&quot;, s1)
+		.model.Title = fsLookUpTerm( &quot;s_read-text&quot;, s1)
+	end with
 end sub
 
 
 sub ttsUpdateDisplay()
 	&apos; These dialog items toggle between enabled And disabled depending On option button selected
-	f_dlgSpeechSetup.GetControl(&quot;ComboBox1&quot;).model.enabled=f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).Model.State
-	f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).model.enabled=f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).Model.State
-	f_dlgSpeechSetup.GetControl(&quot;ComboBox4&quot;).model.enabled=f_dlgSpeechSetup.GetControl(&quot;OptionButton3&quot;).Model.State
-	f_dlgSpeechSetup.GetControl(&quot;FileControl1&quot;).model.enabled=f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).Model.State
-	f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).model.enabled=f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).Model.State
-	f_dlgSpeechSetup.GetControl(&quot;Label1&quot;).model.enabled=f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).Model.State
-	f_dlgSpeechSetup.GetControl(&quot;Label2&quot;).model.enabled=f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).Model.State
+	with f_dlgSpeechSetup
+		dim i# : i = len(.GetControl(&quot;FileControl1&quot;).Model.Text)
+		&apos; If festival is installed, then enable the festival option in `Dialog1`.
+		if i = 0 then
+			&apos; No text in file control box
+			.GetControl(&quot;OptionButton1&quot;).model.enabled=False
+			.GetControl(&quot;ComboBox1&quot;).model.enabled=False
+			.GetControl(&quot;FileControl1&quot;).model.enabled=False
+			.GetControl(&quot;Label1&quot;).model.enabled=False
+		else
+			if FileExists(.GetControl(&quot;FileControl1&quot;).Model.Text) then
+				&apos; Festival is installed
+				.GetControl(&quot;OptionButton1&quot;).model.enabled=True
+				.GetControl(&quot;ComboBox1&quot;).model.enabled=.GetControl(&quot;OptionButton1&quot;).Model.State
+				.GetControl(&quot;FileControl1&quot;).model.enabled=.GetControl(&quot;OptionButton1&quot;).Model.State
+				.GetControl(&quot;Label1&quot;).model.enabled=.GetControl(&quot;OptionButton1&quot;).Model.State
+			else
+				&apos; Cannot find festival
+				.GetControl(&quot;OptionButton1&quot;).model.enabled=False
+				.GetControl(&quot;ComboBox1&quot;).model.enabled=False
+				.GetControl(&quot;FileControl1&quot;).model.enabled=False
+				.GetControl(&quot;Label1&quot;).model.enabled=False		
+			end if
+		
+		end if
+		.GetControl(&quot;ComboBox2&quot;).model.enabled=.GetControl(&quot;OptionButton2&quot;).Model.State
+		.GetControl(&quot;ComboBox4&quot;).model.enabled=.GetControl(&quot;OptionButton3&quot;).Model.State
+		.GetControl(&quot;FileControl2&quot;).model.enabled=.GetControl(&quot;OptionButton2&quot;).Model.State		
+		.GetControl(&quot;Label2&quot;).model.enabled=.GetControl(&quot;OptionButton2&quot;).Model.State
+	end with
 end sub
 
 
 function fvCurrentDialogConfig() as variant
 	dim config(fiCountConfigOptions) as variant
-	
-	config(fiAlwaysShowDialogCheckBox)=f_dlgSpeechSetup.GetControl(&quot;CheckBox1&quot;).model.State
-	config(fiSmartSelectCheckBox)=f_dlgSpeechSetup.GetControl(&quot;CheckBox2&quot;).model.State
-	config(fiDialogLanguageCombo)=f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).model.Text
-	config(fiExternalCommand)=f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).model.Text
-	config(fiExternalOption)=f_dlgSpeechSetup.GetControl(&quot;OptionButton2&quot;).Model.State
-	config(fiExternalProgramPath)=f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text
-	config(fiFestivalComboChoice)=f_dlgSpeechSetup.GetControl(&quot;ComboBox1&quot;).model.Text
-	config(fiFestivalOption)=f_dlgSpeechSetup.GetControl(&quot;OptionButton1&quot;).Model.State
-	config(fiFestivalPath)=f_dlgSpeechSetup.GetControl(&quot;FileControl1&quot;).Model.Text
-	config(fiHtmlComboURL)=f_dlgSpeechSetup.GetControl(&quot;ComboBox4&quot;).model.Text
-	config(fiHtmlOption)=f_dlgSpeechSetup.GetControl(&quot;OptionButton3&quot;).Model.State
+	with f_dlgSpeechSetup
+		config(fiAlwaysShowDialogCheckBox)=.GetControl(&quot;CheckBox1&quot;).model.State
+		config(fiSmartSelectCheckBox)=.GetControl(&quot;CheckBox2&quot;).model.State
+		config(fiDialogLanguageCombo)=.GetControl(&quot;ComboBox3&quot;).model.Text
+		config(fiExternalCommand)=.GetControl(&quot;ComboBox2&quot;).model.Text
+		config(fiExternalOption)=.GetControl(&quot;OptionButton2&quot;).Model.State
+		config(fiExternalProgramPath)=.GetControl(&quot;FileControl2&quot;).Model.Text
+		config(fiFestivalComboChoice)=.GetControl(&quot;ComboBox1&quot;).model.Text
+		config(fiFestivalOption)=.GetControl(&quot;OptionButton1&quot;).Model.State
+		config(fiFestivalPath)=.GetControl(&quot;FileControl1&quot;).Model.Text
+		config(fiHtmlComboURL)=.GetControl(&quot;ComboBox4&quot;).model.Text
+		config(fiHtmlOption)=.GetControl(&quot;OptionButton3&quot;).Model.State
+	end with
 	fvCurrentDialogConfig()=config()
 end function
 
@@ -289,139 +319,142 @@ sub AboutAddOn(_
 	dim msgs() as variant
 	dim errorCode as integer
 	dim s1$ : s1 = fsDisplayLanguage()
-	dim s2$ : s2=fsHomeDrive()
+	dim s2$ : s2 = fsHomeDrive()
 	dim s3$ : s3 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
 	dim s4$ : s4 = &quot;&quot;
 	
-		&apos; Open up the dialog
+	&apos; Open up the dialog
 	DialogLibraries.LoadLibrary( &quot;textToSpeech&quot; )
 	f_dlgAboutReadSelection=CreateUnoDialog( DialogLibraries.textToSpeech.Dialog3)
-	&apos;Update the labels And button with your language
-	f_dlgAboutReadSelection.model.Title = fsLookUpTerm( &quot;s_about&quot;, s1) &amp; _
-		&quot; &quot; &amp; fsLookUpTerm( &quot;s_read-text&quot;, s1) &amp; _
-		&quot; &quot; &amp; fsExtensionVersion
-	if fbHelpIsInstalled then
-		f_dlgAboutReadSelection.model.HelpURL= fsAppSignature &amp; &quot;/set_up.xhp&quot;
-	end if
-	f_dlgAboutReadSelection.GetControl(&quot;CommandButton1&quot;).model.Label = fsLookUpTerm( &quot;s_ok&quot;, s1)
-	f_dlgAboutReadSelection.GetControl(&quot;CommandButton2&quot;).model.helpText = fsLookUpTerm( &quot;s_http-help-url&quot;, s1)
-	f_dlgAboutReadSelection.GetControl(&quot;CommandButton2&quot;).model.Label = fsLookUpTerm( &quot;s_on-line-help&quot;, s1) &amp; &quot;...&quot;
-	f_dlgAboutReadSelection.GetControl(&quot;FrameControl1&quot;).model.Label = fsLookUpTerm( &quot;s_about&quot;, s1)
-	f_dlgAboutReadSelection.GetControl(&quot;FrameControl2&quot;).model.Label = fsLookUpTerm( &quot;s_script&quot;, s1)
-	f_dlgAboutReadSelection.GetControl(&quot;FrameControl3&quot;).model.Label = fsLookUpTerm( &quot;s_command&quot;, s1)
-	f_dlgAboutReadSelection.GetControl(&quot;ImageControl1&quot;).model.helpText = f_dlgAboutReadSelection.model.Title
-	f_dlgAboutReadSelection.GetControl(&quot;ImageControl1&quot;).model.ImageURL = fsExtensionLogo
-	f_dlgAboutReadSelection.GetControl(&quot;ImageControl2&quot;).model.helpText = fsLookUpTerm( &quot;s_test&quot;, s1)
-	f_dlgAboutReadSelection.GetControl(&quot;ImageControl2&quot;).model.ImageURL = fsSpeakerLogo
-	f_dlgAboutReadSelection.GetControl(&quot;ImageControl3&quot;).model.helpText = left(fsGetTextSelection(False, False),99) 
-	f_dlgAboutReadSelection.GetControl(&quot;ImageControl3&quot;).model.ImageURL = fsSelectionLogo
-
-	if fbIsWin64Program and (not(_
-			fbClipBoardAvailable) or _
-			(fsGetSetting(_
-			&quot;oosetupversion&quot;) = &quot;5.0&quot; and _
-			lcase(_
-			fsGetSetting(_
-			&quot;ooName&quot;)) = &quot;libreoffice&quot;)) then
-		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
-		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.Enabled = False
-		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.Enabled = False
-	else
-		CreateFile(s3, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)  &apos; lock clipboard
-		fsGetClipBoard(False)
-		&apos; To avoid a crash, the testing version of office 
-		&apos; needs a dummy run of function before evaluating
-		&apos; the results.
-		&apos; if it crashes, then we are left with a lock file.
-		if fileexists(s3) then  &apos; unlock clipboard
-			kill s3
+	with f_dlgAboutReadSelection
+		&apos;Update the labels And button with your language
+		.model.Title = fsLookUpTerm( &quot;s_about&quot;, s1) &amp; _
+			&quot; &quot; &amp; fsLookUpTerm( &quot;s_read-text&quot;, s1) &amp; _
+			&quot; &quot; &amp; fsExtensionVersion
+		if fbHelpIsInstalled then
+			.model.HelpURL= fsAppSignature &amp; &quot;/set_up.xhp&quot;
 		end if
-		s4 = fsGetClipBoard(False)
-		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.helpText = left(_
-				s4, 99)
-		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.helpText = left(_
-				s4, 99)
-		f_dlgAboutReadSelection.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
-		f_dlgAboutReadSelection.GetControl(&quot;Label2&quot;).model.Label = len(s4)
-	end if
-	if fileexists(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) or _
-		fileexists(s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) or _
-		fileexists(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;) or _
-		fileexists(fsProgramDirectory() &amp; &quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;) then
-		f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm(_
-				&quot;s_speech-properties&quot;, s1)
-	else
-		f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm(_
-				&quot;s_system-settings&quot;, s1)
-	end if
-	f_dlgAboutReadSelection.GetControl(&quot;ImageControl5&quot;).model.ImageURL = fsToolBoxLogo
-	f_dlgAboutReadSelection.GetControl(&quot;Label1&quot;).model.helpText = left(fsGetTextSelection(False, False),99) 
-	f_dlgAboutReadSelection.GetControl(&quot;Label1&quot;).model.Label = len(fsGetTextSelection(False, False))
+		.GetControl(&quot;CommandButton1&quot;).model.Label = fsLookUpTerm( &quot;s_ok&quot;, s1)
+		.GetControl(&quot;CommandButton2&quot;).model.helpText = fsLookUpTerm( &quot;s_http-help-url&quot;, s1)
+		.GetControl(&quot;CommandButton2&quot;).model.Label = fsLookUpTerm( &quot;s_on-line-help&quot;, s1) &amp; &quot;...&quot;
+		.GetControl(&quot;FrameControl1&quot;).model.Label = fsLookUpTerm( &quot;s_about&quot;, s1)
+		.GetControl(&quot;FrameControl2&quot;).model.Label = fsLookUpTerm( &quot;s_script&quot;, s1)
+		.GetControl(&quot;FrameControl3&quot;).model.Label = fsLookUpTerm( &quot;s_command&quot;, s1)
+		.GetControl(&quot;ImageControl1&quot;).model.helpText = .model.Title
+		.GetControl(&quot;ImageControl1&quot;).model.ImageURL = fsExtensionLogo
+		.GetControl(&quot;ImageControl2&quot;).model.helpText = fsLookUpTerm( &quot;s_test&quot;, s1)
+		.GetControl(&quot;ImageControl2&quot;).model.ImageURL = fsSpeakerLogo
+		.GetControl(&quot;ImageControl3&quot;).model.helpText = left(fsGetTextSelection(False, False),99) 
+		.GetControl(&quot;ImageControl3&quot;).model.ImageURL = fsSelectionLogo
 
-	&apos;Change the text in the information text boxes
-	if config(fiFestivalOption) then
-		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=config(fiFestivalPath) &amp; &quot; &quot; &amp; _
-			&quot;&quot;&quot;&quot; &amp; ConvertFromURL(fsFullPathOf(fsFestivalScriptName)) &amp; &quot;&quot;&quot;&quot;
-		sA=replaceLocalTokensWithStr(config(fiFestivalComboChoice))
-		sA=replacePublicTokensWithStr(sA)
-		f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text = sA 
-	elseif config(fiExternalOption) then 
-		sA=replaceLocalTokensWithStr(config(fiExternalCommand))
-		sA=replacePublicTokensWithStr(sA)
-		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=&quot;&quot;&quot;&quot; &amp; config(fiExternalProgramPath) &amp; &quot;&quot;&quot; &quot; &amp; sA
-		if Instr(config(fiExternalCommand),&quot;(TTS_WSCRIPT_VBS)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsVBSTextString
-		elseif Instr(config(fiExternalCommand),&quot;(SPD_READ_TEXT_PY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsSPDTextString
-		elseif Instr(config(fiExternalCommand),&quot;(ESPEAK_READ_TEXT_PY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsEspeakTextString
-		elseif Instr(config(fiExternalCommand),&quot;(FESTIVAL_READ_TEXT_PY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsFestivalTextString
-		elseif Instr(config(fiExternalCommand),&quot;(PICO_READ_TEXT_PY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsPicoTextString
-		elseif Instr(config(fiExternalCommand),&quot;(PYTTSX_READ_TEXT_PY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsPyttsxTextString
-		elseif Instr(config(fiExternalCommand),&quot;(OS_PY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsOSTextString
-		elseif Instr(config(fiExternalCommand),&quot;(CREATE_QR_LABEL_PY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fsQRTextString
-		elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;&quot;, _
-					fsSelectionLanguageAndRegion(true))
-		elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;-r 110 &quot;, _
-					fsSelectionLanguageAndRegion(true))
-		elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_QUICKLY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;-r 240 &quot;, _
-					fsSelectionLanguageAndRegion(true))
-		elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_AIRPLAY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;-a AirPlay &quot;, _
-					fsSelectionLanguageAndRegion(true))
-		elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_AIRPLAY_SLOWLY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;-a AirPlay -r 110 &quot;, _
-					fsSelectionLanguageAndRegion(true))
-		elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_AIRPLAY_QUICKLY)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;-a AirPlay -r 240 &quot;, _
-					fsSelectionLanguageAndRegion(true))
-		elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;) then
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;&quot;, _
-					&quot;&quot;)
+		if fbIsWin64Program and (not(_
+				fbClipBoardAvailable) or _
+				(fsGetSetting(_
+				&quot;oosetupversion&quot;) = &quot;5.0&quot; and _
+				lcase(_
+				fsGetSetting(_
+				&quot;ooName&quot;)) = &quot;libreoffice&quot;)) then
+			.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
+			.GetControl(&quot;ImageControl4&quot;).model.Enabled = False
+			.GetControl(&quot;Label2&quot;).model.Enabled = False
 		else
-			f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=&quot;&quot;
+			CreateFile(s3, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)  &apos; lock clipboard
+			fsGetClipBoard(False)
+			&apos; To avoid a crash, the testing version of office 
+			&apos; needs a dummy run of function before evaluating
+			&apos; the results.
+			&apos; if it crashes, then we are left with a lock file.
+			if fileexists(s3) then  &apos; unlock clipboard
+				kill s3
+			end if
+			s4 = fsGetClipBoard(False)
+			.GetControl(&quot;ImageControl4&quot;).model.helpText = left(_
+					s4, 99)
+			.GetControl(&quot;Label2&quot;).model.helpText = left(_
+					s4, 99)
+			.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
+			.GetControl(&quot;Label2&quot;).model.Label = len(s4)
 		end if
-	else &apos; if config(fiHtmlOption) then
-		sA=replacePublicTokensWithStr(config(fiHtmlComboURL))
-		f_dlgAboutReadSelection.GetControl(&quot;TextField3&quot;).model.Text=&quot;[com.sun.star.system.SystemShellExecute]&quot;
-		if Instr(sA,&quot;.google.&quot;) then
-			sA=sA &amp; chr(13) &amp; chr(13) &amp; &quot;Powered by Google TM&quot;
-		elseif instr(sA,&quot;vozme.com&quot;) then
-			sA=sA &amp; chr(13) &amp; chr(13) &amp; &quot;Powered by Vozme TM&quot;
+		if fileexists(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) or _
+			fileexists(s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) or _
+			fileexists(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;) or _
+			fileexists(fsProgramDirectory() &amp; &quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;) then
+			.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm(_
+					&quot;s_speech-properties&quot;, s1)
+		else
+			.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm(_
+					&quot;s_system-settings&quot;, s1)
 		end if
-		f_dlgAboutReadSelection.GetControl(&quot;TextField2&quot;).model.Text=sA		
-	end if
-	f_dlgAboutReadSelection.GetControl(&quot;TextField1&quot;).model.Text=fsAbout
-	&apos; Show the dialog
-	 f_dlgAboutReadSelection.Execute()
+		.GetControl(&quot;ImageControl5&quot;).model.ImageURL = fsToolBoxLogo
+		.GetControl(&quot;Label1&quot;).model.helpText = left(fsGetTextSelection(False, False),99) 
+		.GetControl(&quot;Label1&quot;).model.Label = len(fsGetTextSelection(False, False))
+
+		&apos;Change the text in the information text boxes
+		if config(fiFestivalOption) then
+			.GetControl(&quot;TextField3&quot;).model.Text=config(fiFestivalPath) &amp; &quot; &quot; &amp; _
+				&quot;&quot;&quot;&quot; &amp; ConvertFromURL(fsFullPathOf(fsFestivalScriptName)) &amp; &quot;&quot;&quot;&quot;
+			sA=replaceLocalTokensWithStr(config(fiFestivalComboChoice))
+			sA=replacePublicTokensWithStr(sA)
+			.GetControl(&quot;TextField2&quot;).model.Text = sA 
+		elseif config(fiExternalOption) then 
+			sA=replaceLocalTokensWithStr(config(fiExternalCommand))
+			sA=replacePublicTokensWithStr(sA)
+			.GetControl(&quot;TextField3&quot;).model.Text=&quot;&quot;&quot;&quot; &amp; config(fiExternalProgramPath) &amp; &quot;&quot;&quot; &quot; &amp; sA
+			if Instr(config(fiExternalCommand),&quot;(TTS_WSCRIPT_VBS)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fsVBSTextString
+			elseif Instr(config(fiExternalCommand),&quot;(SPD_READ_TEXT_PY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fsSPDTextString
+			elseif Instr(config(fiExternalCommand),&quot;(ESPEAK_READ_TEXT_PY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fsEspeakTextString
+			elseif Instr(config(fiExternalCommand),&quot;(FESTIVAL_READ_TEXT_PY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fsFestivalTextString
+			elseif Instr(config(fiExternalCommand),&quot;(PICO_READ_TEXT_PY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fsPicoTextString
+			elseif Instr(config(fiExternalCommand),&quot;(PYTTSX_READ_TEXT_PY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fsPyttsxTextString
+			elseif Instr(config(fiExternalCommand),&quot;(OS_PY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fsOSTextString
+			elseif Instr(config(fiExternalCommand),&quot;(CREATE_QR_LABEL_PY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fsQRTextString
+			elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;&quot;, _
+						fsSelectionLanguageAndRegion(true))
+			elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;-r 110 &quot;, _
+						fsSelectionLanguageAndRegion(true))
+			elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_QUICKLY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;-r 240 &quot;, _
+						fsSelectionLanguageAndRegion(true))
+			elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_AIRPLAY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;-a AirPlay &quot;, _
+						fsSelectionLanguageAndRegion(true))
+			elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_AIRPLAY_SLOWLY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;-a AirPlay -r 110 &quot;, _
+						fsSelectionLanguageAndRegion(true))
+			elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_AIRPLAY_QUICKLY)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;-a AirPlay -r 240 &quot;, _
+						fsSelectionLanguageAndRegion(true))
+			elseif Instr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;) then
+				.GetControl(&quot;TextField2&quot;).model.Text=fswriteOSXSpeechScript(&quot;&quot;, _
+						&quot;&quot;)
+			else
+				.GetControl(&quot;TextField2&quot;).model.Text=&quot;&quot;
+			end if
+		else &apos; if config(fiHtmlOption) then
+			sA=replacePublicTokensWithStr(config(fiHtmlComboURL))
+			.GetControl(&quot;TextField3&quot;).model.Text=&quot;[com.sun.star.system.SystemShellExecute]&quot;
+			if Instr(sA,&quot;.google.&quot;) then
+				sA=sA &amp; chr(13) &amp; chr(13) &amp; &quot;Powered by Google TM&quot;
+			elseif instr(sA,&quot;vozme.com&quot;) then
+				sA=sA &amp; chr(13) &amp; chr(13) &amp; &quot;Powered by Vozme TM&quot;
+			end if
+			.GetControl(&quot;TextField2&quot;).model.Text=sA		
+		end if
+		.GetControl(&quot;TextField1&quot;).model.Text=fsAbout
+		&apos; Show the dialog
+		.Execute()
+	 end with
 end sub
+
 
 </script:module>
