@@ -12,7 +12,7 @@ from __future__ import (
 #
 # Copyright And License
 #
-# (c) 2018 [James Holgate Vancouver, CANADA](readtextextension(a)outlook.com)
+# (c) 2019 [James Holgate Vancouver, CANADA](readtextextension(a)outlook.com)
 #
 # THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE
 # TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE
@@ -1675,20 +1675,12 @@ def PlayWaveInBackground(sOUT1):
         except:
             os.startfile(sOUT1)
     else:
-        if os.path.isfile('/usr/bin/gst-launch-1.0'):
-            s1 = (u'gst-launch-1.0 playbin uri="' +
-                   path2url(sOUT1) + '"')
-        elif os.path.isfile('/usr/bin/gst-launch-0.10'):
-            s1 = (u'gst-launch-0.10 playbin uri="' +
-                   path2url(sOUT1) + u'"')
-        elif os.path.isfile('/usr/bin/vlc'):
-            s1 = u'/usr/bin/vlc I "dummy" "' + sOUT1 + u'" '
+        if os.path.isfile('/usr/bin/aplay'):
+            s1 = u'aplay "' + sOUT1 + u'" '
         elif os.path.isfile('/usr/bin/esdplay'):
             s1 = u'esdplay "' + sOUT1 + u'" '
         elif os.path.isfile('/usr/bin/paplay'):
             s1 = u'paplay "' + sOUT1 + u'" '
-        elif os.path.isfile('/usr/bin/aplay'):
-            s1 = u'aplay "' + sOUT1 + u'" '
         elif os.path.isfile('/usr/bin/ossplay'):
             s1 = u'ossplay "' + sOUT1 + u'" '
         elif os.path.isfile('/usr/bin/artsplay'):
@@ -1697,6 +1689,13 @@ def PlayWaveInBackground(sOUT1):
             s1 = u'roarcatplay "' + sOUT1 + u'" '
         elif os.path.isfile('/usr/bin/roarcat'):
             s1 = u'roarcat "' + sOUT1 + u'" '
+        elif os.path.isfile('/usr/bin/gst-launch-1.0'):
+            s1 = (u'gst-launch-1.0 filesrc location="' +
+                   path2url(sOUT1) + 
+                   '" ! wavparse ! audioconvert ! audioresample ! osssink')
+        elif os.path.isfile('/usr/bin/gst-launch-0.10'):
+            s1 = (u'gst-launch-0.10 playbin uri="' +
+                   path2url(sOUT1) + u'"')
         myossystem(s1)
 
 
