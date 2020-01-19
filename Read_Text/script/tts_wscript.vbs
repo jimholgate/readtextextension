@@ -401,16 +401,20 @@ Function myAudacityLamePath
     Dim WshShell
     Dim s1
     Dim s2
+    Dim s3
 
     Set WshShell = CreateObject("WScript.Shell")
     Set WshEnv = WshShell.Environment("Process")
     myAudacityLamePath = ""
     s1 = WshEnv("ProgramFiles(x86)") & "\Lame For Audacity\lame.exe"
     s2 = WshEnv("ProgramW6432") & "\Lame For Audacity\lame.exe"
+    s3 = WshEnv("ProgramFiles") & "\Lame For Audacity\lame.exe"
     If fbFileExists(s1) Then
         myAudacityLamePath = s1
     ElseIf fbFileExists(s2) Then
         myAudacityLamePath = s2
+    ElseIf fbFileExists(s3) Then
+        myAudacityLamePath = s3
     End If
 End Function
 
@@ -790,6 +794,7 @@ Function fsWhereIsFfmpeg()
     ' This looks for the ffmpeg application.  To use ffmpeg, install it or
     ' link to it in `c:\opt\ffmpeg.exe`
     '''
+    Dim c0
     Dim c1
     Dim c2
     Dim c3
@@ -807,6 +812,7 @@ Function fsWhereIsFfmpeg()
     Set objFSO=CreateObject("Scripting.FileSystemObject")
     Set WshShell = CreateObject("WScript.Shell")
     Set WshEnv = WshShell.Environment("Process")
+    c0 = WshEnv("ProgramFiles")
     c1 = WshEnv("ProgramFiles(x86)")
     c2 = WshEnv("ProgramW6432")
     c3 = "\Audacity\ffmpeg-win-2.2.2\ffmpeg.exe"
@@ -824,10 +830,14 @@ Function fsWhereIsFfmpeg()
         retval = c8
     ElseIf fbFileExists(c5) Then
         retval = c5
+    ElseIf fbFileExists(c0 & c3) Then
+        retval = c0 & c3
     ElseIf fbFileExists(c1 & c3) Then
         retval = c1 & c3
     ElseIf fbFileExists(c2 & c3) Then
         retval = c2 & c3
+    ElseIf fbFileExists(c0 & c4) Then
+        retval = c0 & c4
     ElseIf fbFileExists(c1 & c4) Then
         retval = c1 & c4
     ElseIf fbFileExists(c2 & c4) Then
