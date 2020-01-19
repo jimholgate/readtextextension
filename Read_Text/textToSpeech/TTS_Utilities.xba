@@ -1318,7 +1318,6 @@ sub dialog1Combo2ShowSAYChoices(_
 &apos;&apos; 
 	dim n, o as integer
 	dim s1 as string
-	dim s2 as string
 	dim aA
 	dim oComboBox as variant
 
@@ -1326,12 +1325,11 @@ sub dialog1Combo2ShowSAYChoices(_
 	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
 	REM first remove all old items from the list
 	n=oComboBox.getItemCount()
-	oComboBox.removeItems( 0,n)
-	s2= &quot;.aif,.m4a&quot;
-	aA = split(s2, &quot;,&quot;)
-	for n=lbound(aA) To ubound(aA)
-			s1=&quot;-o &quot;&quot;(HOME)(now)&quot; &amp; s2(n) &amp; &quot;&quot;&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
-			oComboBox.addItem(s1,0)
+	oComboBox.removeItems(0,n)
+	aA = Array(&quot;.aif&quot;, &quot;.m4a&quot;)
+	for n = lbound(aA) To ubound(aA)
+		s1 = &quot;-o &quot;&quot;(HOME)(NOW)&quot; &amp; s2(n) &amp; &quot;&quot;&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
+		oComboBox.addItem(s1,0)
 	Next
 	n=0
 	for n = 0 to 40
@@ -1363,11 +1361,22 @@ sub dialog1Combo2ShowAppleScriptChoices(_
 	oComboBox.removeItems( 0,n)
 	s2 = &quot;&quot;
 	if fbHaveFfmpeg() then
-		s2 = s2 &amp; &quot;.webm&quot;&quot; &quot;&quot;(POSTER2_IMG)&quot;&quot; &quot;&quot;600x400&quot;&quot;,.webm&quot;&quot; &quot;&quot;(POSTER_IMG)&quot;&quot; &quot;&quot;400x400&quot;&quot;,&quot;
-		s2 = s2 &amp; &quot;.webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480,.webm&quot;&quot; &quot;&quot;(MY_IMAGE),&quot;
-		s2 = s2 &amp; &quot;.wav,.ogg,&quot;
-		s2 = s2 &amp; &quot;.mp4&quot;&quot; &quot;&quot;(POSTER2_IMG)&quot;&quot; &quot;&quot;600x400&quot;&quot;,.mp4&quot;&quot; &quot;&quot;(POSTER_IMG)&quot;&quot; &quot;&quot;400x400&quot;&quot;,&quot;
-		s2 = s2 &amp; &quot;.mp4&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480,.mp4&quot;&quot; &quot;&quot;(MY_IMAGE),.mp4,.mp3,&quot;
+		s2 = s2 &amp; Join(_
+				Array(_
+						&quot;.webm&quot;&quot; &quot;&quot;(POSTER2_IMG)&quot;&quot; &quot;&quot;600x400&quot;&quot;&quot;,_
+						&quot;.webm&quot;&quot; &quot;&quot;(POSTER_IMG)&quot;&quot; &quot;&quot;400x400&quot;&quot;&quot;,_
+						&quot;.webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480&quot;,_
+						&quot;.webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;,_
+						&quot;.wav&quot;,_
+						&quot;.ogg&quot;,_
+						&quot;.mp4&quot;&quot; &quot;&quot;(POSTER2_IMG)&quot;&quot; &quot;&quot;600x400&quot;&quot;&quot;,_
+						&quot;.mp4&quot;&quot; &quot;&quot;(POSTER_IMG)&quot;&quot; &quot;&quot;400x400&quot;&quot;&quot;,_
+						&quot;.mp4&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480&quot;,_
+						&quot;.mp4&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;,_
+						&quot;.mp4&quot;,_
+						&quot;.mp3&quot;, _
+						&quot;&quot;),_
+						&quot;,&quot;)
 	end if
 	s2 = s2 &amp; &quot;.aif,.m4a&quot;
 	a2 = split(s2, &quot;,&quot;)
@@ -1376,11 +1385,11 @@ sub dialog1Combo2ShowAppleScriptChoices(_
 			&quot;_AIRPLAY_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
 			&quot;_AIRPLAY)&quot;&quot;&quot; &amp; CR
 	for n = lbound(a2) to ubound(a2)
-		s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now)&quot; &amp; a2(n) &amp; _
+		s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; _
 			&quot;&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;_QUICKLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;_SLOWLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR
+			&quot;_QUICKLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;_SLOWLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR
 	next
 	s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
@@ -1837,14 +1846,14 @@ function fspyOutOptions(_
 		s1 = &quot;&quot;
 	else
 		s1=s1 &amp; CR &amp; s4 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now).wav&quot;&quot;&quot; &amp; _
+				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).wav&quot;&quot;&quot; &amp; _
 				s3
 		if fileexists(&quot;/usr/bin/faac&quot;) or _
 				fileexists(&quot;C:\opt\neroAacEnc.exe&quot;) then
 			&apos; Some players might not play faac output. Check firefox and
 			&apos; Android based music players.
 			s1=s1 &amp; CR &amp; s4 &amp; _
-					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now).m4a&quot;&quot;&quot; &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).m4a&quot;&quot;&quot; &amp; _
 					s2
 		end if
 		if fileexists(&quot;/usr/bin/flac&quot;) or _
@@ -1852,13 +1861,13 @@ function fspyOutOptions(_
 				fbHaveFfmpeg then
 			&apos; Free lossless audio codec
 			s1=s1 &amp; CR &amp; s4 &amp; _
-					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now).flac&quot;&quot;&quot; &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).flac&quot;&quot;&quot; &amp; _
 					s3
 		end if
 		if fbHaveFfmpeg then
 			&apos; Apple Audio Interchange format. not compressed.
 			s1=s1 &amp; CR &amp; s4 &amp; _
-					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now).aif&quot;&quot;&quot; &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).aif&quot;&quot;&quot; &amp; _
 					s2
 		end if
 		if fbHaveFfmpeg then
@@ -1869,17 +1878,17 @@ function fspyOutOptions(_
 			s1=s1 &amp; CR &amp; s4 &amp; _
 					&quot; --image &quot;&quot;(MY_IMAGE)&quot;&quot;&quot; &amp; _
 					&quot; --dimensions &quot;&quot;1200x800&quot;&quot;&quot; &amp; _
-					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now).webm&quot;&quot;&quot; &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot; &amp; _
 				s2
 			s1=s1 &amp; CR &amp; s4 &amp; _
 				&quot; --image &quot;&quot;(POSTER2_IMG)&quot;&quot;&quot;&amp; _
 				&quot; --dimensions &quot;&quot;600x400&quot;&quot;&quot; &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now).webm&quot;&quot;&quot; &amp; _
+				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot; &amp; _
 				s2
 			s1=s1 &amp; CR &amp; s4 &amp; _
 				s5 &amp; _
 				&quot; --dimensions &quot;&quot;600x600&quot;&quot;&quot; &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now).webm&quot;&quot;&quot; &amp; _
+				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot; &amp; _
 				s2
 		end if
 		if (fileexists(&quot;/usr/share/doc/libogg0/copyright&quot;) and _
@@ -1891,7 +1900,7 @@ function fspyOutOptions(_
 			&apos; library exists.
 			s1=s1 &amp; CR &amp; s4 &amp; _
 					s5 &amp; _
-					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now).ogg&quot;&quot;&quot; &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).ogg&quot;&quot;&quot; &amp; _
 					s2
 		end if
 		if fileexists(&quot;/usr/share/doc/libmp3lame0/copyright&quot;) or _
@@ -1900,13 +1909,13 @@ function fspyOutOptions(_
 			&apos; Android based music players.
 			s1=s1 &amp; CR &amp; s4 &amp; _
 					s5 &amp; _
-					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now).mp3&quot;&quot;&quot; &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
 					s2
 		elseif fileexists(&quot;/usr/share/doc/libtwolame0/copyright&quot;) or _
 				fileexists(&quot;C:\opt\twolame.exe&quot;) then
 			&apos; does not work with Rhythm box. not a widely used export format.
 			s1=s1 &amp; CR &amp; s4 &amp; _
-					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(now).mp2&quot;&quot;&quot; &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp2&quot;&quot;&quot; &amp; _
 					s2
 		end if
 		s1=s1 &amp; CR &amp; s4 &amp; _
@@ -2200,7 +2209,11 @@ sub ttsActuate(_
 	if ismissing(sTextToSpeak) or sTextToSpeak = &quot;&quot; then  
 		sTextToSpeak = fsGetTextSelection(False, true)
 	end if
-	a1 = Split(&quot;id,title,album,genre,track&quot;, &quot;,&quot;)
+	a1 = Array(&quot;id&quot;,_
+			&quot;title&quot;,_
+			&quot;album&quot;,_
+			&quot;genre&quot;,_
+			&quot;track&quot;)
 	for n = lbound(a1) To ubound(a1)
 		if fileexists(fsMyTempLock(&quot;lock.&quot; &amp; a1(n))) then
 			Kill fsMyTempLock(&quot;lock.&quot; &amp; a1(n))
@@ -2523,40 +2536,82 @@ function fbCreateMissingMediaDirectory(_
 &apos;&apos; if you don&apos;t like the defaults, set the name of the directory yourself.  The extension
 &apos;&apos; will attempt to create the directory if it is a valid path.
 &apos;&apos;
-	dim s0, s1, s2, s3, s4, s5 as string
+	fbCreateMissingMediaDirectory = False
+	dim s1, s2 as string
 	dim n, o as integer
 	dim a1, a2, a3
 
-	s1 = &quot;&quot;
-	s2 = &quot;.3gp,.aac,.aif,.aiff,.au,.avi,.csv,.doc,.docx,.epub,.flac,.gif,&quot; &amp; _
-			&quot;.jpeg,.jpg,.m4a,.m4v,.mov,.mkv,.mp2,.mp3,.mp4,.mpeg,.oga,&quot; &amp; _
-			&quot;.ogg,.ogm,.ogv,.pdf,.png,.ppt,.pptx,.tif,.wav,.webm,.wma,&quot; &amp; _
-			&quot;.wmv,.xls,.xlsx,.zip&quot;
-	s3 = &quot;&quot;
 	on error goto fbCreateMissingMediaDirectoryErr
-	sCommandLine = fsReplaceText(sCommandLine, &quot;&quot;&quot;&quot;, &quot;&quot;)
-	sCommandLine = fsReplaceText(sCommandLine, &quot;&apos;&quot;, &quot;&quot;)
-	fbCreateMissingMediaDirectory = False
 
-	s0 = &quot; &quot;
+	Select Case fsGetOS()
+	Case &quot;WINDOWS&quot;
+		s1 = &quot;&quot;&quot;&quot;
+	Case Else
+		sCommandLine = fsReplaceText(sCommandLine, &quot;&quot;&quot;&quot;, &quot;&quot;)
+		sCommandLine = fsReplaceText(sCommandLine, &quot;&apos;&quot;, &quot;&quot;)
+		s1 = &quot; &quot;
+	End Select
+	
+	a1 = split(sCommandLine, s1)
+	a2 = array(_
+			&quot;.3gp&quot;, _
+			&quot;.aac&quot;, _
+			&quot;.aif&quot;, _
+			&quot;.aiff&quot;, _
+			&quot;.au&quot;, _
+			&quot;.avi&quot;, _
+			&quot;.csv&quot;, _
+			&quot;.doc&quot;, _
+			&quot;.docx&quot;, _
+			&quot;.epub&quot;, _
+			&quot;.flac&quot;, _
+			&quot;.gif&quot;, _
+			&quot;.jpeg&quot;, _
+			&quot;.jpg&quot;, _
+			&quot;.m4a&quot;, _
+			&quot;.m4v&quot;, _
+			&quot;.mov&quot;, _
+			&quot;.mkv&quot;, _
+			&quot;.mp2&quot;, _
+			&quot;.mp3&quot;, _
+			&quot;.mp4&quot;, _
+			&quot;.mpeg&quot;, _
+			&quot;.oga&quot;, _
+			&quot;.ogg&quot;, _
+			&quot;.ogm&quot;, _
+			&quot;.ogv&quot;, _
+			&quot;.pdf&quot;, _
+			&quot;.png&quot;, _
+			&quot;.ppt&quot;, _
+			&quot;.pptx&quot;, _
+			&quot;.tif&quot;, _
+			&quot;.wav&quot;, _
+			&quot;.webm&quot;, _
+			&quot;.wma&quot;, _
+			&quot;.wmv&quot;, _
+			&quot;.xls&quot;, _
+			&quot;.xlsx&quot;, _
+			&quot;.zip&quot;)
 
-	a1 = split(sCommandLine, s0)
-	a2 = split(s2, &quot;,&quot;)
 	for n = lbound(a1) to ubound(a1)
-
 		for o = lbound(a2) to ubound(a2)
-			if instr(a1(n), a2(o)) &gt; 0 then
+			if instr(a1(n), a2(o)) = 1 + len(a1(n)) - len(a2(o)) then
 				&apos; Creating a text file in a location that does not exist
 				&apos; creates a directory. We can then put a media file in it.
 				&apos; First, we remove the Windows switch that ends with &quot;file:&quot;
-				s4 = a1(n)
-				a3 = split(s4,&quot;file:&quot;)
-				s5 = ConvertToUrl( a3(ubound(a3)))
-				&apos;Assign blame using the app signature if the file isn&apos;t removed
-				CreateFile( s5 &amp; &quot;temp.lock&quot;, fsAppSignature(), &quot;UTF-8&quot;)
-				fbCreateMissingMediaDirectory = True
-				if fileexists(s5 &amp; &quot;temp.lock&quot;) then
-					kill s5 &amp; &quot;temp.lock&quot;
+				a3 = split(a1(n),&quot;file:&quot;)
+				s2 = ConvertToUrl(a3(ubound(a3)))
+				if fileexists(s2) then
+					fbCreateMissingMediaDirectory = True
+					exit function
+				else
+					&apos;Assign blame using the app signature if the file isn&apos;t removed
+					CreateFile(s2 &amp; &quot;temp.lock&quot;, fsAppSignature(), &quot;UTF-8&quot;)
+					if fileexists(s2 &amp; &quot;temp.lock&quot;) then
+						fbCreateMissingMediaDirectory = True
+						kill s2 &amp; &quot;temp.lock&quot;
+						exit function
+					end if
 				end if
 			end if
 		next
@@ -5203,7 +5258,7 @@ function fsMyFfmpeg()
 	dim aC, aD
 	dim i as integer
 
-	aC = split(&quot;ffmpeg,avconv&quot;, &quot;,&quot;)
+	aC = array(&quot;ffmpeg&quot;,&quot;avconv&quot;)
 	cR = chr$(10)
 	sA = fsProgramDirectory()
 	sB = fsProgramDirectoryx86()
@@ -5322,9 +5377,22 @@ sub resetSpeechDispatcher(_
 		if not (fbLetButtonInterruptPosixPlayer) OR fbUsingPosixTalkProgram then
 			&apos; Stop the sound.
 			&apos; Check players before synthesizers.
-			a1 = Split(&quot;gst-launch-1.0,aplay,artsplay,esdplay,ossplay,paplay,play,roarcat,roarcatplay,&quot; &amp; _
-					&quot;espeak,festival,padsp,pico2wave,say,text2wave&quot;, _
-					&quot;,&quot;)
+			a1 = Array(_
+					&quot;gst-launch-1.0&quot;,_
+					&quot;aplay&quot;,_
+					&quot;artsplay&quot;,_
+					&quot;esdplay&quot;,_
+					&quot;ossplay&quot;,_
+					&quot;paplay&quot;,_
+					&quot;play&quot;,_
+					&quot;roarcat&quot;,_
+					&quot;roarcatplay&quot;,_
+					&quot;espeak&quot;,_
+					&quot;festival&quot;,_
+					&quot;padsp&quot;,_
+					&quot;pico2wave&quot;,_
+					&quot;say&quot;,_
+					&quot;text2wave&quot;)
 			for i = lbound(a1) to ubound(a1)
 				if fileexists(&quot;/usr/bin/&quot; &amp; a1(i)) OR _
 						fileexists(&quot;/usr/local/bin/&quot; &amp; a1(i)) then
@@ -5864,13 +5932,31 @@ function fbMdCode(_
 		byval sA)
 	&apos; Identify lines with strings of spaces, tabs or computer code characters
 	dim n, o as integer
-	dim s1, s2 as string
+	dim s1 as string
 	dim a1
 
 	sA = trim(sA)
 	n = len(sA)
-	s2 = &quot;=,-, ,&apos;,*,#,&quot;&quot;,\,[,],{,},/,(,$,%,;,:,&quot; &amp; chr$(9)
-	a1 = split(s2, &quot;,&quot;)
+	a1 = Array(_
+			&quot;=&quot;,_
+			&quot;-&quot;,_
+			&quot; &quot;,_
+			&quot;&apos;&quot;,_
+			&quot;*&quot;,_
+			&quot;#&quot;,_
+			&quot;&quot;&quot;&quot;,_
+			&quot;\&quot;,_
+			&quot;[&quot;,_
+			&quot;]&quot;,_
+			&quot;{&quot;,_
+			&quot;}&quot;,_
+			&quot;/&quot;,_
+			&quot;(&quot;,_
+			&quot;$&quot;,_
+			&quot;%&quot;,_
+			&quot;;&quot;,_
+			&quot;:&quot;,_
+			chr$(9))
 	fbMdCode = False
 	for o = lbound(a1) to ubound(a1)
 		if string(n, a1(o)) = sA then
@@ -7525,7 +7611,12 @@ sub megaDoc()
 	dim s1
 	dim n
 	
-	a1 = split(&quot;TextToSpeech,ThirdPartyCode,TTS_Config,TTS_Indices,TTS_Utilities&quot;, &quot;,&quot;)
+	a1 = Array(_
+			&quot;TextToSpeech&quot;,_
+			&quot;ThirdPartyCode&quot;,_
+			&quot;TTS_Config&quot;,_
+			&quot;TTS_Indices&quot;,_
+			&quot;TTS_Utilities&quot;)
 
 	&apos; cat 1.txt 2.txt 3.txt &gt; 0.txt	
 	s1 = &quot;cat &quot;
