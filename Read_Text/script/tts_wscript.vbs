@@ -406,7 +406,7 @@ Function myAudacityLamePath
     Set WshEnv = WshShell.Environment("Process")
     myAudacityLamePath = ""
     s1 = WshEnv("ProgramFiles(x86)") & "\Lame For Audacity\lame.exe"
-    s2 = WshEnv("ProgramFiles") & "\Lame For Audacity\lame.exe"
+    s2 = WshEnv("ProgramW6432") & "\Lame For Audacity\lame.exe"
     If fbFileExists(s1) Then
         myAudacityLamePath = s1
     ElseIf fbFileExists(s2) Then
@@ -808,7 +808,7 @@ Function fsWhereIsFfmpeg()
     Set WshShell = CreateObject("WScript.Shell")
     Set WshEnv = WshShell.Environment("Process")
     c1 = WshEnv("ProgramFiles(x86)")
-    c2 = WshEnv("ProgramFiles")
+    c2 = WshEnv("ProgramW6432")
     c3 = "\Audacity\ffmpeg-win-2.2.2\ffmpeg.exe"
     c4 = "\Audacity\lib\avconv.exe"
     c5 = WshEnv("HOMEDRIVE") & "\opt\ffmpeg.exe"
