@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xml:lang="en-US">
-  <id>tag:github.com,2008:/jimholgate.private</id>
-  <link type="text/html" rel="alternate" href="https://github.com/jimholgate"/>
-  <link type="application/atom+xml" rel="self" href="https://github.com/jimholgate.private.atom?token=AFa_O2LdwQynL6xZXTw4tLZXGybkeakmks6z6MMDwA=="/>
-  <title>Private Feed for jimholgate</title>
-  <updated>2013-10-14T11:11:25-07:00</updated>
-</feed>
