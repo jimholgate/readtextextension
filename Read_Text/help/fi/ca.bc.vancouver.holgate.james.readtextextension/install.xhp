@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<meta>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp" indexer="include" status="PUBLISH">
+<title id="install" xml-lang="fi-FI">
+Asentaminen</title>
+<filename>/ca.bc.vancouver.holgate.james.readtextextension/install.xhp</filename>
+</topic>
+<history>
+<created date="2010-10-22T00:00:00">
+James Holgate</created>
+<lastedited date="2013-08-08T20:12:00">
+Teijo S, translated help to Finnish</lastedited>
+</history>
+</meta>
+<body>
+<paragraph role="heading" id="install1" xml-lang="fi-FI" level="1">
+Käyttöönotto</paragraph>
+<paragraph role="heading" id="install1.1" xml-lang="fi-FI" level="2">
+Asentaminen</paragraph>
+<list>
+<listitem>
+Hanki lisäosan uusin versio ohjelman %PRODUCTNAME lisäosasivustolta. (http://extensions.%PRODUCTNAME.org).
+</listitem>
+<listitem>
+Avaa lisäosa sovelluksessa %PRODUCTNAME. Hyväksy lisenssisopimus.
+</listitem>
+<listitem>
+Käynnistä sovellus uudelleen.
+</listitem>
+</list>
+</body>
+</helpdocument>

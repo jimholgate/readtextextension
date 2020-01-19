@@ -1,0 +1,11 @@
+  * About
+    * [About About]
+  * Install
+    * [Install Install]
+    * [SetUp Set up]
+    * [CommandAndScriptTokens Tokens]
+  * Use
+    * [ReadClipboard Read Clipboard]
+    * [ReadSelection Read Selection]
+  * Download
+    * [http://extensions.openoffice.org/en/project/read-text Download]

@@ -1,0 +1,30 @@
+#summary About Read Text Extension - An Apache OpenOffice & LibreOffice extension to read text with an external program
+
+=About=
+
+Read Text Extension uses an external program or a web service to read text. Read the selection with Calc, Draw, Impress, Web Writer and Writer. Read the contents of the clipboard. Use speech synthesis to help to edit documents. Compare computer documents with printed documents. Learn a new language. Learn how to pronounce words correctly. Easily transfer text to your mobile device using QR Codes.
+
+==Download==
+
+  * [https://extensions.libreoffice.org/extensions/read-text LibreOffice Extensions]
+  * [http://extensions.services.openoffice.org/en/project/read-text Apache OpenOffice Extensions]
+
+==Screen Shot==
+
+[http://sites.google.com/site/readtextextension/ http://readtextextension.googlecode.com/svn/wiki/Default64.png]
+
+==Tutorial==
+
+<wiki:video url=https://www.youtube.com/watch?v=OCARVoZqC-s />
+
+==Blog==
+
+  * [http://sites.google.com/site/readtextextension/ Read Text Software]
+
+==Source Code==
+
+  * [http://code.google.com/p/readtextextension/source/browse/Read_Text/ Google Project Hosting]
+
+----
+===Related Topics===
+[http://help.libreoffice.org/Common/Accessibility_in Accessibility in LibreOffice]

@@ -1,0 +1,15 @@
+#summary Installieren der Read Text Extension - Setup
+
+= Setup = 
+
+  * Klicken Sie auf das Symbol in der Menüleiste oder wählen Sie *Extras - Add-Ons - Markierten Text vorlesen...* 
+  * Wählen Sie das Programm oder die Website, die Read Text verwenden soll, und wählen Sie eine Befehlszeile oder ein Script aus. 
+  * Stimme und Sprechgeschwindigkeit lassen sich in der Befehlszeile einstellen. 
+  * Sie können die Einstellung vorläufig testen, indem Sie auf *OK* rechtsklicken. 
+  * Sind Sie mit der Einstellung zufrieden, entfernen Sie das Häkchen bei *Diesen Dialog immer zeigen*. 
+  * Klicken Sie *OK*. 
+
+= Anpassen = 
+
+  * Mit Hilfe von externen Anwendungen oder Websites können Sie fremdsprachige Texte vorlesen oder übersetzen lassen. 
+  * Zum Dialogfeld zum Ändern der Einstellungen gelangen Sie über *Extras - Add-Ons – Markierten Text vorlesen...* 

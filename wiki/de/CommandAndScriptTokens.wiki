@@ -1,0 +1,33 @@
+#summary Befehls- und Script-Tokens
+
+= Befehls- und Script-Tokens =
+
+Verwenden Sie das passende Token, wenn Sie diese Werte in einem Befehl oder Script benötigen. Bei Ausführung wird der Wert in Klammern durch die jeweils benötigte Zeichenkette ersetzt.
+
+  * Aktuelles Datum in Landessprache (DATE) 
+  * Current Aktueller Wochentag in Landessprache (WEEKDAY) 
+  * Aktuelle Uhrzeit in Landessprache (TIME) 
+  * Aktuelle Uhrzeit, umformatiert zur Nutzung im Dateinamen (NOW) 
+  * Vollständige Pfadangabe und temporäre Datei mit markiertem Text (TMP) 
+  * Name des Verfassers (AUTHOR) 
+  * Name des Dokuments (TITLE)
+  * Pfad zur Sound-Galerie (SOUND_GALLERY) 
+  * Pfad zu einem Python-Script, das Text als PNG-Bild für Mobilgeräte codiert (CREATE_QR_LABEL_PY) 
+  * Pfad zu einem Python-Script, das einen Betriebssystem-Shell-Befehl ausführt (OS_PY) 
+  * Pfad zu einem Windows Script für das Vorlesen mittels Sprachausgabe (TTS_WSCRIPT_VBS)
+  * Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe (ESPEAK_READ_TEXT_PY) 
+  * Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe (FESTIVAL_READ_TEXT_PY) 
+  * Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe (PICO_READ_TEXT_PY) 
+  * Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe (SPD_READ_TEXT_PY) 
+  * Arbeitsverzeichnis - Dokumente, Eigene Dokumente o.ä. (HOME) 
+  * Anwendungs-Sprachcode - de für Deutsch, fr für Französisch usw. (LANGUAGE_CODE) 
+  * Anwendungs-Ländercode - DE für Deutsch, FR für Französisch, usw. (COUNTRY_CODE) 
+  * Anwendungs-Regionalcode- fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw. (LANGUAGE_COUNTRY_CODE) 
+  * Sprachcode-Auswahl - de für Deutsch, fr für Französisch usw. (SELECTION_LANGUAGE_CODE) 
+  * Ländercode.Auswahl - DE für Deutsch, FR für Französisch, usw. (SELECTION_COUNTRY_CODE) 
+  * Regionalcode-Auswahl - fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw. (SELECTION_LANGUAGE_COUNTRY_CODE) 
+  * Das erste Wort des markierten Textes, für die URL codiert (OOO_WEBTEXTDEFINITION)
+  * Die ersten 99 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXTSMALL) 
+  * Die ersten 249 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXT250) 
+  * Die ersten 999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXT) 
+  * Die ersten 9999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXTBIG)

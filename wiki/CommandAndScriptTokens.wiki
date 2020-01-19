@@ -1,0 +1,34 @@
+#summary Setting up Read Text Extension - Command and Script Tokens
+
+= Command and Script Tokens =
+
+When you need these values in a command or a script use the appropriate token. When the add-on is executed, the value in brackets is replaced by the actual string required.
+
+  * Current date as spoken in region (DATE)
+  * Current day of week as spoken in region (WEEKDAY)
+  * Current time as spoken in region (TIME)
+  * Current time reformatted so that you can use it in a filename (NOW)
+  * Full name of path and temporary file containing selected text (TMP)
+  * Name of the author (AUTHOR)
+  * Name of the document (TITLE)
+  * Path of sound gallery (SOUND_GALLERY)
+  * Path to a Windows Script to read using the system's voice (TTS_WSCRIPT_VBS)
+  * Path to a Python script that encodes text in a PNG image for mobile devices (CREATE_QR_LABEL_PY) 
+  * Path to a Python script that runs a operating system shell command (OS_PY) 
+  * Path to a Python Script to read using espeak (ESPEAK_READ_TEXT_PY) 
+  * Path to a Python Script to read using festival text2wave (FESTIVAL_READ_TEXT_PY) 
+  * Path to a Python Script to read using pico (PICO_READ_TEXT_PY) 
+  * Path to a Python Script to read using speech-dispatcher (SPD_READ_TEXT_PY) 
+  * Work directory also known as My Documents or home (HOME)
+  * Application language code – en for English; fr for French etc. (LANGUAGE_CODE)
+  * Application country code - US for United States; FR for France, etc. (COUNTRY_CODE)
+  * Application regional code - fr-CA for French in Canada; en-GB for English in the United Kingdom, etc. (LANGUAGE_COUNTRY_CODE)
+  * Selection language code – en for English; fr for French etc. (SELECTION_LANGUAGE_CODE)
+  * Selection country code - US for United States; FR for France, etc. (SELECTION_COUNTRY_CODE)
+  * Selection regional code - fr-CA for French in Canada; en-GB for English in the United Kingdom, etc. (SELECTION_LANGUAGE_COUNTRY_CODE)
+  * The first word of the selected text encoded for URL (OOO_WEBTEXTDEFINITION) 
+  * The first 99 letters of the selected text encoded for URL (OOO_WEBTEXTSMALL)
+  * The first 249 letters of the selected text encoded for URL (OOO_WEBTEXT250) 
+  * The first 999 letters of the selected text encoded for URL (OOO_WEBTEXT)
+  * The first 9999 letters of the selected text encoded for URL (OOO_WEBTEXTBIG)
+

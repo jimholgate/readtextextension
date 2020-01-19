@@ -1,0 +1,81 @@
+Language editing
+===============
+
+- [PoEdit][1] is an open source language string editor for Linux, OSX, and
+Windows.
+- [Virtaal][2] is another one.
+
+The format of **PO** translation files is described in the [PO Files Manual][3].
+Having separate language files is best practice because it makes translating
+easier and forces programs to have a single reliable method of getting text.
+GetText is available in [Python][4] as a library. The [Invent with Python][5]
+blog has a set of instructions.
+
+In [StarBasic][6], there is a script that does basic interpretation of PO files.
+
+The wording of dialogues and menu items of LibreOffice and Apache OpenOffice
+include a few differences, which reflect different program features or simply
+different writing styles.  If you notice a difference in your language, you
+should, if possible, use wording that works for either program.
+
+LibreOffice help is available online on a [wiki][7] that reflects the menus
+and dialogues of a recent version of the program.  As well, a comprehensive file
+that includes translations of phrases for all supported languages is maintained
+at the [download site][8].
+
+The `zzy` language is used internally in the code of the extension.  For
+example, the phrase for "English" is `en`, and the code for "Traditional
+Chinese" is `zh-tw`.
+
+What other files include language strings?
+------------------------------------------
+
+### Dialog
+
+```
+/textToSpeech/Dialog1.xdl
+```
+
+ComboBox3 of Dialog1 contains two letter strings of the ISO codes
+for currently supported languages.
+
+### Description files
+
+```
+/description/component.*
+/description.xml
+```
+
+### Help files
+
+```
+/help/*/help.tree
+/help/*/[$unique.id]/install.xhp
+/help/*/[$unique.id]/online.xhp
+/help/*/[$unique.id]/read_clipboard.xhp
+/help/*/[$unique.id]/read_selection.xhp
+/help/*/[$unique.id]/set_up.xhp
+/help/*/[$unique.id]/tokens.xhp
+```
+
+### Registry files
+
+```
+/registration/LICENSE.*
+/registry/data/org/openoffice/Office/Addons.xcu
+```
+
+### Scripts
+
+```
+/script/tts_wscript.vbs
+```
+
+[1]: http://poedit.net/
+[2]: http://virtaal.translatehouse.org/download.html
+[3]: https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
+[4]: https://docs.python.org/2/library/gettext.html
+[5]: http://inventwithpython.com/blog/2014/12/20/translate-your-python-3-program-with-the-gettext-module/
+[6]: http://www.oooforum.org/forum/viewtopic.phtml?t=85441
+[7]: https://help.libreoffice.org/Writer/Edit#Select_Text
+[8]: http://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz

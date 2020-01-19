@@ -1,0 +1,30 @@
+#summary Info - Mit Read Text kann ein externes Programm oder eine Web-Anwendung ...
+
+=Info=
+
+Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Calc, Draw, Impress, Web Writer oder der Windows-Zwischenablage vorlesen. Bei Einsatz zusammen mit einem Text-to-Speech-Programm, einem Script oder einer Web-Anwendung können Sie selbstverfasste Texte abhören oder einen Bildschirmtext akustisch mit einer Vorlage vergleichen. Nützlich auch beim Erlernen einer Fremdsprache oder als Hilfe zur Aussprache unbekannter Worte. Text kann außerdem einfach mittels QR-Code auf Ihr mobiles Gerät übertragen werden.
+
+==Download==
+
+  * [https://extensions.libreoffice.org/extensions/read-text LibreOffice Extensions]
+  * [http://extensions.services.openoffice.org/de/project/read-text Apache OpenOffice Extensions]
+
+==Image==
+
+[http://sites.google.com/site/readtextextension/ http://readtextextension.googlecode.com/svn/wiki/de/Default64.png]
+
+==Lernprogramm==
+
+<wiki:video url=https://www.youtube.com/watch?v=OCARVoZqC-s />
+
+==Blog==
+
+  * [http://sites.google.com/site/readtextextension/ Read Text Software]
+
+==Source-Code==
+
+  * [http://code.google.com/p/readtextextension/source/browse/Read_Text/ Google Project Hosting]
+  
+-----
+===Verwandte Themen===
+[http://help.libreoffice.org/Common/Accessibility_in/de Zugänglichkeit in LibreOffice]

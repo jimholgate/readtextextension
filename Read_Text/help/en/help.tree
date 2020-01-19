@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<tree_view version="24-Aug-2004">
+  <help_section application="readtextextension" id="readtextextension01" title="Read Text Extension">
+    <node id="readtextextension0101" title="Setting up Read Text Extension">
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Install</topic>
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">Set up</topic>
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">Command and Script Tokens</topic>
+    </node>
+    <node id="readtextextension0102" title="Using Read Text Extension">
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Read selection</topic>
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp">Read clipboard</topic>
+    </node>
+    <node id="readtextextension0103" title="Read Text Extension On-line">
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp">On-line Information</topic>
+    </node>
+  </help_section>
+</tree_view>

@@ -1,0 +1,378 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-18 11:20-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "Наружное применение"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "Использование Festival со сценарием"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "Сценарий Festival"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "Использование Наружное применение"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "Параметры командной строки"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "Вид"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "Всегда показывать этот диалог"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "О программе"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "Отмена"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "OK"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "Заказать"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "Сценарий"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "(с) 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "Тест"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "Наружное применение неизвестно"
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "Основная функция не может разобрать строку"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "Справка"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "веб-инструменты"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "Свойства речи"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "Панель управления"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "Сенсорный экран"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "Синтез-речи"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "Английский"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "Африкаанс"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "Болгарский"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "Каталонский"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "Чешский"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "Датский"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "Немецкий"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "Греческий"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "Испанский"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "Французский"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "Эстонский"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "Финский"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "Ирландский"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "Хинди"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "Венгерский"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "Индонезийский"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "Исландский"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "Итальянский"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "Японский"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "Корейский"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "Латышский"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "Литовский"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "Мальтийский"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "Голландский"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "Польский"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "Португальский"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "Румынский"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "Русский"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "Словацкий"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "Словенский"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "Шведский"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "Тагальский"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "Турецкий"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "Украинский"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "Китайский"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "арабский"
+
+#: template.src
+msgctxt ""
+msgid "Album"
+msgstr "Альбом"
+
+#: template.src
+msgctxt ""
+msgid "Artist"
+msgstr "Художник"
+
+#: template.src
+msgctxt ""
+msgid "Genre"
+msgstr "Жанр"
+
+#: template.src
+msgctxt ""
+msgid "Image"
+msgstr "Картина"
+
+#: template.src
+msgctxt ""
+msgid "Lyrics"
+msgstr "Текст Песни"
+
+#: template.src
+msgctxt ""
+msgid "Title"
+msgstr "Название"
+
+#: template.src
+msgctxt ""
+msgid "Track"
+msgstr "Трек"
+
+#: template.src
+msgctxt ""
+msgid "Year"
+msgstr "Год"
+
+#: template.src
+msgctxt ""
+msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
+msgstr ""
+"Read Text – Синтез-речи\n"
+"=========\n"
+"\n"
+">_Выделить текст.  Для запуска демонстрации выберите “Сервис  – Дополнения – "
+"Impress-Вид”._\n"
+"\n"
+"Impress – Вид\n"
+"-------------\n"
+"\n"
+"- Выделить текст.\n"
+"- Для запуска демонстрации выберите “Сервис  – Дополнения – Impress-Вид”._\n"
+"\n"
+"`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ru/)`"
+

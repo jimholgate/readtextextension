@@ -1,0 +1,11 @@
+  * Info
+    * [About Info]
+  * Installieren
+    * [Install Installieren]
+    * [SetUp Setup]
+    * [CommandAndScriptTokens Tokens]
+  * So verwenden Sie die Read Text Extension 
+    * [ReadClipboard Zwischenablage vorlesen]
+    * [ReadSelection Markierten Text vorlesen]
+  * Download
+    * [http://extensions.openoffice.org/de/project/read-text Download]

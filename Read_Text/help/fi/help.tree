@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<tree_view version="24-Aug-2004">
+  <help_section application="readtextextension" id="readtextextension01" title="Lisäosa 'Teksti puheeksi'">
+    <node id="readtextextension0101" title="Käyttöönotto">
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Asentaminen</topic>
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">Asetukset</topic>
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">Komentojonot</topic>
+    </node>
+    <node id="readtextextension0102" title="Käyttö">
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Lue valinta</topic>
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp">Lue leikepöydältä</topic>
+    </node>
+    <node id="readtextextension0103" title="Lisätietoja">
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp">Lisätietoja verkossa</topic>
+    </node>
+  </help_section>
+</tree_view>

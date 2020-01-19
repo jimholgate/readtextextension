@@ -1,0 +1,8 @@
+#summary So verwenden Sie die Read Text Extension - Zwischenablage vorlesen 
+=Zwischenablage vorlesen= 
+
+Sie können sich beliebigen Text aus der Zwischenablage vorlesen lassen. Beispielsweise können Sie Makro-Code, Textfeldinhalte, Datenquellen, Bildunterschriften und Text in markierten Tabellenabschnitten vorlesen lassen, desgleichen Text, der aus externen Programmen wie Web-Browsern, Hilfethemen oder News-Feeds kopiert wurde. 
+
+  * Markieren Sie eine Textpassage. 
+  * Kopieren Sie Text mit *Bearbeiten - Kopieren* oder mit *Strg+C* . 
+  * Verwenden Sie *Extras - Add-Ons - Zwischenablage vorlesen* . 

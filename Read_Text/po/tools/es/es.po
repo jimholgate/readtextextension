@@ -1,0 +1,377 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:57\n"
+"PO-Revision-Date: 2015-08-18 10:53-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "Programa"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "Usar Festival con un script"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "Comandos script"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "Leer el texto con un programa distinto"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "Opciones adicionales en linea de comando"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "Cuadro de díalogo"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "Mostrar siempre este cuadro de dialogo al ejecutar"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "Acerca"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "Aceptar"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "Comando"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "Script"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "Prueba"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "No se encontró el programa."
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "La secuencia no se puede analizar!"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "Ayuda On-line"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "Usar las herramientas web"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "Propiedades de voz"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "Panel de control"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "Pantalla táctil"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "Síntesis de voz"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "Inglés"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "Africaans"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "Búlgaro"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "Catalán"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "Checo"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "Danés"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "Alemán"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "Griego"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "Español"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "Francés"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "Estonio"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "Finlandés"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "Irlandés"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "Hindi"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "Húngaro"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "Indonesio"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "Islandés"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "Italiano"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "Japonés"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "Coreano"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "Letón"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "Lituano"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "Maltés"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "Holandés"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "Polaco"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "Portugués"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "Rumano"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "Ruso"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "Eslovaco"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "Esloveno"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "Sueco"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "Tagalo"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "Turco"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "Ucranio"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "Chino"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "Árabe"
+
+#: template.src
+msgctxt ""
+msgid "Album"
+msgstr "Álbum"
+
+#: template.src
+msgctxt ""
+msgid "Artist"
+msgstr "Artista"
+
+#: template.src
+msgctxt ""
+msgid "Genre"
+msgstr "Género"
+
+#: template.src
+msgctxt ""
+msgid "Image"
+msgstr "Imagen"
+
+#: template.src
+msgctxt ""
+msgid "Lyrics"
+msgstr "Letras"
+
+#: template.src
+msgctxt ""
+msgid "Title"
+msgstr "Título"
+
+#: template.src
+msgctxt ""
+msgid "Track"
+msgstr "Pista"
+
+#: template.src
+msgctxt ""
+msgid "Year"
+msgstr "Año"
+
+#: template.src
+msgctxt ""
+msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
+msgstr ""
+"Read Text – Síntesis de voz\n"
+"=========\n"
+"\n"
+">_Abra un documento y selecciona texto.  Elija “Herramientas - Complementos "
+"- Impress-Ver” para iniciar la presentación._\n"
+"\n"
+"## Impress – Ver\n"
+"\n"
+"- Selecciona texto.\n"
+"- Elija “Herramientas - Complementos - Impress-Ver” para iniciar la "
+"presentación.\n"
+"\n"
+"`© 2015 James Holgate.  [cc by 4.0](http://es.creativecommons.org/)`"
+

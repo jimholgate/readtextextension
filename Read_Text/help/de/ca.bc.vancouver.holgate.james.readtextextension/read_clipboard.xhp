@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+    <meta>
+        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp" indexer="include" status="PUBLISH">
+            <title id="read_clipboard" xml-lang="en-DE">
+                Zwischenablage vorlesen</title>
+            <filename>/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp</filename>
+        </topic>
+        <history>
+            <created date="2010-10-22T00:00:00">
+                James Holgate</created>
+            <lastedited date="2011-03-17T00:00:00">
+                First translated to German by Eugene Seidel. If translation is updated, please remove this line.
+            </lastedited>
+        </history>
+    </meta>
+    <body>
+        <paragraph role="heading" id="read_clipboard1" xml-lang="de-DE" level="1">
+            So verwenden Sie die Read Text Extension
+        </paragraph>
+        <paragraph role="heading" id="read_clipboard_1.1" xml-lang="de-DE" level="2">
+            Zwischenablage vorlesen
+        </paragraph>
+        <list>
+            <listitem>
+                Sie können sich beliebigen Text aus der Zwischenablage vorlesen lassen. Beispielsweise können Sie Makro-Code, Textfeldinhalte, Datenquellen, Bildunterschriften und Text in markierten Tabellenabschnitten vorlesen lassen, desgleichen Text, der aus externen Programmen wie Web-Browsern, Hilfethemen oder News-Feeds kopiert wurde.
+            </listitem>
+            <listitem>
+                Markieren Sie eine Textpassage.
+            </listitem>
+            <listitem>
+                Kopieren Sie Text mit
+                <emph>
+                    Bearbeiten - Kopieren</emph>
+                oder mit
+                <switchinline select="sys">
+                    <caseinline select="MAC">
+                        <emph>
+                            Befehl+C</emph>
+                    </caseinline>
+                    <caseinline select="UNIX">
+                        <emph>
+                            Strg+C</emph>
+                    </caseinline>
+                    <caseinline select="WIN">
+                        <emph>
+                            Strg+C</emph>
+                    </caseinline>
+                    <defaultinline>
+                        dem Tastaturkürzel für das Kopieren von Text
+                    </defaultinline>
+                </switchinline>
+                . 
+            </listitem>
+            <listitem>
+                Verwenden Sie 
+                <emph>
+                    Extras - Add-Ons - Zwischenablage vorlesen</emph>
+                .
+            </listitem>
+        </list>
+    </body>
+</helpdocument>

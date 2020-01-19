@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest>
+<!--Add-on configuration: UI strings in different languages and path of icons-->
+ <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/Addons.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+ <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/CalcWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+ <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/DrawWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+ <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/ImpressWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+ <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/WriterGlobalWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+ <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/WriterWebWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+ <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/WriterWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+<!--Basic library: Path to Basic scripts-->
+ <manifest:file-entry manifest:full-path="textToSpeech/" manifest:media-type="application/vnd.sun.star.basic-library"/>
+<!--Description: Show description of Read Text when extension manager dialog is showing-->
+ <manifest:file-entry manifest:media-type="application/vnd.sun.star.package-bundle-description" manifest:full-path="description/component.txt"/>
+ <manifest:file-entry manifest:full-path="description/component.txt.de" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=de"/>
+ <manifest:file-entry manifest:full-path="description/component.txt.en" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=en"/>
+ <manifest:file-entry manifest:full-path="description/component.txt.es" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=es"/>
+ <manifest:file-entry manifest:full-path="description/component.txt.fi" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=fi"/>
+ <manifest:file-entry manifest:full-path="description/component.txt.fr" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=fr"/>
+ <manifest:file-entry manifest:full-path="description/component.txt.hi" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=hi"/>
+ <manifest:file-entry manifest:full-path="description/component.txt.it" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=it"/>
+ <manifest:file-entry manifest:full-path="description/component.txt.ru" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=ru"/>
+ <manifest:file-entry manifest:full-path="description/component.txt.zh" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=zh"/>
+<!--Help: Show context appropriate help using F1 when Read Text dialog is showing-->
+ <manifest:file-entry manifest:media-type="application/vnd.sun.star.help" manifest:full-path="help/"/>
+</manifest:manifest>

@@ -1,0 +1,325 @@
+# James <readtextextension-discuss@googlegroups.com>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: read-text 1.0\n"
+"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
+"/readtextextension-discuss\n"
+"POT-Creation-Date: 2015-08-15T12:42:58\n"
+"PO-Revision-Date: 2015-08-15 23:12-0700\n"
+"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"Language-Team: LANGUAGE\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Project-Style: openoffice\n"
+
+#: template.src
+msgctxt ""
+msgid "Read Text"
+msgstr "Read Text"
+
+#: template.src
+msgctxt ""
+msgid "External program"
+msgstr "Program zewnętrzne"
+
+#: template.src
+msgctxt ""
+msgid "Use Festival with a script"
+msgstr "Użyj Festival skrypt"
+
+#: template.src
+msgctxt ""
+msgid "Script commands"
+msgstr "Script polecenia"
+
+#: template.src
+msgctxt ""
+msgid "Read with an external program"
+msgstr "Czytaj z zewnętrznego programu"
+
+#: template.src
+msgctxt ""
+msgid "Command line options"
+msgstr "Opcje wiersza poleceń"
+
+#: template.src
+msgctxt ""
+msgid "Display"
+msgstr "Ekran"
+
+#: template.src
+msgctxt ""
+msgid "Always show this dialog"
+msgstr "Zawsze pokazuj tego okna"
+
+#: template.src
+msgctxt ""
+msgid "About"
+msgstr "O"
+
+#: template.src
+msgctxt ""
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: template.src
+msgctxt ""
+msgid "OK"
+msgstr "OK"
+
+#: template.src
+msgctxt ""
+msgid "Command"
+msgstr "Command"
+
+#: template.src
+msgctxt ""
+msgid "Script"
+msgstr "Script"
+
+#: template.src
+msgctxt ""
+msgid "© 2008-2015 James Holgate"
+msgstr "© 2008-2015 James Holgate"
+
+#: template.src
+msgctxt ""
+msgid "Test"
+msgstr "Test"
+
+#: template.src
+msgctxt ""
+msgid "Could not locate the program."
+msgstr "Nie można odnaleźć programu."
+
+#: template.src
+msgctxt ""
+msgid "String cannot be analyzed!"
+msgstr "Napis nie może być analizowana!"
+
+#: template.src
+msgctxt ""
+msgid "On-line help"
+msgstr "Pomoże On-line"
+
+#: template.src
+msgctxt ""
+msgid "https://sites.google.com/site/readtextextension/"
+msgstr "https://sites.google.com/site/readtextextension/"
+
+#: template.src
+msgctxt ""
+msgid "Use a web application"
+msgstr "Przetłumacz i czytać z narzędzi internetowych"
+
+#: template.src
+msgctxt ""
+msgid "Speech properties"
+msgstr "Właściwości mowy"
+
+#: template.src
+msgctxt ""
+msgid "System settings"
+msgstr "Panel sterowania"
+
+#: template.src
+msgctxt ""
+msgid "Touch screen"
+msgstr "Ekran dotykowy"
+
+#: template.src
+msgctxt ""
+msgid "Speech"
+msgstr "Synteza mowy"
+
+#: template.src
+msgctxt ""
+msgid "English"
+msgstr "Angielski"
+
+#: template.src
+msgctxt ""
+msgid "Afrikaans"
+msgstr "Afrikaans"
+
+#: template.src
+msgctxt ""
+msgid "Bulgarian"
+msgstr "Bułgarski"
+
+#: template.src
+msgctxt ""
+msgid "Catalan"
+msgstr "Kataloński"
+
+#: template.src
+msgctxt ""
+msgid "Czech"
+msgstr "Czech"
+
+#: template.src
+msgctxt ""
+msgid "Danish"
+msgstr "Duński"
+
+#: template.src
+msgctxt ""
+msgid "German"
+msgstr "Niemiecki"
+
+#: template.src
+msgctxt ""
+msgid "Greek"
+msgstr "Grecki"
+
+#: template.src
+msgctxt ""
+msgid "Spanish"
+msgstr "Hiszpański"
+
+#: template.src
+msgctxt ""
+msgid "French"
+msgstr "Francuski"
+
+#: template.src
+msgctxt ""
+msgid "Estonian"
+msgstr "Estoński"
+
+#: template.src
+msgctxt ""
+msgid "Finnish"
+msgstr "Fiński"
+
+#: template.src
+msgctxt ""
+msgid "Irish"
+msgstr "Irlandzki"
+
+#: template.src
+msgctxt ""
+msgid "Hindi"
+msgstr "Hinduski"
+
+#: template.src
+msgctxt ""
+msgid "Hungarian"
+msgstr "Węgierski"
+
+#: template.src
+msgctxt ""
+msgid "Indonesian"
+msgstr "Indonezyjski"
+
+#: template.src
+msgctxt ""
+msgid "Icelandic"
+msgstr "Islandzki"
+
+#: template.src
+msgctxt ""
+msgid "Italian"
+msgstr "Włoski"
+
+#: template.src
+msgctxt ""
+msgid "Japanese"
+msgstr "Japoński"
+
+#: template.src
+msgctxt ""
+msgid "Korean"
+msgstr "Koreański"
+
+#: template.src
+msgctxt ""
+msgid "Latvian"
+msgstr "Łotewski"
+
+#: template.src
+msgctxt ""
+msgid "Lithuanian"
+msgstr "Litewski"
+
+#: template.src
+msgctxt ""
+msgid "Maltese"
+msgstr "Maltańczyk"
+
+#: template.src
+msgctxt ""
+msgid "Dutch"
+msgstr "Holenderski"
+
+#: template.src
+msgctxt ""
+msgid "Polish"
+msgstr "Polski"
+
+#: template.src
+msgctxt ""
+msgid "Portuguese"
+msgstr "Portugalski"
+
+#: template.src
+msgctxt ""
+msgid "Romanian"
+msgstr "Rumuński"
+
+#: template.src
+msgctxt ""
+msgid "Russian"
+msgstr "Rosyjski"
+
+#: template.src
+msgctxt ""
+msgid "Slovak"
+msgstr "Słowacki"
+
+#: template.src
+msgctxt ""
+msgid "Slovenian"
+msgstr "Słoweński"
+
+#: template.src
+msgctxt ""
+msgid "Swedish"
+msgstr "Szwedzki"
+
+#: template.src
+msgctxt ""
+msgid "Tagalog"
+msgstr "Tagalog"
+
+#: template.src
+msgctxt ""
+msgid "Turkish"
+msgstr "Turecki"
+
+#: template.src
+msgctxt ""
+msgid "Ukrainian"
+msgstr "Ukraiński"
+
+#: template.src
+msgctxt ""
+msgid "Chinese"
+msgstr "Chiński"
+
+#: template.src
+msgctxt ""
+msgid "Arabic"
+msgstr "Arabski"
+
+#: template.src
+msgctxt ""
+msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
+msgstr "Read Text – Synteza mowy\n=========\n\n>_Musisz otworzyć dokument i wybierz tekst. Wybierz “Narzędzia – Dodatki – Impress-Widok” aby uruchomić pokaz._\n\nImpress – Widok\n--------------\n\n- Musisz otworzyć dokument i wybierz tekst.\n- Wybierz “Narzędzia – Dodatki – Impress-Widok” aby uruchomić pokaz.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.pl)`"
+

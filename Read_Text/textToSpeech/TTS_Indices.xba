@@ -1,0 +1,1615 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Indices" script:language="StarBasic">REM  *****  BASIC  *****
+OPTION EXPLICIT
+global UpdatePoSettingsDone as integer 
+
+global mMyTranslationId(0) as variant 
+global mMyTranslationIdPlur(0) as variant 
+global mMyTranslationStr(0,0) as variant 
+
+&apos;&apos;  Language editing
+&apos;&apos;  ================
+&apos;&apos;   
+&apos;&apos;   - [PoEdit][1] is an open source language string editor for Linux, OSX, and
+&apos;&apos;     Windows.
+&apos;&apos;   - [Virtaal][2] is another one.
+&apos;&apos;   
+&apos;&apos;   The format of **PO** translation files is described in the [PO Files Manual][3].
+&apos;&apos;   Having separate language files is best practice because it makes translating
+&apos;&apos;   easier and forces programs to have a single reliable method of getting text.
+&apos;&apos;   GetText is available in [Python][4] as a library. The [Invent with Python][5]
+&apos;&apos;   blog has a set of instructions.
+&apos;&apos;   
+&apos;&apos;   In [StarBasic][6], there is a script that does basic interpretation of PO files.
+&apos;&apos;   
+&apos;&apos;   The wording of dialogues and menu items of %PRODUCTNAME and Apache %PRODUCTNAME
+&apos;&apos;   include a few differences, which reflect different program features or simply
+&apos;&apos;   different writing styles.  if you notice a difference in your language, you
+&apos;&apos;   should, if possible, use wording that works for either program.
+&apos;&apos;   
+&apos;&apos;   Program help is available online on a [wiki][7] that reflects the menus
+&apos;&apos;   and dialogues of a recent version of the program.  As well, a comprehensive file
+&apos;&apos;   that includes translations of phrases for all supported languages is maintained
+&apos;&apos;   at the [download site][8].
+&apos;&apos;   
+&apos;&apos;   The `zzy` language is used internally in the code of the extension.  for
+&apos;&apos;   example, the phrase for &quot;&quot;English&quot;&quot; is `en`, and the code for &quot;&quot;Traditional
+&apos;&apos;   Chinese&quot;&quot; is `zh-tw`.
+&apos;&apos;   
+&apos;&apos;  What other files include language strings?
+&apos;&apos;  ------------------------------------------
+&apos;&apos;   
+&apos;&apos;  ### Dialog
+&apos;&apos;   
+&apos;&apos;   ```
+&apos;&apos;   /textToSpeech/Dialog1.xdl
+&apos;&apos;   ```
+&apos;&apos;   
+&apos;&apos;   ComboBox3 of Dialog1 contains two letter strings of the ISO codes
+&apos;&apos;   for currently supported languages.
+&apos;&apos;   
+&apos;&apos;  ### Description files
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;       /description/component.*
+&apos;&apos;       /description.xml
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;  ### Help files
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;       /help/*/help.tree
+&apos;&apos;       /help/*/[$unique.id]/install.xhp
+&apos;&apos;       /help/*/[$unique.id]/online.xhp
+&apos;&apos;       /help/*/[$unique.id]/read_clipboard.xhp
+&apos;&apos;       /help/*/[$unique.id]/read_selection.xhp
+&apos;&apos;       /help/*/[$unique.id]/set_up.xhp
+&apos;&apos;       /help/*/[$unique.id]/tokens.xhp
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;  ### Registry files
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;       /registration/LICENSE.*
+&apos;&apos;       /registry/data/org/openoffice/Office/Addons.xcu
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;  ### Scripts
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;       /script/tts_wscript.vbs
+&apos;&apos;   
+&apos;&apos;   
+&apos;&apos;   [1]: https://poedit.net/
+&apos;&apos;   [2]: https://virtaal.translatehouse.org/download.html
+&apos;&apos;   [3]: https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
+&apos;&apos;   [4]: https://docs.python.org/2/library/gettext.html
+&apos;&apos;   [5]: https://inventwithpython.com/blog/2014/12/20/translate-your-python-3-program-with-the-gettext-module/
+&apos;&apos;   [6]: http://www.oooforum.org/forum/viewtopic.phtml?t=85441
+&apos;&apos;   [7]: https://help.libreoffice.org/Writer/Edit#Select_Text
+&apos;&apos;   [8]: https://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz
+&apos;&apos;  
+&apos;&apos;  
+
+function fsLookUpTerm(_
+		optional byVal sTermCode, _
+		optional byval sMyLang, _
+		optional byval bReverse)
+	&apos;
+	&apos;
+	&apos; Returns an indexed term from `zzy` style string (i. e.: `s_ok`).
+	&apos; if the `sTermCode` is in not the index, then the procedure
+	&apos; returns the original first argument.
+	&apos;
+	&apos; + sTermCode - the code to look up
+	&apos; + sMyLang - your requested language as two letter iso code (optional)
+	&apos;   i. e.: en for English, es for Spanish
+	&apos;
+	&apos; Example: Get the language of the selected text:
+	&apos; 
+	&apos;     fsLookUpTerm(fsSelectionLanguage())
+	&apos; 
+	&apos; Example: Get the language of the user interface:
+	&apos;
+	&apos; 
+	&apos;     fsLookUpTerm(fsGetLanguage())
+	&apos; 
+	&apos;
+	&apos;  ### note ###
+	&apos;
+	&apos; Pierre Chef&apos;s PO lookup code stores the current
+	&apos; interface language resources in global variables.  To update
+	&apos; the language on the fly, you need to set the 
+	&apos; `UpdatePoSettingsDone` global variable to -1.
+	&apos;
+	fsLookUpTerm=&quot;&quot;
+	if ismissing(sTermCode) then sTermCode = &quot;s_cancel&quot;
+	if ismissing(sMyLang) then sMyLang = fsGetLanguage()
+	if ismissing(bReverse) then bReverse = False
+	dim s2$ : s2 = fsZzxToEnglish(_
+			sTermCode, _
+			&quot;en&quot;) &apos; Machine to English
+	fsLookUpTerm = _(s2, &quot;tools&quot;, sMyLang)
+end function
+
+
+function _(_
+		msgid, _
+		optional byval sDirPo, _
+		optional byval sMyLang, _
+		optional byval iAlt)
+	_ = &quot;&quot;
+	&apos; msgid = string input
+	&apos; sDirPo = subdirectory path in local mo folder
+	&apos; sMyLang = language to match with English
+	&apos; iAlt = if False, then converts from English
+	&apos; and if true, then converts to English
+
+&apos;&apos; PO language function
+&apos;&apos; ====================
+&apos;&apos;  
+&apos;&apos;  This extension uses external **PO** files to index the
+&apos;&apos;  text in the dialogues to various languages.
+&apos;&apos;  
+&apos;&apos;  English text is used as the index string.  Therefore, English 
+&apos;&apos;  capitalization and spacing must be consistent for language
+&apos;&apos;  translation to work.
+&apos;&apos;
+&apos;&apos;  The function&apos;s name is a single underscore character `_(s1)`
+&apos;&apos;  
+&apos;&apos;  + [Virtaal][1] - Simple and responsive PO editor.
+&apos;&apos;  + [Poedit][2] - PO Editor with features.  On Linux, you
+&apos;&apos;    can use other program&apos;s language resources as models
+&apos;&apos;    and use installed dictionaries to check spelling.
+&apos;&apos;  
+&apos;&apos; Code
+&apos;&apos; ----
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;      sub poExample
+&apos;&apos;          REM Default language lookup
+&apos;&apos;          msgbox _(&quot;Cancel&quot;)
+&apos;&apos;          REM With specific arguments
+&apos;&apos;          REM You must reset UpdatePoSettingsDone before changing languages.
+&apos;&apos;          UpdatePoSettingsDone = -1
+&apos;&apos;          msgbox _(&quot;Read with an external program&quot;, &quot;tools&quot;, &quot;fr&quot;)
+&apos;&apos;          REM Setting the optional fourth parameter to 1 
+&apos;&apos;          REM does a reverse translation to English.
+&apos;&apos;          msgbox _(&quot;Le script du Festival&quot;, &quot;tools&quot;, &quot;fr&quot;, 1)
+&apos;&apos;          REM You must reset UpdatePoSettingsDone before changing languages.
+&apos;&apos;          UpdatePoSettingsDone = -1
+&apos;&apos;          msgbox _(&quot;s_cancel&quot;, &quot;tools&quot;, &quot;zzy&quot;, 1)
+&apos;&apos;      end sub
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;  
+&apos;&apos;    [1]: https://sourceforge.net/projects/translate/files/Virtaal/
+&apos;&apos;    [2]: https://poedit.net/
+&apos;&apos;  
+	dim i as integer
+	dim iMax as integer
+	dim trad as string
+	
+	if ismissing(sDirPo) or sDirPo = &quot;&quot; then
+		sDirPo = &quot;tools&quot;
+	end if
+	if ismissing(sMyLang) or sMyLang = &quot;&quot; then
+		sMyLang = fsDisplayLanguage()
+	end if
+	if ismissing(iAlt) then iAlt = -1
+	if msgid = &quot;&quot; then
+		exit function
+	end if
+	dim sMyPoFile : sMyPoFile = &quot;&quot;
+	sMyPoFile = convertfromurl(_
+			fsMyURL &amp; _
+			&quot;/po/&quot; &amp; _
+			sDirPo &amp; _
+			&quot;/&quot; &amp; _
+			sMyLang)
+	if UpdatePoSettingsDone &lt;&gt; 1 then UpdatePoSettings(sMyPoFile, sMyLang)
+	if iAlt = 1 then
+		&apos; Reverse translation
+		for i = 0 to ubound(mMyTranslationStr)
+			if mMyTranslationStr(i,0)=msgid then 
+				 trad=mMyTranslationId(i)
+				exit for 
+			end if 
+		next i
+		if trad=&quot;&quot; then trad=msgid
+	elseif iAlt = 0 then
+		&apos; Always return a blank for each term
+		trad=&quot;&quot;	
+	else
+		&apos; Normal translation (default)
+		for i = 0 to ubound(mMyTranslationId)
+			if mMyTranslationId(i)=msgid then 
+				 trad=mMyTranslationStr(i,0) 
+				exit for 
+			elseif mMyTranslationIdPlur(i)=msgid then 
+				trad=mMyTranslationStr(i,1) 
+				exit for 
+			end if 
+		next i
+		if trad=&quot;&quot; then trad=msgid
+	end if
+	&apos; Convert escaped quotes and remove unescaped quotes.
+	trad = fsReplaceText(trad, &quot;\&quot;&quot;&quot;, &quot;\&amp;dblquot;&quot;
+	trad = fsReplaceText(trad, &quot;&quot;&quot;&quot;, &quot;&quot;)
+	trad = fsReplaceText(trad, &quot;\&amp;dblquot;&quot;, &quot;&quot;&quot;&quot;)
+	_=trad 
+end function
+
+
+function fbTranslateTable(_
+		message, _
+		cntMsg, _
+		sMyTranslationType, _
+		nbPlural)
+	dim a1
+	fbTranslateTable = False
+	on error goto fbTranslateTableErr
+	if message=&quot;&quot; then exit function
+	if sMyTranslationType=&quot;id&quot; then 
+		a1=mMyTranslationId(cntMsg)+message
+		mMyTranslationId(cntMsg) = a1
+	elseif sMyTranslationType=&quot;idPlur&quot; then 
+		a1=mMyTranslationIdPlur(cntMsg)+message 
+		mMyTranslationIdPlur(cntMsg) = a1
+	elseif sMyTranslationType=&quot;str&quot; then 
+		a1 = mMyTranslationStr(cntMsg,nbPlural)+message
+		mMyTranslationStr(cntMsg,nbPlural) = a1 
+	end if
+	fbTranslateTable = True
+	exit function
+	fbTranslateTableErr:
+	fbTranslateTable = False
+end function
+
+
+function UpdatePoSettings(_
+		podir as string, _
+		optional byval isoCode)
+	&apos; Adaptation du code ecrit par [Pierre Chef][UpdatePoSettings1]
+	&apos; en juin, 2009. 
+	&apos;
+	&apos; + Ajoute une option pour le directoire `podir`
+	&apos; + Ajoute une option pour les langues `isoCode`.
+	&apos; + Avec les fichiers encode en UTF-8, vous pouvez utiliser
+	&apos;   les langues complexes et asiatiques sur le platforme
+	&apos;   Windows. (`myTextFile.Encoding=&quot;UTF-8&quot;`)
+	&apos; + On ferme le fichier explicitement a la fin. 
+	&apos;   (`myTextFile.closeInput`)
+	&apos;
+	&apos; [UpdatePoSettings1]: http://www.oooforum.org/forum/viewtopic.phtml?t=85441
+	&apos;
+	UpdatePoSettings = False
+	on error goto UpdatePoSettingsErr
+	dim lenLineRead# : lenLineRead = 0  &apos; &apos;length of line read
+	dim cntMsg# : cntMsg = 0  &apos; &apos;message counter
+	dim nbPlural# : nbPlural = 0  &apos; &apos;current plural
+	dim nbPluralMax# : nbPluralMax = 0  &apos; &apos;how many plurals
+	dim position# : position = 0  &apos; &apos;position in a string
+	dim idquo# : idquo= 0  &apos; &apos;1 after first quotation mark
+	dim iNumber# : iNumber = 0  &apos;for file access
+
+	dim lineRead$ : lineRead = &quot;&quot;  &apos;line read in the po file
+	dim TranslationType$ : TranslationType = &quot;&quot;  &apos;are we on msgctxt, msgid, msgid_plural, msgstr ?
+	dim message$ : message = &quot;&quot;  &apos;string of msgid or msgstr
+	if ismissing(isoCode) or isoCode = &quot;&quot; then isoCode = fsDisplayLanguage()  &apos;fr, en, es, it, de, ...
+	dim sFilePath$ : sFilePath = &quot;&quot;
+	dim sf as object
+	dim myTextFile as object
+	dim fileStream as object
+	
+	sf = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	&apos; check for existance of PO directory and file
+	if sf.isFolder(podir) then
+		if right(podir,1)&lt;&gt;&quot;/&quot; then podir=podir + &quot;/&quot;
+
+		sFilePath=podir + isoCode + &quot;.po&quot;
+		if sf.exists(sFilePath) then
+			&apos; Prepare to read the file
+			fileStream=sf.openFileRead(sFilePath)
+			myTextFile=createUnoService(&quot;com.sun.star.io.TextInputStream&quot;)
+			myTextFile.InputStream=fileStream
+			&apos; Office settings files are encoded as UTF-8
+			myTextFile.Encoding=&quot;UTF-8&quot;
+		else
+			exit function
+		end if
+	else
+		exit function
+	end if
+
+	cntMsg=-1
+	nbPluralMax=0
+	do while not myTextFile.IsEOF
+		lineRead = myTextFile.readLine
+		lenLineRead=len(lineRead)
+		idquo = instr(lineRead,&quot;&quot;&quot;&quot;)+1
+		if lenLineRead&gt;2 then
+			select case left(lineRead,1)
+			case &quot;#&quot;:
+				&apos; comment
+			case &quot;m&quot;:
+			if left(lineRead,5) = &quot;msgid&quot; then
+				if left(lineRead,12) = &quot;msgid_plural&quot; then
+					if nbPluralMax&gt;0 then
+						TranslationType=&quot;idPlur&quot;
+					else
+						TranslationType=&quot;err&quot;  &apos; error
+					end if
+				else
+					TranslationType=&quot;id&quot;
+					cntMsg=cntMsg+1
+					redim Preserve mMyTranslationId(cntMsg)
+					redim Preserve mMyTranslationIdPlur(cntMsg)
+					redim Preserve mMyTranslationStr(cntMsg,nbPluralMax)
+				end if
+				message=mid(lineRead,idquo,lenLineRead-idquo)
+			elseif left(lineRead,6) = &quot;msgstr&quot; then
+				TranslationType=&quot;str&quot;
+				if left(lineRead,7) = &quot;msgstr[&quot; then
+					nbPlural=int(mid(lineRead,8,1))
+					if nbPlural&gt;nbPluralMax then
+						TranslationType=&quot;err&quot; &apos; error
+					end if
+				else
+					nbPlural=0
+				end if
+				message=mid(lineRead,idquo,lenLineRead-idquo)
+			elseif left(lineRead,7) = &quot;msgctxt&quot; then
+				TranslationType=&quot;ctxt&quot;
+			end if
+			fbTranslateTable(message,cntMsg,TranslationType,nbPlural)
+		case &quot;&quot;&quot;&quot;:
+			&apos;idquo=1 obviously
+			message = mid(lineRead,idquo,lenLineRead-idquo)
+			fbTranslateTable(message,cntMsg,TranslationType,nbPlural)
+			if cntMsg=0 and left(lineRead,14) = &quot;&quot;&quot;Plural-forms:&quot; then
+				position=instr(lineRead,&quot;nplurals=&quot;)
+				nbPluralMax=int(mid(lineRead,position+9,1))-1
+				if nbPluralMax&lt;0 then nbPluralMax=0
+				&apos; Potential bugs : procedure can only use a single digit 
+				&apos; number of plurals (max is Arabic with 6)
+				&apos; if &quot;\n&quot; in readLine set the plural rule
+				&apos; or else you need to get next line(s) until you get &quot;\n&quot;
+				&apos;
+				&apos; The PO file must end with a chr(10)
+				&apos;
+				redim Preserve mMyTranslationStr(cntMsg,nbPluralMax)
+			end if
+			&apos; if cntMsg=0 and TranslationType=&quot;pluralset&quot; then
+			&apos;   &apos;update the plural rule then send it
+			&apos; if no &quot;\n&quot; TranslationType=&quot;pluralset&quot; else TranslationType=&quot;&quot;
+			&apos;end if
+		case else
+			&apos;error in the po file
+			end select
+		end if
+	Loop
+	fileStream.closeInput
+	myTextFile.closeInput
+	UpdatePoSettingsDone=1
+	UpdatePoSettings = True
+	exit function
+	UpdatePoSettingsErr:
+	UpdatePoSettings = False
+end function
+
+
+function fsZzxToEnglish(_
+		byVal sTermCode, _
+		optional byval sMyLang)
+	&apos; returns an indexed term or &quot;&quot; if Not in index
+	&apos; sTermCode - the code to look up
+	&apos; sMyLang - your requested language code (optional)
+	&apos; defaults to &quot;en&quot;.  Optionally, you can get the
+	&apos; internal code with &quot;zzy&quot;
+	&apos;
+	fsZzxToEnglish=&quot;&quot;
+	&apos; zzy
+	dim isoList0$ : isoList0 = &quot;s_read-text;s_external-program;s_use-festival-with-a-script;s_script-commands;s_read-with-an-external-program;s_command-line-options;s_display;s_always-show-this-dialog;s_about;s_cancel;s_ok;s_command;s_script;s_c-james-holgate;s_test;s_could-not-locate-the-program;s_string-cannot-be-analyzed;s_on-line-help;s_http-help-url;s_use-a-web-application;s_speech-properties;s_system-settings;&quot;
+	dim isoList1$ : isoList1 = &quot;s_touch-screen;s_speech-synthesis;en;af;bg;ca;cs;da;de;el;es;fr;et;fi;ga;hi;hu;id;is;it;ja;ko;lv;lt;mt;nl;pl;pt;ro;ru;sk;sl;sv;tl;tr;uk;zh;ar&quot;
+	dim isolist2$ : isolist2= &quot;;s_album;s_artist;s_genre;s_imagedefault;s_lyrics;s_title;s_track;s_year;s_mdsample&quot;	
+	&apos; defaults
+	dim s0$ : s0 = &quot;Read Text;External program;Use Festival with a script;Script commands;Read with an external program;Command line options;Display;Always show this dialog;About;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Could not locate the program.;String cannot be analyzed!;On-line help;https://sites.google.com/site/readtextextension/;Use a web application;Speech properties;System settings;&quot;
+	dim s1$ : s1 = &quot;Touch screen;Speech;English;Afrikaans;Bulgarian;Catalan;Czech;Danish;German;Greek;Spanish;French;Estonian;Finnish;Irish;Hindi;Hungarian;Indonesian;Icelandic;Italian;Japanese;Korean;Latvian;Lithuanian;Maltese;Dutch;Polish;Portuguese;Romanian;Russian;Slovak;Slovenian;Swedish;Tagalog;Turkish;Ukrainian;Chinese;Arabic&quot;
+	dim s2$ : s2 = &quot;;Album;Artist;Genre;Image;Lyrics;Title;Track;Year;Read Text – Speech\n=========\n\n&gt;_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2018 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`&quot;
+	&apos; arrays
+	dim a1
+	dim a2
+	&apos; controls
+	dim n# : n = 0
+	dim bFound as boolean : bFound = not(True)
+
+	if ismissing(sMyLang) Then
+		sMyLang = &quot;en&quot;
+	end if
+&apos;	on error goto fsZzxToEnglishErr
+
+	select case lcase(sMyLang)
+	case &quot;zzy&quot; &apos;Machine language
+		s0 = isolist0
+		s1 = isoList1
+		s2 = isolist2
+	case else
+		&apos; pass - use default English values
+	end select
+	if sTermCode = &quot;s_all_items&quot; then
+		&apos; Get a semicolon separated list of all valid tags
+		fsLookUpTerm = s0 &amp; s1 &amp; s2
+	else
+		a1 = split(isolist0 &amp; isoList1 &amp; isolist2,&quot;;&quot;)
+		For n = Lbound(a1) to Ubound(a1)
+			if a1(n) = sTermCode Then
+				bFound = True
+				exit For
+			end if
+		next
+		if bFound Then
+			a2 = split(s0 &amp; s1 &amp; s2, &quot;;&quot;)
+			fsZzxToEnglish = a2(n)
+		else
+			fsZzxToEnglish = &quot;&quot;
+		end if
+	end if
+	exit function
+	fsZzxToEnglishErr:
+	&apos; Count the semicolons in the data strings for the new language.
+	&apos; It should should match the corresponding isoList
+	fsZzxToEnglish = &quot;%fsZzxToEnglishErr%&quot;
+end function
+
+
+function fsSampleMd(_
+		optional byval hl)
+
+	&apos; Markdown sample code that creates presentations with heading
+	&apos; levels, block quotes and preformatted text.
+
+	dim cr$ : cr = chr(10)
+	dim s1$ : s1 = &quot;&quot;
+	dim s2$ : s2 = &quot;&quot;
+	dim s3$ : s3 = &quot;&quot;
+	
+	if ismissing(hl) then
+		hl = fsSelectionLanguage()
+	end if
+	select case hl
+	case &quot;ar&quot;
+		&apos; Excerpt of a Wikipedia article about [Apache OpenOffice][1] accessed 2015-04-09&quot;.
+		&apos; [1]: https://ar.wikipedia.org/wiki/%D8%A3%D9%88%D8%A8%D9%86_%D8%A3%D9%88%D9%81%D9%8A%D8%B3.%D8%A3%D9%88%D8%B1%D8%AC 
+		&apos; chr(8207) is the unicode rtl marker to switch the reading direction from left to right (LTR)
+		&apos; to right to left (RTL).
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setComplexDocLanguage(&quot;ar-SA&quot;)
+	case &quot;ca&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setWesternDocLanguage(&quot;ca-ES&quot;)		
+	case &quot;de&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setWesternDocLanguage(&quot;de-DE&quot;)
+	case &quot;es&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		s2 = fsDocCountry
+		&apos; Use an approximate regional locale to enable speech
+		select case s2
+		case &quot;MX&quot;, &quot;AR&quot;
+			setWesternDocLanguage(&quot;es-&quot; &amp; s2)
+		case &quot;BZ&quot;, &quot;CA&quot;, &quot;CR&quot;, &quot;DO&quot;, &quot;SV&quot;, &quot;GT&quot;, &quot;NI&quot;, &quot;PA&quot;, &quot;PR&quot;, &quot;US&quot;
+			setWesternDocLanguage(&quot;es-MX&quot;)
+		case &quot;BO&quot;, &quot;BR&quot;, &quot;CL&quot;, &quot;CO&quot;, &quot;EC&quot;, &quot;FK&quot;, &quot;PE&quot;, &quot;PY&quot;, &quot;UY&quot;, &quot;VE&quot;
+			setWesternDocLanguage(&quot;es-AR&quot;)
+		case else
+			setWesternDocLanguage(&quot;es-ES&quot;)
+		end select
+	case &quot;fi&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setWesternDocLanguage(&quot;fi-FI&quot;)
+	case &quot;fr&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setWesternDocLanguage(&quot;fr-FR&quot;)
+	case &quot;hi&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setComplexDocLanguage(&quot;hi-IN&quot;)
+	case &quot;it&quot;
+		s1 =fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setWesternDocLanguage(&quot;it-IT&quot;)
+	case &quot;nl&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setWesternDocLanguage(&quot;nl-NL&quot;)
+	case &quot;pl&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setWesternDocLanguage(&quot;pl-PL&quot;)
+	case &quot;pt&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		s2 = fsGetCountry
+		select case s2
+		case &quot;PT&quot;
+			setWesternDocLanguage(&quot;pt-PT&quot;)
+		case else
+			setWesternDocLanguage(&quot;pt-BR&quot;)
+		end select
+	case &quot;ru&quot;
+		s1 =fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setWesternDocLanguage(&quot;ru-RU&quot;)
+	case &quot;zh&quot;
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		setAsianDocLanguage(&quot;zh-CN&quot;)
+	case else
+		&apos; English is the reference language.
+		&apos; Model the text of your translation on English.
+		&apos; Use &quot;Read Text&quot; as the initial title.
+		&apos; Use a style that resembles [LibreOffice help][1].
+		&apos;   - [Select Text][2]
+		&apos;   - [Showing a Slide Show][3]
+		&apos; The [LibreOffice translations] include lists of menu items for all supported languages[4]
+		&apos; [1]: https://help.libreoffice.org/
+		&apos; [2]: https://help.libreoffice.org/Writer/Edit#Select_Text
+		&apos; [3]: https://help.libreoffice.org/Impress/Showing_a_Slide_Show
+		&apos; [4]: https://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz
+		s1 = fsLookUpTerm(&quot;s_mdsample&quot;, hl)
+		s2 = fsGetCountry
+		select case s2
+		case &quot;GB&quot;
+			setWesternDocLanguage(&quot;en-GB&quot;)
+		case else
+			setWesternDocLanguage(&quot;en-US&quot;)
+		end select
+	end select
+	fsSampleMd = fxStr(s1)
+end function
+
+
+sub ErrorDisplay()
+	&apos; Error message
+	 msgbox(fsLookUpTerm(&quot;s_string-cannot-be-analyzed&quot;), 48, _
+			fsLookUpTerm(&quot;s_read-text&quot;))
+end sub
+
+
+function fsAppSignature() as string
+	&apos; Helper scripts and office app package settings use the signature to find resources
+	fsAppSignature=&quot;ca.bc.vancouver.holgate.james.readtextextension&quot;
+end function
+
+
+function fsMyURL() as string
+	fsMyURL=fsGetPackageDirURL(fsAppSignature)
+end function
+
+
+function fsUser()
+	dim s1 : s1 = environ(&quot;USER&quot;)
+	if s1 = &quot;&quot; then
+		s1 = environ(&quot;USERNAME&quot;)
+	end if
+	if s1 = &quot;&quot; then
+		s1 = &quot;UNKNOWN-USER&quot;
+	end if
+	fsUser = s1
+end function
+
+
+function fsMyTempLock(_
+		optional byval sExt)
+	dim a1
+	dim a2
+	dim sTemp$ : sTemp = &quot;&quot;
+	dim sDiv$ : sDiv = &quot;&quot;
+	dim sUser$ : sUser = fsUser
+	dim i# : i = 0
+	dim sHome$ : sHome = &quot;&quot;
+	
+	fsMyTempLock = &quot;&quot;
+	if ismissing(sExt) then
+		sExt = &quot;lock&quot;
+	end if
+	a1 = array(&quot;READTEXTTEMP&quot;,&quot;TEMP&quot;,&quot;TMP&quot;,&quot;TMPDIR&quot;,&quot;TEMPDIR&quot;)
+&apos;&apos;
+&apos;&apos;  Use a custom environment variable
+&apos;&apos;  =================================
+&apos;&apos;  
+&apos;&apos;  The extension may use a system temporary directory to
+&apos;&apos;  write temporary files like lock files.  On some systems,
+&apos;&apos;  the default temporary directory may be locked to users
+&apos;&apos;  or processes that do not have sufficient reading or writing 
+&apos;&apos;  privileges.
+&apos;&apos;  
+&apos;&apos;  The preferred way of looking up a temporary directory is
+&apos;&apos;  to use an environmental variable.  if you have a custom
+&apos;&apos;  platform, you can set the `READTEXTTEMP` variable using
+&apos;&apos;  the `env` or `set` command in a terminal to prioritize 
+&apos;&apos;  a specific directory as the temporary directory.  if the
+&apos;&apos;  `READTEXTTEMP` variable is set, then it is the first 
+&apos;&apos;  place that the extension looks to read and write temporary
+&apos;&apos;  files.
+&apos;&apos;  
+	for i = lbound(a1) to ubound(a1)
+		sTemp = environ(a1(i))
+		if len(sTemp) &gt; 0 then
+			if fbTestDirRW(sTemp) then
+				exit for
+			else
+				sTemp = &quot;&quot;
+			end if
+		end if
+	Next
+	if sTemp = &quot;&quot; then
+		&apos; An environmental setting is missing or the directory is locked. 
+		&apos; The routine checks for an alternative directory using specific paths.
+		sHome = environ(&quot;HOME&quot;)
+		a2 = array(&quot;/tmp&quot;, _
+				sHome &amp; &quot;/.config&quot;, _
+				sHome &amp; &quot;/.tmp&quot;, _
+				sHome &amp; &quot;/.temp&quot;, _
+				CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;&quot;, _
+				sHome)
+		for i = lbound(a2) to ubound(a2)	
+			if FileExists(a2(i)) then
+				if fbTestDirRW(a2(i)) then
+					sTemp = a2(i)
+					exit for
+				end if
+			end if
+		Next
+	end if
+	if sTemp = &quot;&quot; then exit function
+    if instr(&quot;/\&quot;,right(sTemp, 1)) = 0 then
+    	sDiv = &quot;/&quot;
+    else
+    	sDiv = &quot;&quot;
+    end if
+    fsMyTempLock = ConvertFromURL(converttourl(sTemp) &amp; _
+    		sDiv &amp; fsAppSignature &amp; &quot;.&quot; &amp; sUser &amp; &quot;.&quot; &amp; sExt )
+end function
+
+
+function fbTestDirRW(_
+		byVal sA)
+	fbTestDirRW = False
+	if sA = &quot;&quot; then exit function
+	On Error Goto fbTestDirRWErr
+	dim s1 : s1 = fsAppSignature &amp; &quot;.&quot; &amp; fsUser &amp; &quot;.test.txt&quot; 
+	if Instr(&quot;/\&quot;,right(sA, 1)) = 0 then
+		if Instr(sA, &quot;/&quot;) &gt; 0 then
+    		s1 = &quot;/&quot; &amp; s1
+    	else
+    		s1 = &quot;\&quot; &amp; s1
+    	end if
+    end if
+    fbCreateFile(sA &amp; s1, s1, &quot;utf-8&quot;)
+    if FileExists(sA &amp; s1) then
+    	kill sA &amp; s1
+    	fbTestDirRW = True
+    end if
+    
+	exit function
+	fbTestDirRWErr:
+	fbTestDirRW = False
+end function
+
+
+function fsExtensionVersion() as string
+	dim aFile as string
+	dim iNumber as integer
+	dim sLine as string
+	dim s1 as string
+	dim s2 as string
+
+	s1=fsMyURL &amp; &quot;/description.xml&quot;
+	s2=&quot;&quot;
+	aFile=ConvertFromURL(s1)
+	iNumber=Freefile
+	open aFile for input as #iNumber
+	while (s2=&quot;&quot;) And (not Eof(iNumber))
+		line input #iNumber, sLine
+		if Instr(sLine, &quot;&lt;version value=&quot;) &gt; 0 then
+			s2=sLine
+		end if
+	wend
+	close #iNumber
+	s2=mid(sLine,Instr(s2,&quot;&quot;&quot;&quot;)+1)
+	fsExtensionVersion=left(s2, Instr(s2,&quot;&quot;&quot;&quot;)-1)
+end function
+
+
+function fsPosterImg() as string
+	&apos; returns a url to the image to use for creating album cover for sound files.
+	&apos; It looks first in the `home/yourname/languagename` folder for a file called
+	&apos; poster-nnn.xxx, where nnn is the three digit representation of the current
+	&apos; track number and xxx is one of &quot;.png&quot; or &quot;jpg&quot;. If it doesn&apos;t
+	&apos; find a usable image, the function looks for poster-001.xxx. if nothing
+	&apos; was located, it uses an image in the images directory of the extension.
+	&apos; note - country abbreviations are usually capitalized - ES for Spain
+	&apos; Language abbreviations are usually lower case. - es for Spanish
+	dim s1, s2, s3  as string
+	dim a1, a2
+	dim n, o as integer
+	
+	s1 = fsSelectionLanguageAndRegion &amp; &quot;,&quot; &amp; fsSelectionLanguage &amp; &quot;,&quot; &amp; fsSelectionCountry
+	s2 = &quot;&quot;
+	s3 = converttourl(fsGetHomeDir)
+		a1 = array(s1)
+		a2 = array(&quot;.jpg&quot;,&quot;.png&quot;)
+		for o = lbound(a2) to ubound(a2)
+			fsPosterImg=fsMyURL &amp; &quot;/images/poster-001&quot; &amp; a2(o)
+			for n = lbound(a1) to ubound(a1)
+
+				if fileexists(s3 &amp; _
+						a1(n) &amp; _
+						&quot;/poster-&quot; &amp; _
+						right(&quot;000&quot; &amp; _
+						trim(str(fiMyCurrentAudioTrack(False))), 3) &amp; _
+						a2(o) ) then
+					s2 = s3 &amp; _
+							a1(n) &amp; _
+							&quot;/poster-&quot; &amp; _
+							right(&quot;000&quot; &amp; _
+							trim(str(fiMyCurrentAudioTrack(False))), 3) + a2(o)
+				elseif fileexists(s3 &amp; a1(n) &amp; &quot;/poster-001&quot; &amp; a2(o)) then
+					s2 = s3 &amp; a1(n) &amp; &quot;/poster-001&quot; &amp; + a2(o)
+				elseif fileexists(fsMyURL &amp; &quot;/images/poster-&quot; &amp; a1(n) &amp; a2(o)) then
+					s2 = fsMyURL &amp; &quot;/images/poster-&quot; &amp; a1(n) &amp; a2(o)
+				end if
+				if len(s2) &gt; 0 then
+					fsPosterImg = s2
+					exit for
+				end if
+			next
+		next
+	fsPosterImg = convertfromurl(fsPosterImg)
+end function
+
+function fsPoster2Png() as string
+	fsPoster2Png=fsMyURL &amp; &quot;/images/poster-002.png&quot;
+end function
+
+
+function fsExtensionTitle() as string
+	fsExtensionTitle = fsLookUpTerm( &quot;s_read-text&quot;, fsDisplayLanguage())
+end function
+
+
+function fsExtensionLogo() as string
+	fsExtensionLogo = fsMyURL &amp; &quot;/images/textToSpeech_64.png&quot;
+end function
+
+
+function fsSpeakerLogo() as string
+	fsSpeakerLogo=fsMyURL &amp; &quot;/images/testSound_26.png&quot;
+end function
+
+
+function fsClipBoardLogo() as string
+	fsClipboardLogo=fsMyURL &amp; &quot;/images/clipboard_26h.png&quot;
+end function
+
+
+function fsSelectionLogo() as string
+	fsSelectionLogo=fsMyURL &amp; &quot;/images/textToSpeech_26h.png&quot;
+end function
+
+
+function fsToolBoxLogo() as string
+	fsToolBoxLogo=fsMyURL &amp; &quot;/images/toolbox_26.png&quot;
+end function
+
+
+function fsLicenseDoc() as string
+	dim s1 as string
+
+	s1=fsMyURL &amp; &quot;/license/LICENSE&quot;
+	if fileexists(s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()) then
+		fsLicenseDoc=s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()
+	elseif fileexists(s1 &amp; &quot;.&quot; &amp; fsGetLanguage()) then
+		fsLicenseDoc=s1 &amp; &quot;.&quot; &amp; fsGetLanguage()
+	else
+		fsLicenseDoc=s1
+	end if
+end function
+
+
+function fsPythonSpdDoc() as string
+	fsPythonSpdDoc=fsMyURL &amp; &quot;/python/spd_read_text_file.py&quot;
+end function
+
+
+function fsPythonPicoDoc() as string
+	fsPythonPicoDoc=fsMyURL &amp; &quot;/python/pico_read_text_file.py&quot;
+end function
+
+
+function fsPythonEspeakDoc() as string
+	fsPythonEspeakDoc=fsMyURL &amp; &quot;/python/espeak_read_text_file.py&quot;
+end function
+
+
+function fsPythonFestivalDoc() as string
+	fsPythonFestivalDoc=fsMyURL &amp; &quot;/python/festival_read_text_file.py&quot;
+end function
+
+
+function fsPythonPyttsxDoc() as string
+	fsPythonPyttsxDoc=fsMyURL &amp; &quot;/python/pyttsx_read_text_file.py&quot;
+end function
+
+
+function fsPythonOSDoc() as string
+	fsPythonOSDoc=fsMyURL &amp; &quot;/python/os.py&quot;
+end function
+
+
+function fsPythonCreateQR() as string
+	fsPythonCreateQR=fsMyURL &amp; &quot;/python/create_qr_label.py&quot;
+end function
+
+
+function fsDescriptionDoc() as string
+	dim s1 as string
+
+	s1=fsMyURL &amp; &quot;/description/component.txt&quot;
+	if fileexists(s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()) then
+		fsDescriptionDoc=s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()
+	elseif fileexists(s1 &amp; &quot;.&quot; &amp; fsGetLanguage()) then
+		fsDescriptionDoc=s1 &amp; &quot;.&quot; &amp; fsGetLanguage()
+	else
+		fsDescriptionDoc=s1
+	end if
+end function
+
+
+function fsCopyright() as string
+	fsCopyright=fsLookUpTerm( &quot;s_c-james-holgate&quot;, fsDisplayLanguage())
+end function
+
+
+function fsFestivalScriptName() as string
+	fsFestivalScriptName=&quot;tts_scr.sh&quot;
+end function
+
+
+function fsTTSScriptVBS() as string
+	fsTTSScriptVBS=fsMyURL &amp; &quot;/script/tts_wscript.vbs&quot;
+end function
+
+
+function fsTemporaryTextDoc() as string
+	fsTemporaryTextDoc=&quot;tts_str.txt&quot;
+end function
+
+
+function fsExtensionSettingsIni() as string
+	fsExtensionSettingsIni=&quot;ooo_text-to-speech.ini&quot;
+end function
+
+
+function fiFestivalOption() as integer
+	fiFestivalOption=0
+end function
+
+
+function fiFestivalPath() as integer
+	fiFestivalPath=1
+end function
+
+
+function fiFestivalComboChoice() as integer
+	fiFestivalComboChoice=2
+end function
+
+
+function fiExternalOption() as integer
+	fiExternalOption=3
+end function
+
+
+function fiExternalProgramPath() as integer
+	fiExternalProgramPath=4
+end function
+
+
+function fiExternalCommand() as integer
+	fiExternalCommand=5
+end function
+
+
+function fiAlwaysShowDialogCheckBox() as integer
+	fiAlwaysShowDialogCheckBox=6
+end function
+
+
+function fiDialogLanguageCombo() as integer
+	fiDialogLanguageCombo=7
+end function
+
+
+function fiHtmlOption() as integer
+	fiHtmlOption=8
+end function
+
+
+function fiSmartSelectCheckBox() as integer
+	fiSmartSelectCheckBox=9
+end function
+
+
+function fiHtmlComboURL() as integer
+	fiHtmlComboURL=10
+end function
+
+
+function fiCountConfigOptions() as integer
+	&apos; This is the size of the array to hold settings from the configuration file
+	&apos; and dialog
+	fiCountConfigOptions=fiHtmlComboURL
+	&apos; this is the last TTS_OPTION item above - an Integer
+end function
+
+&apos; Configuration file  uses these strings As keys
+
+
+function fsKeyUSE_FESTIVAL_BOOLEAN()  as string
+	fsKeyUSE_FESTIVAL_BOOLEAN=&quot;text-to-speech.use.festival.boolean&quot;
+end function
+
+
+function fsKeyFESTIVAL_PATH_STRING() as string
+	fsKeyFESTIVAL_PATH_STRING=&quot;text-to-speech.festival.path.string&quot;
+end function
+
+
+function fsKeyFESTIVAL_SCRIPT_STRING() as string
+	fsKeyFESTIVAL_SCRIPT_STRING=&quot;text-to-speech.festival.script.string&quot;
+end function
+
+
+function fsKeyUSE_ESPEAK_BOOLEAN() as string
+	fsKeyUSE_ESPEAK_BOOLEAN=&quot;text-to-speech.use.espeak.boolean&quot;
+end function
+
+
+function fsKeyESPEAK_PATH_STRING() as string
+	fsKeyESPEAK_PATH_STRING=&quot;text-to-speech.espeak.path.string&quot;
+end function
+
+
+function fsKeyESPEAK_COMMANDS_STRING() as string
+	fsKeyESPEAK_COMMANDS_STRING=&quot;text-to-speech.espeak.options.string&quot;
+end function
+
+
+function fsKeyDISPLAY_INFO_INTEGER() as string
+	fsKeyDISPLAY_INFO_INTEGER=&quot;text-to-speech.display.info.integer&quot;
+end function
+
+
+function fsKeyDISPLAY_LANGUAGE_STRING() as string
+	fsKeyDISPLAY_LANGUAGE_STRING=&quot;text-to-speech.display.language.string&quot;
+end function
+
+
+function fsKeyUSE_HTML_BOOLEAN() as string
+	fsKeyUSE_HTML_BOOLEAN=&quot;text-to-speech.use.html.boolean&quot;
+end function
+
+
+function fsKeyHTML_STRING() as string
+	fsKeyHTML_STRING=&quot;text-to-speech.html.string&quot;
+end function
+
+
+function fsKeyUSE_SMART_SELECT() as string
+	fsKeyUSE_SMART_SELECT=&quot;text-to-speech.use.smart.select.integer&quot;
+end function
+
+
+function fsGetCountry() as string
+	fsGetCountry=fsGetSetting(&quot;country&quot;)
+end function
+
+
+function fsGetLanguage() as string
+	fsGetLanguage=fsGetSetting(&quot;language&quot;)
+end function
+
+
+function fsGetOS() as string
+	select case getGUIType
+	case 1
+		fsGetOS=&quot;WINDOWS&quot;
+	case 3
+		fsGetOS=&quot;MAC&quot;
+	case 4
+		if fileexists(&quot;/usr/bin/osascript&quot;) then
+			fsGetOS=&quot;OSX&quot;
+		elseif len(environ(&quot;ANDROID_ROOT&quot;)) &gt; 0 then
+			fsGetOS = &quot;ANDROID&quot;
+		else
+			fsGetOS=&quot;UNIX&quot;
+		end if
+	case else
+		if len(environ(&quot;ANDROID_ROOT&quot;)) &gt; 0 then
+			fsGetOS = &quot;ANDROID&quot;
+		else 
+			fsGetOS=&quot;UNKNOWN&quot;
+		end if
+	end select
+end function
+
+
+function fsGetSetting(sA) as string
+	dim oProdNameAccess As Object
+
+	if not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then
+		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	end if
+	oProdNameAccess=GetRegistryKeyContent(&quot;org.openoffice.Setup/Product&quot;)
+    select case Lcase(sA)
+    case &quot;language&quot;
+		fsGetSetting=GetStarOfficeLocale().language
+	case &quot;country&quot;
+		fsGetSetting=GetStarOfficeLocale().country
+	case &quot;ooname&quot;
+		fsGetSetting=oProdNameAccess.getByName(&quot;ooName&quot;)
+	case &quot;ooversion&quot;,&quot;oosetupversion&quot;
+		fsGetSetting=oProdNameAccess.getByName(&quot;ooSetupVersion&quot;)
+	case else
+		fsGetSetting=&quot;???&quot;
+	end select
+end function
+
+
+function fsDisplayLanguage() as string
+	on error goto DISPLAYLANGUAGEERROR
+	dim s1$: s1 =  f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text
+
+	select case trim(s1)
+	case &quot;&quot;, &quot;...&quot;, &quot;…&quot;, &quot;Default&quot;, &quot;default&quot;
+		fsDisplayLanguage = fsGetLanguage()
+	case else
+		fsDisplayLanguage = s1
+	end select
+	exit function
+	DISPLAYLANGUAGEERROR:
+	fsDisplayLanguage=fsGetLanguage()
+end function
+
+
+function fsDocLanguage()
+	on error goto fsDocLanguageErr
+	fsDocLanguage = ThisComponent.CharLocale.Language
+	exit function
+	fsDocLanguageErr: &apos; No document open! Use interface language.
+	fsDocLanguage = fsGetLanguage()
+end function
+
+
+function fsDocCountry()
+	on error goto fsDocCountryErr
+	fsDocCountry = ThisComponent.CharLocale.Country
+	exit function
+	fsDocCountryErr: &apos; No document open! Use interface country.
+	fsDocCountry = fsGetCountry()
+end function
+
+
+function fsSubStringToright(_
+		byval x, _
+		byval y)
+	dim a1
+	dim z as string
+
+	z = x
+	if instr(x,y) then
+		a1 = split(x,y)
+		z = a1(ubound(a1))
+	end if
+	fsSubStringToRight = z
+end function
+
+
+function fsFestivalVoice(_
+		n)
+	dim x as string
+
+	x=converttourl(fsFestivalDirectory(n))
+	fsFestivalVoice = fsSubStringToright(x,&quot;/&quot;)
+end function
+
+
+function fsFestivalDirectory(_
+		n) as string
+	dim s1, s2 as string
+	dim a1
+	fsFestivalDirectory = &quot;&quot;
+	&apos; Incorrectly installed voices will be silent. Some instructions on
+	&apos; the web for installing mbrola voices need to be updated to work
+	&apos; with the latest version of Festival.
+	select case fsGetOS()
+	case &quot;WINDOWS&quot;
+		if fileexists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) then
+			s2 = converttourl(fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;)
+		else
+			s2 = converttourl(fsProgramDirectory &amp; &quot;Festival\voices\&quot;)
+		end if
+	case else
+		s2 =  converttourl(&quot;/usr/share/festival/&quot;)
+	end select
+	a1 = array(_
+			&quot;lib/voices/english/en1_mbrola&quot;, _
+			&quot;lib/voices/english/nitech_us_slt_arctic_hts&quot;, _
+			&quot;lib/voices/english/nitech_us_jmk_arctic_hts&quot;, _
+			&quot;lib/voices/english/nitech_us_clb_arctic_hts&quot;, _
+			&quot;lib/voices/english/nitech_us_rms_arctic_hts&quot;, _
+			&quot;lib/voices/english/nitech_us_bdl_arctic_hts&quot;, _
+	 		&quot;lib/voices/english/nitech_us_awb_arctic_hts&quot;, _	
+	 		&quot;lib/voices/english/us1_mbrola&quot;, _
+			&quot;lib/voices/english/us2_mbrola&quot;, _
+			&quot;lib/voices/english/us3_mbrola&quot;, _	
+			&quot;voices/castilian/el_diphone&quot;, _
+			&quot;voices/catalan/upc_ca_ona_hts&quot;, _
+			&quot;voices/czech/czech_dita&quot;, _
+			&quot;voices/czech/czech_krb&quot;  &amp; &quot;&quot;, _
+			&quot;voices/czech/czech_machac&quot;, _
+			&quot;voices/czech/czech_ph&quot;, _
+			&quot;voices/english/don_diphone&quot;, _
+			&quot;voices/english/en1_mbrola&quot;, _
+			&quot;voices/english/gsw_diphone&quot;, _
+			&quot;voices/english/kal_diphone&quot;, _
+			&quot;voices/english/ked_diphone&quot;, _
+			&quot;voices/english/nitech_us_slt_arctic_hts&quot;, _
+			&quot;voices/english/nitech_us_jmk_arctic_hts&quot;, _
+			&quot;voices/english/nitech_us_clb_arctic_hts&quot;, _
+			&quot;voices/english/nitech_us_rms_arctic_hts&quot;, _
+			&quot;voices/english/nitech_us_bdl_arctic_hts&quot;, _
+	 		&quot;voices/english/nitech_us_awb_arctic_hts&quot;, _	
+			&quot;voices/english/rab_diphone&quot;, _
+			&quot;voices/english/us1_mbrola&quot;, _
+			&quot;voices/english/us2_mbrola&quot;, _
+			&quot;voices/english/us3_mbrola&quot;, _
+			&quot;voices/finnish/suo_fi_lj_diphone&quot;, _
+			&quot;voices/finnish/suo_fi_mv_diphone&quot;, _
+			&quot;voices/german/german_de2_os&quot;, _
+			&quot;voices/hindi/hindi_NSK_diphone&quot;, _
+			&quot;voices/italian/lp_diphone&quot;, _
+			&quot;voices/italian/pc_diphone&quot;, _
+			&quot;voices/marathi/marathi_NSK_diphone&quot;, _
+			&quot;voices/russian/msu_ru_nsh_clunits&quot;, _
+			&quot;voices/spanish/el_diphone&quot;, _
+			&quot;voices/telugu/telugu_NSK_diphone&quot;, _
+			&quot;voices/vietnamese/wow_vi_liz_diphone&quot;, _
+			&quot;voices/vietnamese/wow_vi_ptn_diphone&quot;)
+	if not(n &gt; ubound(a1)) then 
+		fsFestivalDirectory = convertfromurl(s2 &amp; a1(n))
+	end if
+end function
+
+
+function fiCountFestivalDirectory() as integer
+	dim n as integer
+
+	for n = 0 to 50
+		if fsFestivalDirectory(n) = &quot;&quot; then
+			exit for
+		else
+			fiCountFestivalDirectory=n
+		end if
+	next
+end function
+
+
+function fsGetEspeakMbrolaLanguage(_
+		i as integer, _
+		j as integer) as string
+	&apos;Values for j
+	&apos;1 is mbrola voice file name
+	&apos;2 is language and country code
+	&apos; See &lt;https://www.loc.gov/standards/iso639-2/php/English_list.php&gt;
+	&apos; and &lt;https://www.iso.org/iso-3166-country-codes.html&gt;
+	&apos;3 is gender
+	&apos;4 is name of voice in English
+	dim s(fiCountEspeakMbrolaLanguage(), 4)
+
+	s(0,1)=&quot;vz1&quot;
+	s(0,2)=&quot;es-VE&quot;
+	s(0,3)=&quot;male&quot;
+	s(0,4)=&quot;Venezuelan Spanish 1&quot;
+	s(1,1)=&quot;us3&quot;
+	s(1,2)=&quot;en-US&quot;
+	s(1,3)=&quot;male&quot;
+	s(1,4)=&quot;American English 3&quot;
+	s(2,1)=&quot;us2&quot;
+	s(2,2)=&quot;en-US&quot;
+	s(2,3)=&quot;male&quot;
+	s(2,4)=&quot;American English 2&quot;
+	s(3,1)=&quot;us1&quot;
+	s(3,2)=&quot;en-US&quot;
+	s(3,3)=&quot;female&quot;
+	s(3,4)=&quot;American English 1&quot;
+	s(4,1)=&quot;tr2&quot;
+	s(4,2)=&quot;tr-TR&quot;
+	s(4,3)=&quot;female&quot;
+	s(4,4)=&quot;Turkish 2&quot;
+	s(5,1)=&quot;tr1&quot;
+	s(5,2)=&quot;tr-TR&quot;
+	s(5,3)=&quot;male&quot;
+	s(5,4)=&quot;Turkish 1&quot;
+	s(6,1)=&quot;sw2&quot;
+	s(6,2)=&quot;sv-SE&quot;
+	s(6,3)=&quot;female&quot;
+	s(6,4)=&quot;Swedish 2&quot;
+	s(7,1)=&quot;sw1&quot;
+	s(7,2)=&quot;sv-SE&quot;
+	s(7,3)=&quot;male&quot;
+	s(7,4)=&quot;Swedish 1&quot;
+	s(8,1)=&quot;ro1&quot;
+	s(8,2)=&quot;ro-RO&quot;
+	s(8,3)=&quot;male&quot;
+	s(8,4)=&quot;Romanian 1&quot;
+	s(9,1)=&quot;pt1&quot;
+	s(9,2)=&quot;pt-PT&quot;
+	s(9,3)=&quot;female&quot;
+	s(9,4)=&quot;European Portuguese 1&quot;
+	s(10,1)=&quot;pl1&quot;
+	s(10,2)=&quot;en-us&quot;
+	s(10,3)=&quot;female&quot;
+	s(10,4)=&quot;Polish 1&quot;
+	s(11,1)=&quot;nl3&quot;
+	s(11,2)=&quot;nl-NL&quot;
+	s(11,3)=&quot;female&quot;
+	s(11,4)=&quot;Dutch 3&quot;
+	s(12,1)=&quot;nl2&quot;
+	s(12,2)=&quot;nl-NL&quot;
+	s(12,3)=&quot;male&quot;
+	s(12,4)=&quot;Dutch 1&quot;
+	s(13,1)=&quot;nl1&quot;
+	s(13,2)=&quot;nl-NL&quot;
+	s(13,3)=&quot;male&quot;
+	s(13,4)=&quot;Dutch 2&quot;
+	s(14,1)=&quot;mx2&quot;
+	s(14,2)=&quot;es-MX&quot;
+	s(14,3)=&quot;male&quot;
+	s(14,4)=&quot;Mexican Spanish 2&quot;
+	s(15,1)=&quot;mx1&quot;
+	s(15,2)=&quot;es-MX&quot;
+	s(15,3)=&quot;male&quot;
+	s(15,4)=&quot;Mexican Spanish 1&quot;
+	s(16,1)=&quot;la1&quot;
+	s(16,2)=&quot;la-IT&quot;
+	s(16,3)=&quot;male&quot;
+	s(16,4)=&quot;Classical Latin 1&quot;
+	s(17,1)=&quot;it4&quot;
+	s(17,2)=&quot;it-IT&quot;
+	s(17,3)=&quot;female&quot;
+	s(17,4)=&quot;Italian 4&quot;
+	s(18,1)=&quot;it3&quot;
+	s(18,2)=&quot;it-IT&quot;
+	s(18,3)=&quot;male&quot;
+	s(18,4)=&quot;Italian 3&quot;
+	s(19,1)=&quot;it2&quot;
+	s(19,2)=&quot;it-IT&quot;
+	s(19,3)=&quot;female&quot;
+	s(19,4)=&quot;Italian 2&quot;
+	s(20,1)=&quot;it1&quot;
+	s(20,2)=&quot;it-IT&quot;
+	s(20,3)=&quot;male&quot;
+	s(20,4)=&quot;Italian 1&quot;
+	s(21,1)=&quot;in2&quot;
+	s(21,2)=&quot;hi-IN&quot;
+	s(21,3)=&quot;female&quot;
+	s(21,4)=&quot;Hindi 2&quot;
+	s(22,1)=&quot;in1&quot;
+	s(22,2)=&quot;hi-IN&quot;
+	s(22,3)=&quot;male&quot;
+	s(22,4)=&quot;Hindi 1&quot;
+	s(23,1)=&quot;id1&quot;
+	s(23,2)=&quot;en-us&quot;
+	s(23,3)=&quot;male&quot;
+	s(23,4)=&quot;Indonesian 1&quot;
+	s(24,1)=&quot;hu1&quot;
+	s(24,2)=&quot;en-us&quot;
+	s(24,3)=&quot;female&quot;
+	s(24,4)=&quot;Hungarian 1&quot;
+	s(25,1)=&quot;gr2&quot;
+	s(25,2)=&quot;he-GR&quot;
+	s(25,3)=&quot;male&quot;
+	s(25,4)=&quot;Greek 2&quot;
+	s(26,1)=&quot;gr1&quot;
+	s(26,2)=&quot;he-GR&quot;
+	s(26,3)=&quot;male&quot;
+	s(26,4)=&quot;Greek 1&quot;
+	s(27,1)=&quot;fr7&quot;
+	s(27,2)=&quot;fr-FR&quot;
+	s(27,3)=&quot;male&quot;
+	s(27,4)=&quot;French 7&quot;
+	s(28,1)=&quot;fr6&quot;
+	s(28,2)=&quot;fr-FR&quot;
+	s(28,3)=&quot;male&quot;
+	s(28,4)=&quot;French 6&quot;
+	s(29,1)=&quot;fr5&quot;
+	s(29,2)=&quot;fr-FR&quot;
+	s(29,3)=&quot;male&quot;
+	s(29,4)=&quot;French 5&quot;
+	s(30,1)=&quot;fr4&quot;
+	s(30,2)=&quot;fr-FR&quot;
+	s(30,3)=&quot;female&quot;
+	s(30,4)=&quot;French 4&quot;
+	s(31,1)=&quot;fr3&quot;
+	s(31,2)=&quot;fr-FR&quot;
+	s(31,3)=&quot;male&quot;
+	s(31,4)=&quot;French 3&quot;
+	s(32,1)=&quot;fr2&quot;
+	s(32,2)=&quot;fr-FR&quot;
+	s(32,3)=&quot;female&quot;
+	s(32,4)=&quot;French 2&quot;
+	s(33,1)=&quot;fr1&quot;
+	s(33,2)=&quot;fr-FR&quot;
+	s(33,3)=&quot;male&quot;
+	s(33,4)=&quot;French 1&quot;
+	s(34,1)=&quot;es4&quot;
+	s(34,2)=&quot;es-ES&quot;
+	s(34,3)=&quot;male&quot;
+	s(34,4)=&quot;Spanish 4&quot;
+	s(35,1)=&quot;es2&quot;
+	s(35,2)=&quot;es-ES&quot;
+	s(35,3)=&quot;male&quot;
+	s(35,4)=&quot;Spanish 2&quot;
+	s(36,1)=&quot;es1&quot;
+	s(36,2)=&quot;es-ES&quot;
+	s(36,3)=&quot;male&quot;
+	s(36,4)=&quot;Spanish 1&quot;
+	s(37,1)=&quot;en1&quot;
+	s(37,2)=&quot;en-GB&quot;
+	s(37,3)=&quot;male&quot;
+	s(37,4)=&quot;British English 1&quot;
+	s(38,1)=&quot;de8&quot;
+	s(38,2)=&quot;de-DE&quot;
+	s(38,3)=&quot;male&quot;
+	s(38,4)=&quot;German 8&quot;
+	s(39,1)=&quot;de7&quot;
+	s(39,2)=&quot;de-DE&quot;
+	s(39,3)=&quot;female&quot;
+	s(39,4)=&quot;German 7&quot;
+	s(40,1)=&quot;de6&quot;
+	s(40,2)=&quot;de-DE&quot;
+	s(40,3)=&quot;male&quot;
+	s(40,4)=&quot;German 6&quot;
+	s(41,1)=&quot;de5&quot;
+	s(41,2)=&quot;de-DE&quot;
+	s(41,3)=&quot;female&quot;
+	s(41,4)=&quot;German 5&quot;
+	s(42,1)=&quot;de4&quot;
+	s(42,2)=&quot;de-DE&quot;
+	s(42,3)=&quot;male&quot;
+	s(42,4)=&quot;German 4&quot;
+	s(43,1)=&quot;de3&quot;
+	s(43,2)=&quot;de-DE&quot;
+	s(43,3)=&quot;female&quot;
+	s(43,4)=&quot;German 3&quot;
+	s(44,1)=&quot;de2&quot;
+	s(44,2)=&quot;de-DE&quot;
+	s(44,3)=&quot;male&quot;
+	s(44,4)=&quot;German 2&quot;
+	s(45,1)=&quot;de1&quot;
+	s(45,2)=&quot;de-DE&quot;
+	s(45,3)=&quot;male&quot;
+	s(45,4)=&quot;German-Bavarian 1&quot;
+	s(46,1)=&quot;cz2&quot;
+	s(46,2)=&quot;cs-CZ&quot;
+	s(46,3)=&quot;male&quot;
+	s(46,4)=&quot;Czech 2&quot;
+	s(47,1)=&quot;cz1&quot;
+	s(47,2)=&quot;cs-CZ&quot;
+	s(47,3)=&quot;female&quot;
+	s(47,4)=&quot;Czech 1&quot;
+	s(48,1)=&quot;ca2&quot;
+	s(48,2)=&quot;fr-CA&quot;
+	s(48,3)=&quot;male&quot;
+	s(48,4)=&quot;Canadian French 2&quot;
+	s(49,1)=&quot;ca1&quot;
+	s(49,2)=&quot;fr-CA&quot;
+	s(49,3)=&quot;male&quot;
+	s(49,4)=&quot;Canadian French 1&quot;
+	s(50,1)=&quot;br4&quot;
+	s(50,2)=&quot;pt-BR&quot;
+	s(50,3)=&quot;male&quot;
+	s(50,4)=&quot;Brazilian Portuguese 4&quot;
+	s(51,1)=&quot;br3&quot;
+	s(51,2)=&quot;pt-BR&quot;
+	s(51,3)=&quot;male&quot;
+	s(51,4)=&quot;Brazilian Portuguese 3&quot;
+	s(52,1)=&quot;br1&quot;
+	s(52,2)=&quot;pt-BR&quot;
+	s(52,3)=&quot;male&quot;
+	s(52,4)=&quot;Brazilian Portuguese 2&quot;
+	s(53,1)=&quot;af1&quot;
+	s(53,2)=&quot;af-ZA&quot;
+	s(53,3)=&quot;male&quot;
+	s(53,4)=&quot;Afrikaans 1&quot;
+	fsGetEspeakMbrolaLanguage=s(i,j)
+end function
+
+
+function fiCountEspeakMbrolaLanguage()
+	fiCountEspeakMbrolaLanguage=53
+end function
+
+
+function fsDateMyRegion(_
+		optional i as integer) as string
+	dim sL10N as string
+	dim s1 as string
+	
+	if ismissing(i) then
+		i = 1
+	end if
+	
+	if i = 0 then
+		&apos; Use language of doc
+		s1 = fsDocLanguage()
+	elseif i = 1 then
+		&apos; Use language neutral notation YYYY-MM-DD
+		s1 = &quot;zzy&quot;
+	else
+		&apos; Use language of UI
+		s1 = fsGetLanguage()
+	end if
+	Select case s1
+	case &quot;es&quot;  &apos;el 1 de enero, 2009
+		sL10N=&quot;el &quot; &amp; format(now,&quot;D&quot; ) &amp; &quot; de &quot; &amp; format(now,&quot;MMMM, YYYY&quot;)
+	case &quot;gl&quot;
+		sL10N=format(now,&quot;D&quot; ) &amp; &quot; de &quot; &amp; format(now,&quot;MMMM, YYYY&quot;)
+	case &quot;fr&quot;  &apos;le 1 janvier, 2009
+		sL10N=&quot;le &quot; &amp;  format(now,&quot;D MMMM, YYYY&quot;)
+	case &quot;hr&quot;,&quot;cs&quot;,&quot;da&quot;,&quot;hu&quot;
+		sL10N=format(now,&quot;D, MMMM, YYYY&quot;)
+	case &quot;pt&quot;, &quot;ca&quot; &apos;01 de janeiro de 2009
+		sL10N=format(now,&quot;DD&quot;) &amp; &quot; de &quot; &amp; format(now,&quot;MMMM&quot; ) &amp; _
+				&quot; de &quot; &amp; format(now,&quot;YYYY&quot;)
+	case &quot;de&quot; &apos;der 1. Januar 2009
+		sL10N=&quot;der &quot; &amp; format(now,&quot;D. MMMM YYYY&quot;)
+	case &quot;sv&quot;,&quot;sl&quot;,&quot;et&quot;
+		sL10N=format(now,&quot;D. MMMM YYYY&quot;)
+	case &quot;tr&quot;
+		sL10N=format(now,&quot;D.MMMM.YYYY&quot;)
+	case &quot;cy&quot;,&quot;ga&quot; &apos;
+		sL10N=format(now,&quot;D MMMM, YYYY&quot;)
+	case &quot;mt&quot;,&quot;no&quot; &apos;
+		sL10N=format(now,&quot;D, MMMM YYYY&quot;)
+	case &quot;zh&quot;,&quot;zh-CN&quot;,&quot;zh-TW&quot;,&quot;zh-HK&quot;,&quot;zh-MO&quot;,&quot;zh-SG&quot; &apos; 2009?10?25? ???
+		sL10N=year(now)  &amp; &quot;?&quot; &amp; month(now)  &amp; &quot;?&quot; &amp; day(now)  &amp; &quot;?&quot;
+	case &quot;ja&quot; &apos; 2011?2?6?
+		sL10N=year(now)  &amp; &quot;?&quot; &amp; month(now)  &amp; &quot;?&quot; &amp; day(now)  &amp; &quot;?&quot;
+	case &quot;ko&quot;  &apos;Korea
+		sL10N=year(now)  &amp; &quot;?&quot; &amp; month(now)  &amp; &quot;?&quot; &amp; day(now)  &amp; &quot;?&quot;
+	case &quot;en&quot;,&quot;lv&quot;,&quot;sk&quot;,&quot;uk&quot;,&quot;tl&quot; &apos;January 1, 2009
+		sL10N=format(now,&quot;MMMM D, YYYY&quot;)
+	case else 
+		&apos; &quot;af&quot;,&quot;bg&quot;,&quot;el&quot;,&quot;it&quot;,&quot;hi&quot;,&quot;id&quot;,&quot;mk&quot;,&quot;nl&quot;,&quot;po&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sl&quot;,&quot;th&quot;,&quot;tr
+		sL10N=year(now) &amp; &quot;-&quot; &amp;  right(&quot; 00&quot; &amp; month(now), 2) &amp; &quot;-&quot; &amp; right(&quot; 00&quot; &amp; day(now), 2) 
+		&apos; Revised to international time 2011-02-06
+	end select
+	fsDateMyRegion=sL10N
+end function
+
+
+function fsTimeMyRegion(_
+		optional i as integer) as string
+	dim sL10N as string
+	dim s1 as string
+	
+	if ismissing(i) then
+		i = 1
+	end if
+	
+	if i = 0 then
+		&apos; Use language of doc
+		s1 = fsDocLanguage()
+	elseif i = 1 then
+		&apos; Use language neutral notation 
+		s1 = &quot;zzy&quot;
+	else
+		&apos; Use language of UI
+		s1 = fsGetLanguage()
+	end if
+
+	select case s1()
+	case &quot;es&quot;  &apos;la 1 y 40 de la mañana; las 2 y 40 de la tarde
+		if hour(now)=0 then
+			sL10N=&quot;medionoche y &quot; &amp; minute(now)
+		elseif hour(now)=1 then
+			sL10N=&quot;la &quot; &amp; hour(now) &amp; &quot; y &quot; &amp; minute(now) &amp; &quot;de la mañana&quot;
+		elseif hour(now) &lt; 12 then
+			sL10N=&quot;las &quot; &amp; hour(now) &amp; &quot; y &quot; &amp; minute(now) &amp; &quot;de la mañana&quot;
+		elseif hour(now)=12 then
+			sL10N=&quot;mediodia y &quot; &amp; minute(now)
+		elseif hour(now)=13 then
+			sL10N=&quot;la &quot; &amp; hour(now) Mod 12 &amp; &quot; y &quot; &amp; minute(now) &amp; &quot;de la tarde&quot;
+		elseif hour(now) &lt; 20 then
+			sL10N=&quot;las &quot; &amp; hour(now) Mod 12 &amp; &quot; y &quot; &amp; minute(now) &amp; &quot;de la tarde&quot;
+		else
+			sL10N=&quot;las &quot; &amp; hour(now) Mod 12 &amp; &quot; y &quot; &amp; minute(now) &amp; &quot;de la noche&quot;
+		end if
+	case &quot;fr&quot;
+		if hour(now)=1 then
+			sL10N=&quot; &quot; &amp; hour(now) &amp; &quot; heure &quot; &amp; minute(now)
+		else
+			sL10N=&quot; &quot; &amp; hour(now) &amp; &quot; heures &quot; &amp; minute(now)
+		end if
+	case &quot;en&quot; &apos;1:40 AM ; 2:40 PM (One forty A M; Two forty P M)
+		sL10N=format(now,&quot;h:mm AM/PM&quot;)
+	case else &apos;1:40 ; 14:4
+		sL10N=format(now,&quot;h:mm&quot;)
+	end select
+	fsTimeMyRegion=ltrim(rtrim(sL10N))
+end function
+
+
+function fsWeekDayMyRegion() as string
+    fsWeekDayMyRegion=ltrim(rtrim(format(now,&quot;NNNN&quot;)))
+end function
+
+
+function fsUserName()
+    fsUserName=environ(&quot;USERNAME&quot;)
+    if fsUserName=&quot;&quot; then
+    	fsUserName=environ(&quot;USER&quot;)
+    end if
+end function
+
+
+function fsGetHomeDir()
+	&apos; Work directory also known As My Documents or home
+	&apos; We look up the home directory. if it was deleted,
+	&apos; we try to recreate it. Returns blank if we fail.
+	dim s1 , cr as string
+	dim n as integer
+	dim a1
+
+	cr = chr(10)
+	fsGetHomeDir = &quot;&quot;
+	s1 = ConvertFromURL(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;)
+	if fileexists(s1) then
+		fsGetHomeDir = s1
+	else
+		s1 = ConvertFromURL(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;) &amp; cr
+		s1 = s1 &amp; environ(&quot;pwd&quot;) &amp; &quot;/&quot; &amp; cr
+		s1 = s1 &amp; environ(&quot;HOMEPATH&quot;) &amp; &quot;\&quot; &amp; cr
+		s1 = s1 &amp; environ(&quot;HOME&quot;) &amp; &quot;/&quot; &amp; cr
+		a1 = split(s1, cr)
+		for n = lbound(a1) to ubound(a1)
+		if len(a1(n)) &gt; 0 then
+        	if fbCreateFile(a1(n) &amp; &quot;log.txt&quot;, fsGetSetting(&quot;ooname&quot;) &amp;_
+        			&quot; - &quot; &amp; fsFileTime(), &quot;utf-8&quot;) then
+				kill a1(n) &amp; &quot;log.txt&quot;
+				fsGetHomeDir = a1(n)
+				exit for
+			end if
+		end if
+        next
+	end if
+end function
+
+
+sub debugFsLookUpTerm()
+    &apos; Check for missing language strings.  With po language files, you
+    &apos; might have a partial fill of language strings.  for example,
+    &apos; Korean has the main dialog strings, but not any strings
+    &apos; relating to adding tags to m4a exports.
+    dim s1 as string
+	UpdatePoSettingsDone = -1
+    s1 = inputbox(&quot;Enter the code to look up&quot;,&quot;Debug&quot;, &quot;s_mdsample&quot;)
+	msgbox( fxStr(fsLookupterm(s1, _
+	inputbox(&quot;Enter your language code&quot;, _
+			&quot;Debug&quot;, fsDisplayLanguage())) &amp; _
+			&quot;\n\nshould be the string for &quot; &amp; _
+			s1 &amp; _
+			&quot; in your language.&quot;)
+end sub
+
+</script:module>

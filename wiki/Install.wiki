@@ -1,0 +1,7 @@
+#summary Installing Read Text Extension
+
+= Install =
+
+  * Get the most recent version of the extension at the [http://aoo-extensions.sourceforge.net/en/project/Read_Text Extensions web site]. 
+  * Open the extension with the [http://www.libreoffice.org LibreOffice] or [http://www.openoffice.org OpenOffice.org] application. Approve the license. 
+  * Restart the program. 
