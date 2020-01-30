@@ -408,7 +408,7 @@ function fiReportOnlineRequest(_
 	if bVerify then
 		n = msgbox(sA, _
 				iYesNoCancel, _
-				fsLookUpTerm(&quot;s_read-text&quot;)
+				fsLookUpTerm(&quot;s_read-text&quot;))
 	end if
 	fiReportOnlineRequest = n
 	exit function
