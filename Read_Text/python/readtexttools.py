@@ -726,7 +726,7 @@ def SoundLenInSeconds(sTMP1):
     We round up so that processes that call for sleep have time to finish.
     '''
     sTMP1EXT = os.path.splitext(sTMP1)[1].lower()
-
+    retVal = 0
     mimetypes.init()
     sMIME = "xxz-xzz-no-match"
     if len(sTMP1EXT) != 0:
