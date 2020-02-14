@@ -1481,12 +1481,12 @@ function fsDateMyRegion(_
 		sL10N=format(now,&quot;D MMMM, YYYY&quot;)
 	case &quot;mt&quot;,&quot;no&quot; &apos;
 		sL10N=format(now,&quot;D, MMMM YYYY&quot;)
-	case &quot;zh&quot;,&quot;zh-CN&quot;,&quot;zh-TW&quot;,&quot;zh-HK&quot;,&quot;zh-MO&quot;,&quot;zh-SG&quot; &apos; 2009?10?25? ???
-		sL10N=year(now)  &amp; &quot;?&quot; &amp; month(now)  &amp; &quot;?&quot; &amp; day(now)  &amp; &quot;?&quot;
-	case &quot;ja&quot; &apos; 2011?2?6?
-		sL10N=year(now)  &amp; &quot;?&quot; &amp; month(now)  &amp; &quot;?&quot; &amp; day(now)  &amp; &quot;?&quot;
+	case &quot;zh&quot;,&quot;zh-CN&quot;,&quot;zh-TW&quot;,&quot;zh-HK&quot;,&quot;zh-MO&quot;,&quot;zh-SG&quot;
+		sL10N=year(now)  &amp; chr(24180) &amp; month(now)  &amp; chr(26376) &amp; day(now)  &amp; chr(26085)
+	case &quot;ja&quot;
+		sL10N=year(now)  &amp; chr(24180) &amp; month(now)  &amp; chr(26376) &amp; day(now)  &amp; chr(26085)
 	case &quot;ko&quot;  &apos;Korea
-		sL10N=year(now)  &amp; &quot;?&quot; &amp; month(now)  &amp; &quot;?&quot; &amp; day(now)  &amp; &quot;?&quot;
+		sL10N=year(now)  &amp; chr(45380) &amp; month(now)  &amp; chr(50900) &amp; day(now)  &amp; chr(51068)
 	case &quot;en&quot;,&quot;lv&quot;,&quot;sk&quot;,&quot;uk&quot;,&quot;tl&quot; &apos;January 1, 2009
 		sL10N=format(now,&quot;MMMM D, YYYY&quot;)
 	case else 

@@ -945,7 +945,7 @@ sub dialog1Combo2ShowSAPIChoices(_
 &apos;&apos;
 &apos;&apos; or (save as a .wav file in the home directory):
 &apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /soundfile:&quot;(HOME)(now).wav&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /soundfile:&quot;(HOME)(NOW).wav&quot; &quot;(TMP)&quot;
 &apos;&apos;
 &apos;&apos; or (use a named voice)
 &apos;&apos;
@@ -990,8 +990,8 @@ sub dialog1Combo2ShowSAPIChoices(_
 &apos;&apos; 7. Read text extension now shows .mp3 and .ogg formats as export options.
 &apos;&apos; 8. You can use Audacity to add music or special effects to your sound files.
 &apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(now).mp3&quot; &quot;(TMP)&quot;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(now).ogg&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
 &apos;&apos;
 &apos;&apos; ## Flac
 &apos;&apos;
@@ -1001,7 +1001,7 @@ sub dialog1Combo2ShowSAPIChoices(_
 &apos;&apos;  * [flac encoder](https://xiph.org/flac/links.html#software)
 &apos;&apos;  * [Players and plugins](https://xiph.org/flac/)
 &apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(now).flac&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).flac&quot; &quot;(TMP)&quot;
 &apos;&apos;
 &apos;&apos; ## iTunes
 &apos;&apos;
@@ -1012,9 +1012,9 @@ sub dialog1Combo2ShowSAPIChoices(_
 &apos;&apos; iTunes creates the audio file in it&apos;s own directory and signals you with a sound.
 &apos;&apos; Read Text Extension puts a copy in a sound directory in your home directory.
 &apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(now).aif&quot; &quot;(TMP)&quot;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(now).m4a&quot; &quot;(TMP)&quot;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(now).mp3&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).aif&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).m4a&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
 &apos;&apos;
 &apos;&apos; ## Lame
 &apos;&apos;
@@ -1026,14 +1026,14 @@ sub dialog1Combo2ShowSAPIChoices(_
 &apos;&apos;  * Install `lame.exe` in `C:\opt\`
 &apos;&apos;  * [Lame encoder](http://www.rarewares.org/mp3-lame-bundle.php)
 &apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(now).mp3&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
 &apos;&apos;
 &apos;&apos; ## FFmpeg
 &apos;&apos;
 &apos;&apos; [ffmpeg](https://www.ffmpeg.org) is a free visual music and video converter.
 &apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(now).mp3&quot; &quot;(TMP)&quot;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(now).ogg&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
 &apos;&apos;
 &apos;&apos; ## Ogg
 &apos;&apos;
@@ -1044,7 +1044,7 @@ sub dialog1Combo2ShowSAPIChoices(_
 &apos;&apos;  * [oggenc2 encoder](http://www.rarewares.org/ogg-oggenc.php)
 &apos;&apos;  * [Players and plugins](https://xiph.org/vorbis/)
 &apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(now).ogg&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
 &apos;&apos;
 	dim Sapi As Object
 	dim n as integer
@@ -1087,7 +1087,7 @@ sub dialog1Combo2ShowSAPIChoices(_
 		s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(now).ogg&quot;&quot;&quot; &amp; _
+		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).ogg&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
 	end if
@@ -1097,7 +1097,7 @@ sub dialog1Combo2ShowSAPIChoices(_
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
 		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(now).mp3&quot;&quot;&quot; &amp; _
+		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
 	end if
@@ -1108,7 +1108,7 @@ sub dialog1Combo2ShowSAPIChoices(_
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
 		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(now).m4a&quot;&quot;&quot; &amp; _
+		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
 	elseif fileexists(fsOptDirectory() &amp; &quot;neroAacEnc.exe&quot;) or _
@@ -1116,7 +1116,7 @@ sub dialog1Combo2ShowSAPIChoices(_
 		s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(now).m4a&quot;&quot;&quot; &amp; _
+		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
 	end if
@@ -1126,7 +1126,7 @@ sub dialog1Combo2ShowSAPIChoices(_
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
 		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(now).flac&quot;&quot;&quot; &amp; _
+		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).flac&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
 	end if
@@ -1143,25 +1143,25 @@ sub dialog1Combo2ShowSAPIChoices(_
 		s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(now).aif&quot;&quot;&quot; &amp; _
+		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).aif&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
 		s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(now).mp3&quot;&quot;&quot; &amp; _
+		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
 		s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(now).m4a&quot;&quot;&quot; &amp; _
+		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
 	end if
 	s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 	sSelectionLangCountryTag &amp; _
-	&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(now).wav&quot;&quot;&quot; &amp; _
+	&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).wav&quot;&quot;&quot; &amp; _
 		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	oComboBox.addItem(s1,0)
 	s1=&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
@@ -1303,16 +1303,16 @@ sub dialog1Combo2ShowSAYChoices(_
 &apos;&apos; 
 &apos;&apos; Record
 &apos;&apos; 
-&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(now).aiff&quot;
-&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(now).m4a&quot;
+&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).aiff&quot;
+&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).m4a&quot;
 &apos;&apos; 
 &apos;&apos; FFMPEG (optional)
 &apos;&apos; -----------------
 &apos;&apos; 
 &apos;&apos; Record a jpeg or png image file with sound using `ffmpeg`
 &apos;&apos; 
-&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(now).webm&quot; &quot;(MY_IMAGE)&quot;
-&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(now).webm&quot; &quot;(MY_IMAGE)&quot; &quot;640x480&quot;
+&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).webm&quot; &quot;(MY_IMAGE)&quot;
+&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).webm&quot; &quot;(MY_IMAGE)&quot; &quot;640x480&quot;
 &apos;&apos; 
 &apos;&apos;  [ffmpeg](https://https://www.ffmpeg.org)
 &apos;&apos; 
@@ -1421,8 +1421,8 @@ sub dialog1Combo2ShowESPEAKChoices(_
 	n=oComboBox.getItemCount()
 	oComboBox.removeItems(0,n)
 	s3=&quot;&quot;
-	s2(0)=&quot; -b 1 -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(now).wav&apos;&quot;
-	s2(1)=&quot; -b 1 -f &apos;(TMP)&apos; -w &apos;(HOME)(now).wav&apos;&quot;
+	s2(0)=&quot; -b 1 -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;
+	s2(1)=&quot; -b 1 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;
 	s2(2)=&quot; -b 1 -s 130 -f &apos;(TMP)&apos;&quot;
 	s2(3)=&quot; -b 1 -f &apos;(TMP)&apos;&quot;
 	for n=0 To 3
@@ -1545,9 +1545,9 @@ sub dialog1Combo2ShowTEXT2WAVEChoices(_
 	REM first remove all old items from the list
 	n1=oComboBox.getItemCount()
 	oComboBox.removeItems( 0,n1)
-	s1=&quot;&quot;&quot;(TMP)&quot;&quot; -otype snd -o &quot;&quot;(HOME)(now).wav&quot;&quot;&quot;
+	s1=&quot;&quot;&quot;(TMP)&quot;&quot; -otype snd -o &quot;&quot;(HOME)(NOW).wav&quot;&quot;&quot;
 	oComboBox.addItem(s1,0)
-	s1=&quot;&quot;&quot;(TMP)&quot;&quot; -o &quot;&quot;(HOME)(now).wav&quot;&quot;&quot;
+	s1=&quot;&quot;&quot;(TMP)&quot;&quot; -o &quot;&quot;(HOME)(NOW).wav&quot;&quot;&quot;
 	oComboBox.addItem(s1,0)
 end sub
 
@@ -1709,7 +1709,7 @@ function fiDialog1Combo2ShowMyPythonChoices(_
 		s2(4)=&quot;1&quot;
 		for n=0 to 4
 			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --size &quot; &amp; s2(n) &amp; _
-					&quot; --output &quot;&quot;(HOME)(now).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+					&quot; --output &quot;&quot;(HOME)(NOW).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 
 			s1=s1 &amp; CR &amp; &quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --size &quot; &amp; s2(n) &amp; _
 					&quot; --output &quot;&quot;/tmp/&quot; &amp; _
@@ -1720,7 +1720,7 @@ function fiDialog1Combo2ShowMyPythonChoices(_
 					fsUserName &amp; &quot;.png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		Next
 		s1=s1 &amp; CR &amp; _
-				&quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --output &quot;&quot;(HOME)(now).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				&quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --output &quot;&quot;(HOME)(NOW).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 
 		s1=s1 &amp; CR &amp; &quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --output &quot;&quot;/tmp/&quot; &amp; _
 				fsGetSetting(&quot;ooname&quot;) &amp; _
@@ -1731,8 +1731,8 @@ function fiDialog1Combo2ShowMyPythonChoices(_
 	end if
 	if fileexists(&quot;/usr/bin/espeak&quot;) then
 		&apos; does not work in Windows, only Linux...
-		s2(0)=&quot; -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(now).wav&apos;&quot;&quot;&quot;
-		s2(1)=&quot; -f &apos;(TMP)&apos; -w &apos;(HOME)(now).wav&apos;&quot;&quot;&quot;
+		s2(0)=&quot; -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;&quot;&quot;
+		s2(1)=&quot; -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;&quot;&quot;
 		s2(2)=&quot; -s 130 -f &apos;(TMP)&apos;&quot;&quot;&quot;
 		s2(3)=&quot; -f &apos;(TMP)&apos;&quot;&quot;&quot;
 		s3=&quot;&quot;&quot;(OS_PY)&quot;&quot; --c &quot;&quot;espeak &quot;
@@ -2725,10 +2725,9 @@ function replaceLocalTokensWithStr(_
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		&apos;Current time reformatted so that you can use it in a filename
-		sFind=&quot;(now)&quot;
+		sFind=&quot;(NOW)&quot;
 		sReplace=fsFileTime()
 		sA=fsReplaceText(sA,sFind,sReplace)
-
 		sFind=&quot;(SOUND_GALLERY)&quot;
 		sReplace=soundsDirectory()
 		sA=fsReplaceText(sA,sFind,sReplace)
@@ -4429,8 +4428,8 @@ function fsAboutAbilityToolsApple()
 			&quot;&quot;, _
 			&quot;### Record ###&quot;, _
 			&quot;&quot;, _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(now).aiff&quot;&quot;&quot;, _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(now).m4a&quot;&quot;&quot;, _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;&quot;, _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;&quot;, _
 			&quot;&quot;, _
 			&quot;Features&quot;, _
 			&quot;--------&quot;, _
@@ -4452,8 +4451,8 @@ function fsAboutAbilityToolsApple()
 			&quot;&quot;, _
 			&quot;Record a [jpeg][3] or [png][4] image file with sound using `ffmpeg`&quot;, _
 			&quot;&quot;, _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(now).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;, _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(now).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;480x480&quot;&quot;&quot;, _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;, _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;480x480&quot;&quot;&quot;, _
 			&quot;&quot;, _
 			&quot; [ffmpeg][5]  &quot;, _
 			&quot;&quot;, _
