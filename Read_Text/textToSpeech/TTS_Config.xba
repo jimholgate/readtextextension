@@ -10,7 +10,7 @@ private f_dlgAboutReadSelection as variant
 global s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle as string
 global i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack as integer
 global s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage as string
-
+global b_CaBcVancouverHolgateJamesReadtextextensionHideExports as boolean
 &apos;&apos; # Configuration tools
 &apos;&apos;  
 &apos;&apos; These procedures make dialogues, get settings and write settings.
@@ -87,12 +87,24 @@ sub ConfigureReadTextAloud ()
 	dim msgs() as variant
 	dim errorCode as integer 
 	dim config(fiCountConfigOptions) as variant
+	dim bHideExports as boolean : bHideExports = False
 	
 	&apos; Open up the dialog
 	CheckUnixSpeech
 	ClearWorkingCountryLanguage
 	DialogLibraries.LoadLibrary( &quot;textToSpeech&quot; )
 	f_dlgSpeechSetup=CreateUnoDialog( DialogLibraries.textToSpeech.Dialog1 )
+    Select Case fsGetOS()
+    Case &quot;OSX&quot;
+    	&apos; New versions of MacOS restrict third party apps from writing
+    	&apos; media files, so the extension hides export options in the main
+    	&apos; dialogue.  High Sierra and newer versions of MscOS do not 
+    	&apos; include a built-in telnet command.
+    	bHideExports = not(_
+    			fileexists(_
+    			&quot;/usr/bin/telnet&quot;))
+    End Select
+    b_CaBcVancouverHolgateJamesReadtextextensionHideExports = bHideExports
     with f_dlgSpeechSetup
         if fbHelpIsInstalled then
             .model.HelpURL= fsAppSignature &amp; &quot;/set_up.xhp&quot;
