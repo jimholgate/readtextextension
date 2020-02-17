@@ -405,6 +405,7 @@ function CreateSize(_
 	CreateSize = oSize
 end function
 
+
 sub ChangeBackground(_
 		optional byval i, _
 		optional r1, _

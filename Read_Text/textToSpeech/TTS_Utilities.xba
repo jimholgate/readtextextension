@@ -1195,7 +1195,7 @@ function fsMacVoice(_
 	end if
 	select case s2
 		case &quot;ar-SA&quot;
-			s1 = &quot;Tarik&quot;
+			s1 = &quot;Tarik,Maged&quot;
 		case &quot;cs-CZ&quot;
 			s1 = &quot;Zuzana&quot;
 		case &quot;da-DK&quot;
@@ -1213,17 +1213,42 @@ function fsMacVoice(_
 		case &quot;en-IN&quot;,&quot;en-PK&quot;
 			s1 = &quot;Veena&quot;
 		case &quot;en-US&quot;, &quot;en-CA&quot;
-			s1 = &quot;Agnes,Albert,Alex,Bad News,Bahh,Bells,Boing,Bruce,Bubbles,Cellos,Deranged,&quot;
-			s1 = s1 &amp; &quot;Fred,Good News,Hysterical,Junior,Kathy,Pipe Organ,Princess,Ralph,&quot;
-			s1 = s1 &amp; &quot;Samantha,Trinoids,Vicki,Victoria,Whisper,Zarvox&quot;
+			s1 = Join(_
+					Array(_
+			        &quot;Agnes&quot;,_
+			        &quot;Albert&quot;,_
+			        &quot;Alex&quot;,_
+			        &quot;Bad News&quot;,_
+			        &quot;Bahh&quot;,_
+			        &quot;Bells&quot;,_
+			        &quot;Boing&quot;,_
+			        &quot;Bruce&quot;,_
+			        &quot;Bubbles&quot;,_
+			        &quot;Cellos&quot;,_
+			        &quot;Deranged&quot;,_
+			        &quot;Fred&quot;,_
+			        &quot;Good News&quot;,_
+			        &quot;Hysterical&quot;,_
+			        &quot;Junior&quot;,_
+			        &quot;Kathy&quot;,_
+			        &quot;Pipe Organ&quot;,_
+			        &quot;Princess&quot;,_
+			        &quot;Ralph&quot;,_
+			        &quot;Samantha&quot;,_
+			        &quot;Trinoids&quot;,_
+			        &quot;Vicki&quot;,_
+			        &quot;Victoria&quot;,_
+			        &quot;Whisper&quot;,_
+			        &quot;Zarvox&quot;),_
+			        &quot;,&quot;)
 		case &quot;en-ZA&quot;
 			s1 = &quot;Tessa&quot;
 		case &quot;es-AR&quot;
 			s1 = &quot;Diego&quot;
 		case &quot;es-ES&quot;
-			s1 = &quot;Monica&quot;
+			s1 = &quot;Jorge,Monica&quot;
 		case &quot;es-MX&quot;
-			s1 = &quot;Angelica,Javier,Paulina&quot;
+			s1 = &quot;Angelica,Juan,Javier,Paulina&quot;
 		case &quot;fi-FI&quot;
 			s1 = &quot;Satu&quot;
 		case &quot;fr-CA&quot;
@@ -1239,7 +1264,7 @@ function fsMacVoice(_
 		case &quot;id-ID&quot;
 			s1 = &quot;Damayanti&quot;
 		case &quot;it-IT&quot;
-			s1 = &quot;Alice&quot;
+			s1 = &quot;Alice,Luca&quot;
 		case &quot;ja-JP&quot;
 			s1 = &quot;Kyoko&quot;
 		case &quot;ko-KR&quot;, &quot;ko-KP&quot;
@@ -1301,20 +1326,6 @@ sub dialog1Combo2ShowSAYChoices(_
 &apos;&apos; 
 &apos;&apos;     &quot;(SAY_APPLESCRIPT)&quot;
 &apos;&apos; 
-&apos;&apos; Record
-&apos;&apos; 
-&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).aiff&quot;
-&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).m4a&quot;
-&apos;&apos; 
-&apos;&apos; FFMPEG (optional)
-&apos;&apos; -----------------
-&apos;&apos; 
-&apos;&apos; Record a jpeg or png image file with sound using `ffmpeg`
-&apos;&apos; 
-&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).webm&quot; &quot;(MY_IMAGE)&quot;
-&apos;&apos;      &quot;(SAY_APPLESCRIPT)&quot; &quot;(HOME)(NOW).webm&quot; &quot;(MY_IMAGE)&quot; &quot;640x480&quot;
-&apos;&apos; 
-&apos;&apos;  [ffmpeg](https://https://www.ffmpeg.org)
 &apos;&apos; 
 	dim n, o as integer
 	dim s1 as string
@@ -1327,10 +1338,12 @@ sub dialog1Combo2ShowSAYChoices(_
 	n=oComboBox.getItemCount()
 	oComboBox.removeItems(0,n)
 	aA = Array(&quot;.aif&quot;, &quot;.m4a&quot;)
-	for n = lbound(aA) To ubound(aA)
-		s1 = &quot;-o &quot;&quot;(HOME)(NOW)&quot; &amp; s2(n) &amp; &quot;&quot;&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1,0)
-	Next
+	if not b_CaBcVancouverHolgateJamesReadtextextensionHideExports Then
+		for n = lbound(aA) To ubound(aA)
+			s1 = &quot;-o &quot;&quot;(HOME)(NOW)&quot; &amp; aA(n) &amp; &quot;&quot;&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
+			oComboBox.addItem(s1,0)
+		next
+	end if
 	n=0
 	for n = 0 to 40
 		if fsMacVoice(n) = &quot;&quot; then
@@ -1340,8 +1353,7 @@ sub dialog1Combo2ShowSAYChoices(_
 			oComboBox.addItem(s1,0)
 			n=n+1
 		end if
-	next
-
+		next
 	s1=&quot;-f &quot;&quot;(TMP)&quot;&quot;&quot;
 	oComboBox.addItem(s1,0)
 end sub
@@ -1351,46 +1363,53 @@ sub dialog1Combo2ShowAppleScriptChoices(_
 		oDialog)
 	&apos;Mac OSX open or osascript
 	dim n as integer
-	dim CR, s1, s2 as string
+	dim CR$ : CR = chr$(10)
+	dim s1$ : s1 = &quot;&quot;
+	dim s2$ : s2 = &quot;&quot;
 	dim a1, a2
 	dim oComboBox as variant
 
-	CR = chr$(10)
 	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
 	n=oComboBox.getItemCount()
 	oComboBox.removeItems( 0,n)
-	s2 = &quot;&quot;
-	if fbHaveFfmpeg() then
-		s2 = s2 &amp; Join(_
-				Array(_
-						&quot;.webm&quot;&quot; &quot;&quot;(POSTER2_IMG)&quot;&quot; &quot;&quot;600x400&quot;&quot;&quot;,_
-						&quot;.webm&quot;&quot; &quot;&quot;(POSTER_IMG)&quot;&quot; &quot;&quot;400x400&quot;&quot;&quot;,_
-						&quot;.webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480&quot;,_
-						&quot;.webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;,_
-						&quot;.wav&quot;,_
-						&quot;.ogg&quot;,_
-						&quot;.mp4&quot;&quot; &quot;&quot;(POSTER2_IMG)&quot;&quot; &quot;&quot;600x400&quot;&quot;&quot;,_
-						&quot;.mp4&quot;&quot; &quot;&quot;(POSTER_IMG)&quot;&quot; &quot;&quot;400x400&quot;&quot;&quot;,_
-						&quot;.mp4&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480&quot;,_
-						&quot;.mp4&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;,_
-						&quot;.mp4&quot;,_
-						&quot;.mp3&quot;, _
-						&quot;&quot;),_
-						&quot;,&quot;)
-	end if
-	s2 = s2 &amp; &quot;.aif,.m4a&quot;
-	a2 = split(s2, &quot;,&quot;)
-	s1= &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;_AIRPLAY_QUICKLY)&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;_AIRPLAY_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;_AIRPLAY)&quot;&quot;&quot; &amp; CR
-	for n = lbound(a2) to ubound(a2)
-		s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; _
-			&quot;&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;_QUICKLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;_SLOWLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR
-	next
+	select case b_CaBcVancouverHolgateJamesReadtextextensionHideExports
+	case False
+		if fbHaveFfmpeg() then
+			s2 = s2 &amp; Join(_
+					Array(_
+							&quot;.webm&quot;&quot; &quot;&quot;(POSTER2_IMG)&quot;&quot; &quot;&quot;600x400&quot;&quot;&quot;,_
+							&quot;.webm&quot;&quot; &quot;&quot;(POSTER_IMG)&quot;&quot; &quot;&quot;400x400&quot;&quot;&quot;,_
+							&quot;.webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480&quot;,_
+							&quot;.webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;,_
+							&quot;.wav&quot;,_
+							&quot;.ogg&quot;,_
+							&quot;.mp4&quot;&quot; &quot;&quot;(POSTER2_IMG)&quot;&quot; &quot;&quot;600x400&quot;&quot;&quot;,_
+							&quot;.mp4&quot;&quot; &quot;&quot;(POSTER_IMG)&quot;&quot; &quot;&quot;400x400&quot;&quot;&quot;,_
+							&quot;.mp4&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;640x480&quot;,_
+							&quot;.mp4&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;,_
+							&quot;.mp4&quot;,_
+							&quot;.mp3&quot;, _
+							&quot;&quot;),_
+							&quot;,&quot;)
+		end if
+		s2 = s2 &amp; &quot;.aif,.m4a&quot;
+		a2 = split(s2, &quot;,&quot;)
+		s1 = &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;_AIRPLAY_QUICKLY)&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;_AIRPLAY_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;_AIRPLAY)&quot;&quot;&quot; &amp; CR
+		for n = lbound(a2) to ubound(a2)
+			s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; _
+				&quot;&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;_QUICKLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;_SLOWLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR
+		next
+	case else
+		s1 = &quot;&quot;
+		s2 = &quot;&quot;
+	end select
+
 	s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;_QUICKLY)&quot;&quot;&quot; &amp; CR &amp; _
@@ -2239,9 +2258,9 @@ sub ttsActuate(_
 		&apos; Get current track, then increment it by one to a maximum value of 255. 
 		&apos; (hex FF)
 		n = fiMyCurrentAudioTrack(true)
-		if fsGetOS = &quot;OSX&quot; then 
+		if fsGetOS() = &quot;OSX&quot; then
 			bAddTime = True
-		else 
+		else
 			if config(fiExternalOption) or config(fiFestivalOption) then
 				&apos; Temporary Metadata for an external vbs or python script.
 				&apos; External scripts delete these files once they have been
@@ -4047,6 +4066,7 @@ function fsEscapeStr(_
 	end if
 end function
 
+
 function fsLang() as string
 	&apos; Full Language String - en-US en-GB zh-CN zh-TW etc.
 	&apos; for languages with no UI variant, returns a two letter string
@@ -4426,16 +4446,10 @@ function fsAboutAbilityToolsApple()
 			&quot;&quot;, _
 			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;, _
 			&quot;&quot;, _
-			&quot;### Record ###&quot;, _
-			&quot;&quot;, _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).aiff&quot;&quot;&quot;, _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).m4a&quot;&quot;&quot;, _
-			&quot;&quot;, _
 			&quot;Features&quot;, _
 			&quot;--------&quot;, _
 			&quot;&quot;, _
 			&quot; * Automatically change languages according to the text language.&quot;, _
-			&quot; * Create sound or still-image speech files for listening on the go.&quot;, _
 			&quot; * Use web resources to translate, look up, listen, post, or&quot;, _
 			&quot;   interface with web applications.&quot;, _
 			&quot;&quot;, _
@@ -4444,36 +4458,25 @@ function fsAboutAbilityToolsApple()
 			&quot;&quot;, _
 			&quot;Get *Read Text* from the download page and install it by double-clicking it.&quot;, _
 			&quot;&quot;, _
-			&quot;[Apache %PRODUCTNAME][1]  &quot;, _
-			&quot;[%PRODUCTNAME][2]&quot;, _
+			&quot;[Apache OpenOffice][1]  &quot;, _
+			&quot;[LibreOffice][2]&quot;, _
 			&quot;&quot;, _
-			&quot;### FFMPEG ###&quot;, _
-			&quot;&quot;, _
-			&quot;Record a [jpeg][3] or [png][4] image file with sound using `ffmpeg`&quot;, _
-			&quot;&quot;, _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot;&quot;, _
-			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot; &quot;&quot;(HOME)(NOW).webm&quot;&quot; &quot;&quot;(MY_IMAGE)&quot;&quot; &quot;&quot;480x480&quot;&quot;&quot;, _
-			&quot;&quot;, _
-			&quot; [ffmpeg][5]  &quot;, _
 			&quot;&quot;, _
 			&quot;License&quot;, _
 			&quot;-------&quot;, _
 			&quot;&quot;, _
-			&quot;The project is licensed under the [GNU 2.0][6] license.&quot;, _
+			&quot;The project is licensed under the [GNU 2.0][3] license.&quot;, _
 			&quot;&quot;, _
 			&quot;Online help&quot;, _
 			&quot;-----------&quot;, _
 			&quot;&quot;, _
-			&quot;[Read Text][7]&quot;, _
+			&quot;[Read Text][4]&quot;, _
 			&quot;&quot;, _
 			&quot;&quot;, _
 			&quot;  [1]: https://extensions.services.openoffice.org/en/project/read-text&quot;, _
 			&quot;  [2]: https://extensions.libreoffice.org/extension-center/read-text&quot;, _
-			&quot;  [3]: https://www.w3.org/Graphics/JPEG/&quot;, _
-			&quot;  [4]: https://www.w3.org/Graphics/PNG/&quot;, _
-			&quot;  [5]: https://www.ffmpeg.org&quot;, _
-			&quot;  [6]: https://www.gnu.org/licenses/gpl-2.0.txt&quot;, _
-			&quot;  [7]: https://sites.google.com/site/readtextextension/&quot;, _
+			&quot;  [3]: https://www.gnu.org/licenses/gpl-2.0.txt&quot;, _
+			&quot;  [4]: https://sites.google.com/site/readtextextension/&quot;, _
 			&quot;&quot;), _
 			chr(10))
 
