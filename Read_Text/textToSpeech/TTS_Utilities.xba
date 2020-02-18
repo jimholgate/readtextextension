@@ -2747,6 +2747,7 @@ function replaceLocalTokensWithStr(_
 		sFind=&quot;(NOW)&quot;
 		sReplace=fsFileTime()
 		sA=fsReplaceText(sA,sFind,sReplace)
+		
 		sFind=&quot;(SOUND_GALLERY)&quot;
 		sReplace=soundsDirectory()
 		sA=fsReplaceText(sA,sFind,sReplace)
@@ -2816,7 +2817,7 @@ function ReplaceWebTokensWithStr(_
     sFind = &quot;(OOO_WEBTEXTDEFINITION)&quot;
     &apos; Use with an on-line dictionary.
     &apos;
-    sReplace= lcase(fsEscapeStr(fsQuickTitle(1, 99, fsTrimSpecial(sB,  &quot; `_-*#&gt;_&quot;))
+    sReplace= lcase(fsEscapeStr(fsQuickTitle(1, 99, fsTrimSpecial(sB,  &quot; `_-*#&gt;_&quot;))))
    &apos; sReplace = fsTrimSpecial(sReplace, &quot; `_-*#&gt;_&quot;)
     sA=fsReplaceText(sA,sFind,sReplace)
     ReplaceWebTokensWithStr=sA
@@ -2888,11 +2889,20 @@ end function
 
 
 function fsFileTime() as string
-	&apos;Revised 2011-02-20_17-18 so all versions and locales return the same value
-	fsFileTime=year(now) &amp; &quot;-&quot; &amp; _
-			month(now) &amp; &quot;-&quot; &amp; _
-			day(now) &amp; &quot;_&quot; &amp; _
-			fsReplaceText(Time(now),&quot;:&quot;,&quot;-&quot;)
+	&apos;Revised 2020-02-17_15-46-33 so all versions and locales return the same value
+
+	fsFileTime=join(array(year(now), _
+			&quot;-&quot;, _
+			fsPrefixZeroes(month(now),2), _
+			&quot;-&quot;, _
+			fsPrefixZeroes(day(now),2), _
+			&quot;_&quot;, _
+			format(now,&quot;hh&quot;), _
+			&quot;-&quot;, _
+			fsPrefixZeroes(minute(now),2), _
+			&quot;-&quot;, _
+			fsPrefixZeroes(second(now),2)), _
+			&quot;&quot;)
 end function
 
 
@@ -4121,6 +4131,7 @@ function fsProgramDirectoryx86() as string
 		fsProgramDirectoryx86=&quot;/usr/bin/&quot;
 	end if
 end function
+
 
 function fsLamePath()
   dim s1
@@ -6466,17 +6477,17 @@ function fsGetTopicSentence(_
 			s1 = &quot;&quot;
 		elseif instr(sA, &quot;. &quot;) &gt; 0 then
 			a1 = split(sA, &quot;.&quot;)
-			s1 = fsQuickTitle(100, 200, a1(lbound(a1)) &amp; &quot;.&quot;
+			s1 = fsQuickTitle(100, 200, a1(lbound(a1)) &amp; &quot;.&quot;)
 		elseif instr(sA, &quot;? &quot;) &gt; 0 then
 			a1 = split(sA, &quot;?&quot;)
-			s1 = fsQuickTitle(100, 200, a1(lbound(a1)) &amp; &quot;?&quot;
+			s1 = fsQuickTitle(100, 200, a1(lbound(a1)) &amp; &quot;?&quot;)
 		elseif instr(sA, &quot;! &quot;) &gt; 0 then
 			a1 = split(sA, &quot;!&quot;)
-			s1 = fsQuickTitle(100, 200, a1(lbound(a1)) &amp; &quot;!&quot;
+			s1 = fsQuickTitle(100, 200, a1(lbound(a1)) &amp; &quot;!&quot;)
 		elseif instr(sA, &quot;?&quot;) &gt; 0 then
 			&apos; IDEOGRAPHIC FULL STOP (Asian period symbol)
 			a1 = split(sA, &quot;?&quot;)
-			s1 = fsQuickTitle(100, 200, a1(lbound(a1)) &amp; &quot;?&quot;		
+			s1 = fsQuickTitle(100, 200, a1(lbound(a1)) &amp; &quot;?&quot;)	
 		else
 			s1 = &quot;&quot;					
 		end if
@@ -7044,7 +7055,7 @@ Sub addTextToSlide(_
 		end if
 		oShape.CharHeight = lhigh / 875
 		oShape.CharFontName = &quot;DejaVu Sans Mono;Liberation Mono;Droid Sans Mono;Menlo Regular;Courier New;Courier;Monospace;Microsoft Sans Serif&quot;
-		oShape.setString(mid(sA, 2, len(sA) - 2)
+		oShape.setString(mid(sA, 2, len(sA) - 2))
 	elseif (left(sA, 4)) = string(4, &quot; &quot;)  or sStyle = &quot;pre&quot; then
 		&apos; Code listing - preserve indents (very small)
 		s1 = fsTrimSpecial(s1, &quot;`&quot;)	
@@ -7072,7 +7083,7 @@ Sub addTextToSlide(_
 	
 	&apos;###Colors or posture
 
-	s2 = trim(fsTrimSpecial(sA, &quot; &gt;#&quot; &amp; chr(8207) &amp; chr(8206))
+	s2 = trim(fsTrimSpecial(sA, &quot; &gt;#&quot; &amp; chr(8207) &amp; chr(8206)))
 	s1c = fsReplaceText(s1, chr(8207), &quot;&quot;)
 	s1c = fsReplaceText(s1c, chr(8206), &quot;&quot;)
 	if left(s2, 1) = &quot;*&quot; or  left(s2, 1) = &quot;_&quot; then
@@ -7305,7 +7316,7 @@ function fsGetEscapedCode(_
 	end if
 	fsGetEscapedCode = mid(converttourl(sA), 9)
 	if bShowMe then
-		msgbox( sA &amp; chr(10) &amp; chr(10) &amp; fsGetEscapedCode
+		msgbox( sA &amp; chr(10) &amp; chr(10) &amp; fsGetEscapedCode)
 	end if
 end function
 
