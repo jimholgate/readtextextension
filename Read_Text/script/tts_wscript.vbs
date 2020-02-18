@@ -61,27 +61,15 @@
 ''
 '' ## Audacity
 ''
-'' [Audacity](https://sourceforge.net/projects/audacity/) is a free cross platform audio editor. It can
+'' [Audacity](https://www.audacityteam.org/download/) is a free cross platform audio editor. It can
 '' use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.
 ''
 '' ### FFmpeg for Audacity
 ''
-'' Windows security policies may prevent you from installing the Audacity FFmpeg converter
-'' library using the `ffmpeg-win-2.2.2.exe` installer.  You can install the FFmpeg library
-'' by downloading the `ffmpeg-win-2.2.2.zip` archive and copying the contents to a
-'' directory that is available to all users.
+'' The audacity team does not bundle the ffmpeg converter with the Audacity sound editor program.
+'' You can find installation instructions for the ffmpeg audacity library on the [Audacity team 
+'' wiki](https://manual.audacityteam.org/man/installing_ffmpeg_for_windows.html).
 ''
-'' 1. Log in with an administrator account.
-'' 2. Go to the [MP3 for Audacity page](https://lame.buanzo.org/#lamewindl).
-'' 3. Directly underneath "For FFmpeg/LAME on Windows click below:", left-click the link
-''   `ffmpeg-win-2.2.2.zip` and save the file anywhere on your computer.
-'' 4. Double-click `ffmpeg-win-2.2.2.zip` to open the archive.
-'' 5. If the directory `C:\opt` doesn't exist, create it. Copy the contents of the zip
-''    file to `C:\opt`.
-'' 6. Any user can now set up Audacity to use ffmpeg by opening Audacity, then setting
-''    *Edit - Preferences... - Libraries - FFmpeg library* to `C:\opt`.
-'' 7. Read text extension now shows .mp3 and .ogg formats as export options.
-'' 8. You can use Audacity to add music or special effects to your sound files.
 ''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
@@ -98,9 +86,9 @@
 ''
 '' ## iTunes
 ''
-'' **iTunes** is a visual music manager from Apple available at no cost.
-''
-'' Use [iTunes](https://www.apple.com/itunes/) to convert sound files with metadata
+'' **iTunes** is a visual music manager from Apple available at no cost. Some versions
+'' of iTunes allow you to convert sound to different formats. With these versions, you
+'' can use [iTunes](https://www.apple.com/itunes/) to convert sound files with metadata
 '' and album cover art. The first time you use it, iTunes takes a few moments to start.
 '' iTunes creates the audio file in it's own directory and signals you with a sound.
 '' Read Text Extension puts a copy in a sound directory in your home directory.
@@ -117,7 +105,7 @@
 '' Use `lame.exe` to make an mp3 compatible file.
 ''
 ''  * Install `lame.exe` in `C:\opt\`
-''  * [Lame encoder](http://www.rarewares.org/mp3-lame-bundle.php)
+''  * [Lame encoder](https://lame.sourceforge.io/links.php#Binaries)
 ''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 ''
@@ -134,7 +122,7 @@
 '' Use `oggenc.exe` or `oggenc2.exe` to make an ogg file
 ''
 ''  * The ogg converter program must be installed in `C:\opt\`.
-''  * [oggenc2 encoder](http://www.rarewares.org/ogg-oggenc.php)
+''  * [oggenc2 encoder](https://www.rarewares.org/ogg-oggenc.php)
 ''  * [Players and plugins](https://xiph.org/vorbis/)
 ''
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
@@ -143,7 +131,7 @@
 ''
 '' [Read Text Extension](https://sites.google.com/site/readtextextension/)
 ''
-'' Copyright � 2011 - 2018 James Holgate
+'' Copyright � 2011 - 2020 James Holgate
 '''
 Const ForReading = 1
 Const ForWriting = 3
