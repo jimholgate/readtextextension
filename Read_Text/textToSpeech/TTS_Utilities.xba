@@ -1953,6 +1953,34 @@ function fspyOutOptions(_
 end function
 
 
+function fsAppImageResourcePath(_
+		optional sApp as string)
+	&apos; Linux AppImage installations use a specific version of python
+	&apos; running in a temporary mounted directory. 
+    if IsMissing(sApp) then
+        sApp = &quot;python&quot;
+    end if
+	dim i# : i = 0
+	dim s1$ : s1 = ConvertFromURL(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
+
+	fsAppImageResourcePath = &quot;&quot;
+	if (instr(s1, &quot;/tmp/.mount_&quot;) = 1) then
+		for i = 1 to 5
+			fsAppImageResourcePath = fsAppImageResourcePath &amp; &quot;/&quot; &amp; Split(s1, &quot;/&quot;)(i)
+		next
+		fsAppImageResourcePath = fsAppImageResourcePath &amp; &quot;/&quot; &amp; sApp
+	    if not FileExists(fsAppImageResourcePath) then
+	        fsAppImageResourcePath = &quot;&quot;
+	    end if
+    end If
+end function
+
+sub x
+
+	print fsAppImageResourcePath(&quot;python&quot;)
+end sub
+
+
 function AppleScriptPath() as string
 	AppleScriptPath=&quot;/usr/bin/osascript&quot;
 end function

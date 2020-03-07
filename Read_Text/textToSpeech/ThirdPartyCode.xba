@@ -87,7 +87,9 @@ function fvTts_config_createDefaultConfig(_
 		config(fiSmartSelectCheckBox)=0
 		config(fiHtmlComboURL)=&quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
 		if fsGetOS()=&quot;UNIX&quot; then &apos; Linux
-			if fileexists(&quot;/usr/bin/python3&quot;) then
+			if len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 then
+				config(fiExternalProgramPath) = fsAppImageResourcePath(&quot;python&quot;)
+			elseif fileexists(&quot;/usr/bin/python3&quot;) then
 				config(fiExternalProgramPath)=&quot;/usr/bin/python3&quot;
 			elseif fileexists(&quot;/usr/bin/python2.7&quot;) then
 				config(fiExternalProgramPath)=&quot;/usr/bin/python2.7&quot;
@@ -247,8 +249,13 @@ sub tts_config_parseFile(_
 				config(fiExternalOption)=fbTts_util_stringToBoolean(value)
 
 			case fsKeyESPEAK_PATH_STRING
-				config(fiExternalProgramPath)=value
-
+				if len(fsAppImageResourcePath(&quot;python&quot;)) = 0 then
+					config(fiExternalProgramPath)=value
+				elseif (instr(value, &quot;/python&quot;) &lt;&gt; 0) then
+					&apos; The AppImage program instance needs to update the temporary
+					&apos; location of the included python version.
+					config(fiExternalProgramPath) = fsAppImageResourcePath(&quot;python&quot;)
+				end if
 			case fsKeyESPEAK_COMMANDS_STRING
 				config(fiExternalCommand)=value
 
