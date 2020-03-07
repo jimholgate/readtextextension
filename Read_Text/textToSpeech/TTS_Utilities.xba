@@ -1975,11 +1975,6 @@ function fsAppImageResourcePath(_
     end If
 end function
 
-sub x
-
-	print fsAppImageResourcePath(&quot;python&quot;)
-end sub
-
 
 function AppleScriptPath() as string
 	AppleScriptPath=&quot;/usr/bin/osascript&quot;
