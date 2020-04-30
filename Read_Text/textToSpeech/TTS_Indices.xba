@@ -214,7 +214,7 @@ function _(_
 		&apos; Reverse translation
 		for i = 0 to ubound(mMyTranslationStr)
 			if mMyTranslationStr(i,0)=msgid then 
-				 trad=mMyTranslationId(i)
+				 trad = mMyTranslationId(i)
 				exit for 
 			end if 
 		next i
@@ -236,7 +236,7 @@ function _(_
 		if trad=&quot;&quot; then trad=msgid
 	end if
 	&apos; Convert escaped quotes and remove unescaped quotes.
-	trad = fsReplaceText(trad, &quot;\&quot;&quot;&quot;, &quot;\&amp;dblquot;&quot;
+	trad = fsReplaceText(trad, &quot;\&quot;&quot;&quot;, &quot;\&amp;dblquot;&quot;)
 	trad = fsReplaceText(trad, &quot;&quot;&quot;&quot;, &quot;&quot;)
 	trad = fsReplaceText(trad, &quot;\&amp;dblquot;&quot;, &quot;&quot;&quot;&quot;)
 	_=trad 
@@ -248,19 +248,19 @@ function fbTranslateTable(_
 		cntMsg, _
 		sMyTranslationType, _
 		nbPlural)
-	dim a1
+	dim s1$ : s1 = &quot;&quot;
 	fbTranslateTable = False
 	on error goto fbTranslateTableErr
 	if message=&quot;&quot; then exit function
 	if sMyTranslationType=&quot;id&quot; then 
-		a1=mMyTranslationId(cntMsg)+message
-		mMyTranslationId(cntMsg) = a1
+		s1 = Join(Array(mMyTranslationId(cntMsg), message), &quot;&quot;)
+		mMyTranslationId(cntMsg) = s1
 	elseif sMyTranslationType=&quot;idPlur&quot; then 
-		a1=mMyTranslationIdPlur(cntMsg)+message 
-		mMyTranslationIdPlur(cntMsg) = a1
+		s1 = Join(Array(mMyTranslationIdPlur(cntMsg), message), &quot;&quot;)
+		mMyTranslationIdPlur(cntMsg) = s1
 	elseif sMyTranslationType=&quot;str&quot; then 
-		a1 = mMyTranslationStr(cntMsg,nbPlural)+message
-		mMyTranslationStr(cntMsg,nbPlural) = a1 
+		s1 = Join(Array(mMyTranslationStr(cntMsg,nbPlural), message), &quot;&quot;)
+		mMyTranslationStr(cntMsg,nbPlural) = s1 
 	end if
 	fbTranslateTable = True
 	exit function
@@ -1609,7 +1609,7 @@ sub debugFsLookUpTerm()
 			&quot;Debug&quot;, fsDisplayLanguage())) &amp; _
 			&quot;\n\nshould be the string for &quot; &amp; _
 			s1 &amp; _
-			&quot; in your language.&quot;)
+			&quot; in your language.&quot;))
 end sub
 
 </script:module>
