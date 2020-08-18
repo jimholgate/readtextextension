@@ -316,8 +316,8 @@ end function
 
 sub aboutReadTextDialog()
 	&apos; In LibreOffice 7x for MacOS, go to the web for help because displaying
-	&apos; a dialog from another dialog might crash LibreOffice. Ohterwise, show
-	&apos; a dialog with version, command line and script information
+	&apos; a dialog from another dialog might crash LibreOffice. Otherwise, show
+	&apos; a dialog with version, command line and script information.
 	select case fsGetOS()
 	case &quot;OSX&quot;
 		select case lcase(fsGetSetting(&quot;ooName&quot;))
