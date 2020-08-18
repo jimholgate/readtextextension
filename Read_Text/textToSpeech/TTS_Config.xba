@@ -315,8 +315,20 @@ end function
 
 
 sub aboutReadTextDialog()
+	&apos; In LibreOffice 7x for MacOS, go to the web for help because displaying
+	&apos; a dialog from another dialog might crash LibreOffice. Ohterwise, show
+	&apos; a dialog with version, command line and script information
+	select case fsGetOS()
+	case &quot;OSX&quot;
+		select case lcase(fsGetSetting(&quot;ooName&quot;))
+		case &quot;libreoffice&quot;, &quot;libreofficedev&quot;
+			if GetSolarVersion &gt; 69999 then
+				WebHelp()
+				exit sub
+			end if
+		end select
+	end select
 	dim config(fiCountConfigOptions) as variant
-	
 	config()=fvCurrentDialogConfig()
 	AboutAddOn(config(), &quot;&quot;)
 end sub
