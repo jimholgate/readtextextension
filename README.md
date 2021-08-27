@@ -42,4 +42,4 @@ Read Text Extension uses an external program or a web service to read text. Read
 [5]: https://www.youtube.com/watch?v=OCARVoZqC-s
 [6]: https://sites.google.com/site/readtextextension/
 [7]: https://github.com/jimholgate/readtextextension/
-[8]: https://help.libreoffice.org/Common/Accessibility_in
+[8]: https://help.libreoffice.org/7.2/en-US/text/shared/guide/accessibility.html?DbPAR=SHARED
