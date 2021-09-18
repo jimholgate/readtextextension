@@ -2045,10 +2045,10 @@ sub resetSpeech()
 		fsMyTempLock(&quot;lock.album&quot;) &amp; CR &amp; _
 		fsMyTempLock(&quot;lock.genre&quot;) &amp; CR &amp; _
 		fsMyTempLock(&quot;lock.track&quot;) &amp; CR &amp; _
-		fsFullPathOf(fsFestivalScriptName) &amp; CR &amp; _
-		fsFullPathOf(fsTemporaryTextDoc) &amp; CR &amp; _
-		fsFullPathOf(fsTemporaryTextDoc) &amp; &quot;.sable&quot; &amp; CR &amp; _
-		fsFullPathOf(fsTemporaryTtsAppleScript)
+		fsFullPathOf(fsFestivalScriptName()) &amp; CR &amp; _
+		fsTemporaryTextDoc() &amp; CR &amp; _
+		fsTemporaryTextDoc() &amp; &quot;.sable&quot; &amp; CR &amp; _
+		fsTemporaryTtsAppleScript()
 	a1 = split(aFile, CR)
 	for n = lbound(a1) to ubound(a1)
 		if fileexists(a1(n)) then
@@ -2189,7 +2189,7 @@ sub writeSpeech(_
 	if ismissing(bforceISO885915) then
 		bforceISO885915 = False
 	end if
-	bFile=fsFullPathOf(fsTemporaryTextDoc)
+	bFile=fsTemporaryTextDoc()
 	if(bforceISO885915) then
  		fbCreateFile(bFile, sA, &quot;iso-8859-15&quot;)
  	else
@@ -2698,67 +2698,67 @@ function replaceLocalTokensWithStr(_
 		sB=fsGetTextSelection(False, False)
 		&apos;Temporary file name
 		sFind=&quot;(TMP)&quot;
-		sReplace=ConvertFromURL(fsFullPathOf(fsTemporaryTextDoc))
+		sReplace=ConvertFromURL(fsTemporaryTextDoc())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(TTS_WSCRIPT_VBS)&quot;
-		sReplace=ConvertFromURL(fsTTSScriptVBS)
+		sReplace=ConvertFromURL(fsTTSScriptVBS())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(SPD_READ_TEXT_PY)&quot;
-		sReplace=ConvertFromURL(fsPythonSpdDoc)
+		sReplace=ConvertFromURL(fsPythonSpdDoc())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(PICO_READ_TEXT_PY)&quot;
-		sReplace=ConvertFromURL(fsPythonPicoDoc)
+		sReplace=ConvertFromURL(fsPythonPicoDoc())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(ESPEAK_READ_TEXT_PY)&quot;
-		sReplace=ConvertFromURL(fsPythonEspeakDoc)
+		sReplace=ConvertFromURL(fsPythonEspeakDoc())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(FESTIVAL_READ_TEXT_PY)&quot;
-		sReplace=ConvertFromURL(fsPythonFestivalDoc)
+		sReplace=ConvertFromURL(fsPythonFestivalDoc())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(PYTTSX_READ_TEXT_PY)&quot;
-		sReplace=ConvertFromURL(fsPythonPyttsxDoc)
+		sReplace=ConvertFromURL(fsPythonPyttsxDoc())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(OS_PY)&quot;
-		sReplace=ConvertFromURL(fsPythonOSDoc)
+		sReplace=ConvertFromURL(fsPythonOSDoc())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(SAY_APPLESCRIPT)&quot;
-		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript)
+		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;
-		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript)
+		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(SAY_APPLESCRIPT_QUICKLY)&quot;
-		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript)
+		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(SAY_APPLESCRIPT_AIRPLAY)&quot;
-		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript)
+		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(SAY_APPLESCRIPT_AIRPLAY_SLOWLY)&quot;
-		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript)
+		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(SAY_APPLESCRIPT_AIRPLAY_QUICKLY)&quot;
-		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript)
+		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;
-		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript)
+		sReplace=ConvertFromURL(fsTemporaryTtsAppleScript())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		sFind=&quot;(CREATE_QR_LABEL_PY)&quot;
-		sReplace=ConvertFromURL(fsPythonCreateQR)
+		sReplace=ConvertFromURL(fsPythonCreateQR())
 		sA=fsReplaceText(sA,sFind,sReplace)
 
 		&apos;Work directory also known As My Documents or home
@@ -4518,6 +4518,7 @@ function fsAboutAbilityToolsApple()
 end function
 
 
+
 function fswriteOSXSpeechScript(_
 		byval sArguments, _
 		byval sArgLangLocale, _
@@ -4526,45 +4527,26 @@ function fswriteOSXSpeechScript(_
 	&apos; Writes an osascript to read a sound, or create and convert a sound.
 	&apos; Creates a lock file to prevent double talk and to silence the speaker
 	&apos; if the button is clicked while the synthesizer is speaking.
-&apos;&apos;
-&apos;&apos; AirPlay
-&apos;&apos; -------
-&apos;&apos;
-&apos;&apos; Airplay is a home or office local network protocol that lets you 
-&apos;&apos; send sound and video wirelessly.  In Windows, it is used in the
-&apos;&apos; Apple iTunes application.  Android can use Airplay with several apps
-&apos;&apos; including Reflector.
-&apos;&apos;
-&apos;&apos; Airplay is native to Apple platforms.  On desktop computers using OSX,
-&apos;&apos; you can use Airplay to broadcast your screen and sound using the
-&apos;&apos; Airplay icon at the top of the screen.
-&apos;&apos;
-&apos;&apos; With the Read Text AirPlay option for OSX you can the audio output of  
-&apos;&apos; the speech synthesizer to a compatible player without sharing
-&apos;&apos; your desktop screen. 
-&apos;&apos;
-&apos;&apos;      &quot;(SAY_APPLESCRIPT_AIRPLAY)&quot; 
-&apos;&apos; 
-&apos;&apos; Problems?  Make sure that the device and amplifier are turned on.
-&apos;&apos; if the AirPlay device is playing another program, then using the speak 
-&apos;&apos; program will interrupt the program.
-&apos;&apos; 
-&apos;&apos; [Troubleshooting AirPlay](https://support.apple.com/en-us/HT203822)  
-&apos;&apos; [Troubleshooting Apple TV](https://support.apple.com/en-us/HT200197)  
-&apos;&apos; 
-
-	dim sLang, sLangLocale, sBaseCountry, sLyrics, sTitle as string
-	dim CR, sA, sB, sF, sFile, sEncoding, sSize, sMeta, sBNative as string
-	dim sLongTrack as String
-	dim n as integer
-	dim nMinLength as integer
-	dim s1 as string
-	dim s2 as string
-	dim errorCode
-	dim bGotFFmpeg as boolean
-	
+  
 	fswriteOSXSpeechScript = &quot;&quot;
-	sFile=fsTemporaryTtsAppleScript
+    dim bGotFFmpeg as boolean : bGotFFmpeg = fbHaveFfmpeg()
+    dim CR$ : CR = chr(13)
+    dim n as integer : n = 0
+    dim s1 as string : s1 = &quot;&quot;
+    dim s2 as string : s2 = &quot;&quot;
+    dim sA$ : sA = &quot;&quot;
+    dim sB$ : sB = &quot;&quot;
+    dim sBaseCountry$ : sBaseCountry = &quot;&quot;
+    dim sBNative$ : sBNative = &quot;true&quot;
+    dim sF$ : sF = ConvertFromURL(fsTemporaryTextDoc())
+    dim sFile$ : sFile=fsTemporaryTtsAppleScript()
+    dim sLang$ : sLang = &quot;&quot;
+    dim sLangLocale$ : sLangLocale = &quot;&quot;
+    dim sLyrics$ : sLyrics = &quot;&quot;
+    dim sMeta$ : sMeta = &quot;&quot;
+    dim sSize$ : sSize = &quot;&quot;
+    dim sTitle$ : sTitle = &quot;&quot;
+
 	if fileexists(sFile) then
 		kill sFile
 	end if
@@ -4573,525 +4555,669 @@ function fswriteOSXSpeechScript(_
 		&apos; arbitrary script.
 		exit function
 	else
+        &apos; Make sure we have a valid directory
 		CreateFile(sFile, _
 				&quot;-- fswriteOSXSpeechScript: &quot; &amp; _
 				&quot;No actions are defined.&quot;, _
 				&quot;utf-8&quot;)
+        kill sFile
 	end if
-	sLongTrack =  fsPrefixZeroes(trim(str(fiMyCurrentAudioTrack(False))), 3)
-	if ismissing(ArtURL) or _
-			ArtURL = &quot;&quot; or _
-			not(fileexists(ArtURL)) then
-		s1 = trim(convertfromURL(fsPosterImg))
-	else
-		s1 = trim(convertfromURL(ArtURL))
-	end if
+	
+    &apos; We use the system voice if the selected language is the same as the user
+    &apos; interface language. You can choose a specific voice for your primary
+    &apos; working language using the system preferences for speech. Secondary 
+    &apos; languages use voices chosen to match language and region.  We recommend
+    &apos; you install the optional high quality voice for any voice you use
+    &apos; regularly.
 
-	CR = chr(13)
+    if sArgLangLocale = &quot;&quot; then
+        sLangLocale = &quot;&quot;
+    else
+        sLang = fsGetLanguage() &amp; &quot;-&quot; &amp; fsGetCountry()
+        sBaseCountry = mid(sArgLangLocale, instr(sArgLangLocale,&quot;-&quot;)+1)
+        select case sArgLangLocale
+        case &quot;&quot;, sLang, fsGetLanguage() &amp; &quot;-&quot; &amp; sBaseCountry
+            sLangLocale = &quot;&quot;
+        case else
+            sLangLocale=fsReplaceText(sArgLangLocale,&quot;-&quot;,&quot;_&quot;)
+        end select
+    end if
+    If fileexists(&quot;/Applications/iTunes.app/Contents/version.plist&quot;) then
+            &apos; Legacy music program can generate audio files and playlists
+        if ismissing(ArtURL) or _
+                ArtURL = &quot;&quot; or _
+                not(fileexists(ArtURL)) then
+            s1 = trim(convertfromURL(fsPosterImg))
+        else
+            s1 = trim(convertfromURL(ArtURL))
+        end if
+        
+        &apos; iTunes API on OSX only adds lyrics to M4A sound files
+        if fbCreatingMediaFile(&quot;.m4a&quot;) or not(fsGetOS()=&quot;OSX&quot;) then
+            sLyrics = fsThisSoundLyrics()
+        else
+            sLyrics = &quot;&quot;
+        end if
+        &apos; Check generated  title 
 
-	sLangLocale = &quot;&quot;
-	sBaseCountry = &quot;&quot;
-	bGotFFmpeg = fbHaveFfmpeg
-	&apos; iTunes API on OSX only adds lyrics to M4A sound files
-	if fbCreatingMediaFile(&quot;.m4a&quot;) or not(fsGetOS()=&quot;OSX&quot;) then
-		sLyrics = fsThisSoundLyrics()
-	else
-		sLyrics = &quot;&quot;
-	end if
-	&apos; Check generated  title 
+        if fbCreatingMediaFile(&quot;.3gp,.aac,.aif,.aiff,.au,.avi,.flac,.m4a,&quot; &amp; _
+                &quot;.m4v,.mov,.mkv,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,&quot; &amp; _
+                &quot;.wav,.webm,.wma,.wmv&quot;) and fsGetOS() = &quot;OSX&quot; then
+            sTitle =  fsMyTitleInputBox(true, fsThisSoundTitle())
+            if sTitle = &quot;&quot; then
+                s1 = &quot;-- &quot; &amp; fsNow() &amp; &quot;.  The title is undefined.  &quot; &amp; _
+                        &quot;Did you click &quot;&quot;Cancel&quot;&quot; or leave the title blank?&quot;
+                CreateFile(sFile, _
+                        s1, _
+                        &quot;utf-8&quot;)
+                fswriteOSXSpeechScript = s1 
+                exit function
+            end if
+        else
+            sTitle = fsThisSoundTitle()
+        end if
+        
+        if sLyrics &lt;&gt; &quot;&quot; then
+            &apos; don&apos;t use lyrics if lyrics contain only a
+            &apos; short phrase or a single word.  Deals with
+            &apos; iTunes problem (Track and Lyrics omitted)
+            &apos; Applies to: LibreOffice Version: 4.4.0.3 (OSX)
+            &apos; and Apache OpenOffice AOO411m6(Build:9775) (OSX)
+            sTitle = trim(sTitle)
+            if (instr(sLyrics, &quot; &quot;) &lt; 1 and _
+                    instr(sLyrics, &quot;?&quot;) &lt; 1) or _
+                    len(sLyrics) &lt; 32 then
+                sLyrics = &quot;&quot;
+            end if
+        end if
+    &apos;&apos;
+    &apos;&apos; Graphic sizes
+    &apos;&apos; -------------
+    &apos;&apos;
+    &apos;&apos; Impress presentation software can convert slide images to **.jpeg** or
+    &apos;&apos; **.png** files.  it&apos;s an easy way to add titles to a photo or to
+    &apos;&apos; prepare a picture with a specific size for publication on a blog
+    &apos;&apos; or news site.
+    &apos;&apos;
+    &apos;&apos; When you publish a graphic, it looks best and renders fastest if you
+    &apos;&apos; set it to the exact size needed.  Cameras usually use resolution settings
+    &apos;&apos; that are much larger than needed for viewing on a screen.  The large
+    &apos;&apos; size is required because images are often cropped or straightened.
+    &apos;&apos; On low cost portable devices, these large images may take a long time
+    &apos;&apos; to render or may be distorted.
+    &apos;&apos;
+    &apos;&apos; The [Participatory Culture Foundation][WOSXSS1] published a matrix that
+    &apos;&apos; shows standard screen resolutions as well as resolutions for many
+    &apos;&apos; portable devices.  Here are several popular formats:
+    &apos;&apos; 
+    &apos;&apos; - **1200x800** A classic 35 mm camera format that looks good on a HDMI
+    &apos;&apos;   screen or a full screen MacBook
+    &apos;&apos; - **640x480** VGA projector or NTSC broadcast 4:3
+    &apos;&apos; - **720x576** PAL broadcast
+    &apos;&apos; - **1366x768** Windows laptop 16:9
+    &apos;&apos; - **1280x800** Apple MacBook
+    &apos;&apos; - **1440x900** Apple MacBook Air
+    &apos;&apos; - **1920x1080** 1080p High Def TV 16:9
+    &apos;&apos;
+    &apos;&apos; Some media players will distort album cover art if it is not square.
+    &apos;&apos;
+    &apos;&apos; - **600x600** Small square format for audio players
+    &apos;&apos;
+    &apos;&apos; [WOSXSS1]: https://web.archive.org/web/20160526113720/http://develop.participatoryculture.org/index.php/ConversionMatrix
+    &apos;&apos;
+        sSize = &quot;600x600&quot; &apos; Small square format for audio players
 
-	if fbCreatingMediaFile(&quot;.3gp,.aac,.aif,.aiff,.au,.avi,.flac,.m4a,&quot; &amp; _
-			&quot;.m4v,.mov,.mkv,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,&quot; &amp; _
-			&quot;.wav,.webm,.wma,.wmv&quot;) and fsGetOS() = &quot;OSX&quot; then
-		sTitle =  fsMyTitleInputBox(true, fsThisSoundTitle())
-		if sTitle = &quot;&quot; then
-			sFile=fsTemporaryTtsAppleScript
-			s1 = &quot;-- &quot; &amp; fsNow() &amp; &quot;.  The title is undefined.  &quot; &amp; _
-					&quot;Did you click &quot;&quot;Cancel&quot;&quot; or leave the title blank?&quot;
-			CreateFile(sFile, _
-					s1, _
-					&quot;utf-8&quot;)
-			fswriteOSXSpeechScript = s1 
-			exit function
-		end if
-	else
-		sTitle = fsThisSoundTitle()
-	end if
-	 
-	if sLyrics &lt;&gt; &quot;&quot; then
-		&apos; don&apos;t use lyrics if lyrics contain only a
-		&apos; short phrase or a single word.  Deals with
-		&apos; iTunes problem (Track and Lyrics omitted)
-		&apos; Applies to: LibreOffice Version: 4.4.0.3 (OSX)
-		&apos; and Apache OpenOffice AOO411m6(Build:9775) (OSX)
-		sTitle = trim(sTitle)
-		if (instr(sLyrics, &quot; &quot;) &lt; 1 and _
-				instr(sLyrics, &quot;?&quot;) &lt; 1) or _
-				len(sLyrics) &lt; 32 then
-			sLyrics = &quot;&quot;
-		end if
-	end if
-&apos;&apos;
-&apos;&apos; Graphic sizes
-&apos;&apos; -------------
-&apos;&apos;
-&apos;&apos; Impress presentation software can convert slide images to **.jpeg** or
-&apos;&apos; **.png** files.  it&apos;s an easy way to add titles to a photo or to
-&apos;&apos; prepare a picture with a specific size for publication on a blog
-&apos;&apos; or news site.
-&apos;&apos;
-&apos;&apos; When you publish a graphic, it looks best and renders fastest if you
-&apos;&apos; set it to the exact size needed.  Cameras usually use resolution settings
-&apos;&apos; that are much larger than needed for viewing on a screen.  The large
-&apos;&apos; size is required because images are often cropped or straightened.
-&apos;&apos; On low cost portable devices, these large images may take a long time
-&apos;&apos; to render or may be distorted.
-&apos;&apos;
-&apos;&apos; The [Participatory Culture Foundation][WOSXSS1] published a matrix that
-&apos;&apos; shows standard screen resolutions as well as resolutions for many
-&apos;&apos; portable devices.  Here are several popular formats:
-&apos;&apos; 
-&apos;&apos; - **1200x800** A classic 35 mm camera format that looks good on a HDMI
-&apos;&apos;   screen or a full screen MacBook
-&apos;&apos; - **640x480** VGA projector or NTSC broadcast 4:3
-&apos;&apos; - **720x576** PAL broadcast
-&apos;&apos; - **1366x768** Windows laptop 16:9
-&apos;&apos; - **1280x800** Apple MacBook
-&apos;&apos; - **1440x900** Apple MacBook Air
-&apos;&apos; - **1920x1080** 1080p High Def TV 16:9
-&apos;&apos;
-&apos;&apos; Some media players will distort album cover art if it is not square.
-&apos;&apos;
-&apos;&apos; - **600x600** Small square format for audio players
-&apos;&apos;
-&apos;&apos; [WOSXSS1]: https://web.archive.org/web/20160526113720/http://develop.participatoryculture.org/index.php/ConversionMatrix
-&apos;&apos;
-	sSize = &quot;600x600&quot; &apos; Small square format for audio players
+        if fbCreatingOsxType1Media then
+            sBNative = &quot;true&quot;
+        else
+            sBNative = &quot;False&quot;
+        end if
+        &apos; Some or all metadata information may be ignored, depending on output format
+        &apos; m4a format can include lyrics.
+        &apos;
+        &apos; M4A - album, artist, genre, language, lyrics, title, track and year plus more.
+        &apos; MP3 - album, artist, genre, language, title, track and year
+        &apos; OGA - album, artist, genre, language, title, track and year
+        sMeta = Join(_
+                Array(_
+                &quot; -metadata album=&quot;&quot; &amp; (quoted form of sAlbum) &amp; &quot;&quot;&quot;,  _
+                &quot; -metadata artist=&quot;&quot; &amp; (quoted form of sArtist) &amp; &quot;&quot;&quot;,  _
+                &quot; -metadata genre=&quot;&quot; &amp; (quoted form of sGenre) &amp; &quot;&quot;&quot;,  _
+                &quot; -metadata language=&quot;&quot; &amp; (quoted form of myLang) &amp; &quot;&quot;&quot;,  _
+                &quot; -metadata title=&quot;&quot; &amp; (quoted form of sTitle) &amp; &quot;&quot;&quot;,  _
+                &quot; -metadata track=&quot;&quot; &amp; (quoted form of sTrack) &amp; &quot;&quot;&quot;,  _
+                &quot; -metadata year=&quot;&quot; &amp; (quoted form of sYear) &amp; &quot;&quot; &quot;&quot;&quot;), _
+                &quot;&quot;)
 
-	if fbCreatingOsxType1Media then
-		sBNative = &quot;true&quot;
-	else
-		sBNative = &quot;False&quot;
-	end if
-	&apos; Some or all metadata information may be ignored, depending on output format
-	&apos; m4a format can include lyrics.
-	&apos;
-	&apos; M4A - album, artist, genre, language, lyrics, title, track and year plus more.
-	&apos; MP3 - album, artist, genre, language, title, track and year
-	&apos; OGA - album, artist, genre, language, title, track and year
-	sMeta = Join(_
+        sA = &quot;(*&quot; &amp; CR &amp; fsAboutAbilityToolsApple &amp; CR &amp; &quot;*)&quot; &amp; CR
+        if len(sArguments) &lt;&gt; 0 then
+            if instr(sArguments, &quot;AirPlay&quot;) &lt;&gt; 0 then
+                sA = Join(_
+                        Array(_
+                        &quot;(*&quot;, _
+                        &quot;AirPlay&quot;, _
+                        &quot;=======&quot;, _
+                        &quot;&quot;, _
+                        &quot;     &quot;&quot;(SAY_APPLESCRIPT_AIRPLAY)&quot;&quot;&quot; , _
+                        &quot;&quot;, _
+                        &quot;The AirPlay option lets you send the audio output of your computer&apos;s &quot; &amp; _
+                        &quot;speech synthesizer to a compatible player without sharing your desktop screen. &quot;, _
+                        &quot;&quot;, _
+                        &quot;Make sure that your AirPlay monitor is on and that your computer is &quot; &amp; _
+                        &quot;set to use the *correct* AirPlay device. Check the AirPlay device &quot; &amp; _
+                        &quot;by clicking the *AirPlay* monitor icon on your computer&apos;s menu bar.&quot;, _
+                        &quot;&quot;, _
+                        &quot;Online help&quot;, _
+                        &quot;-----------&quot;, _
+                        &quot;&quot;, _
+                        &quot;[Troubleshooting AirPlay](https://support.apple.com/en-us/HT203822)  &quot;, _
+                        &quot;[Troubleshooting Apple TV](https://support.apple.com/en-us/HT200197)  &quot;, _
+                        &quot;&quot;, _
+                        &quot;*)&quot;, _
+                        &quot;&quot;), _
+                        CR)
+            end if
+        end if
+        sF = ConvertFromURL(fsTemporaryTextDoc())
+
+        sB = Join(Array(&quot;#/usr/bin/osascript&quot;, _
+                sA &amp; _
+                &quot;-- ------------------------------------------------------&quot;, _
+                &quot;-- Read Text Extension created this script&quot;, _
+                &quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; &quot; &amp; fsNow, _
+                &quot;-- ------------------------------------------------------&quot;, _
+                &quot;on run (arguments)&quot;, _
+                &quot;	set argv1 to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set argv2 to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set argv3 to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set astring to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set b to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set bPostPlay to &quot; &amp; sBNative, _
+                &quot;	set c to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set cout1 to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set cout2 to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set defaultImg to &quot;&quot;&quot; &amp; s1 &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set defaultSize to &quot;&quot;&quot; &amp; sSize &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set doPostProcess to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set doPostProcess2 to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set err1 to &quot;&quot;Apple Script&quot;&quot;&quot;, _
+                &quot;	set ffMeta to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set myConverter to &quot;&quot;&quot; &amp; fsMyFfmpeg() &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; fsMyTempLock() &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set myOption to &quot;&quot;&quot; &amp; sArguments &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set mySys to &quot;&quot;&quot; &amp; fsGetOS() &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set myURL to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set sGenre to &quot;&quot;&quot; &amp; fsThisDocGenre() &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set sImageURL to defaultImg&quot;, _
+                &quot;	set sTrack to &quot;&quot;&quot; &amp; fiMyCurrentAudioTrack(False) &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set sYear to &quot;&quot;&quot; &amp; year(now) &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set textFile to &quot;&quot;&quot; &amp; sF &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set sAlbum to &quot;&quot;&quot; &amp; fsThisDocTitle() &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set sArtist to &quot;&quot;&quot; &amp; fsThisDocAuthor() &amp; &quot;&quot;&quot;&quot;, _
+                &quot;	set sTitle to &quot;&quot;&quot; &amp; sTitle &amp; string(2, chr(0)) &amp; &quot;&quot;&quot;&quot; &amp; _
+                &quot; -- Title of the selected text.&quot; &amp; _
+                &quot; Check the title if it is Asian or Complex.&quot;, _
+                &quot;	set myVoice to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	set sLyrics to &quot;&quot;&quot; &amp; sLyrics &amp; &quot;&quot;&quot;&quot;, _
+                &quot;-- ------------------------------------------------------&quot;, _
+                &quot;	set b to (do shell script &quot;&quot;touch &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+                &quot;	try&quot;, _
+                &quot;		set argv1 to (item 1 of arguments)&quot;, _
+                &quot;		set astring to fsChangecase(getExtension(argv1),&quot;&quot;lower&quot;&quot;)&quot;, _
+                &quot;	on error&quot;, _
+                &quot;		set argv1 to &quot;&quot;&quot;&quot;&quot;, _
+                &quot;	end try&quot;, _
+                &quot;	try&quot;, _
+                &quot;		set argv2 to (item 2 of arguments)&quot;, _
+                &quot;	on error&quot;, _
+                &quot;		set argv2 to defaultImg&quot;, _
+                &quot;	end try&quot;, _
+                &quot;	try&quot;, _
+                &quot;		set argv3 to (item 3 of arguments)&quot;, _
+                &quot;	on error&quot;, _
+                &quot;		set argv3 to defaultSize&quot;, _
+                &quot;	end try&quot;, _
+                &quot;	if astring is &quot;&quot;aif&quot;&quot; or astring is &quot;&quot;aiff&quot;&quot; then&quot;, _
+                &quot;		set doPostProcess to &quot;&quot;tag&quot;&quot;&quot;, _
+                &quot;	else if astring is &quot;&quot;m4a&quot;&quot; then&quot;, _
+                &quot;		set doPostProcess to &quot;&quot;tag&quot;&quot;&quot;, _
+                &quot;&quot;), _
+                CR)
+
+            if bGotFFmpeg then
+                sB = sB &amp; Join(Array(&quot;	else if myConverter is not &quot;&quot;&quot;&quot; then&quot;, _
+                        &quot;		-- add ffmpeg metadata commands&quot;, _
+                        &quot;		set ffmeta to &quot;&quot;&quot; &amp; sMeta, _
+                        &quot;		if astring is &quot;&quot;mp3&quot;&quot; then&quot;, _
+                        &quot;			set cout1 to argv1&quot;, _
+                        &quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
+                        &quot;			set cout2 to cout1 &amp; &quot;&quot;.mp3&quot;&quot;&quot;, _
+                        &quot;			set err1 to cout2&quot;, _
+                        &quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout2)&quot;, _
+                        &quot;			set doPostProcess2 to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of cout2) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of defaultImg) &amp; &quot;&quot; -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title=\&quot;&quot;Album cover\&quot;&quot; -metadata:s:v comment=\&quot;&quot;Cover (Front)\&quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
+                        &quot;		else if astring is &quot;&quot;ogg&quot;&quot; then&quot;, _
+                        &quot;			set cout1 to argv1&quot;, _
+                        &quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
+                        &quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
+                        &quot;		else if astring is &quot;&quot;wav&quot;&quot; then&quot;, _
+                        &quot;			set cout1 to argv1&quot;, _
+                        &quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
+                        &quot; 			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
+                        &quot;		else if astring is &quot;&quot;webm&quot;&quot; then&quot;, _
+                        &quot;			set cout1 to argv1&quot;, _
+                        &quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
+                        &quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -f image2 -i &quot;&quot; &amp; (quoted form of POSIX path of argv2) &amp; &quot;&quot; -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
+                        &quot;		else if astring is &quot;&quot;mp4&quot;&quot; then&quot;, _
+                        &quot;			set cout1 to argv1&quot;, _
+                        &quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
+                        &quot;			set cout2 to cout1 &amp; &quot;&quot;.webm&quot;&quot;&quot;, _
+                        &quot;			set err1 to cout2&quot;, _
+                        &quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -f image2 -i &quot;&quot; &amp; (quoted form of POSIX path of argv2) &amp; &quot;&quot; -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot; &amp; (quoted form of POSIX path of cout2)&quot;, _
+                        &quot;			set doPostProcess2 to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of cout2) &amp; &quot;&quot; -acodec aac -ab 160k -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libx264 -preset slow -profile:v baseline -level 30 -maxrate 10000000 -bufsize 10000000 -f mp4 -threads 0 -strict experimental &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
+                        &quot;		else&quot;, _
+                        &quot;			set argv1 to &quot;&quot;&quot;&quot;&quot;, _
+                        &quot;		end if&quot;, _
+                        &quot;&quot;), _
+                        CR)
+            end if
+            sB = sB &amp; Join(Array(&quot;	else&quot;, _
+                    &quot;		set argv1 to &quot;&quot;&quot;&quot;&quot;, _
+                    &quot;		set doPostProcess to &quot;&quot;&quot;&quot;&quot;, _
+                    &quot;	end if&quot;, _
+                    &quot;	if myLang is &quot;&quot;&quot;&quot; then&quot;, _
+                    &quot;		set myVoice to &quot;&quot;System&quot;&quot;&quot;, _
+                    &quot;		set myLang to &quot;&quot;Default Language&quot;&quot;&quot;, _
+                    &quot;		set myVoiceCommand to &quot;&quot;&quot;&quot;&quot;, _
+                    &quot;	else&quot;, _
+                    &quot;		set myVoice to fsGetthevoice(myLang)&quot;, _
+                    &quot;		set myVoiceCommand to &quot;&quot; --voice=&apos;&quot;&quot; &amp; myVoice &amp; &quot;&quot;&apos;&quot;&quot;&quot;, _
+                    &quot;	end if&quot;, _
+                    &quot;	try&quot;, _
+                    &quot;		if argv1 is &quot;&quot;&quot;&quot; then&quot;, _
+                    &quot;			set err1 to &quot;&quot;Say command&quot;&quot;&quot;, _
+                    &quot;			if isInString(myOption, &quot;&quot;AirPlay&quot;&quot;) then&quot;, _
+                    &quot;				set err1 to &quot;&quot;AirPlay&quot;&quot;&quot;, _
+                    &quot;				theMsg (&quot;&quot;AirPlay&quot;&quot;, myVoice, myLang, &quot;&quot;Purr&quot;&quot;)&quot;, _
+                    &quot;			end if&quot;, _
+                    &quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot;, _
+                    &quot;		else&quot;, _
+                    &quot;			set err1 to &quot;&quot;Audio file&quot;&quot;&quot;, _
+                    &quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; &quot;&quot; -o &quot;&quot; &amp; argv1 &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot;, _
+                    &quot;			if doPostProcess is not &quot;&quot;&quot;&quot; then&quot;, _
+                    &quot;				if doPostProcess is &quot;&quot;tag&quot;&quot; then&quot;, _
+                    &quot;					set err1 to &quot;&quot;iTunes &quot;&quot; &amp; astring &amp; &quot;&quot; metadata &quot;&quot;&quot;, _
+                    &quot;					set b to setItunesMetaData(argv1, sAlbum, sArtist, sGenre, sImageURL, sTitle, sTrack, sYear, mySys &amp; &quot;&quot; &quot; &amp; _
+                    fsLookUpTerm(&quot;s_speech-synthesis&quot;) &amp; _
+                    &quot; &quot; &amp; chr(8211) &amp; &quot; &quot;&quot; &amp; myVoice &amp; &quot;&quot; (&quot; &amp; _
+                    fsGetSetting(&quot;ooname&quot;) &amp; _
+                    &quot; &quot; &amp; chr(8211) &amp; &quot; &quot; &amp; _
+                    fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
+                    &quot;)&quot;&quot;, sLyrics)&quot;, _
+                    &quot;&quot;), _
+                    CR)
+            if bGotFFmpeg then
+                sB = sB &amp; Join(_
+                        Array(_
+                        &quot;				else&quot;, _
+                        &quot;					set err1 to &quot;&quot;ffmpeg &quot;&quot; &amp; astring &amp; &quot;&quot; encode&quot;&quot;&quot;, _
+                        &quot;					set b to (do shell script doPostProcess)&quot;, _
+                        &quot;					if doPostProcess2 is not &quot;&quot;&quot;&quot; then&quot;, _
+                        &quot;						set err1 to &quot;&quot;ffmpeg [2] &quot;&quot; &amp; astring &amp; &quot;&quot; encode&quot;&quot;&quot;, _
+                        &quot;						set b to (do shell script doPostProcess2)&quot;, _
+                        &quot;						set c to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; cout2 &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+                        &quot;					end if&quot;, _
+                        &quot;					set c to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; argv1 &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+                        &quot;					set argv1 to cout1&quot;, _
+                        &quot;&quot;), _
+                        CR)
+            end if
+            sB = sB &amp; Join(_
+                    Array(_
+                    &quot;				end if&quot;, _
+                    &quot;			end if&quot;, _
+                    &quot;			if bPostplay is true then&quot;, _
+                    &quot;				set d to (do shell script &quot;&quot;open &quot;&quot; &amp; quoted form of (argv1))&quot;, _
+                    &quot;			else&quot;, _
+                    &quot;				theMsg (argv1, myVoice, myLang, &quot;&quot;Purr&quot;&quot;)&quot;, _
+                    &quot;			end if&quot;, _
+                    &quot;		end if&quot;, _
+                    &quot;	on error&quot;, _
+                    &quot;	--	set b to (do shell script &quot;&quot;rm -f &quot;&quot; &amp; argv1)&quot;, _
+                    &quot;		if argv1 is not &quot;&quot;&quot;&quot; then&quot;, _
+                    &quot;			theMsg (err1 &amp; &quot;&quot;: &quot; &amp; fsLookUpTerm(&quot;s_cancel&quot;) &amp; &quot;&quot;&quot;, myVoice, myLang, &quot;&quot;Sosumi&quot;&quot;)&quot;, _
+                    &quot;		end if&quot;, _
+                    &quot;		return doPostProcess2&quot;, _
+                    &quot;		set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+                    &quot;	end try&quot;, _
+                    &quot;	set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+                    &quot;end run&quot;, _
+                    &quot;-- ------------------------------------------------------&quot;, _
+                    &quot;on theMsg(sA, sVoz, myLang, sBeep)&quot;, _
+                    &quot;	try&quot;, _
+                    &quot;		display notification sA with title &quot;&quot;Read Text: &quot;&quot; &amp; sVoz &amp; &quot;&quot; (&quot;&quot; &amp; myLang &amp; &quot;&quot;)&quot;&quot; sound name sBeep&quot;, _
+                    &quot;	end try&quot;, _
+                    &quot;end theMsg&quot;, _
+                    &quot;on getExtension(sA)&quot;, _
+                    &quot;	if sA is &quot;&quot;&quot;&quot; then&quot;, _
+                    &quot;		set a3 to &quot;&quot;&quot;&quot;&quot;, _
+                    &quot;	else&quot;, _
+                    &quot;		set a1 to theSplit(sA, &quot;&quot;.&quot;&quot;)&quot;, _
+                    &quot;		set s1 to the last item of a1&quot;, _
+                    &quot;		set a2 to theSplit(s1, &quot;&quot;&apos;&quot;&quot;)&quot;, _
+                    &quot;		set s2 to first item of a2&quot;, _
+                    &quot;		set a3 to theSplit(s2, &quot;&quot;\&quot;&quot;&quot;&quot;)&quot;, _
+                    &quot;		set s3 to first item of a3&quot;, _
+                    &quot;	end if&quot;, _
+                    &quot;	return a3 as Unicode text&quot;, _
+                    &quot;end getExtension&quot;, _
+                    &quot;on theSplit(theString, theDelimiter)&quot;, _
+                    &quot;	set oldDelimiters to AppleScript&apos;s text item delimiters&quot;, _
+                    &quot;	set AppleScript&apos;s text item delimiters to theDelimiter&quot;, _
+                    &quot;	set theArray to every text item of theString&quot;, _
+                    &quot;	set AppleScript&apos;s text item delimiters to oldDelimiters&quot;, _
+                    &quot;	return theArray&quot;, _
+                    &quot;end theSplit&quot;, _
+                    &quot;on extractVoice(str0)&quot;, _
+                    &quot;	set iIndex to offset of &quot;&quot;  &quot;&quot; in str0&quot;, _
+                    &quot;	return characters 1 thru (iIndex - 1) of str0 as text&quot;, _
+                    &quot;end extractVoice&quot;, _
+                    &quot;on isInString(str0, str1)&quot;, _
+                    &quot;	set retval to true&quot;, _
+                    &quot;	set iIndex to offset of str1 in str0&quot;, _
+                    &quot;	if iIndex is 0 then&quot;, _
+                    &quot;		set retval to False&quot;, _
+                    &quot;	end if&quot;, _
+                    &quot;	return retval&quot;, _
+                    &quot;end isInString&quot;, _
+                    &quot;on fsChangecase ( s1 , s2 )&quot;, _
+                    &quot;	if s2 is &quot;&quot;lower&quot;&quot; then&quot;, _
+                    &quot;		set s3 to &quot;&quot;A-Z a-z&quot;&quot;&quot;, _
+                    &quot;	else&quot;, _
+                    &quot;		set s3 to &quot;&quot;a-z A-Z&quot;&quot;&quot;, _
+                    &quot;	end if&quot;, _
+                    &quot;	set s4 to (do shell script &quot;&quot;echo &quot;&quot; &amp; quoted form of ( s1 ) &amp; &quot;&quot; | tr &quot;&quot; &amp; s3 &amp; &quot;&quot; &quot;&quot;)&quot;, _
+                    &quot;	return s4&quot;, _
+                    &quot;end fsChangecase&quot;, _
+                    &quot;on testTheString(myArray, sLang, sDiv)&quot;, _
+                    &quot;	set retval to &quot;&quot;&quot;&quot;&quot;, _
+                    &quot;	if sDiv is &quot;&quot; &quot;&quot; then&quot;, _
+                    &quot;		set sLang2 to sLang&quot;, _
+                    &quot;	else&quot;, _
+                    &quot;		set iIndex to offset of sDiv in sLang&quot;, _
+                    &quot;		set sLang2 to characters 1 thru (iIndex) of sLang as text&quot;, _
+                    &quot;	end if&quot;, _
+                    &quot;	repeat with theItem in myArray&quot;, _
+                    &quot;		if (isInString(theItem, sLang2)) then&quot;, _
+                    &quot;			set retval to extractVoice(theItem)&quot;, _
+                    &quot;			exit repeat&quot;, _
+                    &quot;		end if&quot;, _
+                    &quot;	end repeat&quot;, _
+                    &quot;	return retval&quot;, _
+                    &quot;end testTheString&quot;, _
+                    &quot;on fsGetthevoice(sLang)&quot;, _
+                    &quot;	try&quot;, _
+                    &quot;		set str0 to (do shell script &quot;&quot;say --voice=&apos;?&apos;&quot;&quot;)&quot;, _
+                    &quot;		set myArray to my theSplit(str0, (ASCII character 13))&quot;, _
+                    &quot;		set retval to testTheString(myArray, sLang, &quot;&quot; &quot;&quot;)&quot;, _
+                    &quot;		if retval is &quot;&quot;&quot;&quot; then&quot;, _
+                    &quot;			set retval to testTheString(myArray, sLang, &quot;&quot;_&quot;&quot;)&quot;, _
+                    &quot;		end if&quot;, _
+                    &quot;		if retval is &quot;&quot;&quot;&quot; then&quot;, _
+                    &quot;			set retval to testTheString(myArray, sLang, &quot;&quot;-&quot;&quot;)&quot;, _
+                    &quot;		end if&quot;, _
+                    &quot;		if retval is &quot;&quot;&quot;&quot; then&quot;, _
+                    &quot;			set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
+                    &quot;		end if&quot;, _
+                    &quot;	on error&quot;, _
+                    &quot;		set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
+                    &quot;	end try&quot;, _
+                    &quot;	if retval is &quot;&quot;Agnes&quot;&quot; or retval is &quot;&quot;Albert&quot;&quot; or retval is &quot;&quot;&quot;&quot; then&quot;, _
+                    &quot;		set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
+                    &quot;	end if&quot;, _
+                    &quot;	return retval&quot;, _
+                    &quot;end fsGetthevoice&quot;, _
+                    &quot;on setItunesMetaData(myURL, sAlbum, sArtist, sGenre, sImageURL, sTitle, sTrack, sYear, sComment, sLyrics)&quot;, _
+                    &quot;	set aFile to POSIX file myURL&quot;, _
+                    &quot;	try&quot;, _
+                    &quot;		set aImage to POSIX file sImageURL&quot;, _
+                    &quot;	end try&quot;, _
+                    &quot;	set currentAlbum to &quot;&quot;&quot;&quot;&quot;, _
+                    &quot;	set sTaggedURL to &quot;&quot;&quot;&quot;&quot;, _
+                    &quot;	set n to 0&quot;, _
+                    &quot;	if length of sLyrics is 0 then&quot;, _
+                    &quot;		delay 0.400&quot;, _
+                    &quot;	else&quot;, _
+                    &quot;		delay 0.250&quot;, _		
+                    &quot;	end if&quot;, _
+                    &quot;	tell application &quot;&quot;iTunes&quot;&quot;&quot;, _
+                    &quot;		set myTune to open (aFile)&quot;, _
+                    &quot;		try&quot;, _
+                    &quot;			set x to CheckiTunesOK()&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;		set str0 to (do shell script &quot;&quot;ls &quot;&quot; &amp; quoted form of sImageURL)&quot;, _
+                    &quot;		repeat while currentAlbum is &quot;&quot;&quot;&quot; and n is less than 10&quot;, _
+                    &quot;		delay 1&quot;, _
+                    &quot;			try&quot;, _
+                    &quot;				set the album of the current track to sAlbum&quot;, _
+                    &quot;				set currentAlbum to the album of the current track&quot;, _
+                    &quot;			end try&quot;, _
+                    &quot;			set n to 1 + n&quot;, _
+                    &quot;		end repeat&quot;, _
+                    &quot;		set theTrack to the current track&quot;, _
+                    &quot;		try&quot;, _
+                    &quot;			set the artist of theTrack to sArtist&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;		try&quot;, _
+                    &quot;			set the genre of theTrack to sGenre&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;		try&quot;, _
+                    &quot;			set the track number of theTrack to sTrack&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;		try&quot;, _
+                    &quot;			set the year of theTrack to sYear&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;		try&quot;, _	
+                    &quot;			set data of artwork 1 of theTrack to (read (file aImage) as picture)&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;		try&quot;, _
+                    &quot;			set the name of theTrack to sTitle&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;		try&quot;, _
+                    &quot;			set sTaggedURL to quoted form of POSIX path of (get location of theTrack)&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;		try&quot;, _
+                    &quot;			set the comment of theTrack to sComment&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;		try&quot;, _
+                    &quot;			set the lyrics of theTrack to sLyrics&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;		try&quot;, _
+                    &quot;			set myURL to quoted form of POSIX path of aFile&quot;, _
+                    &quot;			set str0 to (do shell script &quot;&quot;cp -f &quot;&quot; &amp; sTaggedURL &amp; &quot;&quot; &quot;&quot; &amp; myURL)&quot;, _
+                    &quot;		on error&quot;, _
+                    &quot;			set sTaggedURL to quoted form of myURL&quot;, _
+                    &quot;		end try&quot;, _
+                    &quot;	end tell&quot;, _
+                    &quot;	return sTaggedURL&quot;, _
+                    &quot;end setItunesMetaData&quot;, _
+                    &quot;on readUtf8File(sURL)&quot;, _
+                    &quot;	set x to read POSIX file sURL as &quot; &amp; chr(171) &amp; &quot;class utf8&quot; &amp; chr(187), _
+                    &quot;	return x&quot;, _
+                    &quot;end readUtf8File&quot;, _
+                    &quot;on RemoveLastCharacter(s1)&quot;, _
+                    &quot;	set s4 to (do shell script &quot;&quot;echo &quot;&quot; &amp; quoted form of (s1) &amp; &quot;&quot; | sed &apos;s/.$//&apos;&quot;&quot;)&quot;, _
+                    &quot;	return s4&quot;, _
+                    &quot;end RemoveLastCharacter&quot;, _
+                    &quot;on CheckiTunesOK()&quot;, _
+                    &quot;	-- Pause up to 30 seconds or until iTunes is an active process&quot;, _
+                    &quot;	set b4 to False&quot;, _
+                    &quot;	set n to 0&quot;, _
+                    &quot;	try&quot;, _
+                    &quot;		repeat while b4 is False and n is less than 30&quot;, _
+                    &quot;			set s4 to (do shell script &quot;&quot;ps aux -c&quot;&quot;)&quot;, _
+                    &quot;			-- ignore iTunesHelper&quot;, _
+                    &quot;			set b4 to isInString(s4, &quot;&quot;iTunes&quot;&quot; &amp; (ASCII character 13))&quot;, _
+                    &quot;			set n to 1 + n&quot;, _
+                    &quot;			if b4 is False then&quot;, _
+                    &quot;				delay 1&quot;, _
+                    &quot;			end if&quot;, _
+                    &quot;		end repeat&quot;, _
+                    &quot;	on error&quot;, _
+                    &quot;		set b4 to False&quot;, _
+                    &quot;	end	try&quot;, _
+                    &quot;	return b4&quot;, _
+                    &quot;end CheckiTunesOK&quot;, _
+                    &quot;&quot;), _
+                    CR)
+    else
+        &apos; No iTunes, but we can play the speech synthesis using `say`
+
+        sB = Join(_
 			Array(_
-			&quot; -metadata album=&quot;&quot; &amp; (quoted form of sAlbum) &amp; &quot;&quot;&quot;,  _
-			&quot; -metadata artist=&quot;&quot; &amp; (quoted form of sArtist) &amp; &quot;&quot;&quot;,  _
-			&quot; -metadata genre=&quot;&quot; &amp; (quoted form of sGenre) &amp; &quot;&quot;&quot;,  _
-			&quot; -metadata language=&quot;&quot; &amp; (quoted form of myLang) &amp; &quot;&quot;&quot;,  _
-			&quot; -metadata title=&quot;&quot; &amp; (quoted form of sTitle) &amp; &quot;&quot;&quot;,  _
-			&quot; -metadata track=&quot;&quot; &amp; (quoted form of sTrack) &amp; &quot;&quot;&quot;,  _
-			&quot; -metadata year=&quot;&quot; &amp; (quoted form of sYear) &amp; &quot;&quot; &quot;&quot;&quot;), _
-	 		&quot;&quot;)
-	if fileexists(fsTemporaryTtsAppleScript) then
-		kill fsTemporaryTtsAppleScript
-	end if
-	sA = &quot;(*&quot; &amp; CR &amp; fsAboutAbilityToolsApple &amp; CR &amp; &quot;*)&quot; &amp; CR
-	if len(sArguments) &lt;&gt; 0 then
-		if instr(sArguments, &quot;AirPlay&quot;) &lt;&gt; 0 then
-			sA = Join(_
-					Array(_
-					&quot;(*&quot;, _
-					&quot;AirPlay&quot;, _
-					&quot;=======&quot;, _
-					&quot;&quot;, _
-					&quot;     &quot;&quot;(SAY_APPLESCRIPT_AIRPLAY)&quot;&quot;&quot; , _
-					&quot;&quot;, _
-					&quot;The AirPlay option lets you send the audio output of your computer&apos;s &quot; &amp; _
-					&quot;speech synthesizer to a compatible player without sharing your desktop screen. &quot;, _
-					&quot;&quot;, _
-					&quot;Make sure that your AirPlay monitor is on and that your computer is &quot; &amp; _
-					&quot;set to use the *correct* AirPlay device. Check the AirPlay device &quot; &amp; _
-					&quot;by clicking the *AirPlay* monitor icon on your computer&apos;s menu bar.&quot;, _
-					&quot;&quot;, _
-					&quot;Online help&quot;, _
-					&quot;-----------&quot;, _
-					&quot;&quot;, _
-					&quot;[Troubleshooting AirPlay](https://support.apple.com/en-us/HT203822)  &quot;, _
-					&quot;[Troubleshooting Apple TV](https://support.apple.com/en-us/HT200197)  &quot;, _
-					&quot;&quot;, _
-					&quot;*)&quot;, _
-					&quot;&quot;), _
-	 				CR)
-		end if
-	end if
-	sF = ConvertFromURL(fsFullPathOf(fsTemporaryTextDoc))
-	&apos; We use the system voice if the selected language is the same as the user
-	&apos; interface language. You can choose a specific voice for your primary
-	&apos; working language using the system preferences for speech. Secondary 
-	&apos; languages use voices chosen to match language and region.  We recommend
-	&apos; you install the optional high quality voice for any voice you use
-	&apos; regularly.
-
-	if sArgLangLocale = &quot;&quot; then
-		sLangLocale = &quot;&quot;
-	else
-		sLang = fsGetLanguage() &amp; &quot;-&quot; &amp; fsGetCountry()
-		sBaseCountry = mid(sArgLangLocale, instr(sArgLangLocale,&quot;-&quot;)+1)
-		select case sArgLangLocale
-		case &quot;&quot;, sLang, fsGetLanguage() &amp; &quot;-&quot; &amp; sBaseCountry
-			sLangLocale = &quot;&quot;
-		case else
-			sLangLocale=fsReplaceText(sArgLangLocale,&quot;-&quot;,&quot;_&quot;)
-		end select
-	end if
-	sB = Join(Array(&quot;#/usr/bin/osascript&quot;, _
-			sA &amp; _
-			&quot;-- ------------------------------------------------------&quot;, _
-			&quot;-- Read Text Extension created this script&quot;, _
-			&quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; &quot; &amp; fsNow, _
-			&quot;-- ------------------------------------------------------&quot;, _
+			&quot;#/usr/bin/osascript&quot;, _
+			&quot;(*&quot;, _
+			&quot;Read Text&quot;, _
+			&quot;=========&quot;, _
+			&quot;&quot;, _
+			&quot;Summary&quot;, _
+			&quot;-------&quot;, _
+			&quot;&quot;, _
+			&quot;**Read Text** reads text aloud, saves audio or video files&quot;, _
+			&quot;from text, and can use resources from the web based on the&quot;, _
+			&quot;selected text.&quot;, _
+			&quot;&quot;, _
+			&quot; * Select text.&quot;, _
+			&quot; * Click the *Read selection...* button.&quot;, _
+			&quot; * To read aloud, accept the default in the dialogue, or choose&quot;, _
+			&quot;   another action from the menus.&quot;, _
+			&quot;&quot;, _
+			&quot;### Read Aloud ###&quot;, _
+			&quot;&quot;, _
+			&quot;    &quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;, _
+			&quot;&quot;, _
+			&quot;Features&quot;, _
+			&quot;--------&quot;, _
+			&quot;&quot;, _
+			&quot; * Automatically change languages according to the text language.&quot;, _
+			&quot; * Use web resources to translate, look up, listen, post, or&quot;, _
+			&quot;   interface with web applications.&quot;, _
+			&quot;&quot;, _
+			&quot;Installation&quot;, _
+			&quot;------------&quot;, _
+			&quot;&quot;, _
+			&quot;Get *Read Text* from the download page and install it by double-clicking it.&quot;, _
+			&quot;&quot;, _
+			&quot;[Apache OpenOffice][1]  &quot;, _
+			&quot;[LibreOffice][2]&quot;, _
+			&quot;&quot;, _
+			&quot;&quot;, _
+			&quot;License&quot;, _
+			&quot;-------&quot;, _
+			&quot;&quot;, _
+			&quot;The project is licensed under the [GNU 2.0][3] license.&quot;, _
+			&quot;&quot;, _
+			&quot;Online help&quot;, _
+			&quot;-----------&quot;, _
+			&quot;&quot;, _
+			&quot;[Read Text][4]&quot;, _
+			&quot;&quot;, _
+			&quot;&quot;, _
+			&quot;  [1]: https://extensions.services.openoffice.org/en/project/read-text&quot;, _
+			&quot;  [2]: https://extensions.libreoffice.org/extension-center/read-text&quot;, _
+			&quot;  [3]: https://www.gnu.org/licenses/gpl-2.0.txt&quot;, _
+			&quot;  [4]: https://sites.google.com/site/readtextextension/&quot;, _
+			&quot;*)&quot;, _
+                &quot;-- ------------------------------------------------------&quot;, _
+                &quot;-- Read Text Extension created this script&quot;, _
+                &quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; &quot; &amp; fsNow(), _
+                &quot;-- ------------------------------------------------------&quot;, _
 			&quot;on run (arguments)&quot;, _
 			&quot;	set argv1 to &quot;&quot;&quot;&quot;&quot;, _
 			&quot;	set argv2 to &quot;&quot;&quot;&quot;&quot;, _
 			&quot;	set argv3 to &quot;&quot;&quot;&quot;&quot;, _
 			&quot;	set astring to &quot;&quot;&quot;&quot;&quot;, _
 			&quot;	set b to &quot;&quot;&quot;&quot;&quot;, _
-			&quot;	set bPostPlay to &quot; &amp; sBNative, _
 			&quot;	set c to &quot;&quot;&quot;&quot;&quot;, _
-			&quot;	set cout1 to &quot;&quot;&quot;&quot;&quot;, _
-			&quot;	set cout2 to &quot;&quot;&quot;&quot;&quot;, _
-			&quot;	set defaultImg to &quot;&quot;&quot; &amp; s1 &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set defaultSize to &quot;&quot;&quot; &amp; sSize &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set doPostProcess to &quot;&quot;&quot;&quot;&quot;, _
-			&quot;	set doPostProcess2 to &quot;&quot;&quot;&quot;&quot;, _
 			&quot;	set err1 to &quot;&quot;Apple Script&quot;&quot;&quot;, _
-			&quot;	set ffMeta to &quot;&quot;&quot;&quot;&quot;, _
-			&quot;	set myConverter to &quot;&quot;&quot; &amp; fsMyFfmpeg &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; fsMyTempLock &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set myOption to &quot;&quot;&quot; &amp; sArguments &amp; &quot;&quot;&quot;&quot;, _
+            &quot;	set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; &quot;&quot;&quot;&quot;, _
+            &quot;	set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; fsMyTempLock() &amp; &quot;&quot;&quot;&quot;, _
+            &quot;	set myOption to &quot;&quot;&quot; &amp; sArguments &amp; &quot;&quot;&quot;&quot;, _
 			&quot;	set mySys to &quot;&quot;&quot; &amp; fsGetOS() &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set myURL to &quot;&quot;&quot;&quot;&quot;, _
-			&quot;	set sGenre to &quot;&quot;&quot; &amp; fsThisDocGenre() &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set sImageURL to defaultImg&quot;, _
-			&quot;	set sTrack to &quot;&quot;&quot; &amp; fiMyCurrentAudioTrack(False) &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set sYear to &quot;&quot;&quot; &amp; year(now) &amp; &quot;&quot;&quot;&quot;, _
 			&quot;	set textFile to &quot;&quot;&quot; &amp; sF &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set sAlbum to &quot;&quot;&quot; &amp; fsThisDocTitle() &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set sArtist to &quot;&quot;&quot; &amp; fsThisDocAuthor() &amp; &quot;&quot;&quot;&quot;, _
-			&quot;	set sTitle to &quot;&quot;&quot; &amp; sTitle &amp; string(2, chr(0)) &amp; &quot;&quot;&quot;&quot; &amp; _
-			&quot; -- Title of the selected text.&quot; &amp; _
-			&quot; Check the title if it is Asian or Complex.&quot;, _
-			&quot;	set myVoice to &quot;&quot;&quot;&quot;&quot;, _
-			&quot;	set sLyrics to &quot;&quot;&quot; &amp; sLyrics &amp; &quot;&quot;&quot;&quot;, _
-			&quot;-- ------------------------------------------------------&quot;, _
+			&quot;	set myVoice to &quot;&quot;&quot; &amp; fsGetMacOS11Voice() &amp; &quot;&quot;&quot;&quot;, _
+			&quot;	-- ------------------------------------------------------&quot;, _
 			&quot;	set b to (do shell script &quot;&quot;touch &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
 			&quot;	try&quot;, _
 			&quot;		set argv1 to (item 1 of arguments)&quot;, _
-			&quot;		set astring to fsChangecase(getExtension(argv1),&quot;&quot;lower&quot;&quot;)&quot;, _
+			&quot;		set astring to fsChangecase(getExtension(argv1), &quot;&quot;lower&quot;&quot;)&quot;, _
 			&quot;	on error&quot;, _
 			&quot;		set argv1 to &quot;&quot;&quot;&quot;&quot;, _
 			&quot;	end try&quot;, _
 			&quot;	try&quot;, _
 			&quot;		set argv2 to (item 2 of arguments)&quot;, _
 			&quot;	on error&quot;, _
-			&quot;		set argv2 to defaultImg&quot;, _
+			&quot;		set argv2 to &quot;&quot;&quot;&quot;&quot;, _
 			&quot;	end try&quot;, _
 			&quot;	try&quot;, _
 			&quot;		set argv3 to (item 3 of arguments)&quot;, _
 			&quot;	on error&quot;, _
-			&quot;		set argv3 to defaultSize&quot;, _
+			&quot;		set argv3 to &quot;&quot;&quot;&quot;&quot;, _
 			&quot;	end try&quot;, _
-			&quot;	if astring is &quot;&quot;aif&quot;&quot; or astring is &quot;&quot;aiff&quot;&quot; then&quot;, _
-			&quot;		set doPostProcess to &quot;&quot;tag&quot;&quot;&quot;, _
-			&quot;	else if astring is &quot;&quot;m4a&quot;&quot; then&quot;, _
-			&quot;		set doPostProcess to &quot;&quot;tag&quot;&quot;&quot;, _
-			&quot;&quot;), _
+			&quot;	set argv1 to &quot;&quot;&quot;&quot;&quot;, _
+			&quot; 	if myLang is &quot;&quot;&quot;&quot; then&quot;, _
+			&quot;		set myVoiceCommand to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	else&quot;, _
+			&quot;		set myVoiceCommand to &quot;&quot; --voice=&apos;&quot;&quot; &amp; myVoice &amp; &quot;&quot;&apos;&quot;&quot;&quot;, _
+			&quot;	end if&quot;, _
+			&quot;	try&quot;, _
+			&quot;		set err1 to &quot;&quot;Say command&quot;&quot;&quot;, _
+			&quot;		set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot;, _
+			&quot;	on error&quot;, _
+			&quot;		if argv1 is not &quot;&quot;&quot;&quot; then&quot;, _
+			&quot;			theMsg(err1 &amp; &quot;&quot;: Cancel&quot;&quot;, myVoice, myLang, &quot;&quot;Sosumi&quot;&quot;)&quot;, _
+			&quot;		end if&quot;, _
+			&quot;		set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+			&quot;	end try&quot;, _
+			&quot;	set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
+			&quot;end run&quot;, _
+			&quot;-- ------------------------------------------------------&quot;, _
+			&quot;on theMsg(sA, sVoz, myLang, sBeep)&quot;, _
+			&quot;	try&quot;, _
+			&quot;		display notification sA with title &quot;&quot;Read Text: &quot;&quot; &amp; sVoz &amp; &quot;&quot; (&quot;&quot; &amp; myLang &amp; &quot;&quot;)&quot;&quot; sound name sBeep&quot;, _
+			&quot;	end try&quot;, _
+			&quot;end theMsg&quot;, _
+			&quot;on getExtension(sA)&quot;, _
+			&quot;	if sA is &quot;&quot;&quot;&quot; then&quot;, _
+			&quot;		set a3 to &quot;&quot;&quot;&quot;&quot;, _
+			&quot;	else&quot;, _
+			&quot;		set a1 to theSplit(sA, &quot;&quot;.&quot;&quot;)&quot;, _
+			&quot;		set s1 to the last item of a1&quot;, _
+			&quot;		set a2 to theSplit(s1, &quot;&quot;&apos;&quot;&quot;)&quot;, _
+			&quot;		set s2 to first item of a2&quot;, _
+			&quot;		set a3 to theSplit(s2, &quot;&quot;\&quot;&quot;&quot;&quot;)&quot;, _
+			&quot;		set s3 to first item of a3&quot;, _
+			&quot;	end if&quot;, _
+			&quot;	return a3 as Unicode text&quot;, _
+			&quot;end getExtension&quot;, _
+			&quot;on theSplit(theString, theDelimiter)&quot;, _
+			&quot;	set oldDelimiters to AppleScript&apos;s text item delimiters&quot;, _
+			&quot;	set AppleScript&apos;s text item delimiters to theDelimiter&quot;, _
+			&quot;	set theArray to every text item of theString&quot;, _
+			&quot;	set AppleScript&apos;s text item delimiters to oldDelimiters&quot;, _
+			&quot;	return theArray&quot;, _
+			&quot;end theSplit&quot;, _
+			&quot;on fsChangecase(s1, s2)&quot;, _
+			&quot;	if s2 is &quot;&quot;lower&quot;&quot; then&quot;, _
+			&quot;		set s3 to &quot;&quot;A-Z a-z&quot;&quot;&quot;, _
+			&quot;	else&quot;, _
+			&quot;		set s3 to &quot;&quot;a-z A-Z&quot;&quot;&quot;, _
+			&quot;	end if&quot;, _
+			&quot;	set s4 to (do shell script &quot;&quot;echo &quot;&quot; &amp; quoted form of (s1) &amp; &quot;&quot; | tr &quot;&quot; &amp; s3 &amp; &quot;&quot; &quot;&quot;)&quot;, _
+			&quot;	return s4&quot;, _
+			&quot;end fsChangecase&quot;), _
 			CR)
-
-		if bGotFFmpeg then
-			sB = sB &amp; Join(Array(&quot;	else if myConverter is not &quot;&quot;&quot;&quot; then&quot;, _
-					&quot;		-- add ffmpeg metadata commands&quot;, _
-					&quot;		set ffmeta to &quot;&quot;&quot; &amp; sMeta, _
-					&quot;		if astring is &quot;&quot;mp3&quot;&quot; then&quot;, _
-					&quot;			set cout1 to argv1&quot;, _
-					&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
-					&quot;			set cout2 to cout1 &amp; &quot;&quot;.mp3&quot;&quot;&quot;, _
-					&quot;			set err1 to cout2&quot;, _
-					&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout2)&quot;, _
-					&quot;			set doPostProcess2 to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of cout2) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of defaultImg) &amp; &quot;&quot; -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title=\&quot;&quot;Album cover\&quot;&quot; -metadata:s:v comment=\&quot;&quot;Cover (Front)\&quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
-					&quot;		else if astring is &quot;&quot;ogg&quot;&quot; then&quot;, _
-					&quot;			set cout1 to argv1&quot;, _
-					&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
-					&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
-					&quot;		else if astring is &quot;&quot;wav&quot;&quot; then&quot;, _
-					&quot;			set cout1 to argv1&quot;, _
-					&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
-					&quot; 			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
-					&quot;		else if astring is &quot;&quot;webm&quot;&quot; then&quot;, _
-					&quot;			set cout1 to argv1&quot;, _
-					&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
-					&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -f image2 -i &quot;&quot; &amp; (quoted form of POSIX path of argv2) &amp; &quot;&quot; -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
-					&quot;		else if astring is &quot;&quot;mp4&quot;&quot; then&quot;, _
-					&quot;			set cout1 to argv1&quot;, _
-					&quot;			set argv1 to argv1 &amp; &quot;&quot;.aif&quot;&quot;&quot;, _
-					&quot;			set cout2 to cout1 &amp; &quot;&quot;.webm&quot;&quot;&quot;, _
-					&quot;			set err1 to cout2&quot;, _
-					&quot;			set doPostProcess to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of argv1) &amp; &quot;&quot; -f image2 -i &quot;&quot; &amp; (quoted form of POSIX path of argv2) &amp; &quot;&quot; -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libvpx -g 120 -lag-in-frames 16 -deadline good -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0 -b:v 768k -acodec libvorbis -ab 112k -ar 44100 -f webm -y &quot;&quot; &amp; (quoted form of POSIX path of cout2)&quot;, _
-					&quot;			set doPostProcess2 to (quoted form of POSIX path of myConverter) &amp; &quot;&quot; -i &quot;&quot; &amp; (quoted form of POSIX path of cout2) &amp; &quot;&quot; -acodec aac -ab 160k -s &quot;&quot; &amp; argv3 &amp; &quot;&quot; -vcodec libx264 -preset slow -profile:v baseline -level 30 -maxrate 10000000 -bufsize 10000000 -f mp4 -threads 0 -strict experimental &quot;&quot; &amp; ffmeta &amp; &quot;&quot; -y &quot;&quot; &amp; (quoted form of POSIX path of cout1)&quot;, _
-					&quot;		else&quot;, _
-					&quot;			set argv1 to &quot;&quot;&quot;&quot;&quot;, _
-					&quot;		end if&quot;, _
-					&quot;&quot;), _
-	 				CR)
-		end if
-		sB = sB &amp; Join(Array(&quot;	else&quot;, _
-				&quot;		set argv1 to &quot;&quot;&quot;&quot;&quot;, _
-				&quot;		set doPostProcess to &quot;&quot;&quot;&quot;&quot;, _
-				&quot;	end if&quot;, _
-				&quot;	if myLang is &quot;&quot;&quot;&quot; then&quot;, _
-				&quot;		set myVoice to &quot;&quot;System&quot;&quot;&quot;, _
-				&quot;		set myLang to &quot;&quot;Default Language&quot;&quot;&quot;, _
-				&quot;		set myVoiceCommand to &quot;&quot;&quot;&quot;&quot;, _
-				&quot;	else&quot;, _
-				&quot;		set myVoice to fsGetthevoice(myLang)&quot;, _
-				&quot;		set myVoiceCommand to &quot;&quot; --voice &apos;&quot;&quot; &amp; myVoice &amp; &quot;&quot;&apos;&quot;&quot;&quot;, _
-				&quot;	end if&quot;, _
-				&quot;	try&quot;, _
-				&quot;		if argv1 is &quot;&quot;&quot;&quot; then&quot;, _
-				&quot;			set err1 to &quot;&quot;Say command&quot;&quot;&quot;, _
-				&quot;			if isInString(myOption, &quot;&quot;AirPlay&quot;&quot;) then&quot;, _
-				&quot;				set err1 to &quot;&quot;AirPlay&quot;&quot;&quot;, _
-				&quot;				theMsg (&quot;&quot;AirPlay&quot;&quot;, myVoice, myLang, &quot;&quot;Purr&quot;&quot;)&quot;, _
-				&quot;			end if&quot;, _
-				&quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot;, _
-				&quot;		else&quot;, _
-				&quot;			set err1 to &quot;&quot;Audio file&quot;&quot;&quot;, _
-				&quot;			set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; &quot;&quot; -o &quot;&quot; &amp; argv1 &amp; myVoiceCommand &amp; &quot;&quot; -f &apos;&quot;&quot; &amp; textFile &amp; &quot;&quot;&apos; &quot;&quot;)&quot;, _
-				&quot;			if doPostProcess is not &quot;&quot;&quot;&quot; then&quot;, _
-				&quot;				if doPostProcess is &quot;&quot;tag&quot;&quot; then&quot;, _
-				&quot;					set err1 to &quot;&quot;iTunes &quot;&quot; &amp; astring &amp; &quot;&quot; metadata &quot;&quot;&quot;, _
-				&quot;					set b to setItunesMetaData(argv1, sAlbum, sArtist, sGenre, sImageURL, sTitle, sTrack, sYear, mySys &amp; &quot;&quot; &quot; &amp; _
-				fsLookUpTerm(&quot;s_speech-synthesis&quot;) &amp; _
-				&quot; &quot; &amp; chr(8211) &amp; &quot; &quot;&quot; &amp; myVoice &amp; &quot;&quot; (&quot; &amp; _
-				fsGetSetting(&quot;ooname&quot;) &amp; _
-				&quot; &quot; &amp; chr(8211) &amp; &quot; &quot; &amp; _
-				fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
-				&quot;)&quot;&quot;, sLyrics)&quot;, _
-				&quot;&quot;), _
- 				CR)
-		if bGotFFmpeg then
-			sB = sB &amp; Join(_
-					Array(_
-					&quot;				else&quot;, _
-					&quot;					set err1 to &quot;&quot;ffmpeg &quot;&quot; &amp; astring &amp; &quot;&quot; encode&quot;&quot;&quot;, _
-					&quot;					set b to (do shell script doPostProcess)&quot;, _
-					&quot;					if doPostProcess2 is not &quot;&quot;&quot;&quot; then&quot;, _
-					&quot;						set err1 to &quot;&quot;ffmpeg [2] &quot;&quot; &amp; astring &amp; &quot;&quot; encode&quot;&quot;&quot;, _
-					&quot;						set b to (do shell script doPostProcess2)&quot;, _
-					&quot;						set c to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; cout2 &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
-					&quot;					end if&quot;, _
-					&quot;					set c to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; argv1 &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
-					&quot;					set argv1 to cout1&quot;, _
-					&quot;&quot;), _
-		 			CR)
-		end if
-		sB = sB &amp; Join(_
-				Array(_
-				&quot;				end if&quot;, _
-				&quot;			end if&quot;, _
-				&quot;			if bPostplay is true then&quot;, _
-				&quot;				set d to (do shell script &quot;&quot;open &quot;&quot; &amp; quoted form of (argv1))&quot;, _
-				&quot;			else&quot;, _
-				&quot;				theMsg (argv1, myVoice, myLang, &quot;&quot;Purr&quot;&quot;)&quot;, _
-				&quot;			end if&quot;, _
-				&quot;		end if&quot;, _
-				&quot;	on error&quot;, _
-				&quot;	--	set b to (do shell script &quot;&quot;rm -f &quot;&quot; &amp; argv1)&quot;, _
-				&quot;		if argv1 is not &quot;&quot;&quot;&quot; then&quot;, _
-				&quot;			theMsg (err1 &amp; &quot;&quot;: &quot; &amp; fsLookUpTerm(&quot;s_cancel&quot;) &amp; &quot;&quot;&quot;, myVoice, myLang, &quot;&quot;Sosumi&quot;&quot;)&quot;, _
-				&quot;		end if&quot;, _
-				&quot;		return doPostProcess2&quot;, _
-				&quot;		set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
-				&quot;	end try&quot;, _
-				&quot;	set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
-				&quot;end run&quot;, _
-				&quot;-- ------------------------------------------------------&quot;, _
-				&quot;on theMsg(sA, sVoz, myLang, sBeep)&quot;, _
-				&quot;	try&quot;, _
-				&quot;		display notification sA with title &quot;&quot;Read Text: &quot;&quot; &amp; sVoz &amp; &quot;&quot; (&quot;&quot; &amp; myLang &amp; &quot;&quot;)&quot;&quot; sound name sBeep&quot;, _
-				&quot;	end try&quot;, _
-				&quot;end theMsg&quot;, _
-				&quot;on getExtension(sA)&quot;, _
-				&quot;	if sA is &quot;&quot;&quot;&quot; then&quot;, _
-				&quot;		set a3 to &quot;&quot;&quot;&quot;&quot;, _
-				&quot;	else&quot;, _
-				&quot;		set a1 to theSplit(sA, &quot;&quot;.&quot;&quot;)&quot;, _
-				&quot;		set s1 to the last item of a1&quot;, _
-				&quot;		set a2 to theSplit(s1, &quot;&quot;&apos;&quot;&quot;)&quot;, _
-				&quot;		set s2 to first item of a2&quot;, _
-				&quot;		set a3 to theSplit(s2, &quot;&quot;\&quot;&quot;&quot;&quot;)&quot;, _
-				&quot;		set s3 to first item of a3&quot;, _
-				&quot;	end if&quot;, _
-				&quot;	return a3 as Unicode text&quot;, _
-				&quot;end getExtension&quot;, _
-				&quot;on theSplit(theString, theDelimiter)&quot;, _
-				&quot;	set oldDelimiters to AppleScript&apos;s text item delimiters&quot;, _
-				&quot;	set AppleScript&apos;s text item delimiters to theDelimiter&quot;, _
-				&quot;	set theArray to every text item of theString&quot;, _
-				&quot;	set AppleScript&apos;s text item delimiters to oldDelimiters&quot;, _
-				&quot;	return theArray&quot;, _
-				&quot;end theSplit&quot;, _
-				&quot;on extractVoice(str0)&quot;, _
-				&quot;	set iIndex to offset of &quot;&quot;  &quot;&quot; in str0&quot;, _
-				&quot;	return characters 1 thru (iIndex - 1) of str0 as text&quot;, _
-				&quot;end extractVoice&quot;, _
-				&quot;on isInString(str0, str1)&quot;, _
-				&quot;	set retval to true&quot;, _
-				&quot;	set iIndex to offset of str1 in str0&quot;, _
-				&quot;	if iIndex is 0 then&quot;, _
-				&quot;		set retval to False&quot;, _
-				&quot;	end if&quot;, _
-				&quot;	return retval&quot;, _
-				&quot;end isInString&quot;, _
-				&quot;on fsChangecase ( s1 , s2 )&quot;, _
-				&quot;	if s2 is &quot;&quot;lower&quot;&quot; then&quot;, _
-				&quot;		set s3 to &quot;&quot;A-Z a-z&quot;&quot;&quot;, _
-				&quot;	else&quot;, _
-				&quot;		set s3 to &quot;&quot;a-z A-Z&quot;&quot;&quot;, _
-				&quot;	end if&quot;, _
-				&quot;	set s4 to (do shell script &quot;&quot;echo &quot;&quot; &amp; quoted form of ( s1 ) &amp; &quot;&quot; | tr &quot;&quot; &amp; s3 &amp; &quot;&quot; &quot;&quot;)&quot;, _
-				&quot;	return s4&quot;, _
-				&quot;end fsChangecase&quot;, _
-				&quot;on testTheString(myArray, sLang, sDiv)&quot;, _
-				&quot;	set retval to &quot;&quot;&quot;&quot;&quot;, _
-				&quot;	if sDiv is &quot;&quot; &quot;&quot; then&quot;, _
-				&quot;		set sLang2 to sLang&quot;, _
-				&quot;	else&quot;, _
-				&quot;		set iIndex to offset of sDiv in sLang&quot;, _
-				&quot;		set sLang2 to characters 1 thru (iIndex) of sLang as text&quot;, _
-				&quot;	end if&quot;, _
-				&quot;	repeat with theItem in myArray&quot;, _
-				&quot;		if (isInString(theItem, sLang2)) then&quot;, _
-				&quot;			set retval to extractVoice(theItem)&quot;, _
-				&quot;			exit repeat&quot;, _
-				&quot;		end if&quot;, _
-				&quot;	end repeat&quot;, _
-				&quot;	return retval&quot;, _
-				&quot;end testTheString&quot;, _
-				&quot;on fsGetthevoice(sLang)&quot;, _
-				&quot;	try&quot;, _
-				&quot;		set str0 to (do shell script &quot;&quot;say --voice ?&quot;&quot;)&quot;, _
-				&quot;		set myArray to my theSplit(str0, (ASCII character 13))&quot;, _
-				&quot;		set retval to testTheString(myArray, sLang, &quot;&quot; &quot;&quot;)&quot;, _
-				&quot;		if retval is &quot;&quot;&quot;&quot; then&quot;, _
-				&quot;			set retval to testTheString(myArray, sLang, &quot;&quot;_&quot;&quot;)&quot;, _
-				&quot;		end if&quot;, _
-				&quot;		if retval is &quot;&quot;&quot;&quot; then&quot;, _
-				&quot;			set retval to testTheString(myArray, sLang, &quot;&quot;-&quot;&quot;)&quot;, _
-				&quot;		end if&quot;, _
-				&quot;		if retval is &quot;&quot;&quot;&quot; then&quot;, _
-				&quot;			set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
-				&quot;		end if&quot;, _
-				&quot;	on error&quot;, _
-				&quot;		set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
-				&quot;	end try&quot;, _
-				&quot;	if retval is &quot;&quot;Agnes&quot;&quot; or retval is &quot;&quot;Albert&quot;&quot; or retval is &quot;&quot;&quot;&quot; then&quot;, _
-				&quot;		set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
-				&quot;	end if&quot;, _
-				&quot;	return retval&quot;, _
-				&quot;end fsGetthevoice&quot;, _
-				&quot;on setItunesMetaData(myURL, sAlbum, sArtist, sGenre, sImageURL, sTitle, sTrack, sYear, sComment, sLyrics)&quot;, _
-				&quot;	set aFile to POSIX file myURL&quot;, _
-				&quot;	try&quot;, _
-				&quot;		set aImage to POSIX file sImageURL&quot;, _
-				&quot;	end try&quot;, _
-				&quot;	set currentAlbum to &quot;&quot;&quot;&quot;&quot;, _
-				&quot;	set sTaggedURL to &quot;&quot;&quot;&quot;&quot;, _
-				&quot;	set n to 0&quot;, _
-				&quot;	if length of sLyrics is 0 then&quot;, _
-				&quot;		delay 0.400&quot;, _
-				&quot;	else&quot;, _
-				&quot;		delay 0.250&quot;, _		
-				&quot;	end if&quot;, _
-				&quot;	tell application &quot;&quot;iTunes&quot;&quot;&quot;, _
-				&quot;		set myTune to open (aFile)&quot;, _
-				&quot;		try&quot;, _
-				&quot;			set x to CheckiTunesOK()&quot;, _
-				&quot;		end try&quot;, _
-				&quot;		set str0 to (do shell script &quot;&quot;ls &quot;&quot; &amp; quoted form of sImageURL)&quot;, _
-				&quot;		repeat while currentAlbum is &quot;&quot;&quot;&quot; and n is less than 10&quot;, _
-				&quot;		delay 1&quot;, _
-				&quot;			try&quot;, _
-				&quot;				set the album of the current track to sAlbum&quot;, _
-				&quot;				set currentAlbum to the album of the current track&quot;, _
-				&quot;			end try&quot;, _
-				&quot;			set n to 1 + n&quot;, _
-				&quot;		end repeat&quot;, _
-				&quot;		set theTrack to the current track&quot;, _
-				&quot;		try&quot;, _
-				&quot;			set the artist of theTrack to sArtist&quot;, _
-				&quot;		end try&quot;, _
-				&quot;		try&quot;, _
-				&quot;			set the genre of theTrack to sGenre&quot;, _
-				&quot;		end try&quot;, _
-				&quot;		try&quot;, _
-				&quot;			set the track number of theTrack to sTrack&quot;, _
-				&quot;		end try&quot;, _
-				&quot;		try&quot;, _
-				&quot;			set the year of theTrack to sYear&quot;, _
-				&quot;		end try&quot;, _
-				&quot;		try&quot;, _	
-				&quot;			set data of artwork 1 of theTrack to (read (file aImage) as picture)&quot;, _
-				&quot;		end try&quot;, _
-				&quot;		try&quot;, _
-				&quot;			set the name of theTrack to sTitle&quot;, _
-				&quot;		end try&quot;, _
-				&quot;		try&quot;, _
-				&quot;			set sTaggedURL to quoted form of POSIX path of (get location of theTrack)&quot;, _
-				&quot;		end try&quot;, _
-				&quot;		try&quot;, _
-				&quot;			set the comment of theTrack to sComment&quot;, _
-				&quot;		end try&quot;, _
-				&quot;		try&quot;, _
-				&quot;			set the lyrics of theTrack to sLyrics&quot;, _
-				&quot;		end try&quot;, _
-				&quot;		try&quot;, _
-				&quot;			set myURL to quoted form of POSIX path of aFile&quot;, _
-				&quot;			set str0 to (do shell script &quot;&quot;cp -f &quot;&quot; &amp; sTaggedURL &amp; &quot;&quot; &quot;&quot; &amp; myURL)&quot;, _
-				&quot;		on error&quot;, _
-				&quot;			set sTaggedURL to quoted form of myURL&quot;, _
-				&quot;		end try&quot;, _
-				&quot;	end tell&quot;, _
-				&quot;	return sTaggedURL&quot;, _
-				&quot;end setItunesMetaData&quot;, _
-				&quot;on readUtf8File(sURL)&quot;, _
-				&quot;	set x to read POSIX file sURL as &quot; &amp; chr(171) &amp; &quot;class utf8&quot; &amp; chr(187), _
-				&quot;	return x&quot;, _
-				&quot;end readUtf8File&quot;, _
-				&quot;on RemoveLastCharacter(s1)&quot;, _
-				&quot;	set s4 to (do shell script &quot;&quot;echo &quot;&quot; &amp; quoted form of (s1) &amp; &quot;&quot; | sed &apos;s/.$//&apos;&quot;&quot;)&quot;, _
-				&quot;	return s4&quot;, _
-				&quot;end RemoveLastCharacter&quot;, _
-				&quot;on CheckiTunesOK()&quot;, _
-				&quot;	-- Pause up to 30 seconds or until iTunes is an active process&quot;, _
-		 		&quot;	set b4 to False&quot;, _
-		  		&quot;	set n to 0&quot;, _
-				&quot;	try&quot;, _
-				&quot;		repeat while b4 is False and n is less than 30&quot;, _
-				&quot;			set s4 to (do shell script &quot;&quot;ps aux -c&quot;&quot;)&quot;, _
-				&quot;			-- ignore iTunesHelper&quot;, _
-		 		&quot;			set b4 to isInString(s4, &quot;&quot;iTunes&quot;&quot; &amp; (ASCII character 13))&quot;, _
-				&quot;			set n to 1 + n&quot;, _
-		 		&quot;			if b4 is False then&quot;, _
-				&quot;				delay 1&quot;, _
-		 		&quot;			end if&quot;, _
-				&quot;		end repeat&quot;, _
-				&quot;	on error&quot;, _
-		 		&quot;		set b4 to False&quot;, _
-				&quot;	end	try&quot;, _
-				&quot;	return b4&quot;, _
-				&quot;end CheckiTunesOK&quot;, _
-				&quot;&quot;), _
- 				CR)
-	sFile=fsTemporaryTtsAppleScript
+    end if
 	CreateFile(sFile,sB,&quot;utf-8&quot;)
 	fswriteOSXSpeechScript = sB
 end function
@@ -5099,8 +5225,7 @@ end function
 
 function fsTemporaryTtsAppleScript()
 	dim sA as string
-
-	sA=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; _
+	sA=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).temp &amp; _
 			&quot;/readaloud.applescript&quot;
 	fsTemporaryTtsAppleScript=ConvertFromURL(sA)
 end function
@@ -5436,15 +5561,15 @@ sub resetSpeechDispatcher(_
 				end if			
 			Next
 		end if
-		if fileexists(fsMyTempLock) then
-			kill fsMyTempLock
+		if fileexists(fsMyTempLock()) then
+			kill fsMyTempLock()
 		end if
-		if fileexists(fsFullPathOf(fsTemporaryTextDoc) &amp; &quot;.sable&quot;) then
-			kill fsFullPathOf(fsTemporaryTextDoc) &amp; &quot;.sable&quot;
+		if fileexists(fsTemporaryTextDoc() &amp; &quot;.sable&quot;) then
+			kill fsTemporaryTextDoc() &amp; &quot;.sable&quot;
 		end if
 	end if
-	if fileexists(fsFullPathOf(fsTemporaryTextDoc)) then
-		kill fsFullPathOf(fsTemporaryTextDoc)
+	if fileexists(fsTemporaryTextDoc()) then
+		kill fsTemporaryTextDoc()
 	end if
 	On Error Resume Next
 	oBar.end()

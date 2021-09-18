@@ -146,8 +146,8 @@ sub ReadTextAloud
 			ConfigureReadTextAloud()
 		else
 			ClearWorkingCountryLanguage
-		    if fileexists(fsMyTempLock) then
-		    	kill fsMyTempLock
+		    if fileexists(fsMyTempLock()) then
+		    	kill fsMyTempLock()
 				resetSpeechDispatcher
 			else
 				ttsActuate(config(),_
@@ -203,7 +203,7 @@ sub ReadClipBoard
 	
 	on error goto ReadClipBoardErr
 	ClearWorkingCountryLanguage
-    if fileexists(fsMyTempLock) then
+    if fileexists(fsMyTempLock()) then
 		resetSpeechDispatcher
 	else
 		if fileexists(s1) or fbClipBoardAvailable = False then
@@ -327,7 +327,7 @@ sub PresentSelection2(_
 		b1 = True
 	end if
 	sA = fsGetTextSelection()
-    if fileexists(fsMyTempLock) then
+    if fileexists(fsMyTempLock()) then
 		resetSpeechDispatcher
 	end if
 	if len(sA) &gt; 1 then

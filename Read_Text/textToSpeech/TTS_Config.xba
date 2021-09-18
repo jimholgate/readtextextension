@@ -151,15 +151,15 @@ sub ConfigureReadTextAloud ()
 		&apos; or delete the Windows temporary lock file so speech ends.
 		&apos; The speech only stops if you use the one of the scripts shown
 		&apos; by default in the extension dialogue.
-		if fileexists(sFile) or fileexists(fsMyTempLock) then
+		if fileexists(sFile) or fileexists(fsMyTempLock()) then
 			if .GetControl(&quot;OptionButton2&quot;).Model.State then
 				resetSpeechDispatcher(true)
 			elseif .GetControl(&quot;OptionButton1&quot;).Model.State then
 				if fileexists(&quot;/usr/bin/killall&quot;) or fileexists(&quot;/usr/local/bin/killall&quot;) then
 					Shell(&quot;killall&quot;,0,&quot;festival&quot;,true)
 				end if
-				if fileexists(fsMyTempLock) then
-					kill fsMyTempLock
+				if fileexists(fsMyTempLock()) then
+					kill fsMyTempLock()
 				end if
 			end if
 		end if
@@ -315,20 +315,8 @@ end function
 
 
 sub aboutReadTextDialog()
-	&apos; In LibreOffice 7x for MacOS, go to the web for help because displaying
-	&apos; a dialog from another dialog might crash LibreOffice. Otherwise, show
-	&apos; a dialog with version, command line and script information.
-	select case fsGetOS()
-	case &quot;OSX&quot;
-		select case lcase(fsGetSetting(&quot;ooName&quot;))
-		case &quot;libreoffice&quot;, &quot;libreofficedev&quot;
-			if GetSolarVersion &gt; 69999 then
-				WebHelp()
-				exit sub
-			end if
-		end select
-	end select
 	dim config(fiCountConfigOptions) as variant
+	
 	config()=fvCurrentDialogConfig()
 	AboutAddOn(config(), &quot;&quot;)
 end sub

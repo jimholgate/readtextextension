@@ -647,7 +647,7 @@ function fsMyTempLock(_
 				sHome &amp; &quot;/.config&quot;, _
 				sHome &amp; &quot;/.tmp&quot;, _
 				sHome &amp; &quot;/.temp&quot;, _
-				CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;&quot;, _
+				CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).temp &amp; &quot;&quot;, _
 				sHome)
 		for i = lbound(a2) to ubound(a2)	
 			if FileExists(a2(i)) then
@@ -674,7 +674,7 @@ function fbTestDirRW(_
 	fbTestDirRW = False
 	if sA = &quot;&quot; then exit function
 	On Error Goto fbTestDirRWErr
-	dim s1 : s1 = fsAppSignature &amp; &quot;.&quot; &amp; fsUser &amp; &quot;.test.txt&quot; 
+	dim s1 : s1 = fsAppSignature() &amp; &quot;.&quot; &amp; fsUser() &amp; &quot;.test.txt&quot; 
 	if Instr(&quot;/\&quot;,right(sA, 1)) = 0 then
 		if Instr(sA, &quot;/&quot;) &gt; 0 then
     		s1 = &quot;/&quot; &amp; s1
@@ -874,12 +874,13 @@ end function
 
 
 function fsTTSScriptVBS() as string
-	fsTTSScriptVBS=fsMyURL &amp; &quot;/script/tts_wscript.vbs&quot;
+	fsTTSScriptVBS=fsMyURL() &amp; &quot;/script/tts_wscript.vbs&quot;
 end function
 
 
 function fsTemporaryTextDoc() as string
-	fsTemporaryTextDoc=&quot;tts_str.txt&quot;
+	fsTemporaryTextDoc=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).temp &amp;_
+		&quot;/tts_str.txt&quot;
 end function
 
 
@@ -1593,6 +1594,132 @@ function fsGetHomeDir()
 		end if
         next
 	end if
+end function
+
+
+Function fsGetMacOS11Voice()
+	&apos; Most MacOS voice codes resemble ISO conventions, but some idioms
+	&apos; like Scottish English and Hong Kong Cantonese are different.
+	&apos; `say --voice=&quot;?&quot;` generated this list of voices using MacOS 11.5.2
+	&apos; (en-US) on 2021-09-09. You might be able to change the default voice
+	&apos; for your region by adding your language and region code to the
+	&apos; case options. For example, if your region is `en-SG`, you might
+	&apos; prefer Daniel&apos;s voice instead of Alex&apos;s voice as a default.
+	&apos; The BASIC `environ()` command doesn&apos;t work on MacOS 11, so the
+	&apos; script can&apos;t use the system `LANG` value to guess your language.
+	dim n as integer : n = 0
+	dim s1$ : s1 = &quot;&quot;
+	dim a1(7) as string
+	a1(0) = fsSelectionLanguageAndRegion()
+	a1(1) = fsSelectionLanguage()
+	a1(2) = fsDocLanguage() &amp; &quot;-&quot; &amp; fsDocCountry()
+	a1(3) = fsDocLanguage()
+	a1(4) = fsGetLanguage() &amp; &quot;-&quot; &amp; fsGetCountry()
+	a1(5) = fsGetLanguage()
+	a1(6) = &quot;en-US&quot;
+
+	for n = 0 to 3
+		select case a1(n)
+			case &quot;ar-SA&quot;,&quot;ar&quot;
+				s1=&quot;Maged&quot;
+			case &quot;cs-CZ&quot;,&quot;cs&quot;
+				s1=&quot;Zuzana&quot;
+			case &quot;da-DK&quot;,&quot;da&quot;
+				s1=&quot;Sara&quot;
+			case &quot;de-DE&quot;,&quot;de&quot;
+				s1=&quot;Anna&quot;
+			case &quot;el-GR&quot;,&quot;el&quot;
+				s1=&quot;Melina&quot;
+			case &quot;en-US&quot;,&quot;en&quot;
+				s1=&quot;Alex&quot;
+			case &quot;es-MX&quot;,&quot;es&quot;
+				s1=&quot;Juan&quot;
+			case &quot;fi-FI&quot;,&quot;fi&quot;
+				s1=&quot;Satu&quot;
+			case &quot;fr-FR&quot;,&quot;fr&quot;
+				s1=&quot;Thomas&quot;
+			case &quot;he-IL&quot;,&quot;he&quot;
+				s1=&quot;Carmit&quot;
+			case &quot;hi-IN&quot;,&quot;hi&quot;
+				s1=&quot;Lekha&quot;
+			case &quot;hu-HU&quot;,&quot;hu&quot;
+				s1=&quot;Mariska&quot;
+			case &quot;id-ID&quot;,&quot;id&quot;
+				s1=&quot;Damayanti&quot;
+			case &quot;it-IT&quot;,&quot;it&quot;
+				s1=&quot;Alice&quot;
+			case &quot;ja-JP&quot;,&quot;ja&quot;
+				s1=&quot;Kyoko&quot;
+			case &quot;ko-KR&quot;,&quot;ko&quot;
+				s1=&quot;Yuna&quot;
+			case &quot;nb-NO&quot;,&quot;nb&quot;
+				s1=&quot;Nora&quot;
+			case &quot;nl-NL&quot;,&quot;nl&quot;
+				s1=&quot;Xander&quot;
+			case &quot;pl-PL&quot;,&quot;pl&quot;
+				s1=&quot;Zosia&quot;
+			case &quot;pt-BR&quot;,&quot;pt&quot;
+				s1=&quot;Luciana&quot;
+			case &quot;ro-RO&quot;,&quot;ro&quot;
+				s1=&quot;Ioana&quot;
+			case &quot;ru-RU&quot;,&quot;ru&quot;
+				s1=&quot;Milena&quot;
+			case &quot;sk-SK&quot;,&quot;sk&quot;
+				s1=&quot;Laura&quot;
+			case &quot;sv-SE&quot;,&quot;sv&quot;
+				s1=&quot;Alva&quot;
+			case &quot;th-TH&quot;,&quot;th&quot;
+				s1=&quot;Kanya&quot;
+			case &quot;tr-TR&quot;,&quot;tr&quot;
+				s1=&quot;Yelda&quot;
+			case &quot;zh-CN&quot;,&quot;zh-SG&quot;, &quot;zh-CHS&quot;, &quot;zh&quot;
+				s1=&quot;Ting-Ting&quot;
+			case &quot;en-AU&quot;
+				s1=&quot;Karen&quot;
+			case &quot;en-GB&quot;
+				s1=&quot;Daniel&quot;
+			case &quot;en-IE&quot;, &quot;en-GB-NIR&quot;
+				s1=&quot;Moira&quot;
+			case &quot;en-IN&quot;
+				s1=&quot;Rishi&quot;
+			case &quot;en-IN&quot;
+				s1=&quot;Veena&quot;
+			case &quot;en-scotland&quot;, &quot;en-GB-SCT&quot;
+				s1=&quot;Fiona&quot;
+			case &quot;en-US&quot;
+				s1=&quot;Fred&quot;
+			case &quot;en-US&quot;
+				s1=&quot;Samantha&quot;
+			case &quot;en-US&quot;
+				s1=&quot;Victoria&quot;
+			case &quot;en-ZA&quot;
+				s1=&quot;Tessa&quot;
+			case &quot;es-AR&quot;
+				s1=&quot;Diego&quot;
+			case &quot;es-ES&quot;
+				s1=&quot;Jorge&quot;
+			case &quot;es-ES&quot;
+				s1=&quot;Monica&quot;
+			case &quot;es-MX&quot;
+				s1=&quot;Paulina&quot;
+			case &quot;fr-CA&quot;
+				s1=&quot;Amelie&quot;
+			case &quot;it-IT&quot;
+				s1=&quot;Luca&quot;
+			case &quot;nl-BE&quot;
+				s1=&quot;Ellen&quot;
+			case &quot;pt-PT&quot;
+				s1=&quot;Joana&quot;
+			case &quot;ru-RU&quot;
+				s1=&quot;Yuri&quot;
+			case &quot;zh-HK&quot;, &quot;zh-MO&quot;, &quot;zh-yue&quot;, &quot;yue&quot;
+				s1=&quot;Sin-ji&quot;
+			case &quot;zh-TW&quot;, &quot;zh-CHT&quot;
+				s1=&quot;Mei-Jia&quot;
+		end select
+		if len(s1) &lt;&gt; 0 then exit for
+	next
+	fsGetMacOS11Voice = s1
 end function
 
 

@@ -47,10 +47,10 @@ end function
 function fsFullPathOf(_
 		filename as string) as string
 	&apos;This macro sets a complete path for the user directory for the temporary file
-	dim pathSettings as variant
 
-	pathSettings=createUnoService(&quot;com.sun.star.util.PathSettings&quot;)
-	fsFullPathOf=pathSettings.userConfig &amp; &quot;/&quot; &amp; filename
+	fsFullPathOf=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp;_
+			&quot;/&quot; &amp; _
+			filename
 end function
 
 
