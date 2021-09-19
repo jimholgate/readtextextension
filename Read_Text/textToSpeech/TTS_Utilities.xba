@@ -219,15 +219,20 @@ sub webHelp(_
 
 	on error goto webHelpErr
 	if ismissing(sURL) then
-		sURL = fsLookUpTerm( &quot;s_http-help-url&quot;, fsDisplayLanguage())
+		sURL = fsLookUpTerm( &quot;s_http-help-url&quot;, fsDisplayLanguage()) 
 	end if
-
 	if len(sURL) &gt; 12 then
 		oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
-		oSvc.execute(sURL, &quot;&quot;, 0)
+		select case fsGetOS()
+		case &quot;OSX&quot;
+			oSvc.execute(converttourl(sURL), &quot;&quot; ,0)
+		case else
+			oSvc.execute(sURL, &quot;&quot; ,0)
+		end select
 	end if
 	exit sub
 	webHelpErr:
+	msgbox &quot;error in TTSUtilities: webHelp&quot;
 end sub
 
 
@@ -1189,7 +1194,7 @@ function fsMacVoice(_
 		optional s2)
 	dim s1 as string
 	dim a1
-
+	fsMacVoice = &quot;&quot;
 	if ismissing(s2) then
 		s2 = fsSelectionLanguageAndRegion(true)
 	end if
@@ -1205,56 +1210,29 @@ function fsMacVoice(_
 		case &quot;el-GR&quot;
 			s1 = &quot;Melina&quot;
 		case &quot;en-AU&quot;,&quot;en-NZ&quot;
-			s1 = &quot;Karen,Lee&quot;
+			s1 = &quot;Lee,Karen&quot;
 		case &quot;en-GB&quot;,&quot;en-BD&quot;,&quot;en-BS&quot;,&quot;en-GH&quot;,&quot;en-HK&quot;,&quot;en-JM&quot;,&quot;en-TT&quot;
-			s1 = &quot;Daniel,Fiona&quot;
+			s1 = &quot;Fiona,Daniel&quot;
 		case &quot;en-IE&quot;
 			s1 = &quot;Moira&quot;
 		case &quot;en-IN&quot;,&quot;en-PK&quot;
 			s1 = &quot;Veena&quot;
 		case &quot;en-US&quot;, &quot;en-CA&quot;
-			s1 = Join(_
-					Array(_
-			        &quot;Agnes&quot;,_
-			        &quot;Albert&quot;,_
-			        &quot;Alex&quot;,_
-			        &quot;Bad News&quot;,_
-			        &quot;Bahh&quot;,_
-			        &quot;Bells&quot;,_
-			        &quot;Boing&quot;,_
-			        &quot;Bruce&quot;,_
-			        &quot;Bubbles&quot;,_
-			        &quot;Cellos&quot;,_
-			        &quot;Deranged&quot;,_
-			        &quot;Fred&quot;,_
-			        &quot;Good News&quot;,_
-			        &quot;Hysterical&quot;,_
-			        &quot;Junior&quot;,_
-			        &quot;Kathy&quot;,_
-			        &quot;Pipe Organ&quot;,_
-			        &quot;Princess&quot;,_
-			        &quot;Ralph&quot;,_
-			        &quot;Samantha&quot;,_
-			        &quot;Trinoids&quot;,_
-			        &quot;Vicki&quot;,_
-			        &quot;Victoria&quot;,_
-			        &quot;Whisper&quot;,_
-			        &quot;Zarvox&quot;),_
-			        &quot;,&quot;)
+			s1 = &quot;Victoria,Samantha,Fred,Alex&quot;
 		case &quot;en-ZA&quot;
 			s1 = &quot;Tessa&quot;
 		case &quot;es-AR&quot;
 			s1 = &quot;Diego&quot;
 		case &quot;es-ES&quot;
-			s1 = &quot;Jorge,Monica&quot;
+			s1 = &quot;Monica,Jorge&quot;
 		case &quot;es-MX&quot;
-			s1 = &quot;Angelica,Juan,Javier,Paulina&quot;
+			s1 = &quot;Paulina,Juan&quot;
 		case &quot;fi-FI&quot;
 			s1 = &quot;Satu&quot;
 		case &quot;fr-CA&quot;
-			s1 = &quot;Amelie,Felix&quot;
+			s1 = &quot;Amelie&quot;
 		case &quot;fr-FR&quot;,&quot;fr-BE&quot;
-			s1 = &quot;Audrey,Thomas,Virginie&quot;
+			s1 = &quot;Thomas&quot;
 		case &quot;he-IL&quot;
 			s1 = &quot;Carmit&quot;
 		case &quot;hi-IN&quot;
@@ -1264,7 +1242,7 @@ function fsMacVoice(_
 		case &quot;id-ID&quot;
 			s1 = &quot;Damayanti&quot;
 		case &quot;it-IT&quot;
-			s1 = &quot;Alice,Luca&quot;
+			s1 = &quot;Luca,Alice&quot;
 		case &quot;ja-JP&quot;
 			s1 = &quot;Kyoko&quot;
 		case &quot;ko-KR&quot;, &quot;ko-KP&quot;
@@ -1298,13 +1276,28 @@ function fsMacVoice(_
 		case &quot;zh-HK&quot;
 			s1 = &quot;Sin-ji&quot;
 		case &quot;zh-TW&quot;
-			s1 = &quot;Mei-Jia,Ya-Ling&quot;
+			s1 = &quot;Ya-Ling,Mei-Jia&quot;
 		case else
-			s1 = &quot;Alex,Daniel,Kathy,Lee,Vicki&quot;
+			s1 = Join(_
+					Array(_
+					&quot;Victoria&quot;,_
+					&quot;Veena&quot;,_
+					&quot;Tessa&quot;,_
+					&quot;Samantha&quot;,_
+					&quot;Rishi&quot;,_
+					&quot;Moira&quot;,_
+					&quot;Karen&quot;,_
+					&quot;Fred&quot;,_
+					&quot;Fiona&quot;,_
+					&quot;Daniel&quot;,_
+					&quot;Alex&quot;),_
+			        &quot;,&quot;)
 	end select
 	s1 = s1 &amp; &quot;,,&quot;
 	a1 = split(s1, &quot;,&quot;)
-	fsMacVoice = a1(n)
+	if n &lt;= ubound(a1) then
+		fsMacVoice = a1(n)
+	end if
 end function
 
 
@@ -1329,18 +1322,20 @@ sub dialog1Combo2ShowSAYChoices(_
 &apos;&apos; 
 	dim n, o as integer
 	dim s1 as string
-	dim aA
+	dim aA : aA = Array(&quot;.m4a&quot;,&quot;.aiff&quot;)
 	dim oComboBox as variant
+	dim isMacOS11 : isMacOS11 = not fileexists(&quot;/Applications/iTunes.app/Contents/version.plist&quot;)
 
 	REM get control
 	oComboBox=oDialog.getControl(&quot;ComboBox2&quot;)
 	REM first remove all old items from the list
 	n=oComboBox.getItemCount()
 	oComboBox.removeItems(0,n)
-	aA = Array(&quot;.aif&quot;, &quot;.m4a&quot;)
-	if not b_CaBcVancouverHolgateJamesReadtextextensionHideExports Then
-		for n = lbound(aA) To ubound(aA)
-			s1 = &quot;-o &quot;&quot;(HOME)(NOW)&quot; &amp; aA(n) &amp; &quot;&quot;&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
+
+	if isMacOS11 or _
+			not b_CaBcVancouverHolgateJamesReadtextextensionHideExports Then
+		for n = lbound(aA) To ubound(aA) 
+			s1 = &quot; -f &quot;&quot;(TMP)&quot;&quot;&quot; &amp; &quot;-o &quot;&quot;(HOME)(NOW)&quot; &amp; aA(n) &amp; &quot;&quot;&quot;&quot;
 			oComboBox.addItem(s1,0)
 		next
 	end if
@@ -1349,11 +1344,22 @@ sub dialog1Combo2ShowSAYChoices(_
 		if fsMacVoice(n) = &quot;&quot; then
 			exit for
 		else
-			s1=&quot;-v &quot;&quot;&quot; &amp; fsMacVoice(n) &amp; &quot;&quot;&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
+			&apos;--voice=Moira -f &quot;(TMP)&quot; -o &quot;(HOME)(NOW).aiff&quot;
+			for o = lbound(aA) to ubound(aA)
+				s1 = &quot;--voice=&quot; &amp; _
+						fsMacVoice(n) &amp;_
+						&quot; -f &quot;&quot;(TMP)&quot;&quot; -o &quot;&quot;(HOME)(NOW).&quot; &amp;_
+					 	aA(o) &amp;_
+						&quot;&quot;&quot;&quot;
+				oComboBox.addItem(s1,0)
+			next
+			s1=&quot;--voice=&quot; &amp; _
+					fsMacVoice(n) &amp;_
+					&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
 			oComboBox.addItem(s1,0)
-			n=n+1
+			&apos;&apos;n=n+1
 		end if
-		next
+	next
 	s1=&quot;-f &quot;&quot;(TMP)&quot;&quot;&quot;
 	oComboBox.addItem(s1,0)
 end sub
@@ -2466,7 +2472,6 @@ sub ttsActuate(_
 	else &apos;if config(fiHtmlOption) then
 	&apos;Translate And read with web tools
 		i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 0
-		sProgram=&quot;com.sun.star.system.SystemShellExecute&quot;
 		sCommand=config(fiHtmlComboURL)
 		sCommand=replacePublicTokensWithStr(sCommand)
 		sCommand=replaceWebTokensWithStr(sCommand,sTextToSpeak)
@@ -2475,9 +2480,7 @@ sub ttsActuate(_
 			if (Instr(sCommand,&quot;http://&quot;)&lt;&gt;1 And Instr(sCommand,&quot;https://&quot;)&lt;&gt;1 And Instr(sCommand,&quot;mailto:&quot;)&lt;&gt;1) then
 				sCommand=&quot;http://&quot; &amp; sCommand
 			end if
-			dim oSvc As Object
-			oSvc=createUnoService(sProgram)
-			oSvc.execute(sCommand, &quot;&quot; ,0)
+			webHelp(sCommand)
 		else
 			ErrorDisplay()
 		end if

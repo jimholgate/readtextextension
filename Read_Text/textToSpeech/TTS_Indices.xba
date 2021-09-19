@@ -879,8 +879,9 @@ end function
 
 
 function fsTemporaryTextDoc() as string
-	fsTemporaryTextDoc=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).temp &amp;_
-		&quot;/tts_str.txt&quot;
+	fsTemporaryTextDoc=createUnoService(_
+			&quot;com.sun.star.util.PathSettings&quot;).temp &amp;_
+			&quot;/tts_str.txt&quot;
 end function
 
 
