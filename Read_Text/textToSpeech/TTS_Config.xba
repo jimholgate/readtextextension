@@ -457,8 +457,6 @@ sub AboutAddOn(_
 			.GetControl(&quot;TextField3&quot;).model.Text=&quot;[com.sun.star.system.SystemShellExecute]&quot;
 			if Instr(sA,&quot;.google.&quot;) then
 				sA=sA &amp; chr(13) &amp; chr(13) &amp; &quot;Powered by Google TM&quot;
-			elseif instr(sA,&quot;vozme.com&quot;) then
-				sA=sA &amp; chr(13) &amp; chr(13) &amp; &quot;Powered by Vozme TM&quot;
 			end if
 			.GetControl(&quot;TextField2&quot;).model.Text=sA		
 		end if
