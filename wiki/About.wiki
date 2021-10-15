@@ -11,11 +11,11 @@ Read Text Extension uses an external program or a web service to read text. Read
 
 ==Screen Shot==
 
-[File:Default64.png]
+https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/Default64.png
 
 ==Tutorial==
 
-<wiki:video url=https://www.youtube.com/watch?v=OCARVoZqC-s />
+[https://www.youtube.com/watch?v=OCARVoZqC-s YouTube]
 
 ==Blog==
 
@@ -26,5 +26,7 @@ Read Text Extension uses an external program or a web service to read text. Read
 * [https://github.com/jimholgate/readtextextension/ GitHub]
 
 ----
+
 ===Related Topics===
+
 [https://help.libreoffice.org/7.2/en-US/text/shared/guide/accessibility.html Accessibility in LibreOffice]

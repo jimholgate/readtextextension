@@ -15,7 +15,7 @@ Cette extension permet à un programme externe ou une application web lire le te
 
 ==Tutoriel==
 
-<wiki:video url=https://www.youtube.com/watch?v=OCARVoZqC-s />
+[https://www.youtube.com/watch?v=OCARVoZqC-s YouTube]
 
 ==Blog==
 

@@ -11,11 +11,11 @@ Tämä lisäosa lukee tekstiä ulkoisen ohjelman tai internetpalvelun avulla. Va
 
 ==Kuvakaappaus==
 
-[File:Default64.png]
+https://raw.githubusercontent.com/jimholgate/readtextextension/master/wiki/fi/Default64.png
 
 ==Oppitunti==
 
-<wiki:video url=https://www.youtube.com/watch?v=OCARVoZqC-s />
+[https://www.youtube.com/watch?v=OCARVoZqC-s YouTube]
 
 ==Blogi==
 

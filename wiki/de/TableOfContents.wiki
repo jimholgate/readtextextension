@@ -1,11 +1,11 @@
 * Info
-** [About Info]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/de/About.wiki Info]
 * Installieren
-** [Install Installieren]
-** [SetUp Setup]
-** [CommandAndScriptTokens Tokens]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/de/Install.wiki Installieren]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/de/SetUp.wiki Setup]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/de/CommandAndScriptTokens.wiki Tokens]
 * So verwenden Sie die Read Text Extension 
-** [ReadClipboard Zwischenablage vorlesen]
-** [ReadSelection Markierten Text vorlesen]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/de/ReadClipboard.wiki Zwischenablage vorlesen]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/de/ReadSelection.wiki Markierten Text vorlesen]
 * Download
 ** [https://extensions.openoffice.org/de/project/read-text Download]

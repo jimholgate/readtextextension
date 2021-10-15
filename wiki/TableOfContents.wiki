@@ -1,11 +1,11 @@
 * About
-** [About About]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/About.wiki About]
 * Install
-** [Install Install]
-** [SetUp Set up]
-** [CommandAndScriptTokens Tokens]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/Install.wiki Install]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/SetUp.wiki Set up]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/CommandAndScriptTokens.wiki Tokens]
 * Use
-** [ReadClipboard Read Clipboard]
-** [ReadSelection Read Selection]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/ReadClipboard.wiki Read Clipboard]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/ReadSelection.wiki Read Selection]
 * Download
 ** [https://extensions.openoffice.org/en/project/read-text Download]

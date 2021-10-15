@@ -15,7 +15,7 @@ Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Cal
 
 ==Lernprogramm==
 
-<wiki:video url=https://www.youtube.com/watch?v=OCARVoZqC-s />
+[https://www.youtube.com/watch?v=OCARVoZqC-s YouTube]
 
 ==Blog==
 

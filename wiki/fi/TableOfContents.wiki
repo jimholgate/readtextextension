@@ -1,11 +1,11 @@
 * Käyttöönotto
-** [About Käyttöönotto]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fi/About.wiki Käyttöönotto]
 * Asentaminen
-** [Install Asentaminen]
-** [SetUp Asetukset]
-** [CommandAndScriptTokens Komentojonot]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fi/Install.wiki Asentaminen]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fi/SetUp.wiki Asetukset]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fi/CommandAndScriptTokens.wiki Komentojonot]
 * Käyttö
-** [ReadClipboard Lue valinta]
-** [ReadSelection Lue leikepöydältä]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fi/ReadClipboard.wiki Lue valinta]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fi/ReadSelection.wiki Lue leikepöydältä]
 * Lisätietoja
 ** [https://extensions.openoffice.org/en/project/read-text Lisätietoja verkossa]

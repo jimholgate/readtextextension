@@ -3,4 +3,4 @@
 = Lue valinta =
 
 * Avaa Writer, Calc, Draw, Impress tai Web Writer ja suorita valinta.  
-* Napsauta *Lue valinta* -painiketta työkalupalkista. 
+* Napsauta ''Lue valinta'' -painiketta työkalupalkista. 

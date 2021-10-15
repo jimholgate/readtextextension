@@ -1,11 +1,11 @@
 * Apropos
-** [About Apropos]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/About.wiki Apropos]
 * Installation
-** [Install Installation]
-** [SetUp Configuration]
-** [CommandAndScriptTokens Tokens]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/Install.wiki Installation]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/SetUp.wiki Configuration]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/CommandAndScriptTokens.wiki Tokens]
 * Utilisation
-** [ReadClipboard Lire le presse-papiers]
-** [ReadSelection Lire la sélection]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/ReadClipboard.wiki Lire le presse-papiers]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/ReadSelection.wiki Lire la sélection]
 * Télécharger
 ** [http://extensions.openoffice.org/fr/project/read-text Télécharger]
