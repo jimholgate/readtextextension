@@ -2,6 +2,6 @@
 
 = Installation =
 
-  * Obtenez la version la plus récente de l’extension à [http://aoo-extensions.sourceforge.net/en/project/Read_Text OpenOffice.org Extensions]. 
-  * Ouvrez l'extension. Approuver la licence. 
-  * Redémarrez LibreOffice ou OpenOffice.org
+* Obtenez la version la plus récente de l’extension à [http://aoo-extensions.sourceforge.net/en/project/Read_Text OpenOffice.org Extensions]. 
+* Ouvrez l'extension. Approuver la licence. 
+* Redémarrez LibreOffice ou OpenOffice.org

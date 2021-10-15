@@ -2,6 +2,6 @@
 
 = Installieren =
 
-  * Laden Sie die neueste Version der Extension von der [http://aoo-extensions.sourceforge.net/en/project/Read_Text Extension-Website herunter]. 
-  * Öffnen Sie die Extension mit der LibreOffice-Anwendung und akzeptieren Sie die Lizenz. 
-  * Starten Sie das Programm neu. 
+* Laden Sie die neueste Version der Extension von der [http://aoo-extensions.sourceforge.net/en/project/Read_Text Extension-Website herunter]. 
+* Öffnen Sie die Extension mit der LibreOffice-Anwendung und akzeptieren Sie die Lizenz. 
+* Starten Sie das Programm neu. 

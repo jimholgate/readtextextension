@@ -4,6 +4,6 @@
 
 Vous pouvez lire n'importe quel texte. 
  
-  * Sélectionnez du texte. 
-  * Utilisez *Édition - Copier* ou *Ctrl+C* . 
-  * Utilisez *Outils - Add-Ons - Lire le presse-papiers* . 
+* Sélectionnez du texte. 
+* Utilisez *Édition - Copier* ou *Ctrl+C* . 
+* Utilisez *Outils - Add-Ons - Lire le presse-papiers* . 

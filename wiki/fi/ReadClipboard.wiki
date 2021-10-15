@@ -1,9 +1,9 @@
 #summary Käyttö - Lue leikepöydältä 
 
-= Lue leikepöydältä  =
+= Lue leikepöydältä =
 
 Voit lukea ääneen mitä tahansa leikepöydälle kopioitua tekstiä, kuten esimerkiksi makroja, tekstikenttien sisältöjä, taulukoiden soluja tai tekstipätkiä. Tekstit on voitu kopioida leikepöydälle myös muista ohjelmista kuten selaimista, ohjetiedostoista tai uutissyötteistä. 
-  * Valitse teksti. 
-  * Käytä Muokkaa - Kopioi tai *Ctrl+C* . 
-  * Käytä *Työkalut - Lisäosat - Lue leikepöydältä* . 
+* Valitse teksti. 
+* Käytä Muokkaa - Kopioi tai *Ctrl+C* . 
+* Käytä *Työkalut - Lisäosat - Lue leikepöydältä* . 
  

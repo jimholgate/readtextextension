@@ -1,13 +1,15 @@
 #summary Installation de l'extension Read text
 
-= Configuration = 
-  * Cliquez sur l'icône dans la barre de menu ou sélectionnez *Outils - Add-ons - Lire la sélection ...* 
-  * Choisissez un logiciel ou un site et modifier les paramètres. 
-  * La plupart du temps les paramètres affichés peuvent synthétiser la parole sans modification.
-  * Vous pouvez tester les paramètres sans les enregistrer par un clic droit sur *OK* . 
-  * Lorsque vous êtes satisfait des paramètres, décochez la case *Toujours affiche cette boîte de dialogue* . 
-  * Cliquez sur *OK* . 
+= Configuration =
 
-= Personnaliser = 
-  * Vous pouvez utiliser des applications externes ou des sites Web pour la synthese vocale des langues différentes ou pour la traduction de texte. 
-  * Si vous souhaitez afficher la boîte de dialogue pour modifier les paramètres, utilisez la commande *Outils - Add-ons - Lire la sélection ...* 
+* Cliquez sur l'icône dans la barre de menu ou sélectionnez *Outils - Add-ons - Lire la sélection ...* 
+* Choisissez un logiciel ou un site et modifier les paramètres. 
+* La plupart du temps les paramètres affichés peuvent synthétiser la parole sans modification.
+* Vous pouvez tester les paramètres sans les enregistrer par un clic droit sur *OK* . 
+* Lorsque vous êtes satisfait des paramètres, décochez la case *Toujours affiche cette boîte de dialogue* . 
+* Cliquez sur *OK* . 
+
+= Personnaliser =
+
+* Vous pouvez utiliser des applications externes ou des sites Web pour la synthese vocale des langues différentes ou pour la traduction de texte. 
+* Si vous souhaitez afficher la boîte de dialogue pour modifier les paramètres, utilisez la commande *Outils - Add-ons - Lire la sélection ...* 

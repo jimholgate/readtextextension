@@ -6,12 +6,12 @@ Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Cal
 
 ==Download==
 
-  * [https://extensions.libreoffice.org/extensions/read-text LibreOffice Extensions]
-  * [http://extensions.services.openoffice.org/de/project/read-text Apache OpenOffice Extensions]
+* [https://extensions.libreoffice.org/extensions/read-text LibreOffice Extensions]
+* [https://extensions.openoffice.org/de/project/read-text Apache OpenOffice Extensions]
 
 ==Image==
 
-[http://sites.google.com/site/readtextextension/ http://readtextextension.googlecode.com/svn/wiki/de/Default64.png]
+[File:Default64.png]
 
 ==Lernprogramm==
 
@@ -19,12 +19,12 @@ Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Cal
 
 ==Blog==
 
-  * [http://sites.google.com/site/readtextextension/ Read Text Software]
+* [https://sites.google.com/site/readtextextension/ Read Text]
 
 ==Source-Code==
 
-  * [http://code.google.com/p/readtextextension/source/browse/Read_Text/ Google Project Hosting]
+* [https://github.com/jimholgate/readtextextension/ GitHub]
   
 -----
 ===Verwandte Themen===
-[http://help.libreoffice.org/Common/Accessibility_in/de Zugänglichkeit in LibreOffice]
+[https://help.libreoffice.org/7.2/de/text/shared/guide/accessibility.html Zugänglichkeit in LibreOffice]

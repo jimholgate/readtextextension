@@ -1,11 +1,11 @@
-  * Käyttöönotto
-    * [About Käyttöönotto]
-  * Asentaminen
-    * [Install Asentaminen]
-    * [SetUp Asetukset]
-    * [CommandAndScriptTokens Komentojonot]
-  * Käyttö
-    * [ReadClipboard Lue valinta]
-    * [ReadSelection Lue leikepöydältä]
-  * Lisätietoja
-    * [http://extensions.openoffice.org/en/project/read-text Lisätietoja verkossa]
+* Käyttöönotto
+** [About Käyttöönotto]
+* Asentaminen
+** [Install Asentaminen]
+** [SetUp Asetukset]
+** [CommandAndScriptTokens Komentojonot]
+* Käyttö
+** [ReadClipboard Lue valinta]
+** [ReadSelection Lue leikepöydältä]
+* Lisätietoja
+** [https://extensions.openoffice.org/en/project/read-text Lisätietoja verkossa]

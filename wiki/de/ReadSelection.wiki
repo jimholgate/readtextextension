@@ -2,5 +2,5 @@
 
 = Markierten Text vorlesen=
 
-  * Öffnen Sie Calc, Draw, Impress, Writer oder Web Writer, und markieren Sie anschließend eine Stelle. 
-  * Klicken Sie auf die Schaltfläche *Markierten Text vorlesen* in der Menüleiste. 
+* Öffnen Sie Calc, Draw, Impress, Writer oder Web Writer, und markieren Sie anschließend eine Stelle. 
+* Klicken Sie auf die Schaltfläche *Markierten Text vorlesen* in der Menüleiste. 
