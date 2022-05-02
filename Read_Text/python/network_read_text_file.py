@@ -261,7 +261,7 @@ class GoogleTranslateClass(object):
 
     Powered by Google\u2122
 
-    "Google", "Google Cloud" and "Google Translate" are trademarks of Google Inc. 
+    "Google", "Google Cloud" and "Google Translate" are trademarks of Google Inc.
 
     The contents of this resource are not affiliated with, sponsored by, or endorsed
     by Google nor does the documention represent the views or opinions of Google or

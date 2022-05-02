@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ThirdPartyCode" script:language="StarBasic">REM  *****  BASIC  *****
-OPTION EXPLICIT
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ThirdPartyCode" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  * 
+Option Explicit
 &apos;&apos; # Third Party Code
 &apos;&apos;
 &apos;&apos; Code shown here is used or adapted from other sources with permission.
@@ -11,124 +11,157 @@ OPTION EXPLICIT
 &apos; and are distributed under the GNU General Public License
 &apos;
 
-function fbTts_util_stringToBoolean(_
-		value as string) as boolean
+Function fbTts_util_stringToBoolean( _
+	value As String) As Boolean
 	&apos; Converts a String to a boolean value.
 	&apos; True=&gt; &quot;True&quot;
 	&apos; False=&gt; &quot;False&quot;
-	dim b as boolean: b=False
-	dim v as string: v=Trim(value)
+	Dim b As Boolean
+	b = False
+	Dim v As String
+	v = Trim(value)
+	
+	If StrComp(v,&quot;True&quot;,0) = 0 _
+		Or StrComp(v,&quot;yes&quot;,0) = 0 _
+		Or val(v) &lt;&gt; 0 Then
+		b = True
+	End If
+	fbTts_util_stringToBoolean = b
+End Function
 
-	if strComp(v,&quot;True&quot;,0)=0 _
-			or strComp(v,&quot;yes&quot;,0)=0 _
-			or val(v) &lt;&gt; 0 then
-		b=True
-	end if
-	fbTts_util_stringToBoolean=b
-end function
 
-
-function fsTts_util_booleanToString(_
-		value as boolean) as string
+Function fsTts_util_booleanToString( _
+	value As Boolean) As String
 	&apos; Converts a boolean value to a String.
 	&apos; True=&gt; &quot;True&quot;
 	&apos; False=&gt; &quot;False&quot;
-	dim s as string
+	Dim s As String
+	
+	If value Then
+		s = &quot;True&quot;
+	Else
+		s = &quot;False&quot;
+	End If
+	fsTts_util_booleanToString = s
+End Function
 
-	if value then
-		s=&quot;True&quot;
-	else
-		s=&quot;False&quot;
-	end if
-	fsTts_util_booleanToString=s
-end function
 
-
-function fsFullPathOf(_
-		filename as string) as string
+Function fsFullPathOf( _
+	filename As String) As String
 	&apos;This macro sets a complete path for the user directory for the temporary file
+	
+	fsFullPathOf = createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; _
+	&quot;/&quot; &amp; _
+	filename
+End Function
 
-	fsFullPathOf=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp;_
-			&quot;/&quot; &amp; _
-			filename
-end function
+
+Function LinuxPythonPath() As String
+	Dim a1
+	Dim x# : x = 0
+	LinuxPythonPath = &quot;&quot;
+	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
+		LinuxPythonPath = fsAppImageResourcePath(&quot;python&quot;)
+	Else
+		a1 = Array(&quot;python3&quot;, &quot;python&quot;, &quot;python2.7&quot;, &quot;python2&quot;)
+		For x = Lbound(a1) To Ubound(a1)
+	 		If fileexists(&quot;/usr/bin/&quot; &amp; a1(x)) Then
+				LinuxPythonPath = &quot;/usr/bin/&quot; &amp; a1(x)
+				Exit Function
+			End If
+		Next
+	End If
+End Function
 
 
-function fvTts_config_createDefaultConfig(_
-		msgs() as variant,_
-		errorCode as integer) as variant
-
+Function fvTts_config_createDefaultConfig( _
+	msgs() As Variant, _
+	errorCode As Integer) As Variant
+	
 	&apos; The place to store the configuration data
-	dim config(fiCountConfigOptions) as variant
-
+	Dim config(fiCountConfigOptions) As Variant
+	
 	&apos; Create default values for variables
-	if GetGUIType()=1 then &apos; Windows
-		config(fiFestivalOption)=False
-		if fileexists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) then
-			config(fiFestivalPath)=fsProgramDirectoryx86 &amp; &quot;festival\festival.exe&quot;
-		else
-			config(fiFestivalPath)=fsProgramDirectory &amp; &quot;festival\festival.exe&quot;
-		end if
-		config(fiFestivalComboChoice)=&quot;(tts&quot;&quot;(TMP)&quot;&quot;nil) (quit)&quot;
-		config(fiExternalOption)=True
-		config(fiHtmlOption)=False
-		config(fiSmartSelectCheckBox)=0
-		config(fiHtmlComboURL)=&quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
-		config(fiExternalProgramPath)=WinSpeechProgramPath()
-		config(fiExternalCommand)=WinSpeechArgument()
-		config(fiAlwaysShowDialogCheckBox)=1
-		config(fiDialogLanguageCombo)=fsGetLanguage()
-	else &apos; *n*x or Mac
-		config(fiFestivalOption)=False
-		config(fiFestivalPath)=&quot;/usr/bin/festival&quot;
-		config(fiFestivalComboChoice)=&quot;(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
-		config(fiExternalOption)=True
-		config(fiHtmlOption)=False
-		config(fiSmartSelectCheckBox)=0
-		config(fiHtmlComboURL)=&quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
-		if fsGetOS()=&quot;UNIX&quot; then &apos; Linux
-			if len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 then
-				config(fiExternalProgramPath) = fsAppImageResourcePath(&quot;python&quot;)
-			elseif fileexists(&quot;/usr/bin/python3&quot;) then
-				config(fiExternalProgramPath)=&quot;/usr/bin/python3&quot;
-			elseif fileexists(&quot;/usr/bin/python2.7&quot;) then
-				config(fiExternalProgramPath)=&quot;/usr/bin/python2.7&quot;
-			elseif fileexists(&quot;/usr/bin/python2&quot;) then
-				config(fiExternalProgramPath)=&quot;/usr/bin/python2&quot;
-			else
-				config(fiExternalProgramPath)=&quot;/usr/bin/python&quot;
-			end if
-			if fileexists(&quot;/usr/bin/pico2wave&quot;) then
-				config(fiExternalCommand)=&quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+	If GetGUIType() = 1 Then
+		&apos; Windows
+		config(fiFestivalOption()) = False
+		If fileexists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) Then
+			config(fiFestivalPath()) = fsProgramDirectoryx86 &amp; &quot;festival\festival.exe&quot;
+		Else
+ 			config(fiFestivalPath()) = fsProgramDirectory &amp; &quot;festival\festival.exe&quot;
+		End If
+		config(fiFestivalComboChoice()) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
+		config(fiExternalOption()) = True
+		config(fiHtmlOption()) = False
+		config(fiSmartSelectCheckBox()) = 0
+		config(fiHtmlComboURL()) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+		config(fiExternalProgramPath()) = WinSpeechProgramPath()
+		config(fiExternalCommand()) = WinSpeechArgument()
+		config(fiAlwaysShowDialogCheckBox()) = 1
+		config(fiDialogLanguageCombo()) = fsGetLanguage()
+	Else
+		&apos; Posix or MacOS
+		config(fiFestivalOption()) = False
+		config(fiFestivalPath()) = &quot;/usr/bin/festival&quot;
+		config(fiFestivalComboChoice()) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
+		config(fiExternalOption()) = True
+		config(fiHtmlOption()) = False
+		config(fiSmartSelectCheckBox()) = 0
+		config(fiHtmlComboURL()) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+		If fsGetOS() = &quot;UNIX&quot; Then
+			&apos; Linux
+			If Len(LinuxPythonPath()) &lt;&gt; 0 Then
+				config(fiExternalProgramPath()) = LinuxPythonPath()
+			Else
+				config(fiExternalProgramPath()) = &quot;/usr/bin/python&quot;
+			End If
+			If fileexists(&quot;/usr/bin/pico2wave&quot;) Then
+				config(fiExternalCommand()) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
-			elseif fileexists(&quot;/usr/bin/text2wave&quot;) then
-				config(fiExternalCommand)=&quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+			ElseIf fileexists(&quot;/usr/bin/text2wave&quot;) Or fileexists(&quot;/usr/bin/flite&quot;) Then
+				config(fiExternalCommand()) = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
-			elseif fileexists(&quot;/usr/lib/python3/dist-packages/speechd/client.py&quot;) and _
-					fileexists(environ(&quot;HOME&quot;) &amp; _
-					&quot;/.speech-dispatcher/conf/speechd.conf&quot;) then
-				config(fiExternalCommand)=&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot; &amp; _
-					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			else
-				config(fiExternalCommand)=&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+			ElseIf fileexists(&quot;/usr/bin/open_jtalk&quot;) And fsGetLanguage() = &quot;ja&quot; Then
+				&apos; Japanese
+				config(fiExternalCommand()) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+				&quot;--visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
+			&apos;ElseIf fbHaveNetworkTTS() And fsGetLanguage() = &quot;ca&quot; Then
+			&apos;	&apos; Catalan
+			&apos;	config(fiExternalCommand()) = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+			&apos;	&quot;--language=(SELECTION_LANGUAGE_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
+			ElseIf fileexists(environ(&quot;HOME&quot;) &amp; _
+				&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or fileexists( _
+				environ(&quot;HOME&quot;) &amp; _
+				&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or Len( _
+				fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
+				
+				config(fiExternalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot; &amp; _
+				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			ElseIf fbHaveEspeak() Then
+				config(fiExternalCommand()) = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
-			end if
-		else &apos;Mac (OSX)
-			config(fiExternalProgramPath)= AppleScriptPath()
-			config(fiExternalCommand)=&quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
-		end if
-		config(fiAlwaysShowDialogCheckBox)=1
-		config(fiDialogLanguageCombo)=fsGetLanguage()
-	end if
-	fvTts_config_createDefaultConfig()=config()
-end function
+			Else
+				config(fiExternalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot; &amp; _
+				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
+			End If
+		Else
+			&apos;Mac (MacOS)
+			config(fiExternalProgramPath()) = AppleScriptPath()
+			config(fiExternalCommand()) = &quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
+		End If
+		config(fiAlwaysShowDialogCheckBox()) = 1
+		config(fiDialogLanguageCombo()) = fsGetLanguage()
+	End If
+	fvTts_config_createDefaultConfig() = config()
+End Function
 
 
-sub tts_config_parseLine(_
-		byval l as string,_
-		key as string,_
-		value as string)
+Sub tts_config_parseLine( _
+	ByVal l As String, _
+	key As String, _
+	value As String)
 	&apos; Parses one line from the configuration file.
 	&apos;
 	&apos; Parameters:
@@ -139,73 +172,79 @@ sub tts_config_parseLine(_
 	&apos; if the line is a comment line then the key will
 	&apos; be &quot;&quot;.
 	&apos;
-	dim iEq as integer
+	Dim iEq As Integer
 	
 	&apos; Initialise return values
-	key=&quot;&quot;
-	value=&quot;&quot;
-
+	key = &quot;&quot;
+	value = &quot;&quot;
+	
 	&apos; Is this an empty line?
-	if len(Trim(l))=0 then
+	If Len(Trim(l)) = 0 Then
 		&apos; Empty - ignore
-
-	&apos; Is this a comment line?
-	elseif left(Trim(l),1)=&quot;#&quot; then
+		
+		&apos; Is this a comment line?
+	ElseIf Left(Trim(l),1) = &quot;#&quot; Then
 		&apos; Comment
-
-	else
+		
+	Else
 		&apos; Parse into key=value
-		iEq=inStr(l,&quot;=&quot;)
-		if iEq=0 then
+		iEq = InStr(l, &quot;=&quot;)
+		If iEq = 0 Then
 			&apos; not found - assume whole thing is key
-			key=l
-		else
-			key=left(l,iEq - 1)
-			value=mid(l,iEq + 1)
-		end if
-	end if
-end sub
+			key = l
+		Else
+			key = Left(l, iEq - 1)
+			value = Mid(l, iEq + 1)
+		End If
+	End If
+End Sub
 
 
-sub tts_config_writeFile(_
-		config() as variant,byval configFilePath as string)
+Sub tts_config_writeFile( _
+	config() As Variant,ByVal configFilePath As String)
 	&apos; Writes a configuration file from an array.
 	&apos; This function updated 2013-08-29 - always write as UTF-8
-	dim sA as string
-	dim CR as string
+	Dim sA As String
+	Dim CR As String
+	Dim ExternalCommand As String
+	Dim PyVersion() As String
+	Dim x As Integer
+	ExternalCommand = config(fiExternalCommand())
+	PyVersion = Array(&quot;3&quot;, &quot;2.7&quot;, &quot;2&quot;, &quot;&quot;)
 
-	CR = chr(10)
-	sA = &quot;# Configuration file for Read Text Extension&quot; &amp; CR
-	sA = fsKeyUSE_FESTIVAL_BOOLEAN &amp; &quot;=&quot; _
-		&amp; fsTts_util_booleanToString(config(fiFestivalOption)) &amp; CR
-	sA = sA &amp; fsKeyFESTIVAL_PATH_STRING &amp; &quot;=&quot; _
-		&amp; config(fiFestivalPath) &amp; CR
-	sA = sA &amp; fsKeyFESTIVAL_SCRIPT_STRING &amp; &quot;=&quot; _
-		&amp; config(fiFestivalComboChoice) &amp; CR
-	sA = sA &amp; fsKeyUSE_ESPEAK_BOOLEAN &amp; &quot;=&quot; _
-		&amp; fsTts_util_booleanToString(config(fiExternalOption)) &amp; CR
-	sA = sA &amp; fsKeyUSE_HTML_BOOLEAN &amp; &quot;=&quot; _
-		&amp; fsTts_util_booleanToString(config(fiHtmlOption)) &amp; CR
-	sA = sA &amp; fsKeyHTML_STRING &amp; &quot;=&quot; _
-		&amp; config(fiHtmlComboURL) &amp; CR
-	sA = sA &amp; fsKeyESPEAK_PATH_STRING &amp; &quot;=&quot; _
-		&amp; config(fiExternalProgramPath) &amp; CR
-	sA = sA &amp; fsKeyESPEAK_COMMANDS_STRING &amp; &quot;=&quot; _
-		&amp; config(fiExternalCommand) &amp; CR
-	sA = sA &amp; fsKeyDISPLAY_INFO_INTEGER &amp; &quot;=&quot; _
-		&amp; config(fiAlwaysShowDialogCheckBox) &amp; CR
-	sA = sA &amp; fsKeyUSE_SMART_SELECT &amp; &quot;=&quot; _
-		&amp; config(fiSmartSelectCheckBox) &amp; CR
-	sA = sA &amp; fsKeyDISPLAY_LANGUAGE_STRING &amp; &quot;=&quot; _
-		&amp; config(fiDialogLanguageCombo) &amp; CR
+	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
+		&apos; Do not record a temporary Posix python application path.
+		If InStr(ExternalCommand, &quot;/python&quot;) &lt;&gt; 0 Then
+			For x = Lbound(PyVersion) To Ubound(PyVersion)
+				If Len(fsFindAppPath(&quot;python&quot; &amp; PyVersion(x))) &lt;&gt; 0 Then
+					ExternalCommand = fsFindAppPath(&quot;python&quot; &amp; PyVersion(x))
+					Exit For
+				End If
+			Next
+		End If
+	End If
+	
+	CR = Chr(10)
+	sA = Join(Array(_
+	&quot;text-to-speech.use.festival.boolean=&quot;, fsTts_util_booleanToString(config(fiFestivalOption())), CR, _
+	&quot;text-to-speech.festival.path.string=&quot;, config(fiFestivalPath()), CR, _
+	&quot;text-to-speech.festival.script.string=&quot;, config(fiFestivalComboChoice()), CR, _
+	&quot;text-to-speech.use.espeak.boolean=&quot;, fsTts_util_booleanToString(config(fiExternalOption())), CR, _
+	&quot;text-to-speech.use.html.boolean=&quot;, fsTts_util_booleanToString(config(fiHtmlOption())), CR, _
+	&quot;text-to-speech.html.string=&quot;, config(fiHtmlComboURL()), CR, _
+	&quot;text-to-speech.espeak.path.string=&quot;, config(fiExternalProgramPath()), CR, _
+	&quot;text-to-speech.espeak.options.string=&quot;, ExternalCommand, CR, _
+	&quot;text-to-speech.display.info.integer=&quot;, config(fiAlwaysShowDialogCheckBox()), CR, _
+	&quot;text-to-speech.use.smart.select.integer=&quot;, config(fiSmartSelectCheckBox()), CR, _
+	&quot;text-to-speech.display.language.string=&quot;, config(fiDialogLanguageCombo()), CR), &quot;&quot;)
 	CreateFile(configFilePath, sA, &quot;UTF-8&quot;)
-end sub
+End Sub
 
 
-sub tts_config_parseFile(_
-		byval configFilePath as string,_
-		config() as variant,_
-		errorCode as integer)
+Sub tts_config_parseFile( _
+	ByVal configFilePath As String, _
+	config() As Variant, _
+	errorCode As Integer)
 	&apos; Parses the configuration file into an array.
 	&apos;
 	&apos; Parameters:
@@ -214,237 +253,250 @@ sub tts_config_parseFile(_
 	&apos;                   from the file.
 	&apos; errorCode (in out) The Error parameter.
 	&apos;
-	dim sA as string
-	dim CR as string
-	dim CR2 as string
-	dim l as string
-	dim key as string
-	dim value as string
-	dim n1 as integer
-	dim n2 as integer
-
-	CR = chr(13)
-	CR2 = chr(10)
+	Dim sA As String
+	Dim CR As String
+	Dim CR2 As String
+	Dim l As String
+	Dim key As String
+	Dim value As String
+	Dim n1 As Integer
+	Dim n2 As Integer
+	Dim sAppPython As String
+	
+	CR = Chr(13)
+	CR2 = Chr(10)
 	sA = getTextFromFile(configFilePath, &quot;UTF-8&quot;)
-	if instr(sA, CR2) &lt; instr(sA, CR) then
+	If InStr(sA, CR2) &lt; InStr(sA, CR) Then
 		&apos; choose character return or line feed
 		CR = CR2
-	end if
+	End If
 	l = sA
-	do while len(l) &gt; 0
-		l = fsSuperTrim(left(sA, instr(sA, CR)))
-		sA = fsSuperTrim(mid(sA, instr(sA, CR) + 1 ))
-		tts_config_parseLine(l,key,value)
-		if len(key) &gt; 0 then
-			select case lcase(key)
-			case fsKeyUSE_FESTIVAL_BOOLEAN
-				config(fiFestivalOption)=fbTts_util_stringToBoolean(value)
-			case fsKeyFESTIVAL_PATH_STRING
-				config(fiFestivalPath)=value
-
-			case fsKeyFESTIVAL_SCRIPT_STRING
-				config(fiFestivalComboChoice)=value
+	Do While Len(l) &gt; 0
+		l = fsSuperTrim(Left(sA, InStr(sA, CR)), &quot;&quot;)
+		sA = fsSuperTrim(Mid(sA, InStr(sA, CR) + 1 ), &quot;&quot;)
+		tts_config_parseLine(l, key, value)
+		If Len(key) &gt; 0 Then
+			Select Case LCase(key)
+				Case &quot;text-to-speech.use.festival.boolean&quot;
+				config(fiFestivalOption()) = fbTts_util_stringToBoolean(value)
+				Case &quot;text-to-speech.festival.path.string&quot;
+				config(fiFestivalPath()) = value
 				
-			case fsKeyUSE_ESPEAK_BOOLEAN
-				config(fiExternalOption)=fbTts_util_stringToBoolean(value)
+				Case &quot;text-to-speech.festival.script.string&quot;
+				config(fiFestivalComboChoice()) = value
+				
+				Case &quot;text-to-speech.use.espeak.boolean&quot;
+				config(fiExternalOption()) = fbTts_util_stringToBoolean(value)
+				
+				Case &quot;text-to-speech.espeak.path.string&quot;
+				If fsGetOS() = &quot;UNIX&quot; Then
+					If InStr(value, &quot;/python&quot;) &lt;&gt; 0 Then
+						&apos; Since users sometimes use both containers and native
+						&apos; apps, we update the location of the python to use.
+						&apos; For example, AppImage programs usually create a mount
+						&apos; point in the `/tmp/` temporary that includes a version of
+						&apos; python that might be incompatible with the system python.
+						config(fiExternalProgramPath()) = LinuxPythonPath()
+					Else
+						config(fiExternalProgramPath()) = value
+					End If
+				Else
+					config(fiExternalProgramPath()) = value
+				End If
+				Case &quot;text-to-speech.espeak.options.string&quot;
+				config(fiExternalCommand()) = value
+				
+				Case &quot;text-to-speech.use.html.boolean&quot;
+				config(fiHtmlOption()) = fbTts_util_stringToBoolean(value)
+				
+				Case &quot;text-to-speech.html.string&quot;
+				config(fiHtmlComboURL()) = value
+				
+				Case &quot;text-to-speech.display.info.integer&quot;
+				config(fiAlwaysShowDialogCheckBox()) = fiStringToInteger(value)
+				
+				Case &quot;text-to-speech.display.language.string&quot;
+				config(fiDialogLanguageCombo()) = value
+				
+				Case &quot;text-to-speech.use.smart.select.integer&quot;
+				config(fiSmartSelectCheckBox()) = value
+				Case Else
+				
+			End Select
+		End If
+	Loop
+End Sub
 
-			case fsKeyESPEAK_PATH_STRING
-				if len(fsAppImageResourcePath(&quot;python&quot;)) = 0 then
-					config(fiExternalProgramPath)=value
-				elseif (instr(value, &quot;/python&quot;) &lt;&gt; 0) then
-					&apos; The AppImage program instance needs to update the temporary
-					&apos; location of the included python version.
-					config(fiExternalProgramPath) = fsAppImageResourcePath(&quot;python&quot;)
-				end if
-			case fsKeyESPEAK_COMMANDS_STRING
-				config(fiExternalCommand)=value
 
-			case fsKeyUSE_HTML_BOOLEAN
-				config(fiHtmlOption)=fbTts_util_stringToBoolean(value)
-
-			case fsKeyHTML_STRING
-				config(fiHtmlComboURL)=value
-
-			case fsKeyDISPLAY_INFO_INTEGER
-				config(fiAlwaysShowDialogCheckBox)=fiStringToInteger(value)
-
-			case fsKeyDISPLAY_LANGUAGE_STRING
-				config(fiDialogLanguageCombo)=value
-
-			case fsKeyUSE_SMART_SELECT
-				config(fiSmartSelectCheckBox)=value
-
-			case else
-
-			end select
-		end if
-	loop
-end sub
-
-
-function fsSuperTrim(_
-		byval sA )
-	&apos; Remove extra line feeds and character returns
-	dim n as integer
-
-	for n = 1 to 100
-		if len(sA) = 0 then
-			exit for
-		elseif right(sA, 1) = chr(10) or right(sA, 1) = chr(13) then
-			sA = left(sA, len(sA) - 1 )
-			sA = trim(sA)
-		else
-			exit for
-		end if
-	next
-	for n = 1 to 100
-		if len(sA) = 0 then
-			exit for
-		elseif left(sA, 1) = chr(10) or left(sA, 1) = chr(13) then
-			sA = mid(sA, 2 )
-			sA = trim(sA)
-		else
-			exit for
-		end if
-	next
+Function fsSuperTrim( _
+	ByVal sA As String, _
+	ByVal unwanted_chrs As String) As String
+	&apos; Trim extra unwanted characters from left and right
+	&apos; of a string - like python `strip`
+	&apos; * `sA` - The string to trim
+	&apos; * `unwanted_chrs` - String of characters to strip
+	&apos;    in the form `Chr(10) &amp; Chr(13)` or `&quot;,:;-&quot;.`
+	If Len(unwanted_chrs) = 0 Then
+		unwanted_chrs = Chr(10) &amp; Chr(13)
+	End If
+	Dim n As Integer
+	Dim limit as Integer
+	limit = 100
+	If Len(sA) &lt; limit Then
+		limit = Len(sA)
+	End If
+	For n = 1 To limit
+		sA = Trim(sA)
+		If Len(sA) = 0 Then
+			Exit For
+		ElseIf Instr(unwanted_chrs, Right(sA, 1)) &gt; 0 Then
+			sA = Left(sA, Len(sA) - 1)
+			sA = Trim(sA)
+		Else
+			Exit For
+		End If
+	Next
+	For n = 1 to limit
+		sA = Trim(sA)
+		If Len(sA) = 0 Then
+			Exit For
+		ElseIf Instr(unwanted_chrs, Left(sA, 1)) &gt; 0 Then
+			sA = Mid(sA, 2)
+			sA = Trim(sA)
+		Else
+			Exit For
+		End If
+	Next		
 	fsSuperTrim = sA
+End Function
 
-end function
 
-
-function fsRetrieveCalcActiveCellProperty(_
-		strA) as string
+Function fsRetrieveCalcActiveCellProperty( _
+	strA) As String
 	&apos; Modified from sub from: Paolo Mantovani
 	&apos; email: mantovani.paolo@tin.it
 	&apos; published at https://sourceforge.net/projects/ooomacros/files/Andrew%20Pitonyak_s%20Macro%20Doc/2006-01-25/AndrewMacro_2006-01-25.zip/download
 	&apos; Gets property of the active cell.
-	dim oOldSelection  &apos;The original selection of cell ranges
-	dim oRanges  &apos;A blank range created by the document
-	dim oActiveCell  &apos;The current active cell
-	dim sCellContent as string
-
-	REM store the current selection
-	oOldSelection=ThisComponent.CurrentSelection
-	oRanges=ThisComponent.createInstance(&quot;com.sun.star.sheet.SheetCellRanges&quot;)
+	Dim oOldSelection  &apos;The original selection of cell ranges
+	Dim oRanges  &apos;A blank range created by the document
+	Dim oActiveCell  &apos;The current active cell
+	Dim sCellContent As String
+	
+	Rem store the current selection
+	oOldSelection = ThisComponent.CurrentSelection
+	oRanges = ThisComponent.createInstance(&quot;com.sun.star.sheet.SheetCellRanges&quot;)
 	ThisComponent.CurrentController.Select(oRanges)
 	&apos;get the active cell!
-	oActiveCell=ThisComponent.CurrentSelection
-	select case strA
-	case &quot;country&quot;
-		sCellContent=oActiveCell.CharLocale.Country
-	case &quot;language&quot;
-		sCellContent=oActiveCell.CharLocale.Language
-	case &quot;asian-language&quot;
-		sCellContent=oActiveCell.CharLocaleAsian.Language
-	case &quot;complex-language&quot;
-		sCellContent=oActiveCell.CharLocaleComplex.Language
-	case &quot;asian-country&quot;
-		sCellContent=oActiveCell.CharLocaleAsian.Country
-	case &quot;complex-country&quot;
-		sCellContent=oActiveCell.CharLocaleComplex.Country
-	case else
-		 sCellContent=oActiveCell.getString()
-	end select
+	oActiveCell = ThisComponent.CurrentSelection
+	Select Case strA
+		Case &quot;country&quot;
+		sCellContent = oActiveCell.CharLocale.Country
+		Case &quot;language&quot;
+		sCellContent = oActiveCell.CharLocale.Language
+		Case &quot;asian-language&quot;
+		sCellContent = oActiveCell.CharLocaleAsian.Language
+		Case &quot;complex-language&quot;
+		sCellContent = oActiveCell.CharLocaleComplex.Language
+		Case &quot;asian-country&quot;
+		sCellContent = oActiveCell.CharLocaleAsian.Country
+		Case &quot;complex-country&quot;
+		sCellContent = oActiveCell.CharLocaleComplex.Country
+		Case Else
+		sCellContent = oActiveCell.getString()
+	End Select
 	&apos;restore the old selection (but loosing the previous active cell)
 	ThisComponent.CurrentController.Select(oOldSelection)
-		fsRetrieveCalcActiveCellProperty=sCellContent
-end function
+	fsRetrieveCalcActiveCellProperty = sCellContent
+End Function
 
 
-function fsGetPackageDirURL(_
-		sIdentifier as string) as string
+Function fsGetPackageDirURL( _
+	sIdentifier As String) As String
 	&apos;http://www.oooforum.org/forum/viewtopic.phtml?t=72633
-	dim oPIP As Object
+	Dim oPIP As Object
+	
+	oPIP = GetDefaultContext().getByName( _
+	&quot;/singletons/com.sun.star.deployment.PackageInformationProvider&quot;)
+	fsGetPackageDirURL = oPIP.getPackageLocation(sIdentifier)
+End Function
 
-	oPIP=GetDefaultContext().getByName( _
-		 &quot;/singletons/com.sun.star.deployment.PackageInformationProvider&quot;)
-	fsGetPackageDirURL=oPIP.getPackageLocation(sIdentifier)
-end function
 
-
-function fsGetPicturePath()
-	dim oDialog
-	dim oAllFiles
-	dim oFrame
-	dim oBar
-	dim sFilePickerArgs
-
-	on error goto fsGetPicturePathErr
+Function fsGetPicturePath() As String
+	Dim oDialog
+	Dim oAllFiles
+	Dim oFrame
+	Dim oBar
+	Dim sFilePickerArgs
+	
+	On error Goto fsGetPicturePathErr
 	oDialog = createUnoService(&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
 	sFilePickerArgs = Array(com.sun.star.ui.dialogs.TemplateDescription.FILEOPEN_LINK_PREVIEW)
 	oDialog.Initialize(sFilePickerArgs())
 	oDialog.setMultiSelectionMode(0)
 	oDialog.AppendFilter( &quot;JPEG, PNG&quot;, &quot;*.jpeg;*.jpg;*.png&quot;)
 	oDialog.AppendFilter( &quot;BMP, GIF, JPEG, PNG, TIF, TGA&quot;, &quot;*.bmp;*.gif;*.&quot; &amp; _
-			&quot;jpeg;*.jpg;*.png;*.tif;*.tiff;*.tga&quot;)
-	oDialog.setTitle(fsLookUpTerm( &quot;s_read-text&quot;, fsGetLanguage())&amp; _
-		&quot; - &quot; &amp;&quot; (MY_IMAGE)&quot;)
-	if oDialog.execute = 0 then
-		fsGetPicturePath=ConvertFromURL(fsPosterImg) &apos;Default picture
-	end if
+	&quot;jpeg;*.jpg;*.png;*.tif;*.tiff;*.tga&quot;)
+	oDialog.setTitle(fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
+	&quot; - &quot; &amp; &quot; (MY_IMAGE)&quot;)
+	If oDialog.execute = 0 Then
+		fsGetPicturePath = ConvertFromURL(fsPosterImg()) &apos;Default picture
+	End If
 	oAllFiles() = oDialog.getFiles()
 	fsGetPicturePath = ConvertFromURL(oAllFiles(0))
-	if fsGetPicturePath = &quot;&quot; then
-		fsGetPicturePath=ConvertFromURL(fsPosterImg) &apos;Default picture
-	end if
-	exit function
+	If fsGetPicturePath = &quot;&quot; Then
+		fsGetPicturePath = ConvertFromURL(fsPosterImg()) &apos;Default picture
+	End If
+	Exit Function
 	fsGetPicturePathErr:
-	fsGetPicturePath = &quot;&quot;
-end function
-
-
-function CreatePoint(_
-		byval x as long, _
-		byval y as long) As com.sun.star.awt.Point
-	&apos; OpenOffice.org Macros Explained, Third Ed., 2015. [Andrew Pitonyak](http://www.pitonyak.org)
-	dim oPoint : oPoint = createUnoStruct( &quot;com.sun.star.awt.Point&quot; )
-	oPoint.X = x : oPoint.Y = y
-	CreatePoint = oPoint
-end function
-
-
-function CreateSize(_
-		byval x as long, _
-		byval y as long) As com.sun.star.awt.Size
-	&apos; OpenOffice.org Macros Explained, Third Ed., 2015. [Andrew Pitonyak](http://www.pitonyak.org)
-	dim oSize : oSize = createUnoStruct( &quot;com.sun.star.awt.Size&quot; )
-	oSize.Width = x : oSize.Height = y
-	CreateSize = oSize
-end function
-
-
-sub ChangeBackground(_
-		optional byval i, _
-		optional r1, _
-		optional g1, _
-		optional b1)
-	&apos;AndrewMacro.odt - [Andrew Pitonyak](http://www.pitonyak.org)
-	dim oDoc as object
-	dim oDrawPages as object
-	dim oDrawPage as object
-	dim oBackground as object
 	
-	if ismissing(i) then
-		i = 0
-	end if
-	if ismissing(r1) then
-		r1 = 0
-	end if	
-	if ismissing(g1) then
-		g1 = 0
-	end if
-	if ismissing(b1) then
-		b1 = 0
-	end if
+	fsGetPicturePath = &quot;&quot;
+End Function
+
+
+Function CreatePoint( _
+	ByVal x As Long, _
+	ByVal y As Long) As com.sun.star.awt.Point
+	&apos; OpenOffice.org Macros Explained, Third Ed., 2015. [Andrew Pitonyak](http://www.pitonyak.org)
+	Dim oPoint
+	oPoint = createUnoStruct( &quot;com.sun.star.awt.Point&quot; )
+	oPoint.X = x
+	oPoint.Y = y
+	CreatePoint = oPoint
+End Function
+
+
+Function CreateSize( _
+	ByVal x As Long, _
+	ByVal y As Long) As com.sun.star.awt.Size
+	&apos; OpenOffice.org Macros Explained, Third Ed., 2015. [Andrew Pitonyak](http://www.pitonyak.org)
+	Dim oSize
+	oSize = createUnoStruct( &quot;com.sun.star.awt.Size&quot; )
+	oSize.Width = x
+	oSize.Height = y
+	CreateSize = oSize
+End Function
+
+
+Sub ChangeBackground( _
+	ByVal i, _
+	ByVal r1, _
+	ByVal g1, _
+	ByVal b1)
+	&apos;AndrewMacro.odt - [Andrew Pitonyak](http://www.pitonyak.org)
+	Dim oDoc As object
+	Dim oDrawPages As object
+	Dim oDrawPage As object
+	Dim oBackground As object
+	
 	oDoc = ThisComponent
-	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or _
-			oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) then
-		oDrawPages = oDoc.getDrawPages()   
+	If oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) Or _
+		oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
+		oDrawPages = oDoc.getDrawPages()
 		oDrawPage = oDrawPages.getByIndex(i)
 		oBackground = oDoc.createInstance(&quot;com.sun.star.drawing.Background&quot;)
 		oBackground.FillColor = RGB(r1, g1, b1)
 		oDrawPage.Background = oBackground
-	end if
-end sub
+	End If
+End Sub
 
 </script:module>

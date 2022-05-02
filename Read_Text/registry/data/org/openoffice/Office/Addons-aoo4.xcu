@@ -181,16 +181,16 @@
 				</prop>
                 <node oor:name="UserDefinedImages">
                     <prop oor:name="ImageSmallURL">
-                        <value>%origin%/../../../../../images/textToSpeech_16.png</value>
+                        <value>%origin%/../../../../../images/textToSpeechSetUp_16.png</value>
                     </prop>
                     <prop oor:name="ImageSmallHCURL">
-                        <value>%origin%/../../../../../images/textToSpeech_16h.png</value>
+                        <value>%origin%/../../../../../images/textToSpeechSetUp_16h.png</value>
                     </prop>
                     <prop oor:name="ImageBigURL">
-                        <value>%origin%/../../../../../images/textToSpeech_26.png</value>
+                        <value>%origin%/../../../../../images/textToSpeechSetUp_26.png</value>
                     </prop>
                     <prop oor:name="ImageBigHCURL">
-                        <value>%origin%/../../../../../images/textToSpeech_26h.png</value>
+                        <value>%origin%/../../../../../images/textToSpeechSetUp_26h.png</value>
                     </prop>
                 </node>
             </node>

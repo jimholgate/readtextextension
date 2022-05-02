@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: UTF-8-*-
-from __future__ import (absolute_import,
-                        division,
-                        print_function,
-                        unicode_literals
-                        )
 '''
 QR Code
 =======
@@ -12,22 +5,24 @@ QR Code
 Encode text in a QR Code image file (png).
 
 QR Code uses square patterns to encode characters in an image.
-Readers are available in many mobile phone platforms. For Linux,
-use zbar. Zbar is an open source toolkit that can decode QR code
-images (zbarimg) and scan QR codes with a webcam (zbarcam).
+Readers are available in many mobile phone platforms.
+
 You can use QR Code images to facilitate inventory, track shipments,
 record web addresses or make electronic business cards (vcards).
 
 **Tip**: For most consumer cameras or phones, keep the length
 of the selection as small as possible. Use less than 800 characters.
 
-Install qrencode using a package manager or build it from source.
+Requires python 3.8 or newer.
+
+    pip3 install qrcode
+    pip3 install pillow
 
 QR Code is registered trademark of DENSO WAVE INCORPORATED in the
 following countries: Japan, United States of America, Australia and
 Europe.
 
-[qrencode](http://fukuchi.org/works/qrencode/)
+[python qrcode](https://pypi.org/project/qrcode/)
 [zbar](http://zbar.sourceforge.net/)
 
 Read Selection... Dialog setup:
@@ -53,85 +48,173 @@ See the manual page for `qrencode` for more detailed information.
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2010 - 2018 James Holgate
+Copyright (c) 2010 - 2022 James Holgate
 
 '''
 import getopt
+import codecs
 import os
 import sys
 import readtexttools
 
-
-def usage():
-    sA = ' ' + os.path.split(sys.argv[0])[1]
-    print ("\n\nQR Code")
-    print ("=======\n")
-    print ("Encode text in a QR Code image (png). Requires `qrencode`.\n")
-    print ("Usage")
-    print ("-----\n")
-    print(('    '+sA + ' [--size nn] [--level L|M|Q|H] \ '))
-    print(('      --output "output.png" "input.txt"\n'))
-    print ('`--size` is the pixel size of each little square. ')
-    print ('`--level` is the level of error correction - low to high. \n')
-    print ('See the manual page for `qrencode` for more information.\n')
-    print ("Copyright notice")
-    print ("----------------\n")
-    print ('*QR Code* is registered trademark of DENSO WAVE INCORPORATED')
-    print (' in the following countries: Japan, United States of')
-    print (' America, Australia and Europe. \n')
+try:
+    import qrcode
+except:
+    pass
 
 
-def qrencode(sTXT, sOUT1, sSIZE, sLEVEL):
+def usage():  # -> None
+    '''Show help text'''
+    sA = os.path.split(sys.argv[0])[1]
+    print('''QR Code
+=======
+
+Encode text in a QR Code image (png). Requires `qrcode`.
+
+    pip3 install qrcode
+    pip3 install pillow
+
+Usage
+-----
+
+    %(sA)s [--size nn] [--level L|M|Q|H] \\ 
+    --fill "0,0,0", --background "255,255,255" \\
+    --output "output.png" "input.txt"
+
+`--size` is the pixel size of each little square. 
+`--level` is the level of error correction - low to high. 
+`--fill` is the foreground color
+`--background` is the background color
+
+See <https://pypi.org/project/qrcode/> for more information.
+
+Copyright notice
+----------------
+
+*QR Code* is registered trademark of DENSO WAVE INCORPORATED
+in the following countries: Japan, United States of America,
+Australia and Europe. ''' % locals())
+
+
+def rgb_to_tuple(_color='', fallback='black'):  # -> str / tuple
+    '''Checks an rgb string and converts it to a rgb tuple
+    if possible, otherwise the returns a fallback string.'''
+    if not bool(fallback):
+        fallback = 'black'
+    if not bool(_color):
+        return fallback.lower()
+    if ',' in _color:
+        try:
+            return eval(readtexttools.safechars(_color))
+        except (NameError, SyntaxError):
+            return fallback.lower()
+    return fallback.lower()
+
+
+def qrencode(_content='',
+             _image_out='',
+             _size='3',
+             _level='L',
+             _fill_color='',
+             _back_color=''):  # -> bool
     '''
     Display a barcode of the selected text
-      sTXT - the text to display
-      sOUT - the output file
-      sSIZE - The dimension of each qr code square
-      sLEVEL - The degree of redundant data for error correction
+
+    * _content - the text to display
+    * _image_out - the output file
+    * _size - The dimension of each QR Code square
+    * _level - The degree of redundant data for error correction
     '''
-    if sSIZE == "":
-        sSIZE = "3"
-    if sLEVEL == "":
-        sLEVEL = "L"
-    # Use cat to send literal text to qrencode...
+    if not bool(_size):
+        _size = '3'
+    _fill_color = rgb_to_tuple(_fill_color, 'black')
+    _back_color = rgb_to_tuple(_back_color, 'white')
+    _checked_size = 3
+    for i in range(31):
+        if _size == str(i + 1):
+            _checked_size = i + 1
+            break
+    if not _level in ['L', 'M', 'Q', 'H']:
+        _level = "L"
+    _content = _content.strip()
+    _image_out = _image_out.strip()
     try:
-        s1 = 'cat "' + sTXT + '" | qrencode -s ' + sSIZE + ' -l ' + sLEVEL
-        s1 = s1 + ' -o "' + sOUT1 + '" '
-        print (s1)
-        readtexttools.myossystem(s1)
-        # Display the image
-        readtexttools.ShowWithApp(sOUT1)
-    except (IOError):
-        print ('I was unable to use cat with qrencode!')
+        correction_level = [
+            {
+                '_switch': 'L',
+                '_int_level': qrcode.constants.ERROR_CORRECT_L
+            },  # 1
+            {
+                '_switch': 'M',
+                '_int_level': qrcode.constants.ERROR_CORRECT_M
+            },  # 0
+            {
+                '_switch': 'Q',
+                '_int_level': qrcode.constants.ERROR_CORRECT_Q
+            },  # 3
+            {
+                '_switch': 'H',
+                '_int_level': qrcode.constants.ERROR_CORRECT_H
+            }
+        ]  # 2
+        _error_correct = 0
+
+        for i in range(len(correction_level)):
+            if correction_level[i]['_switch'].upper() == _level:
+                _error_correct = correction_level[i]['_int_level']
+                break
+        qr = qrcode.QRCode(version=None,
+                           error_correction=_error_correct,
+                           box_size=_checked_size,
+                           border=5)
+
+        qr.add_data(_content)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color=_fill_color, back_color=_back_color)
+        img.save(_image_out)
+        if os.path.isfile(_image_out):
+            readtexttools.show_with_app(_image_out)
+            return True
+        return False
+    except (ValueError):
+        qrencode(_content, _image_out, _size, _level, 'black', 'white')
+    except NameError:
         usage()
-        sys.exit(2)
+        _content = _content.replace(' ', '%20')
+        _url = 'https://chart.apis.google.com/chart?chs=350x350&cht=qr&chl=%(_content)s' % locals(
+        )
+        _msg = '''<%(_url)s>''' % locals()
+        if not readtexttools.pop_message(
+                "`qrcode` missing. `pip3 install qrcode[pil]`", _msg, 5000,
+                readtexttools.net_error_icon(), 1):
+            readtexttools.show_with_app(_url)
+        return False
 
 
 def main():
-    sSIZE = ""
-    sLEVEL = ""
-    sOUT1 = ""
+    '''Get information for the QR code program'''
+    _size = "3"
+    _level = "M"
+    _image_out = ""
+    _fill_color = '0, 0, 0'  # `black` `rgb(0, 0, 0)`
+    _back_color = '255, 255, 255'  # `white` `rgb(255, 255, 255)`
 
     try:
-        sOUT1 = readtexttools.getTempPrefix()+"-qr-code.png"
+        _image_out = readtexttools.get_temp_prefix() + "-qr-code.png"
     except:
-        sOUT1 = ""
-    sTXT = sys.argv[-1]
-    if os.path.isfile(sTXT):
+        _image_out = ""
+    _text_file_in = sys.argv[-1]
+    if os.path.isfile(_text_file_in):
         if sys.argv[-1] == sys.argv[0]:
             usage()
             sys.exit(0)
         try:
-            opts, args = getopt.getopt(sys.argv[1:],
-                                       "hosl",
-                                       ["help",
-                                        "output=",
-                                        "size=",
-                                        "level="]
-                                       )
+            opts, args = getopt.getopt(
+                sys.argv[1:], "hoslfb",
+                ["help", "output=", "size=", "level=", "fill=", "background="])
         except (getopt.GetoptError):
             # print help information and exit:
-            print ("option was not recognized")
+            print("option was not recognized")
             usage()
             sys.exit(2)
         for o, a in opts:
@@ -139,20 +222,26 @@ def main():
                 usage()
                 sys.exit(0)
             elif o in ("-o", "--output"):
-                sOUT1 = a
-            elif o in ("-l", "--level"):
-                sLEVEL = a
+                _image_out = a
             elif o in ("-s", "--size"):
-                sSIZE = a
+                _size = a
+            elif o in ("-l", "--level"):
+                _level = a
+            elif o in ("-f", "--fill"):
+                _fill_color = a
+            elif o in ("-b", "--background"):
+                _back_color = a
             else:
                 assert False, "unhandled option"
-        if (os.path.isfile('/usr/bin/qrencode') !=
-                os.path.isfile('/usr/bin/python')):
+        if not os.path.isfile(_text_file_in):
             usage()
-        else:
-            qrencode(sTXT, sOUT1, sSIZE, sLEVEL)
+            sys.exit(0)
+        _file_handle = codecs.open(_text_file_in, mode='r', encoding='utf-8')
+        _content = _file_handle.read()
+        _file_handle.close()
+        qrencode(_content, _image_out, _size, _level, _fill_color, _back_color)
     else:
-        print ('I was unable to find the file you specified!')
+        print('I was unable to find the file you specified!')
     sys.exit(0)
 
 

@@ -24,17 +24,15 @@ Due to license restrictions,the packages are formally part of Debian's
 non-free category rather than Debian proper ("main"). The packages are also
 available in Ubuntu's multiverse repository.
 
-If you are using this extension to create still frame videos you need ffmpeg
-or avconv.  Webm is the recommended video format. If you are creating a long
-video, be patient.  It can take a long time for the external program to render
-the video.
+For systems that can not use `apt` package manager, see the `picotts-install.sh`
+shell script at <https://github.com/stevenmirabito/asterisk-picotts/>.
 
 Read Selection... Dialog setup:
 -------------------------------
 
 External program:
 
-        /usr/bin/python
+        /usr/bin/python3
 
 Command line options (default):
 
@@ -57,17 +55,14 @@ See the manual page for `pico2wave` for more detailed information
 Copyright (c) 2011 - 2018 James Holgate
 
 '''
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals
-    )
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import codecs
 import getopt
 import os
 import sys
 import readtexttools
+
 
 def usage():
     '''
@@ -95,104 +90,83 @@ Usage
        "input.txt" ''')
 
 
-def picoread(sTXT, sLANG, sVISIBLE, sAUDIBLE, sTMP0, sIMG1, sB, sART, sDIM):
+def picoread(_text, _language, _visible, _audible, _media_file, _image, _title,
+             _artist, _dimensions):
     '''
-    sTXT - Actual text to speak. The file must be written as utf-8.
-    sLANG - Supported two or four letter language code - defaults to US English
-    sVISIBLE- Use a graphic media player, or False for invisible player
-    sTMP0 - Name of desired output media file
-    sAUDIBLE - If false, then don't play the sound file
-    sIMG1 - a .png or .jpg file if required.
-    sB - Commentary or title for post processing
-    sPOSTPROCESS - Get information, play file, or convert a file
-    sART - Artist or Author
-    sDIM - Dimensions to scale photo '600x600'
+    _text - Actual text to speak. The file must be written as utf-8.
+    _language - Supported two or four letter language code - defaults to US English
+    _visible- Use a graphic media player, or False for invisible player
+    _media_file - Name of desired output media file
+    _audible - If false, then don't play the sound file
+    _image - a .png or .jpg file if required.
+    _title - Commentary or title for post processing
+    _artist - Artist or Author
+    _dimensions - Dimensions to scale photo '600x600'
     '''
-    sOUT1 = ''
-    if sLANG[:2].lower() == 'de':
-        s = 'de-DE'
-    elif sLANG[:2].lower() == 'en':
-        if sLANG[-2:].upper() in 'AU;BD;BS;GB;GH;HK;IE;IN;JM;NZ;PK;SA;TT':
-            s = 'en-GB'
+    _out_file = ''
+    if _language[:2].lower() == 'de':
+        _lang = 'de-DE'
+    elif _language[:2].lower() == 'en':
+        if _language[-2:].upper() in 'AU;BD;BS;GB;GH;HK;IE;IN;JM;NZ;PK;SA;TT':
+            _lang = 'en-GB'
         else:
-            s = 'en-US'
-    elif sLANG[:2].lower() == 'es':
-        s = 'es-ES'
-    elif sLANG[:2].lower() == 'fr':
-        s = 'fr-FR'
-    elif sLANG[:2].lower() == 'it':
-        s = 'it-IT'
+            _lang = 'en-US'
+    elif _language[:2].lower() == 'es':
+        _lang = 'es-ES'
+    elif _language[:2].lower() == 'fr':
+        _lang = 'fr-FR'
+    elif _language[:2].lower() == 'it':
+        _lang = 'it-IT'
     else:
-        s = 'en-US'
+        _lang = 'en-US'
     # Determine the output file name
-    sOUT1 = readtexttools.fsGetSoundFileName(sTMP0, sIMG1, 'OUT')
+    _out_file = readtexttools.get_work_file_path(_media_file, _image, 'OUT')
     # Determine the temporary file name
-    sTMP1 = readtexttools.fsGetSoundFileName(sTMP0, sIMG1, 'TEMP')
-
+    _work_file = readtexttools.get_work_file_path(_media_file, _image, 'TEMP')
     # Delete old versions
-    if os.path.isfile(sTMP1):
-        os.remove(sTMP1)
-    if os.path.isfile(sOUT1):
-        os.remove(sOUT1)
+    if os.path.isfile(_work_file):
+        os.remove(_work_file)
+    if os.path.isfile(_out_file):
+        os.remove(_out_file)
     try:
         if 'nt' in os.name.lower():
-            sCommand = readtexttools.getWinFullPath('opt/picosh.exe')
-            if "de" in s.lower():
-                s1 =''.join([
-                        sCommand,
-                        ' –v de-DE_gl0 "',
-                        sTXT,
-                        '" "',
-                        sTMP1,
-                        '"'])
+            _command = readtexttools.get_nt_path('opt/picosh.exe')
+            if "de" in _lang.lower():
+                _os_command = '%(_command)s -v de-DE_gl0 "%(_text)s" "%(_work_file)s"' % locals(
+                )
             else:  # Pico for Windows defaults to British English
-                s1 = ''.join([
-                        sCommand,
-                        ' "',
-                        sTXT,
-                        '" "',
-                        sTMP1,
-                        '"']) 
+                _os_command = '%(_command)s "%(_text)s" "%(_work_file)s"' % locals(
+                )
         else:
-            sCommand = 'pico2wave'
-            s1 = ''.join([
-                    sCommand,
-                    ' -l ',
-                    s,
-                    ' -w "',
-                    sTMP1,
-                    '"  ',
-                    sTXT])
-        readtexttools.myossystem(s1)
-        readtexttools.ProcessWaveMedia(sB,
-                                       sTMP1,
-                                       sIMG1,
-                                       sOUT1,
-                                       sAUDIBLE,
-                                       sVISIBLE,
-                                       sART,
-                                       sDIM
-                                       )
-    except (IOError):
-        print ('I was unable to read!')
+            _command = 'pico2wave'
+            _os_command = '%(_command)s -l %(_lang)s -w "%(_work_file)s"  %(_text)s' % locals(
+            )
+        if readtexttools.my_os_system(_os_command):
+            readtexttools.process_wav_media(_title, _work_file, _image,
+                                            _out_file, _audible, _visible,
+                                            _artist, _dimensions)
+    except IOError:
+        print('I was unable to read!')
         usage()
         sys.exit(2)
 
 
 def main():
-    sLANG = 'en-US'
-    sWAVE = ''
-    sVISIBLE = ''
-    sAUDIBLE = ''
-    sTXT = ''
-    sRATE = '100%'
-    sPITCH = '100%'
-    sIMG1 = ''
-    sTIT = ''
-    sART = ''
-    sDIM = '600x600'
-    sFILEPATH = sys.argv[-1]
-    if os.path.isfile(sFILEPATH):
+    '''Pico read text tools'''
+    _language = 'en-US'
+    _output = ''
+    _visible = ''
+    _audible = ''
+    _text = ''
+    _rate = '100%'
+    _pitch = '100%'
+    _image = ''
+    _title = ''
+    _artist = ''
+    _dimensions = '600x600'
+    _xml_transform = readtexttools.XmlTransform()
+    _file_path = sys.argv[-1]
+    if os.path.isfile(_file_path):
         if sys.argv[-1] == sys.argv[0]:
             usage()
             sys.exit(0)
@@ -201,21 +175,11 @@ def main():
             usage()
             sys.exit(0)
         try:
-            opts, args = getopt.getopt(
-                sys.argv[1:],
-                'hovalrpitnd',
-                ['help',
-                 'output=',
-                 'visible=',
-                 'audible=',
-                 'language=',
-                 'rate=',
-                 'pitch=',
-                 'image=',
-                 'title=',
-                 'artist=',
-                 'dimensions='])
-        except (getopt.GetoptError):
+            opts, args = getopt.getopt(sys.argv[1:], 'hovalrpitnd', [
+                'help', 'output=', 'visible=', 'audible=', 'language=', 'rate=',
+                'pitch=', 'image=', 'title=', 'artist=', 'dimensions='
+            ])
+        except getopt.GetoptError:
             # print help information and exit
             print('option -a not recognized')
             usage()
@@ -225,62 +189,51 @@ def main():
                 usage()
                 sys.exit(0)
             elif o in ('-o', '--output'):
-                sWAVE = a
+                _output = a
             elif o in ('-v', '--visible'):
-                sVISIBLE = a
+                _visible = a
             elif o in ('-a', '--audible'):
-                sAUDIBLE = a
+                _audible = a
             elif o in ('-l', '--language'):
-                sLANG = a
+                _language = a
             elif o in ('-r', '--rate'):
-                sRATE = a
+                _rate = a
             elif o in ('-p', '--pitch'):
-                sPITCH = a
+                _pitch = a
             elif o in ('-i', '--image'):
-                sIMG1 = a
+                _image = a
             elif o in ('-t', '--title'):
-                sTIT = a
+                _title = a
             elif o in ('-n', '--artist'):
-                sART = a
+                _artist = a
             elif o in ('-d', '--dimensions'):
-                sDIM = a
+                _dimensions = a
             else:
                 assert False, 'unhandled option'
         try:
-            oFILE = codecs.open(sFILEPATH, mode='r', encoding='utf-8')
-        except (IOError):
-            print ('I was unable to open the file you specified!')
+            _file_object = codecs.open(_file_path, mode='r', encoding='utf-8')
+        except IOError:
+            print('I was unable to open the file you specified!')
             usage()
         else:
-            sTXT = oFILE.read()
-            oFILE.close()
-            if len(sTXT) != 0:
-                sTXT = readtexttools.stripxml(sTXT)
-            if len(sTXT) != 0:
-                sTXT = readtexttools.cleanstr(sTXT, readtexttools.bFalse())
-                sA = ''.join([
-                        '" <speed level = \'',
-                        sRATE,
-                        '\'>',
-                        "<pitch level = '",
-                        sPITCH,
-                        '\'>',
-                        sTXT,
-                        '</pitch></speed>"'])
-                sB = readtexttools.checkmyartist(sART)
-                sC = readtexttools.checkmytitle(sTIT, "pico")
-                picoread(sA,
-                         sLANG,
-                         sVISIBLE,
-                         sAUDIBLE,
-                         sWAVE,
-                         sIMG1,
-                         sC,
-                         sB,
-                         sDIM
-                         )
+            _text = _file_object.read()
+            _file_object.close()
+            if len(_text) != 0:
+                _text = _xml_transform.clean_for_xml(_text)
+            if len(_text) != 0:
+                if not _language[:2].lower() in ['de', 'es', 'en', 'fr', 'it']:
+                    _language = 'en-US'
+                _text = readtexttools.strip_mojibake(_language, _text)
+                _xml_text = ''.join([
+                    '"<speed level = \'', _rate, '\'>', "<pitch level = '",
+                    _pitch, '\'>', _text, '</pitch></speed>"'
+                ])
+                _artist_ok = readtexttools.check_artist(_artist)
+                _title_ok = readtexttools.check_title(_title, "pico")
+                picoread(_xml_text, _language, _visible, _audible, _output,
+                         _image, _title_ok, _artist_ok, _dimensions)
     else:
-        print ('I was unable to find the file you specified!')
+        print('I was unable to find the file you specified!')
     sys.exit(0)
 
 

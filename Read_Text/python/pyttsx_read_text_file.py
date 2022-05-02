@@ -52,57 +52,54 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 '''
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals
-    )
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import codecs
 import getopt
 import os
 import sys
+try:
+    import pyttsx
+except (ImportError):
+    pass
 
 
 def usage():
-    sA = '    ' + os.path.split(sys.argv[0])[1]
-    print ('\n' +
-           'Pyttsx Read Text\n' +
-           '================\n' +
-           '\n' +
-           'Reads a text file using the Windows `pyttsx` library.\n' +
-           '\n' +
-           'Usage\n' +
-           '-----\n' +
-           '\n' +
-           '+ To say the text with a specific voice  \n' +
-           '  `pyttsx_read_text_file.py --voice "xxxxxx" "TextFile.txt"`\n' +
-           '+ To say the text with the default voice  \n' +
-           '  `pyttsx_read_text_file.py "TextFile.txt"`\n' +
-           '+ To say the text slower  \n' +
-           '  `pyttsx_read_text_file.py --rate "-20" "TextFile.txt"`\n' +
-           '+ To say the text faster  \n' +
-           '  `pyttsx_read_text_file.py --rate "20" "TextFile.txt"`)\n')
+    sA = '    `' + os.path.split(sys.argv[0])[1]
+    print('''
+Pyttsx Read Text
+================
+
+Reads a text file using the Windows `pyttsx` library.
+
+Usage
+-----
+
+* To say the text with a specific voice  
+  %(sA)s --voice "xxxxxx" "TextFile.txt"`
+* To say the text with the default voice  
+  %(sA)s "TextFile.txt"`
+* To say the text slower  
+  %(sA)s --rate "-20" "TextFile.txt"`
+* To say the text faster  
+  %(sA)s --rate "20" "TextFile.txt"`)''' % locals())
 
 
-def ReadTheStringAloud(voiceName, voiceRate, speechString):
+def ReadTheStringAloud(voiceName='', voiceRate=0, speechString=''):
     '''
     Says speechString, using the default voice or voiceName voice
     Positive voiceRate is faster; Negative voiceRate is slower
     '''
     try:
-        import pyttsx
-        engine = pyttsx.init()
-    except (ImportError):
-        print ('I did not find the pyttsx text to speech resources!')
+        dummy = bool(pyttsx)
+    except NameError:
         usage()
         sys.exit(2)
     try:
-        engine.setProperty(
-            'rate',
-            engine.getProperty('rate') + int(voiceRate))
-    except Error:
-        print ('I did not understand the rate!')
+        engine = pyttsx.init()
+        engine.setProperty('rate', engine.getProperty('rate') + int(voiceRate))
+    except Exception:
+        print('I did not understand the rate!')
         usage()
         sys.exit(2)
     voices = engine.getProperty('voices')
@@ -116,14 +113,11 @@ def ReadTheStringAloud(voiceName, voiceRate, speechString):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:],
-                                   "hvr",
-                                   ["help",
-                                    "voice=",
-                                    "rate="])
+        opts, args = getopt.getopt(sys.argv[1:], "hvr",
+                                   ["help", "voice=", "rate="])
     except (getopt.GetoptError):
         # print help information and exit:
-        print ('option -a not recognized')
+        print('option -a not recognized')
         usage()
         sys.exit(2)
     voiceName = ""
@@ -139,18 +133,18 @@ def main():
         else:
             assert False, "unhandled option"
     try:
-        f = codecs.open(
-            sys.argv[-1],
-            mode='r',
-            encoding=sys.getfilesystemencoding())
+        f = codecs.open(sys.argv[-1],
+                        mode='r',
+                        encoding=sys.getfilesystemencoding())
     except IOError:
-        print ('I was unable to open the file you specified!')
+        print('I was unable to open the file you specified!')
         usage()
     else:
         s = f.read()
         f.close()
         ReadTheStringAloud(voiceName, voiceRate, s)
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

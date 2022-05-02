@@ -16,7 +16,7 @@ Install `open_jtalk` using the following packages:
         open-jtalk-mecab-naist-
         
 If you are creating the Open JTalk engine parts from source, you
-must enable the `./configure --with-charset=UTF-8` property. 
+must enable the `./configure --with-charset=UTF-8` property.
 
 Read Selection... Dialog setup:
 -------------------------------

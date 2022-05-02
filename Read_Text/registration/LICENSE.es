@@ -4,18 +4,23 @@ Después de instalar esta extensión, cerrar la aplicación, a continuación, re
 
 Derechos de autor y de licencia
 
-(c) 2011-2021 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+(c) 2011-2022 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 
 <http://www.viti.es/gnu/licenses/gpl.html>
 
 Copyright and License 
 
-(c) 2011-2018 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
-"Bubble" icon © 2013 icomoon.io Creative Commons 2.5 (Attribution) license.
-
-<https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+* (c) 2011-2022 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+* "Bubble" icon (c) 2013 icomoon.io Creative Commons 2.5 (Attribution) license.
+* "python-speech-d" (c) Copyright: 2001-2010, Brailcom, o.p.s. 2009, Marco Skambraks marco@openblinux.de 2009, Rui Batista rui.batista@ist.utl.pt License: LGPL-2.1<https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
 
 This is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. This script is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+"Google", "Google Cloud" and "Google Translate" are trademarks of Google Inc.
+
+The contents of this resource are not affiliated with, sponsored by, or endorsed
+by Google nor does the documention represent the views or opinions of Google or
+Google personnel.
 
 GNU GENERAL PUBLIC LICENSE
 

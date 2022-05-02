@@ -1,43 +1,46 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<description xmlns="http://openoffice.org/extensions/description/2006" xmlns:d="http://openoffice.org/extensions/description/2006"  xmlns:xlink="http://www.w3.org/1999/xlink">
-  <version value="0.8.52" />
-    <identifier value="ca.bc.vancouver.holgate.james.readtextextension" />
-  <display-name>
-    <name lang="en">Read Text</name>
-    <name lang="de">Read Text</name>
-    <name lang="es">Read Text</name>
-    <name lang="fi">Read Text</name>
-    <name lang="fr">Read Text</name>
-  </display-name>
-  <platform value="all" />
-    <dependencies>
-        <OpenOffice.org-minimal-version value="3.3" d:name="OpenOffice.org 3.3" />
-    </dependencies>
-  <registration>
-     <simple-license  accept-by="admin" suppress-on-update="true" >
-       <license-text xlink:href="registration/LICENSE" lang="en" />
-       <license-text xlink:href="registration/LICENSE.de" lang="de" />
-       <license-text xlink:href="registration/LICENSE.es" lang="es" />
-       <license-text xlink:href="registration/LICENSE.fi" lang="fi" />
-       <license-text xlink:href="registration/LICENSE.fr" lang="fr" />
-     </simple-license>
-  </registration>
-    <icon>
-      <default xlink:href="images/textToSpeech_42.png" />
-      <high-contrast xlink:href="images/textToSpeech_42h.png" />
-    </icon>
-  <publisher>
-    <name xlink:href="http://sites.google.com/site/readtextextension/" lang="en">James Holgate</name>
-    <name xlink:href="http://sites.google.com/site/readtextextension/" lang="de">James Holgate</name>
-    <name xlink:href="http://sites.google.com/site/readtextextension/" lang="es">James Holgate</name>
-    <name xlink:href="http://sites.google.com/site/readtextextension/" lang="fi">James Holgate</name>
-    <name xlink:href="http://sites.google.com/site/readtextextension/" lang="fr">James Holgate</name>
-  </publisher>
-  <extension-description>
-    <src xlink:href="description/component.txt.en" lang="en" />
-    <src xlink:href="description/component.txt.de" lang="de" />
-    <src xlink:href="description/component.txt.es" lang="es" />
-    <src xlink:href="description/component.txt.fi" lang="fi" />
-    <src xlink:href="description/component.txt.fr" lang="fr" />
-  </extension-description>
+<description
+	xmlns="http://openoffice.org/extensions/description/2006"
+	xmlns:d="http://openoffice.org/extensions/description/2006"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+	<version value="0.8.56" />
+	<identifier value="ca.bc.vancouver.holgate.james.readtextextension" />
+	<display-name>
+		<name lang="en">Read Text</name>
+		<name lang="de">Read Text</name>
+		<name lang="es">Read Text</name>
+		<name lang="fi">Read Text</name>
+		<name lang="fr">Read Text</name>
+	</display-name>
+	<platform value="all" />
+	<dependencies>
+		<OpenOffice.org-minimal-version value="3.3" d:name="OpenOffice.org 3.3" />
+	</dependencies>
+	<registration>
+		<simple-license  accept-by="admin" suppress-on-update="true" >
+			<license-text xlink:href="registration/LICENSE" lang="en" />
+			<license-text xlink:href="registration/LICENSE.de" lang="de" />
+			<license-text xlink:href="registration/LICENSE.es" lang="es" />
+			<license-text xlink:href="registration/LICENSE.fi" lang="fi" />
+			<license-text xlink:href="registration/LICENSE.fr" lang="fr" />
+		</simple-license>
+	</registration>
+	<icon>
+		<default xlink:href="images/textToSpeechAbout_42.png" />
+		<high-contrast xlink:href="images/textToSpeechAbout_42h.png" />
+	</icon>
+	<publisher>
+		<name xlink:href="http://sites.google.com/site/readtextextension/" lang="en">James Holgate</name>
+		<name xlink:href="http://sites.google.com/site/readtextextension/" lang="de">James Holgate</name>
+		<name xlink:href="http://sites.google.com/site/readtextextension/" lang="es">James Holgate</name>
+		<name xlink:href="http://sites.google.com/site/readtextextension/" lang="fi">James Holgate</name>
+		<name xlink:href="http://sites.google.com/site/readtextextension/" lang="fr">James Holgate</name>
+	</publisher>
+	<extension-description>
+		<src xlink:href="description/component.txt.en" lang="en" />
+		<src xlink:href="description/component.txt.de" lang="de" />
+		<src xlink:href="description/component.txt.es" lang="es" />
+		<src xlink:href="description/component.txt.fi" lang="fi" />
+		<src xlink:href="description/component.txt.fr" lang="fr" />
+	</extension-description>
 </description>

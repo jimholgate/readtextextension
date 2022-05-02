@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TextToSpeech" script:language="StarBasic">REM  *****  BASIC  *****
-OPTION EXPLICIT
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TextToSpeech" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  * 
+Option Explicit
 
 &apos;&apos; # Read Text Extension
 &apos;&apos;
@@ -21,35 +21,6 @@ OPTION EXPLICIT
 &apos;&apos; * Create sound or still-image speech files for listening on the go.
 &apos;&apos; * Use web resources to translate, look up, listen, post, or
 &apos;&apos;   interface with web applications.
-&apos;&apos;
-&apos;&apos; What&apos;s new?
-&apos;&apos; -----------
-&apos;&apos;
-&apos;&apos; *Read Text Extension* Versions 0.9.0 and 0.9.1 have many bug fixes and 
-&apos;&apos;  new features.
-&apos;&apos;
-&apos;&apos;  * Click the button while the sound is playing to stop the sound.
-&apos;&apos;  * Supported export formats include meta-data that helps you to
-&apos;&apos;    organize your sound clips.
-&apos;&apos;  * In writer, you can select text in a table.
-&apos;&apos;  * You can show a text selection using large high contrast text by
-&apos;&apos;    selecting some text, then using *Tools - Add-ons - Impress-View*.
-&apos;&apos;    if you click the text in the presentation, it will read the note
-&apos;&apos;    aloud.
-&apos;&apos;  * By default, the extension now puts the clips in a folder labelled
-&apos;&apos;    with your language code - i.e.: *en* for English, *de* for German etc.
-&apos;&apos;  * Japanese language text is correctly identified.
-&apos;&apos;  * Python for Linux is now Python 2 and Python 3 compatible.
-&apos;&apos;  * Linux now can use either avconv or ffmpeg to convert files.
-&apos;&apos;  * Windows and OSX users can use ffmpeg to convert files by installing
-&apos;&apos;    [Audacity](https://audacityteam.org/)
-&apos;&apos;    with a ffmpeg plug-in.
-&apos;&apos;  * Complex language detection is simpler, faster and more reliable.
-&apos;&apos;  * Separate language **PO files**.  You can easily customize the
-&apos;&apos;    extension for a language or region by modifying en.po using a
-&apos;&apos;    language editor like Virtaal or Poedit or a normal code editor
-&apos;&apos;    that can save files as UTF-8 plain text and saving the file in the
-&apos;&apos;    extension `/po/tools/` directory.
 &apos;&apos;
 &apos;&apos; Installation
 &apos;&apos; ------------
@@ -107,7 +78,7 @@ OPTION EXPLICIT
 &apos;&apos; Copyright And License
 &apos;&apos; ---------------------
 &apos;&apos;
-&apos;&apos; (c) 2008-2021 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+&apos;&apos; (c) 2008-2022 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 &apos;&apos;
 &apos;&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS
 &apos;&apos; OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION;
@@ -125,7 +96,7 @@ OPTION EXPLICIT
 &apos;&apos; Procedures are called from menu items or from the tool bar.
 &apos;&apos;
 
-sub ReadTextAloud
+Sub ReadTextAloud
 &apos;&apos; Use *Read Selection* on the tool bar
 &apos;&apos; ------------------------------------
 &apos;&apos;
@@ -134,45 +105,45 @@ sub ReadTextAloud
 &apos;&apos; will simply do the action that you set up, like, for example, reading text
 &apos;&apos; aloud.
 &apos;&apos;
-	dim sFile as string
-	dim msgs()as variant
-	dim errorCode as integer
-	dim config(fiCountConfigOptions)as variant
-
-	sFile=fsFullPathOf(fsExtensionSettingsIni)
-	if fileexists(sFile)then
+	Dim sFile As String
+	Dim msgs()As Variant
+	Dim errorCode As Integer
+	Dim config(fiCountConfigOptions)As Variant
+	
+	sFile = fsFullPathOf(fsExtensionSettingsIni)
+	If fileexists(sFile) Then
 		tts_config_parseFile(sFile,config(),errorCode)
-		if config(fiAlwaysShowDialogCheckBox) = 1 then
+		If config(fiAlwaysShowDialogCheckBox()) = 1 Then
 			ConfigureReadTextAloud()
-		else
+		Else
 			ClearWorkingCountryLanguage
-		    if fileexists(fsMyTempLock()) then
-		    	kill fsMyTempLock()
-				resetSpeechDispatcher
-			else
-				ttsActuate(config(),_
-						msgs(),_
-						errorCode,_
-						&quot;&quot;)
-			end if
-		end if
-	else
+			If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+				kill fsMyTempLock(&quot;lock&quot;)
+				resetSpeechDispatcher(True)
+			Else
+				ttsActuate(config(), _
+				msgs(), _
+				errorCode, _
+				&quot;&quot;)
+			End If
+		End If
+	Else
 		ConfigureReadTextAloud()
-	end if
-end sub
+	End If
+End Sub
 
 
-sub SetupReadTextAloud
+Sub SetupReadTextAloud
 &apos;&apos; Tools - Add-ons - Read Selection...
 &apos;&apos; -----------------------------------
 &apos;&apos;
 &apos;&apos; Use this to setup the text conversion options and to read the text aloud.
 &apos;&apos;
 	ConfigureReadTextAloud()
-end sub
+End Sub
 
 
-sub ReadClipBoard
+Sub ReadClipBoard
 &apos;&apos;  
 &apos;&apos; Tools - Add-ons - Read Clipboard
 &apos;&apos; --------------------------------
@@ -198,55 +169,58 @@ sub ReadClipBoard
 &apos;&apos;  extension creates.  When you click the *Read Selection* button, the settings 
 &apos;&apos;  are rebuilt from scratch.
 &apos;&apos;  
-	dim s1$ : s1 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
-	dim s2$ : s2 = &quot;&quot;
+	Dim s1$
+	s1 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
+	Dim s2$
+	s2 = &quot;&quot;
 	
-	on error goto ReadClipBoardErr
+	On error Goto ReadClipBoardErr
 	ClearWorkingCountryLanguage
-    if fileexists(fsMyTempLock()) then
-		resetSpeechDispatcher
-	else
-		if fileexists(s1) or fbClipBoardAvailable = False then
-			if fileexists(s1) then
-				if fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getTextFromFile(s1, &quot;UTF-8&quot;) then
+	If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+		resetSpeechDispatcher(True)
+	Else
+		If fileexists(s1) Or fbClipBoardAvailable = False Then
+			If fileexists(s1) Then
+				If fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getTextFromFile(s1, &quot;UTF-8&quot;) Then
 					&apos; You updated office after a crash, so resume
 					&apos; the normal operation on the next run.
 					kill s1
-				end if
-			end if
-			s2 = inputbox(_
-					fsLookUpTerm(_
-					fsSelectionLanguage), _
-					fsLookUpTerm(_
-					&quot;s_read-text&quot;), _
-					&quot; &quot;)
-			if not(s2 = &quot;&quot;) then
+				End If
+			End If
+			s2 = InputBox( _
+			fsLookUpTerm( _
+			fsSelectionLanguage()), _
+			fsLookUpTerm( _
+			&quot;s_read-text&quot;), _
+			&quot; &quot;)
+			If Not(s2 = &quot;&quot;) Then
 				msgSpeak(s2)
-			end if		
-		else
+			End If
+		Else
 			CreateFile(s1, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)
 			fsGetClipBoard(False)
 			&apos; Try it - if it crashes, then we are left with the lock file
-			if fileexists(s1) then
+			If fileexists(s1) Then
 				kill s1
-			end if
-			msgSpeak(fsGetClipBoard(true))
-		end if
-	end if
-	Exit sub
+			End If
+			msgSpeak(fsGetClipBoard(True))
+		End If
+	End If
+	Exit Sub
 	ReadClipBoardErr:
-	msgbox fsLookupTerm(_
-			&quot;s_string-cannot-be-analyzed&quot;) &amp; _
-			chr(10) &amp; _
-			chr(10) &amp; _
-			&quot;`TextToSpeech:fsGetClipBoard()`&quot;, _
-			0, _
-			fsLookUpTerm(_
-			&quot;s_read-text&quot;)
-end sub
+	
+	MsgBox fsLookUpTerm( _
+	&quot;s_string-cannot-be-analyzed&quot;) &amp; _
+	Chr(10) &amp; _
+	Chr(10) &amp; _
+	&quot;`TextToSpeech:fsGetClipBoard()`&quot;, _
+	0, _
+	fsLookUpTerm( _
+	&quot;s_read-text&quot;)
+End Sub
 
 
-sub PresentSelection
+Sub ReadImpress()
 &apos;&apos; Tools - Add-ons - Impress-View
 &apos;&apos; ------------------------------
 &apos;&apos; 
@@ -262,23 +236,22 @@ sub PresentSelection
 &apos;&apos; [PS3]: https://www.ffmpeg.org
 &apos;&apos; [PS4]: https://www.apple.com/itunes/
 &apos;&apos;
-	PresentSelection2()
-end sub
+	PresentSelection2(fsGetLanguage())
+End Sub
 
-sub testRtl
+Sub testRtl
 	PresentSelection2(&quot;ar&quot;)
-end sub
+End Sub
 
-sub testAsia
+Sub testAsia
 	PresentSelection2(&quot;zh&quot;)
-end sub
+End Sub
 
-sub testLTR
+Sub testLTR
 	PresentSelection2(&quot;hi&quot;)
-end sub
+End Sub
 
-sub PresentSelection2(_
-		optional byval sB)
+Sub PresentSelection2(sB)
 	&apos; sB - the language to show.  Defaults to interface language or 
 	&apos; English if the interface language is not available.
 	&apos;
@@ -311,54 +284,36 @@ sub PresentSelection2(_
 	&apos;   to the right margin in the help template if the language of
 	&apos;   the user interface is a right to left language. 
 	&apos;   
-	dim b1 as boolean
-	dim i as integer
-	dim j as integer
-	dim sA as string
+	Dim b1 As Boolean
+	Dim i As Integer
+	Dim j As Integer
+	Dim sA As String
 	
 	ClearWorkingCountryLanguage
-	if ismissing(sB) then
-		sB = fsGetLanguage()
-	end if
-	if ThisComponent.supportsService(&quot;com.sun.star.formula.formulaProperties&quot;) or _
-			ThisComponent.supportsService(&quot;com.sun.star.sdb.DatabaseContext&quot;) then
+	If ThisComponent.supportsService(&quot;com.sun.star.formula.formulaProperties&quot;) Or _
+		ThisComponent.supportsService(&quot;com.sun.star.sdb.DatabaseContext&quot;) Then
 		b1 = False
-	else
+	Else
 		b1 = True
-	end if
-	sA = fsGetTextSelection()
-    if fileexists(fsMyTempLock()) then
-		resetSpeechDispatcher
-	end if
-	if len(sA) &gt; 1 then
+	End If
+	sA = fsGetTextSelection(True, False)
+	If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+		resetSpeechDispatcher(True)
+	End If
+	If Len(sA) &gt; 1 Then
 		NewPresentionFromSelection()
-		if b1 then
+		If b1 Then
 			&apos; Present slide following the title slide
 			wait 1000
 			ThisComponent.getcurrentcontroller().setCurrentPage(ThisComponent.drawpages(1))
 			ThisComponent.Presentation.Start
-		end if
-	else
-		NewPresentionFromSelection(fsLookUpTerm(&quot;s_read-text&quot;, sB) &amp; _
-				&quot; &quot; &amp; _
-				chr(8211) &amp; _
-				&quot; &quot; &amp; _
-				fsLookUpTerm(&quot;s_speech-synthesis&quot;, sB), _
-				fsSampleMd(sB))
-		i = 1  &apos; presenter note on a new LibreOffice or OpenOffice odp document.
-		j = 0  &apos; first slide on any odp document.
-		ThisComponent.getcurrentcontroller().setCurrentPage(ThisComponent.drawpages(1))
-		ThisComponent.getDrawPages().getByIndex(j).getnotesPage.getByIndex(i).String = fsSampleMd(sB)
-		if b1 then
-			wait 1000
-			ThisComponent.Presentation.Start
-		end if
-	end if
-	ThisComponent.setModified(False)
-end sub
+			ThisComponent.setModified(False)
+		End If
+	End If
+End Sub
 
 
-sub ReadTheSlidenote
+Sub ReadTheSlidenote
 &apos;&apos;
 &apos;&apos; Read the note
 &apos;&apos; -------------
@@ -383,39 +338,38 @@ sub ReadTheSlidenote
 &apos;&apos; 
 &apos;&apos; [1]: https://extensions.services.openoffice.org/en/project/read-text
 &apos;&apos;
-	dim s1 as string
-	dim nPage as integer
-
+	Dim s1 As String
+	Dim nPage As Integer
+	
 	nPage = fiCurrentSlideIndex
-	if nPage = -1 or _
-			not(ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;)) then
+	If nPage =  - 1 Or _
+		Not(ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;)) Then
 		&apos; not a valid index or document
-		exit sub
-	else
-		if fileexists(fsMyTempLock(&quot;lock&quot;)) then
+		Exit Sub
+	Else
+		If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
 			resetSpeechDispatcher(False)
-		else
+		Else
 			s1 = ThisComponent.getDrawPages( _
-					).getByIndex(nPage _
-					).getnotesPage.getByIndex(fiGetSlidenoteIndex _
-					).getText( _
-					).getString( _
-					)
-			if fbGoingOnline() then
-				select case fiReportOnlineRequest(true)
-				case 6 &apos; if you click &quot;Yes&quot;, 
+			).getByIndex(nPage _
+			).getnotesPage.getByIndex(fiGetSlidenoteIndex _
+			).getText( _
+			).getString( _
+			)
+			If fbGoingOnline() Then
+				Select Case fiReportOnlineRequest(True)
+					Case 6 &apos; if you click &quot;Yes&quot;, 
 					msgSpeak(s1)
-				case 7 &apos; if you click &quot;No&quot;,
+					Case 7 &apos; if you click &quot;No&quot;,
 					ConfigureReadTextAloud()
-				case else &apos; if you click &quot;Cancel&quot;
-					exit sub
-				end select
-			else
+					Case Else &apos; if you click &quot;Cancel&quot;
+					Exit Sub
+				End Select
+			Else
 				msgSpeak(s1)
-			end if
-		end if
-	end if
-end sub
-
+			End If
+		End If
+	End If
+End Sub
 
 </script:module>

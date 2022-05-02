@@ -1,137 +1,149 @@
 '''
 '' Read text
 '' =========
-''
-'' **Read text** reads text aloud, saves audio files and
+'' 
+'' **Read Text** reads text aloud, saves audio files and
 '' can use resources from the web based on the selected
 '' text.
-''
+'' 
 '' * Select text.
 '' * Click the *Read selection* button.
 '' * To read aloud, accept the default in the dialogue, or choose
 ''   another action from the menus.
-''
+'' 
 '' Saving files
 '' ------------
-''
+'' 
 '' Windows lets you save sound files in an uncompressed`.wav` format.
 '' To save space, convert `.wav` files to small `.m4a` or `mp3` files
 '' that you can share on most mobile phones, music players and tablets.
-''
+'' 
 '' Language support
 '' ----------------
-''
+'' 
 '' This script uses the Windows speech application programming
 '' interface (`SAPI`). Depending on the version and locale of
 '' Windows, voices in different languages may be available.
-''
+'' 
 '' Examples:
 '' ---------
-''
+'' 
 '' External program:
-''
+'' 
 ''     C:\Windows\SysWOW64\wscript.exe
-''
+'' 
 '' Command line options (default):
-''
+'' 
 ''     "(TTS_WSCRIPT_VBS)" "(TMP)"
-''
+'' 
 '' or (save as a .wav file in the home directory):
-''
+'' 
 ''     "(TTS_WSCRIPT_VBS)" /soundfile:"(HOME)(NOW).wav" "(TMP)"
-''
+'' 
 '' or (use a named voice)
-''
+'' 
 ''     "(TTS_WSCRIPT_VBS)" /voice:"Microsoft Hortense Desktop - French" "(TMP)"
-''
+'' 
 '' or (read a little slower)
-''
+'' 
 ''     "(TTS_WSCRIPT_VBS)" /rate:-3 "(TMP)"
-''
+'' 
 '' or (change voice by language)
-''
+'' 
 ''     "(TTS_WSCRIPT_VBS)" /language:"(SELECTION_LANGUAGE_COUNTRY_CODE)" "(TMP)"
-''
+'' 
 '' **Note**: Selecting this option doesn't work with the SAPI
 '' speech synthesizer if you haven't installed a voice in the
 '' language.
+'' 
+'' Visual helper programs
+'' ======================
 ''
-'' Optional formats
-'' ================
-''
-'' ## Audacity
-''
-'' [Audacity](https://www.audacityteam.org/download/) is a free cross platform audio editor. It can
-'' use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.
-''
-'' ### FFmpeg for Audacity
-''
-'' The audacity team does not bundle the ffmpeg converter with the Audacity sound editor program.
-'' You can find installation instructions for the ffmpeg audacity library on the [Audacity team 
-'' wiki](https://manual.audacityteam.org/man/installing_ffmpeg_for_windows.html).
-''
-''
-''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
-''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
-''
-'' ## Flac
-''
-'' Makes free lossless audio codec (FLAC) files.
-''
-''  * Install `flac.exe` in `C:\opt\`
-''  * [flac encoder](https://xiph.org/flac/links.html#software)
-''  * [Players and plugins](https://xiph.org/flac/)
-''
-''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).flac" "(TMP)"
-''
+'' Read Text can use helper programs to save audio files using MP3 and other formats.
+'' 
 '' ## iTunes
-''
-'' **iTunes** is a visual music manager from Apple available at no cost. Some versions
-'' of iTunes allow you to convert sound to different formats. With these versions, you
+'' 
+'' **iTunes** is a visual music manager from Apple available at no cost. This
+'' application allows you to convert sound to different formats. Read text
 '' can use [iTunes](https://www.apple.com/itunes/) to convert sound files with metadata
-'' and album cover art. The first time you use it, iTunes takes a few moments to start.
-'' iTunes creates the audio file in it's own directory and signals you with a sound.
+'' and album cover art. The first time you use iTunes it can take a moment to start.
+'' iTunes creates an audio file in it's own directory and signals you with a sound.
 '' Read Text Extension puts a copy in a sound directory in your home directory.
-''
+'' 
 ''     "(TTS_WSCRIPT_VBS)" /language:"en-US" /soundfile:"(HOME)en\(NOW).aif" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /language:"en-US" /soundfile:"(HOME)en\(NOW).m4a" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /language:"en-US" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 ''
-'' ## Lame
-''
-'' Lame is a free command line file converter.
-''
-'' Play mp3 compatible encoded sound files with most music players
-'' Use `lame.exe` to make an mp3 compatible file.
-''
-''  * Install `lame.exe` in `C:\opt\`
-''  * [Lame encoder](https://lame.sourceforge.io/links.php#Binaries)
-''
+'' ## VideoLAN VLC
+'' 
+'' [VideoLAN VLC](https://videolan.org/vlc) is a free viewer, streamer and converter. 
+'' To use VLC, install the desktop application using the installer program default
+'' location. The script for VLC compresses audio files quickly, and the resulting
+'' file does not include personalized metadata.
+'' 
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
+''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
+''
+'' Command line programs
+'' =====================
+''
+'' These programs are more challenging to install and use on Windows than visual helper
+'' programs. You can install them locally in the Windows user `LOCALAPPDATA` directory,
+'' or choose a custom directory by setting the `READTEXTHELPER` environment variable
+'' to a directory that you specify.
 ''
 '' ## FFmpeg
-''
-'' [ffmpeg](https://www.ffmpeg.org) is a free visual music and video converter.
-''
+'' 
+'' [ffmpeg](https://ffmpeg.org/download.html#build-windows) is a free media converter. 
+'' If it is correctly installed, you will see these options in the Read Text extension
+'' main dialogue.
+'' 
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
+'' 
+'' ## Flac
+'' 
+'' **[FLAC](https://xiph.org/flac/)** is a free lossless audio codec.
+'' 
+''  * [Get flac encoder](https://xiph.org/flac/links.html#software)
+''  * [Players and plugins](https://xiph.org/flac/)
+'' 
+''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).flac" "(TMP)"
+'' 
+'' ## Lame
 ''
-'' ## Ogg
+'' **[LAME](https://lame.sourceforge.io/)** (Lame Ain't an MP3 Encoder)
+'' is an open source project that creates MP3 compatible audio files
+'' with options to specify compression and psychoacoustic properties.
 ''
-'' Play ogg encoded sound files with firefox, chrome or chromium.
+'' > LAME is an educational tool to be used for learning about MP3 encoding.
+'' >
+'' > -- *[About LAME](https://lame.sourceforge.io/about.php)*. LAME Project. (2020).
+'' 
+''  * [Get Lame encoder](https://lame.sourceforge.io/links.php#Binaries)
+'' 
+''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
+'' 
+'' ## OggEnc
+''
+'' **[OGG](https://xiph.org/vorbis/)** is a file format that uses free 
+'' audio codecs.
+'' 
+'' Play ogg encoded sound files with Firefox and browsers based on the Chromium
+'' platform, like Chrome and Edge.
+'' 
 '' Use `oggenc.exe` or `oggenc2.exe` to make an ogg file
-''
-''  * The ogg converter program must be installed in `C:\opt\`.
-''  * [oggenc2 encoder](https://www.rarewares.org/ogg-oggenc.php)
+'' 
+''  * [About oggenc2 encoder](https://www.rarewares.org/ogg.php)
 ''  * [Players and plugins](https://xiph.org/vorbis/)
-''
+'' 
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
-''
+'' 
 '' ----------------------------------------------------------------------------
-''
+'' 
 '' [Read Text Extension](https://sites.google.com/site/readtextextension/)
-''
-'' Copyright � 2011 - 2020 James Holgate
+'' 
+'' Copyright (c) 2011 - 2022 James Holgate
 '''
 Const ForReading = 1
 Const ForWriting = 3
@@ -164,7 +176,19 @@ Sub Usage(sA)
     MsgBox s1, 0, APP_NAME
 End Sub
 
-
+Function bWriteText(outFile, theString)
+    Dim strackm
+    Dim objFile
+    Set strm = CreateObject("ADODB.Stream")
+    With strm
+        .Open
+        .CharSet = "UTF-8"
+        .WriteText theString
+        .SaveToFile outFile, 1
+        .Close
+    End With
+    bwriteText = fbFileExists(outFile)
+End Function
 Function EscapeReturnsAndReplaceQuotes(sA)
     '''
     ' Use a normal plain text string to generate a 'lyrics' string
@@ -190,8 +214,8 @@ Function EscapeReturnsAndReplaceQuotes(sA)
     s1 = Replace(s1, Chr(9) & """", Chr(9) & "" & LQ )  ' TAB, left double quote
     s1 = Replace(s1, "(" & """", "(" & LQ )  ' left (, left double quote
     s1 = Replace(s1, "[" & """", "[" & LQ )  ' left [, left double quote
-    s1 = Replace(s1, "*" & """", "*" & LQ )  ' *, left double quote from markdown
-    s1 = Replace(s1, "_" & """", "_" & LQ )  ' _, left double quote from markdown
+    s1 = Replace(s1, "*" & """", "*" & LQ )  ' *, list symbol from markdown
+    s1 = Replace(s1, "_" & """", "_" & LQ )  ' _, emphasis symbol from markdown
     s1 = Replace(s1, """", RQ )  ' all others, right double quote
     EscapeReturnsAndReplaceQuotes = s1
 End Function
@@ -243,6 +267,47 @@ Function fbRemoveFile(sfilespec)
     fbRemoveFile = Not(fso.FileExists(sfilespec))
 End Function
 
+Function fsXmlInputBox(s1)
+    '''
+    ' Debug or pause execution. Returns string or blank if you click 'Cancel'
+    '''
+    fsXmlInputBox = ""
+    Dim cr
+    Dim s0
+    Dim source
+    Dim sformat
+    Dim album
+    Dim artist
+    Dim genre
+    Dim title
+    Dim track
+    Dim xDoc
+
+    source = sLockPath("lock") & ".xml"
+    If fbFileExists(source) Then
+        Set xDoc = Nothing
+        Set xDoc = CreateObject("Microsoft.XMLDOM")
+        xDoc.Load(source)
+        For Each MusicInfoElement in xDoc.selectNodes("/audiotrack")
+            album = MusicInfoElement.selectSingleNode("album").text
+            artist = MusicInfoElement.selectSingleNode("artist").text
+            genre = MusicInfoElement.selectSingleNode("genre").text
+            title = MusicInfoElement.selectSingleNode("title").text
+            track = MusicInfoElement.selectSingleNode("track").text
+        Next
+        Set xDoc = Nothing
+    Else
+        album = "_album"
+        artist = "_artist"
+        genre = "_genre"
+        title = "_title"
+        track = "1"
+        syear = cstr(Year(Now))
+    End If
+    cr = Chr(10)
+    fsXmlInputBox = InputBox(album & cr & artist & cr & cr & track & ". " & title, genre, s1)
+End Function
+
 
 Function fsMyInputBox(sA)
     '''
@@ -279,6 +344,264 @@ Function fbFileExists(sfilespec)
 End Function
 
 
+Function fsfixfFfmpegMetaVal(s1)
+	fsfixfFfmpegMetaVal = ""
+	Dim a1 : a1 = array(_
+			"\", _
+			"=", _
+			";",_
+			"#", _
+			chr(10), _
+			chr(13))
+	Dim n
+    n = 0
+	If len(s1) <> 0 Then
+		For n = lbound(a1) to ubound(a1)
+			s1 = Replace(s1, a1(n), "\" & a1(n))
+		Next
+	End If
+	fsfixfFfmpegMetaVal = s1
+End Function
+
+
+Function getXmlMeta(sformat, bShowInput)
+    ' Format a c9hverter's metadata string using an XML data
+    ' source.
+    '
+    ' + `sformat` - code for the return format i.e.: `ffmpeg`
+    ' + `bShowInput` - `True` to show an input box, `False` to skip.
+    getXmlMeta = ""
+    Dim b1
+    Dim s1
+    Dim s2
+    Dim source
+    Dim album
+    Dim artist
+    Dim genre
+    Dim title
+    Dim track
+    Dim syear
+    Dim xDoc
+    Set xDoc = Nothing
+    source = sLockPath("lock") & ".xml"
+    If fbFileExists(source) Then
+        Set xDoc = CreateObject("Microsoft.XMLDOM")
+        xDoc.Load(source)
+        For Each MusicInfoElement in xDoc.selectNodes("/audiotrack")
+            album = MusicInfoElement.selectSingleNode("album").text
+            artist = MusicInfoElement.selectSingleNode("artist").text
+            genre = MusicInfoElement.selectSingleNode("genre").text
+            title = MusicInfoElement.selectSingleNode("title").text
+            track = MusicInfoElement.selectSingleNode("track").text
+            syear = MusicInfoElement.selectSingleNode("year").text
+        Next
+    Set xDoc = Nothing
+    Else
+        Exit Function
+    End If
+    'verify title
+    Select Case bShowInput
+    Case True
+        s1 = fsMyInputBox(title)
+    Case Else
+        s1 = title
+    End Select
+    if len(s1) <> 0 then 
+        Select Case sformat
+        Case "ffmpeg.ini", "ToFfmpeg.ini", "ToAvconv.ini"
+            album = fsfixfFfmpegMetaVal(album)
+            artist = fsfixfFfmpegMetaVal(artist)
+            genre = fsfixfFfmpegMetaVal(genre)
+            s1 = fsfixfFfmpegMetaVal(s1)
+            track = fsfixfFfmpegMetaVal(track)
+            syear = fsfixfFfmpegMetaVal(syear)
+        Case Else
+            album = EscapeReturnsAndReplaceQuotes(album)
+            artist = EscapeReturnsAndReplaceQuotes(artist)
+            genre = EscapeReturnsAndReplaceQuotes(genre)
+            s1 = EscapeReturnsAndReplaceQuotes(s1)
+            track = EscapeReturnsAndReplaceQuotes(track)
+            syear = EscapeReturnsAndReplaceQuotes(syear)
+        End Select
+
+        Select Case sformat
+        ' Simple strings - iTunes
+        Case "album"
+            getXmlMeta = album
+        Case "artist"
+            getXmlMeta = artist
+        Case "genre"
+            getXmlMeta = genre
+        Case "title"
+            getXmlMeta = s1
+        Case "checkedtitle"
+            getXmlMeta = fsMyInputBox(title)
+        Case "track"
+            getXmlMeta = track
+        Case "year"
+            getXmlMeta = syear
+        ' Long strings - ffmpeg etc.
+        Case "ffmpeg", "avconv"
+            getXmlMeta = Join(Array(" -metadata album=""", album, _
+                    """ -metadata artist=""", artist, _
+                    """ -metadata comment="""& "[FFmpeg](https://www.ffmpeg.org)", _
+                    """ -metadata genre="""& genre, _
+                    """ -metadata title=""", s1, _
+                    """ -metadata track=""", track, _
+                    """ -metadata year=""", syear, """ "), _
+                    "")
+        Case "ffmpeg.ini", "ToFfmpeg.ini", "ToAvconv.ini"
+            ' For writing to a utf-8 encoded text file.
+            '
+            ' Documented at <https://ffmpeg.org>
+            '
+            ' Reinserting edited metadata information from the FFMETADATAFILE file
+            ' can be done as:
+            '
+            '    ffmpeg -i INPUT -i FFMETADATAFILE -map_metadata 1 -codec copy OUTPUT
+            '
+            getXmlMeta = Join(Array(_
+                    ";FFMETADATA1", _
+                    "album=" & album, _
+                    "artist=" & artist, _
+                    "genre=" & genre, _
+                    "title=" & s1, _
+                    "track=" & track, _
+                    "year=" & syear), _
+                    chr(10))
+            s2 = source & sformat
+            If fbFileExists(s2) Then
+                fbRemoveFile(s2)
+            End If
+            If Len(album) <> 0 Then
+                b1 = bWriteText(s2, getXmlMeta)
+            End If
+        Case "vorbis", "flac"
+            getXmlMeta = Join(Array(_
+                    " -T ALBUM=""", album, _
+                    """ -T ARTIST=""", artist, _
+                    """ -T GENRE=""", genre, _
+                    """ -T TITLE=""", s1, _
+                    """ -T TRACKNUMBER=""", track, _
+                    """ "), "")
+        Case "ogg2"
+            getXmlMeta = Join(Array(" --album """, album, _
+                    """ --artist """, artist, _
+                    """ --genre """, genre, _
+                    """ --title """, s1, _
+                    """ --tracknum """, track, _
+                    """ "), "")
+        Case "nero"
+            getXmlMeta = Join(Array(" -meta:album=""", album, _
+                    """ -meta:artist=""", artist, _
+                    """ -meta:composer=""", artist, _
+                    """ -meta:comment=""", "[Nero AAC Encoder](https://www.nero.com)", _
+                    """ -meta:genre=""", genre, _
+                    """ -meta:title=""", s1, _
+                    """ -meta:track=""", track, _
+                    """ -meta:year=""", syear, _
+                    """ "), "")
+        Case "lame"
+            getXmlMeta = Join(Array(" --tt """, s1, _
+                    """ --ta """, artist, _
+                    """ --tc """, "[Lame.exe](http://www.rarewares.org)", _
+                    """ --tl """, album, _
+                    """ --ty """, syear, _
+                    """ --tn """, track, _
+                    """ --tg """, genre, _
+                    """ "), "")
+        Case Else
+            getXmlMeta = ""
+        End Select
+    End If
+Exit Function
+getXmlMetaErr:
+getXmlMeta = ""
+End Function
+
+Function fsGetEnvironResult(sA)
+    '''
+    ' `fsGetEnvironResult("ProgramFiles(x86)")`
+    ' `> C:\Program Files(x86)\`
+    ' Converts an environment variable to a file path followed by
+    ' a backslash, or `""` if the environment variable was not set. '''
+    fsGetEnvironResult = ""
+    Dim return_value
+    Dim objFSO
+    Dim WshEnv
+    Dim WshShell
+    return_value = ""
+    Set objFSO=CreateObject("Scripting.FileSystemObject")
+    Set WshShell = CreateObject("WScript.Shell")
+    Set WshEnv = WshShell.Environment("Process")
+    On Error Resume Next
+    If Len(sA) = 0 Then
+        Exit Function
+    Else
+        return_value = WshEnv(sA)
+        If Len(return_value) < 2 Then
+            return_value = ""
+        ElseIf not Right(return_value, 1) = "\" Then
+            return_value = return_value & "\"
+        End If
+    End If
+    fsGetEnvironResult = return_value
+End Function
+
+Function fsFindAppPath(sA)
+     '''
+    ' Given an Application subpath in the form
+    ' `fsFindAppPath("Adobe\Adobe Digital Editions 4.5\DigitalEditions.exe")`
+    ' `fsFindAppPath("Audacity\Audacity.exe")`
+    ' `fsFindAppPath("Common Files\microsoft shared\MSInfo\msinfo32.exe")`
+    ' `fsFindAppPath("ffmpeg\bin\ffmpeg.exe")`
+    ' `fsFindAppPath("ffmpeg\bin\ffplay.exe")`
+    ' `fsFindAppPath("Internet Explorer\iexplore.exe")`
+    ' `fsFindAppPath("lame3\lame.exe")`
+    ' `fsFindAppPath("LibreOffice\program\soffice.exe")`
+    ' `fsFindAppPath("Microsoft VS Code\Code.exe")`
+    ' `fsFindAppPath("Mozilla Firefox\firefox.exe")`
+    ' `fsFindAppPath("OpenOffice 4\program\soffice.exe")`
+    ' `fsFindAppPath("Pandoc\pandoc.exe")`
+    ' `fsFindAppPath("Python\Python310\python.exe")`
+    ' `fsFindAppPath("xiph\flac.exe")`
+    ' `fsFindAppPath("rarewares\oggenc.exe")`
+    ' `fsFindAppPath("rarewares\oggenc2.exe")`
+    ' `fsFindAppPath("VideoLAN\VLC\vlc.exe")`
+    ' `fsFindAppPath("Windows Media Player\wmplayer.exe")`
+    ' `fsFindAppPath("Windows NT\Accessories\wordpad.exe")
+    ' `fsFindAppPath("Zulu\zulu-17\bin\java.exe")`
+    ' returns a full path if it is in a normal
+    ' location, like `C:\Program Files\` or it
+    ' returns `""` if it is not.
+    '''
+    Dim a1
+    Dim n
+    fsFindAppPath = ""
+    a1 = Array(_
+            fsGetEnvironResult("READTEXTHELPER"), _
+            fsGetEnvironResult("LOCALAPPDATA"), _
+            fsGetEnvironResult("ProgramFiles"), _
+            fsGetEnvironResult("ProgramFiles(x86)"), _
+            fsGetEnvironResult("ProgramW6432"), _
+            fsGetEnvironResult("HOMEDRIVE") & "opt\", _
+            fsGetEnvironResult("SystemRoot"), _
+            fsGetEnvironResult("USERPROFILE") & "opt\", _
+            fsGetEnvironResult("HOMEDRIVE") & "opt\", _
+            fsGetEnvironResult("LOCALAPPDATA") & "Programs\")
+    If Len(sA) > 0 Then
+        For n = LBound(a1) To UBound(a1)
+            If Len(a1(n)) > 1 Then
+                If fbFileExists(a1(n) & sA) Then
+                    fsFindAppPath = a1(n) & sA
+                    Exit For
+                End If
+            End If
+        Next
+    End If
+End Function
+
+
 Function fbIsAppDataFile(sA, bTattle)
     '''
     ' Identify files that shouldn't be manually edited or deleted.
@@ -290,9 +613,6 @@ Function fbIsAppDataFile(sA, bTattle)
     Dim b1
     Dim n
     Dim objFSO
-    Dim oExec
-    Dim s1
-    Dim s2
     Dim WshEnv
     Dim WshShell
 
@@ -300,27 +620,24 @@ Function fbIsAppDataFile(sA, bTattle)
     Set objFSO=CreateObject("Scripting.FileSystemObject")
     Set WshShell = CreateObject("WScript.Shell")
     Set WshEnv = WshShell.Environment("Process")
-    s2 = ""
-    s1 = WshEnv("ALLUSERSPROFILE") & Chr(10) & _
-            WshEnv("APPDATA") & Chr(10) & _
-            WshEnv("LOCALAPPDATA") & Chr(10) & _
-            ".oxt" & Chr(10) & _
-            WshEnv("ProgramData") & Chr(10) & _
-            WshEnv("ProgramFiles(x86)") & Chr(10) & _
-            WshEnv("ProgramFiles") & Chr(10) & _
-            WshEnv("ProgramW6432") & Chr(10) & _
-            WshEnv("SystemDrive") & "\opt" & Chr(10) & _
-            WshEnv("SystemRoot") & Chr(10) & _
-            "uno_packages" & Chr(10) & _
-            WshEnv("USERPROFILE") & "\opt" & Chr(10) & _
-            WshEnv("windir")
-    a1 = Split(s1, (Chr(10)))
+    a1 = Array(WshEnv("ALLUSERSPROFILE"), _
+            WshEnv("APPDATA"), _
+            WshEnv("LOCALAPPDATA"), _
+            ".oxt", _
+            WshEnv("ProgramData"), _
+            WshEnv("ProgramFiles(x86)"), _
+            WshEnv("ProgramFiles"), _
+            WshEnv("ProgramW6432"), _
+            WshEnv("SystemDrive") & "\opt", _
+            WshEnv("SystemRoot"), _
+            "uno_packages", _
+            WshEnv("USERPROFILE") & "\opt", _
+            WshEnv("windir"))
     If Len(sA) > 0 Then
         For n = LBound(a1) To UBound(a1)
             If Len(a1(n)) > 0 Then
                 If InStr(sA, a1(n)) > 0 Then
                     fbIsAppDataFile = True
-                    s2 = a1(n)
                     Exit For
                 End If
             End If
@@ -330,7 +647,6 @@ Function fbIsAppDataFile(sA, bTattle)
         b1 = InputBox("Restricted path!", APP_NAME, sA)
     End If
 End Function
-
 
 Function canUseSpeechXML
     '''
@@ -356,54 +672,44 @@ Function canUseSpeechXML
 End Function
 
 
-Function myOptPath(appName)
+Function lamePath()
     '''
-    ' Look in a couple of spots for optional command line converters
-    ' * In your home directory in a directory named opt `C:\Users\myName\opt\`
-    ' * In opt in the root of your home drive `C:\opt\`
-    ' Returns path if found, or "" if not found.
+    ' Returns path to the lame mp3 converter program.
     '''
-    Dim wshEnv
-    Dim WshShell
-    Dim s1
-    Dim s2
-
-    Set WshShell = CreateObject("WScript.Shell")
-    Set WshEnv = WshShell.Environment("Process")
-    myOptPath = ""
-    s1 = WshEnv("HOMEDRIVE") & "\opt\" & appName
-    s2 = WshEnv("USERPROFILE") & "\opt\" & appName
-    If fbFileExists(s1) Then
-        myOptPath = s1
-    ElseIf fbFileExists(s2) Then
-        myOptPath = s2
-    End If
+    lamePath = ""
+    Dim n
+    Dim a1
+    a1 = Array(_
+        "lame3\lame.exe", _
+        "lame2\lame.exe", _
+        "lame\lame.exe", _
+        "Lame For Audacity\lame.exe")
+    For n = Lbound(a1) to Ubound(a1)
+        If len(fsFindAppPath(a1(n))) > 0 Then
+            lamePath = fsFindAppPath(a1(n))
+            Exit For
+        End If
+    Next
 End Function
 
 
-Function myAudacityLamePath
-    '''
-    ' Returns path to lame mp3 converter program.
-    '''
-    Dim wshEnv
-    Dim WshShell
-    Dim s1
-    Dim s2
-    Dim s3
-
-    Set WshShell = CreateObject("WScript.Shell")
-    Set WshEnv = WshShell.Environment("Process")
-    myAudacityLamePath = ""
-    s1 = WshEnv("ProgramFiles(x86)") & "\Lame For Audacity\lame.exe"
-    s2 = WshEnv("ProgramW6432") & "\Lame For Audacity\lame.exe"
-    s3 = WshEnv("ProgramFiles") & "\Lame For Audacity\lame.exe"
-    If fbFileExists(s1) Then
-        myAudacityLamePath = s1
-    ElseIf fbFileExists(s2) Then
-        myAudacityLamePath = s2
-    ElseIf fbFileExists(s3) Then
-        myAudacityLamePath = s3
-    End If
+Function oggPath()
+    oggPath = ""
+    Dim a1
+    a1 = Array(_
+            "rarewares\oggenc.exe", _
+            "rarewares\oggenc2.exe", _
+            "xiph\oggenc.exe", _
+            "xiph\oggenc2.exe", _
+            "oggenc.exe", _
+            "oggenc2.exe")
+    Dim n
+    For n = Lbound(a1) to Ubound(a1)
+        If Len(fsFindAppPath(a1(n))) > 0 Then
+            oggPath = fsFindAppPath(a1(n))
+            Exit For
+        End If
+    Next
 End Function
 
 
@@ -417,25 +723,19 @@ Function wav2ogg(wavfile, outfile, sMyWords)
     Dim s3
     Dim sMeta
     Dim sLyrics
-    Dim sPname
     Dim sPath
 
     wav2ogg = False
     On Error Resume Next
-    s1 = myOptPath("oggenc2.exe")
-    s2 = myOptPath("oggenc.exe")
+    s1 = oggPath()
     sLyrics = ""
     If fbFileExists(s1) Then
         sPpath = s1
-        sPname = s1
-    ElseIf fbFileExists(s2) Then
-        sPpath = s2
-        sPname = s2
     Else
         Exit Function
     End If
-    If sPpath = s1 Then
-        s3 = fsVerifiedMetatitle
+    If Len(sPpath) > 0 Then
+        s3 = fsVerifiedMetatitle()
         If s3 = "" Then
             sMeta = ""
         Else
@@ -458,7 +758,6 @@ Function wav2ogg(wavfile, outfile, sMyWords)
     End If
     s2 = outfile
     If Len(s2) > 0  Then
-        ' fsMyInputBox(sA)
         b1 = doExecute(sA, True)
     End If
     If fbFileExists(outfile) Then
@@ -491,6 +790,25 @@ Function fsVorbisMeta
 End Function
 
 
+Function flacPath()
+    flacPath = ""
+    Dim a1
+    a1 = Array(_
+            "rarewares\flac.exe", _
+            "xiph\flac.exe", _
+            "opt\flac.exe", _
+            "flac.exe"_ 
+            )
+    Dim n
+    For n = Lbound(a1) to Ubound(a1)
+        If Len(fsFindAppPath(a1(n))) > 0 Then
+            flacPath = fsFindAppPath(a1(n))
+            Exit For
+        End If
+    Next
+End Function
+
+
 Function wav2flac(wavfile, outfile, sMyWords, sImage)
     '''
     ' Converts wav audio file to free lossless audio codec.
@@ -503,7 +821,7 @@ Function wav2flac(wavfile, outfile, sMyWords, sImage)
     Dim sMeta
 
     wav2flac = False
-    s1 = myOptPath("flac.exe")
+    s1 = flacPath()
     If fbFileExists(s1) Then
         sPpath = s1
         sPname = s1
@@ -530,6 +848,23 @@ Function wav2flac(wavfile, outfile, sMyWords, sImage)
     End If
 End Function
 
+Function neroEncPath()
+    neroEncPath = ""
+    Dim a1
+    a1 = Array(_
+            "nero\neroAacEnc.exe", _
+            "opt\neroAacEnc.exe", _
+            "neroAacEnc.exe"_
+            )
+    Dim n
+    For n = Lbound(a1) to Ubound(a1)
+        If Len(fsFindAppPath(a1(n))) > 0 Then
+            neroEncPath = fsFindAppPath(a1(n))
+            Exit For
+        End If
+    Next
+End Function
+
 
 Function wav2m4a(wavfile, outFile, sMyWords, sImage)
     '''
@@ -544,35 +879,43 @@ Function wav2m4a(wavfile, outFile, sMyWords, sImage)
     Dim sA
     Dim sPpath
     Dim sPname
-
-    s1 = myOptPath("neroAacEnc.exe")
-    s2 = myOptPath("faac.exe")
+    Dim a1
+    s1 = neroEncPath()
     wav2m4a = False
     If fbFileExists(s1) Then
         sPpath = s1
         sPname = s1
-    ElseIf fbFileExists(s2) Then
-        sPpath = s2
-        sPname = s2
     Else
         Exit Function
     End If
     s3 = outFile
     s4 = ""
     If Len(s3) > 0  Then
-        If sPname = s1 Then
-            sA = sPpath & " -if """ & wavfile & """ -of """ & s3 & """"
-            b1 = doExecute(sA, False)
-        Else 'faac.exe
-            sA = sPpath & " -o """ & s3 & """ """ & wavfile & """"
-            b1 = doExecute(sA, True)
-        End If
+        sA = sPpath & " -if """ & wavfile & """ -of """ & s3 & """"
+        b1 = doExecute(sA, False)
     End If
     b2 = fbTagM4a(s3, sMyWords, sImage)
     If fbFileExists(s3) Then
         wav2m4a = True
         fbRemoveFile wavfile
     End If
+End Function
+
+Function neroTagPath()
+    neroTagPath = ""
+    Dim a1
+    a1 = Array(_
+            "nero\neroAacTag.exe", _
+            "opt\neroAacTag.exe", _
+            "neroAacTag.exe"_
+            )
+    Dim n
+    For n = Lbound(a1) to Ubound(a1)
+        If Len(fsFindAppPath(a1(n))) > 0 Then
+            neroTagPath = fsFindAppPath(a1(n))
+            Exit For
+        End If
+    Next
 End Function
 
 
@@ -591,9 +934,9 @@ Function fbTagM4a(s2, sMyWords, sImage)
     Dim sMeta
 
     fbTagM4a = False
-    s1 = myOptPath("neroAacTag.exe")
-    s3 = fsVerifiedMetatitle
-    If s3 = "" Then
+    s1 = neroTagPath()
+    s3 = fsVerifiedMetatitle()
+    If s3 = "" or s1 = "" Then
         Exit Function
     End If
     If fbFileExists(s1) And fbFileExists(s2) Then
@@ -622,9 +965,106 @@ Function fbTagM4a(s2, sMyWords, sImage)
 End Function
 
 
+Function executeVideoLanVLC(in_sound_path, out_sound_path)
+	' Create a simple compressed file with the [VideoLAN
+	' VLC](https://videolan.org/vlc) Desktop application
+	' for Windows.
+
+	Dim vlc_app
+    vlc_app = fsFindAppPath("VideoLAN\VLC\vlc.exe")
+	If len(vlc_app) > 0 Then
+		vlc_app = """" & vlc_app & """"
+	Else
+		executeVideoLanVLC = False 
+		Exit Function
+	End If
+	Dim command_line
+	command_line = ""
+	Dim channel_count
+	channel_count = "2"
+	Dim audio_codec
+	audio_codec = ""
+	Dim average_bitrate
+	average_bitrate = "0"
+	Dim sample_rate
+	sample_rate = "0"
+	Dim mux
+	mux = ""
+	Dim verbosity
+	verbosity = ""
+	Dim extension
+	extension = LCase(strExt(out_sound_path))
+	Dim error_code
+    error_code = ""
+
+	If extension = "flac" Then
+		audio_codec = "flac"
+		average_bitrate = "96"
+		sample_rate = "44100"
+		mux = "ogg"
+	Elseif extension = "mp3" Then
+		audio_codec = "mp3"
+		average_bitrate = "128"
+		sample_rate = "44100"
+		mux = "dummy"
+	Elseif extension = "ogg" Then
+		audio_codec = "vorb"
+		average_bitrate = "128"
+		sample_rate = "44100"
+		mux = "ogg"
+	Elseif extension = "opus" Then
+		audio_codec = "opus"
+		average_bitrate = "96"
+		sample_rate = "48000"
+		mux = "ogg"
+	End If	
+	If audio_codec is "" Then
+		executeVideoLanVLC = False 
+		Exit Function
+	Else
+		command_line = join(_
+			array(_
+				"""", _
+				in_sound_path, _
+				"""", _
+				" --intf dummy ", _
+				verbosity, _
+				"--sout=", _
+				"""", _
+				"#transcode{vcodec=none,acodec=", _
+				audio_codec, _
+				",ab=", _
+				average_bitrate, _
+				",channels=", _
+				channel_count, _
+				",samplerate=", _
+				sample_rate, _
+				"}:std{access=file,mux=", _
+				mux, _
+				",dst='", _
+				out_sound_path, _
+				"'}", _
+				"""", _
+				" vlc://quit"), _
+			"")
+		On Error Resume Next
+		error_code = doExecute(_
+				vlc_app & _
+				" " & _
+				command_line)
+	End If
+	executeVideoLanVLC = FileExists(out_sound_path)
+	Exit Function
+	executeVideoLanVLCErr:
+		executeVideoLanVLC = False 
+End Function
+
+
 Function wav2mp3(wavfile, outFile, sImage)
     '''
-    ' Use a downloaded command line program to convert sound file.
+    ' Use [L. A. M. E.](https://www.rarewares.org) - a free
+    ' command line program to convert a wave sound file to 
+    ' an MP3 file.
     '''
     Dim s1
     Dim s2
@@ -634,25 +1074,21 @@ Function wav2mp3(wavfile, outFile, sImage)
 
     wav2mp3 = False
     On Error Resume Next
-    s1 = myOptPath("lame.exe")
-    If Len(s1) = 0 Then
-        ' Look for lame.exe in the Audacity lame library
-        s1 = myAudacityLamePath()
-    End If
-    If fbFileExists(s1) Then
+    s1 = lamePath()
+    If len(s1) > 0 Then
         sPpath = s1
     Else
         Exit Function
     End If
-    s3 = fsVerifiedMetatitle
+    s3 = fsVerifiedMetatitle()
     If s3 = "" Then
         sMeta = ""
     Else
         sMeta = " --tt """ & s3 & _
                 """ --ta """ & fsMetaId & _
-                """ --tc """ & "[Lame.exe](http://www.rarewares.org)" & _
+                """ --tc """ & "[lame.exe](https://www.rarewares.org)" & _
                 """ --tl """ & fsMetaalbum & _
-                """ --ty """ &  Year(Now) & _
+                """ --ty """ & Year(Now) & _
                 """ --tn """ & fsMetatrack & _
                 """ --tg """ & fsMetagenre & _
                 """ "
@@ -777,66 +1213,6 @@ Sub removeMetaFiles()
 End Sub
 
 
-Function fsWhereIsFfmpeg()
-    '''
-    ' This looks for the ffmpeg application.  To use ffmpeg, install it or
-    ' link to it in `c:\opt\ffmpeg.exe`
-    '''
-    Dim c0
-    Dim c1
-    Dim c2
-    Dim c3
-    Dim c4
-    Dim c5
-    Dim c6
-    Dim c7
-    Dim c8
-    Dim objFSO
-    Dim oExec
-    Dim retval
-    Dim WshEnv
-    Dim WshShell
-
-    Set objFSO=CreateObject("Scripting.FileSystemObject")
-    Set WshShell = CreateObject("WScript.Shell")
-    Set WshEnv = WshShell.Environment("Process")
-    c0 = WshEnv("ProgramFiles")
-    c1 = WshEnv("ProgramFiles(x86)")
-    c2 = WshEnv("ProgramW6432")
-    c3 = "\Audacity\ffmpeg-win-2.2.2\ffmpeg.exe"
-    c4 = "\Audacity\lib\avconv.exe"
-    c5 = WshEnv("HOMEDRIVE") & "\opt\ffmpeg.exe"
-    c6 = WshEnv("USERPROFILE") & "\opt\ffmpeg.exe"
-    c7 = WshEnv("HOMEDRIVE") & "\opt\avconv.exe"
-    c8 = WshEnv("USERPROFILE") & "\opt\avconv.exe"
-    retval = ""
-    If fbFileExists(c6) Then
-        retval = c6
-    ElseIf fbFileExists(c7) Then
-        retval = c7
-    ElseIf fbFileExists(c8) Then
-        retval = c8
-    ElseIf fbFileExists(c5) Then
-        retval = c5
-    ElseIf fbFileExists(c0 & c3) Then
-        retval = c0 & c3
-    ElseIf fbFileExists(c1 & c3) Then
-        retval = c1 & c3
-    ElseIf fbFileExists(c2 & c3) Then
-        retval = c2 & c3
-    ElseIf fbFileExists(c0 & c4) Then
-        retval = c0 & c4
-    ElseIf fbFileExists(c1 & c4) Then
-        retval = c1 & c4
-    ElseIf fbFileExists(c2 & c4) Then
-        retval = c2 & c4
-    Else
-        retval = ""
-    End If
-    fsWhereIsFfmpeg = retval
-End Function
-
-
 Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
     '''
     ' iTunes makes a mp3, aac or m4a in the iTunes Music Library
@@ -915,11 +1291,11 @@ Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
 End Function
 
 
-Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
+Function compressWaveAudioWithFfmpeg(sWaveName, sOutName, sImage, sDimensions)
     '''
     ''
-    '' wav2FFmpeg
-    '' ========
+    '' compressWaveAudioWithFfmpeg
+    '' ===========================
     ''
     '' Converts wav format sound to compressed format optionally
     '' including a picture if supported by the ffmpeg muxer.
@@ -945,7 +1321,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
     Dim sPreProcess
 
     cr= Chr(10)
-    wav2FFmpeg = False 'default when exiting Function before creating a file
+    compressWaveAudioWithFfmpeg = False 'default when exiting Function before creating a file
     doJob = ""
     doJob1 = ""
     doJob2 = ""
@@ -957,7 +1333,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
 
 ' ###Where's ffmpeg?
 
-    myConverter = fsWhereIsFfmpeg()
+    myConverter = fsFindAppPath("ffmpeg\bin\ffmpeg.exe")
     If Len(myConverter) = 0 Then
         Exit Function
     End If
@@ -968,7 +1344,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
         Case ".m4a"
             sPreProcess=""
             sPostProcess= ""
-            If fbFileExists("C:\opt\neroAacEnc.exe") Then
+            If len(neroEncPath()) > 0 Then
              '[Nero](https://www.nero.com/) m4a encoder produces standards
              ' compliant m4a output.
                  Exit Function
@@ -976,7 +1352,7 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
         Case ".mp3"
             sPreProcess=""
             sPostProcess= ""
-            If fbFileExists("C:\opt\lame.exe") Then
+            If Len(lamePath()) > 0 Then
                 ' You appear to prefer the lame encoder.
                 Exit Function
             End If
@@ -989,24 +1365,23 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
             ' flac is compressed, but requires a player or plugin
             sPreProcess=""
             sPostProcess= ""
-            If fbFileExists("C:\opt\flac.exe") Then
+            If len(flacPath()) > 0 Then
                 ' You appear to prefer the flac conversion utility.
                 Exit Function
             End If
         Case ".ogg"
             sPreProcess=""
             sPostProcess= ""
-            If fbFileExists("C:\opt\oggenc2.exe") Then
+            If Len(oggPath()) > 0 Then
                 ' You appear to prefer the oggenc2 conversion utility.
                 Exit Function
             End If
         Case ".webm"
-            ' Webm - web media file for Chromium, Google Chrome and Firefox.
+            ' Webm - Web video media file for Chromium, Google Chrome and Firefox.
             sPreProcess=""
             sPostProcess= ""
         Case ".m4v",".mp4"
-            ' uses `-strict experimental`. **Do not enable by default**.
-            ' May produce bad results.
+            ' Video media format file
             sPreProcess="preFlightCheck"
             sPostProcess= ""
         Case Else ' ".aac"
@@ -1100,39 +1475,19 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
         End If
         b1 = doExecute(doJob1, True)
     Case ".m4v"
-        ' -strict experimental may produce bad results...
-        cout2 = sWaveName & ".webm"
-        doJob1 ="""" & myConverter & """ -i """ & sImage & """ -i """ & _
-                sWaveName & """ -vcodec libvpx -g 120" & _
-                " -lag-in-frames 16 -deadline good" & _
-                " -cpu-used 0 -vprofile 0 -qmax 63 -qmin 0" & _
-                " -b:v 768k -acodec libvorbis -ab 112k" & _
-                " -ar 44100 -f webm -y """ &  cout2 & """ "
-        doJob2 = """" & myConverter & """ -i """ & cout2 & _
-                """ -acodec aac -ab 160k -vcodec libx264" & _
-                " -preset slow -profile:v baseline -level 30" & _
-                " -maxrate 10000000 -bufsize 10000000 -f mp4" & _
-                " -threads 0 -strict experimental " & ffmeta & _
-                " -y """ & sOutName & """ "
-        If sPreProcess="preFlightCheck" Or "postFlightCheck" Then
-            retval = fsMyInputBox( doJob1 )
-            If Len(retVal) = 0 Then
-                Exit Function
-            Else
-                doJob1 = retVal
-            End If
-        End If
+        ' 2022-12 : Can view with VideoLAN VLC; WebM recommended
+        ' because the format is strictly defined.
+        doJob1 = Join(Array(_
+                """", _
+                myConverter, _
+                """ -loop 1 -i """, _
+                sImage, _
+                """ -i """, _
+                sWaveName, _
+                """ -ac 2 -c:v libx264 -r 25 -c:a aac -shortest -y """, _
+                cout2, _
+                """"), "")
         b1 = doExecute(doJob1, True)
-        WScript.Sleep 500
-        If sPreProcess="postFlightCheck" Then
-            retval = fsMyInputBox( doJob2 )
-            If Len(retVal) = 0 Then
-                Exit Function
-            Else
-                doJob2 = retVal
-            End If
-        End If
-        b1 = doExecute(doJob2, True)
     Case Else
         doJob = """" & myConverter & """ -i """ & sWaveName
         doJob = doJob & """ -y """ & sOutName & """"
@@ -1140,8 +1495,8 @@ Function wav2FFmpeg(sWaveName, sOutName, sImage, sDimensions)
     End Select
     If fbFileExists(sOutName) Then
         fbRemoveFile sWaveName
-        removeMetaFiles
-        wav2FFmpeg = True
+        removeMetaFiles()
+        compressWaveAudioWithFfmpeg = True
     End If
 End Function
 
@@ -1153,30 +1508,34 @@ Function AddLanguageCodes(s1, s4)
     '''
     Dim s2
     Dim s3
-
+    s4 = Replace(_
+        Replace(_
+            s4, ">", "&#62;"), "<", "&#60;")
     s1 = LCase(s1)
     If canUseSpeechXML Then
         ' With Sapi 5.3 and above we use the ISO language code
-        s3 = "<?xml version = ""1.0""?>"
-        s3 = s3 & " <speak version = ""1.0"" xmlns ="
-        s3 = s3 & " ""http://www.w3.org/2001/10/synthesis"""
-        s3 = s3 & " xmlns:xsi = ""http://www.w3.org/2001/XMLSchema-instance"""
-        s3 = s3 & " xsi:schemaLocation = ""http://www.w3.org/2001/10/synthesis"
-        s3 = s3 & " http://www.w3.org/TR/speech-synthesis/synthesis.xsd"""
-        s3 = s3 & " xml:lang = """
-        s3 = s3 & fsWindowsCloseMatchLanguage(s1)
-        s3 = s3 & """> "
-        s3 = s3 & s4
-        s3 = s3 & "</speak>"
+        s3 = Join(Array(_
+            "<?xml version = ""1.0""?>", _
+            " <speak version = ""1.0"" xmlns =", _
+            " ""http://www.w3.org/2001/10/synthesis""", _
+            " xmlns:xsi = ""http://www.w3.org/2001/XMLSchema-instance""", _
+            " xsi:schemaLocation = ""http://www.w3.org/2001/10/synthesis", _
+            " http://www.w3.org/TR/speech-synthesis/synthesis.xsd""", _
+            " xml:lang = """, _
+            fsWindowsCloseMatchLanguage(s1), _
+            """> ", _
+            s4, _
+            " </speak>"), "")
     Else
         ' XP  Sapi 5.1- we look up the Microsoft language code
-                s2 = fsIsoToHumanReadable(s1, 3)
-                If s2 = "1000" Then s2 = "409"  ' Use en-US if undefined language
-        s3 = "<speak><lang langid = """
-        s3 = s3 & s2
-        s3 = s3 & """> "
-        s3 =  s3 & s4
-        s3 = s3 & " <break strength=""strong"" /></lang></speak>"
+        s2 = fsIsoToHumanReadable(s1, 3)
+        If s2 = "1000" Then s2 = "409"  ' Use en-US if undefined language
+        s3 = Join(Array(_
+            "<speak><lang langid = """, _
+            s2, _
+            """> ", _
+            s4, _
+            "<break strength=""strong"" /></lang></speak>"), "")
     End If
     AddLanguageCodes = s3
 End Function
@@ -1339,9 +1698,9 @@ Function WriteIt(s1, _
         ElseIf LCase(sLibre) = "true" Then
             Select Case sFileNameExt
             Case ".aif", ".aiff"
-                bOK = wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions)
+                bOK = compressWaveAudioWithFfmpeg(sWaveName, sFileName, sImage, sDimensions)
             Case ".flac"
-                If wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions) = False Then
+                If compressWaveAudioWithFfmpeg(sWaveName, sFileName, sImage, sDimensions) = False Then
                      sLastProcess = "flac"
                      bOK = wav2Flac(sWaveName, sFileName, sMyWords, sImage)
                 End If
@@ -1349,10 +1708,10 @@ Function WriteIt(s1, _
                 sLastProcess = "M4A encoder"
                 If wav2m4a(sWaveName, sFileName, sMyWords, sImage) = False Then
                      sLastProcess = "ffmpeg"
-                     bOK = wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions)
+                     bOK = compressWaveAudioWithFfmpeg(sWaveName, sFileName, sImage, sDimensions)
                 End If
             Case ".mp3"
-                If wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions) = False Then
+                If compressWaveAudioWithFfmpeg(sWaveName, sFileName, sImage, sDimensions) = False Then
                      sLastProcess = "lame"
                      bOK = wav2mp3(sWaveName, sFileName, sImage)
                 End If
@@ -1360,13 +1719,22 @@ Function WriteIt(s1, _
                 sLastProcess = "OGG Encoder"
                 If wav2Ogg(sWaveName,sFileName, sMyWords) = False Then
                      sLastProcess = "ffmpeg"
-                     bOK = wav2FFmpeg(sWaveName, sFileName, sImage, sDimensions)
+                     bOK = compressWaveAudioWithFfmpeg(sWaveName, sFileName, sImage, sDimensions)
                 End If
             Case Else
                 ' Format was not tested, is experimental or is not normally used
                 ' with speech clips.
                  bOK = False
             End Select
+            If Not bOK Then
+                ' Use [VideoLAN VLC](https://videolan.org/vlc) video player
+                ' in "dummy" (non-interactive) mode to create a compressed
+                ' audio file with no metadata. 
+                If Len(fsFindAppPath("VideoLAN\VLC\vlc.exe")) > 0 Then
+                    sLastProcess = "VideoLAN VLC"
+                    bOK = executeVideoLanVLC(sWaveName, sFileName)
+                End If
+            End If
         Else
             ' use iTunes
             sLastProcess = "iTunes"
@@ -1491,7 +1859,7 @@ Function fsDone(b)
     Case "tr"
         a1 = "Bitirdi"
     Case "uk"
-        a1 = "&#1047;&#1072;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1086;"
+        a1 = "&#x0413;&#x043E;&#x0442;&#x043E;&#x0432;&#x43e;"
     Case "zh"
         If InStr(b1, "TW") > 0 Then
             a1 = "&#2360;&#2350;&#2366;&#2346;&#2381;&#2340;"
@@ -2770,8 +3138,15 @@ Sub main()
             Usage "Help"
             WScript.Exit(0)
         Case ""
-            s0 = Year(Date) & "-" & Month(Date) & "-" & Day(Date)
-            s0 = s0 & ", " & FormatDateTime(Now,4)
+            s0 = Join(_
+                    Array(_
+                    Year(Date), _
+                    "-", _
+                    Month(Date), _
+                    "-", _
+                    Day(Date), _
+                    ", ", _
+                    FormatDateTime(Now,4)), "")
             s3 = Left(fsIsoToHumanReadable(fsDec2Hex(Int(GetLocale())), 0), 2)
             Select Case s3
             Case "de"
@@ -2823,5 +3198,4 @@ Sub main()
 End Sub
 
 
-main
-
+main()
