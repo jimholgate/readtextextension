@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
-'''
+r'''
 Pyttsx
 ======
 
@@ -85,10 +85,10 @@ Usage
   %(sA)s --rate "20" "TextFile.txt"`)''' % locals())
 
 
-def ReadTheStringAloud(voiceName='', voiceRate=0, speechString=''):
+def read_string_aloud(_name='', _rate=0, speechString=''):
     '''
-    Says speechString, using the default voice or voiceName voice
-    Positive voiceRate is faster; Negative voiceRate is slower
+    Says speechString, using the default voice or _name voice
+    Positive _rate is faster; Negative _rate is slower
     '''
     try:
         dummy = bool(pyttsx)
@@ -97,14 +97,14 @@ def ReadTheStringAloud(voiceName='', voiceRate=0, speechString=''):
         sys.exit(2)
     try:
         engine = pyttsx.init()
-        engine.setProperty('rate', engine.getProperty('rate') + int(voiceRate))
+        engine.setProperty('rate', engine.getProperty('rate') + int(_rate))
     except Exception:
         print('I did not understand the rate!')
         usage()
         sys.exit(2)
     voices = engine.getProperty('voices')
     for voice in voices:
-        if voice.name == voiceName:
+        if voice.name == _name:
             engine.setProperty('voice', voice.id)
             break
     engine.say(speechString)
@@ -120,16 +120,16 @@ def main():
         print('option -a not recognized')
         usage()
         sys.exit(2)
-    voiceName = ""
-    voiceRate = 0
+    _name = ""
+    _rate = 0
     for o, a in opts:
         if o in ("-h", "--help"):
             usage()
             sys.exit()
         elif o in ("-v", "--voice"):
-            voiceName = a
+            _name = a
         elif o in ("-r", "--rate"):
-            voiceRate = a
+            _rate = a
         else:
             assert False, "unhandled option"
     try:
@@ -142,7 +142,7 @@ def main():
     else:
         s = f.read()
         f.close()
-        ReadTheStringAloud(voiceName, voiceRate, s)
+        read_string_aloud(_name, _rate, s)
         sys.exit(0)
 
 

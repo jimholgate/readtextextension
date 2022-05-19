@@ -35,7 +35,6 @@ by the distribution.
 '''
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-import codecs
 import getopt
 import math
 import os
@@ -263,15 +262,15 @@ class GoogleTranslateClass(object):
     by Google nor does the documention represent the views or opinions of Google or
     Google personnel.
 
-    The creators of the `gtts` python library are the originators of the library 
+    The creators of the `gtts` python library are the originators of the library
     enabling the `GoogleTranslateClass` class.
 
     The `gtts` library can only be enabled by electing to install it on a supported
     platform. Read the documentation for help installing `gtts`  or to help with
     troubleshooting if `gtts` does not work when using your Linux package manager.
-    
+
         sudo apt -y install python3-gtts
-    
+
     See:
 
     * <https://github.com/pndurette/gTTS>

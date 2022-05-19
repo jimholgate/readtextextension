@@ -1,8 +1,9 @@
 ﻿#!/usr/bin/env python
 # -*- coding: UTF-8-*-
-r'''
-Espeak
-======
+
+'''
+Read text
+=========
 
 Reads a text file using espeak, mbrola and a media player.
 
@@ -16,8 +17,8 @@ the mbrola binary and installing it.  Download mbrola voices and copy or link
 the voice files into the appropriate directory. For example:
 
         /usr/share/mbrola/voices (Linux, OSX)
-        C:\Program Files (x86)\eSpeak\espeak-data (Windows 64 bit)
-        C:\Program Files\eSpeak\espeak-data (Windows 32 bit)
+        C:/Program Files (x86)/eSpeak/espeak-data (Windows 64 bit)
+        C:/Program Files/eSpeak/espeak-data (Windows 32 bit)
 
 You only need to copy or link to the voices files themselves.
 In April 2011, compatible mbrola voices were:
@@ -63,12 +64,12 @@ Command line options (default):
 
 or (save as a .wav file in the home directory):
 
-        "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
+        "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE)
           --output="(HOME)(NOW).wav" "(TMP)"
 
 or (speak more slowly with a lowered pitch):
 
-        "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
+        "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE)
           --rate=80% --pitch=80% "(TMP)"
 
 See the manual page for `espeak` for more detailed information
@@ -80,7 +81,6 @@ Copyright (c) 2011 - 2022 James Holgate
 '''
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-import codecs
 import getopt
 import math
 import os
@@ -116,7 +116,7 @@ Usage
 ''')
 
 
-def espkread(_text_path, _lang, _visible, _audible, sTMP0, _image, _title,
+def espkread(_text_path, _lang, _visible, _audible, _tmp0, _image, _title,
              _post_process, _author, _dimensions, _ipitch, _irate):
     '''
 Creates a temporary speech-synthesis sound file and optionally
@@ -125,7 +125,7 @@ reads the file aloud.
 + `_text_path` - Name of text file to speak
 + `_lang` - Supported two or four letter language code - defaults to US English
 + `_visible` - Use a graphic media player, or False for invisible player
-+ `sTMP0` - Name of desired output media file
++ `_tmp0` - Name of desired output media file
 + `_audible` - If false, then don't play the sound file
 + `_image` - a .png or .jpg file if required.
 + `_title` - Commentary or title for post processing
@@ -299,7 +299,7 @@ reads the file aloud.
             # Identify an mbrola voice if it is installed
 
             if a0[i]['a1'] == s:
-                if 'nt' in os.name.lower():
+                if os.name == 'nt':
                     if os.path.isfile(
                             os.path.join(os.getenv('ProgramFiles'),
                                          'eSpeak/espeak-data/mbrola',
@@ -307,14 +307,13 @@ reads the file aloud.
                         _voice = 'mb-' + a0[i]['a2']
                         break
                     elif os.getenv('ProgramFiles(x86)'):
-                        sPFX86 = os.getenv('ProgramFiles(x86)')
-                        sEEDM = 'eSpeak/espeak-data/mbrola'
+                        _pfx86 = os.getenv('ProgramFiles(x86)')
+                        _mbrola = 'eSpeak/espeak-data/mbrola'
                         if (os.path.isfile(
-                                os.path.join(sPFX86, sEEDM, a0[i]['a2']))):
+                                os.path.join(_pfx86, _mbrola, a0[i]['a2']))):
                             _voice = 'mb-' + a0[i]['a2']
                             break
                 else:
-                    print(os.path.join('/usr/share/mbrola/voices', a0[i]['a2']))
                     if os.path.isfile(
                             os.path.join('/usr/share/mbrola/voices',
                                          a0[i]['a2'])):
@@ -326,9 +325,9 @@ reads the file aloud.
                         _voice = 'mb-' + a0[i]['a2']
                         break
     # Determine the output file name
-    _out_file = readtexttools.get_work_file_path(sTMP0, _image, 'OUT')
+    _out_file = readtexttools.get_work_file_path(_tmp0, _image, 'OUT')
     # Determine the temporary file name
-    _work_file = readtexttools.get_work_file_path(sTMP0, _image, 'TEMP')
+    _work_file = readtexttools.get_work_file_path(_tmp0, _image, 'TEMP')
 
     # Remove old files.
     if os.path.isfile(_work_file):
@@ -346,9 +345,10 @@ reads the file aloud.
             if readtexttools.have_posix_app(app_name, False):
                 _app = app_name
                 break
-        sSub = 'eSpeak/command_line/espeak.exe'
-        if 'nt' in os.name.lower():
-            _app = readtexttools.get_nt_path(sSub)
+        if os.name == 'nt': 
+            _app = 'eSpeak/command_line/espeak.exe'
+            _app = readtexttools.get_nt_path(_app)
+
         if bool(_app):
             _command = ''.join([
                 '"', _app, '" -b 1 -p ', _pitch, ' -s ', _rate, ' -v ', _voice,
@@ -390,7 +390,7 @@ reads the file aloud.
             print(readtexttools.sound_length_seconds(_work_file))
             print("-----------------------------------------------------")
             return True
-    except (IOError):
+    except IOError:
         print('I was unable to use espeak and read text tools!')
         usage()
         return False
@@ -404,28 +404,28 @@ def _espeak_rate(sA):
     '''
     i1 = 0
     i2 = 0
-    iMinVal = 20
-    iMaxVal = 640
-    retVal = 160
+    _minval = 20
+    _maxval = 640
+    _myval = 160
     s1 = ''
 
     try:
         if '%' in sA:
             s1 = sA.replace('%', '')
             i1 = (float(s1) if '.' in s1 else int(s1) / 100)
-            i2 = math.ceil(i1 * retVal)
+            i2 = math.ceil(i1 * _myval)
         else:
             i1 = (float(sA) if '.' in sA else int(sA))
             i2 = math.ceil(i1)
-    except (TypeError):
+    except TypeError:
         print('I was unable to determine espeak rate!')
-    if i2 <= iMinVal:
-        retVal = iMinVal
-    elif i2 >= iMaxVal:
-        retVal = iMaxVal
+    if i2 <= _minval:
+        _myval = _minval
+    elif i2 >= _maxval:
+        _myval = _maxval
     else:
-        retVal = i2
-    return retVal
+        _myval = i2
+    return _myval
 
 
 def _espeak_pitch(sA):
@@ -437,28 +437,28 @@ def _espeak_pitch(sA):
     '''
     i1 = 0
     i2 = 0
-    iMinVal = 0
-    iMaxVal = 100
-    retVal = 50
+    _minval = 0
+    _maxval = 100
+    _myval = 50
     s1 = ''
 
     try:
         if '%' in sA:
             s1 = sA.replace('%', '')
             i1 = (float(s1) if '.' in s1 else int(s1) / 100)
-            i2 = math.ceil(i1 * retVal)
+            i2 = math.ceil(i1 * _myval)
         else:
             i1 = (float(sA) if '.' in sA else int(sA))
             i2 = math.ceil(i1)
     except TypeError:
         print('I was unable to determine espeak pitch!')
-    if i2 <= iMinVal:
-        retVal = iMinVal
-    elif i2 >= iMaxVal:
-        retVal = iMaxVal
+    if i2 <= _minval:
+        _myval = _minval
+    elif i2 >= _maxval:
+        _myval = _maxval
     else:
-        retVal = i2
-    return retVal
+        _myval = i2
+    return _myval
 
 
 def main():

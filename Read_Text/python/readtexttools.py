@@ -51,7 +51,6 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import aifc
 import codecs
-import datetime
 import getopt
 import glob
 import math
@@ -182,7 +181,7 @@ def safechars(_test_string='', _allowed='1234567890,'):  # -> string
     return _test_string
 
 
-def remove_unsafe_chars(_test_string='', _forbidden='[]\{\}%|*'):  # -> string
+def remove_unsafe_chars(_test_string='', _forbidden='[]\\{}%|*'):  # -> string
     '''Removes unwanted characters from a string.'''
     if not bool(_test_string):
         return ''
@@ -599,8 +598,8 @@ def have_posix_app(posix_app='vlc', do_test=True):  # -> bool
 
     If `do_test` is `False`, then only look for the app installed in the
     standard system-wide location, otherwise test for a manual or help
-    response. A container version of an app might test `True`, but the 
-    python program might not be able to run the posix app. 
+    response. A container version of an app might test `True`, but the
+    python program might not be able to run the posix app.
     '''
     os_sep = os.sep
     mute_response = '&> %(os_sep)sdev%(os_sep)snull &' % locals()

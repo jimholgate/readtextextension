@@ -50,7 +50,6 @@ Copyright (c) 2022 James Holgate
 '''
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-import codecs
 import getopt
 import os
 import sys
