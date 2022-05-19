@@ -136,14 +136,14 @@ Function fvTts_config_createDefaultConfig( _
 				fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
 				
 				config(fiExternalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot; &amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf fbHaveEspeak() Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
 			Else
 				config(fiExternalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot; &amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
 			End If
 		Else

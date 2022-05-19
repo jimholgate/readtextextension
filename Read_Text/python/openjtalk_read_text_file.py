@@ -132,6 +132,8 @@ def openjtalk_read(_in_text='',
         if readtexttools.my_os_system(_os_command):
             if len(_out_file) != 0:
                 readtexttools.unlock_my_lock()
+            if os.path.getsize(_work_file) == 0:
+                return False
             if readtexttools.process_wav_media(_title, _work_file, _image,
                                                _out_file, _audible, _visible,
                                                _artist, _dimensions):

@@ -142,17 +142,21 @@ def picoread(_text, _language, _visible, _audible, _media_file, _image, _title,
             _os_command = '%(_command)s -l %(_lang)s -w "%(_work_file)s"  %(_text)s' % locals(
             )
         if readtexttools.my_os_system(_os_command):
+            if os.path.getsize(_work_file) == 0:
+                return False
             readtexttools.process_wav_media(_title, _work_file, _image,
                                             _out_file, _audible, _visible,
                                             _artist, _dimensions)
+            return True
     except IOError:
         print('I was unable to read!')
         usage()
-        sys.exit(2)
+        return False
 
 
 def main():
     '''Pico read text tools'''
+    _imported_meta = readtexttools.ImportedMetaData()
     _language = 'en-US'
     _output = ''
     _visible = ''
@@ -166,74 +170,66 @@ def main():
     _dimensions = '600x600'
     _xml_transform = readtexttools.XmlTransform()
     _file_path = sys.argv[-1]
-    if os.path.isfile(_file_path):
-        if sys.argv[-1] == sys.argv[0]:
+    if not os.path.isfile(_file_path):
+        sys.exit(0)
+    if sys.argv[-1] == sys.argv[0]:
+        usage()
+        sys.exit(0)
+    elif not os.path.isfile('/usr/bin/pico2wave'):
+        print('Please install libttspico-utils.')
+        usage()
+        sys.exit(0)
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'hovalrpitnd', [
+            'help', 'output=', 'visible=', 'audible=', 'language=', 'rate=',
+            'pitch=', 'image=', 'title=', 'artist=', 'dimensions='
+        ])
+    except getopt.GetoptError:
+        # print help information and exit
+        print('option -a not recognized')
+        usage()
+        sys.exit(2)
+    for o, a in opts:
+        if o in ('-h', '--help'):
             usage()
             sys.exit(0)
-        elif not os.path.isfile('/usr/bin/pico2wave'):
-            print('Please install libttspico-utils.')
-            usage()
-            sys.exit(0)
-        try:
-            opts, args = getopt.getopt(sys.argv[1:], 'hovalrpitnd', [
-                'help', 'output=', 'visible=', 'audible=', 'language=', 'rate=',
-                'pitch=', 'image=', 'title=', 'artist=', 'dimensions='
-            ])
-        except getopt.GetoptError:
-            # print help information and exit
-            print('option -a not recognized')
-            usage()
-            sys.exit(2)
-        for o, a in opts:
-            if o in ('-h', '--help'):
-                usage()
-                sys.exit(0)
-            elif o in ('-o', '--output'):
-                _output = a
-            elif o in ('-v', '--visible'):
-                _visible = a
-            elif o in ('-a', '--audible'):
-                _audible = a
-            elif o in ('-l', '--language'):
-                _language = a
-            elif o in ('-r', '--rate'):
-                _rate = a
-            elif o in ('-p', '--pitch'):
-                _pitch = a
-            elif o in ('-i', '--image'):
-                _image = a
-            elif o in ('-t', '--title'):
-                _title = a
-            elif o in ('-n', '--artist'):
-                _artist = a
-            elif o in ('-d', '--dimensions'):
-                _dimensions = a
-            else:
-                assert False, 'unhandled option'
-        try:
-            _file_object = codecs.open(_file_path, mode='r', encoding='utf-8')
-        except IOError:
-            print('I was unable to open the file you specified!')
-            usage()
+        elif o in ('-o', '--output'):
+            _output = a
+        elif o in ('-v', '--visible'):
+            _visible = a
+        elif o in ('-a', '--audible'):
+            _audible = a
+        elif o in ('-l', '--language'):
+            _language = a
+        elif o in ('-r', '--rate'):
+            _rate = a
+        elif o in ('-p', '--pitch'):
+            _pitch = a
+        elif o in ('-i', '--image'):
+            _image = a
+        elif o in ('-t', '--title'):
+            _title = a
+        elif o in ('-n', '--artist'):
+            _artist = a
+        elif o in ('-d', '--dimensions'):
+            _dimensions = a
         else:
-            _text = _file_object.read()
-            _file_object.close()
-            if len(_text) != 0:
-                _text = _xml_transform.clean_for_xml(_text)
-            if len(_text) != 0:
-                if not _language[:2].lower() in ['de', 'es', 'en', 'fr', 'it']:
-                    _language = 'en-US'
-                _text = readtexttools.strip_mojibake(_language, _text)
-                _xml_text = ''.join([
-                    '"<speed level = \'', _rate, '\'>', "<pitch level = '",
-                    _pitch, '\'>', _text, '</pitch></speed>"'
-                ])
-                _artist_ok = readtexttools.check_artist(_artist)
-                _title_ok = readtexttools.check_title(_title, "pico")
-                picoread(_xml_text, _language, _visible, _audible, _output,
-                         _image, _title_ok, _artist_ok, _dimensions)
-    else:
-        print('I was unable to find the file you specified!')
+            assert False, 'unhandled option'
+    _text = _imported_meta.meta_from_file(_file_path)
+    if len(_text) != 0:
+        _text = _xml_transform.clean_for_xml(_text)
+    if len(_text) != 0:
+        if not _language[:2].lower() in ['de', 'es', 'en', 'fr', 'it']:
+            _language = 'en-US'
+        _text = readtexttools.strip_mojibake(_language, _text)
+        _xml_text = ''.join([
+            '"<speed level = \'', _rate, '\'>', "<pitch level = '",
+            _pitch, '\'>', _text, '</pitch></speed>"'
+        ])
+        _artist_ok = readtexttools.check_artist(_artist)
+        _title_ok = readtexttools.check_title(_title, "pico")
+        picoread(_xml_text, _language, _visible, _audible, _output,
+                 _image, _title_ok, _artist_ok, _dimensions)
     sys.exit(0)
 
 

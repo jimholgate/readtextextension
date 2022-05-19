@@ -522,6 +522,8 @@ Setup
         if os.path.isfile(_media_work) and _post_process in [
                 'process_mp3_media', 'process_audio_media'
         ]:
+            if os.path.getsize(_media_work) == 0:
+                return False
             readtexttools.process_wav_media(_info, _media_work, _icon,
                                             _media_out, _audible, _visible,
                                             _writer, _size)
@@ -591,7 +593,7 @@ def main():
         print('Your system does not support the network python tool.')
         usage()
         sys.exit(0)
-
+    _imported_meta = readtexttools.ImportedMetaData()
     _speech_rate = 160
     _iso_lang = 'ca-ES'
     try:
@@ -665,15 +667,7 @@ def main():
         if not _continue:
             usage()
             sys.exit(0)
-
-        try:
-            oFILE = codecs.open(_text_file_in, mode='r', encoding='utf-8')
-        except IOError:
-            print('I was unable to open the file you specified!')
-            usage()
-            sys.exit(0)
-        _text = oFILE.read()
-        oFILE.close()
+        _text = _imported_meta.meta_from_file(_text_file_in)
         if len(_text) != 0:
             _text = readtexttools.clean_str(_text, True).strip()
             _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)

@@ -1661,6 +1661,17 @@ Sub dialog1Combo1ShowFestivalScripts( _
 End Sub
 
 
+Function fiCountFestivalVoices() As Integer
+	Dim n# : n = 0
+	fiCountFestivalVoices = 0
+	For n = 0 To fiCountFestivalDirectory()
+		If fileexists(fsFestivalDirectory(n)) Then
+			fiCountFestivalVoices = fiCountFestivalVoices + 1
+		End If
+	Next
+End Function
+
+
 Function fiDialog1Combo2ShowMyPythonChoices( _
 	oDialog) As Integer
 &apos;&apos;
@@ -1760,7 +1771,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			Next
 			s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-			&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot;&quot; &amp; _
+			&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		End If
@@ -1799,15 +1810,42 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	If fileexists(&quot;/usr/bin/text2wave&quot;) Or _
 		fileexists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave&quot;) Or _
 		fileexists(fsProgramDirectory() &amp; &quot;festival\texttowave&quot;) Then
-		For n = 0 To fiCountFestivalDirectory()
-			If fileexists(fsFestivalDirectory(n)) Then
-				s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(voice_&quot; &amp; fsFestivalVoice(n) &amp; &quot;)&quot;&quot;&quot;
+		Select Case fiCountFestivalLanguage()
+			Case 0
+			&apos; pass
+			Case 1
+			Select Case fiCountFestivalDirectory()
+				Case 1 
+				s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;
 				s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
-			End If
-		Next
+				Case Else
+				For n = 0 To fiCountFestivalDirectory()
+					If fileexists(fsFestivalDirectory(n)) Then
+						s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(voice_&quot; &amp; fsFestivalVoice(n) &amp; &quot;)&quot;&quot;&quot;
+						s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
+					End If
+				Next				
+			End Select	
+			Case 2
+			For n = 0 To fiCountFestivalDirectory()
+				If fileexists(fsFestivalDirectory(n)) Then
+					s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(voice_&quot; &amp; fsFestivalVoice(n) &amp; &quot;)&quot;&quot;&quot;
+					s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
+				End If
+			Next
+			s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
+			s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
+			Case Else
+			s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
+			s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
+		End Select
 	ElseIf fileexists(&quot;/usr/bin/flite&quot;) Then
 		s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)	
+	End If
+	If fbOKWithRhVoice(sLanguage) Then
+		s4 = &quot;&quot;&quot;(RHVOICE_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)	
 	End If
 	If fbHaveEspeak() Or _
 		fileexists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
@@ -2745,6 +2783,10 @@ Function replaceLocalTokensWithStr( _
 	
 	sFind = &quot;(FESTIVAL_READ_TEXT_PY)&quot;
 	sReplace = ConvertFromURL(fsPythonFestivalDoc())
+	sA = fsReplaceText(sA,sFind,sReplace)
+	
+	sFind = &quot;(RHVOICE_READ_TEXT_PY)&quot;
+	sReplace = ConvertFromURL(fsRhVoiceTtsDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(NETWORK_READ_TEXT_PY)&quot;
@@ -5561,6 +5603,50 @@ Function fbHavePyQrCode() As Boolean
 	End If
 End Function
 
+
+Function fbOKWithRhVoice(_
+		sA) As Boolean
+	fbOKWithRhVoice = False
+	&apos; The version of RhVoice included in Ubuntu 22.04 does not include
+	&apos; all languages described on the github site.
+	Dim _test$ : _test$ = &quot;&quot;
+	Dim languages$ : languages = &quot;file:///usr/share/RHVoice/languages/&quot;
+	Dim a1 : a1 = Array(_
+		&quot;RHVoice-test&quot;)
+	Dim x As Integer : x = 0
+
+    If Not Fileexists(fsRhVoiceTtsDoc()) Then
+        Exit Function
+    End If
+    
+	For x = Lbound(a1) to Ubound(a1)
+		If Fileexists(&quot;/usr/bin/&quot; &amp; a1(x)) Then
+			_test = a1(x)
+			Exit For
+		End If
+	Next
+	If Len(_test) = 0 Then
+		Exit Function
+	End If
+	Select Case Split(sA &amp; &quot;-&quot;, &quot;-&quot;)(0)
+	Case &quot;en&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;English&quot;)	
+	Case &quot;eo&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;Esperanto&quot;)
+	Case &quot;ky&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;Kyrgyz&quot;)
+	Case &quot;pt&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;Brazilian-Portuguese&quot;)
+	Case &quot;ru&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;Russian&quot;)
+	Case &quot;tt&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;Tatar&quot;)
+	Case  &quot;uk&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;Ukrainian&quot;)
+	Case Else
+	fbOKWithRhVoice = False
+	End Select 
+End Function
 
 
 Function fbHaveNetworkTTS() As Boolean

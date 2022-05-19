@@ -202,6 +202,7 @@ def main():  # -> None
     _txt = ''
     i_rate = 0
     _language = ''
+    _voice = ''
     verbose_language = os.getenv('LANGUAGE')
     py_m = platform.python_version_tuple()[0]
     py_m_verbose = '.'.join(platform.python_version_tuple())
@@ -286,12 +287,13 @@ See also: [pip install](https://pip.pypa.io/en/stable/cli/pip_install/)''' %
             client.set_output_module(a)
         elif o in ("-l", "--language"):
             # 2 letters lowercase - fr Français, de Deutsch...
-            concise_lang = a[:2].lower()
+            concise_lang = ''.join([a.lower(), '-']).split('-')[0]
             client.set_language(concise_lang)
             _language = a
         elif o in ("-v", "--voice"):
             # MALE1, MALE2 ...
-            client.set_voice(a.upper())
+            _voice = a.upper()
+            client.set_voice(_voice)
         elif o in ("-r", "--rate"):
             client.set_rate(int(a))
             i_rate = a
@@ -305,36 +307,54 @@ See also: [pip install](https://pip.pypa.io/en/stable/cli/pip_install/)''' %
         client.close()
         print("I was unable to open the file you specified!")
         usage()
-    else:
-        _txt = f.read()
-        f.close()
-        if len(_txt) != 0:
-            _txt = readtexttools.strip_xml(_txt)
-            _coding = 'utf-8'
-            _txt = readtexttools.strip_mojibake(concise_lang, _txt)
-        if _xml_tool.use_mode in ['text']:
-            _message = ' " %(_txt)s"' % locals()
-        else:
-            _txt = _xml_tool.clean_for_xml(_txt)
-            _message = '''<?xml version='1.0'?>
-<speak version='1.1' xml:lang='%(_language)s'>%(_txt)s</speak>''' % locals()
-        _lock = readtexttools.get_my_lock("lock")
-        if os.path.isfile(_lock):
-            client.close()
-            readtexttools.my_os_system("spd-say --cancel")
-            time.sleep(0.2)
-            hard_reset('speech-dispatcher')
-            readtexttools.unlock_my_lock()
-        else:
-            readtexttools.lock_my_lock()
-            _time = guess_time(_txt, i_rate, _in_file, _language)
-            client.set_data_mode(_xml_tool.use_mode)
-            client.set_punctuation(speechd.PunctuationMode.SOME)
-            client.speak(_message)
-            time.sleep(_time)
-            client.close()
-            readtexttools.unlock_my_lock()
         sys.exit(0)
+    _txt = f.read()
+    f.close()
+    if len(_txt) != 0:
+        _txt = readtexttools.strip_xml(_txt)
+        _coding = 'utf-8'
+        _txt = readtexttools.strip_mojibake(concise_lang, _txt)
+    if _xml_tool.use_mode in ['text']:
+        _message = ' " %(_txt)s"' % locals()
+        sys.exit(0)
+    _txt = _xml_tool.clean_for_xml(_txt)
+    _message = '''<?xml version='1.0'?>
+<speak version='1.1' xml:lang='%(_language)s'>%(_txt)s</speak>''' % locals()
+    _lock = readtexttools.get_my_lock("lock")
+    if os.path.isfile(_lock):
+        client.close()
+        readtexttools.my_os_system("spd-say --cancel")
+        time.sleep(0.2)
+        hard_reset('speech-dispatcher')
+        readtexttools.unlock_my_lock()
+    else:
+        readtexttools.lock_my_lock()
+        _time = guess_time(_txt, i_rate, _in_file, _language)
+        client.set_data_mode(_xml_tool.use_mode)
+        client.set_punctuation(speechd.PunctuationMode.SOME)
+        # print(client.list_synthesis_voices())
+        # print(client.list_output_modules()) #  - i. e.: (espeak-ng-mbrola, espeak-ng, ...)
+        # client.list_synthesis_voices() - i. e.: ('Alan', 'en', 'none', ...)
+        if _language in ['en-US', 'en-AS', 'en-PH', 'en-PR', 'en-UM', 'en-VI']:
+            _client_voices = client.list_synthesis_voices()
+            if bool(_voice):
+                # Don't alter user's choice.
+                pass
+            elif ('Bdl', 'en', 'none') in _client_voices:
+                try:
+                    client.set_synthesis_voice('Bdl')
+                except (AttributeError, SyntaxError, TypeError):
+                    pass
+            elif ('English (America)+male1', 'en-US', 'male1') in _client_voices:
+                try:
+                    client.set_synthesis_voice('English (America)+male1')
+                except (AttributeError, SyntaxError, TypeError):
+                    pass
+        client.speak(_message)
+        time.sleep(_time)
+        client.close()
+        readtexttools.unlock_my_lock()
+    sys.exit(0)
 
 
 if __name__ == "__main__":

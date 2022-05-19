@@ -182,6 +182,15 @@ def safechars(_test_string='', _allowed='1234567890,'):  # -> string
     return _test_string
 
 
+def remove_unsafe_chars(_test_string='', _forbidden='[]\{\}%|*'):  # -> string
+    '''Removes unwanted characters from a string.'''
+    if not bool(_test_string):
+        return ''
+    for _letter in _forbidden:
+        _test_string = _test_string.replace(_letter, '')
+    return _test_string
+
+
 def net_error_icon():  # -> string
     '''Path to Gnome network error icon'''
     for _path in [
@@ -2005,6 +2014,17 @@ def clean_str(test_text='', beautify_quotes=True):  #-> str
     except UnicodeDecodeError:
         print(_text + ' error in readtexttools.clean_str')
     return _text
+
+
+def count_items_in_dir(_dir=''):
+    '''Count many items are in a directory'''
+    _init = 0
+    if not os.path.isdir(_dir):
+        return _init
+    for _path in os.listdir(_dir):
+        if os.path.exists(os.path.join(_dir, _path)):
+            _init += 1
+    return _init
 
 
 def time_for_title():  # -> str

@@ -370,7 +370,7 @@ reads the file aloud.
             _app = 'gst-launch-1.0'
             _content = _imported_meta.meta_from_file(_text_path)
             _content = _imported_meta.escape_gst_pipe_meta(_content)
-            _command = '%(_app)s espeak text="%(_content)s" voice=%(_voice)s ! autoaudiosink' % locals(
+            _command = '%(_app)s espeak text="%(_content)s" voice=%(_voiespeakce)s ! autoaudiosink' % locals(
             )
             _post_process = None
         if not bool(_app):
@@ -379,6 +379,8 @@ reads the file aloud.
         if not bool(_post_process):
             readtexttools.unlock_my_lock()
         elif _post_process == "process_wav_media":
+            if os.path.getsize(_work_file) == 0:
+                return False
             return bool(
                 readtexttools.process_wav_media(_title, _work_file, _image,
                                                 _out_file, _audible, _visible,
@@ -468,7 +470,6 @@ def main():
     _wave = ''
     _visible = ''
     _audible = ''
-    _content = ''
     _rate_percent = '100%'
     _pitch_percent = '100%'
     _image = ''
@@ -477,67 +478,62 @@ def main():
     _dimensions = '600x600'
     _text_path = sys.argv[-1]
 
-    if os.path.isfile(_text_path):
-        if sys.argv[-1] == sys.argv[0]:
+    if not os.path.isfile(_text_path):
+        sys.exit(0)
+    if sys.argv[-1] == sys.argv[0]:
+        usage()
+        sys.exit(0)
+    elif not os.path.isfile('/usr/bin/espeak'):
+        if not os.path.isfile('/usr/bin/espeak-ng'):
+            print(
+                'Please install espeak.  Use `sudo apt-get install espeak-ng`'
+            )
             usage()
             sys.exit(0)
-        elif not os.path.isfile('/usr/bin/espeak'):
-            if not os.path.isfile('/usr/bin/espeak-ng'):
-                print(
-                    'Please install espeak.  Use `sudo apt-get install espeak-ng`'
-                )
-                usage()
-                sys.exit(0)
-        try:
-            opts, args = getopt.getopt(sys.argv[1:], 'hovalrpitnd', [
-                'help', 'output=', 'visible=', 'audible=', 'language=', 'rate=',
-                'pitch=', 'image=', 'title=', 'artist=', 'dimensions='
-            ])
-        except getopt.GetoptError:
-            # print help information and exit
-            print('option -a not recognized')
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'hovalrpitnd', [
+            'help', 'output=', 'visible=', 'audible=', 'language=', 'rate=',
+            'pitch=', 'image=', 'title=', 'artist=', 'dimensions='
+        ])
+    except getopt.GetoptError:
+        # print help information and exit
+        print('option -a not recognized')
+        usage()
+        sys.exit(2)
+    for o, a in opts:
+        if o in ('-h', '--help'):
             usage()
-            sys.exit(2)
-        for o, a in opts:
-            if o in ('-h', '--help'):
-                usage()
-                sys.exit(0)
-            elif o in ('-o', '--output'):
-                _wave = a
-            elif o in ('-v', '--visible'):
-                _visible = a
-            elif o in ('-a', '--audible'):
-                _audible = a
-            elif o in ('-l', '--language'):
-                _lang = a
-            elif o in ('-r', '--rate'):
-                _rate_percent = a
-                _irate = _espeak_rate(_rate_percent)
-            elif o in ('-p', '--pitch'):
-                _pitch_percent = a
-                _ipitch = _espeak_pitch(_pitch_percent)
-            elif o in ('-i', '--image'):
-                _image = a
-            elif o in ('-t', '--title'):
-                _title = a
-            elif o in ('-n', '--artist'):
-                _author = a
-            elif o in ('-d', '--dimensions'):
-                _dimensions = a
-            else:
-                assert False, 'unhandled option'
-        try:
-            oFILE = codecs.open(_text_path, mode='r', encoding='utf-8')
-        except IOError:
-            print('I was unable to open the file you specified!')
-            usage()
+            sys.exit(0)
+        elif o in ('-o', '--output'):
+            _wave = a
+        elif o in ('-v', '--visible'):
+            _visible = a
+        elif o in ('-a', '--audible'):
+            _audible = a
+        elif o in ('-l', '--language'):
+            _lang = a
+        elif o in ('-r', '--rate'):
+            _rate_percent = a
+            _irate = _espeak_rate(_rate_percent)
+        elif o in ('-p', '--pitch'):
+            _pitch_percent = a
+            _ipitch = _espeak_pitch(_pitch_percent)
+        elif o in ('-i', '--image'):
+            _image = a
+        elif o in ('-t', '--title'):
+            _title = a
+        elif o in ('-n', '--artist'):
+            _author = a
+        elif o in ('-d', '--dimensions'):
+            _dimensions = a
         else:
-            _author = readtexttools.check_artist(_author)
-            _title = readtexttools.check_title(_title, 'espeak')
-            _post_process = 'process_wav_media'
-            espkread(_text_path, _lang, _visible, _audible, _wave, _image,
-                     _title, _post_process, _author, _dimensions, _ipitch,
-                     _irate)
+            assert False, 'unhandled option'
+    _author = readtexttools.check_artist(_author)
+    _title = readtexttools.check_title(_title, 'espeak')
+    _post_process = 'process_wav_media'
+    espkread(_text_path, _lang, _visible, _audible, _wave, _image,
+             _title, _post_process, _author, _dimensions, _ipitch,
+             _irate)
     sys.exit(0)
 
 

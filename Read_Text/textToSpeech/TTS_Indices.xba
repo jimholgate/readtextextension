@@ -921,6 +921,11 @@ Function fsNetworkTtsDoc() As String
 End Function
 
 
+Function fsRhVoiceTtsDoc() As String
+	fsRhVoiceTtsDoc = fsMyURL() &amp; &quot;/python/rhvoice_read_text_file.py&quot;
+End Function
+
+
 Function fsPythonPyttsxDoc() As String
 	fsPythonPyttsxDoc = fsMyURL() &amp; &quot;/python/pyttsx_read_text_file.py&quot;
 End Function
@@ -1229,10 +1234,23 @@ Function fsFestivalDirectory( _
 	&quot;voices/russian/msu_ru_nsh_clunits&quot;, _
 	&quot;voices/spanish/el_diphone&quot;, _
 	&quot;voices/telugu/telugu_NSK_diphone&quot;, _
+	&quot;voices/us/cmu_us_awb_arctic_hts&quot;, _
+	&quot;voices/us/cmu_us_awb_cg&quot;, _
+	&quot;voices/us/cmu_us_bdl_arctic_hts&quot;, _
+	&quot;voices/us/cmu_us_bdl_cg&quot;, _
+	&quot;voices/us/cmu_us_clb_arctic_hts&quot;, _
+	&quot;voices/us/cmu_us_clb_cg&quot;, _
+	&quot;voices/us/cmu_us_jmk_arctic_hts&quot;, _
+	&quot;voices/us/cmu_us_jmk_cg&quot;, _
+	&quot;voices/us/cmu_us_rms_arctic_hts&quot;, _
+	&quot;voices/us/cmu_us_rms_cg&quot;, _
 	&quot;voices/us/cmu_us_slt_arctic_hts&quot;, _
 	&quot;voices/us/cmu_us_slt_cg&quot;, _
 	&quot;voices/vietnamese/wow_vi_liz_diphone&quot;, _
-	&quot;voices/vietnamese/wow_vi_ptn_diphone&quot;)
+	&quot;voices/vietnamese/wow_vi_ptn_diphone&quot;, _
+	&quot;voices/welsh/cb_cy_llg_diphone&quot;, _
+	&quot;voices/welsh/cb_cy_cw_diphone&quot;, _
+	&quot;voices/welsh/hl_diphone&quot;)
 	If Not(n &gt; UBound(a1)) Then
 		fsFestivalDirectory = convertfromurl(s2 &amp; a1(n))
 	End If
@@ -1242,11 +1260,75 @@ End Function
 Function fiCountFestivalDirectory() As Integer
 	Dim n As Integer
 	
-	For n = 0 To 50
+	For n = 0 To 80
 		If fsFestivalDirectory(n) = &quot;&quot; Then
 			Exit For
 		Else
 			fiCountFestivalDirectory = n
+		End If
+	Next
+End Function
+sub xx
+	print fsFestivalLanguage(0, 1)
+end sub
+
+Function fsFestivalLanguage( _
+	n, o) As String
+	&apos; if `o` is `0` then returns directory to check
+	&apos; otherwise returns iso language + area code like `en-US`
+	Dim s1, s2 As String
+	Dim a1
+	fsFestivalLanguage = &quot;&quot;
+	&apos; Incorrectly installed voices will be silent. Some instructions on
+	&apos; the web for installing mbrola voices need to be updated to work
+	&apos; with the latest version of Festival.
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+		If fileexists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
+			s2 = converttourl(fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;)
+		Else
+			s2 = converttourl(fsProgramDirectory &amp; &quot;Festival\voices\&quot;)
+		End If
+		Case Else
+		s2 = converttourl(&quot;/usr/share/festival/&quot;)
+	End Select
+
+	a1 = Array( _
+	Array(&quot;voices/us&quot;, &quot;en-US&quot;), _
+	Array(&quot;lib/voices/english&quot;, &quot;en-GB&quot;), _
+	Array(&quot;voices/castilian&quot;, &quot;es-ES&quot;), _
+	Array(&quot;voices/catalan&quot;, &quot;ca-ES&quot;), _
+	Array(&quot;voices/czech&quot;, &quot;cz-CS&quot;), _
+	Array(&quot;voices/english&quot;, &quot;en-GB&quot;), _
+	Array(&quot;voices/finnish&quot;, &quot;fi-FI&quot;), _
+	Array(&quot;voices/german&quot;, &quot;de-DE&quot;), _
+	Array(&quot;voices/hindi&quot;, &quot;hi-IN&quot;), _
+	Array(&quot;voices/italian&quot;, &quot;it-IT&quot;), _
+	Array(&quot;voices/marathi&quot;, &quot;mr-IN&quot;), _
+	Array(&quot;voices/russian&quot;, &quot;ru-RU&quot;), _
+	Array(&quot;voices/spanish&quot;, &quot;es-ES&quot;), _
+	Array(&quot;voices/telugu&quot;, &quot;te-IN&quot;), _
+	Array(&quot;voices/vietnamese&quot;, &quot;vi-VN&quot;), _
+	Array(&quot;voices/welsh&quot;, &quot;cy-GB&quot;))
+	If Not(n &gt; UBound(a1)) Then
+        Select Case o
+            Case 0
+		    fsFestivalLanguage = convertfromurl(s2 &amp; a1(n)(0))
+            Case Else
+		    fsFestivalLanguage = a1(n)(1)
+        End Select
+	End If
+End Function
+
+
+Function fiCountFestivalLanguage() As Integer
+	Dim n As Integer
+	
+	For n = 0 To 80
+		If fsFestivalLanguage(n, 0) = &quot;&quot; Then
+			Exit For
+		Else
+			fiCountFestivalLanguage = n
 		End If
 	Next
 End Function
