@@ -116,7 +116,7 @@ Usage
 ''')
 
 def espeak_path():  # -> str
-    '''Returns path to espeak program or `''` if it cannot be found.'''
+    '''Returns path to espeak program, name or `''` if it cannot be found.'''
     if os.name == 'nt':
         _app = 'eSpeak/command_line/espeak.exe'
         return readtexttools.get_nt_path(_app)
