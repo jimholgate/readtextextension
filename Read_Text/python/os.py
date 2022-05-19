@@ -26,12 +26,8 @@ See the manual page for `python` for more detailed information
 Copyright (c) 2011 - 2018 James Holgate
 
 '''
-from __future__ import (
-    absolute_import,
-    division,
-    print_function,
-    unicode_literals
-    )
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import getopt
 import os
 import sys
@@ -40,18 +36,18 @@ import readtexttools
 
 def usage():
     sA = ' ' + os.path.split(sys.argv[0])[1]
-    print ('')
-    print ('Usage')
-    print (sA + ' --c "string" ')
-    print ("")
+    print('')
+    print('Usage')
+    print(sA + ' --c "string" ')
+    print("")
 
 
 def playscript(s1):
     try:
-        print ('> ' + s1)
+        print('> ' + s1)
         readtexttools.myossystem(s1)
     except IOError as err:
-        print ('I was unable to do the command!')
+        print('I was unable to do the command!')
         usage()
         sys.exit(2)
 
@@ -62,7 +58,7 @@ def main():
         opts, args = getopt.getopt(sys.argv[1:], 'hc', ['help', 'command='])
     except getopt.GetoptError as err:
         # print help information and exit:
-        print ('option -a not recognized')
+        print('option -a not recognized')
         usage()
         sys.exit(2)
     for o, a in opts:

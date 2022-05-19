@@ -100,10 +100,10 @@ class AmazonClass(object):
         '''Returns the version in the form `nn.nn.nn`.'''
         try:
             return awsserver.version()
-        except(AttributeError, NameError):
+        except (AttributeError, NameError):
             self.ok = False
         return ''
-    
+
     def language_supported(self, iso_lang='ca-ES'):  # -> bool
         '''Is the language supported?'''
         try:
@@ -128,21 +128,20 @@ class AmazonClass(object):
         if not self.ok:
             return False
         try:
-            return awsserver.read(
-                _text="",
-                _iso_lang='en-US',
-                _visible="false",
-                _audible="true",
-                _out_path="",
-                _icon="",
-                _info="",
-                _post_process=None,
-                _writer='',
-                _size='600x600',
-                _speech_rate=160)
-        except(AttributeError, NameError):
+            return awsserver.read(_text="",
+                                  _iso_lang='en-US',
+                                  _visible="false",
+                                  _audible="true",
+                                  _out_path="",
+                                  _icon="",
+                                  _info="",
+                                  _post_process=None,
+                                  _writer='',
+                                  _size='600x600',
+                                  _speech_rate=160)
+        except (AttributeError, NameError):
             pass
-        return False     
+        return False
 
 
 class AzureClass(object):
@@ -157,7 +156,7 @@ class AzureClass(object):
     def __init__(self):  # -> None
         '''Initialize data'''
         self.ok = True
-    
+
     def language_supported(self, iso_lang='ca-ES'):  # -> bool
         '''Is the language supported?'''
         try:
@@ -182,22 +181,20 @@ class AzureClass(object):
         if not self.ok:
             return False
         try:
-            return azureserver.read(
-                _text="",
-                _iso_lang='en-US',
-                _visible="false",
-                _audible="true",
-                _out_path="",
-                _icon="",
-                _info="",
-                _post_process=None,
-                _writer='',
-                _size='600x600',
-                _speech_rate=160)
-        except(AttributeError, NameError):
+            return azureserver.read(_text="",
+                                    _iso_lang='en-US',
+                                    _visible="false",
+                                    _audible="true",
+                                    _out_path="",
+                                    _icon="",
+                                    _info="",
+                                    _post_process=None,
+                                    _writer='',
+                                    _size='600x600',
+                                    _speech_rate=160)
+        except (AttributeError, NameError):
             pass
         return False
-
 
 
 class GoogleCloudClass(object):
@@ -213,7 +210,7 @@ class GoogleCloudClass(object):
     def __init__(self):  # -> None
         '''Initialize data'''
         self.ok = True
-    
+
     def language_supported(self, iso_lang='ca-ES'):  # -> bool
         '''Is the language supported?'''
         try:
@@ -238,19 +235,18 @@ class GoogleCloudClass(object):
         if not self.ok:
             return False
         try:
-            return gcloudserver.read(
-                _text="",
-                _iso_lang='en-US',
-                _visible="false",
-                _audible="true",
-                _out_path="",
-                _icon="",
-                _info="",
-                _post_process=None,
-                _writer='',
-                _size='600x600',
-                _speech_rate=160)
-        except(AttributeError, NameError):
+            return gcloudserver.read(_text="",
+                                     _iso_lang='en-US',
+                                     _visible="false",
+                                     _audible="true",
+                                     _out_path="",
+                                     _icon="",
+                                     _info="",
+                                     _post_process=None,
+                                     _writer='',
+                                     _size='600x600',
+                                     _speech_rate=160)
+        except (AttributeError, NameError):
             pass
         return False
 
@@ -281,6 +277,7 @@ class GoogleTranslateClass(object):
     * <https://github.com/pndurette/gTTS>
     * <https://gtts.readthedocs.io/en/latest/>
     '''
+
     def __init__(self):  # -> None
         '''Initialize data'''
         self.ok = True
@@ -299,7 +296,8 @@ class GoogleTranslateClass(object):
         '''Check for minimum version.'''
         _test_version = self.version()
         try:
-            self.ok = float('.'.join(_test_version.split('.')[:2])) >= minimum_version
+            self.ok = float('.'.join(
+                _test_version.split('.')[:2])) >= minimum_version
         except (AttributeError, IndexError, ValueError):
             self.ok = False
         return self.ok
@@ -487,7 +485,8 @@ Setup
         if os.path.isfile(_media_out):
             os.remove(_media_out)
         _max_words = 20
-        _short_text = '%20'.join(_text.replace('+', '%2B').split(' ')[:_max_words])
+        _short_text = '%20'.join(
+            _text.replace('+', '%2B').split(' ')[:_max_words])
 
         for _punctuation in '\n.?!':
             if _punctuation in _short_text:
@@ -496,11 +495,13 @@ Setup
         if _lang != _lang1:
             # Translate **to** default language
             _lang2 = _lang1
-        _msg = '`<https://translate.%(_domain)s.%(_tld)s?&langpair=auto|%(_lang2)s&tbb=1&ie=&hl=%(_env_lang)s&text=%(_short_text)s>' % locals()
+        _msg = '`<https://translate.%(_domain)s.%(_tld)s?&langpair=auto|%(_lang2)s&tbb=1&ie=&hl=%(_env_lang)s&text=%(_short_text)s>' % locals(
+        )
         if not self.language_supported(_iso_lang):
             # Fallback: display a link to translate using Google Translate.
-            readtexttools.pop_message(u"%(_provider)s Translate\u2122" % locals(), _msg,
-                                      5000, _provider_logo, 0)
+            readtexttools.pop_message(
+                u"%(_provider)s Translate\u2122" % locals(), _msg, 5000,
+                _provider_logo, 0)
             return True
         try:
             tts = gtts.gTTS(_text, _tld, _lang, _slow, _lang_check)
@@ -515,8 +516,9 @@ Setup
             return False
         except (AssertionError, NameError, ValueError, RuntimeError):
             # gtts error. Consider using pip3 to check for an update.
-            readtexttools.pop_message(u"%(_provider)s Translate\u2122" % locals(), _msg,
-                                      5000, _provider_logo, 0)
+            readtexttools.pop_message(
+                u"%(_provider)s Translate\u2122" % locals(), _msg, 5000,
+                _provider_logo, 0)
             self.ok = False
             return False
         if os.path.isfile(_media_work) and _post_process in [
@@ -556,6 +558,7 @@ Setup
         except NameError:
             pass
         return False
+
 
 def speech_wpm(_percent='100%'):  # -> int
     '''
@@ -676,21 +679,20 @@ def main():
             # If the library does not require a postprocess, use `0`,
             # otherwise use the item corresponding to the next action.
             _post_processes = [
-                              None,
-                              'process_mp3_media',
-                              'process_playlist',
-                              'process_riff_media',
-                              'process_vorbis_media',
-                              'process_wav_media',
-                              'process_audio_media']
+                None, 'process_mp3_media', 'process_playlist',
+                'process_riff_media', 'process_vorbis_media',
+                'process_wav_media', 'process_audio_media'
+            ]
             if _amazon_class.language_supported(_iso_lang):
                 _amazon_class.read(_text, _iso_lang, _visible, _audible,
-                                   _media_out, _icon, clip_title, _post_processes[1],
-                                   _info, _size, _speech_rate)
+                                   _media_out, _icon, clip_title,
+                                   _post_processes[1], _info, _size,
+                                   _speech_rate)
             elif _azure_class.language_supported(_iso_lang):
                 _azure_class.read(_text, _iso_lang, _visible, _audible,
-                                  _media_out, _icon, clip_title, _post_processes[1],
-                                  _info, _size, _speech_rate)
+                                  _media_out, _icon, clip_title,
+                                  _post_processes[1], _info, _size,
+                                  _speech_rate)
             elif _google_cloud_class.language_supported(_iso_lang):
                 _google_cloud_class.read(_text, _iso_lang, _visible, _audible,
                                          _media_out, _icon, clip_title,
@@ -698,13 +700,13 @@ def main():
                                          _speech_rate)
             elif _gtts_class.language_supported(_iso_lang):
                 _gtts_class.read(_text, _iso_lang, _visible, _audible,
-                                 _media_out, _icon, clip_title, _post_processes[1],
-                                 _info, _size, _speech_rate)
+                                 _media_out, _icon, clip_title,
+                                 _post_processes[1], _info, _size, _speech_rate)
             else:
                 # Just display a translation link.
                 _gtts_class.read(_text, _iso_lang, _visible, _audible,
-                                 _media_out, _icon, clip_title, _post_processes[0],
-                                 _info, _size, _speech_rate)
+                                 _media_out, _icon, clip_title,
+                                 _post_processes[0], _info, _size, _speech_rate)
     sys.exit(0)
 
 

@@ -486,8 +486,7 @@ def main():
     elif not os.path.isfile('/usr/bin/espeak'):
         if not os.path.isfile('/usr/bin/espeak-ng'):
             print(
-                'Please install espeak.  Use `sudo apt-get install espeak-ng`'
-            )
+                'Please install espeak.  Use `sudo apt-get install espeak-ng`')
             usage()
             sys.exit(0)
     try:
@@ -531,9 +530,8 @@ def main():
     _author = readtexttools.check_artist(_author)
     _title = readtexttools.check_title(_title, 'espeak')
     _post_process = 'process_wav_media'
-    espkread(_text_path, _lang, _visible, _audible, _wave, _image,
-             _title, _post_process, _author, _dimensions, _ipitch,
-             _irate)
+    espkread(_text_path, _lang, _visible, _audible, _wave, _image, _title,
+             _post_process, _author, _dimensions, _ipitch, _irate)
     sys.exit(0)
 
 

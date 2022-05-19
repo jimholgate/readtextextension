@@ -48,7 +48,7 @@ Read Selection... Dialog setup:
 
 External program:
 
-    /usr/bin/python3  
+    /usr/bin/python3
 
 Command line options (default):
 
@@ -135,8 +135,10 @@ Usage
        "input.txt"
 ''' % locals())
 
+
 class ReadFestivalClass(object):
     '''Read long strings aloud with low latency.'''
+
     def __init__(self):
         self.player = ''
         if os.name == 'nt':
@@ -156,7 +158,7 @@ class ReadFestivalClass(object):
                 u"\uFF1F": u"\uFF1F\u2424",
                 u"\uFF01": u"\uFF01\u2424",
                 u".": u".\u2424",
-#                u",": u",\u2424",
+                #u",": u",\u2424",
                 u"¡": u"¡\u2424",
                 u"(": u"(\u2424",
                 u")": u")\u2424",
@@ -179,60 +181,60 @@ class ReadFestivalClass(object):
         except AttributeError:
             self.punctuation = None
 
-        self.domain_table = [ {
-            'package': 'american_english',
-            'sample': 'Hello. I am an English system voice.',
-            'iso_code': 'US',
-            'lang1': 'en',
+        self.domain_table = [{
+            'package':
+                'american_english',
+            'sample':
+                'Hello. I am an English system voice.',
+            'iso_code':
+                'US',
+            'lang1':
+                'en',
             'voices': [
-                "us/cmu_us_slt_arctic_hts",
-                "us/cmu_us_slt_cg",
-                "us/cmu_us_awb_arctic_hts",
-                "us/cmu_us_awb_cg",
-                "us/cmu_us_bdl_arctic_hts",
-                "us/cmu_us_bdl_cg",
-                "us/cmu_us_clb_arctic_hts",
-                "us/cmu_us_clb_cg",
-                "us/cmu_us_jmk_arctic_hts",
-                "us/cmu_us_jmk_cg",
-                "us/cmu_us_rms_arctic_hts",
-                "us/cmu_us_rms_cg",
+                "us/cmu_us_slt_arctic_hts", "us/cmu_us_slt_cg",
+                "us/cmu_us_awb_arctic_hts", "us/cmu_us_awb_cg",
+                "us/cmu_us_bdl_arctic_hts", "us/cmu_us_bdl_cg",
+                "us/cmu_us_clb_arctic_hts", "us/cmu_us_clb_cg",
+                "us/cmu_us_jmk_arctic_hts", "us/cmu_us_jmk_cg",
+                "us/cmu_us_rms_arctic_hts", "us/cmu_us_rms_cg",
                 "english/nitech_us_awb_arctic_hts",
                 "english/nitech_us_bdl_arctic_hts",
                 "english/nitech_us_clb_arctic_hts",
                 "english/nitech_us_jmk_arctic_hts",
                 "english/nitech_us_rms_arctic_hts",
-                "english/nitech_us_slt_arctic_hts",
-                "english/us1_mbrola",
-                "english/us2_mbrola",
-                "english/us3_mbrola",
-                "english/kal_diphone"]
+                "english/nitech_us_slt_arctic_hts", "english/us1_mbrola",
+                "english/us2_mbrola", "english/us3_mbrola",
+                "english/kal_diphone"
+            ]
         }, {
-            'package': 'british_english',
-            'sample': 'Hello. I am an English system voice.',
-            'iso_code': 'GB',
-            'lang1': 'en',
+            'package':
+                'british_english',
+            'sample':
+                'Hello. I am an English system voice.',
+            'iso_code':
+                'GB',
+            'lang1':
+                'en',
             'voices': [
-                "english/kal_diphone",
-                "english/ked_diphone",
-                "english/don_diphone",
-                "english/en1_mbrola",
-                "english/gsw_diphone",
-                "english/rab_diphone"]
+                "english/kal_diphone", "english/ked_diphone",
+                "english/don_diphone", "english/en1_mbrola",
+                "english/gsw_diphone", "english/rab_diphone"
+            ]
         }, {
-            'package': 'english',
-            'sample': 'Hello. I am an English system voice.',
-            'iso_code': 'GB',
-            'lang1': 'en',
+            'package':
+                'english',
+            'sample':
+                'Hello. I am an English system voice.',
+            'iso_code':
+                'GB',
+            'lang1':
+                'en',
             'voices': [
-                "us/cmu_us_slt_arctic_hts",
-                "us/cmu_us_slt_cg",
-                "english/kal_diphone",
-                "english/ked_diphone",
-                "english/don_diphone",
-                "english/en1_mbrola",
-                "english/gsw_diphone",
-                "english/rab_diphone"]
+                "us/cmu_us_slt_arctic_hts", "us/cmu_us_slt_cg",
+                "english/kal_diphone", "english/ked_diphone",
+                "english/don_diphone", "english/en1_mbrola",
+                "english/gsw_diphone", "english/rab_diphone"
+            ]
         }, {
             'package': 'italian',
             'sample': 'Ciao. Sono una voce di sistema italiana.',
@@ -258,25 +260,24 @@ class ReadFestivalClass(object):
             'lang1': 'ru',
             'voices': ["russian/msu_ru_nsh_clunits"]
         }, {
-            'package': 'scots_gaelic',
-            'sample': "Halò. 'S e guth siostam Gàidhlig a th' annam.",
-            'iso_code': 'GB',
-            'lang1': 'gd',
-            'voices': ["scots_gaelic"]
-        }, {
             'package': 'finnish',
             'sample': "Hei. Olen suomalainen järjestelmäääni.",
             'iso_code': 'FI',
             'lang1': 'fi',
-            'voices': ["finnish/hy_fi_mv_diphone",
-            "finnish/suo_fi_lj_diphone"]
+            'voices': ["finnish/hy_fi_mv_diphone", "finnish/suo_fi_lj_diphone"]
         }, {
-            'package': 'czech',
-            'sample': "Ahoj. Jsem český systémový hlas.",
-            'iso_code': 'CZ',
-            'lang1': 'cz',
-            'voices': ["czech/czech_dita", "czech/czech_krb",
-            "czech/czech_machac", "czech/czech_ph"]
+            'package':
+                'czech',
+            'sample':
+                "Ahoj. Jsem český systémový hlas.",
+            'iso_code':
+                'CZ',
+            'lang1':
+                'cz',
+            'voices': [
+                "czech/czech_dita", "czech/czech_krb", "czech/czech_machac",
+                "czech/czech_ph"
+            ]
         }, {
             'package': 'german',
             'sample': "Hallo. Ich bin eine deutsche Stimme.",
@@ -302,25 +303,36 @@ class ReadFestivalClass(object):
             'lang1': 'te',
             'voices': ["telugu/telugu_NSK_diphone"]
         }, {
-            'package': 'vietnamese',
-            'sample': "Xin chào. Tôi là một giọng nói việt nam.",
-            'iso_code': 'VN',
-            'lang1': 'vi',
+            'package':
+                'vietnamese',
+            'sample':
+                "Xin chào. Tôi là một giọng nói việt nam.",
+            'iso_code':
+                'VN',
+            'lang1':
+                'vi',
             'voices': [
-                "vietnamese/wow_vi_liz_diphone",
-                "vietnamese/wow_vi_ptn_diphone"]
+                "vietnamese/wow_vi_liz_diphone", "vietnamese/wow_vi_ptn_diphone"
+            ]
         }, {
-            'package': 'welsh',
-            'sample': 'Helo. Llais system cymraeg ydw i.',
-            'iso_code': 'GB',
-            'lang1': 'cy',
-            'voices': ["welsh/cb_cy_llg_diphone",
-            "welsh/cb_cy_cw_diphone", "welsh/hl_diphone", ]
+            'package':
+                'welsh',
+            'sample':
+                'Helo. Llais system cymraeg ydw i.',
+            'iso_code':
+                'GB',
+            'lang1':
+                'cy',
+            'voices': [
+                "welsh/cb_cy_llg_diphone",
+                "welsh/cb_cy_cw_diphone",
+                "welsh/hl_diphone",
+            ]
         }]
 
     def first_good_voice(self, _test):  # -> str
         '''Return the first voice in the list. If the voice is
-        not supported, then Festival normally shows a message 
+        not supported, then Festival normally shows a message
         then continues in English.'''
 
         if not _test:
@@ -330,17 +342,19 @@ class ReadFestivalClass(object):
         if os.name == 'nt':
             voice_roots = [
                 os.path.join(os.getenv('ProgramFiles', 'Festival', 'Voices')),
-                os.path.join(os.getenv('ProgramFiles(x86)', 'Festival', 'Voices'))]
+                os.path.join(
+                    os.getenv('ProgramFiles(x86)', 'Festival', 'Voices'))
+            ]
         else:
             voice_roots = [
-            '/usr/share/festival/voices/',
-            '/usr/share/festival/lib/voices/']
+                '/usr/share/festival/voices/', '/usr/share/festival/lib/voices/'
+            ]
         for _root in voice_roots:
             for _path in _test:
                 test_path = os.path.join(_root, _path)
                 if os.path.isdir(test_path):
                     path_stem = os.path.split(test_path)[1]
-                    return '(voice_%(path_stem)s)' %locals()
+                    return '(voice_%(path_stem)s)' % locals()
         return ''
 
     def one_voice_installed(self):  # -> bool
@@ -349,10 +363,10 @@ class ReadFestivalClass(object):
         test_dir = '/usr/share/festival/voices'
         _count = (readtexttools.count_items_in_dir(test_dir))
         if _count == 1:
-            test_dir = os.path.join(test_dir,os.listdir(test_dir)[0])
+            test_dir = os.path.join(test_dir, os.listdir(test_dir)[0])
             _count = readtexttools.count_items_in_dir(test_dir)
         return bool(_count == 1)
-    
+
     def iso_lang_to_fest_lang(self, iso_lang='en-US'):  # -> str
         '''Check if the library supports the language or voice.
         If so, return festival's name of the language, otherwise return
@@ -377,12 +391,14 @@ class ReadFestivalClass(object):
             _region = ''
             _voices = ['']
             for i in range(len(domain_table)):
-                _region = '-'.join([domain_table[i]['lang1'], domain_table[i]['iso_code']])
+                _region = '-'.join(
+                    [domain_table[i]['lang1'], domain_table[i]['iso_code']])
                 if _region.strip() == iso_lang.strip():
-                    self.voice_eval = self.first_good_voice(domain_table[i]['voices'])
-                    if len(self.voice_eval):
+                    self.voice_eval = self.first_good_voice(
+                        domain_table[i]['voices'])
+                    if len(self.voice_eval) != 0:
                         self.lang = domain_table[i]['lang1']
-                        return self.domain_table[i]['package'] # first_good_voice(domain_table[i]['voices'])
+                        return self.domain_table[i]['package']
             for i in range(len(domain_table)):
                 if domain_table[i]['lang1'] == test_lang.lower():
                     _tld = domain_table[i]['package']
@@ -396,23 +412,28 @@ class ReadFestivalClass(object):
                         if not '-' in _test:
                             return _test
                 elif _test.lower() == _region.lower():
-                    self.voice_eval = self.first_good_voice(domain_table[i]['voices'])
+                    self.voice_eval = self.first_good_voice(
+                        domain_table[i]['voices'])
                     self.lang = domain_table[i]['lang1']
                     return self.domain_table[i]['package']
                 elif _test.lower() == _lang1:
-                    self.voice_eval = self.first_good_voice(domain_table[i]['voices'])
+                    self.voice_eval = self.first_good_voice(
+                        domain_table[i]['voices'])
                     self.lang = domain_table[i]['lang1']
                     return self.domain_table[i]['package']
                 elif _test.lower() == _tld.lower():
-                    self.voice_eval = self.first_good_voice(domain_table[i]['voices'])
+                    self.voice_eval = self.first_good_voice(
+                        domain_table[i]['voices'])
                     self.lang = domain_table[i]['lang1']
                     return self.domain_table[i]['package']
                 elif _test in _voices:
-                    self.voice_eval = self.first_good_voice(domain_table[i]['voices'])
+                    self.voice_eval = self.first_good_voice(
+                        domain_table[i]['voices'])
                     self.lang = domain_table[i]['lang1']
                     return _test
                 elif _test.lower() in _voices:
-                    self.voice_eval = self.first_good_voice(domain_table[i]['voices'])
+                    self.voice_eval = self.first_good_voice(
+                        domain_table[i]['voices'])
                     self.lang = domain_table[i]['lang1']
                     return _test
         except NameError:
@@ -429,20 +450,21 @@ class ReadFestivalClass(object):
             return str(_test_string.translate(self.punctuation)).split(_divider)
         for _item in self.replacements:
             _iter = _item
-            _test_string = _test_string.replace(_iter, u'%(_iter)s%(_divider)s' % locals())
+            _test_string = _test_string.replace(
+                _iter, u'%(_iter)s%(_divider)s' % locals())
         return _test_string.split(_divider)
 
     def festival_read(self,
-                    _file_path='',
-                    _visible='false',
-                    _audible='false',
-                    _output='',
-                    _image='',
-                    _content='',
-                    _eval_token='',
-                    _title='',
-                    _writer='',
-                    _image_size=''):  # -> bool
+                      _file_path='',
+                      _visible='false',
+                      _audible='false',
+                      _output='',
+                      _image='',
+                      _content='',
+                      _eval_token='',
+                      _title='',
+                      _writer='',
+                      _image_size=''):  # -> bool
         '''
 Creates a temporary speech-synthesis sound file and optionally
 reads the file aloud.
@@ -479,10 +501,11 @@ reads the file aloud.
                 return False
             if readtexttools.get_nt_path('festival/text2wave'):
                 _script = readtexttools.get_nt_path('festival/text2wave')
-                _command = '''%(_app)s --script %(_script)s "%(file_path)s" -o "%(_work_file)s"''' %locals()
+                _command = '''%(_app)s --script %(_script)s "%(file_path)s" -o "%(_work_file)s"''' % locals(
+                )
             else:
                 # With Windows, this script only supports reading text aloud.
-                _command = '%(_app)s --tts  "%(_file_path)s"' %locals()
+                _command = '%(_app)s --tts  "%(_file_path)s"' % locals()
         else:
             if readtexttools.have_posix_app('text2wave', False):
                 _app = 'text2wave'
@@ -490,19 +513,22 @@ reads the file aloud.
                 if len(_eval_token) == 0:
                     _switch = ''
                 else:
-                    _switch = ' -eval "%(_eval_token)s"' %locals()
-                _command = '%(_app)s%(_switch)s "%(_file_path)s" -o "%(_work_file)s"' %locals()
+                    _switch = ' -eval "%(_eval_token)s"' % locals()
+                _command = '%(_app)s%(_switch)s "%(_file_path)s" -o "%(_work_file)s"' % locals(
+                )
             elif readtexttools.have_posix_app('flite', False):
                 # Flite reates a compact .wav file - Signed 16 bit Little Endian,
                 # Rate 8000 Hz, Mono. This format works with vlc, aplay & paplay,
                 # but might not with a gstreamer app like totem or gst-launch-1.0
                 if os.path.splitext(_file_path)[1] not in ['.txt']:
                     return False
-                _command = 'flite -f "%(_file_path)s" -o "%(_work_file)s"' %locals()
+                _command = 'flite -f "%(_file_path)s" -o "%(_work_file)s"' % locals(
+                )
         try:
             if not readtexttools.my_os_system(_command):
                 # try with _switch = '' -- default voice
-                _command = '%(_app)s "%(_file_path)s" -o "%(_work_file)s"' %locals()
+                _command = '%(_app)s "%(_file_path)s" -o "%(_work_file)s"' % locals(
+                )
         except IOError as err:
             print('I was unable to read!')
             usage()
@@ -511,8 +537,8 @@ reads the file aloud.
             if os.path.getsize(_work_file) == 0:
                 return False
             readtexttools.process_wav_media(_title, _work_file, _image,
-                                                _out_file, _audible, _visible,
-                                                _writer, _image_size)
+                                            _out_file, _audible, _visible,
+                                            _writer, _image_size)
             return True
         return False
 
@@ -520,20 +546,19 @@ reads the file aloud.
         '''
         Sable
         =====
-        
+
         Use [Sable](https://www.cs.cmu.edu/~awb/festival_demos/sable.html)
         name in `<SPEAKER NAME="kal_diphone">` markup
         `(voice_upc_ca_ona_hts)` becomes `upc_ca_ona_hts`
         `(voice_kal_diphone)` becomes `kal_diphone`
-        
         '''
-        retVal = 'male1'
+        my_val = 'male1'
 
         if '(voice_' in _test:
             return _test.replace('(voice_', '').replace(')', '')
         elif len(self.iso_lang_to_fest_lang(_test)) != 0:
-            retVal = self.voice_eval.replace('(voice_', '').replace(')', '')
-        return retVal
+            my_val = self.voice_eval.replace('(voice_', '').replace(')', '')
+        return my_val
 
     def festival_rate(self, _test='100%'):
         '''
@@ -544,9 +569,9 @@ reads the file aloud.
         Returns Sable rate as string between -99% and 100%.
         '''
         i2 = 0
-        iMinVal = -99
-        iMaxVal = 100
-        retVal = 0
+        min_val = -99
+        max_val = 100
+        my_val = 0
         s1 = ''
         try:
             if '%' in _test:
@@ -555,18 +580,18 @@ reads the file aloud.
                 i2 = int(s1) - 100
             else:
                 i2 = 0
-        except (TypeError):
+        except TypeError:
             print('I was unable to determine festival rate!')
-        if i2 <= iMinVal:
-            retVal = iMinVal
-        elif i2 >= iMaxVal:
-            retVal = iMaxVal
+        if i2 <= min_val:
+            my_val = min_val
+        elif i2 >= max_val:
+            my_val = max_val
         else:
-            retVal = i2
-        myStr = str(retVal) + '%'
+            my_val = i2
+        myStr = str(my_val) + '%'
         return myStr
 
-    def in_festival_defaults(self, _test= '0%'):  # -> bool
+    def in_festival_defaults(self, _test='0%'):  # -> bool
         '''Check if a parameter value is like a default setting.'''
         if _test in [None, False, '0', '0%', '']:
             return True
@@ -578,13 +603,11 @@ reads the file aloud.
         Converts w3 Smil style percentage to Sable percentage
         _test - Pitch expressed as a percentage.
         Use '100%' for default Pitch of 0% in Sable markup
-        Returns pitch value as string between -99% and 100%
-        
-        '''
+        Returns pitch value as string between -99% and 100%'''
         i2 = 0
-        iMinVal = -99
-        iMaxVal = 100
-        retVal = 0
+        min_val = -99
+        max_val = 100
+        my_val = 0
         s1 = ''
         try:
             if '%' in _test:
@@ -593,16 +616,15 @@ reads the file aloud.
                 i2 = int(s1) - 100
             else:
                 i2 = 0
-        except (TypeError):
+        except TypeError:
             print('I was unable to determine festival pitch!')
-        if i2 <= iMinVal:
-            retVal = iMinVal
-        elif i2 >= iMaxVal:
-            retVal = iMaxVal
+        if i2 <= min_val:
+            my_val = min_val
+        elif i2 >= max_val:
+            my_val = max_val
         else:
-            retVal = i2
-        myStr = str(retVal) + '%'
-        return myStr
+            my_val = i2
+        return str(my_val) + '%'
 
 
 def main():
@@ -612,7 +634,6 @@ reads the file aloud.
     '''
     _read_festival = ReadFestivalClass()
     _imported_meta = readtexttools.ImportedMetaData()
-    # print(_read_festival.festival_read_aloud('This is a festival script. How is "it"? Okay! See you.'))
     _xml_tool = readtexttools.XmlTransform()
     _sable = ''
     _output = ''
@@ -639,13 +660,13 @@ reads the file aloud.
     if not os.path.isfile(_file_path):
         print('I was unable to find the file you specified!...')
         sys.exit(0)
-    elif (sys.argv[-1] == sys.argv[0]):
+    elif sys.argv[-1] == sys.argv[0]:
         usage()
         sys.exit(0)
     elif not readtexttools.have_posix_app(
-        'text2wave', False) and not readtexttools.have_posix_app(
-            'flite', False) and not bool(
-                readtexttools.get_nt_path('festival/festival.exe')):
+            'text2wave', False) and not readtexttools.have_posix_app(
+                'flite', False) and not bool(
+                    readtexttools.get_nt_path('festival/festival.exe')):
         usage()
         sys.exit(0)
     try:
@@ -699,14 +720,15 @@ reads the file aloud.
         concise_lang = _read_festival.lang
     _content = readtexttools.strip_mojibake(concise_lang, _content)
     if _read_festival.in_festival_defaults(
-        _sable_rate) and _read_festival.in_festival_defaults(
-            _sable_pitch) and _read_festival.in_festival_defaults(
-                _sable_speaker):
+            _sable_rate) and _read_festival.in_festival_defaults(
+                _sable_pitch) and _read_festival.in_festival_defaults(
+                    _sable_speaker):
         # Pass plain text
         _content = readtexttools.clean_str(_content, False)
         _file_content = _content
-        _read_festival.festival_read(_file_path, _visible, _audible, _output, _image,
-                      _content, "", _title, _writer, _image_size)
+        _read_festival.festival_read(_file_path, _visible, _audible, _output,
+                                     _image, _content, "", _title, _writer,
+                                     _image_size)
     else:
         # Prepare Sable XML (To SLOW DOWN speech use --RATE=75%)
         _content = _xml_tool.clean_for_xml(_content)
@@ -723,13 +745,15 @@ reads the file aloud.
         _writer = readtexttools.check_artist(_writer)
         _title = readtexttools.check_title(_title, 'festival')
         if _read_festival.one_voice_installed():
-            _read_festival.festival_read(_file_path, _visible, _audible, _output, _image,
-                          _content, "", _title, _writer, _image_size)
-        elif not _read_festival.festival_read(_sable, _visible, _audible, _output, _image,
-                             _content, _eval_token, _title, _writer,
-                             _image_size):
-            _read_festival.festival_read(_file_path, _visible, _audible, _output, _image,
-                          _content, "", _title, _writer, _image_size)
+            _read_festival.festival_read(_file_path, _visible, _audible,
+                                         _output, _image, _content, "", _title,
+                                         _writer, _image_size)
+        elif not _read_festival.festival_read(
+                _sable, _visible, _audible, _output, _image, _content,
+                _eval_token, _title, _writer, _image_size):
+            _read_festival.festival_read(_file_path, _visible, _audible,
+                                         _output, _image, _content, "", _title,
+                                         _writer, _image_size)
 
 
 if __name__ == '__main__':

@@ -345,7 +345,8 @@ See also: [pip install](https://pip.pypa.io/en/stable/cli/pip_install/)''' %
                     client.set_synthesis_voice('Bdl')
                 except (AttributeError, SyntaxError, TypeError):
                     pass
-            elif ('English (America)+male1', 'en-US', 'male1') in _client_voices:
+            elif ('English (America)+male1', 'en-US',
+                  'male1') in _client_voices:
                 try:
                     client.set_synthesis_voice('English (America)+male1')
                 except (AttributeError, SyntaxError, TypeError):

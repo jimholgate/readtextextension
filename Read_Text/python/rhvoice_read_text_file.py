@@ -49,6 +49,7 @@ import os
 import sys
 import readtexttools
 
+
 def usage():  # -> None
     '''
     Command line help
@@ -124,137 +125,141 @@ class RhVoiceClass(object):
     * <https://rhvoice.org/>
 
     '''
+
     def __init__(self):  # -> None
         '''Initialize data'''
         self.ok = True
         self.app = 'RHVoice-test'
-        self.domain_table = [{
-            'package': 'Brazilian-Portuguese',
-            'sample': 'Olá. Eu sou a voz portuguesa do sistema.',
-            'iso_code': 'BR',
-            'lang1': 'pt',
-            'voices': ["Letícia-F123"]  # Western European letters.
-        }, {
-            'package': 'English',
-            'sample': 'Hello. I am an English system voice.',
-            'iso_code': 'CA',
-            'lang1': 'en',
-            'voices': [
-                "alan",  # en_GB.scotland Male
-                "bdl",  # en-US Male
-                "clb",  # en-US Female
-                "slt",  # en-US Female
-                "natalia",  # This `ua` voice can talk in English
-                "elena"]  # This `ru` voice can talk in English
-        }, {
-            'package': 'English',
-            'sample': 'Hello. I am an English system voice.',
-            'iso_code': 'KG',
-            'lang1': 'en',
-            'voices': [
-                "alan",
-                "bdl",
-                "clb",
-                "slt",
-                "nazgul"]  # This `ky-KG` voice can talk in English
-        }, {
-            'package': 'English',
-            'sample': 'Hello. I am an English system voice.',
-            'iso_code': 'GB',
-            'lang1': 'en',
-            'voices': [
-                "alan",
-                "slt",
-                "clb",
-                "bdl",
-                "natalia",  # This `uk-UA` voice can talk in English
-                "elena"]  # This `ru-RU` voice can talk in English
-        }, {
-            'package': 'English',
-            'sample': 'Hello. I am an English system voice.',
-            'iso_code': 'RU',
-            'lang1': 'en',
-            'voices': [
-                "alan",
-                "slt",
-                "clb",
-                "bdl",
-                "elena"]  # This `ru-RU` voice can talk in English
-        }, {
-            'package': 'English',
-            'sample': 'Hello. I am an English system voice.',
-            'iso_code': 'TA',
-            'lang1': 'en',
-            'voices': [
-                "alan",
-                "slt",
-                "clb",
-                "bdl",
-                "talgat"]  # This `tt-TA` voice can talk in English
-        }, {
-            'package': 'English',
-            'sample': 'Hello. I am an English system voice.',
-            'iso_code': 'UK',
-            'lang1': 'en',
-            'voices': [
-                "alan",
-                "slt",
-                "clb",
-                "bdl",
-                "natalia"]  # This `uk-UA` voice can talk in English
-        }, {
-            'package': 'English',
-            'sample': 'Hello. I am an English system voice.',
-            'iso_code': 'US',
-            'lang1': 'en',
-            'voices': [
-                "bdl",
-                "slt",
-                "clb",
-                "alan",
-                "natalia",  # This `uk-UA` voice can talk in English
-                "elena"]  # This `ru-RU` voice can talk in English
-        }, {
-            'package': 'Esperanto',
-            'sample': 'Saluton. Mi estas la Esperanta voĉo de la sistemo.',
-            'iso_code': 'PL',
-            'lang1': 'eo',
-            'voices': ["spomenka"]  # Western European letters.
-        }, {
-            'package': 'Kyrgyz',
-            'sample': 'Салам. Мен системанын кыргыз үнүмун.',
-            'iso_code': 'KG',
-            'lang1': 'ky',
-            'voices': [
-                "azamat",
-                "nazgul"]
-        }, {
-            'package': 'Russian',
-            'sample': 'Здравствуйте. Я - русский голос системы.',
-            'iso_code': 'RU',
-            'lang1': 'ru',
-            'voices': [
-                "aleksandr",
-                "anna",
-                "artemiy",
-                "elena",
-                "irina"]
-        }, {
-            'package': 'Tatar',
-            'sample': 'Салам. Мен системанын татар үнүмин.',
-            'iso_code': 'TA',
-            'lang1': 'tt',
-            'voices': ["talgat"]
-        }, {
-            'package': 'Ukrainian',
-            'sample': 'Привет. Я украинский голос системы.',
-            'iso_code': 'UA',
-            'lang1': 'uk',
-            'voices': [
-                "anatol",
-                "natalia"]
-        }]
-
+        self.domain_table = [
+            {
+                'package': 'Brazilian-Portuguese',
+                'sample': 'Olá. Eu sou a voz portuguesa do sistema.',
+                'iso_code': 'BR',
+                'lang1': 'pt',
+                'voices': ["Letícia-F123"]  # Western European letters.
+            },
+            {
+                'package':
+                    'English',
+                'sample':
+                    'Hello. I am an English system voice.',
+                'iso_code':
+                    'CA',
+                'lang1':
+                    'en',
+                'voices': [
+                    "alan",  # en_GB.scotland Male
+                    "bdl",  # en-US Male
+                    "clb",  # en-US Female
+                    "slt",  # en-US Female
+                    "natalia",  # This `ua` voice can talk in English
+                    "elena"
+                ]  # This `ru` voice can talk in English
+            },
+            {
+                'package': 'English',
+                'sample': 'Hello. I am an English system voice.',
+                'iso_code': 'KG',
+                'lang1': 'en',
+                'voices': ["alan", "bdl", "clb", "slt",
+                           "nazgul"]  # This `ky-KG` voice can talk in English
+            },
+            {
+                'package':
+                    'English',
+                'sample':
+                    'Hello. I am an English system voice.',
+                'iso_code':
+                    'GB',
+                'lang1':
+                    'en',
+                'voices': [
+                    "alan",
+                    "slt",
+                    "clb",
+                    "bdl",
+                    "natalia",  # This `uk-UA` voice can talk in English
+                    "elena"
+                ]  # This `ru-RU` voice can talk in English
+            },
+            {
+                'package': 'English',
+                'sample': 'Hello. I am an English system voice.',
+                'iso_code': 'RU',
+                'lang1': 'en',
+                'voices': ["alan", "slt", "clb", "bdl",
+                           "elena"]  # This `ru-RU` voice can talk in English
+            },
+            {
+                'package': 'English',
+                'sample': 'Hello. I am an English system voice.',
+                'iso_code': 'TA',
+                'lang1': 'en',
+                'voices': ["alan", "slt", "clb", "bdl",
+                           "talgat"]  # This `tt-TA` voice can talk in English
+            },
+            {
+                'package': 'English',
+                'sample': 'Hello. I am an English system voice.',
+                'iso_code': 'UK',
+                'lang1': 'en',
+                'voices': ["alan", "slt", "clb", "bdl",
+                           "natalia"]  # This `uk-UA` voice can talk in English
+            },
+            {
+                'package':
+                    'English',
+                'sample':
+                    'Hello. I am an English system voice.',
+                'iso_code':
+                    'US',
+                'lang1':
+                    'en',
+                'voices': [
+                    "bdl",
+                    "slt",
+                    "clb",
+                    "alan",
+                    "natalia",  # This `uk-UA` voice can talk in English
+                    "elena"
+                ]  # This `ru-RU` voice can talk in English
+            },
+            {
+                'package': 'Esperanto',
+                'sample': 'Saluton. Mi estas la Esperanta voĉo de la sistemo.',
+                'iso_code': 'PL',
+                'lang1': 'eo',
+                'voices': ["spomenka"]  # Western European letters.
+            },
+            {
+                'package': 'Kyrgyz',
+                'sample': 'Салам. Мен системанын кыргыз үнүмун.',
+                'iso_code': 'KG',
+                'lang1': 'ky',
+                'voices': ["azamat", "nazgul"]
+            },
+            {
+                'package': 'Russian',
+                'sample': 'Здравствуйте. Я - русский голос системы.',
+                'iso_code': 'RU',
+                'lang1': 'ru',
+                'voices': ["aleksandr", "anna", "artemiy", "elena", "irina"]
+            },
+            {
+                'package': 'Tatar',
+                'sample': 'Салам. Мен системанын татар үнүмин.',
+                'iso_code': 'TA',
+                'lang1': 'tt',
+                'voices': ["talgat"]
+            },
+            {
+                'package': 'Ukrainian',
+                'sample': 'Привет. Я украинский голос системы.',
+                'iso_code': 'UA',
+                'lang1': 'uk',
+                'voices': ["anatol", "natalia"]
+            }
+        ]
 
     def read(self,
              _text="",
@@ -300,7 +305,7 @@ class RhVoiceClass(object):
         # Determine the temporary file name
         _media_work = readtexttools.get_work_file_path(_out_path, _icon, 'TEMP')
         _text_work = ''.join([_media_work, '.txt'])
-        
+
         # Remove old files.
         if os.path.isfile(_media_work):
             os.remove(_media_work)
@@ -312,7 +317,7 @@ class RhVoiceClass(object):
         _app = self.app
         _speech_rate = readtexttools.safechars(_speech_rate, '1234567890')
         _command = '''%(_app)s -i '%(_text_work)s' -r %(_speech_rate)s -p %(_voice)s -o '%(_media_work)s'  
- ''' %locals() 
+ ''' % locals()
         try:
             readtexttools.my_os_system(_command)
         except:
@@ -331,8 +336,8 @@ class RhVoiceClass(object):
             _msg = "Could not play a rhvoice media file locally."
             if bool(_media_out):
                 _msg = "Could not save a rhvoice media file locally."
-            readtexttools.pop_message("Python `rhvoice`" % locals(),
-                                      _msg, 5000, _error_icon, 1)
+            readtexttools.pop_message("Python `rhvoice`" % locals(), _msg, 5000,
+                                      _error_icon, 1)
         self.ok = False
         return False
 
@@ -340,7 +345,7 @@ class RhVoiceClass(object):
         '''Check if you have installed a language resource for
         a language or a voice.'''
         _voice = self.language_to_voice(iso_lang)
-        if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' %locals()):
+        if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' % locals()):
             self.ok = True
             return True
         self.ok = False
@@ -353,9 +358,10 @@ class RhVoiceClass(object):
         installed, try reading the text with the native voice.'''
         for test_voice in _voices:
             try:
-                _voice = test_voice.strip()                    
+                _voice = test_voice.strip()
                 if bool(_voice):
-                    if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' %locals()):
+                    if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' %
+                                     locals()):
                         return _voice
             except (AttributeError, SyntaxError):
                 pass
@@ -382,7 +388,8 @@ class RhVoiceClass(object):
             _region = ''
             _voices = ['']
             for i in range(len(domain_table)):
-                _region = '-'.join([domain_table[i]['lang1'], domain_table[i]['iso_code']])
+                _region = '-'.join(
+                    [domain_table[i]['lang1'], domain_table[i]['iso_code']])
                 if _region.strip() == iso_lang.strip():
                     return self.first_good_voice(domain_table[i]['voices'])
             for i in range(len(domain_table)):
@@ -439,7 +446,7 @@ def main():
     _text_file_in = sys.argv[-1]
 
     if not os.path.isfile(_text_file_in):
-        sys.exit(0)    
+        sys.exit(0)
     if sys.argv[-1] == sys.argv[0]:
         usage()
         sys.exit(0)
@@ -481,7 +488,7 @@ def main():
     _rhvoice_cl = RhVoiceClass()
     _voice = _rhvoice_cl.language_to_voice(_iso_lang)
     if not _rhvoice_cl.voice_available(_voice):
-        print('The %(_voice)s voice (%(_iso_lang)s) was not found.' %locals())
+        print('The %(_voice)s voice (%(_iso_lang)s) was not found.' % locals())
         usage()
         sys.exit(0)
     _text = _imported_meta.meta_from_file(_text_file_in)
@@ -493,16 +500,12 @@ def main():
         # If the library does not require a postprocess, use `0`,
         # otherwise use the item corresponding to the next action.
         _post_processes = [
-                          None,
-                          'process_mp3_media',
-                          'process_playlist',
-                          'process_riff_media',
-                          'process_vorbis_media',
-                          'process_wav_media',
-                          'process_audio_media']
-        _rhvoice_cl.read(_text, _iso_lang, _visible, _audible,
-                         _media_out, _icon, clip_title, _post_processes[5],
-                         _info, _size, _speech_rate)
+            None, 'process_mp3_media', 'process_playlist', 'process_riff_media',
+            'process_vorbis_media', 'process_wav_media', 'process_audio_media'
+        ]
+        _rhvoice_cl.read(_text, _iso_lang, _visible, _audible, _media_out,
+                         _icon, clip_title, _post_processes[5], _info, _size,
+                         _speech_rate)
     sys.exit(0)
 
 

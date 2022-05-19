@@ -542,20 +542,24 @@ class ExtensionTable(object):
                 if not application_search:
                     continue
                 for application_search in application_searches:
-                    common_app_executable = '%(get_env)s%(application_search)s%(application_executable)s%(extension)s' % locals()
+                    common_app_executable = '%(get_env)s%(application_search)s%(application_executable)s%(extension)s' % locals(
+                    )
                     if os.path.isfile(common_app_executable):
                         return self.add_quotes_if_needed(
                             self.check_path_str(common_app_executable))
                     else:
                         # Look for a directory like `ffmpeg-YYYY-MM-DD-git-xxxxxx`
-                        developer_app_executables = glob.glob('%(get_env)s%(application_search)s%(application_executable)s*' % locals())
+                        developer_app_executables = glob.glob(
+                            '%(get_env)s%(application_search)s%(application_executable)s*'
+                            % locals())
                         if bool(developer_app_executables):
                             # Get a matching item in `developer_app_executables`
                             # object.
                             for app_match in developer_app_executables:
                                 if not app_match:
                                     continue
-                                return_value = '%(app_match)s%(os_sep)s%(application_executable)s%(extension)s' % locals()
+                                return_value = '%(app_match)s%(os_sep)s%(application_executable)s%(extension)s' % locals(
+                                )
                                 return_value = return_value.replace(
                                     '\\', os_sep)
                                 if os.path.isfile(return_value):
@@ -1179,9 +1183,8 @@ class ImportedMetaData(object):
                     # it is not a command
                     return ''
         try:
-            return unicode(
-                subprocess.check_output(a_command, shell=True),
-                errors='ignore')
+            return unicode(subprocess.check_output(a_command, shell=True),
+                           errors='ignore')
         except NameError:
             # Python 3
             try:

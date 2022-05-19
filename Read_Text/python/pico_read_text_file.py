@@ -223,13 +223,13 @@ def main():
             _language = 'en-US'
         _text = readtexttools.strip_mojibake(_language, _text)
         _xml_text = ''.join([
-            '"<speed level = \'', _rate, '\'>', "<pitch level = '",
-            _pitch, '\'>', _text, '</pitch></speed>"'
+            '"<speed level = \'', _rate, '\'>', "<pitch level = '", _pitch,
+            '\'>', _text, '</pitch></speed>"'
         ])
         _artist_ok = readtexttools.check_artist(_artist)
         _title_ok = readtexttools.check_title(_title, "pico")
-        picoread(_xml_text, _language, _visible, _audible, _output,
-                 _image, _title_ok, _artist_ok, _dimensions)
+        picoread(_xml_text, _language, _visible, _audible, _output, _image,
+                 _title_ok, _artist_ok, _dimensions)
     sys.exit(0)
 
 
