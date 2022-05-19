@@ -115,6 +115,17 @@ Usage
        "input.txt"
 ''')
 
+def espeak_path():  # -> str
+    '''Returns path to espeak program or `''` if it cannot be found.'''
+    if os.name == 'nt':
+        _app = 'eSpeak/command_line/espeak.exe'
+        return readtexttools.get_nt_path(_app)
+    else:
+        for app_name in ['espeak-ng', 'speak-ng', 'espeak']:
+            if readtexttools.have_posix_app(app_name, False):
+                return app_name
+    return ''
+
 
 def espkread(_text_path, _lang, _visible, _audible, _tmp0, _image, _title,
              _post_process, _author, _dimensions, _ipitch, _irate):
@@ -339,16 +350,7 @@ reads the file aloud.
             print(readtexttools.gst_plugin_path('libgstespeak'))
         # espeak must be in your system's path
         # for example: /usr/bin/ or /usr/local/bin/
-        _app = ''
-
-        for app_name in ['espeak-ng', 'speak-ng', 'espeak']:
-            if readtexttools.have_posix_app(app_name, False):
-                _app = app_name
-                break
-        if os.name == 'nt': 
-            _app = 'eSpeak/command_line/espeak.exe'
-            _app = readtexttools.get_nt_path(_app)
-
+        _app = espeak_path()
         if bool(_app):
             _command = ''.join([
                 '"', _app, '" -b 1 -p ', _pitch, ' -s ', _rate, ' -v ', _voice,
@@ -483,12 +485,11 @@ def main():
     if sys.argv[-1] == sys.argv[0]:
         usage()
         sys.exit(0)
-    elif not os.path.isfile('/usr/bin/espeak'):
-        if not os.path.isfile('/usr/bin/espeak-ng'):
-            print(
-                'Please install espeak.  Use `sudo apt-get install espeak-ng`')
-            usage()
-            sys.exit(0)
+    elif not bool(espeak_path()):
+        print(
+            'Please install espeak.  Use `sudo apt-get install espeak-ng`')
+        usage()
+        sys.exit(0)
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'hovalrpitnd', [
             'help', 'output=', 'visible=', 'audible=', 'language=', 'rate=',
