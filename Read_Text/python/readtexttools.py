@@ -217,8 +217,9 @@ def strip_mojibake(concise_lang='en', _raw_text=''):
         concise_lang = concise_lang[:2].lower()
     except (AttributeError, TypeError):
         concise_lang = 'en'
-    if concise_lang in ('af', 'ca', 'de', 'en', 'eo,'
-                        'es', 'fr', 'gd', 'it', 'la', 'nl', 'pt'):
+    if concise_lang in ('af', 'ca', 'de', 'en', 'eo', 'es',
+                        'fr', 'gd', 'gl', 'it', 'la', 'nl',
+                        'pt', 'tl'):
         # Use Western European encoded characters.
         _coding = 'iso8859_15'
     else:
@@ -240,7 +241,12 @@ def strip_xml(str1):  # -> str
 
     When `strip_xml` is applied to a string, python converts the
     xml input into plain text with no special codes.  This is
-    for speech synthesis and other applications that require a
+    for speech synthesis a    elif concise_lang in ('uk'):
+        # Ukrainian `uk-UA`
+        _coding = 'koi8_u'
+    elif concise_lang in ('be', 'ky', 'ru', 'sr', 'tt'):
+        # Cyrillic alphabet
+        _coding = 'iso8859_5'nd other applications that require a
     sanitized string.
 
     Application note
@@ -2348,7 +2354,6 @@ def main():  # -> NoReturn
 
 if __name__ == '__main__':
     main()
-
 ###############################################################################
 
 # Read Text Extension
