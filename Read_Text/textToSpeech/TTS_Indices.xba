@@ -1268,9 +1268,7 @@ Function fiCountFestivalDirectory() As Integer
 		End If
 	Next
 End Function
-sub xx
-	print fsFestivalLanguage(0, 1)
-end sub
+
 
 Function fsFestivalLanguage( _
 	n, o) As String

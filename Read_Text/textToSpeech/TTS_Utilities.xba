@@ -1810,22 +1810,12 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	If fileexists(&quot;/usr/bin/text2wave&quot;) Or _
 		fileexists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave&quot;) Or _
 		fileexists(fsProgramDirectory() &amp; &quot;festival\texttowave&quot;) Then
-		Select Case fiCountFestivalLanguage()
+		Select Case fiCountFestivalVoices()
 			Case 0
 			&apos; pass
 			Case 1
-			Select Case fiCountFestivalDirectory()
-				Case 1 
-				s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;
-				s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
-				Case Else
-				For n = 0 To fiCountFestivalDirectory()
-					If fileexists(fsFestivalDirectory(n)) Then
-						s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(voice_&quot; &amp; fsFestivalVoice(n) &amp; &quot;)&quot;&quot;&quot;
-						s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
-					End If
-				Next				
-			End Select	
+			s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;
+			s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)				
 			Case 2
 			For n = 0 To fiCountFestivalDirectory()
 				If fileexists(fsFestivalDirectory(n)) Then
