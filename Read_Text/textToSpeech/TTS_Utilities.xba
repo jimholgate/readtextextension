@@ -3129,7 +3129,7 @@ Function isoToEnglish( _
 	Dim S2 As String
 	
 	If Right(s1,1) = &quot;-&quot; Then
-		s1 = Left(s1,Len(s1 - 1))
+		s1 = Left(s1, Len(s1) - 1)
 	End If
 	Select Case LCase(s1)
 		Case &quot;en-us&quot;
