@@ -450,6 +450,8 @@ Sub AboutAddOn( _
 				.GetControl(&quot;TextField2&quot;).model.Text = fsPicoTextString()
 			ElseIf InStr(config(fiExternalCommand()),&quot;(PYTTSX_READ_TEXT_PY)&quot;) Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsPyttsxTextString()
+			ElseIf InStr(config(fiExternalCommand()), &quot;(RHVOICE_READ_TEXT_PY)&quot;) Then
+				.GetControl(&quot;TextField2&quot;).model.Text = fsRhVoiceTextString()
 			ElseIf InStr(config(fiExternalCommand()),&quot;(OS_PY)&quot;) Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsOSTextString()
 			ElseIf InStr(config(fiExternalCommand()),&quot;(CREATE_QR_LABEL_PY)&quot;) Then

@@ -2159,9 +2159,15 @@ Function fsPythonNetTtsTextString() As String
 End Function
 
 
+Function fsRhVoiceTextString() As String
+	fsRhVoiceTextString = getTextFromFile(fsRhVoiceTtsDoc(), &quot;utf-8&quot;)
+End Function
+
+
 Function fsOpenJtalkTextString() As String
 	fsOpenJtalkTextString = getTextFromFile(fsPythonOpenJTalkDoc(), &quot;utf-8&quot;) 
 End Function
+
 
 Function fsPyttsxTextString() As String
 	fsPyttsxTextString = getTextFromFile(fsPythonPyttsxDoc(), &quot;utf-8&quot;)
@@ -3129,7 +3135,7 @@ Function isoToEnglish( _
 	Dim S2 As String
 	
 	If Right(s1,1) = &quot;-&quot; Then
-		s1 = Left(s1, Len(s1) - 1)
+		s1 = Left(s1,Len(s1 - 1))
 	End If
 	Select Case LCase(s1)
 		Case &quot;en-us&quot;
@@ -5652,17 +5658,19 @@ Function fbHaveNetworkTTS() As Boolean
 	home &amp; &quot;/.config/readtext/aws/polly/config.json&quot;, _
 	home &amp; &quot;/.config/readtext/googleapis/tts/config.json&quot;, _
 	home &amp; &quot;/.config/readtext/ms/azure/cognitiveservices/speech/config.json&quot;)
-	
-	If FileExists(fsNetworkTtsDoc()) And _
-	Len(fsContainerResourcePath(&quot;python&quot;)) = 0 And _
-	Len(fsContainerResourcePath(&quot;python3&quot;)) = 0 Then
-		For x = Lbound(Tokens) To Ubound(Tokens)
-			If FileExists(Tokens(x)) Then
-				fbHaveNetworkTTS = True
-				Exit For
-			End If
-		Next 
-	End If
+	Select Case home
+		Case Environ(&quot;PWD&quot;)
+		If FileExists(fsNetworkTtsDoc()) And _
+		Len(fsContainerResourcePath(&quot;python&quot;)) = 0 And _
+		Len(fsContainerResourcePath(&quot;python3&quot;)) = 0 Then
+			For x = Lbound(Tokens) To Ubound(Tokens)
+				If FileExists(Tokens(x)) Then
+					fbHaveNetworkTTS = True
+					Exit For
+				End If
+			Next 
+		End If
+	End Select
 End Function
 
 
