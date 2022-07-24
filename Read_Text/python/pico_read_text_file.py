@@ -153,7 +153,7 @@ def picoread(_text, _language, _visible, _audible, _media_file, _image, _title,
         return False
 
 
-def main():
+def main():  # -> NoReturn
     '''Pico read text tools'''
     _imported_meta = readtexttools.ImportedMetaData()
     _language = 'en-US'

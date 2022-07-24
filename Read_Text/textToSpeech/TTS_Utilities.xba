@@ -217,6 +217,12 @@ Sub webHelpButton() As String
 End Sub
 
 
+Function fbIsLibreOffice() As Boolean
+	&apos; &quot;OpenOffice&quot; returns `False`, but &quot;LibreOfficeDev&quot; returns `True`. 
+	fbIsLibreOffice = Instr(fsGetSetting(&quot;ooname&quot;), &quot;LibreOffice&quot;) = 1
+End Function
+
+
 Sub webHelp(ByVal sURL)
 	Dim oSvc
 	On error Goto webHelpErr
@@ -289,7 +295,8 @@ Function fbUsingPosixTalkProgram(ByVal s1) As Boolean
 	&quot;festival&quot;, _
 	&quot;padsp&quot;, _
 	&quot;say&quot;, _
-	&quot;speak-ng&quot;)
+	&quot;speak-ng&quot;, _
+	&quot;aplay&quot;)
 	If s1 = &quot;&quot; Then
 		s1 = fsProgramCommand()
 	End If
@@ -723,19 +730,21 @@ Function fbClipBoardAvailable() As Boolean
 	&apos; if program has crashed or is a version known to 
 	&apos; crash when reading the clipboard, provide
 	&apos; an alternative to reading the clipboard directly.
+	On Error GoTo fbClipBoardAvailableErr
 	fbClipBoardAvailable = fbOfficeSupports(_
 	&quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;)
 	If fileexists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
 		fbClipBoardAvailable = False
 	End If
-	If fbIsWin64Program And _
-		(fsGetSetting( _
-		&quot;oosetupversion&quot;) = &quot;5.0&quot; And _
-		LCase( _
+	If fbIsWin64Program() And _
 		fsGetSetting( _
-		&quot;ooName&quot;)) = &quot;libreoffice&quot;) Then
+		&quot;oosetupversion&quot;) = &quot;5.0&quot; And _
+		fbIsLibreOffice() Then
 		fbClipBoardAvailable = False
 	End If
+	Exit Function
+	fbClipBoardAvailableErr:
+	fbClipBoardAvailable = False
 End Function
 
 
@@ -774,7 +783,7 @@ Function fsGetClipBoard( _
 	fsGetClipBoard = &quot;&quot;
 	Dim mimetype$
 	mimetype = &quot;text/plain;charset=utf-16&quot;
-	If Not(fbClipBoardAvailable) Then
+	If Not(fbClipBoardAvailable()) Then
 		fsGetClipBoard = &quot;&quot;
 		Exit Function
 	End If
@@ -789,9 +798,9 @@ Function fsGetClipBoard( _
 	i = 0
 	Dim iPlainLoc%
 	iPlainLoc =  - 1
-	
 	Dim s$
 	s$ = &quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;
+	On Error GoTo fsGetClipBoardErr
 	oClip = createUnoService(s$)
 	oConverter = createUnoService(&quot;com.sun.star.script.Converter&quot;)
 	&apos;Print &quot;Clipboard name=&quot; &amp; oClip.getName()
@@ -821,22 +830,27 @@ Function fsGetClipBoard( _
 			&quot; &quot;)
 		End If
 	End If
+	Exit Function
+	fsGetClipBoardErr:
+	fsGetClipBoard = &quot;&quot;
 End Function
 
 
 Function WinSpeechProgramPath() As String
-	&apos; 2011-03-14
+	&apos; 2022-07-22
 	&apos; Always default to wscript.
 	&apos; The dialog shows all compatible SAPI5 voices
 	&apos; SAPI5 can&apos;t use Microsoft Speech Server voices
-	Dim s1 As String
-	
-	If fileexists(&quot;C:\Windows\SysWOW64\wscript.exe&quot;) Then
-		s1 = &quot;C:\Windows\SysWOW64\wscript.exe&quot;
-	Else
-		s1 = &quot;C:\WINDOWS\system32\wscript.exe&quot;
-	End If
-	WinSpeechProgramPath = s1
+	WinSpeechProgramPath = &quot;&quot;
+	Dim sub_path As Variant : sub_path = faWindowsTestArray()
+	Dim s2$ : s2 = fsHomeDrive()
+	Dim x As Integer
+	For x = Lbound(sub_path) To Ubound(sub_path)
+		If fileexists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\wscript.exe&quot;) Then
+			WinSpeechProgramPath = s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\wscript.exe&quot;
+				Exit Function
+		End If
+	Next
 End Function
 
 
@@ -875,7 +889,7 @@ Function fbWindowsHasAnInternationalVoice( _
 			s1 = (Sapi.GetVoices.Item(n).GetDescription)
 			s2 = s2 &amp; s1 &amp; cr
 			s1 = LCase(s1)
-			If InStr(s1, &quot;microsoft sam&quot;) &gt; 0 Then
+			If InStr(s1, &quot;microsoft sam&quot;) &lt;&gt; 0 Then
 				Exit For
 			ElseIf InStr(s1, LCase(sSearch)) = 0 Then
 				&apos; We found a non-matching voice
@@ -1722,52 +1736,60 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	Select Case fsGetOS()
 		Case &quot;WINDOWS&quot; &apos; Show examples
 		s1 = s1 &amp; CR &amp; &quot;-c &quot;&quot;import os; os.startfile(&apos;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
-		s1 = s1 &amp; CR &amp; &quot;-c &quot;&quot;import os; os.startfile(&apos;https://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&apos;)&quot;&quot;&quot;
-		s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(OS_PY)&quot;&quot; &quot;&quot;notepad &apos;(TMP)&apos;&quot;&quot;&quot;
-		Case &quot;MacOS&quot;  &apos; Python *must* be the one packaged with the app on MacOS.
-		Exit Function
+		s1 = s1 &amp; CR &amp; &quot;-c &quot;&quot;import os; os.startfile(&apos;https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&apos;)&quot;&quot;&quot;
+		Case &quot;MacOS&quot;
+		&apos;pass
+		Case Else
 	End Select
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
 	n = oComboBox.getItemCount()
 	oComboBox.removeItems(0,n)
-	If fileexists(fsProgramDirectory() &amp; &quot;Python\Lib\site-packages\pyttsx&quot;) Or _
-		fileexists(fsProgramDirectoryx86() &amp; &quot;Python\Lib\site-packages\pyttsx&quot;) Then
-		Redim s2 : s2 = Array(_
-		&quot; --rate 90 &quot;,_
-		&quot; --rate 60 &quot;,_
-		&quot; --rate 30 &quot;,_
-		&quot; --rate 0 &quot;,_
-		&quot; --rate -30 &quot;,_
-		&quot; --rate -60 &quot;,_
-		&quot; --rate -90 &quot;,_
-		&quot; &quot;)
-		For n = 0 To Ubound(s2)
-			s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(PYTTSX_READ_TEXT_PY)&quot;&quot;&quot; &amp; s2(n) &amp; &quot;&quot;&quot;(TMP)&quot;&quot;&quot;
-		Next
-	End If
-	If InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/python3&quot;) &gt; 0 or _
+	If InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/python3&quot;) &lt;&gt; 0 or _
 	bIsAppImage Then
 		If fileexists(environ(&quot;HOME&quot;) &amp; _
 			&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or fileexists( _
 			environ(&quot;HOME&quot;) &amp; _
 			&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or bIsAppImage Or _
-			Not(fbHaveEspeak()) Then
-			Redim s2 : s2 = Array(_
-			&quot;MALE3&quot;,_
-			&quot;MALE2&quot;,_
-			&quot;MALE1&quot;,_
-			&quot;FEMALE3&quot;,_
-			&quot;FEMALE2&quot;,_
-			&quot;FEMALE1&quot;,_
-			&quot;CHILD_MALE&quot;,_
-			&quot;CHILD_FEMALE&quot;)
-			For n = 0 To Ubound(s2)
+			Not(fbHaveEspeak()) or Len(fsGetPipLibPath(&quot;speechd&quot;)) &lt;&gt; 0 Then
+			Select Case fsGetOS()
+				Case &quot;UNIX&quot;
+				If fbHaveNetworkTTS() Then
+					Redim s2 : s2 = Array(_
+					&quot;AUTO&quot;,_
+					&quot;MALE3&quot;,_
+					&quot;MALE2&quot;,_
+					&quot;MALE1&quot;,_
+					&quot;FEMALE3&quot;,_
+					&quot;FEMALE2&quot;,_
+					&quot;FEMALE1&quot;,_
+					&quot;CHILD_MALE&quot;,_
+					&quot;CHILD_FEMALE&quot;)
+				Else
+					Redim s2 : s2 = Array(_
+					&quot;MALE3&quot;,_
+					&quot;MALE2&quot;,_
+					&quot;MALE1&quot;,_
+					&quot;FEMALE3&quot;,_
+					&quot;FEMALE2&quot;,_
+					&quot;FEMALE1&quot;,_
+					&quot;CHILD_MALE&quot;,_
+					&quot;CHILD_FEMALE&quot;)
+				
+				End If
+				Case &quot;MacOS&quot;
+				Redim s2 : s2 = Array(_
+				&quot;Veena&quot;, &quot;Moira&quot;, &quot;Karen&quot;, &quot;Fiona&quot;, &quot;AUTO&quot;)
+				Case Else
+				Redim s2 : s2 = Array(_
+				&quot;FEMALE1&quot;, &quot;MALE1&quot;)
+			End Select
+			For n = Lbound(s2) To Ubound(s2)
 				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; s2(n) &amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; s2(n) &amp; _
 				&quot;&quot;&quot; --rate &quot;&quot;-30&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 				
 				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; s2(n) &amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; s2(n) &amp; _
 				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			Next
 			s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
@@ -1803,13 +1825,13 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
 		&quot;.png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	End If
-	If fbHaveNetworkTTS() Then
+	If fbHaveNetworkTTS() And fsGetOS() = &quot;UNIX&quot; Then
 		s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE)&quot;
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
 	End If
-	If fileexists(&quot;/usr/bin/text2wave&quot;) Or _
-		fileexists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave&quot;) Or _
-		fileexists(fsProgramDirectory() &amp; &quot;festival\texttowave&quot;) Then
+	If len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or _
+		fileexists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave.exe&quot;) Or _
+		fileexists(fsProgramDirectory() &amp; &quot;festival\texttowave.exe&quot;) Then
 		Select Case fiCountFestivalVoices()
 			Case 0
 			&apos; pass
@@ -1829,7 +1851,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 			s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
 			s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
 		End Select
-	ElseIf fileexists(&quot;/usr/bin/flite&quot;) Then
+	ElseIf len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
 		s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)	
 	End If
@@ -1843,11 +1865,11 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &apos; &amp; &quot; --rate=100% --pitch=100% &quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
 	End If
-	If fileexists(&quot;/usr/bin/pico2wave&quot;) Then
+	If Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0  Then
 		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
 	End If
-	If fileexists(&quot;/usr/bin/open_jtalk&quot;) Then
+	If Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 Then
 		s4 = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; --language=ja-JP&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 	End If
@@ -2123,7 +2145,7 @@ End Sub
 
 
 Function fsAbout() As String
-	fsAbout = getTextFromFile(fsDescriptionDoc(), &quot;utf-8&quot;)
+	fsAbout = getTextFromFile(fsDescriptionDoc(), &quot;UTF-8&quot;)
 	&apos; Application&apos;s Default encoding
 End Function
 
@@ -2135,52 +2157,42 @@ End Function
 
 
 Function fsSPDTextString() As String
-	fsSPDTextString = getTextFromFile(fsPythonSpdDoc(), &quot;utf-8&quot;)
+	fsSPDTextString = getTextFromFile(fsPythonSpdDoc(), &quot;UTF-8&quot;)
 End Function
 
 
 Function fsPicoTextString() As String
-	fsPicoTextString = getTextFromFile(fsPythonPicoDoc(), &quot;utf-8&quot;)
+	fsPicoTextString = getTextFromFile(fsPythonPicoDoc(), &quot;UTF-8&quot;)
 End Function
 
 
 Function fsEspeakTextString() As String
-	fsEspeakTextString = getTextFromFile(fsPythonEspeakDoc(), &quot;utf-8&quot;)
+	fsEspeakTextString = getTextFromFile(fsPythonEspeakDoc(), &quot;UTF-8&quot;)
 End Function
 
 
 Function fsFestivalTextString() As String
-	fsFestivalTextString = getTextFromFile(fsPythonFestivalDoc(), &quot;utf-8&quot;)
+	fsFestivalTextString = getTextFromFile(fsPythonFestivalDoc(), &quot;UTF-8&quot;)
 End Function
 
 
 Function fsPythonNetTtsTextString() As String
-	fsPythonNetTtsTextString = getTextFromFile(fsNetworkTtsDoc(), &quot;utf-8&quot;)
+	fsPythonNetTtsTextString = getTextFromFile(fsNetworkTtsDoc(), &quot;UTF-8&quot;)
 End Function
 
-
+  
 Function fsRhVoiceTextString() As String
-	fsRhVoiceTextString = getTextFromFile(fsRhVoiceTtsDoc(), &quot;utf-8&quot;)
+	fsRhVoiceTextString = getTextFromFile(fsRhVoiceTtsDoc(), &quot;UTF-8&quot;)
 End Function
 
 
 Function fsOpenJtalkTextString() As String
-	fsOpenJtalkTextString = getTextFromFile(fsPythonOpenJTalkDoc(), &quot;utf-8&quot;) 
-End Function
-
-
-Function fsPyttsxTextString() As String
-	fsPyttsxTextString = getTextFromFile(fsPythonPyttsxDoc(), &quot;utf-8&quot;)
-End Function
-
-
-Function fsOSTextString() As String
-	fsOSTextString = getTextFromFile(fsPythonOSDoc(), &quot;utf-8&quot;)
+	fsOpenJtalkTextString = getTextFromFile(fsPythonOpenJTalkDoc(), &quot;UTF-8&quot;) 
 End Function
 
 
 Function fsQRTextString() As String
-	fsQRTextString = getTextFromFile(fsPythonCreateQR(), &quot;utf-8&quot;)
+	fsQRTextString = getTextFromFile(fsPythonCreateQR(), &quot;UTF-8&quot;)
 End Function
 
 
@@ -2287,7 +2299,7 @@ Sub ttsActuate( _
 	Dim sArtURL$
 	sArtURL = &quot;&quot;
 	Dim scodec$
-	scodec = &quot;utf-8&quot;
+	scodec = &quot;UTF-8&quot;
 	Dim sCommand$
 	sCommand = &quot;&quot;
 	Dim sGetOS$
@@ -2403,20 +2415,20 @@ Sub ttsActuate( _
 				scodec = &quot;iso-8895-15&quot;
 			End If
 		End If
-		fbCreateFile(fsFestivalScriptName(), sScript, scodec)
-		fbCreateFile(fsTemporaryTextDoc(), sTextToSpeak, scodec)
+		CreateFile(fsFestivalScriptName(), sScript, scodec)
+		CreateFile(fsTemporaryTextDoc(), sTextToSpeak, scodec)
 	ElseIf config(fiExternalOption()) Then
 		If fbIsSandboxed() Then
 			Exit Sub
 		End If
 		sProgram = config(fiExternalProgramPath())
 		sCommand = config(fiExternalCommand)
-		If InStr(LCase(sProgram), &quot;bin/padsp&quot;) &gt; 0 Then
-			If InStr(LCase(sCommand), &quot;swift&quot;) &gt; 0 Then
+		If InStr(LCase(sProgram), &quot;bin/padsp&quot;) &lt;&gt; 0 Then
+			If InStr(LCase(sCommand), &quot;swift&quot;) &lt;&gt; 0 Then
 				&apos; Cepstral swift Alison (2008) for Linux does not pronounce text around smart quotes correctly,
-				&apos; so we strip the smart quotes. Be sure to tell swift to use utf-8 encoded text as follows: 
+				&apos; so we strip the smart quotes. Be sure to tell swift to use UTF-8 encoded text as follows: 
 				&apos; &quot;Read with external program&quot; set to /usr/bin/padsp and 
-				&apos; &quot;Command line options&quot; to swift -e utf-8 -m text -f &quot;(TMP)&quot;
+				&apos; &quot;Command line options&quot; to swift -e UTF-8 -m text -f &quot;(TMP)&quot;
 				sTextToSpeak = fsStripSmartQuotes(sTextToSpeak)
 			End If
 		End If
@@ -2436,7 +2448,9 @@ Sub ttsActuate( _
 				&apos; applications on all Posix platforms, because the `killall`
 				&apos; command may not work on some processes when it is invoked 
 				&apos; by a user with limited permissions.
-				fbCreateFile(fsMyTempLock(&quot;lock&quot;), fsAppSignature(), &quot;utf-8&quot;)
+				If instr(sProgram, &quot;/say&quot;) = 0 Then
+					CreateFile(fsMyTempLock(&quot;lock&quot;), fsAppSignature(), &quot;UTF-8&quot;)
+				End If
 			End If
 		End If
 		
@@ -2500,7 +2514,7 @@ Sub ttsActuate( _
 		&apos;&apos; [SMIL3]: https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/FineTuning/FineTuning.html#//apple_ref/doc/uid/TP40004365-CH5-SW10
 		&apos;&apos;
 		
-		fbCreateFile(fsTemporaryTextDoc(), sTextToSpeak, scodec)
+		CreateFile(fsTemporaryTextDoc(), sTextToSpeak, scodec)
 		If sGetOS = &quot;MacOS&quot; Then
 			If InStr(sCommand,&quot;&quot;&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;&quot;&quot;) = 1 Then
 				fswriteMacOSSpeechScript(&quot;-r 110 &quot;, _
@@ -2508,7 +2522,7 @@ Sub ttsActuate( _
 			ElseIf InStr(sCommand,&quot;&quot;&quot;(SAY_APPLESCRIPT_QUICKLY)&quot;&quot;&quot;) = 1 Then
 				fswriteMacOSSpeechScript(&quot;-r 240 &quot;, _
 				fsSelectionLanguageAndRegion(True), sArtURL)
-			ElseIf InStr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;) Then
+			ElseIf InStr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;) &lt;&gt; 0 Then
 				fswriteMacOSSpeechScript(&quot;&quot;, _
 				&quot;&quot;, sArtLook)
 			Else
@@ -2523,6 +2537,7 @@ Sub ttsActuate( _
 		sCommand = replaceLocalTokensWithStr(sCommand)
 		sCommand = replacePublicTokensWithStr(sCommand)
 		sCommand = replaceWebTokensWithStr(sCommand, sTextToSpeak) &apos;for online content with media player
+
 		fbCreateMissingMediaDirectory(sCommand)
 	Else &apos;if config(fiHtmlOption) then
 		&apos;Translate And read with web tools
@@ -2558,7 +2573,29 @@ Sub ttsActuate( _
 		End If
 		
 		If sCommand &lt;&gt; &quot;&quot; Then
-			errorCode = Shell(sProgram,0,sCommand,bWait)
+			Select Case sGetOS
+				Case &quot;WINDOWS&quot;
+				errorCode = Shell(_
+				sProgram, 0, sCommand, bWait)
+				Case Else
+				&apos; Specify a program path as URL because
+				&apos; a program path to a python application
+				&apos; could include spaces.
+				If sGetOS =&quot;MacOS&quot; And _
+					InStr(sProgram, &quot;/python&quot;) &lt;&gt; 0 And _
+					fbIsLibreOffice() Then
+						sProgram = PosixPythonPath()				
+				End If
+				If True Then
+				errorCode = Shell(_
+				converttourl(_
+				sProgram), 0, sCommand, bWait)
+				Else
+				errorCode = Shell (sProgram, 0, sCommand, bWait)				
+				
+				End If
+				
+			End Select
 		End If
 		On Error Resume Next
 		oBar.Value = 80
@@ -2793,14 +2830,6 @@ Function replaceLocalTokensWithStr( _
 	sReplace = ConvertFromURL(fsPythonOpenJTalkDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
-	sFind = &quot;(PYTTSX_READ_TEXT_PY)&quot;
-	sReplace = ConvertFromURL(fsPythonPyttsxDoc())
-	sA = fsReplaceText(sA,sFind,sReplace)
-	
-	sFind = &quot;(OS_PY)&quot;
-	sReplace = ConvertFromURL(fsPythonOSDoc())
-	sA = fsReplaceText(sA,sFind,sReplace)
-	
 	sFind = &quot;(SAY_APPLESCRIPT)&quot;
 	sReplace = ConvertFromURL(fsTemporaryTtsAppleScript())
 	sA = fsReplaceText(sA,sFind,sReplace)
@@ -2835,16 +2864,6 @@ Function replaceLocalTokensWithStr( _
 	sReplace = soundsDirectory()
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
-	&apos; Legacy seting
-	sFind = &quot;(POSTER_PNG)&quot;
-	sReplace = &quot;(POSTER_IMG)&quot;
-	sA = fsReplaceText(sA,sFind,sReplace)
-	
-	&apos; Legacy seting
-	sFind = &quot;(POSTER2_PNG)&quot;
-	sReplace = &quot;(POSTER2_IMG)&quot;
-	sA = fsReplaceText(sA,sFind,sReplace)
-	
 	&apos; Sample image for movie clip with embedded speech
 	sFind = &quot;(POSTER_IMG)&quot;
 	sReplace = ConvertFromURL(fsPosterImg())
@@ -2856,7 +2875,7 @@ Function replaceLocalTokensWithStr( _
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	&apos;Choose an image for your movie clip with embedded speech
-	If InStr(sA,&quot;(MY_IMAGE)&quot;) &gt; 0 Then
+	If InStr(sA,&quot;(MY_IMAGE)&quot;) &lt;&gt; 0 Then
 		sFind = &quot;(MY_IMAGE)&quot;
 		sReplace = fsGetPicturePath()
 		sA = fsReplaceText(sA,sFind,sReplace)
@@ -3066,8 +3085,9 @@ Function fsSelectionLanguageAndRegion( _
 		If ismissing(bIgnoreInstalledVoices) Then
 			bIgnoreInstalledVoices = True
 		End If
-		sA = fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
-		sB = fsSelectionLanguage
+		sB = fsSelectionLanguage()
+		sA = sB &amp; &quot;-&quot; &amp; fsSelectionCountry()
+
 		If bIgnoreInstalledVoices Then
 			fsSelectionLanguageAndRegion = sA
 		Else
@@ -3748,11 +3768,11 @@ Function fsSelectionCountry( _
 		If sB = &quot;&quot; Then
 			&apos; no text is selected.
 			On Error Resume Next
-			myLocale = ThisComponent.CharLocale
+			myLocale = oDoc.CharLocale
 			sA = myLocale.Country
-			myLocale = ThisComponent.CharLocaleAsian
+			myLocale = oDoc.CharLocaleAsian
 			sC = myLocale.Country
-			myLocale = ThisComponent.CharLocaleComplex
+			myLocale = oDoc.CharLocaleComplex
 			sD = myLocale.Country
 			CountryErr
 			
@@ -4240,7 +4260,7 @@ Function fbIsWin64Program( _
 	
 	If fsGetOS = &quot;WINDOWS&quot; And _
 		UCase(environ(&quot;PROCESSOR_ARCHITECTURE&quot;)) = &quot;AMD64&quot; And _
-		InStr(LCase(installPath), &quot;(x86)&quot;) &lt; 1 Then
+		InStr(LCase(installPath), &quot;(x86)&quot;) &lt;&gt; 0 Then
 		fbIsWin64Program = True
 	Else
 		fbIsWin64Program = False
@@ -4259,6 +4279,7 @@ Function fbIsAMediaPlayer( _
 	End If
 	Dim aA
 	aA = Array( _
+	&quot;/usr/bin/aplay&quot;, _
 	&quot;/usr/bin/avplay&quot;, _
 	&quot;/usr/bin/bangarang&quot;, _
 	&quot;/usr/bin/exail&quot;, _
@@ -4302,50 +4323,99 @@ End Function
 Sub myBeep()
 	Dim sA As String
 	Dim oSvc As Object
-	
 	sA = soundsDirectory() &amp; &quot;apert.wav&quot;
 	If fileexists(sA) Then
-		sA = convertToURL(sA)
+		Select Case fsGetOS()
+			Case &quot;UNIX&quot;
+			sA = ConvertToURL(sA)
+		End Select
 	ElseIf fileexists(&quot;/usr/share/sounds/alsa/Noise.wav&quot;) Then
 		sA = convertToURL(&quot;/usr/share/sounds/alsa/Noise.wav&quot;)
 	Else
 		sA = convertToURL(&quot;/usr/share/sounds/speech-dispatcher/test.wav&quot;)
 	End If
-	oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
-	oSvc.execute(sA,&quot;&quot;,1)
+	If fileexists(&quot;/usr/bin/afplay&quot;) Then
+		Shell(&quot;afplay&quot;, 0, sA)
+	ElseIf fileexists(&quot;/usr/bin/gst-play-1.0&quot;) Then
+		Shell(&quot;gst-play-1.0&quot;, 0, sA)
+	Else
+		On Error GoTo myBeepErr
+		oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+		oSvc.execute(sA, &quot;&quot;, 1)
+	End If
+	Exit Sub
+	myBeepErr:
 End Sub
 
 
 Sub windowsSAPIControl()
-	Dim s2 As String
+	Dim sA as String
 	Dim oSvc As Object
-	
 	oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
-	s2 = fsHomeDrive()
-	If fileexists(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) Then
-		oSvc.execute(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;,&quot;&quot;,0)
-	ElseIf fileexists(s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) Then
-		oSvc.execute(s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;,&quot;&quot;,0)
-	ElseIf fileexists(fsProgramDirectory() &amp; _
-		&quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;) Then
-		oSvc.execute(fsProgramDirectory() &amp; _
-		&quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;,&quot;&quot;,0)
-	ElseIf fileexists(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;) Then
-		oSvc.execute(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;,&quot;&quot;,0)
-	ElseIf fileexists(s2 &amp; &quot;\Windows\System32\access.cpl&quot;) Then
-		oSvc.execute(s2 &amp; &quot;\Windows\System32\access.cpl&quot;,&quot;&quot;,0)
-	ElseIf fileexists(&quot;/usr/bin/systemsettings&quot;) Then &apos;kde
-		Shell(&quot;/usr/bin/systemsettings&quot;,0,&quot;&quot;,False)
-	ElseIf fileexists(&quot;/usr/bin/xfce-setting-show&quot;) Then &apos;xfce
-		Shell(&quot;/usr/bin/xfce-setting-show&quot;,0,&quot;&quot;,False)
-	ElseIf fileexists(&quot;/usr/bin/gnome-control-center&quot;) Then &apos;gnome
-		Shell(&quot;/usr/bin/gnome-control-center&quot;,0,&quot;&quot;,False)
-	ElseIf fileexists(&quot;/usr/bin/unity-control-center&quot;) Then &apos;ubuntu
-		Shell(&quot;/usr/bin/unity-control-center&quot;,0,&quot;&quot;,False)
-	ElseIf fsGetOS() = &quot;MacOS&quot; Then &apos;MacOS
-		Shell(&quot;open&quot;,0,&quot;-b com.apple.systempreferences&quot;,False)
-	End If
+	sA = fswindowsSAPIControl()
+	Select Case fsGetOS()
+		Case &quot;MacOS&quot;
+		Shell(&quot;open&quot;, 0, &quot;-b com.apple.systempreferences&quot;, False)
+		Case &quot;WINDOWS&quot;
+		If Len(sA) &lt;&gt; 0 Then
+			oSvc.execute(sA, &quot;&quot;, 0)
+		End If
+		Case Else
+		If Len(sA) &lt;&gt; 0 Then
+			Shell(sA, 0, &quot;&quot;, False)
+		End If		
+	End Select
 End Sub
+
+
+Function faWindowsTestArray() As Variant
+	faWindowsTestArray = Array(&quot;SysWOW64&quot;, &quot;System32&quot;, &quot;SysArm32&quot;, &quot;SyChpe32&quot;)
+End Function
+
+
+Function fswindowsSAPIControl() As String
+	fswindowsSAPIControl = &quot;&quot;
+	Dim x As Integer
+	Dim s2 As String
+	Dim sub_path As Variant
+
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+			sub_path = faWindowsTestArray()
+		s2 = fsHomeDrive()
+		For x = Lbound(sub_path) To Ubound(sub_path)
+			If fileexists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\Speech\SpeechUX\sapi.cpl&quot;) Then
+				fswindowsSAPIControl = s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\Speech\SpeechUX\sapi.cpl&quot;
+				Exit Function
+			End If
+		Next
+		If fileexists(fsProgramDirectory() &amp; _
+		&quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;) Then
+			fswindowsSAPIControl = fsProgramDirectory() &amp; _
+			&quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;
+		ElseIf fileexists(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;) Then
+			fswindowsSAPIControl = s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;
+		Else
+			For x = Lbound(sub_path) To Ubound(sub_path)
+				If fileexists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\access.cpl&quot;) Then
+					fswindowsSAPIControl = s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\access.cpl&quot;
+					Exit Function
+				End If
+			Next
+		End If
+		Case &quot;MacOS&quot;
+			fswindowsSAPIControl = &quot;open -b com.apple.systempreferences&quot;
+		Case Else
+		sub_path = Array(_
+		&quot;systemsettings&quot;, &quot;xfce-setting-show&quot;, &quot;gnome-control-center&quot;, &quot;unity-control-center&quot;)
+		For x = Lbound(sub_path) To Ubound(sub_path)
+			If fileexists(&quot;/usr/bin/&quot; &amp; sub_path(x)) Then
+				fswindowsSAPIControl = &quot;/usr/bin/&quot; &amp; sub_path(x)
+				Exit Function
+			End If
+		Next
+	End Select
+End Function
 
 
 Sub libreHelp()
@@ -4357,65 +4427,10 @@ Sub libreHelp()
 &apos;&apos; application&apos;s help documents are not installed. In this case,
 &apos;&apos; we show web based extension help in a browser window
 &apos;&apos;
-	Select Case fbHelpIsInstalled()
-		Case False
+	If Not fbHelpIsInstalled() Then
 		WebHelp(fsHttpHelpUrl())
-		Case Else
-		&apos;don&apos;t do anything; extension can use ordinary help.
-	End Select
+	End If
 End Sub
-
-
-Function fbCreateFile( _
-	sFilePath, _
-	sWriteString, _
-	Optional sEncoding) As Boolean
-	&apos; fbCreateFile(&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;,&quot;utf-8&quot;) &apos; Best practice
-	&apos; fbCreateFile(&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;) &apos; is allowed, but not
-	&apos; best practice.
-&apos;&apos;
-&apos;&apos; Asian file names in Windows
-&apos;&apos; ---------------------------
-&apos;&apos;
-&apos;&apos; Depending on the locale and age of your system, you may have
-&apos;&apos; have problems if a Windows file path includes Asian characters.
-&apos;&apos; Windows used different encodings for different markets.  if 
-&apos;&apos; you have a problem saving or opening a file, try renaming the
-&apos;&apos; directories in the file path with Western characters.
-&apos;&apos;
-	Dim oOutputAccess As Object
-	Dim oOutputStream As Object
-	Dim vOutputData, UDP, PV As Variant
-	Dim CR As String
-	
-	If ismissing(sEncoding) Then
-		Select Case fsGetOS()
-			Case &quot;WINDOWS&quot;
-			sEncoding = &quot;utf-8&quot; &apos; iso-8859-15 is Windows &quot;western&quot; encoding
-			&apos; It doesn&apos;t include Asian or Complex language support
-			Case Else
-			sEncoding = &quot;utf-8&quot; &apos; Posix standard
-		End Select
-	End If
-	On Error Goto fbCreateFileError
-	CR = Chr(13)
-	If fileexists(sFilePath) Then
-		kill sFilePath
-	End If
-	oOutputAccess = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
-	oOutputStream = CreateUnoService(&quot;com.sun.star.io.TextOutputStream&quot;)
-	vOutputData = oOutputAccess.openFileWrite( sFilePath )
-	oOutputStream.setOutputStream(vOutputData)
-	oOutputStream.setEncoding(sEncoding)
-	oOutputStream.writeString( sWriteString )
-	oOutputStream.flush()
-	oOutputStream.closeOutput()
-	fbCreateFile = True
-	Exit Function
-	fbCreateFileError:
-	
-	fbCreateFile = False
-End Function
 
 
 Function fbcreateDirectory( _
@@ -4432,7 +4447,7 @@ Function fbcreateDirectory( _
 		Else
 			sA = sPath &amp; &quot;/&quot; &amp; &quot;temp-&quot; &amp; Trim(Second(Now)) &amp; &quot;.txt&quot;
 		End If
-		fbcreateDirectory = fbCreateFile(sA, fsAppSignature(), &quot;UTF-8&quot;)
+		fbcreateDirectory = CreateFile(sA, fsAppSignature(), &quot;UTF-8&quot;)
 		If fileexists(sA) Then
 			kill sA
 		End If
@@ -4662,7 +4677,7 @@ End Function
 Function fswriteMacOSSpeechScript( _
 	ByVal sArguments, _
 	ByVal sArgLangLocale, _
-	Optional ByVal ArtPath) As String
+	ByVal ArtPath) As String
 	fswriteMacOSSpeechScript = &quot;&quot;
 &apos; Writes an osascript to read a sound, or create and convert a sound.
 &apos; Creates a lock file to prevent double talk and to silence the speaker
@@ -4733,7 +4748,7 @@ Function fswriteMacOSSpeechScript( _
 		&apos; Make sure we have a valid directory
 		CreateFile(sFile, _
 		sA, _
-		&quot;utf-8&quot;)
+		&quot;UTF-8&quot;)
 		kill sFile
 	End If
 	sA = &quot;&quot;
@@ -4760,9 +4775,7 @@ Function fswriteMacOSSpeechScript( _
 	If Len(myTunes) &lt;&gt; 0 And fbCreatingMediaFile() Then
 		&apos; MacOS 10 iTunes or MacOS 11 Music programs can generate
 		&apos; audio files and playlists.
-		If ismissing(ArtPath) Then
-			ArtPath = Trim(convertfromURL(fsPosterImg()))
-		ElseIf ArtPath = &quot;&quot; Or _
+		If ArtPath = &quot;&quot; Or _
 			Not(fileexists(ArtPath)) Then
 			ArtPath = Trim(convertfromURL(fsPosterImg()))
 		Else
@@ -4779,7 +4792,7 @@ Function fswriteMacOSSpeechScript( _
 				&quot;Did you click &quot;&quot;Cancel&quot;&quot; or leave the title blank?&quot;
 				CreateFile(sFile, _
 				s1, _
-				&quot;utf-8&quot;)
+				&quot;UTF-8&quot;)
 				fswriteMacOSSpeechScript = s1
 				Exit Function
 			End If
@@ -5340,12 +5353,11 @@ Function fswriteMacOSSpeechScript( _
 	&quot;end fsGetthevoice&quot;, _
 	&quot;&quot;), _
 	CR)
-	&apos;fbShowOK(sB)
-	&apos;print 5338
+
 	CreateFile( _
 	sFile, _
 	sB, _
-	&quot;utf-8&quot;)
+	&quot;UTF-8&quot;)
 	fswriteMacOSSpeechScript = sB
 End Function
 
@@ -5363,12 +5375,10 @@ Function CreateFile( _
 	sFilePath, _
 	sWriteString, _
 	Optional sEncoding) As Boolean
-	&apos; CreateFile(&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;,&quot;utf-8&quot;) &apos; Best practice
-	&apos; CreateFile(&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;) &apos; is allowed, but not best
-	&apos; practice.
+	&apos; CreateFile(&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;,&quot;UTF-8&quot;) &apos; Best practice
 	&apos;
 	&apos; Windows can not write Asian languages correctly with &quot;iso-8859-15&quot;
-	&apos; Anything written for the extension&apos;s private use should be &quot;utf-8&quot;
+	&apos; Anything written for the extension&apos;s private use should be &quot;UTF-8&quot;
 	&apos; This sub will create the file and all the nested directories
 	&apos; in the path in a single step.
 	Dim CR As String
@@ -5382,7 +5392,7 @@ Function CreateFile( _
 			Case &quot;WINDOWS&quot;
 			sEncoding = &quot;iso-8859-15&quot; &apos;iso-8859-15 is Windows &quot;western&quot; encoding
 			Case Else
-			sEncoding = &quot;utf-8&quot; &apos; Posix standard
+			sEncoding = &quot;UTF-8&quot; &apos; Posix standard
 		End Select
 	End If
 	On Error Goto CreateFileError
@@ -5391,16 +5401,17 @@ Function CreateFile( _
 	End If
 	oOutputAccess = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
 	oOutputStream = CreateUnoService(&quot;com.sun.star.io.TextOutputStream&quot;)
-	vOutputData = oOutputAccess.openFileWrite( sFilePath )
+	vOutputData = oOutputAccess.openFileWrite(sFilePath)
 	oOutputStream.setOutputStream(vOutputData)
-	oOutputStream.setEncoding(sEncoding)
-	oOutputStream.writeString( sWriteString )
+	If Len(sEncoding) &lt;&gt; 0 Then
+		oOutputStream.setEncoding(sEncoding)
+	End If
+	oOutputStream.writeString(sWriteString)
 	oOutputStream.flush()
 	oOutputStream.closeOutput()
-	CreateFile = True
+	CreateFile = FileExists(sFilePath)
 	Exit Function
 	CreateFileError:
-	
 	CreateFile = False
 End Function
 
@@ -5525,16 +5536,21 @@ End Sub
 
 Function fbIsSandboxed() As Boolean
 	&apos; flatpak apps cannot run external programs.
-	fbIsSandboxed = Not Instr(soundsDirectory(), &quot;/.var/app/org.libreoffice.LibreOffice/&quot;) = 0
+	fbIsSandboxed = Instr(soundsDirectory(), &quot;/.var/app/org.libreoffice.LibreOffice/&quot;) &lt;&gt; 0
 End Function
 
 
 Function fbHaveEspeak() As Boolean
 	fbHaveEspeak = False
-	If fileexists(&quot;/usr/bin/espeak-ng&quot;) Or _
-			fileexists(&quot;/usr/bin/speak-ng&quot;) Or _
-			fileexists(&quot;/usr/bin/espeak&quot;) Or _
-			fileexists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
+	Dim n# : n = 0
+	Dim a1 : a1 = Array(&quot;espeak-ng&quot;, &quot;speak-ng&quot;, &quot;espeak&quot;)
+	For n = Lbound(a1) To Ubound(a1)
+		If Len(fsFindAppPath(a1(n))) &lt;&gt; 0 Then
+			fbHaveEspeak = True
+			Exit Function
+		End If
+	Next
+	If fileexists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
 			fileexists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
 		fbHaveEspeak = True
 	End If
@@ -5581,7 +5597,10 @@ End Function
 
 
 Function fbHavePyQrCode() As Boolean
-	fbHavePyQrCode = False
+	fbHavePyQrCode = Len(fsGetPipLibPath(&quot;qrcode&quot;)) &lt;&gt; 0
+	If fbHavePyQrCode Then
+		Exit Function
+	End If
 	Dim x# : x = 0
 	Dim Tokens : Tokens = Array(_
 	&quot;/usr/lib/python3/dist-packages/qrcode/release.py&quot;, _
@@ -5624,20 +5643,26 @@ Function fbOKWithRhVoice(_
 	If Len(_test) = 0 Then
 		Exit Function
 	End If
-	Select Case Split(sA &amp; &quot;-&quot;, &quot;-&quot;)(0)
+	Select Case Split(sA &amp; &quot;-&quot;, &quot;-&quot;)(0)	
 	Case &quot;en&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;English&quot;)	
 	Case &quot;eo&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Esperanto&quot;)
 	Case &quot;ky&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Kyrgyz&quot;)
+	Case &quot;mk&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;Macedonian&quot;)
+	Case &quot;pl&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;Polish&quot;)
 	Case &quot;pt&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Brazilian-Portuguese&quot;)
 	Case &quot;ru&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Russian&quot;)
+	Case &quot;sq&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;Albanian&quot;)
 	Case &quot;tt&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Tatar&quot;)
-	Case  &quot;uk&quot;
+	Case &quot;uk&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Ukrainian&quot;)
 	Case Else
 	fbOKWithRhVoice = False
@@ -5645,10 +5670,106 @@ Function fbOKWithRhVoice(_
 End Function
 
 
+Function fsGetPipLibPath(s_test As String) As String
+	Dim ret_val$ : ret_val = &quot;&quot;
+	Dim os_div$ : os_div = getPathSeparator
+	Dim sPythonSubDirs$
+	Dim py_dir$
+	fsGetPipLibPath = &quot;&quot;
+	
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+		sPythonSubDirs = &quot;\Lib\site-packages&quot;
+		py_dir = Environ(&quot;LOCALAPPDATA&quot;) &amp; &quot;\Programs\Python&quot;
+		Case &quot;MacOS&quot;
+		sPythonSubDirs = &quot;/lib/python/site-packages&quot;
+		py_dir = Environ(&quot;HOME&quot;) &amp; &quot;/Library/Python&quot;	
+		Case &quot;UNIX&quot;
+		&apos; `snap`, `flatpak`, `appimage` and other standalone versions of
+		&apos; of LibreOffice python might not work correctly with the system
+		&apos; python extended libraries or user installed libraries
+		If Not Instr(Environ(&quot;PWD&quot;), Environ(&quot;HOME&quot;)) = 1 Then
+			Exit Function
+		ElseIf Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
+			Exit Function
+		ElseIf FileExists(&quot;/usr/lib/python3/dist-packages/&quot; &amp; s_test) Then
+			fsGetPipLibPath = &quot;/usr/lib/python3/dist-packages/&quot; &amp; s_test
+			Exit Function
+		ElseIf FileExists(fsLinux64PythonLib() &amp; &quot;/site-packages/&quot; &amp; s_test) Then
+			fsGetPipLibPath = fsLinux64PythonLib() &amp; &quot;/site-packages/&quot; &amp; s_test
+			Exit Function
+		End If
+		sPythonSubDirs = &quot;/lib/site-packages&quot;
+		py_dir = Environ(&quot;HOME&quot;) &amp; &quot;.local/lib/python&quot;		
+	End Select
+	Dim sSubDirectories$ : sSubDirectories = fsSubDirectories(py_dir)
+	Dim version_list As Variant : version_list = Split(sSubDirectories, Chr(13))
+	Dim x As Integer : x = 0
+	For x = Lbound(version_list) to Ubound(version_list)
+		ret_val = py_dir &amp; _
+		os_div &amp; _
+		version_list(x) &amp; _
+		sPythonSubDirs &amp; _
+		os_div &amp; _
+		s_test
+		If FileExists(ret_val) Then
+			fsGetPipLibPath = ret_val
+			Exit Function
+		End If
+	Next
+	fsGetPipLibPath = &quot;&quot;
+End Function
+
+
+Function fsSubDirectories(sPath As String)
+	&apos; Returns directories
+	Dim sDir As String
+	Dim sValue As String
+	Dim cnt_msg# : cnt_msg = -1
+	Dim a1(0) As Variant
+	fsSubDirectories = &quot;&quot;
+	sDir = &quot; &quot;
+	If Len(sPath) = 0 Then sPath = CurDir
+	sValue = Dir$(sPath + getPathSeparator + &quot;*&quot;,16)
+	On Error GoTo fsSubDirectoriesErr
+	Do
+		If sValue &lt;&gt; &quot;.&quot; And sValue &lt;&gt; &quot;..&quot; Then
+			If (GetAttr(sPath + getPathSeparator + sValue) And 16) &gt; 0 Then
+				sDir = sDir &amp; Chr(13) &amp; sValue			   
+			End If
+		End If
+		sValue = Dir$
+	Loop Until sValue = &quot;&quot;
+	fsSubDirectories = fsSuperTrim(sDir, &quot;&quot;)
+	Exit Function
+	fsSubDirectoriesErr:
+	fsSubDirectories = &quot;&quot;
+End Function
+
+
+Function fbLocalPythonDevKit() As Boolean
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+		fbLocalPythonDevKit = FileExists(_
+		Environ(_
+		&quot;LOCALAPPDATA&quot;) &amp; &quot;\Programs\Python&quot;)
+		Case &quot;MacOS&quot;
+			fbLocalPythonDevKit = FileExists(_
+			Environ(_
+			&quot;HOME&quot;) &amp; &quot;/Library/Python&quot;)
+		Case Else
+			fbLocalPythonDevKit = False
+		End Select
+End Function
+
+
 Function fbHaveNetworkTTS() As Boolean
 	&apos; See: &lt;https://github.com/pndurette/gTTS&gt;
 	&apos; 
-	fbHaveNetworkTTS = False
+	fbHaveNetworkTTS = Len(fsGetPipLibPath(&quot;gtts&quot;)) &lt;&gt; 0
+	If fbHaveNetworkTTS Then
+		Exit Function
+	End If
 	Dim x# : x = 0
 	Dim home$ : home = Environ(&quot;HOME&quot;)
 	Dim Tokens : Tokens = Array(_
@@ -5762,6 +5883,29 @@ Function fsMyFfmpeg() As String
 End Function
 
 
+Function fsGetPath(app As String) As String
+	&apos; Use the system path to select a complete application URI
+	&apos; or return `&apos;&apos;` if the application isn&apos;t in the path.
+	&apos; Most platforms let you add and remove paths in the
+	&apos; system user&apos;s &quot;PATHS&quot; list.
+	FsGetPath = &quot;&quot;
+	Dim spliter$ : spliter = &quot;:&quot;
+	If fsGetOS() = &quot;WINDOWS&quot; Then
+		spliter = &quot;;&quot;
+	End If
+	Dim a1 : a1 = split(Environ(&quot;PATH&quot;), spliter)
+	Dim n# : n = 0
+	Dim prueba$ : prueba = &quot;&quot;
+	For n = Lbound(a1) To Ubound(a1)
+		prueba = ConvertToURL(a1(n)) &amp; &quot;/&quot; &amp; app
+		If FileExists(prueba) Then
+			FsGetPath = prueba
+			Exit Function
+		End If
+	Next
+End Function
+
+
 Function fsFindAppPath(sa) As String
 	&apos; Given an Application subpath in the form
 	&apos; `fsFindAppPath(&quot;Adobe/Adobe Digital Editions 4.5/DigitalEditions.exe&quot;)`
@@ -5824,8 +5968,11 @@ Function fsFindAppPath(sa) As String
 			End If
 		Next
 	End If
+	fsFindAppPath = fsGetPath(sa)
 End Function
-
+sub xxxxx
+	print(&quot;C:\Program Files\LibreOffice\program\python.exe&quot;)
+end sub
 
 Function vlcPath() As String
 	Select Case fsGetOS()
@@ -5982,7 +6129,7 @@ End Function
 
 
 Sub resetSpeechDispatcher( _
-	Optional bAll As Boolean)
+	bAll As Boolean)
 &apos;&apos; # Stopping Speech
 &apos;&apos; 
 &apos;&apos; To stop speech, click the Read selection button while the voice is 
@@ -6025,48 +6172,42 @@ Sub resetSpeechDispatcher( _
 &apos;&apos; [fvTts1]: https://www.unix.com/man-page/all/1/speech-dispatcher/
 &apos;&apos;
 	Dim a1
-	Dim i#
-	i = 0
+	Dim i# : i = 0
 	Dim errorCode
 	Dim oBar
 	Dim oFrame
 	Dim sTemp
 	
-	If ismissing(bAll) Then
-		bAll = False
-	End If
 	On Error Resume Next
 	oFrame = ThisComponent.getCurrentController().getFrame()
 	oBar = oFrame.createStatusIndicator()
 	oBar.start(fsLookUpTerm(&quot;s_read-text&quot;), 100)
 	oBar.Value = 70
 	On Error Goto resetSpeechDispatcherErr
-	If fsGetOS() = &quot;WINDOWS&quot; Then
+    Select Case fsGetOS()
+    	Case &quot;WINDOWS&quot;
 		If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
 			kill fsMyTempLock(&quot;lock&quot;)
-		End If
-	ElseIf fsGetOS() = &quot;MacOS&quot; Then
+		End if
+
+    	Case &quot;MacOS&quot;
 		If fileexists(&quot;/usr/bin/say&quot;) Then
 			If Not (fbCreatingMacOSMediaFile()) Then
-				If fileexists(&quot;/usr/bin/killall&quot;) Or fileexists(&quot;/usr/local/bin/killall&quot;) Then
-					errorCode = Shell(&quot;killall&quot;,0,&quot;say&quot;,True)
-				End If
+				errorCode = Shell(&quot;killall&quot;, 0, &quot;say&quot;, True)
+				errorCode = Shell(&quot;killall&quot;, 0, &quot;afplay&quot;, True)
 				If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
 					kill fsMyTempLock(&quot;lock&quot;)
 				End If
 			End If
 		End If
-	ElseIf fsGetOS() = &quot;UNIX&quot; And ( _
-		fileexists( _
-		&quot;/usr/bin/killall&quot;) Or _
-		fileexists( _
-		&quot;/usr/local/bin/killall&quot;)) Then
+
+    	Case Else  &apos; UNIX
 		If fileexists(&quot;/usr/bin/spd-say&quot;) Or _
 			fileexists(&quot;/usr/local/bin/spd-say&quot;) Then
 			If bAll Then
-				errorCode = Shell(&quot;killall&quot;,0,&quot;--quiet speech-dispatcher&quot;,True)
+				errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet speech-dispatcher&quot;, True)
 			Else
-				errorCode = Shell(&quot;spd-say&quot;,0,&quot;--cancel&quot;,True)
+				errorCode = Shell(&quot;spd-say&quot;, 0, &quot;--cancel&quot;, True)
 			End If
 		End If
 		
@@ -6077,6 +6218,7 @@ Sub resetSpeechDispatcher( _
 			&apos; Check players before synthesizers.
 			a1 = Array( _
 			&quot;gst-launch-1.0&quot;, _
+			&quot;afplay&quot;, _
 			&quot;aplay&quot;, _
 			&quot;artsplay&quot;, _
 			&quot;esdplay&quot;, _
@@ -6088,17 +6230,20 @@ Sub resetSpeechDispatcher( _
 			&quot;espeak&quot;, _
 			&quot;espeak-ng&quot;, _
 			&quot;festival&quot;, _
+			&quot;festvox&quot;, _
 			&quot;padsp&quot;, _
 			&quot;pico2wave&quot;, _
-			&quot;say&quot;, _
 			&quot;speak_ng&quot;, _
 			&quot;text2wave&quot;)
 			For i = LBound(a1) To UBound(a1)
 				If fileexists(&quot;/usr/bin/&quot; &amp; a1(i)) Or _
 					fileexists(&quot;/usr/local/bin/&quot; &amp; a1(i)) Then
-					errorCode = Shell(&quot;killall&quot;,0,&quot;--quiet &quot; &amp; a1(i),True)
+					errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet &quot; &amp; a1(i), True)
 				End If
 			Next
+			If fbHaveNetworkTTS() And fileexists(&quot;/usr/bin/vlc&quot;) Then
+				errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet vlc&quot;, True)
+			End If
 		End If
 		If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
 			kill fsMyTempLock(&quot;lock&quot;)
@@ -6106,7 +6251,8 @@ Sub resetSpeechDispatcher( _
 		If fileexists(fsTemporaryTextDoc() &amp; &quot;.sable&quot;) Then
 			kill fsTemporaryTextDoc() &amp; &quot;.sable&quot;
 		End If
-	End If
+
+    End Select
 	If fileexists(fsTemporaryTextDoc()) Then
 		kill fsTemporaryTextDoc()
 	End If
@@ -6198,7 +6344,7 @@ Function fbCreatingMediaFile( _
 		For n = LBound(aA) To UBound(aA)
 			If aA(n) = &quot;&quot; Then
 				Exit For
-			ElseIf InStr(sB, aA(n)) &gt; 0 Then
+			ElseIf InStr(sB, aA(n)) &lt;&gt; 0 Then
 				fbCreatingMediaFile = True
 				Exit For
 			End If
@@ -6404,7 +6550,7 @@ Function fsThisDocGenre() As String
 	Else
 		If fsGetLanguage() = &quot;en&quot; Then
 			&apos; Use language and region
-			sB = isoToEnglish( fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry)
+			sB = isoToEnglish(fsSelectionLanguageAndRegion(True))
 		Else
 			&apos; Use lookup table for language
 			&apos; Use language and region for Traditional Chinese (zh-TW)
@@ -6860,13 +7006,13 @@ Function fsExportAlbumCover( _
 		iScale = 28000 / 600
 	End If
 	If ismissing(sPath) Then
-		sPath = converttourl(fsGetHomeDir) &amp; fsSelectionLanguage &amp; _
+		sPath = converttourl(fsGetHomeDir) &amp; fsSelectionLanguage() &amp; _
 		&quot;/poster-&quot; &amp; _
 		Right(&quot;000&quot; &amp; _
 		Trim(str(fiMyCurrentAudioTrack(False))), 3) &amp; _
 		&quot;.jpg&quot;
 	ElseIf sPath = &quot;&quot; Then
-		sPath = converttourl(fsGetHomeDir) &amp; fsSelectionLanguage &amp; _
+		sPath = converttourl(fsGetHomeDir) &amp; fsSelectionLanguage() &amp; _
 		&quot;/poster-&quot; &amp; _
 		Right(&quot;000&quot; &amp; _
 		Trim(str(fiMyCurrentAudioTrack(False))), 3) &amp; _
@@ -6883,7 +7029,7 @@ Function fsExportAlbumCover( _
 		
 		&apos; Make sure we have a writable folder
 		&apos;on error goto ExportAlbumCoverErr
-		fbCreateFile(sPath &amp; &quot;.txt&quot; , fsAppSignature(), &quot;utf-8&quot;)
+		CreateFile(sPath &amp; &quot;.txt&quot; , fsAppSignature(), &quot;UTF-8&quot;)
 		If fileexists(sPath &amp; &quot;.txt&quot;) Then
 			kill sPath &amp; &quot;.txt&quot;
 			If fileexists(sPath) Then
@@ -7108,7 +7254,7 @@ Function fsTrimSpecial( _
 	s1 = &quot;&quot;
 	s2 = &quot;&quot;
 	For n = 1 To Len(sTrim)
-		If InStr(sA, Mid(sTrim, n, 1)) &gt; 0 Then
+		If InStr(sA, Mid(sTrim, n, 1)) &lt;&gt; 0 Then
 			s2 = s2 &amp; Mid(sTrim, n, 1)
 		End If
 	Next
@@ -7165,16 +7311,16 @@ Function fsGetTopicSentence( _
 			&apos; as an aside, quote or intermission slide; not
 			&apos; a topic sentence.
 			s1 = &quot;&quot;
-		ElseIf InStr(sA, &quot;. &quot;) &gt; 0 Then
+		ElseIf InStr(sA, &quot;. &quot;) &lt;&gt; 0 Then
 			a1 = Split(sA, &quot;.&quot;)
 			s1 = fsQuickTitle(100, 200, a1(LBound(a1)) &amp; &quot;.&quot;)
-		ElseIf InStr(sA, &quot;? &quot;) &gt; 0 Then
+		ElseIf InStr(sA, &quot;? &quot;) &lt;&gt; 0 Then
 			a1 = Split(sA, &quot;?&quot;)
 			s1 = fsQuickTitle(100, 200, a1(LBound(a1)) &amp; &quot;?&quot;)
-		ElseIf InStr(sA, &quot;! &quot;) &gt; 0 Then
+		ElseIf InStr(sA, &quot;! &quot;) &lt;&gt; 0 Then
 			a1 = Split(sA, &quot;!&quot;)
 			s1 = fsQuickTitle(100, 200, a1(LBound(a1)) &amp; &quot;!&quot;)
-		ElseIf InStr(sA, &quot;?&quot;) &gt; 0 Then
+		ElseIf InStr(sA, &quot;?&quot;) &lt;&gt; 0 Then
 			&apos; IDEOGRAPHIC FULL STOP (Asian period symbol)
 			a1 = Split(sA, &quot;?&quot;)
 			s1 = fsQuickTitle(100, 200, a1(LBound(a1)) &amp; &quot;?&quot;)
@@ -7914,18 +8060,18 @@ Function fbHasAsianCharacters( _
 		b1 = False
 	Else
 		s1 = converttourl(Left(Trim(sA), 100))
-		If InStr(s1, &quot;%8&quot;) &gt; 0 Then
+		If InStr(s1, &quot;%8&quot;) &lt;&gt; 0 Then
 			b1 = True
-		ElseIf InStr(s1, &quot;%9&quot;) &gt; 0 Then
+		ElseIf InStr(s1, &quot;%9&quot;) &lt;&gt; 0 Then
 			&apos; zh , ja
 			b1 = True
-		ElseIf InStr(s1, &quot;%A&quot;) &gt; 0 Then
+		ElseIf InStr(s1, &quot;%A&quot;) &lt;&gt; 0 Then
 			&apos; zh, ja
 			b1 = True
-		ElseIf InStr(s1, &quot;%B&quot;) &gt; 0 Then
+		ElseIf InStr(s1, &quot;%B&quot;) &lt;&gt; 0 Then
 			&apos; zh, ja
 			b1 = True
-		ElseIf InStr(s1, &quot;%E&quot;) &gt; 0 Then
+		ElseIf InStr(s1, &quot;%E&quot;) &lt;&gt; 0 Then
 			&apos; ko
 			b1 = True
 		Else
@@ -7949,7 +8095,7 @@ Function fbHasRTLMarker( _
 		b1 = False
 	Else
 		s1 = converttourl(Left(Trim(sA), 15))
-		If InStr(s1, &quot;%D8&quot;) &gt; 0 Then
+		If InStr(s1, &quot;%D8&quot;) &lt;&gt; 0 Then
 			b1 = True
 		End If
 	End If
@@ -7970,7 +8116,7 @@ Function fbHasLTRMarker( _
 		b1 = False
 	Else
 		s1 = converttourl(Left(Trim(sA), 15))
-		If InStr(s1, &quot;%E0&quot;) &gt; 0 Then
+		If InStr(s1, &quot;%E0&quot;) &lt;&gt; 0 Then
 			b1 = True
 		End If
 	End If
@@ -8058,7 +8204,6 @@ Sub addBubbleToSlide( _
 	Optional ByVal lBackgroundColor, _
 	Optional ByVal lcharacterColor, _
 	Optional ByVal sMacroBookMark)
-	&apos;    print 100, width, height
 	&apos; Add bubble to slide
 	&apos; -------------------
 	&apos;
@@ -8289,7 +8434,7 @@ Function fsReleasenotesCMD( _
 			Exit For
 		Else
 			fsReleasenotesCMD = fsReleasenotesCMD &amp; &quot;;&quot; &amp; s5
-			If InStr(sA, &quot;,&quot;) &lt; 1 Then
+			If InStr(sA, &quot;,&quot;) &lt;&gt; 0 Then
 				webhelp(converttourl(fsGetHomeDir &amp; _
 				a1(LBound(a1)) &amp; _
 				&quot;.markdown&quot;))

@@ -93,6 +93,7 @@ def read_string_aloud(_name='', _rate=0, speechString=''):
     try:
         dummy = bool(pyttsx)
     except NameError:
+        print("FAIL: The `pyttsx` python library is not available.")
         usage()
         sys.exit(2)
     try:
@@ -111,7 +112,7 @@ def read_string_aloud(_name='', _rate=0, speechString=''):
     engine.runAndWait()
 
 
-def main():
+def main():  # -> NoReturn
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hvr",
                                    ["help", "voice=", "rate="])

@@ -56,21 +56,98 @@ Function fsFullPathOf( _
 End Function
 
 
-Function LinuxPythonPath() As String
-	Dim a1
+Function fsGetHomePyVer(home As String) As String
+	fsGetHomePyVer = &quot;&quot;
+	Dim sub_dirs$ : sub_dirs = fsSubDirectories(home)
 	Dim x# : x = 0
-	LinuxPythonPath = &quot;&quot;
+	Dim a1 As Variant : a1 = split(sub_dirs, Chr(13))
+	For x = Lbound(a1) to Ubound(a1)
+		If a1(x) &lt;&gt; &quot;Current&quot; Then
+			fsGetHomePyVer = a1(x)
+			Exit Function
+		End If
+	Next
+End Function
+
+
+Function fsMacPythonVersion()
+	fsMacPythonVersion = &quot;&quot;
+	If fsGetOS() &lt;&gt; &quot;MacOS&quot; Then
+		Exit Function
+	End If
+	Dim home$ : home = &quot;/Applications/LibreOffice.app/Contents/Frameworks/LibreOfficePython.framework/Versions&quot;
+	fsMacPythonVersion = fsGetHomePyVer(home)
+End Function
+
+
+Function fsLinux64PythonLib() As String
+	&apos; Find location of the fedora python library
+	fsLinux64PythonLib = &quot;&quot;
+	Dim home$ : home = &quot;/usr/lib64&quot;
+	Dim sub_dirs$ : sub_dirs = fsSubDirectories(home)
+	Dim a1 As Variant : a1 = Split(sub_dirs, Chr(13))
+	Dim x# : x = 0
+	For x = Lbound(a1) To Ubound(a1)
+		if instr(a1(x), &quot;python&quot;) = 1 Then
+			 fsLinux64PythonLib = home &amp; &quot;/&quot; &amp; a1(x)
+			 Exit Function
+		End If
+	Next
+End Function
+
+
+Function PosixPythonPath() As String
+	&apos; On MacOS, if you want to use pip3 libraries, the
+	&apos; version of the system python or the developer
+	&apos; python needs to match the LibreOffice python
+	&apos; major and minor versions (i. e.: `3.8` for
+	&apos; LibreOffice 7.3). Otherwise you can only use the
+	&apos; built-in libraries included with LibreOffice
+	&apos; python. (i.e. : `(SPD_READ_TEXT_PY)` works)
+	&apos;
+	&apos; Linux LibreOffice installations use the system
+	&apos; version of python3, and pip3 just works
+	Dim a0 As Variant
+	Dim a1 As Variant
+	Dim x# : x = 0
+	Dim y# : y = 0
+	Dim py_ver$ : py_ver = fsMacPythonVersion()
+	PosixPythonPath = &quot;&quot;
 	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
-		LinuxPythonPath = fsAppImageResourcePath(&quot;python&quot;)
+		PosixPythonPath = fsAppImageResourcePath(&quot;python&quot;)
 	Else
-		a1 = Array(&quot;python3&quot;, &quot;python&quot;, &quot;python2.7&quot;, &quot;python2&quot;)
-		For x = Lbound(a1) To Ubound(a1)
-	 		If fileexists(&quot;/usr/bin/&quot; &amp; a1(x)) Then
-				LinuxPythonPath = &quot;/usr/bin/&quot; &amp; a1(x)
-				Exit Function
-			End If
+		Select Case Len(py_ver)
+			Case 0
+			a0 = Array(&quot;/usr&quot;)
+			a1 = Array(&quot;python3&quot;, &quot;python&quot;)
+			Case Else
+			&apos; [developer, system, LibreOffice]
+			a0 = Array(_
+			&quot;/Library/Frameworks/Python.framework/Versions/&quot; &amp; py_ver, _
+			&quot;/usr&quot;, _
+			&quot;/Applications/LibreOffice.app/Contents/Frameworks/LibreOfficePython.framework/Versions/&quot; &amp; py_ver)
+			a1 = Array(&quot;python&quot; &amp; py_ver, &quot;python3&quot;)
+		End Select
+		
+		For y = Lbound(a0) to Ubound(a0)
+			For x = Lbound(a1) To Ubound(a1)
+				If fileexists(a0(y) &amp; &quot;/bin/&quot; &amp; a1(x)) Then
+					PosixPythonPath = a0(y) &amp; &quot;/bin/&quot; &amp; a1(x)
+					Exit Function
+				End If
+			Next
 		Next
 	End If
+End Function
+
+
+Function fbOsaScriptOk() As Boolean
+	&apos; Return `True` if MacOS `osascript` is executable
+	On Error GoTo fbOsaScriptOkErr
+	fbOsaScriptOk = Shell(&quot;osascript&quot;, 0, &quot;--help&quot;) = 0
+	Exit Function
+	fbOsaScriptOkErr:
+	fbOsaScriptOk = False
 End Function
 
 
@@ -86,17 +163,21 @@ Function fvTts_config_createDefaultConfig( _
 		&apos; Windows
 		config(fiFestivalOption()) = False
 		If fileexists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) Then
-			config(fiFestivalPath()) = fsProgramDirectoryx86 &amp; &quot;festival\festival.exe&quot;
+			config(fiFestivalPath()) = fsProgramDirectoryx86() &amp; &quot;festival\festival.exe&quot;
 		Else
- 			config(fiFestivalPath()) = fsProgramDirectory &amp; &quot;festival\festival.exe&quot;
+ 			config(fiFestivalPath()) = fsProgramDirectory() &amp; &quot;festival\festival.exe&quot;
 		End If
 		config(fiFestivalComboChoice()) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
 		config(fiExternalOption()) = True
 		config(fiHtmlOption()) = False
 		config(fiSmartSelectCheckBox()) = 0
 		config(fiHtmlComboURL()) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
-		config(fiExternalProgramPath()) = WinSpeechProgramPath()
-		config(fiExternalCommand()) = WinSpeechArgument()
+		If Len(WinSpeechProgramPath()) = 0 Then
+			config(fiExternalProgramPath()) = &quot;wscript.exe&quot;
+		Else
+			config(fiExternalProgramPath()) = WinSpeechProgramPath()
+		End If
+			config(fiExternalCommand()) = WinSpeechArgument()
 		config(fiAlwaysShowDialogCheckBox()) = 1
 		config(fiDialogLanguageCombo()) = fsGetLanguage()
 	Else
@@ -110,25 +191,21 @@ Function fvTts_config_createDefaultConfig( _
 		config(fiHtmlComboURL()) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
 		If fsGetOS() = &quot;UNIX&quot; Then
 			&apos; Linux
-			If Len(LinuxPythonPath()) &lt;&gt; 0 Then
-				config(fiExternalProgramPath()) = LinuxPythonPath()
+			If Len(PosixPythonPath()) &lt;&gt; 0 Then
+				config(fiExternalProgramPath()) = PosixPythonPath()
 			Else
 				config(fiExternalProgramPath()) = &quot;/usr/bin/python&quot;
 			End If
-			If fileexists(&quot;/usr/bin/pico2wave&quot;) Then
+			If Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0 Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf fileexists(&quot;/usr/bin/text2wave&quot;) Or fileexists(&quot;/usr/bin/flite&quot;) Then
+			ElseIf Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or Len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf fileexists(&quot;/usr/bin/open_jtalk&quot;) And fsGetLanguage() = &quot;ja&quot; Then
+			ElseIf Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 And fsGetLanguage() = &quot;ja&quot; Then
 				&apos; Japanese
 				config(fiExternalCommand()) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
-			&apos;ElseIf fbHaveNetworkTTS() And fsGetLanguage() = &quot;ca&quot; Then
-			&apos;	&apos; Catalan
-			&apos;	config(fiExternalCommand()) = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-			&apos;	&quot;--language=(SELECTION_LANGUAGE_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf fileexists(environ(&quot;HOME&quot;) &amp; _
 				&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or fileexists( _
 				environ(&quot;HOME&quot;) &amp; _
@@ -148,8 +225,15 @@ Function fvTts_config_createDefaultConfig( _
 			End If
 		Else
 			&apos;Mac (MacOS)
-			config(fiExternalProgramPath()) = AppleScriptPath()
-			config(fiExternalCommand()) = &quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
+			If fbOsaScriptOk() And fbHaveItunes() Then
+				config(fiExternalProgramPath()) = AppleScriptPath()
+				config(fiExternalCommand()) = &quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
+			Else
+				config(fiExternalProgramPath()) = PosixPythonPath()
+				config(fiExternalCommand()) =  &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
+				&quot; --voice &quot;&quot;AUTO&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
+			End If
 		End If
 		config(fiAlwaysShowDialogCheckBox()) = 1
 		config(fiDialogLanguageCombo()) = fsGetLanguage()
@@ -259,9 +343,6 @@ Sub tts_config_parseFile( _
 	Dim l As String
 	Dim key As String
 	Dim value As String
-	Dim n1 As Integer
-	Dim n2 As Integer
-	Dim sAppPython As String
 	
 	CR = Chr(13)
 	CR2 = Chr(10)
@@ -289,20 +370,21 @@ Sub tts_config_parseFile( _
 				config(fiExternalOption()) = fbTts_util_stringToBoolean(value)
 				
 				Case &quot;text-to-speech.espeak.path.string&quot;
-				If fsGetOS() = &quot;UNIX&quot; Then
+				Select Case fsGetOS()
+					Case &quot;UNIX&quot;, &quot;MacOS&quot;
 					If InStr(value, &quot;/python&quot;) &lt;&gt; 0 Then
 						&apos; Since users sometimes use both containers and native
 						&apos; apps, we update the location of the python to use.
 						&apos; For example, AppImage programs usually create a mount
 						&apos; point in the `/tmp/` temporary that includes a version of
 						&apos; python that might be incompatible with the system python.
-						config(fiExternalProgramPath()) = LinuxPythonPath()
+						config(fiExternalProgramPath()) = PosixPythonPath()
 					Else
 						config(fiExternalProgramPath()) = value
 					End If
-				Else
+					Case Else
 					config(fiExternalProgramPath()) = value
-				End If
+					End Select
 				Case &quot;text-to-speech.espeak.options.string&quot;
 				config(fiExternalCommand()) = value
 				
@@ -349,7 +431,7 @@ Function fsSuperTrim( _
 		sA = Trim(sA)
 		If Len(sA) = 0 Then
 			Exit For
-		ElseIf Instr(unwanted_chrs, Right(sA, 1)) &gt; 0 Then
+		ElseIf Instr(unwanted_chrs, Right(sA, 1)) &lt;&gt; 0 Then
 			sA = Left(sA, Len(sA) - 1)
 			sA = Trim(sA)
 		Else
@@ -360,7 +442,7 @@ Function fsSuperTrim( _
 		sA = Trim(sA)
 		If Len(sA) = 0 Then
 			Exit For
-		ElseIf Instr(unwanted_chrs, Left(sA, 1)) &gt; 0 Then
+		ElseIf Instr(unwanted_chrs, Left(sA, 1)) &lt;&gt; 0 Then
 			sA = Mid(sA, 2)
 			sA = Trim(sA)
 		Else

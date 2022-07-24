@@ -128,7 +128,7 @@ def espeak_path():  # -> str
 
 
 def espkread(_text_path, _lang, _visible, _audible, _tmp0, _image, _title,
-             _post_process, _author, _dimensions, _ipitch, _irate):
+             _post_process, _author, _dimensions, _ipitch, _irate):  # -> int
     '''
 Creates a temporary speech-synthesis sound file and optionally
 reads the file aloud.
@@ -358,15 +358,15 @@ reads the file aloud.
             ])
         elif bool(readtexttools.gst_plugin_path('libgstespeak')):
             if not readtexttools.have_posix_app('gst-launch-1.0'):
-                return False
+                return 0
             elif os.path.isfile(readtexttools.get_my_lock('lock')):
                 # User requested play, but action is locked
-                return False
+                return 0
             elif bool(
                     _imported_meta.execute_command(
                         'ps -a | grep gst-launch-1.0')):
                 # Program is currently running;
-                return False
+                return 0
             # Fall back - no application found, so use gst-launch to synthesise
             # text from the text file.
             _app = 'gst-launch-1.0'
@@ -376,26 +376,27 @@ reads the file aloud.
             )
             _post_process = None
         if not bool(_app):
-            return False
+            return 0
         readtexttools.my_os_system(_command)
         if not bool(_post_process):
             readtexttools.unlock_my_lock()
         elif _post_process == "process_wav_media":
             if os.path.getsize(_work_file) == 0:
-                return False
-            return bool(
-                readtexttools.process_wav_media(_title, _work_file, _image,
-                                                _out_file, _audible, _visible,
-                                                _author, _dimensions))
+                return 0
+            if bool(readtexttools.process_wav_media(_title, _work_file, _image,
+                                                    _out_file, _audible, _visible,
+                                                    _author, _dimensions)):
+                return readtexttools.sound_length_seconds(_work_file)
         elif _post_process == "show_sound_length_seconds":
+            _seconds = readtexttools.sound_length_seconds(_work_file)
             print("show_sound_length_seconds")
-            print(readtexttools.sound_length_seconds(_work_file))
+            print(_seconds)
             print("-----------------------------------------------------")
-            return True
+            return _seconds
     except IOError:
         print('I was unable to use espeak and read text tools!')
         usage()
-        return False
+        return 0
 
 
 def _espeak_rate(sA):
@@ -463,7 +464,7 @@ def _espeak_pitch(sA):
     return _myval
 
 
-def main():
+def main():  # -> NoReturn
     '''Use espeak or espeak-ng'''
     _xml_tool = readtexttools.XmlTransform()
     _ipitch = 50

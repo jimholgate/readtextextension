@@ -53,6 +53,7 @@ import aifc
 import codecs
 import getopt
 import glob
+import locale
 import math
 import mimetypes
 import os
@@ -63,6 +64,11 @@ import time
 
 try:
     import dbus
+except ImportError:
+    pass
+
+try:
+    import site
 except ImportError:
     pass
 
@@ -109,6 +115,45 @@ except ImportError:
     pass
 
 from xml.etree.ElementTree import TreeBuilder
+
+
+def write_plain_text_file(_file_path='',
+                          _body_text='',
+                          scodeco='utf-8'):  # -> bool
+    '''
+    Create a plain text file.
+    `write_plain_text_file("/path/file.txt", "Hello world", "utf-8")`
+    '''
+    if not bool(_file_path):
+        return False
+    try:
+        try:
+            os.remove(_file_path)
+        except:
+            pass
+        writer = codecs.open(_file_path,
+                             mode='w',
+                             encoding=scodeco,
+                             errors='replace')
+        writer.write(_body_text)
+        writer.close()
+    except:
+        print('`write_plain_text_file` error in readtexttools.py')
+    return os.path.isfile(_file_path)
+
+
+def get_temp_prefix():  # -> str
+    '''
+    Returns path to temporary directory plus a filename prefix.
+    Need to supply an extension to determine the context - i.e:
+     -sound.wav for sound
+     -image.png for image
+    '''
+    if os.name == 'nt':
+        return os.path.join(os.getenv('TMP'), os.getenv('USERNAME'))
+    elif os.path.isfile('/usr/bin/say'):
+        return os.path.join(os.getenv('TMPDIR'), os.getenv('USER'))
+    return os.path.join('/tmp', os.getenv('USER'))
 
 
 class XmlTransform(object):
@@ -316,6 +361,24 @@ def app_release():  # -> str
     '''
     return '0.9.2'
 
+def default_lang():  # -> str
+    '''Returns the system language in the form `en_US`'''
+    _lang = ''
+    try:
+        _lang = os.getenv('LANG')
+    except AttributeError:
+        pass
+    if not bool(_lang):
+        try:
+            _lang = os.getenv('LANGUAGE')
+        except AttributeError:
+            pass
+    if not bool(_lang):
+        _lang = locale.getdefaultlocale()[0]
+    if _lang:
+        return _lang.split('.')[0].split(':')[0]
+    return ''
+
 
 def gst_plugin_path(plug_in_name='libgstvorbis'):  # -> str
     '''
@@ -334,7 +397,7 @@ def gst_plugin_path(plug_in_name='libgstvorbis'):  # -> str
         '/usr/lib64/'
     ]
     _ext = '.so'
-    if platform.uname()[0] == 'Darwin':
+    if os.path.isfile('/usr/bin/say'):
         _paths = [
             os.path.join(os.getenv('HOME'), '/'),
             os.getenv('GST_PLUGIN_PATH')
@@ -342,7 +405,7 @@ def gst_plugin_path(plug_in_name='libgstvorbis'):  # -> str
         _ext = '.dylib'
     elif os.name == 'nt':
         _paths = [
-            os.path.join(os.getenv('HOME'), '/'),
+            ''.join([os.getenv('USERPROFILE'), '\\']),
             os.path.join(os.getenv('HOMEDRIVE'), 'gstreamer-sdk', '/'),
             os.getenv('GST_PLUGIN_PATH'),
             os.path.join(os.getenv('HOMEDRIVE'), '/opt/')
@@ -377,7 +440,7 @@ class ExtensionTable(object):
         w_opus = None
         w_spx = None
         self.mime_video = False
-        self.ffmpeg = ffmpeg_path()
+        self.ffmpeg = ''
         self.extension = 0
         self.filter = 1
         self.standalone = 2
@@ -539,8 +602,6 @@ class ExtensionTable(object):
                 continue
             get_env = get_env.replace('\\', os_sep)
             for extension in executable_extensions:
-                if not application_search:
-                    continue
                 for application_search in application_searches:
                     common_app_executable = '%(get_env)s%(application_search)s%(application_executable)s%(extension)s' % locals(
                     )
@@ -567,6 +628,35 @@ class ExtensionTable(object):
                                         self.check_path_str(return_value))
         return ''
 
+
+def find_local_pip(lib_name='qrcode'): # -> str
+    '''If you installed a pip tool as a local user, then
+    return the library path, otherwise return `''` '''
+    if int(platform.python_version_tuple()[0]) < 3:
+        return ''
+    elif os.name == 'nt':
+        profile = os.getenv("LOCALAPPDATA")
+        path1 = os.path.join(profile, 'Programs\\Python\\')
+        path2 = '\\Lib\\site-packages'
+    elif os.path.isfile('/usr/bin/say'):
+        profile = os.getenv("HOME")
+        path1 = os.path.join(profile, 'Library/Python/')
+        path2 = '/lib/python/site-packages'
+    elif os.name == 'posix':
+        site_list = site.getsitepackages()
+        for site in site_list:
+            if os.getenv("PWD") in site and len(os.getenv) != 0:
+                if os.path.isdir(os.path.join(site, lib_name)):
+                    return site
+        return ''
+    py_path = ''
+    with os.scandir(path1) as it:
+        for entry in it:
+            if not entry.name.startswith('.') and entry.is_dir():
+                py_path = ''.join([path1, entry.name, path2, os.sep, lib_name])
+                if os.path.isdir(py_path):
+                    return ''.join([path1, entry.name, path2])
+    return ''
 
 def my_os_system(_command):  # -> bool
     '''
@@ -708,11 +798,11 @@ def pop_message(summary="Note",
             if bool(tkinter):
                 for tag in ['<b>', '</b>', '<i>', '</i>']:
                     msg = msg.replace(tag, ' ')
+                
                 tkinter.messagebox(summary, msg)
                 return True
-        except (NameError, ValueError):
+        except (AttributeError, NameError, ValueError):
             pass
-
     if have_posix_app('notify-send'):
         my_os_system(
             'notify-send -i "%(my_icon)s" -t %(m_sec)s "%(summary)s" "%(msg)s"'
@@ -747,7 +837,11 @@ def lax_mime_match(_wanted='', _testing=''):  # -> bool
     mimetypes.init()
     try:
         return mimetypes.types_map[_wanted] == mimetypes.types_map[_testing]
-    except [KeyError, NameError]:
+    except:
+        # Note: catching classes that do not inherit from BaseException
+        # is not allowed on some platforms, so allow a general exception.
+        # Different versions and platforms do not have the same coverage
+        # of mimetypes, so fall back to trivial match
         try:
             return _wanted.lower() == _testing.lower()
         except [AttributeError, NameError, TypeError]:
@@ -769,7 +863,7 @@ def ffmpeg_path():  # -> str
             get_nt_path('ffmpeg', 'ffmpeg'),
             get_nt_path('avconv', 'avconv.exe')
         ]
-    elif platform.uname()[0] == 'Darwin':
+    elif os.path.isfile('/usr/bin/say'):
         mvc = 'Miro Video Converter'
         paths = [
             '/usr/local/bin/ffmpeg',
@@ -781,20 +875,6 @@ def ffmpeg_path():  # -> str
         if os.path.isfile(path):
             return path
     return ''
-
-
-def get_temp_prefix():  # -> str
-    '''
-    Returns path to temporary directory plus a filename prefix.
-    Need to supply an extension to determine the context - i.e:
-     -sound.wav for sound
-     -image.png for image
-    '''
-    if os.name == 'nt':
-        return os.path.join(os.getenv('TMP'), os.getenv('USERNAME'))
-    elif platform.uname()[0] == 'Darwin':
-        return os.path.join(os.getenv('TMPDIR'), os.getenv('USER'))
-    return os.path.join('/tmp', os.getenv('USER'))
 
 
 def get_work_file_path(_work, _image, _type):  # -> str
@@ -986,7 +1066,7 @@ def process_wav_media(_title='untitled',
         return False
     _extension_table = ExtensionTable()
 
-    if not bool(_out) or not _extension_table.audio_extension_ok():
+    if not bool(_out) or not _extension_table.audio_extension_ok(_work):
         if os.path.isfile(get_my_lock('lock')):
             return True
         # ignore `_audible` status
@@ -2074,31 +2154,6 @@ def check_artist(_artist):  # -> str
         return _metas.get_my_id(False)
 
 
-def write_plain_text_file(_file_path='',
-                          _body_text='',
-                          scodeco='utf-8'):  # -> bool
-    '''
-    Create a plain text file.
-    `write_plain_text_file("/path/file.txt", "Hello world", "utf-8")`
-    '''
-    if not bool(_file_path):
-        return False
-    try:
-        try:
-            os.remove(_file_path)
-        except:
-            pass
-        writer = codecs.open(_file_path,
-                             mode='w',
-                             encoding=scodeco,
-                             errors='replace')
-        writer.write(_body_text)
-        writer.close()
-    except:
-        print('`write_plain_text_file` error in readtexttools.py')
-    return os.path.isfile(_file_path)
-
-
 def lock_my_lock():  # -> None
     '''
     Create a file that informs the world that the application.
@@ -2135,7 +2190,7 @@ def get_my_lock(_lock=''):  # -> str
         if os.name == 'nt':
             return os.path.join(env_path,
                                 app_sign + '.' + os.getenv('USERNAME') + p_lock)
-        elif platform.uname()[0] == 'Darwin':
+        elif os.path.isfile('/usr/bin/say'):
             if bool(os.getenv('USERNAME')):
                 return os.path.join(
                     env_path, app_sign + '.' + os.getenv('USERNAME') + p_lock)
@@ -2149,14 +2204,20 @@ def get_my_lock(_lock=''):  # -> str
     elif os.name == 'nt':
         return os.path.join(os.getenv('TMP'),
                             app_sign + '.' + os.getenv('USERNAME') + p_lock)
-    elif platform.uname()[0] == 'Darwin':
-        if bool(os.getenv('USERNAME')):
-            return os.path.join(os.getenv('TMPDIR'),
-                                app_sign + '.' + os.getenv('USERNAME') + p_lock)
+    elif os.path.isfile('/usr/bin/say'):
+        if bool(os.getenv("TMPDIR")):
+            mac_temp = os.getenv("TMPDIR")
+        elif bool(os.getenv("TMP")):
+            mac_temp = os.getenv("TMP")
         else:
-            # MacOS 11
-            return os.path.join(os.getenv('TMP'),
-                                app_sign + '.' + os.getenv('USER') + p_lock)
+            mac_temp = os.join(os.getenv("HOME"), "_temporary")
+        if bool(os.getenv("USERNAME")):
+            mac_user = os.getenv("USERNAME")
+        elif bool(os.getenv("USER")):
+            mac_user = os.getenv("USER")
+        else:
+            mac_user = "MacUser"
+        return os.path.join(mac_temp, app_sign + '.' + mac_user + p_lock)
     else:
         if os.path.isdir('/tmp') and os.access('/tmp', os.W_OK):
             return os.path.join('/tmp',
@@ -2178,7 +2239,7 @@ def show_with_app(_out):  # -> bool
     Same as double clicking the document - opens in default
     application.
     '''
-    if platform.uname()[0] == 'Darwin':
+    if os.path.isfile('/usr/bin/say'):
         # MacOS
         _command = 'open "%(_out)s"' % locals()
         my_os_system(_command)
@@ -2210,29 +2271,35 @@ def play_wav_no_ui(file_path=''):  # -> bool
     Opens using command line shell.
     '''
     _command = ''
-    if platform.uname()[0] == 'Darwin':
-        # MacOS
-        _command = 'afplay "%(file_path)s"' % locals()
-    elif os.name == 'nt':
+    a_app = 'System audio'
+    uri_path = path2url(file_path)
+    _extension_table = ExtensionTable()
+    if os.name == 'nt':
         # Windows
-        try:
-            import winsound
-            winsound.PlaySound(file_path,
-                               winsound.SND_FILENAME | winsound.SND_NOWAIT)
+        if os.path.splitext(file_path)[1].lower() in [
+            '.m4a', '.mp3', '.mp4', '.oga', '.ogg', '.opus', '.spx', '.webm']:
+            os.startfile(file_path)
             return True
-        except:
+        else:
             try:
-                os.startfile(file_path)
+                import winsound
+                winsound.PlaySound(file_path,
+                                winsound.SND_FILENAME | winsound.SND_NOWAIT)
                 return True
             except:
-                return False
+                try:
+                    os.startfile(file_path)
+                    return True
+                except:
+                    return False
     else:
         _apt_get = 0
         _app = 1
         _command = 2
         _universal_play = 3  # verified to play compressed formats
-        uri_path = path2url(file_path)
         players = [
+            ['afplay', 'afplay',  # Darwin
+             ' "%(file_path)s"' % locals(), True],
             ['esdplay', 'esdplay',
              ' "%(file_path)s"' % locals(), False],
             ['ossplay', 'ossplay',

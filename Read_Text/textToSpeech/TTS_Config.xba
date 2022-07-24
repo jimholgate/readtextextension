@@ -25,7 +25,7 @@ Sub ClearWorkingCountryLanguage()
 End Sub
 
 Sub SetWorkingCountryLanguage()
-	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = fsSelectionLanguageAndRegion()
+	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = fsSelectionLanguageAndRegion(True)
 End Sub
 
 Function fiMyCurrentAudioTrack( _
@@ -133,7 +133,7 @@ Sub ConfigureReadTextAloud()
 		End If
 		&apos;Now apply the settings to the dialog box
 		.GetControl(&quot;CheckBox1&quot;).Model.State = config(fiAlwaysShowDialogCheckBox())
-		If fbEnhancedRTVersion And fbClipBoardAvailable Then
+		If fbEnhancedRTVersion And fbClipBoardAvailable() Then
 			.GetControl(&quot;CheckBox2&quot;).Model.State = config(fiSmartSelectCheckBox())
 		Else
 			.GetControl(&quot;CheckBox2&quot;).Model.State = 0
@@ -212,45 +212,61 @@ End Sub
 
 Sub ttsUpdateCombo2a( _
 	bRefreshText)
-	If InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text), _
-		&quot;\wscript.exe&quot;) &gt; 0 Then
-		dialog1Combo2ShowSAPIChoices(f_dlgSpeechSetup)
-		&apos; Typical for Mac
-	ElseIf InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/say&quot;) &gt; 0 Then
-		dialog1Combo2ShowSAYChoices(f_dlgSpeechSetup)
-	ElseIf InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/osascript&quot;) &gt; 0 Then
-		dialog1Combo2ShowAppleScriptChoices(f_dlgSpeechSetup)
-		&apos; Typical for Linux
-	ElseIf InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;speak-ng&quot;) &gt; 0 Then
-		dialog1Combo2ShowESPEAKChoices(f_dlgSpeechSetup)
-	ElseIf InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;espeak-ng&quot;) &gt; 0 Then
-		dialog1Combo2ShowESPEAKChoices(f_dlgSpeechSetup)
-	ElseIf InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;espeak&quot;) &gt; 0 Then
-		dialog1Combo2ShowESPEAKChoices(f_dlgSpeechSetup)
-	ElseIf InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;festival&quot;) &gt; 0 Then
-		dialog1Combo2ShowFESTIVALChoices(f_dlgSpeechSetup)
-		&apos;Festival text2wav
-	ElseIf InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;text2wave&quot;) &gt; 0 Then
-		dialog1Combo2ShowTEXT2WAVEChoices(f_dlgSpeechSetup)
-	ElseIf InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;/bin/python&quot;) &gt; 0 Then
-		fiDialog1Combo2ShowMyPythonChoices(f_dlgSpeechSetup)
-	ElseIf InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;python.exe&quot;) &gt; 0 Then
-		fiDialog1Combo2ShowMyPythonChoices(f_dlgSpeechSetup)
-	ElseIf InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;/bin/open&quot;) &gt; 0 And _
-		fsGetOS() = &quot;MacOS&quot; Then
-		&apos;The system chooses an application to open the file or URL (See man: gnome-open and xdg-open)
-		&apos;There are some examples at https://ss64.com/MacOS/open.html and 
-		&apos;https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man1/open.1.html
-		dialog1Combo2ShowMEDIAChoices(f_dlgSpeechSetup)
-		&apos; You entered a media player
-	ElseIf fbIsAMediaPlayer(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text)) Then
-		dialog1Combo2ShowMEDIAChoices(f_dlgSpeechSetup)
-	Else
-		
-	End If
-	If bRefreshText And FileExists(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text) Then
-		f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).Model.Text = f_dlgSpeechSetup.GetControl(&quot;ComboBox2&quot;).GetItem(0)
-	End If
+    With f_dlgSpeechSetup
+		If InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text), _
+			&quot;\wscript.exe&quot;) &lt;&gt; 0 Then
+			dialog1Combo2ShowSAPIChoices(f_dlgSpeechSetup)
+			&apos; Typical for Mac
+		ElseIf InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/say&quot;) &lt;&gt; 0 Then
+			dialog1Combo2ShowSAYChoices(f_dlgSpeechSetup)
+		ElseIf InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/osascript&quot;) &lt;&gt; 0 Then
+			dialog1Combo2ShowAppleScriptChoices(f_dlgSpeechSetup)
+			&apos; Typical for Linux
+		ElseIf InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;speak-ng&quot;) &lt;&gt; 0 Then
+			dialog1Combo2ShowESPEAKChoices(f_dlgSpeechSetup)
+		ElseIf InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;espeak-ng&quot;) &lt;&gt; 0 Then
+			dialog1Combo2ShowESPEAKChoices(f_dlgSpeechSetup)
+		ElseIf InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;espeak&quot;) &lt;&gt; 0 Then
+			dialog1Combo2ShowESPEAKChoices(f_dlgSpeechSetup)
+		ElseIf InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;festival&quot;) &lt;&gt; 0 Then
+			dialog1Combo2ShowFESTIVALChoices(f_dlgSpeechSetup)
+			&apos;Festival text2wav
+		ElseIf InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;text2wave&quot;) &lt;&gt; 0 Then
+			dialog1Combo2ShowTEXT2WAVEChoices(f_dlgSpeechSetup)
+		ElseIf InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;/bin/python&quot;) &lt;&gt; 0 Then
+			If fsGetOS() = &quot;MacOS&quot; And fbIsLibreOffice() Then
+				&apos; Must use LibreOffice python			
+				.GetControl(&quot;FileControl2&quot;).Model.Text = PosixPythonPath()
+			End If
+			fiDialog1Combo2ShowMyPythonChoices(f_dlgSpeechSetup)
+		ElseIf InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;python.exe&quot;) &lt;&gt; 0 Then
+			fiDialog1Combo2ShowMyPythonChoices(f_dlgSpeechSetup)
+		ElseIf InStr(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;/bin/open&quot;) &lt;&gt; 0 And _
+			fsGetOS() = &quot;MacOS&quot; Then
+			&apos;The system chooses an application to open the file or URL (See man: gnome-open and xdg-open)
+			&apos;There are some examples at https://ss64.com/MacOS/open.html and 
+			&apos;https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man1/open.1.html
+			dialog1Combo2ShowMEDIAChoices(f_dlgSpeechSetup)
+			&apos; You entered a media player
+		ElseIf fbIsAMediaPlayer(LCase(.GetControl(&quot;FileControl2&quot;).Model.Text)) Then
+			dialog1Combo2ShowMEDIAChoices(f_dlgSpeechSetup)
+		Else
+			
+		End If
+		If bRefreshText And FileExists(.GetControl(&quot;FileControl2&quot;).Model.Text) Then
+			If fsGetOS() = &quot;MacOS&quot; And _
+			fbIsLibreOffice() And _
+			.GetControl(&quot;FileControl2&quot;).Model.Text = PosixPythonPath() Then
+				.GetControl(&quot;ComboBox2&quot;).Model.Text = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot;&quot; &amp; _
+				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			Else:
+				.GetControl( _
+				&quot;ComboBox2&quot;).Model.Text = .GetControl( _
+				&quot;ComboBox2&quot;).GetItem(0)
+			End If
+		End If
+    End With
 End Sub
 
 
@@ -315,13 +331,19 @@ End Sub
 
 Function fvCurrentDialogConfig() As Variant
 	Dim config(fiCountConfigOptions) As Variant
+	Dim file_control_2 As String
 	With f_dlgSpeechSetup
+		file_control_2 = .GetControl(&quot;FileControl2&quot;).Model.Text
+		If fsGetOS() = &quot;MacOS&quot; and fbIsLibreOffice() And _
+		Instr(file_control_2, &quot;/usr/python3&quot;) &lt;&gt; 0 Then
+			file_control_2 = PosixPythonPath()
+		End If
 		config(fiAlwaysShowDialogCheckBox()) = .GetControl(&quot;CheckBox1&quot;).model.State
 		config(fiSmartSelectCheckBox()) = .GetControl(&quot;CheckBox2&quot;).model.State
 		config(fiDialogLanguageCombo()) = .GetControl(&quot;ComboBox3&quot;).model.Text
 		config(fiExternalCommand()) = .GetControl(&quot;ComboBox2&quot;).model.Text
 		config(fiExternalOption()) = .GetControl(&quot;OptionButton2&quot;).Model.State
-		config(fiExternalProgramPath) = .GetControl(&quot;FileControl2&quot;).Model.Text
+		config(fiExternalProgramPath) = file_control_2
 		config(fiFestivalComboChoice()) = .GetControl(&quot;ComboBox1&quot;).model.Text
 		config(fiFestivalOption()) = .GetControl(&quot;OptionButton1&quot;).Model.State
 		config(fiFestivalPath()) = .GetControl(&quot;FileControl1&quot;).Model.Text
@@ -381,13 +403,9 @@ Sub AboutAddOn( _
 		.GetControl(&quot;ImageControl3&quot;).model.helpText = Left(fsGetTextSelection(False, False),99)
 		.GetControl(&quot;ImageControl3&quot;).model.ImageURL = fsSelectionLogo
 		
-		If fbIsWin64Program And (Not( _
-			fbClipBoardAvailable) Or _
-			(fsGetSetting( _
-			&quot;oosetupversion&quot;) = &quot;5.0&quot; And _
-			LCase( _
-			fsGetSetting( _
-			&quot;ooName&quot;)) = &quot;libreoffice&quot;)) Then
+		If fbIsWin64Program() Then
+			&apos; 2022 - If the clipboard is empty, then the program
+			&apos; might crash in Windows.
 			.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
 			.GetControl(&quot;ImageControl4&quot;).model.Enabled = False
 			.GetControl(&quot;Label2&quot;).model.Enabled = False
@@ -406,13 +424,10 @@ Sub AboutAddOn( _
 			s4, 99)
 			.GetControl(&quot;Label2&quot;).model.helpText = Left( _
 			s4, 99)
-			.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
+			.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo()
 			.GetControl(&quot;Label2&quot;).model.Label = Len(s4)
 		End If
-		If fileexists(s2 &amp; &quot;\Windows\SysWOW64\Speech\SpeechUX\sapi.cpl&quot;) Or _
-			fileexists(s2 &amp; &quot;\Windows\System32\Speech\SpeechUX\sapi.cpl&quot;) Or _
-			fileexists(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;) Or _
-			fileexists(fsProgramDirectory() &amp; &quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;) Then
+		If Len(WinSpeechProgramPath()) &lt;&gt; 0 Then
 			.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm2( _
 			&quot;s_speech-properties&quot;, s1)
 		Else
@@ -434,47 +449,43 @@ Sub AboutAddOn( _
 			sA = replaceLocalTokensWithStr(config(fiExternalCommand()))
 			sA = replacePublicTokensWithStr(sA)
 			.GetControl(&quot;TextField3&quot;).model.Text = &quot;&quot;&quot;&quot; &amp; config(fiExternalProgramPath) &amp; &quot;&quot;&quot; &quot; &amp; sA
-			If InStr(config(fiExternalCommand()),&quot;(TTS_WSCRIPT_VBS)&quot;) Then
+			If InStr(config(fiExternalCommand()),&quot;(TTS_WSCRIPT_VBS)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsVBSTextString()
-			ElseIf InStr(config(fiExternalCommand()),&quot;(SPD_READ_TEXT_PY)&quot;) Then
+			ElseIf InStr(config(fiExternalCommand()),&quot;(SPD_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsSPDTextString()
-			ElseIf InStr(config(fiExternalCommand()),&quot;(ESPEAK_READ_TEXT_PY)&quot;) Then
+			ElseIf InStr(config(fiExternalCommand()),&quot;(ESPEAK_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsEspeakTextString()
-			ElseIf InStr(config(fiExternalCommand()),&quot;(FESTIVAL_READ_TEXT_PY)&quot;) Then
+			ElseIf InStr(config(fiExternalCommand()),&quot;(FESTIVAL_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsFestivalTextString()
-			ElseIf InStr(config(fiExternalCommand()),&quot;(NETWORK_READ_TEXT_PY)&quot;) Then
+			ElseIf InStr(config(fiExternalCommand()),&quot;(NETWORK_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsPythonNetTtsTextString()
-			ElseIf InStr(config(fiExternalCommand()),&quot;(OPENJTALK_READ_TEXT_PY)&quot;) Then
+			ElseIf InStr(config(fiExternalCommand()),&quot;(OPENJTALK_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsOpenJtalkTextString()
-			ElseIf InStr(config(fiExternalCommand()),&quot;(PICO_READ_TEXT_PY)&quot;) Then
+			ElseIf InStr(config(fiExternalCommand()),&quot;(PICO_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsPicoTextString()
-			ElseIf InStr(config(fiExternalCommand()),&quot;(PYTTSX_READ_TEXT_PY)&quot;) Then
-				.GetControl(&quot;TextField2&quot;).model.Text = fsPyttsxTextString()
-			ElseIf InStr(config(fiExternalCommand()), &quot;(RHVOICE_READ_TEXT_PY)&quot;) Then
+			ElseIf InStr(config(fiExternalCommand()), &quot;(RHVOICE_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsRhVoiceTextString()
-			ElseIf InStr(config(fiExternalCommand()),&quot;(OS_PY)&quot;) Then
-				.GetControl(&quot;TextField2&quot;).model.Text = fsOSTextString()
-			ElseIf InStr(config(fiExternalCommand()),&quot;(CREATE_QR_LABEL_PY)&quot;) Then
+			ElseIf InStr(config(fiExternalCommand()),&quot;(CREATE_QR_LABEL_PY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsQRTextString()
-			ElseIf InStr(config(fiExternalCommand()),&quot;(SAY_APPLESCRIPT)&quot;) Then
+			ElseIf InStr(config(fiExternalCommand()),&quot;(SAY_APPLESCRIPT)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fswriteMacOSSpeechScript(&quot;&quot;, _
-				fsSelectionLanguageAndRegion(True))
-			ElseIf InStr(config(fiExternalCommand()),&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;) Then
+				fsSelectionLanguageAndRegion(True), &quot;&quot;)
+			ElseIf InStr(config(fiExternalCommand()),&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fswriteMacOSSpeechScript(&quot;-r 110 &quot;, _
-				fsSelectionLanguageAndRegion(True))
-			ElseIf InStr(config(fiExternalCommand()),&quot;(SAY_APPLESCRIPT_QUICKLY)&quot;) Then
+				fsSelectionLanguageAndRegion(True), &quot;&quot;)
+			ElseIf InStr(config(fiExternalCommand()),&quot;(SAY_APPLESCRIPT_QUICKLY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fswriteMacOSSpeechScript(&quot;-r 240 &quot;, _
-				fsSelectionLanguageAndRegion(True))
-			ElseIf InStr(config(fiExternalCommand()),&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;) Then
+				fsSelectionLanguageAndRegion(True), &quot;&quot;)
+			ElseIf InStr(config(fiExternalCommand()),&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fswriteMacOSSpeechScript(&quot;&quot;, _
-				&quot;&quot;)
+				&quot;&quot;, &quot;&quot;)
 			Else
 				.GetControl(&quot;TextField2&quot;).model.Text = &quot;&quot;
 			End If
 		Else &apos; if config(fiHtmlOption) then
 			sA = replacePublicTokensWithStr(config(fiHtmlComboURL()))
 			.GetControl(&quot;TextField3&quot;).model.Text = &quot;[com.sun.star.system.SystemShellExecute]&quot;
-			If InStr(sA,&quot;.google.&quot;) Then
+			If InStr(sA,&quot;.google.&quot;) &lt;&gt; 0 Then
 				sA = sA &amp; Chr(13) &amp; Chr(13) &amp; &quot;Powered by Google TM&quot;
 			End If
 			.GetControl(&quot;TextField2&quot;).model.Text = sA

@@ -16,7 +16,7 @@ of the selection as small as possible. Use less than 800 characters.
 Requires python 3.8 or newer.
 
     pip3 install qrcode
-    pip3 install pillow
+    pip3 install Pillow
 
 QR Code is registered trademark of DENSO WAVE INCORPORATED in the
 following countries: Japan, United States of America, Australia and
@@ -59,8 +59,19 @@ import readtexttools
 
 try:
     import qrcode
-except:
-    pass
+except ImportError:
+    if len(readtexttools.find_local_pip('qrcode')) != 0:
+        sys.path.append(readtexttools.find_local_pip('qrcode'))
+        try:
+            import qrcode
+        except:
+            print('''
+A python tool cannot find a library that it
+needs to create a QR code. Try 
+
+    pip3 install qrcode
+    pip3 install Pillow
+''')
 
 
 def usage():  # -> None
@@ -72,7 +83,7 @@ def usage():  # -> None
 Encode text in a QR Code image (png). Requires `qrcode`.
 
     pip3 install qrcode
-    pip3 install pillow
+    pip3 install Pillow
 
 Usage
 -----
@@ -191,7 +202,7 @@ def qrencode(_content='',
         return False
 
 
-def main():
+def main():  # -> NoReturn
     '''Get information for the QR code program'''
     _size = "3"
     _level = "M"

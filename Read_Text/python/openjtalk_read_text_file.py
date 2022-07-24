@@ -143,7 +143,7 @@ def openjtalk_read(_in_text='',
     return False
 
 
-def main():
+def main():  # -> NoReturn
     '''OpenJtalk read text tools'''
     _language = 'ja-JP'
     _output = ''

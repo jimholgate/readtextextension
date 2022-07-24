@@ -62,10 +62,13 @@ RhVoice Speech Synthesis
 Reads a text file using a synthetic voice and a media player
 like ffmpeg or avconv.  Voices are available for
 
+* Albanian
 * Brazilian-Portuguese
 * English
 * Esperanto
 * Kyrgyz
+* Macedonian
+* Polish
 * Russian
 * Tatar
 * Ukrainian
@@ -131,6 +134,13 @@ class RhVoiceClass(object):
         self.ok = True
         self.app = 'RHVoice-test'
         self.domain_table = [
+            {
+                'package': 'Albanian',
+                'sample': 'Përshëndetje. Unë jam një zë i sistemit shqiptar.',
+                'iso_code': 'AL',
+                'lang1': 'sq',
+                'voices': ["hana"]
+            },
             {
                 'package': 'Brazilian-Portuguese',
                 'sample': 'Olá. Eu sou a voz portuguesa do sistema.',
@@ -232,11 +242,25 @@ class RhVoiceClass(object):
                 'voices': ["spomenka"]  # Western European letters.
             },
             {
+                'package': 'Macedonian',
+                'sample': 'Здраво. Јас сум глас на македонскиот систем.',
+                'iso_code': 'MK',
+                'lang1': 'mk',
+                'voices': ["kiko", "suze"]
+            },
+            {
                 'package': 'Kyrgyz',
                 'sample': 'Салам. Мен системанын кыргыз үнүмун.',
                 'iso_code': 'KG',
                 'lang1': 'ky',
                 'voices': ["azamat", "nazgul"]
+            },
+            {
+                'package': 'Polish',
+                'sample': 'Witam. Jestem polskim głosem systemowym.',
+                'iso_code': 'PL',
+                'lang1': 'pl',
+                'voices': ["magda", "natan"]
             },
             {
                 'package': 'Russian',
@@ -257,7 +281,7 @@ class RhVoiceClass(object):
                 'sample': 'Привет. Я украинский голос системы.',
                 'iso_code': 'UA',
                 'lang1': 'uk',
-                'voices': ["anatol", "natalia"]
+                'voices': ["anatol", "marianna", "natalia", "volodymyr"]
             }
         ]
 
@@ -294,7 +318,7 @@ class RhVoiceClass(object):
         _lang_check = True
         _lang = _iso_lang
         _error_icon = readtexttools.net_error_icon()
-        _env_lang = os.getenv('LANGUAGE').split('_')[0].split('-')[0]
+        _env_lang = readtexttools.default_lang().split('_')[0].split('-')[0]
         _voice = self.language_to_voice(_iso_lang)
         if not bool(_voice):
             self.ok = False
@@ -419,7 +443,7 @@ class RhVoiceClass(object):
         return ''
 
 
-def main():
+def main():  # -> NoReturn
     '''Use rhvoice speech synthesis for supported languages while on-line'''
     if not sys.version_info >= (3, 6) or not os.name in ['posix']:
         print('Your system does not support the rhvoice python tool.')
@@ -429,8 +453,8 @@ def main():
     _speech_rate = 100
     _iso_lang = 'en-US'
     try:
-        _iso_lang = os.getenv('LANGUAGE').replace(
-            '_', '-').split(':')[0].split('.')[0]
+        _iso_lang = readtexttools.default_lang().replace(
+            '_', '-')
     except AttributeError:
         pass
     _media_out = ''

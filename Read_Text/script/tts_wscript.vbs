@@ -267,6 +267,25 @@ Function fbRemoveFile(sfilespec)
     fbRemoveFile = Not(fso.FileExists(sfilespec))
 End Function
 
+
+Function fsGetPath(app)
+    ' Use the system path to select a complete application URI
+    ' or return `''` if the application is not in the path.
+    FsGetPath = ""
+    Dim a1
+    a1 = split(Environ("PATH"), ";")
+    Dim n
+    Dim prueba
+    For n = Lbound(a1) To Ubound(a1)
+        prueba = a1(n) & "\" & app
+        If fbFileExists(prueba) Then
+            FsGetPath = prueba
+            Exit Function
+        End If
+    Next
+End Function
+
+
 Function fsXmlInputBox(s1)
     '''
     ' Debug or pause execution. Returns string or blank if you click 'Cancel'
@@ -594,11 +613,12 @@ Function fsFindAppPath(sA)
             If Len(a1(n)) > 1 Then
                 If fbFileExists(a1(n) & sA) Then
                     fsFindAppPath = a1(n) & sA
-                    Exit For
+                    Exit Function
                 End If
             End If
         Next
     End If
+    fsFindAppPath = fsGetPath(sA)
 End Function
 
 

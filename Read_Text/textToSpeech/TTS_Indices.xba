@@ -496,7 +496,7 @@ Function fsZzxToEnglish( _
 		&apos; Get a semicolon separated list of all valid tags
 		fsZzxToEnglish = s0 &amp; s1 &amp; s2
 	Else
-		a1 = Split(isolist0 &amp; isoList1 &amp; isolist2,&quot;;&quot;)
+		a1 = Split(isolist0 &amp; isoList1 &amp; isolist2, &quot;;&quot;)
 		For n = LBound(a1) To UBound(a1)
 			If a1(n) = sTermCode Then
 				bFound = True
@@ -732,13 +732,13 @@ Function fbTestDirRW( _
 	Dim s1
 	s1 = fsAppSignature() &amp; &quot;.&quot; &amp; fsUser() &amp; &quot;.test.txt&quot;
 	If InStr(&quot;/\&quot;,Right(sA, 1)) = 0 Then
-		If InStr(sA, &quot;/&quot;) &gt; 0 Then
+		If InStr(sA, &quot;/&quot;) &lt;&gt; 0 Then
 			s1 = &quot;/&quot; &amp; s1
 		Else
 			s1 = &quot;\&quot; &amp; s1
 		End If
 	End If
-	fbCreateFile(sA &amp; s1, s1, &quot;utf-8&quot;)
+	CreateFile(sA &amp; s1, s1, &quot;UTF-8&quot;)
 	If FileExists(sA &amp; s1) Then
 		kill sA &amp; s1
 		fbTestDirRW = True
@@ -765,7 +765,7 @@ Function fsExtensionVersion() As String
 	open aFile For input As #iNumber
 	While (s2 = &quot;&quot;) And (Not Eof(iNumber))
 		line input #iNumber, sLine
-		If InStr(sLine, &quot;&lt;version value=&quot;) &gt; 0 Then
+		If InStr(sLine, &quot;&lt;version value=&quot;) &lt;&gt; 0 Then
 			s2 = sLine
 		End If
 	WEnd
@@ -793,7 +793,7 @@ Function fsPosterImg() As String
 	Dim s3$
 	s3 = converttourl(fsGetHomeDir)
 	Dim a1
-	a1 = Array(fsSelectionLanguageAndRegion(), _
+	a1 = Array(fsSelectionLanguageAndRegion(True), _
 	fsSelectionLanguage(), _
 	fsSelectionCountry())
 	Dim a2
@@ -923,16 +923,6 @@ End Function
 
 Function fsRhVoiceTtsDoc() As String
 	fsRhVoiceTtsDoc = fsMyURL() &amp; &quot;/python/rhvoice_read_text_file.py&quot;
-End Function
-
-
-Function fsPythonPyttsxDoc() As String
-	fsPythonPyttsxDoc = fsMyURL() &amp; &quot;/python/pyttsx_read_text_file.py&quot;
-End Function
-
-
-Function fsPythonOSDoc() As String
-	fsPythonOSDoc = fsMyURL() &amp; &quot;/python/os.py&quot;
 End Function
 
 
@@ -1156,7 +1146,7 @@ Function fsSubStringToright( _
 	Dim z As String
 	
 	z = x
-	If InStr(x,y) Then
+	If InStr(x,y) &lt;&gt; 0 Then
 		a1 = Split(x,y)
 		z = a1(UBound(a1))
 	End If
@@ -1703,8 +1693,8 @@ Function fsGetHomeDir() As String
 		a1 = Split(s1, cr)
 		For n = LBound(a1) To UBound(a1)
 			If Len(a1(n)) &gt; 0 Then
-				If fbCreateFile(a1(n) &amp; &quot;log.txt&quot;, fsGetSetting(&quot;ooname&quot;) &amp; _
-					&quot; - &quot; &amp; fsFileTime(), &quot;utf-8&quot;) Then
+				If CreateFile(a1(n) &amp; &quot;log.txt&quot;, fsGetSetting(&quot;ooname&quot;) &amp; _
+					&quot; - &quot; &amp; fsFileTime(), &quot;UTF-8&quot;) Then
 					kill a1(n) &amp; &quot;log.txt&quot;
 					fsGetHomeDir = a1(n)
 					Exit For
@@ -1730,7 +1720,7 @@ Function fsGetMacOS11Voice() As String
 	Dim s1$
 	s1 = &quot;&quot;
 	Dim a1(7) As String
-	a1(0) = fsSelectionLanguageAndRegion()
+	a1(0) = fsSelectionLanguageAndRegion(True)
 	a1(1) = fsSelectionLanguage()
 	a1(2) = fsDocLanguage() &amp; &quot;-&quot; &amp; fsDocCountry()
 	a1(3) = fsDocLanguage()

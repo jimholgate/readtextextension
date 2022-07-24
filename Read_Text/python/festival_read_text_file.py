@@ -86,7 +86,6 @@ Copyright (c) 2011 - 2022 James Holgate
 '''
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-import codecs
 import getopt
 import os
 import sys
@@ -626,7 +625,7 @@ reads the file aloud.
         return str(my_val) + '%'
 
 
-def main():
+def main():  # -> NoReturn
     '''
 Creates a temporary speech-synthesis sound file and optionally
 reads the file aloud.
@@ -648,13 +647,10 @@ reads the file aloud.
     _title = ''
     _writer = ''
     _image_size = '600x600'
-    concise_lang = os.getenv('LANG')[:2]
+    _lang = readtexttools.default_lang()
+    concise_lang = _lang.split('_')[0].split('-')[0]
     if not concise_lang:
-        concise_lang = os.getenv('LANGUAGE')[:2]
-    if not concise_lang:
-        # Use utf-8; don't correct Mojibaki
         concise_lang = 'hi'
-
     _file_path = sys.argv[-1]
     if not os.path.isfile(_file_path):
         print('I was unable to find the file you specified!...')

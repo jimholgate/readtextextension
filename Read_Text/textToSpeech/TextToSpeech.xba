@@ -107,12 +107,12 @@ Sub ReadTextAloud
 &apos;&apos;
 	Dim sFile As String
 	Dim msgs()As Variant
-	Dim errorCode As Integer
+	Dim errorCode As Integer : errorCode = 0
 	Dim config(fiCountConfigOptions)As Variant
 	
 	sFile = fsFullPathOf(fsExtensionSettingsIni)
 	If fileexists(sFile) Then
-		tts_config_parseFile(sFile,config(),errorCode)
+		tts_config_parseFile(sFile, config(), errorCode)
 		If config(fiAlwaysShowDialogCheckBox()) = 1 Then
 			ConfigureReadTextAloud()
 		Else
@@ -179,7 +179,7 @@ Sub ReadClipBoard
 	If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
 		resetSpeechDispatcher(True)
 	Else
-		If fileexists(s1) Or fbClipBoardAvailable = False Then
+		If fileexists(s1) Or fbClipBoardAvailable() = False Then
 			If fileexists(s1) Then
 				If fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getTextFromFile(s1, &quot;UTF-8&quot;) Then
 					&apos; You updated office after a crash, so resume

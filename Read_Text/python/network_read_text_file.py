@@ -43,7 +43,16 @@ import readtexttools
 try:
     import gtts
 except ImportError:
-    pass
+    try:
+        if len(readtexttools.find_local_pip('gtts')) != 0:
+            sys.path.append(readtexttools.find_local_pip('gtts'))
+            try:
+                import gtts
+            except:
+                pass
+    except:
+        pass
+    
 try:
     import awsserver
 except ImportError:
@@ -56,7 +65,6 @@ try:
     import gcloudserver
 except ImportError:
     pass
-
 
 def usage():  # -> None
     '''
@@ -111,33 +119,19 @@ class AmazonClass(object):
             self.ok = False
         return self.ok
 
-    def read(self,
-             _text="",
-             _iso_lang='en-US',
-             _visible="false",
-             _audible="true",
-             _out_path="",
-             _icon="",
-             _info="",
-             _post_process=None,
-             _writer='',
-             _size='600x600',
-             _speech_rate=160):  # -> bool
+    def read(self, _text="", _iso_lang='en-US', _visible="false",
+            _audible="true", _out_path="", _icon="", _info="",
+            _post_process=None, _writer='', _size='600x600',
+            _speech_rate=160):  # -> bool
         '''stub'''
         if not self.ok:
             return False
         try:
-            return awsserver.read(_text="",
-                                  _iso_lang='en-US',
-                                  _visible="false",
-                                  _audible="true",
-                                  _out_path="",
-                                  _icon="",
-                                  _info="",
-                                  _post_process=None,
-                                  _writer='',
-                                  _size='600x600',
-                                  _speech_rate=160)
+            return awsserver.read(_text="", _iso_lang='en-US',
+                                  _visible="false", _audible="true",
+                                  _out_path="", _icon="", _info="", 
+                                  _post_process=None, _writer='',
+                                  _size='600x600', _speech_rate=160)
         except (AttributeError, NameError):
             pass
         return False
@@ -164,33 +158,19 @@ class AzureClass(object):
             self.ok = False
         return self.ok
 
-    def read(self,
-             _text="",
-             _iso_lang='en-US',
-             _visible="false",
-             _audible="true",
-             _out_path="",
-             _icon="",
-             _info="",
-             _post_process=None,
-             _writer='',
-             _size='600x600',
-             _speech_rate=160):  # -> bool
+    def read(self, _text="", _iso_lang='en-US', _visible="false",
+            _audible="true", _out_path="", _icon="", _info="",
+            _post_process=None, _writer='', _size='600x600',
+            _speech_rate=160):  # -> bool
         '''stub'''
         if not self.ok:
             return False
         try:
-            return azureserver.read(_text="",
-                                    _iso_lang='en-US',
-                                    _visible="false",
-                                    _audible="true",
-                                    _out_path="",
-                                    _icon="",
-                                    _info="",
-                                    _post_process=None,
-                                    _writer='',
-                                    _size='600x600',
-                                    _speech_rate=160)
+            return azureserver.read(_text="", _iso_lang='en-US',
+                                    _visible="false", _audible="true",
+                                    _out_path="", _icon="", _info="", 
+                                    _post_process=None, _writer='',
+                                    _size='600x600', _speech_rate=160)
         except (AttributeError, NameError):
             pass
         return False
@@ -218,33 +198,19 @@ class GoogleCloudClass(object):
             self.ok = False
         return self.ok
 
-    def read(self,
-             _text="",
-             _iso_lang='en-US',
-             _visible="false",
-             _audible="true",
-             _out_path="",
-             _icon="",
-             _info="",
-             _post_process=None,
-             _writer='',
-             _size='600x600',
-             _speech_rate=160):  # -> bool
+    def read(self, _text="", _iso_lang='en-US', _visible="false",
+            _audible="true", _out_path="", _icon="", _info="",
+            _post_process=None, _writer='', _size='600x600',
+            _speech_rate=160):  # -> bool
         '''stub'''
         if not self.ok:
             return False
         try:
-            return gcloudserver.read(_text="",
-                                     _iso_lang='en-US',
-                                     _visible="false",
-                                     _audible="true",
-                                     _out_path="",
-                                     _icon="",
-                                     _info="",
-                                     _post_process=None,
-                                     _writer='',
-                                     _size='600x600',
-                                     _speech_rate=160)
+            return  gcloudserver.read(_text="", _iso_lang='en-US',
+                                      _visible="false", _audible="true",
+                                      _out_path="", _icon="", _info="", 
+                                      _post_process=None, _writer='',
+                                      _size='600x600', _speech_rate=160)
         except (AttributeError, NameError):
             pass
         return False
@@ -293,6 +259,12 @@ class GoogleTranslateClass(object):
 
     def check_version(self, minimum_version=2.2):  # -> bool
         '''Check for minimum version.'''
+        if os.name == 'nt':
+            # The library is not available in the LibreOffice
+            # and OpenOffice for Windows python environments.
+            # winsound.PlaySound does not play mp3 content.
+            self.ok = False
+            return self.ok
         _test_version = self.version()
         try:
             self.ok = float('.'.join(
@@ -302,16 +274,9 @@ class GoogleTranslateClass(object):
         return self.ok
 
     def read(self,
-             _text="",
-             _iso_lang='en-US',
-             _visible="false",
-             _audible="true",
-             _out_path="",
-             _icon="",
-             _info="",
-             _post_process='process_wav_media',
-             _writer='',
-             _size='600x600',
+             _text="", _iso_lang='en-US', _visible="false", _audible="true",
+             _out_path="", _icon="", _info="",
+             _post_process=None, _writer='', _size='600x600',
              _speech_rate=160):  # -> bool
         '''
 Setup
@@ -345,12 +310,12 @@ Setup
         _lang = _iso_lang
         _error_icon = readtexttools.net_error_icon()
         _version = self.version()
-        _env_lang = os.getenv('LANGUAGE').split('_')[0].split('-')[0]
+        _env_lang = readtexttools.default_lang()
         _domain = self.translator_domain
         _provider = self.translator
-        _provider_logo = '/usr/share/icons/hicolor/scalable/apps/goa-account-%(_domain)s.svg' % locals(
+        _provider_logo = '/usr/share/icons/hicolor/scalable/apps/goa-account-%(_domain)s.svg' %locals(
         )
-
+        
         if '-' in _iso_lang:
             _lang = _iso_lang.split('-')[0]
             _region = _iso_lang.split('-')[1]
@@ -505,8 +470,9 @@ Setup
         try:
             tts = gtts.gTTS(_text, _tld, _lang, _slow, _lang_check)
             tts.save(_media_work)
-            readtexttools.pop_message("`gtts-%(_version)s`" % locals(), _msg,
-                                      5000, _provider_logo, 0)
+            if os.path.isfile(_media_work):
+                readtexttools.pop_message("`gtts-%(_version)s`" % locals(),
+                                          _msg, 5000, _provider_logo, 0)
         except gtts.tts.gTTSError:
             readtexttools.pop_message(
                 "`gtts-%(_version)s` failed to connect." % locals(), _msg, 5000,
@@ -525,6 +491,7 @@ Setup
         ]:
             if os.path.getsize(_media_work) == 0:
                 return False
+            # NOTE: Calling process must unlock_my_lock()
             readtexttools.process_wav_media(_info, _media_work, _icon,
                                             _media_out, _audible, _visible,
                                             _writer, _size)
@@ -589,18 +556,98 @@ def speech_wpm(_percent='100%'):  # -> int
     return i2
 
 
-def main():
+def network_ok(_iso_lang='en-US'):  # -> bool
+    '''Do at least one of the classes support an on-line speech library?'''
+    _gtts_class = GoogleTranslateClass()
+    _continue = False
+    if _gtts_class.check_version(2.2):
+        _continue = True
+    if not _continue:
+        _amazon_class = AmazonClass()
+        _continue = bool(_amazon_class.language_supported(_iso_lang))
+    if not _continue:
+        _azure_class = AzureClass()
+        _continue = bool(_azure_class.language_supported(_iso_lang))
+    if not _continue:
+        _google_cloud_class = GoogleCloudClass()
+        _continue = bool(_google_cloud_class.language_supported(_iso_lang))
+    return _continue
+
+
+def network_main(_text_file_in='', _iso_lang='ca-ES', _visible='false',
+                 _audible='true', _media_out='', _writer='', _title='',
+                 _icon='', _size='600x600', _speech_rate=160, vox=''):  # -> boolean
+    '''Read a text file aloud using a network resource.'''
+    _imported_meta = readtexttools.ImportedMetaData()
+    _amazon_class = AmazonClass()
+    _azure_class = AzureClass()
+    _google_cloud_class = GoogleCloudClass()
+    _gtts_class = GoogleTranslateClass()
+    _continue = False
+    if _gtts_class.check_version(2.2) and vox in ['', 'AUTO', 'GTTS']:
+        _continue = True
+    if not _continue:
+        _continue = bool(_amazon_class.language_supported(_iso_lang)) and vox in ['', 'AUTO', 'AWS']
+    if not _continue:
+        _continue = bool(_azure_class.language_supported(_iso_lang))  and vox in ['', 'AUTO', 'AZURE']
+    if not _continue:
+        _continue = bool(_google_cloud_class.language_supported(_iso_lang)) and vox in ['', 'AUTO', 'GOOGLECLOUD']
+    if not _continue:
+        usage()
+        return False
+    _text = _imported_meta.meta_from_file(_text_file_in)
+    if len(_text) != 0:
+        _text = readtexttools.clean_str(_text, True).strip()
+        _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
+        _info = readtexttools.check_artist(_writer)
+        clip_title = readtexttools.check_title(_title, 'espeak')
+        # If the library does not require a postprocess, use `0`,
+        # otherwise use the item corresponding to the next action.
+        _post_processes = [
+            None, 'process_mp3_media', 'process_playlist',
+            'process_riff_media', 'process_vorbis_media',
+            'process_wav_media', 'process_audio_media'
+        ]
+
+        if _amazon_class.language_supported(_iso_lang):
+            _amazon_class.read(_text, _iso_lang, _visible, _audible,
+                               _media_out, _icon, clip_title,
+                               _post_processes[1], _info, _size,
+                               _speech_rate)
+        elif _azure_class.language_supported(_iso_lang):
+            _azure_class.read(_text, _iso_lang, _visible, _audible,
+                              _media_out, _icon, clip_title,
+                              _post_processes[1], _info, _size,
+                              _speech_rate)
+        elif _google_cloud_class.language_supported(_iso_lang):
+            _google_cloud_class.read(_text, _iso_lang, _visible, _audible,
+                                     _media_out, _icon, clip_title,
+                                     _post_processes[1], _info, _size,
+                                     _speech_rate)
+        elif _gtts_class.language_supported(_iso_lang):
+
+            _gtts_class.read(_text, _iso_lang, _visible, _audible,
+                             _media_out, _icon, clip_title,
+                             _post_processes[1], _info, _size, _speech_rate)
+        else:
+            # Just display a translation link.
+            _gtts_class.read(_text, _iso_lang, _visible, _audible,
+                             _media_out, _icon, clip_title,
+                             _post_processes[0], _info, _size, _speech_rate)
+    return True
+
+
+def main():  # -> NoReturn
     '''Use network speech synthesis for supported languages while on-line'''
-    if not sys.version_info >= (3, 6) or not os.name in ['posix']:
+    if not sys.version_info >= (3, 6) or not os.name in ['posix', 'nt']:
         print('Your system does not support the network python tool.')
         usage()
         sys.exit(0)
-    _imported_meta = readtexttools.ImportedMetaData()
     _speech_rate = 160
     _iso_lang = 'ca-ES'
     try:
-        _iso_lang = os.getenv('LANGUAGE').replace(
-            '_', '-').split(':')[0].split('.')[0]
+        _iso_lang = readtexttools.default_lang().replace(
+            '_', '-')
     except AttributeError:
         pass
     _media_out = ''
@@ -624,7 +671,6 @@ def main():
                 'image=', 'title=', 'artist=', 'dimensions='
             ])
         except getopt.GetoptError:
-            # print help information and exit
             print('option -a not recognized')
             usage()
             sys.exit(2)
@@ -653,59 +699,9 @@ def main():
                 _size = a
             else:
                 assert False, 'unhandled option'
-        _continue = False
-        _amazon_class = AmazonClass()
-        _azure_class = AzureClass()
-        _google_cloud_class = GoogleCloudClass()
-        _gtts_class = GoogleTranslateClass()
-        if _gtts_class.check_version(2.2):
-            _continue = True
-        if not _continue:
-            _continue = bool(_amazon_class.language_supported(_iso_lang))
-        if not _continue:
-            _continue = bool(_azure_class.language_supported(_iso_lang))
-        if not _continue:
-            _continue = bool(_google_cloud_class.language_supported(_iso_lang))
-        if not _continue:
-            usage()
-            sys.exit(0)
-        _text = _imported_meta.meta_from_file(_text_file_in)
-        if len(_text) != 0:
-            _text = readtexttools.clean_str(_text, True).strip()
-            _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
-            _info = readtexttools.check_artist(_writer)
-            clip_title = readtexttools.check_title(_title, 'espeak')
-            # If the library does not require a postprocess, use `0`,
-            # otherwise use the item corresponding to the next action.
-            _post_processes = [
-                None, 'process_mp3_media', 'process_playlist',
-                'process_riff_media', 'process_vorbis_media',
-                'process_wav_media', 'process_audio_media'
-            ]
-            if _amazon_class.language_supported(_iso_lang):
-                _amazon_class.read(_text, _iso_lang, _visible, _audible,
-                                   _media_out, _icon, clip_title,
-                                   _post_processes[1], _info, _size,
-                                   _speech_rate)
-            elif _azure_class.language_supported(_iso_lang):
-                _azure_class.read(_text, _iso_lang, _visible, _audible,
-                                  _media_out, _icon, clip_title,
-                                  _post_processes[1], _info, _size,
-                                  _speech_rate)
-            elif _google_cloud_class.language_supported(_iso_lang):
-                _google_cloud_class.read(_text, _iso_lang, _visible, _audible,
-                                         _media_out, _icon, clip_title,
-                                         _post_processes[1], _info, _size,
-                                         _speech_rate)
-            elif _gtts_class.language_supported(_iso_lang):
-                _gtts_class.read(_text, _iso_lang, _visible, _audible,
-                                 _media_out, _icon, clip_title,
-                                 _post_processes[1], _info, _size, _speech_rate)
-            else:
-                # Just display a translation link.
-                _gtts_class.read(_text, _iso_lang, _visible, _audible,
-                                 _media_out, _icon, clip_title,
-                                 _post_processes[0], _info, _size, _speech_rate)
+        network_main(_text_file_in, _iso_lang, _visible, _audible,
+                     _media_out, _writer, _title, _icon, _size,
+                     _speech_rate, 'AUTO')
     sys.exit(0)
 
 
