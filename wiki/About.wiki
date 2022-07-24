@@ -6,12 +6,12 @@ Read Text Extension uses an external program or a web service to read text. Read
 
 ==Download==
 
-* [https://extensions.libreoffice.org/extensions/read-text LibreOffice Extensions]
+* [https://extensions.libreoffice.org/en/extensions/show/read-text LibreOffice Extensions]
 * [https://extensions.openoffice.org/en/project/read-text Apache OpenOffice Extensions]
 
 ==Screen Shot==
 
-https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/Default64.png
+[File:Default64.png]
 
 ==Tutorial==
 
@@ -29,4 +29,4 @@ https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/Default64.pn
 
 ===Related Topics===
 
-[https://help.libreoffice.org/7.2/en-US/text/shared/guide/accessibility.html Accessibility in LibreOffice]
+[https://help.libreoffice.org/7.3/en-US/text/shared/guide/accessibility.html Accessibility in LibreOffice]

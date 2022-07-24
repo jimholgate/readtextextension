@@ -6,7 +6,7 @@ Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Cal
 
 ==Download==
 
-* [https://extensions.libreoffice.org/extensions/read-text LibreOffice Extensions]
+* [https://extensions.libreoffice.org/de/extensions/show/read-text LibreOffice Extensions]
 * [https://extensions.openoffice.org/de/project/read-text Apache OpenOffice Extensions]
 
 ==Image==
@@ -27,4 +27,4 @@ Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Cal
   
 -----
 ===Verwandte Themen===
-[https://help.libreoffice.org/7.2/de/text/shared/guide/accessibility.html Zugänglichkeit in LibreOffice]
+[https://help.libreoffice.org/7.3/de/text/shared/guide/accessibility.html?DbPAR=SHARED Zugänglichkeit in LibreOffice]

@@ -6,7 +6,7 @@ Cette extension permet à un programme externe ou une application web lire le te
 
 ==Téléchargement==
 
-* [https://extensions.libreoffice.org/extensions/read-text LibreOffice Extensions]
+* [https://extensions.libreoffice.org/fr/extensions/show/read-text LibreOffice Extensions]
 * [https://extensions.openoffice.org/fr/project/read-text Apache OpenOffice Extensions]
 
 ==Capture d'écran==
@@ -28,4 +28,4 @@ Cette extension permet à un programme externe ou une application web lire le te
 -----
 ===Rubriques connexes===
 
-[https://help.libreoffice.org/7.2/fr/text/shared/guide/accessibility.html Accessibilité dans LibreOffice]
+[https://help.libreoffice.org/7.3/fr/text/shared/guide/accessibility.html?DbPAR=SHARED Accessibilité dans LibreOffice]
