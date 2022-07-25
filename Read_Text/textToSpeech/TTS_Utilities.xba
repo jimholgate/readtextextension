@@ -1568,11 +1568,11 @@ Sub dialog1Combo2ShowMEDIAChoices( _
 	Rem first remove all old items from the list
 	n1 = oComboBox.getItemCount()
 	oComboBox.removeItems(0,n1)
-	s1 = &quot;https://translate.google.com/translate_tts?tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
+	&apos; &quot;https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;
+	s1 = &quot;https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;
 	oComboBox.addItem(s1,0)
-	s1 = &quot;https://translate.google.com/translate_tts?tl=(LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;
-	oComboBox.addItem(s1,0)
-	
+	s1 = &quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;
+	oComboBox.addItem(s1,0)	
 End Sub
 
 
@@ -1783,19 +1783,27 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 				Redim s2 : s2 = Array(_
 				&quot;FEMALE1&quot;, &quot;MALE1&quot;)
 			End Select
-			For n = Lbound(s2) To Ubound(s2)
+			If fbIsSandboxed() Then
+				&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
+				s1 = CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;-m webbrowser -t &quot;&quot;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(COUNTRY_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
+			Else
+				For n = Lbound(s2) To Ubound(s2)
+					s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; s2(n) &amp; _
+					&quot;&quot;&quot; --rate &quot;&quot;-30&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+					
+					s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; s2(n) &amp; _
+					&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				Next
 				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; s2(n) &amp; _
-				&quot;&quot;&quot; --rate &quot;&quot;-30&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-				
-				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; s2(n) &amp; _
-				&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			Next
-			s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-			&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
-			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
+				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			End If
 		End If
 	End If
 	If fbHavePyQrCode() Then
@@ -2418,9 +2426,6 @@ Sub ttsActuate( _
 		CreateFile(fsFestivalScriptName(), sScript, scodec)
 		CreateFile(fsTemporaryTextDoc(), sTextToSpeak, scodec)
 	ElseIf config(fiExternalOption()) Then
-		If fbIsSandboxed() Then
-			Exit Sub
-		End If
 		sProgram = config(fiExternalProgramPath())
 		sCommand = config(fiExternalCommand)
 		If InStr(LCase(sProgram), &quot;bin/padsp&quot;) &lt;&gt; 0 Then
@@ -2891,10 +2896,11 @@ End Function
 
 Function ReplaceWebTokensWithStr( _
 	sA As String, _
-	sB As String) As String
+	ByVal sB As String) As String
 	Dim sFind As String
 	Dim sReplace As String
 	
+	sB = fsSuperTrim(sB, &quot;&quot;)
 	sFind = &quot;(OOO_WEBTEXTBIG)&quot;
 	sReplace = fsEscapeStr(Left(Trim(sB),9999))
 	&apos; A lot of text. Use if you have a dedicated online speech server.
@@ -5518,25 +5524,38 @@ Sub CheckUnixSpeech()
 	&apos; Check the first time the application runs.
 	If fsGetOS() = &quot;UNIX&quot; Then
 		If Not(fileexists(fsFullPathOf(fsExtensionSettingsIni))) Then
-			If Not(fbHaveEspeak()) Then
-				If Not(fileexists(&quot;/usr/bin/festival&quot;)) Then
-					If Not(fileexists(&quot;/usr/bin/pico2wave&quot;)) Then
-						If Not(fileexists(&quot;/usr/bin/spd-say&quot;)) Then
-							WarnNoSpeech()
+			If fbIsSandboxed() Then
+				WarnNoSpeech()
+			Else
+				If Not(fbHaveEspeak()) Then
+					If Not(fileexists(&quot;/usr/bin/festival&quot;)) Then
+						If Not(fileexists(&quot;/usr/bin/pico2wave&quot;)) Then
+							If Not(fileexists(&quot;/usr/bin/spd-say&quot;)) Then
+								WarnNoSpeech()
+							End If
 						End If
 					End If
 				End If
-		End If
-		ElseIf fbIsSandboxed() Then
-			WarnNoSpeech()
+			End If
 		End If
 	End If
 End Sub
 
 
 Function fbIsSandboxed() As Boolean
-	&apos; flatpak apps cannot run external programs.
-	fbIsSandboxed = Instr(soundsDirectory(), &quot;/.var/app/org.libreoffice.LibreOffice/&quot;) &lt;&gt; 0
+	&apos; flatpak and snap apps cannot run external programs.
+	fbIsSandboxed = False
+	Dim x As Integer
+	Dim sand_path As Variant : sand_path = Array(_
+	&quot;/.var/app/org.libreoffice.LibreOffice/&quot;, _
+	&quot;/snap/libreoffice&quot;_
+	)
+	For x = Lbound(sand_path) to Ubound(sand_path)
+		If Instr(soundsDirectory(), sand_path(x)) &lt;&gt; 0 Then
+			fbIsSandboxed = True
+			Exit Function
+		End If
+	Next
 End Function
 
 
@@ -5970,9 +5989,7 @@ Function fsFindAppPath(sa) As String
 	End If
 	fsFindAppPath = fsGetPath(sa)
 End Function
-sub xxxxx
-	print(&quot;C:\Program Files\LibreOffice\program\python.exe&quot;)
-end sub
+
 
 Function vlcPath() As String
 	Select Case fsGetOS()

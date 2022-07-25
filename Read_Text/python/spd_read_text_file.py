@@ -164,16 +164,26 @@ import espeak_read_text_file
 import readtexttools
 import network_read_text_file
 try:
+    import webbrowser
+except:
+    pass
+USE_SPEECHD = True
+try:
     import speechd
 except ImportError:
     for test_path in ['/snap/libreoffice', '/var/', '/.var/']:
         if test_path in os.path.realpath(__file__):
-            print('The speechd library is not available')
-            exit()
+            print('''
+Using a *container* version of an office application could restrict your
+computer's ability to run system python libraries.
+''')
+            # Run `main()` to show usage alternatives.
+            USE_SPEECHD = False
     try:
-        import speechd_py as speechd
+        if USE_SPEECHD:
+            import speechd_py as speechd
     except ImportError:
-        pass
+        USE_SPEECHD = False
 
 def about_script(player='speech-dispatcher'): # -> str
     '''Information about the python script'''
@@ -332,10 +342,13 @@ def hard_reset(sd='speech-dispatcher'):  # -> bool
 def usage():  # -> None
     '''Print information about the script to the console'''
     player = 'speech-dispatcher'
+    _reset = USE_SPEECHD
     if os.path.isfile('/usr/bin/say'):
+        _reset = True
         player = 'say'
-    print(about_script(player)) 
-    hard_reset(player)
+    print(about_script(player))
+    if _reset:
+        hard_reset(player)
 
 
 def guess_time(second_string, word_rate, _file_path, _language):  # -> int
@@ -825,7 +838,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         except:
             s2 = ''
         return s2
-    
+
     def say_aloud(self, _file_spec='', _voice='', _requested_voice='',
                   _language='', i_rate=0):  # -> bool
         '''Read aloud using a MacOS system voice if the voice
@@ -1010,6 +1023,17 @@ def main():
         _say_formats.say_aloud(__file_spec, mac_reader, _voice, _language, i_rate)
         sys.exit(0)
     elif os.name in ['posix']:
+        if not USE_SPEECHD:
+            print('''The `speechd` library is not compatible with your application or platform.''')
+            try:
+                if _language[:2] in ['en']:
+                    _language = 'es'
+                webbrowser.open_new(
+                    'https://translate.google.com/?sl=auto&tl=%(_language)s&text=The+python+`speechd`+library+is+not+compatible+with+your+application+or+platform&op=translate' %locals()
+                    )
+            except NameError:
+                pass
+            exit()
         _spd_formats = SpdFormats()
         if not _spd_formats.spd_ok:
             print("The `speechd` python 3 library is required.")
@@ -1017,8 +1041,7 @@ def main():
             exit()
         if not _spd_formats.set_up():
             print('''The python 3 `speechd` setup failed. Check for a system update and
-restart your computer. Using a *container* version of an office application
-could limit your computer's ability to run some required python libraries.''')
+restart your computer.''')
             usage()
             exit()
         _testing = False
