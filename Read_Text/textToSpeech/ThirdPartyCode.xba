@@ -196,7 +196,10 @@ Function fvTts_config_createDefaultConfig( _
 			Else
 				config(fiExternalProgramPath()) = &quot;/usr/bin/python&quot;
 			End If
-			If Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0 Then
+			If fbIsSandboxed() Then
+				config(fiExternalCommand()) = &quot;-m webbrowser -t &quot; &amp; _
+				&quot;&quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(COUNTRY_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
+			ElseIf Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0 Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or Len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
