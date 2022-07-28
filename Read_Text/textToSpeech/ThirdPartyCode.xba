@@ -198,7 +198,7 @@ Function fvTts_config_createDefaultConfig( _
 			End If
 			If fbIsSandboxed() Then
 				config(fiExternalCommand()) = &quot;-m webbrowser -t &quot; &amp; _
-				&quot;&quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(COUNTRY_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
+				&quot;&quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
 			ElseIf Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0 Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;

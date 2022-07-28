@@ -423,6 +423,21 @@ configurations.
                            'CHILD_MALE', 'CHILD_FEMALE',
                            'AUTO', 'NETWORK', 'AWS',
                            'AZURE', 'GOOGLECLOUD', 'GTTS']
+        # language_list of voices that `espeak-ng` supports 2022.07
+        self.language_list = ['af', 'am', 'an', 'ar', 'az', 'ba', 'bg', 'bn',
+                              'bpy', 'bs', 'ca', 'cmn', 'cs', 'cy', 'da',
+                              'de', 'el', 'en', 'en-GB', 'en-US', 'eo', 'es',
+                              'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gd', 'gn',
+                              'grc', 'gu', 'hak', 'hi', 'hr', 'ht', 'hu',
+                              'hy', 'hyw', 'ia', 'id', 'is', 'it', 'ja',
+                              'jbo', 'ka', 'kk', 'kl', 'kn', 'ko', 'kok',
+                              'ku', 'ky', 'la', 'lfn', 'lt', 'lv', 'mi',
+                              'mk', 'ml', 'mr', 'ms', 'mt', 'mt', 'my',
+                              'nb', 'nci', 'ne', 'nl', 'om', 'or', 'pap',
+                              'pt', 'py', 'quc', 'ro', 'ru', 'sd', 'shn',
+                              'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta',
+                              'te', 'tn', 'tn', 'tn', 'tr', 'tt', 'ur',
+                              'uz', 'vi', 'yue']
         self.config_dir = '/etc/speech-dispatcher/modules'
         self.local_config = ''
         self.local_json = readtexttools.get_my_lock('json')
@@ -443,23 +458,30 @@ configurations.
 
     def spdsay_supports_language(self, _lang='en', experimental=False):  # -> Bool
         '''Verify spd-say supports language. If spd-say is not installled
-        and `experimental is `True` then return languages nominally
-        supported by `espeak`.'''
+        and `experimental is `True` then issue warning and return languages
+        that are nominally supported by `espeak`.'''
         _imported_meta = readtexttools.ImportedMetaData()
         _short_lang = _lang.split('-')[0].split('_')[0]
         _result = _imported_meta.execute_command(
                         'spd-say -L ')
         if len(_result) == 0:
-            print('''NOTICE:
-A python script could not use `spd-say`, so it could not determine all
-of the available languages. Install package `speech-dispatcher-utils`.''')
             if experimental:
-                return _short_lang in ['en', 'af', 'de', 'eo', 'es', 'fi',
-                                       'fr', 'it', 'pt', 'ro', 'cs', 'cy',
-                                       'el', 'nl', 'no', 'hi', 'pl', 'ru',
-                                       'sv', 'vi']
+                if _short_lang in self.language_list:
+                    _msg = ''.join([
+                        'http://htmlpreview.github.io/?',
+                        'https://github.com/brailcom/speechd/blob/master/doc/spd-say.html'])
+                    readtexttools.pop_message("Missing `spd-say` program",
+                                              _msg, 5000, "", 0)
+                    return True
             _result = ' '
-        return _result.count(''.join([' ', _short_lang, ' '])) != 0
+        for lang_code in [''.join([' ', _short_lang, ' ']),  # en
+                          ''.join([' ', _short_lang, '-']),  # en-
+                          ''.join([' ', _lang, ' ']),  # en-GB
+                          ''.join([' ', _lang, '-']),  # en-GB-SCOTLAND
+                         ]:
+            if _result.count(lang_code) != 0:
+                return True
+        return False
 
 
     def set_up(self):  # -> bool
@@ -467,13 +489,15 @@ of the available languages. Install package `speech-dispatcher-utils`.''')
         if not self.spd_ok:
             return False
         try:
-            # Sometimes speech-dispatcher sounds distorted and echoes
-            # on first run. You can fix it with a `hard_reset` --help            
-            bug_cleaner = speechd.SSIPClient(
-                self.client_app, self.client_user, None, None)
-            bug_cleaner.speak('\t')
-            time.sleep(0.2)
-            bug_cleaner.close()
+            if sys.version_info.minor < 9:
+                # Your computer uses an older version of python3.
+                # Sometimes speech-dispatcher sounds distorted and echoes
+                # on first run.
+                bug_cleaner = speechd.SSIPClient(
+                    self.client_app, self.client_user, None, None)
+                bug_cleaner.speak('\t')
+                time.sleep(0.2)
+                bug_cleaner.close()
             self.client = speechd.SSIPClient(
                 self.client_app, self.client_user, None, None)
             return True
@@ -957,6 +981,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
 def main():
     '''Command line speech-dispatcher tool. Some implimentations of python
     require the long command line switch'''
+
     _xml_tool = readtexttools.XmlTransform()
     __file_spec = sys.argv[-1]
     _txt = ''
@@ -1024,15 +1049,9 @@ def main():
         sys.exit(0)
     elif os.name in ['posix']:
         if not USE_SPEECHD:
-            print('''The `speechd` library is not compatible with your application or platform.''')
-            try:
-                if _language[:2] in ['en']:
-                    _language = 'es'
-                webbrowser.open_new(
-                    'https://translate.google.com/?sl=auto&tl=%(_language)s&text=The+python+`speechd`+library+is+not+compatible+with+your+application+or+platform&op=translate' %locals()
-                    )
-            except NameError:
-                pass
+            readtexttools.web_info_translate(
+                '''The `speechd` library is not compatible with your application or platform.''',
+                _language)
             exit()
         _spd_formats = SpdFormats()
         if not _spd_formats.spd_ok:

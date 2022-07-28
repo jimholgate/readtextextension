@@ -116,6 +116,10 @@ except ImportError:
 
 from xml.etree.ElementTree import TreeBuilder
 
+try:
+    import webbrowser
+except:
+    pass
 
 def write_plain_text_file(_file_path='',
                           _body_text='',
@@ -1157,6 +1161,21 @@ def do_gst_parse_launch(_pipe=''):  # -> bool
                     print('%(gst_l)s %(_pipe)s' % locals())
                     return True
     return False
+
+
+def web_info_translate(_msg='WARNING:\n\nPython `speechd` Error.', _language='en'):  # -> bool
+    '''Opens a web browser with the text of the message and a local translation.
+    Users of a sandboxed program can get a message.''' 
+    _web_text = path2url(_msg).replace('file:///', '')
+    try:
+        if _language[:2] in ['en']:
+            _language = 'es'
+        webbrowser.open_new(
+            'https://translate.google.com/?sl=auto&tl=%(_language)s&text=%(_web_text)s&op=translate' %locals()
+            )
+        return True
+    except NameError:
+        return False
 
 
 class ImportedMetaData(object):

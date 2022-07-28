@@ -843,13 +843,17 @@ Function WinSpeechProgramPath() As String
 	&apos; SAPI5 can&apos;t use Microsoft Speech Server voices
 	WinSpeechProgramPath = &quot;&quot;
 	Dim sub_path As Variant : sub_path = faWindowsTestArray()
+	Dim _app As Variant : _app = Array(&quot;\wscript.exe&quot;, &quot;\cscript.exe&quot;)
 	Dim s2$ : s2 = fsHomeDrive()
 	Dim x As Integer
-	For x = Lbound(sub_path) To Ubound(sub_path)
-		If fileexists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\wscript.exe&quot;) Then
-			WinSpeechProgramPath = s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\wscript.exe&quot;
-				Exit Function
-		End If
+	Dim y As Integer
+	For y = Lbound(_app) to Ubound(_app)
+		For x = Lbound(sub_path) To Ubound(sub_path)
+			If fileexists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; _app(y)) Then
+				WinSpeechProgramPath = s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; _app(y)
+					Exit Function
+			End If
+		Next
 	Next
 End Function
 
@@ -1777,8 +1781,14 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 				
 				End If
 				Case &quot;MacOS&quot;
-				Redim s2 : s2 = Array(_
-				&quot;Veena&quot;, &quot;Moira&quot;, &quot;Karen&quot;, &quot;Fiona&quot;, &quot;AUTO&quot;)
+				Redim s2
+				If Len(fsGetMacOS11Voice()) = 0 Then
+					s2 = Array(_
+					&quot;Veena&quot;, &quot;Moira&quot;, &quot;Karen&quot;, &quot;Fiona&quot;, &quot;AUTO&quot;)
+				Else
+					s2 = Array(_
+					&quot;Veena&quot;, &quot;Moira&quot;, &quot;Karen&quot;, &quot;Fiona&quot;, fsGetMacOS11Voice(), &quot;AUTO&quot;)				
+				End If
 				Case Else
 				Redim s2 : s2 = Array(_
 				&quot;FEMALE1&quot;, &quot;MALE1&quot;)
@@ -1788,7 +1798,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 				s1 = CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
 				&quot;-m webbrowser -t &quot;&quot;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&quot;&quot;&quot; &amp; CR &amp; _
 				&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
-				&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(COUNTRY_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
+				&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
 			Else
 				For n = Lbound(s2) To Ubound(s2)
 					s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
@@ -4263,10 +4273,9 @@ Function fbIsWin64Program( _
 	ElseIf installPath = &quot;&quot; Then
 		installPath = fsInstallPath()
 	End If
-	
 	If fsGetOS = &quot;WINDOWS&quot; And _
 		UCase(environ(&quot;PROCESSOR_ARCHITECTURE&quot;)) = &quot;AMD64&quot; And _
-		InStr(LCase(installPath), &quot;(x86)&quot;) &lt;&gt; 0 Then
+		InStr(LCase(installPath), &quot;(x86)&quot;) = 0 Then
 		fbIsWin64Program = True
 	Else
 		fbIsWin64Program = False
@@ -4375,7 +4384,43 @@ End Sub
 
 
 Function faWindowsTestArray() As Variant
-	faWindowsTestArray = Array(&quot;SysWOW64&quot;, &quot;System32&quot;, &quot;SysArm32&quot;, &quot;SyChpe32&quot;)
+	&apos; Return an array of the Windows subdirectories where you can find
+	&apos; System programs, Control Panels or other resources
+	&apos; i.e: [&apos;SysArm32&apos;, &apos;System32&apos;, &apos;SysWOW64&apos; ...]
+	faWindowsTestArray = Array()
+	Dim _div$ : _div = Chr(13)
+	Dim _win_dir$ : _win_dir = &quot;C:\Windows&quot;
+	On Error GoTo faWindowsTestArrayErr
+	If Len(Environ(&quot;windir&quot;)) &lt;&gt; 0 Then
+		win_dir = Environ(&quot;windir&quot;)
+	End If
+	faWindowsTestArrayErr:
+	Dim _system$ : _system = &quot;System32&quot;
+	If fbIsWin64Program() Then
+		_system = &quot;SysWOW64&quot;
+	End If
+	Dim _skip$ : _skip = &quot;;SYSTEM;SYSTEMAPPS;SYSTEMRESOURCES;SYSTEMTEMP;&quot;
+	Dim x# : x = 0
+	Dim _Dirs As Variant : _Dirs = Split(_
+	_system &amp; _div &amp; fsSubDirectories(_win_dir), _
+	_div)
+	Dim result$ : result = &quot;&quot;
+	For x = Lbound(_Dirs) To Ubound(_Dirs)
+		If instr(Ucase(_Dirs(x)), &quot;SYS&quot;) &lt;&gt; 0 Then
+			If Instr(_skip, Ucase(&quot;;&quot; &amp; _Dirs(x) &amp; &quot;;&quot;)) = 0 Then
+				If Len(Result) = 0 Then 
+					result = _Dirs(x)
+				ElseIf Instr(result, _Dirs(x) &amp; _div) &lt;&gt; 1 then
+					result = result &amp; _div &amp; _Dirs(x)
+				End If
+			End If
+		End If
+	Next
+	If Len(result) = 0 Then
+		faWindowsTestArray = Array(_system)
+	Else
+		faWindowsTestArray = Split(result, _div)
+	End If
 End Function
 
 
