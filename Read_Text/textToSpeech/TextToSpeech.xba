@@ -357,7 +357,7 @@ Sub ReadTheSlidenote
 			).getString( _
 			)
 			If fbGoingOnline() Then
-				Select Case fiReportOnlineRequest(True)
+				Select Case fiReportOnlineRequest()
 					Case 6 &apos; if you click &quot;Yes&quot;, 
 					msgSpeak(s1)
 					Case 7 &apos; if you click &quot;No&quot;,

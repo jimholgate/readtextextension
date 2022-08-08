@@ -397,15 +397,14 @@ Function fiReportMetaData( _
 End Function
 
 
-Function fiReportOnlineRequest(ByVal bVerify) As Integer
-	&apos; bVerify - if bVerify is False, the function always 
-	&apos; returns 6 (&quot;Yes&quot;) but if bVerify is true, then the
-	&apos; function  returns 6 if you click &quot;Yes&quot;, 7 if you
+Function fiReportOnlineRequest() As Integer
+	&apos; The function returns 6 if you click &quot;Yes&quot;, 7 if you
 	&apos; click &quot;No&quot;, and 2 if you click Cancel
 	&apos;
 	Dim iYes As Integer
 	Dim iNo As Integer
 	Dim iCancel As Integer
+	Dim iYesNo As Integer
 	Dim iYesNoCancel As Integer
 	Dim sA As String
 	Dim CR As String
@@ -415,6 +414,7 @@ Function fiReportOnlineRequest(ByVal bVerify) As Integer
 	iYes = 6
 	iNo = 7
 	iCancel = 2
+	iYesNo = 1
 	iYesNoCancel = 3
 	n = iYes
 	CR = Chr(10)
@@ -423,16 +423,11 @@ Function fiReportOnlineRequest(ByVal bVerify) As Integer
 	&quot; - &quot; &amp; _
 	fsLookUpTerm(&quot;s_ok&quot;) &amp; _
 	&quot; ? &quot;
-	If bVerify Then
-		n = MsgBox(sA, _
-		iYesNoCancel, _
-		fsLookUpTerm(&quot;s_read-text&quot;))
-	End If
-	fiReportOnlineRequest = n
+	fiReportOnlineRequest = MsgBox(sA, _
+	iYesNoCancel, _
+	fsLookUpTerm(&quot;s_read-text&quot;))
 	Exit Function
 	fiReportOnlineRequestErr:
-	
-	&apos; MetaData has a problem, so return &quot;No&quot;.
 	fiReportOnlineRequest = iNo
 End Function
 
@@ -468,6 +463,7 @@ Function soundsDirectory() As String
 	End If
 	soundsDirectory = ConvertFromURL(strA &amp; &quot;/sounds/&quot;)
 End Function
+
 
 Function fbEnhancedRTVersion() As Boolean
 	&apos; Version 9 of the Read Text Extension enables smart text
@@ -1759,26 +1755,12 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 				Case &quot;UNIX&quot;
 				If fbHaveNetworkTTS() Then
 					Redim s2 : s2 = Array(_
-					&quot;AUTO&quot;,_
-					&quot;MALE3&quot;,_
-					&quot;MALE2&quot;,_
-					&quot;MALE1&quot;,_
-					&quot;FEMALE3&quot;,_
-					&quot;FEMALE2&quot;,_
-					&quot;FEMALE1&quot;,_
-					&quot;CHILD_MALE&quot;,_
-					&quot;CHILD_FEMALE&quot;)
+					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+					&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;, &quot;AUTO&quot;)
 				Else
 					Redim s2 : s2 = Array(_
-					&quot;MALE3&quot;,_
-					&quot;MALE2&quot;,_
-					&quot;MALE1&quot;,_
-					&quot;FEMALE3&quot;,_
-					&quot;FEMALE2&quot;,_
-					&quot;FEMALE1&quot;,_
-					&quot;CHILD_MALE&quot;,_
-					&quot;CHILD_FEMALE&quot;)
-				
+					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+					&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;)
 				End If
 				Case &quot;MacOS&quot;
 				Redim s2
@@ -1787,11 +1769,12 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 					&quot;Veena&quot;, &quot;Moira&quot;, &quot;Karen&quot;, &quot;Fiona&quot;, &quot;AUTO&quot;)
 				Else
 					s2 = Array(_
-					&quot;Veena&quot;, &quot;Moira&quot;, &quot;Karen&quot;, &quot;Fiona&quot;, fsGetMacOS11Voice(), &quot;AUTO&quot;)				
+					&quot;Veena&quot;, &quot;Moira&quot;, &quot;Karen&quot;, &quot;Fiona&quot;, fsGetMacOS11Voice(),_
+					&quot;AUTO&quot;)				
 				End If
 				Case Else
 				Redim s2 : s2 = Array(_
-				&quot;FEMALE1&quot;, &quot;MALE1&quot;)
+				&quot;MALE1&quot;, &quot;FEMALE1&quot;)
 			End Select
 			If fbIsSandboxed() Then
 				&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
@@ -1800,6 +1783,10 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 				&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
 				&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
 			Else
+				If Len(fsFindAppPath(&quot;afconvert&quot;)) &lt;&gt; 0 Then
+					s4 = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+					s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
+				End If
 				For n = Lbound(s2) To Ubound(s2)
 					s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; s2(n) &amp; _
@@ -1926,7 +1913,6 @@ Function fspyOutOptions( _
 	ByVal s4, _
 	ByVal bPitchSpeed) As String
 	Dim s1, s2, s3, s5, s6, CR As String
-	
 	s1 = &quot;&quot;
 	s3 = &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	s6 = &quot;&quot;
@@ -1940,6 +1926,17 @@ Function fspyOutOptions( _
 	s5 = &quot;&quot;
 	If s4 = &quot;&quot; Then
 		s1 = &quot;&quot;
+	ElseIf fsGetOS() = &quot;MacOS&quot; Then
+		s1 = s1 &amp; CR &amp; s4 &amp; _
+		&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).m4a&quot;&quot;&quot; &amp; s3
+		If Len(vlcPath()) &lt;&gt; 0 Then
+			s1 = s1 &amp; CR &amp; s4 &amp; _
+			&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).ogg&quot;&quot;&quot; &amp; _
+			s3 &amp; CR &amp; s4 &amp; _
+			&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
+			s3 &amp; CR &amp; s4
+		End If
+		s1 =  CR &amp; s4 &amp; s1 &amp; s2
 	Else
 		s1 = s1 &amp; CR &amp; s4 &amp; _
 		&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).wav&quot;&quot;&quot; &amp; _
@@ -5564,23 +5561,41 @@ Sub WarnNoSpeech()
 End Sub
 
 
+Function fbCheckPosixSpeech() As Boolean
+	fbCheckPosixSpeech = False
+	Dim _app As Variant
+	Dim x As Integer : x = 0
+	Select Case fsGetOS()
+		Case &quot;UNIX&quot;
+		_app = Array(_
+		&quot;festival&quot;, &quot;pico2wave&quot;, &quot;RHVoice-test&quot;, &quot;spd-say&quot;)
+		Case &quot;MacOS&quot;
+		_app = Array(&quot;say&quot;)
+		Case Else
+		Exit Function
+	End Select
+	If Not fbIsSandboxed() Then
+		If fbHaveEspeak() Then
+			fbCheckPosixSpeech = True
+		Else
+			For x = Lbound(_app) To Ubound(_app)
+				If fileexists(&quot;/usr/bin/&quot; &amp; _app(x)) Then
+					fbCheckPosixSpeech = True
+					Exit Function
+				End If
+			Next
+		End If
+	End If
+End Function
+
+
 Sub CheckUnixSpeech()
 	&apos; Linux may not include a speech synthesiser by default.
 	&apos; Check the first time the application runs.
 	If fsGetOS() = &quot;UNIX&quot; Then
 		If Not(fileexists(fsFullPathOf(fsExtensionSettingsIni))) Then
-			If fbIsSandboxed() Then
+			If Not fbCheckPosixSpeech() Then
 				WarnNoSpeech()
-			Else
-				If Not(fbHaveEspeak()) Then
-					If Not(fileexists(&quot;/usr/bin/festival&quot;)) Then
-						If Not(fileexists(&quot;/usr/bin/pico2wave&quot;)) Then
-							If Not(fileexists(&quot;/usr/bin/spd-say&quot;)) Then
-								WarnNoSpeech()
-							End If
-						End If
-					End If
-				End If
 			End If
 		End If
 	End If
@@ -5827,6 +5842,35 @@ Function fbLocalPythonDevKit() As Boolean
 End Function
 
 
+Function AwsBoto3Json()
+	AwsBoto3Json = fsFullPathOf(&quot;aws/boto3/config.json&quot;)
+End Function
+
+
+Function AwsPolyJson()
+	AwsPolyJson = fsFullPathOf(&quot;aws/polly/config.json&quot;)
+End Function
+
+
+Function GoogleApisJson()
+	&apos; https://codelabs.developers.google.com/codelabs/cloud-text-speech-python3
+	&apos; Requires registration with Google:
+	&apos; Project_Email Project_Name, Project_ID, Project_Number
+	&apos; [Set up python](https://cloud.google.com/python/docs/setup)
+	&apos; Install python library using pip3
+	&apos; `pip3 install --user --upgrade google-cloud-texttospeech`
+	&apos; Save key.json to your configuration directory.
+	&apos; Don&apos;t share the key without evaluating usage fees.
+	&apos; Sample code produces .wav files
+	GoogleApisJson = fsFullPathOf(&quot;googleapis/tts/key.json&quot;)
+End Function
+
+
+Function msAzureJson()
+	msAzureJson = fsFullPathOf(&quot;ms/azure/cognitiveservices/speech/config.json&quot;)
+End Function
+
+
 Function fbHaveNetworkTTS() As Boolean
 	&apos; See: &lt;https://github.com/pndurette/gTTS&gt;
 	&apos; 
@@ -5839,10 +5883,10 @@ Function fbHaveNetworkTTS() As Boolean
 	Dim Tokens : Tokens = Array(_
 	&quot;/usr/lib/python3/dist-packages/gtts_token/gtts_token.py&quot;, _
 	home &amp; &quot;/.local/bin/gtts-cli&quot;, _
-	home &amp; &quot;/.config/readtext/aws/boto3/config.json&quot;, _
-	home &amp; &quot;/.config/readtext/aws/polly/config.json&quot;, _
-	home &amp; &quot;/.config/readtext/googleapis/tts/config.json&quot;, _
-	home &amp; &quot;/.config/readtext/ms/azure/cognitiveservices/speech/config.json&quot;)
+	AwsBoto3Json(), _
+	AwsPolyJson(), _
+	GoogleApisJson(), _
+	msAzureJson())
 	Select Case home
 		Case Environ(&quot;PWD&quot;)
 		If FileExists(fsNetworkTtsDoc()) And _
@@ -6271,6 +6315,8 @@ Sub resetSpeechDispatcher( _
 			Else
 				errorCode = Shell(&quot;spd-say&quot;, 0, &quot;--cancel&quot;, True)
 			End If
+		ElseIf fileexists(&quot;/usr/bin/speech-dispatcher&quot;) Then	
+			errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet speech-dispatcher&quot;, True)
 		End If
 		
 		If Not ( _

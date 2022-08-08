@@ -257,9 +257,14 @@ Sub ttsUpdateCombo2a( _
 			If fsGetOS() = &quot;MacOS&quot; And _
 			fbIsLibreOffice() And _
 			.GetControl(&quot;FileControl2&quot;).Model.Text = PosixPythonPath() Then
-				.GetControl(&quot;ComboBox2&quot;).Model.Text = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot;&quot; &amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				If fbHaveNetworkTTS() Then
+					.GetControl(&quot;ComboBox2&quot;).Model.Text = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot;&quot; &amp; _
+					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				Else
+					.GetControl(&quot;ComboBox2&quot;).Model.Text = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;	
+				End If
 			Else:
 				.GetControl( _
 				&quot;ComboBox2&quot;).Model.Text = .GetControl( _

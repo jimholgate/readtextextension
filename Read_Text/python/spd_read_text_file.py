@@ -163,10 +163,7 @@ import time
 import espeak_read_text_file
 import readtexttools
 import network_read_text_file
-try:
-    import webbrowser
-except:
-    pass
+
 USE_SPEECHD = True
 try:
     import speechd
@@ -184,6 +181,9 @@ computer's ability to run system python libraries.
             import speechd_py as speechd
     except ImportError:
         USE_SPEECHD = False
+
+NET_SERVICE_LIST = ['AUTO', 'NETWORK', 'AWS',
+                    'AZURE', 'GOOGLECLOUD', 'GTTS']
 
 def about_script(player='speech-dispatcher'): # -> str
     '''Information about the python script'''
@@ -383,8 +383,7 @@ def guess_time(second_string, word_rate, _file_path, _language):  # -> int
 def net_play(_file_spec='', _language='en-US', i_rate=0, _requested_voice=''): # -> bool
     '''Attempt to play a sound from the network.'''
     if network_read_text_file.network_ok(_language):
-        if _requested_voice in ['AUTO', 'NETWORK', 'AWS',
-                                'AZURE', 'GOOGLECLOUD', 'GTTS']:
+        if _requested_voice in NET_SERVICE_LIST:
             net_rate = 160
             if i_rate < 0:
                 net_rate = 110                    
@@ -412,18 +411,26 @@ configurations.
         '''Define common settings'''
         self.client_app = readtexttools.app_signature()
         self.xml_tool = readtexttools.XmlTransform()
+        self.json_tools = readtexttools.JsonTools()
+        self.imported_meta = readtexttools.ImportedMetaData()
         self.client_user = get_whoami()
         self.client = None
         self.py_m = platform.python_version_tuple()[0]
         # Speech dispatcher and network tools do not have all
         # voices for all languages, so a tool might substitute
         # a missing voice for one that it does have.
+        
         self.all_voices = ['MALE3', 'MALE2', 'MALE1',
                            'FEMALE3', 'FEMALE2', 'FEMALE1',
                            'CHILD_MALE', 'CHILD_FEMALE',
                            'AUTO', 'NETWORK', 'AWS',
                            'AZURE', 'GOOGLECLOUD', 'GTTS']
+        self.spd_voices = ['MALE3', 'MALE2', 'MALE1',
+                           'FEMALE3', 'FEMALE2', 'FEMALE1',
+                           'CHILD_MALE', 'CHILD_FEMALE']
+        self.stop_voice = 'TriggerAssertionError'
         # language_list of voices that `espeak-ng` supports 2022.07
+        # NOTE: speechd might reject a language when length of item > 2
         self.language_list = ['af', 'am', 'an', 'ar', 'az', 'ba', 'bg', 'bn',
                               'bpy', 'bs', 'ca', 'cmn', 'cs', 'cy', 'da',
                               'de', 'el', 'en', 'en-GB', 'en-US', 'eo', 'es',
@@ -455,41 +462,36 @@ configurations.
         except Exception:
             pass
 
-
-    def spdsay_supports_language(self, _lang='en', experimental=False):  # -> Bool
-        '''Verify spd-say supports language. If spd-say is not installled
-        and `experimental is `True` then issue warning and return languages
-        that are nominally supported by `espeak`.'''
-        _imported_meta = readtexttools.ImportedMetaData()
-        _short_lang = _lang.split('-')[0].split('_')[0]
-        _result = _imported_meta.execute_command(
-                        'spd-say -L ')
-        if len(_result) == 0:
-            if experimental:
-                if _short_lang in self.language_list:
-                    _msg = ''.join([
-                        'http://htmlpreview.github.io/?',
-                        'https://github.com/brailcom/speechd/blob/master/doc/spd-say.html'])
-                    readtexttools.pop_message("Missing `spd-say` program",
-                                              _msg, 5000, "", 0)
-                    return True
-            _result = ' '
-        for lang_code in [''.join([' ', _short_lang, ' ']),  # en
-                          ''.join([' ', _short_lang, '-']),  # en-
-                          ''.join([' ', _lang, ' ']),  # en-GB
-                          ''.join([' ', _lang, '-']),  # en-GB-SCOTLAND
-                         ]:
-            if _result.count(lang_code) != 0:
+    def is_a_supported_language(self, _lang='en', experimental=False):  # -> Bool
+        '''Verify that your installed speech synthesisers are *registered* with
+        the selected language. If there's an error and `experimental` is `True`,
+        then we return `True` if it is language that `espeak-ng` supported in
+        July, 2022.'''
+        _list = self.list_synthesis_languages(_lang)
+        if bool(_list):
+            return True
+        if experimental:
+            _short_lang = _lang.split('-')[0].split('_')[0]
+            if _short_lang in self.language_list:
                 return True
         return False
-
+    
+    def is_named_voice(self, _language, _voice='Bdl'):  # -> Bool
+        '''Verify that `spd-say` lists the voice. '''
+        
+        _result = self.list_synthesis_voices(_language)
+        if not bool(_result):
+            return False            
+        if _voice in _result:
+            return True
+        return False
 
     def set_up(self):  # -> bool
         '''Set up the instance of speechd'''
         if not self.spd_ok:
             return False
         try:
-            if sys.version_info.minor < 9:
+            if sys.version_info.major == 3 and sys.version_info.minor < 9:
                 # Your computer uses an older version of python3.
                 # Sometimes speech-dispatcher sounds distorted and echoes
                 # on first run.
@@ -505,32 +507,11 @@ configurations.
                 speechd.SSIPCommunicationError):
             return False
 
-    def sanitize_json(self, content= ''):  # -> str
-        '''Escape json characters in content'''
-        return content.strip().replace(
-            '{', '\\u007B').replace(
-                '}', '\\u0070').replace(
-                    '"', '\\u0022').replace(
-                        '@', '\\u0040')
-
-    def set_json_content(self, output_module='', language='en',
-                         voice='MALE1', i_rate=0, 
-                         _file_spec=''): # -> str
-        '''Sanitize content and return json string'''
-        s_rate = str(i_rate)
-        output_module= self.sanitize_json(output_module)
-        language = self.sanitize_json(language)
-        voice = self.sanitize_json(voice)
-        s_rate = self.sanitize_json(s_rate)
-        _file_spec = self.sanitize_json(_file_spec)
-
-        return '''{
-  "output_module": "%(output_module)s",
-  "language": "%(language)s",
-  "voice": "%(voice)s",
-  "i_rate": %(s_rate)s,
-  "file_spec": "%(_file_spec)s"
-}''' %locals()
+    def _switch_to_female(self, voice=''):  # -> bool
+        '''If voice includes `FEMALE` or a network voice, return `True`'''
+        if voice.count('FEMALE') != 0 or voice in NET_SERVICE_LIST:
+            return True
+        return False
 
     def speak_spd(self, output_module='', language='',
                       voice='', i_rate=0, _file_spec=''): # -> bool
@@ -538,15 +519,18 @@ configurations.
         _lock = readtexttools.get_my_lock("lock")
         _try_voice = voice
         if voice not in self.all_voices:
-            _try_voice = "MALE1"
+            if voice not in ['none', 'None', language,
+                             language.split('-')[0].split('_')[0]]:
+                if self.is_named_voice(language, voice):
+                    _try_voice = voice.strip()
+                else:
+                    _try_voice = "MALE1"
+            else:
+                _try_voice = "AUTO"  # pass on except: or use alternate
         if os.path.isfile(_lock):
-            self.client.close()
-            time.sleep(0.2)
-            hard_reset('speech-dispatcher')
-            readtexttools.unlock_my_lock()
-            return True
+            _try_voice = self.stop_voice
         else:
-            readtexttools.lock_my_lock()            
+            readtexttools.lock_my_lock()
         try:
             if bool(output_module):
                 try:
@@ -564,9 +548,15 @@ configurations.
                         pass
             try:
                 if bool(_try_voice):
-                    self.client.set_voice(_try_voice.upper())
+                    self.client.set_voice(_try_voice)
             except AssertionError:
-                if not self.spdsay_supports_language(
+                if _try_voice == self.stop_voice:
+                    self.client.close()
+                    time.sleep(0.2)
+                    hard_reset('speech-dispatcher')
+                    readtexttools.unlock_my_lock()
+                    return True
+                elif not self.is_a_supported_language(
                     language, not os.path.isfile(
                         '/usr/bin/spd-say')):
                     self.client.close()
@@ -584,9 +574,9 @@ configurations.
                             hard_reset(_player)
                         os.remove(self.local_json)
                     else:
-                        self.json_content = self.set_json_content(
-                                output_module, language, voice, i_rate,
-                                _file_spec)
+                        self.json_content = self.json_tools.set_json_content(
+                                language, voice, i_rate,
+                                _file_spec, output_module)
                         readtexttools.write_plain_text_file(self.local_json,
                                                             self.json_content,
                                                             'utf-8')
@@ -595,13 +585,20 @@ configurations.
                         return retval
                     return False
             else:
-                readtexttools.unlock_my_lock()
                 pass
             self.client.set_rate(i_rate)
         except (ImportError, NameError, speechd.SpawnError):
             if len(voice) != 0:
+                self.json_content = self.json_tools.set_json_content(
+                        language, voice, i_rate,
+                        _file_spec, output_module)
+                readtexttools.write_plain_text_file(self.local_json,
+                                                    self.json_content,
+                                                    'utf-8')
+                retval = net_play(_file_spec, language, i_rate, voice)
+                os.remove(self.local_json)
                 readtexttools.unlock_my_lock()
-                return bool(net_play(_file_spec, language, i_rate, voice))
+                return retval
             else:
                 readtexttools.unlock_my_lock()
             return False
@@ -627,25 +624,61 @@ configurations.
         else:
             _txt = self.xml_tool.clean_for_xml(_txt)
             _message = '''<?xml version='1.0'?>
-<speak version='1.1' xml:lang='%(language)s'>%(_txt)s</speak>''' % locals()            
+<speak version='1.1' xml:lang='%(language)s'>%(_txt)s</speak>''' % locals()
         _time = guess_time(_txt, i_rate, _file_spec, language)
         self.client.set_data_mode(self.xml_tool.use_mode)
         self.client.set_punctuation(speechd.PunctuationMode.SOME)
-        if language in ['en-US', 'en-AS', 'en-PH', 'en-PR', 'en-UM', 'en-VI']:
-            _client_voices = self.client.list_synthesis_voices()
-            if bool(voice):
-                # Don't alter user's choice.
-                pass
-            elif ('Bdl', 'en', 'none') in _client_voices:
+        _voice_list = None
+        # Try to match requested gender and locale for supported synthesizers
+        try:
+            _client_voices = self.list_synthesis_voices(language.split('-')[0])
+        except [AttributeError, TypeError]:
+            _client_voices = [""]
+        if language in ['en-AS', 'en-PH', 'en-PR', 'en-UM', 'en-US',
+                        'en-VI']:
+            if self._switch_to_female(voice):
+                _voice_list = ['Slt', 'Clb', 'samantha', 'Bdl', 'Alan',
+                               'English (America)+female1']
+            else:
+                _voice_list = ['Bdl', 'Alan', 'Clb', 'Slt', 'samantha',
+                               'English (America)+male1']
+        elif language[:2] == 'en':
+            if self._switch_to_female(voice):
+                _voice_list = ['serena', 'Slt', 'Clb', 'Alan', 'Bdl',
+                               'English+female1']
+            else:
+                _voice_list = ['Alan', 'Bdl', 'Clb', 'Slt', 'serena',
+                               'English']
+        elif language[:2] == 'kg':
+            if self._switch_to_female(voice):
+                _voice_list = ['Azamat', 'Nazgul', 'Kyrgyz+female1']
+            else:
+                _voice_list = ['Nazgul', 'Azamat', 'Kyrgyz']
+        elif language[:2] == 'pl':
+            if self._switch_to_female(voice):
+                _voice_list = ['Magda', 'Natan', 'Polish+female1']
+            else:
+                _voice_list = ['Natan', 'Magda', 'Polish']
+        elif language[:2] == 'ru':
+            if self._switch_to_female(voice):
+                _voice_list = ['Anna', 'Elena', 'Aleksandr', 'Artemiy',
+                               'Russian+female1']
+            else:
+                _voice_list = ['Aleksandr', 'Artemiy', 'Anna', 'Elena',
+                               'Russian']
+        elif language[:2] == 'uk':
+            if self._switch_to_female(voice):
+                _voice_list = ['Natalia', 'Anatol', 'Ukrainian+female1']
+            else:
+                _voice_list = ['Anatol', 'Natalia', 'Ukrainian']
+        else:
+            _voice_list = [voice]
+        for test_voice in _voice_list:
+            if test_voice in _client_voices:
                 try:
-                    self.client.set_synthesis_voice('Bdl')
+                    self.client.set_synthesis_voice(test_voice)
+                    break
                 except(AttributeError, SyntaxError, TypeError):
-                    pass
-            elif ('English (America)+male1', 'en-US',
-                  'male1') in _client_voices:
-                try:
-                    self.client.set_synthesis_voice('English (America)+male1')
-                except (AttributeError, SyntaxError, TypeError):
                     pass
         self.client.speak(_message)
         time.sleep(_time)
@@ -653,10 +686,36 @@ configurations.
         readtexttools.unlock_my_lock()
         return True
 
-    def list_synthesis_voices(self):  # -> (tuple | None)
-        '''List synthesis voices. i. e.: ('Alan', 'en', 'none', ...)'''
+    def list_synthesis_languages(self, _language=''):  # -> (tuple | None)
+        '''if `language == `''` then list all synthesis languages.
+        if the language is a string, then return a one item list if the
+        language is supported.'''
+        string_list = ''
+        _lang = _language.split('-')[0]
         if bool(self.client):
-            return self.client.list_synthesis_voices()
+            for _item in self.client.list_synthesis_voices():
+                if string_list.count(_lang) == 0:
+                    if bool(_language):
+                        if _lang in [_item[1]] or _language in [_item[1]]:
+                            string_list = string_list + _item[1] + ':'
+                            break
+                    else:
+                        string_list = string_list + _item[1] + ':'
+            if len(string_list) > 1:
+                return string_list[:-1].split(':')
+        return None
+
+    def list_synthesis_voices(self, _language=''):  # -> (tuple | None)
+        '''List synthesis voices. i. e.: ('Alan', 'Slt',...)'''
+        string_list = ''
+        if bool(self.client):
+            for _item in self.client.list_synthesis_voices():
+                if bool(_language):
+                    if _language in [_item[1], _item[2]]:
+                        string_list = string_list + _item[0] + ':'
+                else:
+                    string_list = string_list + _item[0] + ':'
+            return string_list[:-1].split(':')
         return None
     
     def list_output_modules(self):  # -> (tuple | None)
@@ -699,15 +758,15 @@ class SayFormats(object):
         self._f = ''
         self.is_mac = os.path.isfile('/usr/bin/say')
         # On MacOS systems, we specify the complete path`/usr/bin/say`.
-        self.say = ''
+        self.app = ''
         self.lock = readtexttools.get_my_lock("lock")
         if self.is_mac:
-            self.say = 'say'
+            self.app = 'say'
             if os.path.isfile('/usr/bin/say'):
-                self.say = '/usr/bin/say'
+                self.app = '/usr/bin/say'
             try:
                 s1 = (subprocess.check_output(
-                    ''.join([self.say, ' --voice="?"']),
+                    ''.join([self.app, ' --voice="?"']),
                     shell=True))
                 # Python 3 : a bytes-like
                 # object is required
@@ -738,7 +797,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         if self.is_mac:
             try:
                 s1 = (subprocess.check_output(
-                    ''.join([self.say, " --file-format=? "]),
+                    ''.join([self.app, " --file-format=? "]),
                     shell=True))
                 # Python 3 : a bytes-like
                 # object is required
@@ -862,14 +921,10 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         except:
             s2 = ''
         return s2
-
-    def say_aloud(self, _file_spec='', _voice='', _requested_voice='',
-                  _language='', i_rate=0):  # -> bool
-        '''Read aloud using a MacOS system voice if the voice
-        is not already talking. Returns `True` if there is no
-        error. '''
-        if os.path.isfile(readtexttools.get_my_lock('lock')):
-            return True
+    
+    def _i_rate_voice(self, i_rate=0, _voice=''):
+        '''Specific to MacOS say -- check rate and voice, and return
+        a list with `[m_rate, _voice]`.'''
         m_rate = ''
         if bool(i_rate):
             try:
@@ -881,16 +936,30 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
                 pass
         if _voice in ['Agnes', 'Albert']:
             _voice = "Alex"
+        return m_rate, _voice
+
+    def say_aloud(self, _file_spec='', _voice='', _requested_voice='',
+                  i_rate=0):  # -> bool
+        '''Read aloud using a MacOS system voice if the voice
+        is not already talking. Returns `True` if there is no
+        error. 
+        +  `_file_spec` - Text file to speak
+        '''
+        if os.path.isfile(readtexttools.get_my_lock('lock')):
+            return True
+        _speaker_conf = [self._i_rate_voice(i_rate, _voice)]
+        m_rate = _speaker_conf[0][0]
+        _voice = _speaker_conf[0][1]
         try:
             # We need to use subprocess here, because we want to test for
             # `CalledProcessError`.
             v_tag = '-v '
             if len(_voice) == 0:
-                return net_play(_file_spec, _language, i_rate, _requested_voice)
+                return False
             readtexttools.lock_my_lock()
             s1 = (subprocess.check_output(
                 ''.join([
-                    self.say,
+                    self.app,
                     "%(m_rate)s %(v_tag)s%(_voice)s -f '%(_file_spec)s'" %locals()]),
                 shell=True))
             readtexttools.unlock_my_lock()
@@ -901,6 +970,70 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
             # Let's tidy up for the next run.
             readtexttools.unlock_my_lock()
             return False
+
+    def save_audio(self,
+                  _file_spec='', _voice='', i_rate=0, _media_out='',
+                  _audible=False, _visible=False):  # -> bool
+        '''
+
++ `_file_spec` - Text file to speak
++ `_voice` - Supported voice
++ `i_rate` - Two speeds supported
++ `_visible` - Use a graphic media player, or False for invisible player
++ `_media_out` - Name of desired output media file
++ `_audible` - If false, then don't play the sound file
++ `_visible` - If false, then try playing in the background.
++ 
+    '''
+        if len(_media_out) == 0:
+            return False
+        m_rate = ''
+        v_tag = '-v '
+
+        _error_icon = readtexttools.net_error_icon()
+        _speech_rate = readtexttools.safechars(i_rate, '1234567890')
+        _speaker_conf = [self._i_rate_voice(_speech_rate, _voice)]
+        m_rate = _speaker_conf[0][0]
+        _voice = _speaker_conf[0][1]
+        if not bool(_voice):
+            self.ok = False
+            return False
+        _icon = readtexttools.app_icon_image('poster-001.png')
+        # Determine the output file name
+        _media_out = readtexttools.get_work_file_path(_media_out, _icon, 'OUT')
+        # Determine the temporary file name
+        _media_work = readtexttools.get_work_file_path(_media_out, _icon, 'TEMP') + '.aiff'
+
+        # Remove old files.
+        if os.path.isfile(_media_work):
+            os.remove(_media_work)
+        if os.path.isfile(_media_out):
+            os.remove(_media_out)
+        _app = self.app
+        _command = '''%(_app)s%(m_rate)s %(v_tag)s%(_voice)s -o '%(_media_work)s' -f '%(_file_spec)s' ''' % locals()
+        try:
+            readtexttools.my_os_system(_command)
+        except:
+            self.ok = False
+            return False
+        if os.path.isfile(_media_work):
+            if os.path.getsize(_media_work) == 0:
+                return False
+            _writer = ''
+            _size = '600x600'
+            _info = "Apple MacOS Speech Synthesis Voice: %(_voice)s" %locals()
+            readtexttools.process_wav_media(_info, _media_work, _icon,
+                                            _media_out, _audible, _visible,
+                                            _writer, _size)
+            return True
+        else:
+            _msg = "Could not play a say media file locally."
+            if bool(_media_out):
+                _msg = "Could not save a say media file locally."
+            readtexttools.pop_message("Python `say`" % locals(), _msg, 5000,
+                                      _error_icon, 1)
+        self.ok = False
+        return False
 
     def voice(self, s0=''):
         '''
@@ -987,6 +1120,7 @@ def main():
     _txt = ''
     i_rate = 0
     _language = ''
+    _output = ''
     _output_module = ''
     _voice = 'MALE1'
     verbose_language = readtexttools.default_lang()
@@ -1009,8 +1143,9 @@ def main():
         sys.exit(0)
     try:
         opts, args = getopt.getopt(
-            sys.argv[1:], "holvr",
-            ["help", "output_module=", "language=", "voice=", "rate="])
+            sys.argv[1:], "hmolvr",
+            ["help", "output_module=", "output=", "language=", "voice=",
+            "rate="])
     except (getopt.GetoptError):
         print('option was not recognized')
         usage()
@@ -1019,9 +1154,10 @@ def main():
         if o in ("-h", "--help"):
             usage()
             sys.exit()
-        elif o in ("-o", "--output_module"):
+        elif o in ("-m", "--output_module"):
             _output_module = a
-            
+        elif o in ('-o', '--output'):
+            _output = a
         elif o in ("-l", "--language"):
             # 2 letters lowercase - fr Français, de Deutsch...
             concise_lang = ''.join([a.lower(), '-']).split('-')[0]
@@ -1045,7 +1181,10 @@ def main():
                 if line.startswith('%(_voice)s ' %locals()):
                     mac_reader = _voice
                     break
-        _say_formats.say_aloud(__file_spec, mac_reader, _voice, _language, i_rate)
+        if len(_output) == 0:
+            _say_formats.say_aloud(__file_spec, mac_reader, _voice, i_rate)
+        else:
+            _say_formats.save_audio(__file_spec, mac_reader, i_rate, _output, False, False)
         sys.exit(0)
     elif os.name in ['posix']:
         if not USE_SPEECHD:

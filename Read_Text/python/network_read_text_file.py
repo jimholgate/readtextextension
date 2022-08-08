@@ -459,12 +459,15 @@ Setup
         if _lang != _lang1:
             # Translate **to** default language
             _lang2 = _lang1
-        _msg = '`<https://translate.%(_domain)s.%(_tld)s?&langpair=auto|%(_lang2)s&tbb=1&ie=&hl=%(_env_lang)s&text=%(_short_text)s>' % locals(
+        if readtexttools.have_posix_app('osascript', False):
+            _msg = 'https://translate.%(_domain)s.%(_tld)s' %locals()
+        else:
+            _msg = '`<https://translate.%(_domain)s.%(_tld)s?&langpair=auto|%(_lang2)s&tbb=1&ie=&hl=%(_env_lang)s&text=%(_short_text)s>' %locals(
         )
         if not self.language_supported(_iso_lang):
             # Fallback: display a link to translate using Google Translate.
             readtexttools.pop_message(
-                u"%(_provider)s Translate\u2122" % locals(), _msg, 5000,
+                u"%(_provider)s Translate\u2122" %locals(), _msg, 5000,
                 _provider_logo, 0)
             return True
         try:
@@ -476,7 +479,7 @@ Setup
         except gtts.tts.gTTSError:
             readtexttools.pop_message(
                 "`gtts-%(_version)s` failed to connect." % locals(), _msg, 5000,
-                _error_icon, 1)
+                _error_icon, 2)
             self.ok = False
             return False
         except (AssertionError, NameError, ValueError, RuntimeError):
