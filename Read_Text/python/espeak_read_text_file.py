@@ -14,7 +14,7 @@ Ubuntu makes mbrola and mbrola voices available in the multiverse repository.
 
 Install mbrola by installing mbrola using your package manager or downloading
 the mbrola binary and installing it.  Download mbrola voices and copy or link
-the voice files into the appropriate directory. For example:
+the dictionary files into the appropriate directory. For example:
 
         /usr/share/mbrola/voices (Linux, OSX)
         C:/Program Files (x86)/eSpeak/espeak-data (Windows 64 bit)
@@ -126,6 +126,28 @@ def espeak_path():  # -> str
                 return app_name
     return ''
 
+def espk_languages():  # -> list[str]
+    '''If using `espeak-ng`, return a language_list of voices that `espeak-ng`
+    supported in 2022.07, otherwise return a list of supported`espeak` voices.
+    '''
+    _app_name = espeak_path()
+    if _app_name.count('-ng') !=0:
+        return ['af', 'am', 'an', 'ar', 'az', 'ba', 'bg', 'bn', 'bpy', 'bs',
+                'ca', 'cmn', 'cs', 'cy', 'da', 'de', 'el', 'en', 'en-GB',
+                'en-US', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gd',
+                'gn', 'grc', 'gu', 'hak', 'hi', 'hr', 'ht', 'hu', 'hy', 'hyw',
+                'ia', 'id', 'is', 'it', 'ja', 'jbo', 'ka', 'kk', 'kl', 'kn',
+                'ko', 'kok', 'ku', 'ky', 'la', 'lfn', 'lt', 'lv', 'mi', 'mk',
+                'ml', 'mr', 'ms', 'mt', 'mt', 'my', 'nb', 'nci', 'ne', 'nl',
+                'om', 'or', 'pap', 'pt', 'py', 'quc', 'ro', 'ru', 'sd', 'shn',
+                'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te', 'tn', 'tn',
+                'tn', 'tr', 'tt', 'ur', 'uz', 'vi', 'yue']
+    else:
+        return ['af', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'eo', 'fi',
+                'fr', 'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ku', 'la',
+                'lv', 'mk', 'nl', 'pl', 'ro', 'ru', 'sk', 'sq', 'sr', 'sv',
+                'sw', 'ta', 'tr', 'vi']
+
 
 def espkread(_text_path, _lang, _visible, _audible, _tmp0, _image, _title,
              _post_process, _author, _dimensions, _ipitch, _irate):  # -> int
@@ -151,9 +173,12 @@ reads the file aloud.
     _pitch = str(_ipitch)
     _rate = str(_irate)
     _rate = '100'
-    if _lang[:2].lower() in ['de']:
+    _concise_lang = _lang.split('-')[0].split('_')[0].lower()
+    _app_name = espeak_path()
+    _voice = ''
+    if _concise_lang in ['de']:
         s = 'de'
-    elif _lang[:2].lower() in ['en']:
+    elif _concise_lang in ['en']:
         if _lang[-2:].upper() in [
                 'AU', 'BD', 'BS', 'CA', 'GB', 'GH', 'HK', 'IE', 'IN', 'JM',
                 'NZ', 'PK', 'SA', 'TT'
@@ -161,45 +186,44 @@ reads the file aloud.
             s = 'en'
         else:
             s = 'en-us'
-    elif _lang[:2].lower() in ['es']:
+    elif _concise_lang in ['es']:
         if _lang[-2:].upper() in ['ES']:
             s = 'es'
         elif _lang[-2:].upper() in ['MX']:
             s = 'es-mx'
         else:
             s = 'es-la'
-    elif _lang[:2].lower() in ['nb']:
+    elif _concise_lang in ['nb']:
         # *Office uses language code for Norwegian Bokmal - nb
         #  NO is the country code for Norway, not an official language code.
         s = 'no'
-    elif _lang[:2].lower() in ['pt']:
+    elif _concise_lang in ['pt']:
         if _lang[-2:].upper() in ['PT']:
             s = 'pt-pt'
         else:
             s = 'pt'
-    elif _lang[:2].lower() in ['zh']:
+    elif _concise_lang in ['zh']:
         if _lang[-2:].upper() in ['HK', 'MO']:
             # Yue is official language in Hong Kong & Macau
             s = 'zh-yue'
         else:
             s = 'zh'
-    elif _lang[:2].lower() in [
-            'af', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'eo', 'fi', 'fr',
-            'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ku', 'la', 'lv', 'mk',
-            'nl', 'pl', 'ro', 'ru', 'sk', 'sq', 'sr', 'sv', 'sw', 'ta', 'tr',
-            'vi'
-    ]:
-        s = _lang[:2].lower()
+    elif _concise_lang in espk_languages():
+        s = _concise_lang
+    elif os.path.isfile('/usr/share/espeak-ng-data/%(_concise_lang)s_dict' %locals()):
+        s = _concise_lang
     else:
-        s = 'en'
-    _voice = s  # standard espeak voice
+        print('''`espeak_read_text_file.py` says:
+`%(_lang)s` is an unsupported language.  Exiting.''' %locals())
+        return 0
+    _voice = s  # standard espeak dictionary
     if _post_process == 'process_wav_media':
-        # Check if an mbrola voice is available for the language, otherwise use
-        # the default espeak voice.  If there are several compatible mbrola
+        # If an mbrola dictionary is available for the language, use it.
+        # If not use the default.  If there are several compatible mbrola
         # voices, this python script will choose the first one - for example:
         # de2 instead of de7.
         #
-        # Dictionary : `a2` is the locally installed language abbreviation;
+        # In the `a0` list, `a2` is the locally installed language abbreviation;
         # `a1` is the equivalent ISO 639-1 standard for languages, except in
         # the cases of pt-PT and en-US, which include a regional ISO code.
         a0 = [{
@@ -307,7 +331,7 @@ reads the file aloud.
         }]
 
         for i in range(len(a0)):
-            # Identify an mbrola voice if it is installed
+            # Identify an mbrola dict if it is installed
 
             if a0[i]['a1'] == s:
                 if os.name == 'nt':
@@ -372,7 +396,7 @@ reads the file aloud.
             _app = 'gst-launch-1.0'
             _content = _imported_meta.meta_from_file(_text_path)
             _content = _imported_meta.escape_gst_pipe_meta(_content)
-            _command = '%(_app)s espeak text="%(_content)s" voice=%(_voiespeakce)s ! autoaudiosink' % locals(
+            _command = '%(_app)s espeak text="%(_content)s" voice=%(_voice)s ! autoaudiosink' % locals(
             )
             _post_process = None
         if not bool(_app):

@@ -161,8 +161,10 @@ import subprocess
 import sys
 import time
 import espeak_read_text_file
-import readtexttools
 import network_read_text_file
+import openjtalk_read_text_file
+import readtexttools
+import rhvoice_read_text_file
 
 USE_SPEECHD = True
 try:
@@ -386,7 +388,7 @@ def net_play(_file_spec='', _language='en-US', i_rate=0, _requested_voice=''): #
         if _requested_voice in NET_SERVICE_LIST:
             net_rate = 160
             if i_rate < 0:
-                net_rate = 110                    
+                net_rate = 110
             ret_val = network_read_text_file.network_main(
                 _file_spec, _language, 'false', 'true', '',
                 '', '', '', '600x600', net_rate,
@@ -409,6 +411,7 @@ configurations.
 
     def __init__(self):  # -> None
         '''Define common settings'''
+        self.open_jtalk = openjtalk_read_text_file.OpenJTalkClass()
         self.client_app = readtexttools.app_signature()
         self.xml_tool = readtexttools.XmlTransform()
         self.json_tools = readtexttools.JsonTools()
@@ -419,7 +422,7 @@ configurations.
         # Speech dispatcher and network tools do not have all
         # voices for all languages, so a tool might substitute
         # a missing voice for one that it does have.
-        
+
         self.all_voices = ['MALE3', 'MALE2', 'MALE1',
                            'FEMALE3', 'FEMALE2', 'FEMALE1',
                            'CHILD_MALE', 'CHILD_FEMALE',
@@ -429,22 +432,8 @@ configurations.
                            'FEMALE3', 'FEMALE2', 'FEMALE1',
                            'CHILD_MALE', 'CHILD_FEMALE']
         self.stop_voice = 'TriggerAssertionError'
-        # language_list of voices that `espeak-ng` supports 2022.07
         # NOTE: speechd might reject a language when length of item > 2
-        self.language_list = ['af', 'am', 'an', 'ar', 'az', 'ba', 'bg', 'bn',
-                              'bpy', 'bs', 'ca', 'cmn', 'cs', 'cy', 'da',
-                              'de', 'el', 'en', 'en-GB', 'en-US', 'eo', 'es',
-                              'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gd', 'gn',
-                              'grc', 'gu', 'hak', 'hi', 'hr', 'ht', 'hu',
-                              'hy', 'hyw', 'ia', 'id', 'is', 'it', 'ja',
-                              'jbo', 'ka', 'kk', 'kl', 'kn', 'ko', 'kok',
-                              'ku', 'ky', 'la', 'lfn', 'lt', 'lv', 'mi',
-                              'mk', 'ml', 'mr', 'ms', 'mt', 'mt', 'my',
-                              'nb', 'nci', 'ne', 'nl', 'om', 'or', 'pap',
-                              'pt', 'py', 'quc', 'ro', 'ru', 'sd', 'shn',
-                              'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta',
-                              'te', 'tn', 'tn', 'tn', 'tr', 'tt', 'ur',
-                              'uz', 'vi', 'yue']
+        self.language_list = espeak_read_text_file.espk_languages()
         self.config_dir = '/etc/speech-dispatcher/modules'
         self.local_config = ''
         self.local_json = readtexttools.get_my_lock('json')
@@ -465,23 +454,31 @@ configurations.
     def is_a_supported_language(self, _lang='en', experimental=False):  # -> Bool
         '''Verify that your installed speech synthesisers are *registered* with
         the selected language. If there's an error and `experimental` is `True`,
-        then we return `True` if it is language that `espeak-ng` supported in
-        July, 2022.'''
+        then we return `True` if it is language that `espeak-ng` supports.'''
         _list = self.list_synthesis_languages(_lang)
+        _rhvoice = rhvoice_read_text_file.RhVoiceClass()
         if bool(_list):
             return True
         if experimental:
             _short_lang = _lang.split('-')[0].split('_')[0]
             if _short_lang in self.language_list:
                 return True
+            elif os.path.isfile('/usr/share/espeak-ng-data/%(_short_lang)s_dict' %locals()):
+                return True
+            elif _rhvoice.voice_available(_short_lang):
+                # rhvoice includes Ukrainian and other languages that might
+                # not be included with espeak-ng or espeak
+                return True
+            elif _short_lang == 'ja':
+                if os.path.exists(self.open_jtalk.dictionary):
+                    return True
         return False
-    
+
     def is_named_voice(self, _language, _voice='Bdl'):  # -> Bool
         '''Verify that `spd-say` lists the voice. '''
-        
         _result = self.list_synthesis_voices(_language)
         if not bool(_result):
-            return False            
+            return False
         if _voice in _result:
             return True
         return False
@@ -514,7 +511,7 @@ configurations.
         return False
 
     def speak_spd(self, output_module='', language='',
-                      voice='', i_rate=0, _file_spec=''): # -> bool
+                  voice='', i_rate=0, _file_spec=''): # -> bool
         '''Set user configuration settings'''
         _lock = readtexttools.get_my_lock("lock")
         _try_voice = voice
@@ -557,8 +554,8 @@ configurations.
                     readtexttools.unlock_my_lock()
                     return True
                 elif not self.is_a_supported_language(
-                    language, not os.path.isfile(
-                        '/usr/bin/spd-say')):
+                        language, not os.path.isfile(
+                            '/usr/bin/spd-say')):
                     self.client.close()
                     hard_reset('speech-dispatcher')
                     time.sleep(0.2)
@@ -566,7 +563,7 @@ configurations.
                     if os.path.isfile(self.local_json):
                         # Using the json file as a lock file. The lock
                         # lock file works if and only if the network
-                        # media creator returns an audio file that is 
+                        # media creator returns an audio file that is
                         # normally playable with your computer's media
                         # player.
                         for _player in ['avplay', 'ffplay', 'vlc',
@@ -575,8 +572,8 @@ configurations.
                         os.remove(self.local_json)
                     else:
                         self.json_content = self.json_tools.set_json_content(
-                                language, voice, i_rate,
-                                _file_spec, output_module)
+                            language, voice, i_rate,
+                            _file_spec, output_module)
                         readtexttools.write_plain_text_file(self.local_json,
                                                             self.json_content,
                                                             'utf-8')
@@ -590,8 +587,8 @@ configurations.
         except (ImportError, NameError, speechd.SpawnError):
             if len(voice) != 0:
                 self.json_content = self.json_tools.set_json_content(
-                        language, voice, i_rate,
-                        _file_spec, output_module)
+                    language, voice, i_rate,
+                    _file_spec, output_module)
                 readtexttools.write_plain_text_file(self.local_json,
                                                     self.json_content,
                                                     'utf-8')
@@ -620,7 +617,7 @@ configurations.
         _txt = readtexttools.strip_xml(_txt)
         _txt = readtexttools.strip_mojibake(concise_lang, _txt)
         if self.xml_tool.use_mode in ['text']:
-            _message = ' " %(_txt)s"' % locals()   
+            _message = ' " %(_txt)s"' % locals()
         else:
             _txt = self.xml_tool.clean_for_xml(_txt)
             _message = '''<?xml version='1.0'?>
@@ -717,7 +714,7 @@ configurations.
                     string_list = string_list + _item[0] + ':'
             return string_list[:-1].split(':')
         return None
-    
+
     def list_output_modules(self):  # -> (tuple | None)
         '''List available output modules. i. e.: (espeak-ng-mbrola, espeak-ng,
         rhvoice, pico, festival, festvox ...)'''
@@ -921,7 +918,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         except:
             s2 = ''
         return s2
-    
+
     def _i_rate_voice(self, i_rate=0, _voice=''):
         '''Specific to MacOS say -- check rate and voice, and return
         a list with `[m_rate, _voice]`.'''
@@ -930,7 +927,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
             try:
                 if i_rate < 0:
                     m_rate = ' -r 110'
-                elif not i_rate == 0:
+                elif i_rate != 0:
                     m_rate = ' -r 240'
             except:
                 pass
@@ -942,8 +939,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
                   i_rate=0):  # -> bool
         '''Read aloud using a MacOS system voice if the voice
         is not already talking. Returns `True` if there is no
-        error. 
-        +  `_file_spec` - Text file to speak
+        error.
         '''
         if os.path.isfile(readtexttools.get_my_lock('lock')):
             return True
@@ -972,8 +968,8 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
             return False
 
     def save_audio(self,
-                  _file_spec='', _voice='', i_rate=0, _media_out='',
-                  _audible=False, _visible=False):  # -> bool
+                   _file_spec='', _voice='', i_rate=0, _media_out='',
+                   _audible=False, _visible=False):  # -> bool
         '''
 
 + `_file_spec` - Text file to speak
@@ -983,7 +979,6 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
 + `_media_out` - Name of desired output media file
 + `_audible` - If false, then don't play the sound file
 + `_visible` - If false, then try playing in the background.
-+ 
     '''
         if len(_media_out) == 0:
             return False
@@ -1010,7 +1005,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         if os.path.isfile(_media_out):
             os.remove(_media_out)
         _app = self.app
-        _command = '''%(_app)s%(m_rate)s %(v_tag)s%(_voice)s -o '%(_media_work)s' -f '%(_file_spec)s' ''' % locals()
+        _command = "%(_app)s%(m_rate)s %(v_tag)s%(_voice)s -o '%(_media_work)s' -f '%(_file_spec)s' " %locals()
         try:
             readtexttools.my_os_system(_command)
         except:
@@ -1145,8 +1140,8 @@ def main():
         opts, args = getopt.getopt(
             sys.argv[1:], "hmolvr",
             ["help", "output_module=", "output=", "language=", "voice=",
-            "rate="])
-    except (getopt.GetoptError):
+             "rate="])
+    except getopt.GetoptError:
         print('option was not recognized')
         usage()
         sys.exit(2)
@@ -1182,7 +1177,15 @@ def main():
                     mac_reader = _voice
                     break
         if len(_output) == 0:
-            _say_formats.say_aloud(__file_spec, mac_reader, _voice, i_rate)
+            if not _say_formats.say_aloud(__file_spec, mac_reader, _voice, i_rate):
+                if _voice in NET_SERVICE_LIST:
+                    if not net_play(__file_spec, _language, i_rate, _voice):
+                        print('''Is the network connected?
+=========================
+    
++ The `%(_voice)s` on-line voice is currently unavailable.
++ It might help to restart your device, refresh the network
+  or check your on-line account status.''' %locals())
         else:
             _say_formats.save_audio(__file_spec, mac_reader, i_rate, _output, False, False)
         sys.exit(0)
@@ -1191,17 +1194,17 @@ def main():
             readtexttools.web_info_translate(
                 '''The `speechd` library is not compatible with your application or platform.''',
                 _language)
-            exit()
+            sys.exit(0)
         _spd_formats = SpdFormats()
         if not _spd_formats.spd_ok:
             print("The `speechd` python 3 library is required.")
             usage()
-            exit()
+            sys.exit(0)
         if not _spd_formats.set_up():
             print('''The python 3 `speechd` setup failed. Check for a system update and
 restart your computer.''')
             usage()
-            exit()
+            sys.exit(0)
         _testing = False
         if not _spd_formats.speak_spd(_output_module, _language,
                                       _voice, i_rate, __file_spec):
@@ -1210,5 +1213,5 @@ restart your computer.''')
     sys.exit(0)
 
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
     main()

@@ -1862,7 +1862,8 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	End If
 	If fbOKWithRhVoice(sLanguage) Then
 		s4 = &quot;&quot;&quot;(RHVOICE_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)	
+		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)  &apos; 2022.08 voices ignored rate and pitch
+			
 	End If
 	If fbHaveEspeak() Or _
 		fileexists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
@@ -1908,11 +1909,62 @@ Function fspyPlayOption( _
 End Function
 
 
+Function gst_plugin_path() As String
+	&apos; Enumerate Array fileexists(dir)
+	gst_plugin_path = &quot;&quot;
+	Dim x As Integer
+	Dim _paths As Variant
+	_paths = Array(_
+	&quot;/usr/local/lib/x86_64-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/x86_64-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib64/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib64/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/i386/gstreamer-1.0/&quot;, _
+	&quot;/usr/i386/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/i386-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/i386-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/amd64-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/amd64-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/armel-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/armel-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/armhf-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/armhf-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/arm64-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/arm64-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/mips-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/mips-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/mips64el-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/mips64el-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/mipsel-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/mipsel-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/ppc64el-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/ppc64el-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/s390x-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/s390x-linux-gnu/gstreamer-1.0/&quot;)
+	For x = Lbound(_paths) to Ubound(_paths)
+		If fileexists(_paths(x)) Then
+			gst_plugin_path = _paths(x)
+			Exit Function
+		End If
+	Next
+End Function
+
+
 Function fspyOutOptions( _
 	oDialog, _
 	ByVal s4, _
 	ByVal bPitchSpeed) As String
 	Dim s1, s2, s3, s5, s6, CR As String
+	Dim extension As Variant
+	Dim command_list As Variant
+	Dim x As Integer
+	Dim _x_ok As Integer : _x_ok = 0
+	Dim _ext As Integer : _ext = 0
+	Dim _lib_so As Integer : _lib_so = 1
+	Dim _plugin_path As String : _plugin_path = gst_plugin_path()
+	Dim _vlc As String : _vlc = vlcPath()
 	s1 = &quot;&quot;
 	s3 = &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	s6 = &quot;&quot;
@@ -1927,98 +1979,102 @@ Function fspyOutOptions( _
 	If s4 = &quot;&quot; Then
 		s1 = &quot;&quot;
 	ElseIf fsGetOS() = &quot;MacOS&quot; Then
-		s1 = s1 &amp; CR &amp; s4 &amp; _
-		&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).m4a&quot;&quot;&quot; &amp; s3
-		If Len(vlcPath()) &lt;&gt; 0 Then
-			s1 = s1 &amp; CR &amp; s4 &amp; _
-			&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).ogg&quot;&quot;&quot; &amp; _
-			s3 &amp; CR &amp; s4 &amp; _
-			&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
-			s3 &amp; CR &amp; s4
-		End If
-		s1 =  CR &amp; s4 &amp; s1 &amp; s2
+		Select Case Len(_vlc)
+			Case 0
+			extension = Array(&quot;.aiff&quot;, &quot;.m4a&quot;, &quot;.aac&quot;)
+			Case Else
+			extension = Array(&quot;.aiff&quot;, &quot;.opus&quot;, &quot;.ogg&quot;, &quot;.mp3&quot;, &quot;.m4a&quot;, &quot;.flac&quot;, _
+			&quot;.aac&quot;)
+		End Select
+		For x = Lbound(extension) To Ubound(extension)
+			ReDim Preserve command_list(x)
+			command_list(x) = s4 &amp; _
+			&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; _
+			extension(x) &amp; &quot;&quot;&quot;&quot; &amp; s3
+		Next
+		s1 = CR &amp; Join(command_list, CR) &amp; CR &amp; s4
 	Else
-		s1 = s1 &amp; CR &amp; s4 &amp; _
-		&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).wav&quot;&quot;&quot; &amp; _
-		s3
+		If fsGetOS() = &quot;UNIX&quot; Then
+			If Len(_
+			fsContainerResourcePath(_
+			&quot;python&quot;)) &lt;&gt; 0 Then
+				&apos; Pass - The container is sandboxed by default, so
+				&apos; we cannot count on it working properly.
+			ElseIf Len(_
+			fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 And Not(_
+			fbHaveFfmpeg()) And Len(_vlc) = 0 Then
+				&apos; The Python gstreamer library might not be available, so 
+				&apos; propose saving an uncompressed audio file.
+				s1 = s1 &amp; CR &amp; s4 &amp; _
+				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).wav&quot;&quot;&quot; &amp; _
+				s3
+			Else
+				&apos; `opus` replaces `.spx` and `.ogg`.
+				&apos; `lame` (.mp3) replaces `mp1` and `.mp2`.
+				extension = Array(_
+				Array(&quot;.wav&quot;, &quot;libgstwavenc&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;), _
+				Array(&quot;.opus&quot;, &quot;libgstopus&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;), _
+				Array(&quot;.ogg&quot;, &quot;libgstogg&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;), _
+				Array(&quot;.mp3&quot;, &quot;libgstlame&quot;, &quot;libmp3lame0/copyright&quot;), _
+				Array(&quot;.flac&quot;, &quot;libgstflac&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;))
+
+				For x = Lbound(extension) To Ubound(extension)
+					If fileexists(_plugin_path &amp; extension(x)(1) &amp; &quot;.so&quot;) Then 
+						ReDim Preserve command_list(_x_ok)
+						command_list(_x_ok) = s4 &amp; _
+						&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; _
+						extension(x)(0) &amp; &quot;&quot;&quot;&quot; &amp; s3
+						_x_ok = _x_ok + 1
+					End If
+				Next
+
+				If _x_ok = 0 Then
+					For x = Lbound(extension) To Ubound(extension)
+						If fileexists(&quot;/usr/share/doc/&quot; &amp; extension(x)(2)) Then 
+							ReDim Preserve command_list(_x_ok)
+							command_list(_x_ok) = s4 &amp; _
+							&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; _
+							extension(x)(0) &amp; &quot;&quot;&quot;&quot; &amp; s3
+							_x_ok = _x_ok + 1
+						End If
+					Next
+				End If
+				If Len(fsContainerResourcePath(&quot;python&quot;)) = 0 Then			
+					If _x_ok &lt;&gt; 0 Then
+						s1 = CR &amp; Join(command_list, CR) &amp; CR &amp; s4
+					Else
+						s1 = s1 &amp; CR &amp; s4 &amp; _
+						&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).wav&quot;&quot;&quot; &amp; _
+						s3
+					End If
+				End If
+			End If
+		Else  &apos; WINDOWS			
+			extension = Array(_
+			Array(&quot;.wav&quot;, _vlc, fsMyFfmpeg()), _
+			Array(&quot;.opus&quot;, _vlc, fsMyFfmpeg()), _
+			Array(&quot;.ogg&quot;, _vlc, oggPath()), _
+			Array(&quot;.mp3&quot;, _vlc, lamePath()), _
+			Array(&quot;.flac&quot;, _vlc, flacPath()), _
+			Array(&quot;.aac&quot;, _vlc, neroPath()))
+			For x = Lbound(extension) To Ubound(extension)
+				If fileexists(extension(x)(2)) Or _
+				fileexists(extension(x)(1)) Then
+					ReDim Preserve command_list(_x_ok)
+					command_list(_x_ok) = s4 &amp; _
+					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)\(NOW)&quot; &amp; _
+					extension(x)(0) &amp; &quot;&quot;&quot;&quot; &amp; s3
+					_x_ok = _x_ok + 1
+				End If
+			Next		
+		End If
 		If Len(fsContainerResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
 			&apos;pass
 		ElseIf Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 And Not(fbHaveFfmpeg()) Then
 			&apos; The Python gi Gst library is unavailable, so the python script can
 			&apos; only work with a discreet converter.
 			&apos;pass
-		Else
-			If fileexists(&quot;/usr/bin/faac&quot;) Or _
-				fileexists(&quot;C:\opt\neroAacEnc.exe&quot;) Then
-				&apos; Some players might not play faac output. Check firefox and
-				&apos; Android based music players.
-				s1 = s1 &amp; CR &amp; s4 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).m4a&quot;&quot;&quot; &amp; _
-				s2
-			End If
-			If fileexists(&quot;/usr/bin/flac&quot;) Or _
-				fbHaveFlac() Or _
-				fbHaveFfmpeg() Or _
-				fbHaveVLC() Then
-				&apos; Free lossless audio codec
-				s1 = s1 &amp; CR &amp; s4 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).flac&quot;&quot;&quot; &amp; _
-				s3
-			End If
-			If fbHaveFfmpeg() Then
-				&apos; Apple Audio Interchange format. not compressed.
-				s1 = s1 &amp; CR &amp; s4 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).aif&quot;&quot;&quot; &amp; _
-				s2
-			End If
-			If fbHaveFfmpeg() Then
-				&apos; Webm is a modern cross platform web browser oriented video format. 
-				&apos; Works on google-chrome, chromium, and firefox, but not on Safari 
-				&apos; or Internet Explorer
-				s5 = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
-				s1 = s1 &amp; CR &amp; s4 &amp; _
-				&quot; --image &quot;&quot;(MY_IMAGE)&quot;&quot;&quot; &amp; _
-				&quot; --dimensions &quot;&quot;1200x800&quot;&quot;&quot; &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot; &amp; _
-				s2
-				s1 = s1 &amp; CR &amp; s4 &amp; _
-				&quot; --image &quot;&quot;(POSTER2_IMG)&quot;&quot;&quot; &amp; _
-				&quot; --dimensions &quot;&quot;600x400&quot;&quot;&quot; &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot; &amp; _
-				s2
-				s1 = s1 &amp; CR &amp; s4 &amp; _
-				s5 &amp; _
-				&quot; --dimensions &quot;&quot;600x600&quot;&quot;&quot; &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).webm&quot;&quot;&quot; &amp; _
-				s2
-			End If
-			If (fileexists(&quot;/usr/share/doc/libogg0/copyright&quot;) Or _
-				fbHaveFfmpeg()) Or _
-				fbHaveOgg() Then
-				&apos; Could look for library, but the copyright page is in the same place
-				&apos; on 64 bit systems.  avconv can convert wave to ogg files if the 
-				&apos; library exists.
-				s1 = s1 &amp; CR &amp; s4 &amp; _
-				s5 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).ogg&quot;&quot;&quot; &amp; _
-				s2
-			End If
-			If fileexists(&quot;/usr/share/doc/libmp3lame0/copyright&quot;) Or _
-				fileexists(&quot;C:\opt\lame.exe&quot;) Or fbHaveGst() Then
-				&apos; Some players might not play lame mp3 output. Check firefox and 
-				&apos; Android based music players.
-				s1 = s1 &amp; CR &amp; s4 &amp; _
-				s5 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
-				s2
-			ElseIf fileexists(&quot;/usr/share/doc/libtwolame0/copyright&quot;) Or _
-				fileexists(&quot;C:\opt\twolame.exe&quot;) Then
-				&apos; does not work with Rhythm box. not a widely used export format.
-				s1 = s1 &amp; CR &amp; s4 &amp; _
-				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp2&quot;&quot;&quot; &amp; _
-				s2
-			End If
-			&apos; End AppImage block
+
 		End If
 		&apos; End File Write section
 		If bPitchSpeed Then
@@ -2068,11 +2124,11 @@ Function fsContainerResourcePath( _
 	ByVal sApp As String) As String
 	&apos; Linux Snap installations use a specific version of python
 	&apos; running in the root `/snap` directory.
+	fsContainerResourcePath = &quot;&quot;
 	Dim i#
 	i = 0
 	Dim s1$
 	s1 = ConvertFromURL(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
-	fsContainerResourcePath = &quot;&quot;
 	If (InStr(s1, &quot;/snap/&quot;) = 1) Or InStr(s1, &quot;.mount&quot;) &lt;&gt; 0 Then
 		If FileExists(&quot;/snap/core/current/usr/bin/python3&quot;) Then
 			fsContainerResourcePath = &quot;/snap/core/current/usr/bin/python3&quot;
@@ -2090,12 +2146,13 @@ End Function
 &apos;&apos;
 
 Function fsMyTitleInputBox( _
-	ByVal bSkipWindows, _
-	ByVal sA) As String
-	&apos; bSkipWindows - Skip dialogue if Windows..
+	ByVal b_skip_windows, _
+	ByVal suggestion, _
+	ByVal dialog_title) As String
+	&apos; b_skip_windows - Skip dialogue if Windows..
 	&apos; Normally, the Windows script takes care of verifying
 	&apos; the title.
-	&apos; sA - an optional title suggestion.  Returns string or blank if 
+	&apos; suggestion - an optional title suggestion.  Returns string or blank if 
 	&apos; you click &quot;Cancel&quot;
 	&apos; 
 	Dim cr As String
@@ -2104,23 +2161,32 @@ Function fsMyTitleInputBox( _
 	Dim s3 As String
 	Dim s4 As String
 	Dim s5 As String
+	Dim x As Integer
 	Dim unwanted_characters As String
-	unwanted_characters = &quot;,:;-–&quot;
-	If bSkipWindows Then
+	unwanted_characters = &quot;,:;-–&gt;&lt;{}|&quot;
+	If b_skip_windows Then
 		If fsGetOS = (&quot;WINDOWS&quot;) Then
-			fsMyTitleInputBox = sA
+			fsMyTitleInputBox = suggestion
 			Exit Function
 		End If
 	End If
-	If True Then
-		cr = Chr(10)
-		s1 = fsSuperTrim(fsThisDocTitle(), unwanted_characters)
-		s2 = fsSuperTrim(fsThisDocAuthor(), unwanted_characters)
-		s3 = fsThisDocGenre()
-		s4 = fsSuperTrim(fsThisSoundTitle(), unwanted_characters)
-		s5 = Trim(str(fiMyCurrentAudioTrack(False)))
-		sA = fsSuperTrim(sA, unwanted_characters)
-		fsMyTitleInputBox = InputBox(s1 &amp; cr &amp; s2 &amp; cr &amp; cr &amp; s5 &amp; &quot;. &quot; &amp; s4, s3, sA)
+	If len(dialog_title) = 0 Then
+		dialog_title = fsThisDocGenre()
+	End If
+	cr = Chr(10)
+	s1 = fsSuperTrim(fsThisDocTitle(), unwanted_characters)
+	s2 = fsSuperTrim(fsThisDocAuthor(), unwanted_characters)
+	s3 = dialog_title  &apos; ###### Dialog Title
+	s4 = fsSuperTrim(fsThisSoundTitle(), unwanted_characters)
+	s5 = Trim(str(fiMyCurrentAudioTrack(False)))
+	suggestion = fsSuperTrim(suggestion, unwanted_characters)
+	fsMyTitleInputBox = InputBox(s1 &amp; cr &amp; s2 &amp; cr &amp; cr &amp; s5 &amp; &quot;. &quot; &amp; s4, s3, _
+	suggestion)
+	If Len(fsMyTitleInputBox) = 0 Then
+		x = i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack
+		If x &gt; 0 Then
+			i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = x - 1
+		End If
 	End If
 End Function
 
@@ -2294,6 +2360,22 @@ Function fbWestEuropeanLang( _
 End Function
 
 
+Function fsGetActuateExtension( _
+	ByVal test_command As String, _
+	ByVal media_list As String) As String
+	fsGetActuateExtension = &quot;&quot;
+	Dim a1 As Variant
+	a1 = Split(media_list, &quot;,&quot;)
+	Dim x As Integer
+	For x = Lbound(a1) To Ubound(a1)
+		If Instr(test_command, a1(x) &amp; &quot;&quot;&quot;&quot;) &lt;&gt; 0 Then
+			fsGetActuateExtension = a1(x)
+			Exit For
+		End If
+	Next
+End Function
+
+
 Sub ttsActuate( _
 	config() As Variant, _
 	msgs() As Variant, _
@@ -2330,6 +2412,10 @@ Sub ttsActuate( _
 	n = 0
 	Dim oBar    &apos; Generated status bar 
 	Dim oFrame  &apos; Current frame
+	Dim media_list As String
+	media_list = &quot;.3gp,.aac,.aif,.aiff,.alsa,.ape,.asf,.au,.avi,.caf,.dts,.flac,&quot; &amp; _
+		&quot;.m4a,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.oma,.opus,.riff,.rm,.smp,.snd,.sou,.spx,&quot; &amp; _
+		&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;
 &apos;&apos;
 &apos;&apos; Temporary Files
 &apos;&apos; ---------------
@@ -2364,16 +2450,14 @@ Sub ttsActuate( _
 	On Error Resume Next
 	oFrame = ThisComponent.getCurrentController().getFrame()
 	oBar = oFrame.createStatusIndicator()
-	oBar.start(fsLookUpTerm(&quot;s_read-text&quot;),100)
+	oBar.start(fsLookUpTerm(&quot;s_read-text&quot;), 100)
 	&apos;On Error Goto ErrorHandler
 	
 	&apos;Get rid of the old files containing a script And/or plain text of selected String
 	resetSpeech
 	sArtLook = config(5)
-	If fbCreatingMediaFile(&quot;.3gp,.aac,.aif,.aiff,.alsa,.ape,.asf,.au,.avi,.caf,.dts,.flac,&quot; &amp; _
-		&quot;.m4a,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.oma,.opus,.riff,.rm,.smp,.snd,.sou,.spx,&quot; &amp; _
-		&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;, _
-		sArtLook) Then
+
+	If fbCreatingMediaFile(media_list) Then
 		&apos; Get current track, then increment it by one to a maximum value of 255. 
 		&apos; (hex FF)
 		n = fiMyCurrentAudioTrack(True)
@@ -2382,7 +2466,7 @@ Sub ttsActuate( _
 			&apos; osascript document.
 			bAddTime = True
 		Else
-			If config(fiExternalOption()) Or config(fiFestivalOption()) Then
+			If Bool(config(fiExternalOption())) Or Bool(config(fiFestivalOption())) Then
 				&apos; Temporary Metadata for an external vbs or python script.
 				&apos; External scripts delete these files once they have been
 				&apos; read.  MacOS creates a script at run-time, so these files
@@ -2395,7 +2479,11 @@ Sub ttsActuate( _
 					Case &quot;WINDOWS&quot;
 					s1 = fsThisSoundTitle()
 					Case Else
-					s1 = fsMyTitleInputBox(True, fsThisSoundTitle())
+					s1 = fsMyTitleInputBox(_
+					True, _
+					fsThisSoundTitle(), _
+					fsThisDocGenre() &amp; &quot; (&quot; &amp; fsGetActuateExtension(_
+					sArtLook, media_list) &amp; &quot;)&quot; )
 					If s1 = &quot;&quot; Then
 						Exit Sub
 					End If
@@ -3606,7 +3694,7 @@ Function isoToEnglish( _
 		Case &quot;tyx&quot;,&quot;tyx-cg&quot;
 		S2 = &quot;Teke-Tyee&quot;
 		Case &quot;uk&quot;,&quot;uk-ua&quot;
-		S2 = &quot;Ukranian&quot;
+		S2 = &quot;Ukrainian&quot;
 		Case &quot;ur&quot;,&quot;ur-in&quot;,&quot;ur-pk&quot;
 		S2 = &quot;Urdu&quot;
 		Case &quot;uz&quot;,&quot;uz-uz&quot;
@@ -4834,7 +4922,7 @@ Function fswriteMacOSSpeechScript( _
 		
 		If fbCreatingMediaFile( _
 			confirmMetaData) And sGetOS = &quot;MacOS&quot; Then
-			sTitle = fsMyTitleInputBox(True, fsThisSoundTitle(&quot;`&gt;_ &quot;))
+			sTitle = fsMyTitleInputBox(True, fsThisSoundTitle(&quot;`&gt;_ &quot;), &quot;&quot;)
 			If sTitle = &quot;&quot; Then
 				s1 = &quot;-- &quot; &amp; fsNow() &amp; &quot;.  The title is undefined.  &quot; &amp; _
 				&quot;Did you click &quot;&quot;Cancel&quot;&quot; or leave the title blank?&quot;
@@ -5269,9 +5357,9 @@ Function fswriteMacOSSpeechScript( _
 		&quot;            set audio_codec to &quot;&quot;&quot;&quot;&quot;, _
 		&quot;        else&quot;, _
 		&quot;            set audio_codec to &quot;&quot;flac&quot;&quot;&quot;, _
-		&quot;            set average_bitrate to &quot;&quot;96&quot;&quot;&quot;, _
+		&quot;            set average_bitrate to &quot;&quot;128&quot;&quot;&quot;, _
 		&quot;            set sample_rate to &quot;&quot;44100&quot;&quot;&quot;, _
-		&quot;            set mux to &quot;&quot;ogg&quot;&quot;&quot;, _
+		&quot;            set mux to &quot;&quot;raw&quot;&quot;&quot;, _
 		&quot;        end if&quot;, _
 		&quot;    end if&quot;, _
 		&quot;    if audio_codec is &quot;&quot;&quot;&quot; then&quot;, _
@@ -5779,7 +5867,7 @@ Function fsGetPipLibPath(s_test As String) As String
 			Exit Function
 		End If
 		sPythonSubDirs = &quot;/lib/site-packages&quot;
-		py_dir = Environ(&quot;HOME&quot;) &amp; &quot;.local/lib/python&quot;		
+		py_dir = Environ(&quot;HOME&quot;) &amp; &quot;/.local/lib/python&quot;
 	End Select
 	Dim sSubDirectories$ : sSubDirectories = fsSubDirectories(py_dir)
 	Dim version_list As Variant : version_list = Split(sSubDirectories, Chr(13))
@@ -5809,8 +5897,8 @@ Function fsSubDirectories(sPath As String)
 	fsSubDirectories = &quot;&quot;
 	sDir = &quot; &quot;
 	If Len(sPath) = 0 Then sPath = CurDir
-	sValue = Dir$(sPath + getPathSeparator + &quot;*&quot;,16)
-	On Error GoTo fsSubDirectoriesErr
+	sValue = Dir$(sPath + getPathSeparator + &quot;*&quot;, 16)
+	On Error Resume Next
 	Do
 		If sValue &lt;&gt; &quot;.&quot; And sValue &lt;&gt; &quot;..&quot; Then
 			If (GetAttr(sPath + getPathSeparator + sValue) And 16) &gt; 0 Then
@@ -5873,7 +5961,9 @@ End Function
 
 Function fbHaveNetworkTTS() As Boolean
 	&apos; See: &lt;https://github.com/pndurette/gTTS&gt;
-	&apos; 
+	&apos; If you are not running libreoffice from normal home directory, then
+	&apos; the script disables network speech because container versions of
+	&apos; the application do not necessarily include the required libraries.
 	fbHaveNetworkTTS = Len(fsGetPipLibPath(&quot;gtts&quot;)) &lt;&gt; 0
 	If fbHaveNetworkTTS Then
 		Exit Function
@@ -6188,6 +6278,40 @@ Function lamePath() As String
 		found_value = fsFindAppPath(a1(n))
 		If Len(found_value) &gt; 0 Then
 			lamePath = found_value
+			Exit Function
+		End If
+	Next
+End Function
+
+
+Function neroPath() As String
+&apos;&apos;&apos;
+	&apos; Returns path to the nero aac converter program.
+&apos;&apos;&apos;
+	neroPath = &quot;&quot;
+	Dim n
+	Dim found_value$
+	found_value = &quot;&quot;
+	Dim a1
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+		a1 = Array( _
+		&quot;nero/neroAacEnc.exe&quot;, _
+		&quot;neroAacEnc.exe&quot;)
+		Case &quot;MacOS&quot;
+		a1 = Array( _
+		&quot;neroAacEnc.app/Contents/MacOS/neroAacEnc&quot;, _
+		&quot;neroAacEnc&quot;, _
+		&quot;NEROAACENC&quot;)
+		Case Else
+		a1 = Array( _
+		&quot;neroAacEnc&quot;, _
+		&quot;NEROAACENC&quot;)
+	End Select
+	For n = LBound(a1) To UBound(a1)
+		found_value = fsFindAppPath(a1(n))
+		If Len(found_value) &gt; 0 Then
+			neroPath = found_value
 			Exit Function
 		End If
 	Next
@@ -6616,7 +6740,7 @@ End Function
 
 
 Function fsThisDocTitle() As String
-	Dim sA, sB, sC As String
+	Dim sC As String
 	
 	On error Goto fsThisDocTitleErr
 	If Not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
@@ -6624,8 +6748,9 @@ Function fsThisDocTitle() As String
 	End If
 	sC = ThisComponent.DocumentProperties.Title
 	If Len(sC) = 0 Then
-		sA = ThisComponent.getURL()
-		sC = GetFileNameWithoutExtension(FileNameoutofPath(sA))
+		sC = Replace(_
+		GetFileNameWithoutExtension(_
+		FileNameoutofPath(ThisComponent.getURL())), &quot;%20&quot;, &quot; &quot;)
 	End If
 	fsThisDocTitle = fsSuperTrim(sC, &quot;&quot;)
 	Exit Function

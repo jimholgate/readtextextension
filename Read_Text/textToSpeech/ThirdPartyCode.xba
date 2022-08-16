@@ -141,10 +141,13 @@ Function PosixPythonPath() As String
 End Function
 
 
-Function fbOsaScriptOk() As Boolean
+Function fbOsaScriptOk(_command) As Boolean
 	&apos; Return `True` if MacOS `osascript` is executable
 	On Error GoTo fbOsaScriptOkErr
-	fbOsaScriptOk = Shell(&quot;osascript&quot;, 0, &quot;-e &apos;set checked to &quot;&quot;osascript ok&quot;&quot;&apos;&quot;) = 0
+	If Len(_command) = 0 Then
+		_command = &quot;-e &apos;set checked to &quot;&quot;osascript ok&quot;&quot;&apos;&quot;
+	End If
+	fbOsaScriptOk = Shell(&quot;osascript&quot;, 0, _command) = 0
 	Exit Function
 	fbOsaScriptOkErr:
 	fbOsaScriptOk = False
@@ -228,7 +231,7 @@ Function fvTts_config_createDefaultConfig( _
 			End If
 		Else
 			&apos;Mac (MacOS)
-			If fbOsaScriptOk() And fbHaveItunes() Then
+			If fbOsaScriptOk(&quot;&quot;) And fbHaveItunes() Then
 				config(fiExternalProgramPath()) = AppleScriptPath()
 				config(fiExternalCommand()) = &quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
 			ElseIf fbHaveNetworkTTS() Then

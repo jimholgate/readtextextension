@@ -2926,9 +2926,9 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
                 s1 = "1000"  ' XP Not supported
                 s2="Teke-Tyee"
                 s3 ="tyx-CG"
-        Case "uk","uk-ua", "ukranian", "422"
+        Case "uk","uk-ua", "ukrainian", "422"
                 s1 = "422"
-                s2="Ukranian"
+                s2="Ukrainian"
                 s3 ="uk-UA"
         Case "ur","ur-in","ur-pk", "urdu"
                 s1 = "1000"  ' XP Not supported

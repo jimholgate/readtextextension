@@ -396,10 +396,35 @@ def gst_plugin_path(plug_in_name='libgstvorbis'):  # -> str
 
     g_versions = ['1.2', '1.1', '1.0', '1', '0.10']
     _paths = [
-        '/usr/local/lib/x86_64-linux-gnu/', '/usr/local/lib/',
-        '/usr/lib/x86_64-linux-gnu/', '/usr/lib/', '/usr/local/lib64/',
-        '/usr/lib64/'
-    ]
+        '/usr/local/lib/x86_64-linux-gnu/',
+        '/usr/local/lib/',
+        '/usr/lib/x86_64-linux-gnu/',
+        '/usr/lib/',
+        '/usr/local/lib64/',
+        '/usr/lib64/',
+        '/usr/local/i386/',
+        '/usr/i386/',
+        '/usr/local/lib/i386-linux-gnu/',
+        '/usr/lib/i386-linux-gnu/',
+        '/usr/local/lib/amd64-linux-gnu/',
+        '/usr/lib/amd64-linux-gnu/',
+        '/usr/local/lib/armel-linux-gnu/',
+        '/usr/lib/armel-linux-gnu/',
+        '/usr/local/lib/armhf-linux-gnu/',
+        '/usr/lib/armhf-linux-gnu/',
+        '/usr/local/lib/arm64-linux-gnu/',
+        '/usr/lib/arm64-linux-gnu/',
+        '/usr/local/lib/mips-linux-gnu/',
+        '/usr/lib/mips-linux-gnu/',
+        '/usr/local/lib/mips64el-linux-gnu/',
+        '/usr/lib/mips64el-linux-gnu/',
+        '/usr/local/lib/mipsel-linux-gnu/',
+        '/usr/lib/mipsel-linux-gnu/',
+        '/usr/local/lib/ppc64el-linux-gnu/',
+        '/usr/lib/ppc64el-linux-gnu/',
+        '/usr/local/lib/s390x-linux-gnu/',
+        '/usr/lib/s390x-linux-gnu/',
+        ]
     _ext = '.so'
     if have_posix_app('say', False):
         _paths = [
@@ -476,8 +501,9 @@ class ExtensionTable(object):
                                [['.oga', '.ogg', '.ogv'], 'libgstogg',
                                 self.ffmpeg,
                                 ['/usr/bin/oggenc', w_oggenc, w_oggenc2, self.vlc]],
-                               [['.opus'], 'libgstopus', self.ffmpeg, [w_opus]],
+                               [['.opus'], 'libgstopus', self.ffmpeg, [w_opus, self.vlc]],
                                [['.spx'], 'libgstspeex', self.ffmpeg, [w_spx, self.vlc]],
+                               [['.wav'], 'libwavenc', self.ffmpeg, [self.ffmpeg]],
                                [['.webm'], 'libgstmatroska', self.ffmpeg, []]]
 
     def audio_extension_ok(self,
@@ -538,7 +564,7 @@ class ExtensionTable(object):
                                     return True
         return False
 
-    def get_mime(self, test_file_spec=''):  # -> str
+    def get_mime(self, test_file_spec='', strict=False):  # -> str
         '''Return python's mime-type for a file path.'''
         _ext = os.path.splitext(test_file_spec)[1].lower()
         if not _ext:
@@ -549,6 +575,26 @@ class ExtensionTable(object):
             mimetypes.init()
             return mimetypes.types_map[_ext]
         except (IndexError, KeyError):
+            if strict:
+                return ''
+            # Darwin platform (a. k. a. MacOS) ?
+            #
+            # Gstreamer vorbis file family ; Specific mime type
+            #
+            # The information from gstreamer on open desktop is
+            # via /usr/share/gstreamer-1.0/<fileextension>.gep
+            for _format in ['flac', 'ogg', 'opus', 'spx']:
+                format = _format
+                if test_file_spec.endswith('.%(format)s' %locals()):
+                    return 'audio/x-vorbis;audio/%(format)s' %locals()
+            for _format in ['ogv', 'webm']:
+                format = _format
+                if test_file_spec.endswith('.%(format)s' %locals()):
+                    return 'video/x-vorbis;video/%(format)s' %locals()
+            for _format in ['md', 'wiki']:
+                format = _format
+                if test_file_spec.endswith('.%(format)s' %locals()):
+                    return 'text/plain;application/x-%(format)s'
             return ''
 
     def add_quotes_if_needed(self, app=''):  # -> str
@@ -664,10 +710,10 @@ def find_local_pip(lib_name='qrcode'): # -> str
         path2 = '/lib/python/site-packages'
     elif os.name == 'posix':
         site_list = site.getsitepackages()
-        for site in site_list:
-            if os.getenv("PWD") in site and len(os.getenv) != 0:
-                if os.path.isdir(os.path.join(site, lib_name)):
-                    return site
+        for _site in site_list:
+            if os.getenv("PWD") in _site and len(os.getenv) != 0:
+                if os.path.isdir(os.path.join(_site, lib_name)):
+                    return _site
         return ''
     py_path = ''
     with os.scandir(path1) as it:
@@ -818,7 +864,6 @@ def pop_message(summary="Note",
             if bool(tkinter):
                 for tag in ['<b>', '</b>', '<i>', '</i>']:
                     msg = msg.replace(tag, ' ')
-                
                 tkinter.messagebox(summary, msg)
                 return True
         except (AttributeError, NameError, ValueError):
@@ -942,11 +987,11 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
     if _work_ext in ['.aac']:
         if have_posix_app('afconvert', False):
             _out = _work
-            _work = '%(_out)s.aiff' % locals()             
+            _work = '%(_out)s.aiff' % locals()
     elif _work_ext in ['.m4a', 'm4r']:
         if have_posix_app('faac', False) or bool(
-            get_nt_path('nero', 'neroAacEnc')) or bool(get_nt_path(
-                'faac', 'faac')):
+                get_nt_path('nero', 'neroAacEnc')) or bool(
+                    get_nt_path('faac', 'faac')):
             _out = _work
             _work = '%(_out)s.wav' % locals()
         elif have_posix_app('afconvert', False):
@@ -1013,8 +1058,8 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
             _work = _out
     elif lax_mime_match(_work_ext, '.flac'):
         if (
-            media_converter_installed() or
-            bool(get_nt_path('flac', 'flac'))):
+                media_converter_installed() or
+                bool(get_nt_path('flac', 'flac'))):
             _out = _work
             _work = '%(_out)s.wav' % locals()
         else:
@@ -1117,6 +1162,7 @@ def process_wav_media(_title='untitled',
         return False
     _extension_table = ExtensionTable()
     if not _extension_table.audio_extension_ok(_out):
+        clean_temp_files(_work)
         if os.path.isfile(get_my_lock('lock')):
             return True
         # ignore `_audible` status
@@ -1147,6 +1193,7 @@ def process_wav_media(_title='untitled',
                                         _visible, _artist, _dimensions):
                     vlc_wav_to_media(_work, _out, _audible, _visible, False)
                 break
+    clean_temp_files(_work)
     if os.path.isfile(_work):
         if os.path.isfile(_out):
             try:
@@ -1200,11 +1247,17 @@ def do_gst_parse_launch(_pipe=''):  # -> bool
         _player.set_state(Gst.State.NULL)
         return True
     except:  # gi.repository.GLib.Error: gst_parse_error: no element "filesrc" (1)
-        for launch in [
-                'gst-launch-1.0', 'gst-launch-1.1', 'gst-launch-1.2',
-                'gst-launch-1.3'
-        ]:
-            if have_posix_app(launch, True):
+        try:
+            _terminator = u'\u0000'
+            Gst.init(None)
+            Gst.ParseContext.new()
+            Gst.parse_launchv('%(_pipe)s%(_terminator)s' % locals())
+            Gst.ParseContext.free()
+            return True
+        except:
+            pass
+        for launch in ['gst-launch-1.0']:
+            if have_posix_app(launch, False):
                 gst_l = launch
                 if my_os_system('%(gst_l)s %(_pipe)s' % locals()):
                     print('%(gst_l)s %(_pipe)s' % locals())
@@ -1214,7 +1267,7 @@ def do_gst_parse_launch(_pipe=''):  # -> bool
 
 def web_info_translate(_msg='WARNING:\n\nPython `speechd` Error.', _language='en'):  # -> bool
     '''Opens a web browser with the text of the message and a local translation.
-    Users of a sandboxed program can get a message.''' 
+    Users of a sandboxed program can get a message.'''
     _web_text = path2url(_msg).replace('file:///', '')
     try:
         if _language[:2] in ['en']:
@@ -1240,7 +1293,7 @@ class JsonTools(object):
         except AttributeError:
             self.safe_json = None
 
-    def sanitize_json(self, content= ''):  # -> str
+    def sanitize_json(self, content=''):  # -> str
         '''Escape json characters in content'''
         try:
             test_text = content.strip()
@@ -1260,7 +1313,7 @@ class JsonTools(object):
                         '@', '\\u0040')
 
     def set_json_content(self, language='en', voice='AUTO', i_rate=0,
-                        file_spec='',  output_module='', flags= '', album='',
+                         file_spec='', output_module='', flags= '', album='',
                          author='', genre='', title='', track=1): # -> str
         '''Sanitize content and return json string'''
         try:
@@ -1277,7 +1330,7 @@ class JsonTools(object):
         flags = self.sanitize_json(flags)  # `;` list of dev flags
         genre = self.sanitize_json(genre)
         language = self.sanitize_json(language)
-        output_module= self.sanitize_json(output_module)
+        output_module = self.sanitize_json(output_module)
         s_rate = self.sanitize_json(s_rate)
         s_track = self.sanitize_json(s_track)
         title = self.sanitize_json(title)
@@ -1740,14 +1793,34 @@ track=%(track)s''' % locals()
         '''
         Returns the album name.
         '''
-        returned_value = self.meta_from_file(get_my_lock('lock.album'), erase)
+        # If the file is located on a remote url
+        # then the file name might be expressed
+        # as a URI. Therefore, replace `%20` with
+        # a space for the title.
+        returned_value = self.meta_from_file(
+            get_my_lock(
+                'lock.album'), erase).replace('%20', ' ')
         if bool(returned_value):
             self.album = returned_value
         else:
             self.get_defaults()
         return self.album
 
-
+def clean_temp_files(_out=''):  # -> Bool
+    '''Clean text and image files used to create media'''
+    try:
+        for _temp_file in ['%(_out)s.wav.txt' %locals(),
+                           '%(_out)s.txt' %locals(),
+                           '%(_out)stemp.lock' %locals(),
+                           '%(_out)s.wav.png' %locals(),
+                           '%(_out)s.wav.jpg' %locals()]:
+            if os.path.isfile(_temp_file):
+                os.remove(_temp_file)
+        return True
+    except:
+        pass
+    return False
+        
 def gst_wav_to_media(_title='untitled',
                      _work='',
                      _image='',
@@ -1792,7 +1865,7 @@ def gst_wav_to_media(_title='untitled',
             code_pad = '! matroskamux'
     elif s_out_extension == ".flac":
         if gst_plugin_path('libgstflac'):
-            code_pad = "flacenc"
+            code_pad = "! flacenc ! oggmux"
     elif s_out_extension in [".oga", '.ogg']:
         if gst_plugin_path('libgstogg'):
             code_pad = '! vorbisenc ! oggmux'
@@ -1836,6 +1909,7 @@ def gst_wav_to_media(_title='untitled',
                     unlock_my_lock()
                     show_with_app(_work)
             unlock_my_lock()
+        clean_temp_files(_out)
     else:
         if os.path.isfile(get_my_lock('lock')):
             exit()
@@ -1893,9 +1967,9 @@ def vlc_wav_to_media(in_sound_path='',
     verbosity = ['', '-vvv '][0]  # no debug, debug
     if ext == '.flac':
         audio_codec = 'flac'
-        average_bitrate = '96'
+        average_bitrate = '128'
         sample_rate = '44100'
-        mux = 'ogg'
+        mux = 'raw'
     elif ext == '.mp3':
         audio_codec = 'mp3'
         average_bitrate = '128'
@@ -1908,8 +1982,8 @@ def vlc_wav_to_media(in_sound_path='',
         mux = 'ogg'
     elif ext == '.opus':
         audio_codec = 'opus'
-        average_bitrate = '96'
-        sample_rate = '48000'
+        average_bitrate = '16'
+        sample_rate = '16000'
         mux = 'ogg'
     elif ext == '.wav':
         audio_codec = 's16l'
@@ -2204,6 +2278,7 @@ the `libx264` or `aac` package to convert media to`video/mp4`.''')
                     show_with_app(_out)
         else:
             print('No output file was created.')
+        clean_temp_files(_out)
     except IOError:
         print(app_name() + " Tools execution failed")
         pop_message(app_name(), "python error", 5000)
@@ -2431,14 +2506,15 @@ def play_wav_no_ui(file_path=''):  # -> bool
     if os.name == 'nt':
         # Windows
         if os.path.splitext(file_path)[1].lower() in [
-            '.m4a', '.mp3', '.mp4', '.oga', '.ogg', '.opus', '.spx', '.webm']:
+                '.m4a', '.mp3', '.mp4', '.oga', '.ogg', '.opus', '.spx',
+                '.webm']:
             os.startfile(file_path)
             return True
         else:
             try:
                 import winsound
                 winsound.PlaySound(file_path,
-                                winsound.SND_FILENAME | winsound.SND_NOWAIT)
+                                   winsound.SND_FILENAME | winsound.SND_NOWAIT)
                 return True
             except:
                 try:
@@ -2504,7 +2580,10 @@ def play_wav_no_ui(file_path=''):  # -> bool
 
     if _command:
         display_file = os.path.split(file_path)[1]
-        print('[>] %(a_app)s playing `%(display_file)s`' % locals())
+        if os.path.getsize(file_path) == 0:
+            print('''[>]  %(a_app)s cannot play `%(display_file)s`''' %locals())
+            return True
+        print('[>] %(a_app)s playing `%(display_file)s`' %locals())
         my_os_system(_command)
         return True
     return False

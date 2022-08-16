@@ -355,15 +355,15 @@ class ReadFestivalClass(object):
                     return '(voice_%(path_stem)s)' % locals()
         return ''
 
-    def one_voice_installed(self):  # -> bool
-        ''''Return `True` if only festival voice is installed.'''
+    def count_your_voices(self):  # -> int
+        ''''Return a non-zero value only if a festival voice is installed.'''
         _count = 0
         test_dir = '/usr/share/festival/voices'
         _count = (readtexttools.count_items_in_dir(test_dir))
         if _count == 1:
             test_dir = os.path.join(test_dir, os.listdir(test_dir)[0])
             _count = readtexttools.count_items_in_dir(test_dir)
-        return bool(_count == 1)
+        return _count
 
     def iso_lang_to_fest_lang(self, iso_lang='en-US'):  # -> str
         '''Check if the library supports the language or voice.
@@ -437,6 +437,17 @@ class ReadFestivalClass(object):
         except NameError:
             self.lang = ''
         return ''
+
+    def language_ok(self, _lang):  # -> bool
+        '''Third party voices installed in the festival directory might
+        not be compatible with the `text2wave` program, and cause a crash.'''
+        if _lang[:2] in ['uk', 'tt', 'sq', 'ru', 'pt', 'pl', 'mk', 'kg', 'eo']:
+            for third_party in ['/usr/share/doc/rhvoice',
+                                '/usr/local/share/doc/rhvoice',
+                                '/opt/rhvoice']:
+                if os.path.isdir(third_party):
+                    return False
+        return True
 
     def list_sentences(self, _test_string=''):  # -> [list[str] | None]
         '''Generate a list of sentences from a string.'''
@@ -637,6 +648,7 @@ reads the file aloud.
     _output = ''
     _visible = ''
     _audible = ''
+    _eval_lang = 'zz-ZY'
     _sable_speaker = ''
     _sable_rate = '0%'
     _sable_pitch = '0%'
@@ -694,6 +706,7 @@ reads the file aloud.
             _image = a
         elif o in ('-e', '--eval'):
             _eval_token = a
+            _eval_lang = _eval_token
             _sable_speaker = _read_festival.sable_speaker_name(_eval_token)
             if '-' in _eval_token:
                 _eval_token = _read_festival.voice_eval
@@ -705,6 +718,9 @@ reads the file aloud.
             _image_size = a
         else:
             assert False, 'unhandled option'
+    if not _read_festival.language_ok(_eval_lang):
+        print('FAIL: `%(_eval_lang)s` - incompatible language or voice.' %locals())
+        sys.exit(0)
     _content = _imported_meta.meta_from_file(_file_path)
     if len(_content) == 0:
         sys.exit(0)
@@ -739,7 +755,7 @@ reads the file aloud.
         readtexttools.write_plain_text_file(_sable, _file_content, 'utf-8')
         _writer = readtexttools.check_artist(_writer)
         _title = readtexttools.check_title(_title, 'festival')
-        if _read_festival.one_voice_installed():
+        if _read_festival.count_your_voices() == 1:
             _read_festival.festival_read(_file_path, _visible, _audible,
                                          _output, _image, _content, "", _title,
                                          _writer, _image_size)
