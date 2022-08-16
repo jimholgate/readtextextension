@@ -1255,13 +1255,12 @@ def do_gst_parse_launch(_pipe=''):  # -> bool
             Gst.ParseContext.free()
             return True
         except:
-            pass
-        for launch in ['gst-launch-1.0']:
-            if have_posix_app(launch, False):
-                gst_l = launch
-                if my_os_system('%(gst_l)s %(_pipe)s' % locals()):
-                    print('%(gst_l)s %(_pipe)s' % locals())
-                    return True
+            for launch in ['gst-launch-1.0']:
+                if have_posix_app(launch, False):
+                    gst_l = launch
+                    if my_os_system('%(gst_l)s %(_pipe)s' % locals()):
+                        print('%(gst_l)s %(_pipe)s' % locals())
+                        return True
     return False
 
 
