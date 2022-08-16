@@ -578,6 +578,13 @@ configurations.
                                                             self.json_content,
                                                             'utf-8')
                         retval = net_play(_file_spec, language, i_rate, voice)
+                        if not retval:
+                            print('''Is the network connected?
+=========================
+    
++ The `%(voice)s` on-line voice is currently unavailable.
++ It might help to restart your device, refresh the network
+  or check your on-line account status.''' %locals())
                         os.remove(self.local_json)
                         return retval
                     return False

@@ -499,8 +499,9 @@ class ExtensionTable(object):
                                [['.oga', '.ogg', '.ogv'], 'libgstogg',
                                 self.ffmpeg,
                                 ['/usr/bin/oggenc', w_oggenc, w_oggenc2, self.vlc]],
-                               [['.opus'], 'libgstopus', self.ffmpeg, [w_opus]],
+                               [['.opus'], 'libgstopus', self.ffmpeg, [w_opus, self.vlc]],
                                [['.spx'], 'libgstspeex', self.ffmpeg, [w_spx, self.vlc]],
+                               [['.wav'], 'libwavenc', self.ffmpeg, [self.ffmpeg]],
                                [['.webm'], 'libgstmatroska', self.ffmpeg, []]]
 
     def audio_extension_ok(self,
@@ -561,7 +562,7 @@ class ExtensionTable(object):
                                     return True
         return False
 
-    def get_mime(self, test_file_spec=''):  # -> str
+    def get_mime(self, test_file_spec='', strict=False):  # -> str
         '''Return python's mime-type for a file path.'''
         _ext = os.path.splitext(test_file_spec)[1].lower()
         if not _ext:
@@ -572,6 +573,26 @@ class ExtensionTable(object):
             mimetypes.init()
             return mimetypes.types_map[_ext]
         except (IndexError, KeyError):
+            if strict:
+                return ''
+            # Darwin platform (a. k. a. MacOS) ?
+            #
+            # Gstreamer vorbis file family ; Specific mime type
+            #
+            # The information from gstreamer on open desktop is
+            # via /usr/share/gstreamer-1.0/<fileextension>.gep
+            for _format in ['flac', 'ogg', 'opus', 'spx']:
+                format = _format
+                if test_file_spec.endswith('.%(format)s' %locals()):
+                    return 'audio/x-vorbis;audio/%(format)s' %locals()
+            for _format in ['ogv', 'webm']:
+                format = _format
+                if test_file_spec.endswith('.%(format)s' %locals()):
+                    return 'video/x-vorbis;video/%(format)s' %locals()
+            for _format in ['md', 'wiki']:
+                format = _format
+                if test_file_spec.endswith('.%(format)s' %locals()):
+                    return 'text/plain;application/x-%(format)s'
             return ''
 
     def add_quotes_if_needed(self, app=''):  # -> str
@@ -1139,6 +1160,7 @@ def process_wav_media(_title='untitled',
         return False
     _extension_table = ExtensionTable()
     if not _extension_table.audio_extension_ok(_out):
+        clean_temp_files(_work)
         if os.path.isfile(get_my_lock('lock')):
             return True
         # ignore `_audible` status
@@ -1169,6 +1191,7 @@ def process_wav_media(_title='untitled',
                                         _visible, _artist, _dimensions):
                     vlc_wav_to_media(_work, _out, _audible, _visible, False)
                 break
+    clean_temp_files(_work)
     if os.path.isfile(_work):
         if os.path.isfile(_out):
             try:
@@ -1222,15 +1245,20 @@ def do_gst_parse_launch(_pipe=''):  # -> bool
         _player.set_state(Gst.State.NULL)
         return True
     except:  # gi.repository.GLib.Error: gst_parse_error: no element "filesrc" (1)
-        for launch in [
-                'gst-launch-1.0', 'gst-launch-1.1', 'gst-launch-1.2',
-                'gst-launch-1.3'
-        ]:
-            if have_posix_app(launch, True):
-                gst_l = launch
-                if my_os_system('%(gst_l)s %(_pipe)s' % locals()):
-                    print('%(gst_l)s %(_pipe)s' % locals())
-                    return True
+        try:
+            _terminator = u'\u0000'
+            Gst.init(None)
+            Gst.ParseContext.new()
+            Gst.parse_launchv('%(_pipe)s%(_terminator)s' % locals())
+            Gst.ParseContext.free()
+            return True
+        except:
+            for launch in ['gst-launch-1.0']:
+                if have_posix_app(launch, False):
+                    gst_l = launch
+                    if my_os_system('%(gst_l)s %(_pipe)s' % locals()):
+                        print('%(gst_l)s %(_pipe)s' % locals())
+                        return True
     return False
 
 
@@ -1762,14 +1790,34 @@ track=%(track)s''' % locals()
         '''
         Returns the album name.
         '''
-        returned_value = self.meta_from_file(get_my_lock('lock.album'), erase)
+        # If the file is located on a remote url
+        # then the file name might be expressed
+        # as a URI. Therefore, replace `%20` with
+        # a space for the title.
+        returned_value = self.meta_from_file(
+            get_my_lock(
+                'lock.album'), erase).replace('%20', ' ')
         if bool(returned_value):
             self.album = returned_value
         else:
             self.get_defaults()
         return self.album
 
-
+def clean_temp_files(_out=''):  # -> Bool
+    '''Clean text and image files used to create media'''
+    try:
+        for _temp_file in ['%(_out)s.wav.txt' %locals(),
+                           '%(_out)s.txt' %locals(),
+                           '%(_out)stemp.lock' %locals(),
+                           '%(_out)s.wav.png' %locals(),
+                           '%(_out)s.wav.jpg' %locals()]:
+            if os.path.isfile(_temp_file):
+                os.remove(_temp_file)
+        return True
+    except:
+        pass
+    return False
+        
 def gst_wav_to_media(_title='untitled',
                      _work='',
                      _image='',
@@ -1814,7 +1862,7 @@ def gst_wav_to_media(_title='untitled',
             code_pad = '! matroskamux'
     elif s_out_extension == ".flac":
         if gst_plugin_path('libgstflac'):
-            code_pad = "flacenc"
+            code_pad = "! flacenc ! oggmux"
     elif s_out_extension in [".oga", '.ogg']:
         if gst_plugin_path('libgstogg'):
             code_pad = '! vorbisenc ! oggmux'
@@ -1858,6 +1906,7 @@ def gst_wav_to_media(_title='untitled',
                     unlock_my_lock()
                     show_with_app(_work)
             unlock_my_lock()
+        clean_temp_files(_out)
     else:
         if os.path.isfile(get_my_lock('lock')):
             exit()
@@ -1915,9 +1964,9 @@ def vlc_wav_to_media(in_sound_path='',
     verbosity = ['', '-vvv '][0]  # no debug, debug
     if ext == '.flac':
         audio_codec = 'flac'
-        average_bitrate = '96'
+        average_bitrate = '128'
         sample_rate = '44100'
-        mux = 'ogg'
+        mux = 'raw'
     elif ext == '.mp3':
         audio_codec = 'mp3'
         average_bitrate = '128'
@@ -1930,8 +1979,8 @@ def vlc_wav_to_media(in_sound_path='',
         mux = 'ogg'
     elif ext == '.opus':
         audio_codec = 'opus'
-        average_bitrate = '96'
-        sample_rate = '48000'
+        average_bitrate = '16'
+        sample_rate = '16000'
         mux = 'ogg'
     elif ext == '.wav':
         audio_codec = 's16l'
@@ -2226,6 +2275,7 @@ the `libx264` or `aac` package to convert media to`video/mp4`.''')
                     show_with_app(_out)
         else:
             print('No output file was created.')
+        clean_temp_files(_out)
     except IOError:
         print(app_name() + " Tools execution failed")
         pop_message(app_name(), "python error", 5000)
@@ -2527,7 +2577,10 @@ def play_wav_no_ui(file_path=''):  # -> bool
 
     if _command:
         display_file = os.path.split(file_path)[1]
-        print('[>] %(a_app)s playing `%(display_file)s`' % locals())
+        if os.path.getsize(file_path) == 0:
+            print('''[>]  %(a_app)s cannot play `%(display_file)s`''' %locals())
+            return True
+        print('[>] %(a_app)s playing `%(display_file)s`' %locals())
         my_os_system(_command)
         return True
     return False
