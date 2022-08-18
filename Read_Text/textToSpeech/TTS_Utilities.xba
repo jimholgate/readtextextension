@@ -4543,7 +4543,8 @@ Function fswindowsSAPIControl() As String
 			fswindowsSAPIControl = &quot;open -b com.apple.systempreferences&quot;
 		Case Else
 		sub_path = Array(_
-		&quot;systemsettings&quot;, &quot;xfce-setting-show&quot;, &quot;gnome-control-center&quot;, &quot;unity-control-center&quot;)
+		&quot;systemsettings&quot;, &quot;xfce-setting-show&quot;, &quot;gnome-control-center&quot;, _
+		&quot;mate-control-center&quot;, &quot;unity-control-center&quot;)
 		For x = Lbound(sub_path) To Ubound(sub_path)
 			If fileexists(&quot;/usr/bin/&quot; &amp; sub_path(x)) Then
 				fswindowsSAPIControl = &quot;/usr/bin/&quot; &amp; sub_path(x)
