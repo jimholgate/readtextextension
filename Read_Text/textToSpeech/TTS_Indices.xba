@@ -1163,6 +1163,26 @@ Function fsFestivalVoice( _
 End Function
 
 
+Function fsMatchFestivalVoice(_
+	_search As String) As String
+	&apos; Find the path to the first festival voice that matches the
+	&apos; `_search` term.
+	fsMatchFestivalVoice = &quot;&quot;
+	If Len(_search) = 0 Then
+		_search = &quot;_hts&quot;
+	End If
+	Dim x As Integer
+	For x = 0 To fiCountFestivalVoices()
+		If Len(fsFestivalDirectory(x)) = 0 Then
+			Exit For
+		ElseIf Instr(fsFestivalDirectory(x), _search) &lt;&gt; 0 Then
+			fsMatchFestivalVoice = fsFestivalDirectory(x)
+			Exit For
+		End If
+	Next
+End Function
+
+
 Function fsFestivalDirectory( _
 	n) As String
 	Dim s1, s2 As String

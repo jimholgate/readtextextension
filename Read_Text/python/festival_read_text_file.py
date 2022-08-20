@@ -4,7 +4,8 @@
 Festival
 ========
 
-Reads a text file using festival and a media player.
+Reads a text file using festival and a media player. Some voices let you
+change the pitch and speed.
 
 The festival engine is a software speech synthesizer.
 
@@ -28,8 +29,9 @@ Small footprint English
     sudo dnf upgrade
     sudo dnf install flite
 
-Ubuntu
--------
+
+Debian and derivatives like Mint and Ubuntu 
+-------------------------------------------
 
 High quality scriptable English
 
@@ -106,7 +108,8 @@ def usage():
         pass
     if not bool(_version):
         if readtexttools.have_posix_app('flite', False):
-            _version = '''Carnegie Mellon University, Copyright (c) 1999-2016, all rights reserved
+            _version = '''Carnegie Mellon University, Copyright (c) 1999-2016,
+all rights reserved
 version: flite-2.1-release Dec 2017 (http://cmuflite.org)'''
             _app = 'flite - a small simple speech synthesizer'
     print('''

@@ -207,11 +207,11 @@ Function fvTts_config_createDefaultConfig( _
 				&quot;--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or Len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;--visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
+				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 And fsGetLanguage() = &quot;ja&quot; Then
 				&apos; Japanese
 				config(fiExternalCommand()) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;--visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
+				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf fileexists(environ(&quot;HOME&quot;) &amp; _
 				&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or fileexists( _
 				environ(&quot;HOME&quot;) &amp; _

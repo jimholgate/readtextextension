@@ -121,6 +121,8 @@ try:
 except:
     pass
 
+LOOK_UPS = 0
+
 def write_plain_text_file(_file_path='',
                           _body_text='',
                           scodeco='utf-8'):  # -> bool
@@ -539,7 +541,10 @@ class ExtensionTable(object):
         else:
             self.mime_video = False
             return False
-        if not test_can_export:
+        if os.path.splitext(test_file_spec)[1] in ['.aif', '.aiff', '.wav']:
+            # Uncompressed audio from the speech file generator
+            return True
+        elif not test_can_export:
             return True
         for _test in self.extension_test:
             if exact_match:
@@ -1171,7 +1176,6 @@ def process_wav_media(_title='untitled',
             play_wav_no_ui(_work)
             unlock_my_lock()
         return True
-
     out_ext = os.path.splitext(_out)[1].lower()
     _ffmpeg = ffmpeg_path()
     for _test in _extension_table.extension_test:
@@ -1509,12 +1513,6 @@ class ImportedMetaData(object):
                     self.seconds = 0
                 return self.seconds
             else:
-                temp_wave = '%(file_path)s_temp.wav' % locals()
-                if gst_wav_to_media('untitled', file_path, '', temp_wave,
-                                    'false', 'false', '', '600x600', False):
-                    self.seconds = sound_length_seconds(temp_wave)
-                    if os.path.isfile(temp_wave):
-                        os.remove(temp_wave)
                 return self.seconds
         else:
             return '0'
@@ -1842,6 +1840,10 @@ def gst_wav_to_media(_title='untitled',
     _metas.set_time_meta(_work)
 
     if _out:
+        if os.path.isfile(_out):
+            print('''`gst_wav_to_media` says:
+`%(_out)s` already_exists. Exiting.''' %locals())
+            return True
         s_out_extension = os.path.splitext(_out)[1].lower()
     b_audible = lax_bool(_audible)
     b_visible = lax_bool(_visible)
@@ -2491,7 +2493,7 @@ def path2url(_file_path):  # -> str
         # Fall back works on Posix
         return ''.join(['file://', _file_path.replace(' ', '%20')])
 
-
+ 
 def play_wav_no_ui(file_path=''):  # -> bool
     '''
     Opens using command line shell.
@@ -2499,7 +2501,10 @@ def play_wav_no_ui(file_path=''):  # -> bool
     _command = ''
     a_app = 'System audio'
     uri_path = path2url(file_path)
-    _extension_table = ExtensionTable()
+    afplay_exts = ['.3gp', '.3g2', '.aac', '.adts', '.aifc', '.aiff', '.aif',
+                   '.amr', '.m4a', '.m4r', '.m4b', '.caf', '.ec3', '.flac',
+                   '.mp1', '.mp2', '.mp3', '.mpeg', '.mpa', '.mp4', '.snd',
+                   '.au', '.wav', '.w64']
     if os.name == 'nt':
         # Windows
         if os.path.splitext(file_path)[1].lower() in [
@@ -2526,7 +2531,8 @@ def play_wav_no_ui(file_path=''):  # -> bool
         _universal_play = 3  # verified to play compressed formats
         players = [
             ['afplay', 'afplay',  # Darwin
-             ' "%(file_path)s"' % locals(), True],
+             ' "%(file_path)s"' % locals(), os.path.splitext(
+                file_path)[1] in afplay_exts],
             ['esdplay', 'esdplay',
              ' "%(file_path)s"' % locals(), False],
             ['ossplay', 'ossplay',
