@@ -455,12 +455,14 @@ configurations.
         '''Verify that your installed speech synthesisers are *registered* with
         the selected language. If there's an error and `experimental` is `True`,
         then we return `True` if it is language that `espeak-ng` supports.'''
+        _short_lang = _lang.split('-')[0].split('_')[0]
         _list = self.list_synthesis_languages(_lang)
-        _rhvoice = rhvoice_read_text_file.RhVoiceClass()
+        if not bool(_list):
+            _list = self.list_synthesis_languages(_short_lang)
         if bool(_list):
             return True
         if experimental:
-            _short_lang = _lang.split('-')[0].split('_')[0]
+            _rhvoice = rhvoice_read_text_file.RhVoiceClass()
             if _short_lang in self.language_list:
                 return True
             elif os.path.isfile('/usr/share/espeak-ng-data/%(_short_lang)s_dict' %locals()):
@@ -623,6 +625,14 @@ configurations.
         concise_lang = ''.join([language.lower(), '-']).split('-')[0].split('_')[0]
         _txt = readtexttools.strip_xml(_txt)
         _txt = readtexttools.strip_mojibake(concise_lang, _txt)
+        try:
+            if os.uname()[1] in ['centos', 'fedora', 'rhel']:
+                # `espeak-ng` for `speechd` on fedora 5.18.18-200.fc36.x86_64
+                # changes the pitch of capitalized words. This could make the
+                # synthesized speech hard to understand.
+                _txt = _txt.lower()
+        except [AttributeError, TypeError]:
+            pass
         if self.xml_tool.use_mode in ['text']:
             _message = ' " %(_txt)s"' % locals()
         else:
@@ -696,12 +706,17 @@ configurations.
         language is supported.'''
         string_list = ''
         _lang = _language.split('-')[0]
+        _iso = ''
         if bool(self.client):
             for _item in self.client.list_synthesis_voices():
+                _iso = _item[1].split('-')[0]
                 if string_list.count(_lang) == 0:
                     if bool(_language):
                         if _lang in [_item[1]] or _language in [_item[1]]:
                             string_list = string_list + _item[1] + ':'
+                            break
+                        elif _lang == _iso:
+                            string_list = string_list + _iso + ':'
                             break
                     else:
                         string_list = string_list + _item[1] + ':'

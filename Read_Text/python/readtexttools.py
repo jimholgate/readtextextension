@@ -541,10 +541,7 @@ class ExtensionTable(object):
         else:
             self.mime_video = False
             return False
-        if os.path.splitext(test_file_spec)[1] in ['.aif', '.aiff', '.wav']:
-            # Uncompressed audio from the speech file generator
-            return True
-        elif not test_can_export:
+        if not test_can_export:
             return True
         for _test in self.extension_test:
             if exact_match:
@@ -1176,6 +1173,7 @@ def process_wav_media(_title='untitled',
             play_wav_no_ui(_work)
             unlock_my_lock()
         return True
+
     out_ext = os.path.splitext(_out)[1].lower()
     _ffmpeg = ffmpeg_path()
     for _test in _extension_table.extension_test:
