@@ -2871,12 +2871,6 @@ Function fbCreateMissingMediaDirectory( _
 	fbCreateMissingMediaDirectory = False
 End Function
 
-sub xxy
-	Dim sPath$ : sPath = &quot;C:\Windows\winver.exe&quot;
-	sPath = ConvertToUrl(sPath)
-	Dim Separator$ : Separator = &quot;/&quot;
-	print fileexists(DirectoryNameoutofPath(sPath, Separator))
-end sub
 
 Function fsReplaceText( _
 	sA As String, _
