@@ -94,8 +94,8 @@ version, then reinstall the system LibreOffice using the following commands:
     sudo apt upgrade
     sudo apt install libreoffice
 
-See also: [Classic
-Confinement](https://ubuntu.com/blog/how-to-snap-introducing-classic-confinement)
+See also: [Classic Confinement : Introduction to
+Snap](https://ubuntu.com/blog/how-to-snap-introducing-classic-confinement)
 
 ### The speech synthesizer produces distorted sound.
 
@@ -382,7 +382,8 @@ def guess_time(second_string, word_rate, _file_path, _language):  # -> int
     return retval
 
 
-def net_play(_file_spec='', _language='en-US', i_rate=0, _requested_voice=''): # -> bool
+def net_play(_file_spec='', _language='en-US', i_rate=0,
+             _requested_voice=''): # -> bool
     '''Attempt to play a sound from the network.'''
     if network_read_text_file.network_ok(_language):
         if _requested_voice in NET_SERVICE_LIST:
@@ -451,7 +452,8 @@ configurations.
         except Exception:
             pass
 
-    def is_a_supported_language(self, _lang='en', experimental=False):  # -> Bool
+    def is_a_supported_language(self, _lang='en',
+                                experimental=False):  # -> Bool
         '''Verify that your installed speech synthesisers are *registered* with
         the selected language. If there's an error and `experimental` is `True`,
         then we return `True` if it is language that `espeak-ng` supports.'''
@@ -581,12 +583,7 @@ configurations.
                                                             'utf-8')
                         retval = net_play(_file_spec, language, i_rate, voice)
                         if not retval:
-                            print('''Is the network connected?
-=========================
-    
-+ The `%(voice)s` on-line voice is currently unavailable.
-+ It might help to restart your device, refresh the network
-  or check your on-line account status.''' %locals())
+                            print(network_read_text_file.network_problem(voice))
                         os.remove(self.local_json)
                         return retval
                     return False
@@ -622,7 +619,8 @@ configurations.
             self.client.close()
             readtexttools.unlock_my_lock()
             return False
-        concise_lang = ''.join([language.lower(), '-']).split('-')[0].split('_')[0]
+        concise_lang = ''.join([language.lower(),
+                                '-']).split('-')[0].split('_')[0]
         _txt = readtexttools.strip_xml(_txt)
         _txt = readtexttools.strip_mojibake(concise_lang, _txt)
         try:
@@ -984,7 +982,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
             return len(s1) == 0
         except subprocess.CalledProcessError:
             # You clicked a button to cancel reading aloud, so `killall` stopped
-            # the running process, raising a `subprocess.CalledProcessError` here.
+            # the running process, with a `subprocess.CalledProcessError` here.
             # Let's tidy up for the next run.
             readtexttools.unlock_my_lock()
             return False
@@ -1199,22 +1197,20 @@ def main():
                     mac_reader = _voice
                     break
         if len(_output) == 0:
-            if not _say_formats.say_aloud(__file_spec, mac_reader, _voice, i_rate):
+            if not _say_formats.say_aloud(__file_spec, mac_reader, _voice,
+                                          i_rate):
                 if _voice in NET_SERVICE_LIST:
                     if not net_play(__file_spec, _language, i_rate, _voice):
-                        print('''Is the network connected?
-=========================
-    
-+ The `%(_voice)s` on-line voice is currently unavailable.
-+ It might help to restart your device, refresh the network
-  or check your on-line account status.''' %locals())
+                        print(network_read_text_file.network_problem(_voice))
         else:
-            _say_formats.save_audio(__file_spec, mac_reader, i_rate, _output, False, False)
+            _say_formats.save_audio(__file_spec, mac_reader, i_rate, _output,
+                                    False, False)
         sys.exit(0)
     elif os.name in ['posix']:
         if not USE_SPEECHD:
             readtexttools.web_info_translate(
-                '''The `speechd` library is not compatible with your application or platform.''',
+                '''The `speechd` library is not compatible with your application
+or platform.''',
                 _language)
             sys.exit(0)
         _spd_formats = SpdFormats()

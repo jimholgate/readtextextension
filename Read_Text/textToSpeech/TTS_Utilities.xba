@@ -1754,7 +1754,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 			&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or fileexists( _
 			environ(&quot;HOME&quot;) &amp; _
 			&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or bIsAppImage Or _
-			Not(fbHaveEspeak()) or Len(fsGetPipLibPath(&quot;speechd&quot;)) &lt;&gt; 0 Then
+			Not(fbHaveEspeak()) or Len(fsGetPipLibPath(&quot;speechd&quot;, False)) &lt;&gt; 0 Then
 			Select Case fsGetOS()
 				Case &quot;UNIX&quot;
 				If fbHaveNetworkTTS() Then
@@ -2638,13 +2638,13 @@ Sub ttsActuate( _
 			End If
 		End If
 		If InStr(sCommand,&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot;) = 1 Then
+			
 			&apos;only consider SAPI voices
 			sCommand = fsReplaceText(sCommand,&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,fsSelectionLanguageAndRegion(False))
 		End If
 		sCommand = replaceLocalTokensWithStr(sCommand)
 		sCommand = replacePublicTokensWithStr(sCommand)
 		sCommand = replaceWebTokensWithStr(sCommand, sTextToSpeak) &apos;for online content with media player
-
 		fbCreateMissingMediaDirectory(sCommand)
 	Else &apos;if config(fiHtmlOption) then
 		&apos;Translate And read with web tools
@@ -2759,7 +2759,7 @@ End Sub
 
 Function fbCreateMissingMediaDirectory( _
 	ByVal sCommandLine) As Boolean
-	&apos; To put a data file in a directory that does not exist.
+	&apos; To put a media file in a directory that does not exist.
 &apos;&apos;    
 &apos;&apos; Media Directories
 &apos;&apos; -----------------
@@ -2785,11 +2785,17 @@ Function fbCreateMissingMediaDirectory( _
 	Dim s1, s2 As String
 	Dim n, o As Integer
 	Dim a1, a2, a3
+	Dim os_div As String : os_div = &quot;/&quot;
+
+	If Not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
+		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	End If
 	
 	On error Goto fbCreateMissingMediaDirectoryErr
 	
 	Select Case fsGetOS()
 		Case &quot;WINDOWS&quot;
+		os_div = &quot;\&quot;
 		s1 = &quot;&quot;&quot;&quot;
 		Case Else
 		sCommandLine = fsReplaceText(sCommandLine, &quot;&quot;&quot;&quot;, &quot;&quot;)
@@ -2797,76 +2803,80 @@ Function fbCreateMissingMediaDirectory( _
 		s1 = &quot; &quot;
 	End Select
 	
+	If Instr(sCommandLine, os_div) = 0 Then
+		Exit Function
+	End If
 	a1 = Split(sCommandLine, s1)
 	a2 = Array( _
-	&quot;.3gp&quot;, _
-	&quot;.aac&quot;, _
-	&quot;.aif&quot;, _
-	&quot;.aiff&quot;, _
-	&quot;.au&quot;, _
-	&quot;.avi&quot;, _
-	&quot;.csv&quot;, _
-	&quot;.doc&quot;, _
-	&quot;.docx&quot;, _
-	&quot;.epub&quot;, _
-	&quot;.flac&quot;, _
-	&quot;.gif&quot;, _
-	&quot;.jpeg&quot;, _
-	&quot;.jpg&quot;, _
-	&quot;.m4a&quot;, _
-	&quot;.m4v&quot;, _
-	&quot;.mov&quot;, _
-	&quot;.mkv&quot;, _
-	&quot;.mp2&quot;, _
-	&quot;.mp3&quot;, _
-	&quot;.mp4&quot;, _
-	&quot;.mpeg&quot;, _
-	&quot;.oga&quot;, _
-	&quot;.ogg&quot;, _
-	&quot;.ogm&quot;, _
-	&quot;.ogv&quot;, _
-	&quot;.pdf&quot;, _
-	&quot;.png&quot;, _
-	&quot;.ppt&quot;, _
-	&quot;.pptx&quot;, _
-	&quot;.tif&quot;, _
-	&quot;.wav&quot;, _
-	&quot;.webm&quot;, _
-	&quot;.wma&quot;, _
-	&quot;.wmv&quot;, _
-	&quot;.xls&quot;, _
-	&quot;.xlsx&quot;, _
-	&quot;.zip&quot;)
-	
-	For n = LBound(a1) To UBound(a1)
-		For o = LBound(a2) To UBound(a2)
-			If InStr(a1(n), a2(o)) = 1 + Len(a1(n)) - Len(a2(o)) Then
-				&apos; Creating a text file in a location that does not exist
-				&apos; creates a directory. We can then put a media file in it.
-				&apos; First, we remove the Windows switch that ends with &quot;file:&quot;
-				a3 = Split(a1(n),&quot;file:&quot;)
-				s2 = ConvertToUrl(a3(UBound(a3)))
-				If fileexists(s2) Then
-					fbCreateMissingMediaDirectory = True
-					Exit Function
-				Else
-					&apos;Assign blame using the app signature if the file isn&apos;t removed
-					CreateFile(s2 &amp; &quot;temp.lock&quot;, fsAppSignature(), &quot;UTF-8&quot;)
-					If fileexists(s2 &amp; &quot;temp.lock&quot;) Then
+	&quot;wav&quot;, _
+	&quot;png&quot;, _
+	&quot;opus&quot;, _
+	&quot;ogg&quot;, _
+	&quot;mp4&quot;, _
+	&quot;mp3&quot;, _
+	&quot;m4a&quot;, _
+	&quot;jpg&quot;, _
+	&quot;flac&quot;, _
+	&quot;3gp&quot;, _
+	&quot;aac&quot;, _
+	&quot;aif&quot;, _
+	&quot;aiff&quot;, _
+	&quot;au&quot;, _
+	&quot;avi&quot;, _
+	&quot;csv&quot;, _
+	&quot;doc&quot;, _
+	&quot;docx&quot;, _
+	&quot;epub&quot;, _
+	&quot;gif&quot;, _
+	&quot;jpeg&quot;, _
+	&quot;jpg&quot;, _
+	&quot;m4a&quot;, _
+	&quot;m4v&quot;, _
+	&quot;mov&quot;, _
+	&quot;mkv&quot;, _
+	&quot;mp2&quot;, _
+	&quot;mpeg&quot;, _
+	&quot;oga&quot;, _
+	&quot;ogg&quot;, _
+	&quot;ogm&quot;, _
+	&quot;pdf&quot;, _
+	&quot;ppt&quot;, _
+	&quot;pptx&quot;, _
+	&quot;tif&quot;, _
+	&quot;webm&quot;, _
+	&quot;wma&quot;, _
+	&quot;wmv&quot;, _
+	&quot;xls&quot;, _
+	&quot;xlsx&quot;, _
+	&quot;zip&quot;)	
+	For n = UBound(a1) To LBound(a1) Step -1
+		s2 = a1(n)
+		If instr(s2, &quot;.&quot;) &lt;&gt; 0 And Instr(s2, os_div) &lt;&gt; 0 Then
+			For o = LBound(a2) To UBound(a2)
+				If GetFileNameExtension(s2) = a2(o) Then
+					s2 = ConvertToUrl(s2)
+					If fileexists(DirectoryNameoutofPath(s2, &quot;/&quot;)) Then
 						fbCreateMissingMediaDirectory = True
-						kill s2 &amp; &quot;temp.lock&quot;
-						Exit Function
+					Else
+						fbCreateMissingMediaDirectory = fbcreateDirectory(_
+						DirectoryNameoutofPath(s2, &quot;/&quot;))
 					End If
+					Exit For		
 				End If
-			End If
-		Next
+			Next
+		End If
 	Next
 	Exit Function
 	fbCreateMissingMediaDirectoryErr:
-	
 	fbCreateMissingMediaDirectory = False
 End Function
 
+sub xxy
+	Dim sPath$ : sPath = &quot;C:\Windows\winver.exe&quot;
+	sPath = ConvertToUrl(sPath)
+	Dim Separator$ : Separator = &quot;/&quot;
+	print fileexists(DirectoryNameoutofPath(sPath, Separator))
+end sub
 
 Function fsReplaceText( _
 	sA As String, _
@@ -4579,6 +4589,7 @@ End Sub
 
 Function fbcreateDirectory( _
 	sPath) As Boolean
+	&apos; `sPath` is a URI, not a file path
 	On error Goto fbcreateDirectoryErr
 	Dim sA As String
 	
@@ -4598,7 +4609,6 @@ Function fbcreateDirectory( _
 	End If
 	Exit Function
 	fbcreateDirectoryErr:
-	
 	fbcreateDirectory = False
 End Function
 
@@ -5772,7 +5782,9 @@ End Function
 
 
 Function fbHavePyQrCode() As Boolean
-	fbHavePyQrCode = Len(fsGetPipLibPath(&quot;qrcode&quot;)) &lt;&gt; 0
+	&apos; Install `qrcode` with `apt install python3-qrcode`
+	&apos; or `pip3 install qrcode` 
+	fbHavePyQrCode = Len(fsGetPipLibPath(&quot;qrcode&quot;, False)) &lt;&gt; 0
 	If fbHavePyQrCode Then
 		Exit Function
 	End If
@@ -5845,13 +5857,15 @@ Function fbOKWithRhVoice(_
 End Function
 
 
-Function fsGetPipLibPath(s_test As String) As String
+Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
+	&apos; On UNIX, if `only_local` is True, then do not check for a library
+	&apos; unless the current user has explicitly installed it with `pip3`
 	Dim ret_val$ : ret_val = &quot;&quot;
 	Dim os_div$ : os_div = getPathSeparator
 	Dim sPythonSubDirs$
 	Dim py_dir$
 	fsGetPipLibPath = &quot;&quot;
-	
+
 	Select Case fsGetOS()
 		Case &quot;WINDOWS&quot;
 		sPythonSubDirs = &quot;\Lib\site-packages&quot;
@@ -5867,12 +5881,14 @@ Function fsGetPipLibPath(s_test As String) As String
 			Exit Function
 		ElseIf Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
 			Exit Function
-		ElseIf FileExists(&quot;/usr/lib/python3/dist-packages/&quot; &amp; s_test) Then
-			fsGetPipLibPath = &quot;/usr/lib/python3/dist-packages/&quot; &amp; s_test
-			Exit Function
-		ElseIf FileExists(fsLinux64PythonLib() &amp; &quot;/site-packages/&quot; &amp; s_test) Then
-			fsGetPipLibPath = fsLinux64PythonLib() &amp; &quot;/site-packages/&quot; &amp; s_test
-			Exit Function
+		ElseIf Not only_local Then
+			If FileExists(&quot;/usr/lib/python3/dist-packages/&quot; &amp; s_test) Then
+				fsGetPipLibPath = &quot;/usr/lib/python3/dist-packages/&quot; &amp; s_test
+				Exit Function
+			ElseIf FileExists(fsLinux64PythonLib() &amp; &quot;/site-packages/&quot; &amp; s_test) Then
+				fsGetPipLibPath = fsLinux64PythonLib() &amp; &quot;/site-packages/&quot; &amp; s_test
+				Exit Function
+			End If
 		End If
 		sPythonSubDirs = &quot;/lib/site-packages&quot;
 		py_dir = Environ(&quot;HOME&quot;) &amp; &quot;/.local/lib/python&quot;
@@ -5972,14 +5988,15 @@ Function fbHaveNetworkTTS() As Boolean
 	&apos; If you are not running libreoffice from normal home directory, then
 	&apos; the script disables network speech because container versions of
 	&apos; the application do not necessarily include the required libraries.
-	fbHaveNetworkTTS = Len(fsGetPipLibPath(&quot;gtts&quot;)) &lt;&gt; 0
+	&apos;
+	&apos; Install `gtts` with `pip3 install python3-gtts-token python3-gtts` 
+	fbHaveNetworkTTS = Len(fsGetPipLibPath(&quot;gtts&quot;, True)) &lt;&gt; 0
 	If fbHaveNetworkTTS Then
 		Exit Function
 	End If
 	Dim x# : x = 0
 	Dim home$ : home = Environ(&quot;HOME&quot;)
 	Dim Tokens : Tokens = Array(_
-	&quot;/usr/lib/python3/dist-packages/gtts_token/gtts_token.py&quot;, _
 	home &amp; &quot;/.local/bin/gtts-cli&quot;, _
 	AwsBoto3Json(), _
 	AwsPolyJson(), _

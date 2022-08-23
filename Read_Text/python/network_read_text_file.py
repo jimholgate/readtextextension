@@ -90,6 +90,16 @@ seconds, or retrieving the online resource might fail.
 ''')
 
 
+def network_problem(voice='default'):  # -> str
+    '''Return suggestions to make an on-line voice work.'''
+    return '''Is the network connected?
+=========================
+    
++ The `%(voice)s` on-line voice is currently unavailable.
++ It might help to restart your device, refresh the network
+  or check your on-line account status.''' %locals()
+
+
 class AmazonClass(object):
     u''' The following notice should be displayed in a dialog when users click
     *About...* or the equivalent in their language when this class is enabled.
