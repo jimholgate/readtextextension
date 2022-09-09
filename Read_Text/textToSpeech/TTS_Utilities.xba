@@ -1067,14 +1067,16 @@ Sub dialog1Combo2ShowSAPIChoices( _
 	Dim s2 As String
 	Dim sSelectionLangCountryTag, sSelectionLanguageTag As String
 	Dim bNoMp3Tool As Boolean
-	bNoMp3Tool = True
-	
+	Dim bHaveVLC As Boolean
+	Dim bHaveFfmpeg As Boolean
+    bNoMp3Tool = True
+	bHaveVLC = fbHaveVLC()
+	bHaveFfmpeg = fbHaveFfmpeg()
 	Set Sapi = CreateObject(&quot;Sapi.SpVoice&quot;)
-	Rem Get control
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
 	Rem first remove all old items from the list
 	n1 = oComboBox.getItemCount()
-	oComboBox.removeItems( 0,n1)
+	oComboBox.removeItems(0, n1)
 	n = 0
 	If fbWindowsHasAnInternationalVoice(False, &quot;united states&quot;) Then
 		sSelectionLangCountryTag = &quot; /language:&quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
@@ -1083,7 +1085,7 @@ Sub dialog1Combo2ShowSAPIChoices( _
 		sSelectionLangCountryTag = &quot; /language:&quot;&quot;en-US&quot;&quot;&quot;
 		sSelectionLanguageTag = &quot;en&quot;
 	End If
-	
+
 	While n &lt; Sapi.GetVoices.Count
 		s1 = Sapi.GetVoices.Item(n).GetDescription
 		For n1 = 10 To - 10 step - 2
@@ -1098,26 +1100,35 @@ Sub dialog1Combo2ShowSAPIChoices( _
 		sSelectionLangCountryTag &amp; _
 		&quot; /rate:&quot; &amp; Trim(n1) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;,0)
 	Next
-	
-	If fbHaveOgg() Or fbHaveFfmpeg() Then
+
+	If bHaveVLC Then
+		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
+		sSelectionLangCountryTag &amp; _
+		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
+		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).opus&quot;&quot;&quot; &amp; _
+		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+		oComboBox.addItem(s1, 0)
+	End If
+
+	If fbHaveOgg() Or bHaveFfmpeg Or bHaveVLC Then
 		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).ogg&quot;&quot;&quot; &amp; _
 		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1,0)
+		oComboBox.addItem(s1, 0)
 	End If
-	
-	If fbHaveFfmpeg() Or fbHaveLame() Then
+
+	If bHaveFfmpeg Or fbHaveLame() Then
 		bNoMp3Tool = False
 		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
+		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
 		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
 		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1,0)
-	ElseIf fbHaveVLC() And Not fbHaveItunes() Then
+		oComboBox.addItem(s1, 0)
+	ElseIf bHaveVLC And Not fbHaveItunes() Then
 		bNoMp3Tool = False
 		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
@@ -1125,32 +1136,34 @@ Sub dialog1Combo2ShowSAPIChoices( _
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
 		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	End If
+
 	If fbHaveNeroEnc() And fbHaveNeroTag() Then
 		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
+		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
 		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1,0)
+		oComboBox.addItem(s1, 0)
 	ElseIf fbHaveNeroEnc() Then
 		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
 		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1,0)
+		oComboBox.addItem(s1, 0)
 	End If
-	
+
 	If fbHaveFlac() Then
 		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).flac&quot;&quot;&quot; &amp; _
+		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
 		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1,0)
+		oComboBox.addItem(s1, 0)
 	End If
+
 	If bNoMp3Tool Then
 		If fbHaveItunes() Then
 			&apos; We can use iTunes to embed metadata and an album cover.
@@ -1166,23 +1179,23 @@ Sub dialog1Combo2ShowSAPIChoices( _
 			&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
 			&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).aif&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 			sSelectionLangCountryTag &amp; _
 			&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
 			&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 			sSelectionLangCountryTag &amp; _
 			&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
 			&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
 			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 		End If
 	End If
 	s2 = &quot;&quot;
-	If fbHaveVLC() Then
+	If bHaveVLC Then
 		s2 = &quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot;
 	End If
 	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
@@ -1190,25 +1203,22 @@ Sub dialog1Combo2ShowSAPIChoices( _
 	s2 &amp; _
 	&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).wav&quot;&quot;&quot; &amp; _
 	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1,0)
+	oComboBox.addItem(s1, 0)
 	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 	sSelectionLangCountryTag &amp; _
 	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1,0)
+	oComboBox.addItem(s1, 0)
 	&apos; do not specify the language for the top item.
 	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1,0)
-	
+	oComboBox.addItem(s1, 0)
 	If fileexists(myTextPath) Then
 		Kill myTextPath
 	End If
 	Exit Sub
 	FichierKO:
-	
 	Resume FichierKO2
 	FichierKO2:
-	
 	On Error Resume Next
 End Sub
 
