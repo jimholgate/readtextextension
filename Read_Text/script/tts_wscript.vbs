@@ -79,7 +79,10 @@
 '' [VideoLAN VLC](https://videolan.org/vlc) is a free viewer, streamer and converter. 
 '' To use VLC, install the desktop application using the installer program default
 '' location. The script for VLC compresses audio files quickly, and the resulting
-'' file does not include personalized metadata.
+'' file does not include personalized metadata. In some cases, your system security
+'' policies will prevent this script from running VLC directly, although you will
+'' still be able to compress audio files using the desktop application or a `vlc.exe`
+'' command  from the system Command Prompt program.
 '' 
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).mp3" "(TMP)"
 ''     "(TTS_WSCRIPT_VBS)" /use-optional-app:"True" /soundfile:"(HOME)en\(NOW).ogg" "(TMP)"
@@ -271,18 +274,22 @@ End Function
 Function fsGetPath(app)
     ' Use the system path to select a complete application URI
     ' or return `''` if the application is not in the path.
-    FsGetPath = ""
+    fsGetPath = ""
     Dim a1
-    a1 = split(Environ("PATH"), ";")
+    If Len(app) = 0 Then
+        Exit Function
+    End If
+    a1 = split(fsGetEnvironResult("PATH"), ";")
     Dim n
     Dim prueba
     For n = Lbound(a1) To Ubound(a1)
         prueba = a1(n) & "\" & app
         If fbFileExists(prueba) Then
-            FsGetPath = prueba
+            fsGetPath = prueba
             Exit Function
         End If
     Next
+    Exit Function
 End Function
 
 
@@ -1000,6 +1007,8 @@ Function executeVideoLanVLC(in_sound_path, out_sound_path)
 	End If
 	Dim command_line
 	command_line = ""
+    Dim command_line2
+    command_line2 = ""
 	Dim channel_count
 	channel_count = "2"
 	Dim audio_codec
@@ -1016,64 +1025,82 @@ Function executeVideoLanVLC(in_sound_path, out_sound_path)
 	extension = LCase(strExt(out_sound_path))
 	Dim error_code
     error_code = ""
-
-	If extension = "flac" Then
+    Select Case extension
+	Case ".flac"
 		audio_codec = "flac"
 		average_bitrate = "96"
 		sample_rate = "44100"
 		mux = "ogg"
-	Elseif extension = "mp3" Then
+	Case ".mp3"
 		audio_codec = "mp3"
 		average_bitrate = "128"
 		sample_rate = "44100"
 		mux = "dummy"
-	Elseif extension = "ogg" Then
+	Case ".ogg"
 		audio_codec = "vorb"
 		average_bitrate = "128"
 		sample_rate = "44100"
 		mux = "ogg"
-	Elseif extension = "opus" Then
+	Case ".opus"
 		audio_codec = "opus"
 		average_bitrate = "96"
 		sample_rate = "48000"
 		mux = "ogg"
-	End If	
-	If audio_codec is "" Then
+	Case Else
 		executeVideoLanVLC = False 
 		Exit Function
-	Else
-		command_line = join(_
-			array(_
-				"""", _
-				in_sound_path, _
-				"""", _
-				" --intf dummy ", _
-				verbosity, _
-				"--sout=", _
-				"""", _
-				"#transcode{vcodec=none,acodec=", _
-				audio_codec, _
-				",ab=", _
-				average_bitrate, _
-				",channels=", _
-				channel_count, _
-				",samplerate=", _
-				sample_rate, _
-				"}:std{access=file,mux=", _
-				mux, _
-				",dst='", _
-				out_sound_path, _
-				"'}", _
-				"""", _
-				" vlc://quit"), _
-			"")
-		On Error Resume Next
-		error_code = doExecute(_
-				vlc_app & _
-				" " & _
-				command_line)
-	End If
+	End Select
+	command_line = join(_
+	array(_
+	"""", _
+	in_sound_path, _
+	"""", _
+	" --intf dummy ", _
+	verbosity, _
+	"--sout=", _
+	"""", _
+	"#transcode{vcodec=none,acodec=", _
+	audio_codec, _
+	",ab=", _
+	average_bitrate, _
+	",channels=", _
+	channel_count, _
+	",samplerate=", _
+	sample_rate, _
+	"}:std{access=file,mux=", _
+	mux, _
+	",dst='", _
+	out_sound_path, _
+	"'}", _
+	"""", _
+	" vlc://quit"), _
+	"")
+	On Error Resume Next
+    ' On slow computers, the speech synthesizer might take a moment to
+    ' create the `in_sound_path`. On some systems, security settings
+    ' might prevent running VLC from a script.
+	    error_code = doExecute(_
+			vlc_app & _
+			" " & _
+			command_line)
 	executeVideoLanVLC = FileExists(out_sound_path)
+    if Not executeVideoLanVLC Then
+        ' The script does not have permission to run the VLC app or
+        ' the source file does not exist yet.
+        command_line2 = InputBox("VideoLAN VLC did not run. Keep `.WAV`?" & _
+        Chr(10) & _
+        "Command Prompt", _
+        APP_NAME, _
+        vlc_app & " " & command_line)
+        Select Case command_line2
+        Case ""
+            ' Cancel
+            fbRemoveFile in_sound_path
+        Case Else
+            error_code = doExecute(command_line2)
+        End Select
+        executeVideoLanVLC = FileExists(out_sound_path)
+    End If
 	Exit Function
 	executeVideoLanVLCErr:
 		executeVideoLanVLC = False 
@@ -1339,20 +1366,19 @@ Function compressWaveAudioWithFfmpeg(sWaveName, sOutName, sImage, sDimensions)
     Dim retVal
     Dim sFileNameExt
     Dim sPreProcess
-
     cr= Chr(10)
     compressWaveAudioWithFfmpeg = False 'default when exiting Function before creating a file
     doJob = ""
     doJob1 = ""
     doJob2 = ""
     ffMeta = ""
+
     If Len(sDimensions) = 0 Then
         sDimensions = "400x400"
     End If
     sFileNameExt = strExt(sOutName)
 
 ' ###Where's ffmpeg?
-
     myConverter = fsFindAppPath("ffmpeg\bin\ffmpeg.exe")
     If Len(myConverter) = 0 Then
         Exit Function
@@ -1749,7 +1775,7 @@ Function WriteIt(s1, _
             If Not bOK Then
                 ' Use [VideoLAN VLC](https://videolan.org/vlc) video player
                 ' in "dummy" (non-interactive) mode to create a compressed
-                ' audio file with no metadata. 
+                ' audio file with no metadata.
                 If Len(fsFindAppPath("VideoLAN\VLC\vlc.exe")) > 0 Then
                     sLastProcess = "VideoLAN VLC"
                     bOK = executeVideoLanVLC(sWaveName, sFileName)

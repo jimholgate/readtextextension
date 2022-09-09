@@ -1064,6 +1064,7 @@ Sub dialog1Combo2ShowSAPIChoices( _
 	Dim aLineOfText As String,myScriptPath As String
 	Dim n1 As Integer,s1 As String,oComboBox As Variant
 	Dim sProgram As String,myTextPath As String
+	Dim s2 As String
 	Dim sSelectionLangCountryTag, sSelectionLanguageTag As String
 	Dim bNoMp3Tool As Boolean
 	bNoMp3Tool = True
@@ -1091,14 +1092,14 @@ Sub dialog1Combo2ShowSAPIChoices( _
 		Next
 		n = n + 1
 	WEnd
-	On Error GoTo 0
+	On Error GoTo FichierKO
 	For n1 = 10 To - 10 step - 2
 		oComboBox.addItem( &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /rate:&quot; &amp; Trim(n1) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;,0)
 	Next
 	
-	If fbHaveOgg() Or fbHaveFfmpeg() Or fbHaveVLC() Then
+	If fbHaveOgg() Or fbHaveFfmpeg() Then
 		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
@@ -1116,7 +1117,7 @@ Sub dialog1Combo2ShowSAPIChoices( _
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
 		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1,0)
-	ElseIf fbHaveVLC() Then
+	ElseIf fbHaveVLC() And Not fbHaveItunes() Then
 		bNoMp3Tool = False
 		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
@@ -1180,8 +1181,13 @@ Sub dialog1Combo2ShowSAPIChoices( _
 			oComboBox.addItem(s1,0)
 		End If
 	End If
+	s2 = &quot;&quot;
+	If fbHaveVLC() Then
+		s2 = &quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot;
+	End If
 	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 	sSelectionLangCountryTag &amp; _
+	s2 &amp; _
 	&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).wav&quot;&quot;&quot; &amp; _
 	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	oComboBox.addItem(s1,0)
