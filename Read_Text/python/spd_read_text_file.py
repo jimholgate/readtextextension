@@ -13,6 +13,27 @@ all voices in all languages.
 MacOS
 =====
 
+### Enable python 3
+
+For local python scripts to work with MacOS, you need to install XCode and
+to agree to the terms of the Xcode/iOS license.
+
+This requires administrator (sudo) privileges.
+
+Once you have installed XCode, open a terminal and run
+
+    sudo xcodebuild -license
+
+and read the license. Finally, type `accept`, and hit the `return` key.
+
+Depending on the release of MacOS, you might need to install additional software
+to enable python to run locally.
+
+Run `python3 --version` and if the program shows you further installation prompts,
+follow the instructions to install the required software.
+
+### Menu options
+
 External program:
 
     /usr/bin/python3
@@ -27,7 +48,7 @@ or (specific language):
 
 or (specific voice):
 
-        "(SPD_READ_TEXT_PY)" --voice "Fiona" "(TMP)"
+    "(SPD_READ_TEXT_PY)" --voice "Fiona" "(TMP)"
 
 Linux
 =====
@@ -973,13 +994,23 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
             if len(_voice) == 0:
                 return False
             readtexttools.lock_my_lock()
-            s1 = (subprocess.check_output(
-                ''.join([
+            _command = ''.join([
                     self.app,
-                    "%(m_rate)s %(v_tag)s%(_voice)s -f '%(_file_spec)s'" %locals()]),
+                    "%(m_rate)s %(v_tag)s%(_voice)s -f '%(_file_spec)s'" %locals()])
+            s1 = (subprocess.check_output(
+                _command,
                 shell=True))
             readtexttools.unlock_my_lock()
             return len(s1) == 0
+        except TypeError:
+            # fork_exec() takes exactly 21 arguments (17 given)
+            try:
+                os.system(_command)
+                readtexttools.unlock_my_lock()
+                return True
+            except:
+                print('Cannot execute command: `%(_command)s`' %locals())
+                return False
         except subprocess.CalledProcessError:
             # You clicked a button to cancel reading aloud, so `killall` stopped
             # the running process, with a `subprocess.CalledProcessError` here.

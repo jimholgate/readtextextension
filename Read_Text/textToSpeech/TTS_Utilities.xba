@@ -1135,6 +1135,7 @@ Sub dialog1Combo2ShowSAPIChoices( _
 		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
 		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
 		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+		oComboBox.addItem(s1, 0)
 	End If
 
 	If fbHaveNeroEnc() And fbHaveNeroTag() Then
