@@ -180,7 +180,7 @@ Sub Usage(sA)
 End Sub
 
 Function bWriteText(outFile, theString)
-	Dim strackm
+	Dim strm
 	Dim objFile
 	Set strm = CreateObject("ADODB.Stream")
 	With strm
@@ -1727,6 +1727,8 @@ Function WriteIt(s1, _
 	Dim sLastProcess
 	Dim sWavename
     Dim Cruft
+	Dim CruftTest
+	Dim CruftLen
 	Set fs=CreateObject("Scripting.FileSystemObject")
 	Set Sapi=Nothing
 	Set Sapi=Wscript.CreateObject("SAPI.SpVoice")
@@ -1841,8 +1843,14 @@ Function WriteIt(s1, _
 	fbRemoveFile s3 & ".id"
 	fbRemoveFile s3 & ".title"
     Cruft = Split(sFileName, ".")(0)
-    For n = 12 to 14
-        fbRemoveFile Left(Cruft, Len(Cruft) - n)
+	CruftLen = 20
+	' Remove unwanted system generated files (a. k. a. "Cruft")
+    For n = 1 to CruftLen
+		CruftTest = Left(Cruft, Len(Cruft) - n)
+		If Right(CruftTest, 1) = "\" Then
+			Exit For
+		End If
+        fbRemoveFile CruftTest
     Next
 
 	bTattle = False

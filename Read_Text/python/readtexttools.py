@@ -60,6 +60,7 @@ import os
 import platform
 import sunau
 import sys
+import threading
 import time
 
 try:
@@ -1350,6 +1351,48 @@ class JsonTools(object):
 }''' %locals()
 
 
+def sound_length_seconds(_work):  # -> int
+    '''
+    Tells approximately how long a sound file is in seconds as an integer
+    We round up so that processes that call for sleep have time to finish.
+    '''
+    _work_ext = os.path.splitext(_work)[1].lower()
+    _return_value = 0
+    mimetypes.init()
+    _mime = "xxz-xzz-no-match"
+    if len(_work_ext) != 0:
+        try:
+            _mime = mimetypes.types_map[_work_ext]
+        except IndexError:
+            return 0
+    if _mime == mimetypes.types_map['.wav']:
+        try:
+            snd_read = wave.open(_work, 'r')
+            _return_value = math.ceil(
+                snd_read.getnframes() // snd_read.getframerate()) + 1
+            snd_read.close()
+        except:
+            pass
+    elif _mime == mimetypes.types_map['.au']:
+        try:
+            snd_read = sunau.open(_work, 'r')
+            _return_value = math.ceil(
+                snd_read.getnframes() // snd_read.getframerate()) + 1
+            snd_read.close()
+        except:
+            pass
+    elif _mime == (mimetypes.types_map['.aif'] or
+                   _mime == mimetypes.types_map['.aifc']):
+        try:
+            snd_read = aifc.open(_work, 'r')
+            _return_value = math.ceil(
+                snd_read.getnframes() // snd_read.getframerate()) + 1
+            snd_read.close()
+        except:
+            pass
+    return _return_value
+
+
 class ImportedMetaData(object):
     '''Get your media's metadata ready to include in new media'''
 
@@ -1799,6 +1842,72 @@ track=%(track)s''' % locals()
             self.get_defaults()
         return self.album
 
+
+class WinMediaPlay(object):
+    '''Play a sound file in Windows. Use winsound with uncompressed files
+    instead because Windows Media Player takes more time to start up.'''
+    def __init__(self):
+        self.extensions = [['.aifc', 0], ['.aif', 0], ['.aiff', 0], ['.au', 0],
+                          ['.m4a', 12209], ['.mp2', 12209], ['.mp3', 12209],
+                          ['.snd', 88320], ['.wav', 0], ['.wma', 12209]]
+        self.app = get_nt_path('Windows Media Player', 'wmplayer.exe')
+        self.rest = 0
+
+    def app_ok(self, file_path=''):  # -> bool
+        '''Can the Windows Media Player application play the sound file?
+        Estimate the play time in seconds.'''
+        for _test in [self.app, file_path]:
+            if len(_test.strip()) == 0:
+                return False
+        if not os.path.isfile(file_path):
+            return False
+        _continue = False
+        _ext = os.path.splitext(file_path)[1]
+        for _test in self.extensions:
+            if _test[0] == _ext:
+                _continue = True
+                break
+        if not _continue:
+            return False
+        _denominator = 12209
+        for _test in self.extensions:
+            if os.path.splitext(file_path)[1] == _test[0]:
+                _denominator = _test[1]
+                break
+        if _denominator == 0:
+            self.rest = sound_length_seconds(file_path)
+        else:
+            self.rest = int(os.path.getsize(file_path) / _denominator) + 1
+        return self.rest != 0 
+
+    def _windowsmedia(self, file_path=''):  # -> bool
+        '''(Local use) Initiate Windows Media Player without a user interface'''
+        if not os.path.isfile(file_path):
+            return False
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        _app = self.app
+        a = subprocess.call('%(_app)s /play /close "%(file_path)s"' %locals(),
+                            startupinfo=startupinfo)
+        return bool(a)
+
+    def play(self, file_path=''):  # -> bool
+        '''Play an audio file using Windows Media Player. You must initialize
+        with `app_ok` to check `wmplayer` and estimate the rest time, then if
+        the file can be played `wmplayer` plays it. For supported audio files
+        like `.wav` the Windows python3 `winsound` library is much faster.'''
+        if self.rest == 0:
+            return False
+        mythread = threading.Thread(target=self._windowsmedia,
+                                    args=[file_path])
+        mythread.start()
+        time.sleep(self.rest)
+        try:
+            return os.system('taskkill /im wmplayer.exe') == 0
+        except [SyntaxError, TypeError]:
+            return False
+
+
 def clean_temp_files(_out=''):  # -> Bool
     '''Clean text and image files used to create media'''
     try:
@@ -2011,48 +2120,6 @@ VideoLAN VLC
             unlock_my_lock()
         return True
     return False
-
-
-def sound_length_seconds(_work):  # -> int
-    '''
-    Tells approximately how long a sound file is in seconds as an integer
-    We round up so that processes that call for sleep have time to finish.
-    '''
-    _work_ext = os.path.splitext(_work)[1].lower()
-    _return_value = 0
-    mimetypes.init()
-    _mime = "xxz-xzz-no-match"
-    if len(_work_ext) != 0:
-        try:
-            _mime = mimetypes.types_map[_work_ext]
-        except IndexError:
-            return 0
-    if _mime == mimetypes.types_map['.wav']:
-        try:
-            snd_read = wave.open(_work, 'r')
-            _return_value = math.ceil(
-                snd_read.getnframes() // snd_read.getframerate()) + 1
-            snd_read.close()
-        except:
-            pass
-    elif _mime == mimetypes.types_map['.au']:
-        try:
-            snd_read = sunau.open(_work, 'r')
-            _return_value = math.ceil(
-                snd_read.getnframes() // snd_read.getframerate()) + 1
-            snd_read.close()
-        except:
-            pass
-    elif _mime == (mimetypes.types_map['.aif'] or
-                   _mime == mimetypes.types_map['.aifc']):
-        try:
-            snd_read = aifc.open(_work, 'r')
-            _return_value = math.ceil(
-                snd_read.getnframes() // snd_read.getframerate()) + 1
-            snd_read.close()
-        except:
-            pass
-    return _return_value
 
 
 def get_meta_data(_index=0, _artist='', _image='', _work=''):  # -> str
@@ -2503,23 +2570,33 @@ def play_wav_no_ui(file_path=''):  # -> bool
                    '.amr', '.m4a', '.m4r', '.m4b', '.caf', '.ec3', '.flac',
                    '.mp1', '.mp2', '.mp3', '.mpeg', '.mpa', '.mp4', '.snd',
                    '.au', '.wav', '.w64']
+    display_file = os.path.split(file_path)[1]
     if os.name == 'nt':
         # Windows
-        if os.path.splitext(file_path)[1].lower() in [
-                '.m4a', '.mp3', '.mp4', '.oga', '.ogg', '.opus', '.spx',
-                '.webm']:
+        _win_ext = os.path.splitext(file_path)[1].lower()
+        if _win_ext in ['.m4a', '.mp2', '.mp3', '.wma']:
+            a_app = 'Windows Media Player'
+            _winm = WinMediaPlay()
+            if _winm.app_ok(file_path):
+                print('[>] %(a_app)s playing `%(display_file)s`' %locals())
+                _winm.play(file_path)
+                return True
+            else:
+                return os.startfile(file_path) == 0
+        elif _win_ext in [
+                '.mp4', '.oga', '.ogg', '.opus', '.spx', '.webm']:
             os.startfile(file_path)
             return True
         else:
             try:
                 import winsound
+                print('[>] %(a_app)s playing `%(display_file)s`' %locals())                
                 winsound.PlaySound(file_path,
                                    winsound.SND_FILENAME | winsound.SND_NOWAIT)
                 return True
             except:
                 try:
-                    os.startfile(file_path)
-                    return True
+                    return os.startfile(file_path) == 0
                 except:
                     return False
     else:
@@ -2580,7 +2657,6 @@ def play_wav_no_ui(file_path=''):  # -> bool
             print('You need an audio player:%(_apt_get_list)s' % locals())
 
     if _command:
-        display_file = os.path.split(file_path)[1]
         if os.path.getsize(file_path) == 0:
             print('''[>]  %(a_app)s cannot play `%(display_file)s`''' %locals())
             return True
