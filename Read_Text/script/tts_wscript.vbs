@@ -181,6 +181,9 @@ End Sub
 
 
 Function bWriteText(outFile, theString)
+	'''
+	' Write text to a new file using UTF-8 character coding
+	'''
 	Dim strm
 	Dim objFile
 	Set strm = CreateObject("ADODB.Stream")
@@ -196,7 +199,10 @@ End Function
 
 
 Function FileSize(sfilespec)
-	Dim objFSO
+	'''
+	' If file size exists, return file size, otherwise `0`
+	'''
+	Dim fso
 	Dim file_size
 	file_size = 0
 	If fbFileExists(sfilespec) Then
