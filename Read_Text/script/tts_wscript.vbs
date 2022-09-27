@@ -179,6 +179,7 @@ Sub Usage(sA)
 	MsgBox s1, 0, APP_NAME
 End Sub
 
+
 Function bWriteText(outFile, theString)
 	Dim strm
 	Dim objFile
@@ -192,6 +193,20 @@ Function bWriteText(outFile, theString)
 	End With
 	bwriteText = fbFileExists(outFile)
 End Function
+
+
+Function FileSize(sfilespec)
+	Dim objFSO
+	Dim file_size
+	file_size = 0
+	If fbFileExists(sfilespec) Then
+		Set fso = CreateObject("Scripting.FileSystemObject")
+		file_size = fso.GetFile(sfilespec).Size
+	End If
+	FileSize = file_size
+End Function
+
+
 Function EscapeReturnsAndReplaceQuotes(sA)
 	'''
 	' Use a normal plain text string to generate a 'lyrics' string
@@ -869,7 +884,7 @@ Function wav2flac(wavfile, outfile, sMyWords, sImage)
 		''''''End If
 		b1 = doExecute(sA, True)
 	End If
-	If fbFileExists(outfile) Then
+	If FileSize(outfile) > 0 Then
 		wav2flac = True
 		fbRemoveFile wavfile
 	End If
@@ -1004,6 +1019,8 @@ Function executeVideoLanVLC(in_sound_path, out_sound_path)
 	Else
 		Exit Function
 	End If
+	Dim CR
+	CR = Chr(10)
 	Dim command_line
 	command_line = ""
 	Dim command_line2
@@ -1025,9 +1042,17 @@ Function executeVideoLanVLC(in_sound_path, out_sound_path)
 	Dim error_code
 	error_code = ""
 	Select Case extension
+	' 2022-09 - This extension does not support VLC flac export.
+	' Install ffmpeg.
+	'Case ".flac"
+	'	audio_codec = "flac"
+	'	average_bitrate = "0"
+    '	channel_count = "0"
+	'	sample_rate = "0"
+	'	mux = "raw"
 	Case ".mp2"
 		audio_codec = "mp2"
-		average_bitrate = "96"
+		average_bitrate = "128"
     	channel_count = "1"
 		sample_rate = "16000"
 		mux = "dummy"
@@ -1064,18 +1089,31 @@ Function executeVideoLanVLC(in_sound_path, out_sound_path)
 	End Select
     Dim comment
     comment = "Convert with VideoLAN VLC?" & _
-		Chr(10) & _
+		CR & _
 		"Average Bitrate: " & _
 		average_bitrate & _
-		Chr(10) & _
+		CR & _
 		"Channel Count: " & _
 		channel_count & _
-		Chr(10) & _
+		CR & _
 		"Codec: " & _
 		audio_codec & _
-		Chr(10) & _
+		CR & _
 		"Sample Rate: " & _
 		sample_rate
+	Select Case mux
+	Case "raw", ""
+		compression = ""
+	Case Else
+		compression = join(_
+		array(_
+		",ab=", _
+		average_bitrate, _
+		",channels=", _
+		channel_count, _
+		",samplerate=", _
+		sample_rate))
+	End Select
 	command_line = join(_
 	array(_
 	"""", _
@@ -1087,12 +1125,7 @@ Function executeVideoLanVLC(in_sound_path, out_sound_path)
 	"""", _
 	"#transcode{vcodec=none,acodec=", _
 	audio_codec, _
-	",ab=", _
-	average_bitrate, _
-	",channels=", _
-	channel_count, _
-	",samplerate=", _
-	sample_rate, _
+	compression, _
 	"}:std{access=file,mux=", _
 	mux, _
 	",dst='", _
@@ -1106,11 +1139,14 @@ Function executeVideoLanVLC(in_sound_path, out_sound_path)
 	' create the `in_sound_path`. On some systems, security settings
 	' might prevent running VLC from a script or VLC might fail to
     ' initialize on the first run.
+	If FileSize(in_sound_path) = 0 Then
+		WScript.Sleep 2000
+	End If
 	error_code = doExecute(_
 	vlc_app & _
 	" " & _
 	command_line, True)
-	executeVideoLanVLC = FileExists(out_sound_path)
+	executeVideoLanVLC = FileSize(out_sound_path) > 0
     If executeVideoLanVLC Then
         fbRemoveFile in_sound_path
 	Else
@@ -1126,7 +1162,7 @@ Function executeVideoLanVLC(in_sound_path, out_sound_path)
             fbRemoveFile out_sound_path
             fbRemoveFile in_sound_path
 		End If
-		executeVideoLanVLC = FileExists(out_sound_path)
+		executeVideoLanVLC = FileSize(out_sound_path) > 0
 	End If
 	Exit Function
 	executeVideoLanVLCErr:
@@ -1566,7 +1602,7 @@ Function compressWaveAudioWithFfmpeg(sWaveName, sOutName, sImage, sDimensions)
 		doJob = doJob & """ -y """ & sOutName & """"
 		b1 = doExecute(doJob, True)
 	End Select
-	If fbFileExists(sOutName) Then
+	If FileSize(sOutName) > 0 Then
 		fbRemoveFile sWaveName
 		removeMetaFiles()
 		compressWaveAudioWithFfmpeg = True
@@ -1788,7 +1824,9 @@ Function WriteIt(s1, _
 				End If
 			Case ".mp3"
 				If compressWaveAudioWithFfmpeg(sWaveName, sFileName, sImage, sDimensions) = False Then
-					 sLastProcess = "lame"
+					If Len(lamePath()) > 0 Then
+					 	sLastProcess = "lame"
+					End If
 					 bOK = wav2mp3(sWaveName, sFileName, sImage)
 				End If
 			Case ".ogg"

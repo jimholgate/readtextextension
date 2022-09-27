@@ -1844,9 +1844,15 @@ track=%(track)s''' % locals()
 
 
 class WinMediaPlay(object):
-    '''Play a sound file in Windows. Use winsound with uncompressed files
+    '''Play a sound file in Windows. Use `winsound` with uncompressed files
     instead because Windows Media Player takes more time to start up.'''
     def __init__(self):
+        '''Item`[0]` of `extensions` is a file extension. Item `[1]` of
+        `extensions` is an experientially calculated divisor based on
+        speech using the default Windows 10 SAPI `en-US` voice. `app`
+        is the path to the app or a blank string if the app is not
+        found. `rest` is the approximate length of the speech in
+        seconds.'''
         self.extensions = [['.aifc', 0], ['.aif', 0], ['.aiff', 0], ['.au', 0],
                           ['.m4a', 12209], ['.mp2', 12209], ['.mp3', 12209],
                           ['.snd', 88320], ['.wav', 0], ['.wma', 12209]]
@@ -1871,7 +1877,8 @@ class WinMediaPlay(object):
             return False
         _denominator = 12209
         for _test in self.extensions:
-            if os.path.splitext(file_path)[1] == _test[0]:
+            _ext = os.path.splitext(file_path)[1]
+            if _ext.lower() == _test[0]:
                 _denominator = _test[1]
                 break
         if _denominator == 0:
