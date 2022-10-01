@@ -1997,6 +1997,8 @@ Function fspyOutOptions( _
 	Dim _lib_so As Integer : _lib_so = 1
 	Dim _plugin_path As String : _plugin_path = gst_plugin_path()
 	Dim _vlc As String : _vlc = vlcPath()
+	Dim _mp3_image As String : _mp3_image = &quot;&quot;
+	Dim _ogg_image As String : _ogg_image = &quot;&quot;
 	s1 = &quot;&quot;
 	s3 = &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	s6 = &quot;&quot;
@@ -2036,24 +2038,38 @@ Function fspyOutOptions( _
 			fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 And Not(_
 			fbHaveFfmpeg()) And Len(_vlc) = 0 Then
 				&apos; The Python gstreamer library might not be available, so 
-				&apos; propose saving an uncompressed audio file.
+				&apos; propose saving audio formats that your apps support.
+
+				If fbHaveLame() Then
+					s1 = s1 &amp; CR &amp; s4 &amp; _
+					&quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
+					s3
+				End If
 				s1 = s1 &amp; CR &amp; s4 &amp; _
 				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).wav&quot;&quot;&quot; &amp; _
 				s3
 			Else
 				&apos; `opus` replaces `.spx` and `.ogg`.
 				&apos; `lame` (.mp3) replaces `mp1` and `.mp2`.
+				If fbHaveLame() Then
+					_mp3_image = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+				End If
+				If fbHaveFfmpeg() Then
+					_mp3_image = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+					_ogg_image = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+				End If
 				extension = Array(_
-				Array(&quot;.wav&quot;, &quot;libgstwavenc&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;), _
-				Array(&quot;.opus&quot;, &quot;libgstopus&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;), _
-				Array(&quot;.ogg&quot;, &quot;libgstogg&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;), _
-				Array(&quot;.mp3&quot;, &quot;libgstlame&quot;, &quot;libmp3lame0/copyright&quot;), _
-				Array(&quot;.flac&quot;, &quot;libgstflac&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;))
+				Array(&quot;.wav&quot;, &quot;libgstwavenc&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;, &quot;&quot;), _
+				Array(&quot;.opus&quot;, &quot;libgstopus&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;, &quot;&quot;), _
+				Array(&quot;.ogg&quot;, &quot;libgstogg&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;, _ogg_image), _
+				Array(&quot;.mp3&quot;, &quot;libgstlame&quot;, &quot;libmp3lame0/copyright&quot;, _mp3_image), _
+				Array(&quot;.flac&quot;, &quot;libgstflac&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;, &quot;&quot;))
 
 				For x = Lbound(extension) To Ubound(extension)
 					If fileexists(_plugin_path &amp; extension(x)(1) &amp; &quot;.so&quot;) Then 
 						ReDim Preserve command_list(_x_ok)
 						command_list(_x_ok) = s4 &amp; _
+						extension(x)(3) &amp; _
 						&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; _
 						extension(x)(0) &amp; &quot;&quot;&quot;&quot; &amp; s3
 						_x_ok = _x_ok + 1

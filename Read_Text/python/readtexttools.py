@@ -725,6 +725,7 @@ def find_local_pip(lib_name='qrcode'): # -> str
                     return ''.join([path1, entry.name, path2])
     return ''
 
+
 def my_os_system(_command):  # -> bool
     '''
     This is equivalent to os.system(_command)
@@ -1133,6 +1134,20 @@ def make_output_directory(_out):  # -> str
     return _out_directory
 
 
+def posix_compressor_ok(_ext=''):  # -> bool
+    '''Check if a stand alone compressor app that works with the
+    working file extension is installed.'''
+    if not os.name == 'posix':
+        return False
+    _apps = [['flac', ['.flac']], ['lame', ['.mp2', '.mp3']],
+            ['twolame', ['.mp2']], ['oggenc', ['.oga', '.ogg']]]
+    for _app in _apps:
+        if have_posix_app(_app[0], False):
+            if _ext in _app[1]:
+                return True
+    return False
+
+
 def process_wav_media(_title='untitled',
                       _work='',
                       _image='',
@@ -1185,7 +1200,7 @@ def process_wav_media(_title='untitled',
                                  _artist, _dimensions)
                 break
             elif bool(_ffmpeg) or os.path.isfile(
-                    _test[_extension_table.standalone]):
+                    _test[_extension_table.standalone]) or posix_compressor_ok(out_ext):
                 wav_to_media(_title, _work, _image, _out, _audible, _visible,
                              _artist, _dimensions)
                 break
@@ -1258,6 +1273,8 @@ def do_gst_parse_launch(_pipe=''):  # -> bool
         except:
             for launch in ['gst-launch-1.0']:
                 if have_posix_app(launch, False):
+                    os.environ.setdefault(
+                        'GST_PLUGIN_PATH', gst_plugin_path('libgstwavenc')[0])
                     gst_l = launch
                     if my_os_system('%(gst_l)s %(_pipe)s' % locals()):
                         print('%(gst_l)s %(_pipe)s' % locals())
