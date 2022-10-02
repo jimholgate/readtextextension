@@ -168,6 +168,12 @@ class XmlTransform(object):
 
     def __init__(self):  # -> None
         '''Initialize data'''
+        self.caution = [' alias ', ' awk ', ' base64 ', ' bash ', ' curl ',
+                        ' cut ', ' echo ', ' egrep ', ' fgrep ', 'glob',
+                        ' grep ', ' groff ', ' hash ', ' iconv ', ' import ',
+                        ' java ', ' killall ', ' node ', ' python ',
+                        ' python2 ', ' python3 ', ' ruby ',  ' sed ', ' sh ',
+                        ' split ', ' sudo ', ' tee ', ' unhash ', ' | ']
         try:
             # If the XML client can use all XML text substitutions,
             # escape the string for characters that can cause
@@ -205,6 +211,11 @@ class XmlTransform(object):
         For example, malformed scheme code strings or sable code could
         cause some speech synthesizers to crash.
         '''
+        if not strict:
+            for _test in self.caution:
+                if _test in test_text:
+                    strict = True
+                    break                    
         if bool(self.safe_xml):
             if strict:
                 return str(test_text.translate(self.safe_xml))
