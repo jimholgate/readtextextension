@@ -655,7 +655,7 @@ configurations.
         if self.xml_tool.use_mode in ['text']:
             _message = ' " %(_txt)s"' % locals()
         else:
-            _txt = self.xml_tool.clean_for_xml(_txt)
+            _txt = self.xml_tool.clean_for_xml(_txt, True)
             _message = '''<?xml version='1.0'?>
 <speak version='1.1' xml:lang='%(language)s'>%(_txt)s</speak>''' % locals()
         _time = guess_time(_txt, i_rate, _file_spec, language)

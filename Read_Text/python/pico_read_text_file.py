@@ -160,6 +160,7 @@ def main():  # -> NoReturn
     _output = ''
     _visible = ''
     _audible = ''
+    _strict = 'false'
     _text = ''
     _rate = '100%'
     _pitch = '100%'
@@ -204,6 +205,8 @@ def main():  # -> NoReturn
             _rate = a
         elif o in ('-p', '--pitch'):
             _pitch = a
+        elif o in ('-s', '--strict'):
+            _strict = a
         elif o in ('-i', '--image'):
             _image = a
         elif o in ('-t', '--title'):
@@ -216,7 +219,8 @@ def main():  # -> NoReturn
             assert False, 'unhandled option'
     _text = _imported_meta.meta_from_file(_file_path)
     if len(_text) != 0:
-        _text = _xml_transform.clean_for_xml(_text)
+        _text = _xml_transform.clean_for_xml(_text,
+                                             readtexttools.lax_bool(_strict))
     if len(_text) != 0:
         if not _language[:2].lower() in ['de', 'es', 'en', 'fr', 'it']:
             _language = 'en-US'

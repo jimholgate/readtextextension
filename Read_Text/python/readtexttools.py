@@ -169,6 +169,9 @@ class XmlTransform(object):
     def __init__(self):  # -> None
         '''Initialize data'''
         try:
+            # If the XML client can use all XML text substitutions,
+            # escape the string for characters that can cause
+            # problems in a Posix shell environment.
             self.safe_xml = str.maketrans({
                 "&": "&#38;",
                 '"': "&#34;",
@@ -182,11 +185,19 @@ class XmlTransform(object):
                 "(": "&#40;",
                 ")": "&#41;"
             })
+            # Minimum necessary for valid XML in a shell environment.
+            self.base_xml = str.maketrans({
+                "&": "&#38;",
+                '"': '\\"',
+                '<': "&#60;",
+                ">": "&#62;"
+            })
         except AttributeError:
             self.safe_xml = None
+            self.base_xml = None
         self.use_mode = ['ssml', 'text'][0]
 
-    def clean_for_xml(self, test_text):  # -> str
+    def clean_for_xml(self, test_text='', strict=True):  # -> str
         '''The data portions of an XML file should escape characters
         with special properties. Not using `xml.sax.saxutils` because
         the replacements aren't always safe for uncontrolled input.
@@ -195,15 +206,22 @@ class XmlTransform(object):
         cause some speech synthesizers to crash.
         '''
         if bool(self.safe_xml):
-            return str(test_text.translate(self.safe_xml))
-        else:
-            # python 2 - slower equivalent
+            if strict:
+                return str(test_text.translate(self.safe_xml))
+            else:
+                return str(test_text.translate(self.base_xml))
+        # python 2 - slower equivalent
+        if strict:
             for pair in [["&", "&#38;"], ['"', "&#34;"], ["'", "&#39;"],
                          ["<", "&#60;"], [">", "&#62;"], ["[", "&#91;"],
                          ["]", "&#93;"], ["{", "&#123;"], ["}", "&#125;"],
                          ["(", "&#40;"], [")", "&#41;"]]:
                 test_text = test_text.replace(pair[0], pair[1])
             return test_text
+        for pair in [["&", "&#38;"], ['"', '\\"'],
+                     ["<", "&#60;"], [">", "&#62;"]]:
+            test_text = test_text.replace(pair[0], pair[1])
+        return test_text
 
 
 class ClassRemoveXML(HTMLParser):

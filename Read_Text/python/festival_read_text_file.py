@@ -745,7 +745,7 @@ reads the file aloud.
                                      _image_size)
     else:
         # Prepare Sable XML (To SLOW DOWN speech use --RATE=75%)
-        _content = _xml_tool.clean_for_xml(_content)
+        _content = _xml_tool.clean_for_xml(_content, True)
         _file_content = ''.join([
             '<SABLE>\n', '<SPEAKER NAME="', _sable_speaker + '">\n',
             '<RATE SPEED="', _sable_rate + '">\n', '<PITCH BASE="',
