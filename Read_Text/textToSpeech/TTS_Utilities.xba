@@ -223,6 +223,35 @@ Function fbIsLibreOffice() As Boolean
 End Function
 
 
+Function fbInPaths(ByVal _app As String) As Boolean
+	Dim Paths As String
+	Dim Div As String
+	Dim Os_Div As String
+	Dim PathList As Variant
+	Dim x As Integer
+	fbInPaths = False
+	On Local Error GoTo fbInPathsErr
+	Paths = fsReplaceText(Environ(&quot;PATH&quot;), &quot;PATH=&quot;, &quot;&quot;)
+	If Instr(Paths, &quot;:&quot;) &lt;&gt; 0 Then
+		Div = &quot;:&quot;
+		Os_Div = &quot;/&quot;
+	Else
+		Div = &quot;;&quot;
+		Os_Div = &quot;\&quot;
+	End If
+	PathList = Split(Paths, Div)
+	For x = Lbound(PathList) To Ubound(PathList)
+		If FileExists(PathList(x) &amp; Os_Div &amp; _app) Then
+			fbInPaths = True
+			Exit For
+		End If
+	Next
+	Exit Function
+	fbInPathsErr:
+	fbInPaths = False
+End Function
+
+
 Sub webHelp(ByVal sURL)
 	Dim oSvc
 	On error Goto webHelpErr
@@ -6019,6 +6048,10 @@ Function fbHaveNetworkTTS() As Boolean
 	&apos; Install `gtts` with `pip3 install python3-gtts-token python3-gtts` 
 	fbHaveNetworkTTS = Len(fsGetPipLibPath(&quot;gtts&quot;, True)) &lt;&gt; 0
 	If fbHaveNetworkTTS Then
+		Exit Function
+	End If
+	If fbInPaths(&quot;larynx-server&quot;) Then
+		fbHaveNetworkTTS = True
 		Exit Function
 	End If
 	Dim x# : x = 0

@@ -39,7 +39,18 @@ import getopt
 import math
 import os
 import sys
+import time
 import readtexttools
+try:
+    import urllib
+    import json
+except ImportError:
+    pass
+try:
+    import requests
+    REQUESTS_OK = True
+except:
+    REQUESTS_OK = False
 try:
     import gtts
 except ImportError:
@@ -52,7 +63,6 @@ except ImportError:
                 pass
     except:
         pass
-    
 try:
     import awsserver
 except ImportError:
@@ -130,9 +140,9 @@ class AmazonClass(object):
         return self.ok
 
     def read(self, _text="", _iso_lang='en-US', _visible="false",
-            _audible="true", _out_path="", _icon="", _info="",
-            _post_process=None, _writer='', _size='600x600',
-            _speech_rate=160):  # -> bool
+             _audible="true", _out_path="", _icon="", _info="",
+             _post_process=None, _writer='', _size='600x600',
+             _speech_rate=160):  # -> bool
         '''stub'''
         if not self.ok:
             return False
@@ -169,9 +179,9 @@ class AzureClass(object):
         return self.ok
 
     def read(self, _text="", _iso_lang='en-US', _visible="false",
-            _audible="true", _out_path="", _icon="", _info="",
-            _post_process=None, _writer='', _size='600x600',
-            _speech_rate=160):  # -> bool
+             _audible="true", _out_path="", _icon="", _info="",
+             _post_process=None, _writer='', _size='600x600',
+             _speech_rate=160):  # -> bool
         '''stub'''
         if not self.ok:
             return False
@@ -209,16 +219,16 @@ class GoogleCloudClass(object):
         return self.ok
 
     def read(self, _text="", _iso_lang='en-US', _visible="false",
-            _audible="true", _out_path="", _icon="", _info="",
-            _post_process=None, _writer='', _size='600x600',
-            _speech_rate=160):  # -> bool
+             _audible="true", _out_path="", _icon="", _info="",
+             _post_process=None, _writer='', _size='600x600',
+             _speech_rate=160):  # -> bool
         '''stub'''
         if not self.ok:
             return False
         try:
             return  gcloudserver.read(_text="", _iso_lang='en-US',
                                       _visible="false", _audible="true",
-                                      _out_path="", _icon="", _info="", 
+                                      _out_path="", _icon="", _info="",
                                       _post_process=None, _writer='',
                                       _size='600x600', _speech_rate=160)
         except (AttributeError, NameError):
@@ -323,9 +333,8 @@ Setup
         _env_lang = readtexttools.default_lang()
         _domain = self.translator_domain
         _provider = self.translator
-        _provider_logo = '/usr/share/icons/hicolor/scalable/apps/goa-account-%(_domain)s.svg' %locals(
-        )
-        
+        _provider_logo = '/usr/share/icons/hicolor/scalable/apps/goa-account-%(_domain)s.svg' %locals()
+
         if '-' in _iso_lang:
             _lang = _iso_lang.split('-')[0]
             _region = _iso_lang.split('-')[1]
@@ -472,8 +481,7 @@ Setup
         if readtexttools.have_posix_app('osascript', False):
             _msg = 'https://translate.%(_domain)s.%(_tld)s' %locals()
         else:
-            _msg = '`<https://translate.%(_domain)s.%(_tld)s?&langpair=auto|%(_lang2)s&tbb=1&ie=&hl=%(_env_lang)s&text=%(_short_text)s>' %locals(
-        )
+            _msg = '`<https://translate.%(_domain)s.%(_tld)s?&langpair=auto|%(_lang2)s&tbb=1&ie=&hl=%(_env_lang)s&text=%(_short_text)s>' %locals()
         if not self.language_supported(_iso_lang):
             # Fallback: display a link to translate using Google Translate.
             readtexttools.pop_message(
@@ -539,6 +547,206 @@ Setup
         return False
 
 
+class LarynxClass(object):
+    u'''Local voice server using Larynx'''
+    def __init__(self):  # -> None
+        '''Initialize data. See
+        <https://github.com/rhasspy/larynx#basic-synthesis>'''
+        _metadata = readtexttools.ImportedMetaData()
+        self.ok = True
+        self.url = 'http://0.0.0.0:5002'  # localhost port 5002
+        self.vocoders = None  # ordered fast+normal to slow+high quality
+        self.ssmls = [False, True]  # false = TEXT or true = SSML
+        self.length_scales = [1.25, 1.00, 0.85]  # higher number is slower
+        self.voice_id = ''
+        try:
+            self.base_curl = str.maketrans({
+                '\\': ' ',
+                '"': '\\"',
+                '''
+''': '''\
+''',
+                '\r': ' '
+            })
+        except AttributeError:
+            self.base_curl = None
+        self.is_x86_64 = False
+        if 'x86_64' in _metadata.execute_command('uname -a'):
+            self.is_x86_64 = True
+        else:
+            try:
+                if bool(os.getenv('ProgramFiles(x86)')):
+                    self.is_x86_64 = True
+            except:
+                pass
+
+    def _set_vocoders(self, alt_larynx_url=''):  # -> bool
+        '''If the server is running, then get the list of voice coders.
+        + `alt_larynx_url` If you are connecting to a local network's
+           larynx server using a different computer, you might need to use
+           a different url.'''
+        if len(alt_larynx_url) != 0:
+            self.url = alt_larynx_url
+        data = {}
+        if bool(self.vocoders):
+            return True
+        try:
+            response = urllib.request.urlopen(''.join([self.url, '/api/vocoders']))
+            data_response = response.read()
+            data = json.loads(data_response)
+        except urllib.error.URLError:
+            print('''urllib.error.URLError
+To use the larynx speech synthesis client, you need to initiate `larynx-server`.
+[More...](https://github.com/rhasspy/larynx)''')
+            self.ok = False
+            return False
+        except AttributeError:
+            try:
+                response = urllib.urlopen(''.join([self.url, 'api/vocoders']))
+                data_response = response.read()
+                data = json.loads(data_response)
+            except [AttributeError, urllib.error.URLError]:
+                self.ok = False
+                return False
+        if len(data) == 0:
+            return False
+        _nsv = ''
+        for _jint in range(0, len(data)):
+            _nsv = ''.join([_nsv, data[_jint]['id'], '\n'])
+        self.vocoders = _nsv[:-1].split('\n')
+        return True
+
+    def language_supported(self, iso_lang='en-US', alt_larynx_url=''):  # -> bool
+        '''Is the language or voice supported?
+        + `iso_lang` can be in the form `en-US` or a voice like `eva_k`
+        + `alt_larynx_url` If you are connecting to a local network's
+           larynx server using a different computer, you might need to use
+           a different url.'''
+        if len(alt_larynx_url) != 0:
+            self.url = alt_larynx_url
+        if not REQUESTS_OK:
+            if not readtexttools.have_posix_app('curl', False):
+                self.ok = False
+                return False
+        self._set_vocoders(self.url)
+        if len(self.voice_id) != 0:
+            return True
+        # format of json dictionary item: 'de-de/eva_k-glow_tts'
+        # "voice" or "language and region"
+        _lang1 = iso_lang.lower()
+        # concise language
+        _lang2 = iso_lang.lower()[:2]
+        data = {}
+        try:
+            response = urllib.request.urlopen(''.join([self.url, '/api/voices']))
+            data_response = response.read()
+            data = json.loads(data_response)
+        except urllib.error.URLError:
+            print('''urllib.error.URLError
+To use the larynx speech synthesis client, you need to initiate `larynx-server`.
+[More...](https://github.com/rhasspy/larynx)''')
+            self.ok = False
+            return False
+        except AttributeError:
+            try:
+                response = urllib.urlopen(''.join([self.url, 'api/voices']))
+                data_response = response.read()
+                data = json.loads(data_response)
+            except [AttributeError, urllib.error.URLError]:
+                self.ok = False
+                return False
+        if len(data) == 0:
+            return False
+        # Get each json data `dict`, then check each json
+        # `string` against the supplied voice or language
+        for _item in data:
+            if data[_item]['downloaded']:
+                for _query in [_lang1, _lang2]:
+                    if _query in [data[_item]['id'],
+                                  data[_item]['language'], data[_item]['name'],
+                                  data[_item]['language'].split('-')[0]]:
+                        self.ok = True
+                        self.voice_id = data[_item]['id']
+                        return True
+        self.ok = False
+        return False
+
+    def read(self, _text="", _iso_lang='en-US', _visible="false",
+             _audible="true", _out_path="", _icon="", _info="",
+             _post_process=None, _writer='', _size='600x600',
+             _speech_rate=160, quality=1, ssml=False):  # -> bool
+        '''
+        First, check larynx language support using `def language_supported`.
+        Speak text aloud using a running instance of the
+        [larynx-server](https://github.com/rhasspy/larynx)
+        For most computers "highest" is too slow for
+        real time speech synthesis. Use "standard" or "higher".
+        '''
+        if not self.ok:
+            return False
+        if len(self.voice_id) == 0:
+            self.voice_id = 'en-us/mary_ann-glow_tts'
+        _media_out = ''
+        # Determine the output file name
+        _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
+        # Determine the temporary file name
+        _media_work = readtexttools.get_work_file_path(_out_path, _icon, 'TEMP')
+        _voice = self.voice_id
+        _length_scale = self.length_scales[2]
+        if _speech_rate < 160:
+            _length_scale = self.length_scales[1]
+        elif _speech_rate > 160:
+            _length_scale = self.length_scales[3]
+        if not self.is_x86_64:
+            # Unknown platform - try the fastest setting.
+            _vocoder = self.vocoders[0]
+        elif quality in range(0, len(self.vocoders)):
+            # Set manually
+            _vocoder = self.vocoders[quality]
+        elif len(_media_out) > 0:
+            # Medium quality when saving file.
+            _vocoder = self.vocoders[1]
+        elif len(_text.split()) > 20:
+            # Word count > 20 so use fastest setting.
+            _vocoder = self.vocoders[0]
+        else:
+            _vocoder = self.vocoders[1]
+        _ssml = 'false'
+        if ssml:
+            _ssml = 'true'
+        _url = ''.join([self.url, '/api/tts'])
+        if not bool(self.base_curl):
+            return False
+        if REQUESTS_OK:
+            _text = ''.join([_text, ' \n.'])
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+            response = requests.post(
+                '%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=0.005&noiseScale=0.667&lengthScale=%(_length_scale)s&ssml=%(_ssml)s' %locals(),
+                headers=headers,
+                data=_text.encode('utf-8'))
+            with open(_media_work, 'wb') as f:
+                f.write(response.content)
+        else:
+            _text = str(_text.translate(self.base_curl)).encode('utf-8')
+            _curl = '''curl -d "%(_text)s" "%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=0.005&noiseScale=0.667&lengthScale=%(_length_scale)s&ssml=%(_ssml)s" -o "%(_media_work)s"''' %locals()
+            os.system(_curl)
+        if os.path.getsize(_media_work) == 0:
+            time.sleep(2)
+        if os.path.isfile(_media_work) and _post_process in [
+                'process_audio_media', 'process_wav_media'
+        ]:
+            if os.path.getsize(_media_work) == 0:
+                return False
+            # NOTE: Calling process must unlock_my_lock()
+            readtexttools.process_wav_media(_info, _media_work, _icon,
+                                            _media_out, _audible, _visible,
+                                            _writer, _size)
+            return True
+        return False
+
+
 def speech_wpm(_percent='100%'):  # -> int
     '''
     _percent - rate expressed as a percentage.
@@ -576,6 +784,9 @@ def network_ok(_iso_lang='en-US'):  # -> bool
     if _gtts_class.check_version(2.2):
         _continue = True
     if not _continue:
+        _larynx = LarynxClass()
+        _continue = _larynx.language_supported(_iso_lang)
+    if not _continue:
         _amazon_class = AmazonClass()
         _continue = bool(_amazon_class.language_supported(_iso_lang))
     if not _continue:
@@ -592,13 +803,15 @@ def network_main(_text_file_in='', _iso_lang='ca-ES', _visible='false',
                  _icon='', _size='600x600', _speech_rate=160, vox=''):  # -> boolean
     '''Read a text file aloud using a network resource.'''
     _imported_meta = readtexttools.ImportedMetaData()
+    _larynx = LarynxClass()
     _amazon_class = AmazonClass()
     _azure_class = AzureClass()
     _google_cloud_class = GoogleCloudClass()
     _gtts_class = GoogleTranslateClass()
     _continue = False
-    if _gtts_class.check_version(2.2) and vox in ['', 'AUTO', 'GTTS']:
-        _continue = True
+    _continue = _larynx.language_supported(_iso_lang) and vox in ['', 'AUTO', 'LARYNX']
+    if not _continue:
+        _continue = _gtts_class.check_version(2.2) and vox in ['', 'AUTO', 'GTTS']
     if not _continue:
         _continue = bool(_amazon_class.language_supported(_iso_lang)) and vox in ['', 'AUTO', 'AWS']
     if not _continue:
@@ -621,8 +834,14 @@ def network_main(_text_file_in='', _iso_lang='ca-ES', _visible='false',
             'process_riff_media', 'process_vorbis_media',
             'process_wav_media', 'process_audio_media'
         ]
-
-        if _amazon_class.language_supported(_iso_lang):
+        if _larynx.language_supported(_iso_lang):
+            _quality = -1  # Auto; Manual is 0 (lowest) to 2 (highest)
+            _ssml = False
+            _larynx.read(_text, _iso_lang, _visible, _audible,
+                         _media_out, _icon, clip_title,
+                         _post_processes[5], _info, _size,
+                         _speech_rate, _quality, _ssml)
+        elif _amazon_class.language_supported(_iso_lang):
             _amazon_class.read(_text, _iso_lang, _visible, _audible,
                                _media_out, _icon, clip_title,
                                _post_processes[1], _info, _size,

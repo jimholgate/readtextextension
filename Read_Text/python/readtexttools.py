@@ -168,16 +168,31 @@ class XmlTransform(object):
 
     def __init__(self):  # -> None
         '''Initialize data'''
-        self.caution = [' alias ', ' awk ', ' base64 ', ' bash ', ' curl ',
-                        ' cut ', ' echo ', ' egrep ', ' fgrep ', 'glob',
-                        ' grep ', ' groff ', ' hash ', ' iconv ', ' import ',
-                        ' java ', ' killall ', ' node ', ' python ',
-                        ' python2 ', ' python3 ', ' ruby ',  ' sed ', ' sh ',
-                        ' split ', ' sudo ', ' tee ', ' unhash ', ' | ']
+        self.caution = ['alias ', 'awk ', 'base64 ', 'bash ', 'curl ',
+                        'cut ', 'echo ', 'egrep ', 'fgrep ', 'glob',
+                        'grep ', 'groff ', 'hash ', 'iconv ', 'import ',
+                        'java ', 'killall ', 'node ', 'python ',
+                        'python2 ', 'python3 ', 'ruby ', 'sed ', 'sh ',
+                        'split ', 'sudo ', 'tee ', 'unhash ', '| ']
         try:
             # If the XML client can use all XML text substitutions,
             # escape the string for characters that can cause
             # problems in a Posix shell environment.
+            self.caution_xml = str.maketrans({
+                "&": "&amp;",
+                "_": " ",
+                '"': "",
+                "'": "",
+                '<': "",
+                ">": "",
+                "[": "",
+                "]": "",
+                "{": "",
+                "}": "",
+                "(": "",
+                ")": ""
+            })
+            # For modern tts platforms that fully support W3C XML standards.
             self.safe_xml = str.maketrans({
                 "&": "&#38;",
                 '"': "&#34;",
@@ -193,10 +208,10 @@ class XmlTransform(object):
             })
             # Minimum necessary for valid XML in a shell environment.
             self.base_xml = str.maketrans({
-                "&": "&#38;",
+                "&": "&amp;",
                 '"': '\\"',
-                '<': "&#60;",
-                ">": "&#62;"
+                '<': "&lt;",
+                ">": "&gt;"
             })
         except AttributeError:
             self.safe_xml = None
@@ -211,14 +226,18 @@ class XmlTransform(object):
         For example, malformed scheme code strings or sable code could
         cause some speech synthesizers to crash.
         '''
+        _caution = False
         if not strict:
             for _test in self.caution:
                 if _test in test_text:
-                    strict = True
-                    break                    
+                    _caution = True
+                    break
         if bool(self.safe_xml):
             if strict:
                 return str(test_text.translate(self.safe_xml))
+            elif _caution:
+                # Omit some characters in a shell command
+                return str(test_text.translate(self.caution_xml))
             else:
                 return str(test_text.translate(self.base_xml))
         # python 2 - slower equivalent
@@ -229,14 +248,20 @@ class XmlTransform(object):
                          ["(", "&#40;"], [")", "&#41;"]]:
                 test_text = test_text.replace(pair[0], pair[1])
             return test_text
-        for pair in [["&", "&#38;"], ['"', '\\"'],
-                     ["<", "&#60;"], [">", "&#62;"]]:
+        elif _caution:
+            for pair in [["&", "&amp;"], ["_", " "], ['"', ""], ["'", ""],
+                         ["<", ""], [">", ""], ["[", ""], ["]", ""],
+                         ["{", ""], ["}", ""], ["(", ""], [")", ""]]:
+                test_text = test_text.replace(pair[0], pair[1])
+            return test_text
+        for pair in [["&", "&amp;"], ['"', '\\"'],
+                     ["<", "&gt;"], [">", "&lt;"]]:
             test_text = test_text.replace(pair[0], pair[1])
         return test_text
 
 
 class ClassRemoveXML(HTMLParser):
-    ''' Remove XML using python HTML parsing. '''
+    '''Remove XML using python HTML parsing. '''
 
     def __init__(self):
         self.reset()
@@ -244,11 +269,11 @@ class ClassRemoveXML(HTMLParser):
         self.convert_charrefs = []
 
     def handle_data(self, d):
-        ''' Handle string data. '''
+        '''Handle string data. '''
         self.fed.append(d)
 
     def get_fed_data(self):
-        ''' Return fed data. '''
+        '''Return fed data. '''
         return ''.join(self.fed)
 
 
@@ -298,7 +323,7 @@ def strip_mojibake(concise_lang='en', _raw_text=''):
         concise_lang = concise_lang[:2].lower()
     except (AttributeError, TypeError):
         concise_lang = 'en'
-    if concise_lang in ('en'):
+    if concise_lang in ('en', 'sw'):
         # Use Western European encoded characters.
         _coding = 'latin_1'
     else:
@@ -614,17 +639,17 @@ class ExtensionTable(object):
             # The information from gstreamer on open desktop is
             # via /usr/share/gstreamer-1.0/<fileextension>.gep
             for _format in ['flac', 'ogg', 'opus', 'spx']:
-                format = _format
-                if test_file_spec.endswith('.%(format)s' %locals()):
-                    return 'audio/x-vorbis;audio/%(format)s' %locals()
+                _test = _format
+                if test_file_spec.endswith('.%(_test)s' % locals()):
+                    return 'audio/x-vorbis;audio/%(_test)s' % locals()
             for _format in ['ogv', 'webm']:
-                format = _format
-                if test_file_spec.endswith('.%(format)s' %locals()):
-                    return 'video/x-vorbis;video/%(format)s' %locals()
+                _test = _format
+                if test_file_spec.endswith('.%(_test)s' % locals()):
+                    return 'video/x-vorbis;video/%(_test)s' % locals()
             for _format in ['md', 'wiki']:
-                format = _format
-                if test_file_spec.endswith('.%(format)s' %locals()):
-                    return 'text/plain;application/x-%(format)s'
+                _test = _format
+                if test_file_spec.endswith('.%(_test)s' % locals()):
+                    return 'text/plain;application/x-%(_test)s'
             return ''
 
     def add_quotes_if_needed(self, app=''):  # -> str
@@ -913,7 +938,7 @@ def pop_message(summary="Note",
             _sound = ' sound name "Tink"'
         else:
             _sound = ''
-        my_os_system('''osascript -e 'display notification "%(msg)s" with title "%(summary)s"%(_sound)s' ''' %locals())
+        my_os_system('''osascript -e 'display notification "%(msg)s" with title "%(summary)s"%(_sound)s' ''' % locals())
         return True
     return False
 
@@ -1169,7 +1194,7 @@ def posix_compressor_ok(_ext=''):  # -> bool
     if not os.name == 'posix':
         return False
     _apps = [['flac', ['.flac']], ['lame', ['.mp2', '.mp3']],
-            ['twolame', ['.mp2']], ['oggenc', ['.oga', '.ogg']]]
+             ['twolame', ['.mp2']], ['oggenc', ['.oga', '.ogg']]]
     for _app in _apps:
         if have_posix_app(_app[0], False):
             if _ext in _app[1]:
@@ -1319,7 +1344,7 @@ def web_info_translate(_msg='WARNING:\n\nPython `speechd` Error.', _language='en
         if _language[:2] in ['en']:
             _language = 'es'
         webbrowser.open_new(
-            'https://translate.google.com/?sl=auto&tl=%(_language)s&text=%(_web_text)s&op=translate' %locals()
+            'https://translate.google.com/?sl=auto&tl=%(_language)s&text=%(_web_text)s&op=translate' % locals()
             )
         return True
     except NameError:
@@ -1359,7 +1384,7 @@ class JsonTools(object):
                         '@', '\\u0040')
 
     def set_json_content(self, language='en', voice='AUTO', i_rate=0,
-                         file_spec='', output_module='', flags= '', album='',
+                         file_spec='', output_module='', flags='', album='',
                          author='', genre='', title='', track=1): # -> str
         '''Sanitize content and return json string'''
         try:
@@ -1394,7 +1419,7 @@ class JsonTools(object):
   "secret_key": "%(file_spec)s.json",
   "title": "%(title)s",
   "voice": "%(voice)s"
-}''' %locals()
+}''' % locals()
 
 
 def sound_length_seconds(_work):  # -> int
@@ -1900,8 +1925,8 @@ class WinMediaPlay(object):
         found. `rest` is the approximate length of the speech in
         seconds.'''
         self.extensions = [['.aifc', 0], ['.aif', 0], ['.aiff', 0], ['.au', 0],
-                          ['.m4a', 12209], ['.mp2', 12209], ['.mp3', 12209],
-                          ['.snd', 88320], ['.wav', 0], ['.wma', 12209]]
+                           ['.m4a', 12209], ['.mp2', 12209], ['.mp3', 12209],
+                           ['.snd', 88320], ['.wav', 0], ['.wma', 12209]]
         self.app = get_nt_path('Windows Media Player', 'wmplayer.exe')
         self.rest = 0
 
@@ -1931,7 +1956,7 @@ class WinMediaPlay(object):
             self.rest = sound_length_seconds(file_path)
         else:
             self.rest = int(os.path.getsize(file_path) / _denominator) + 1
-        return self.rest != 0 
+        return self.rest != 0
 
     def _windowsmedia(self, file_path=''):  # -> bool
         '''(Local use) Initiate Windows Media Player without a user interface'''
@@ -1940,7 +1965,7 @@ class WinMediaPlay(object):
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         _app = self.app
-        a = subprocess.call('%(_app)s /play /close "%(file_path)s"' %locals(),
+        a = subprocess.call('%(_app)s /play /close "%(file_path)s"' % locals(),
                             startupinfo=startupinfo)
         return bool(a)
 
@@ -1964,18 +1989,18 @@ class WinMediaPlay(object):
 def clean_temp_files(_out=''):  # -> Bool
     '''Clean text and image files used to create media'''
     try:
-        for _temp_file in ['%(_out)s.wav.txt' %locals(),
-                           '%(_out)s.txt' %locals(),
-                           '%(_out)stemp.lock' %locals(),
-                           '%(_out)s.wav.png' %locals(),
-                           '%(_out)s.wav.jpg' %locals()]:
+        for _temp_file in ['%(_out)s.wav.txt' % locals(),
+                           '%(_out)s.txt' % locals(),
+                           '%(_out)stemp.lock' % locals(),
+                           '%(_out)s.wav.png' % locals(),
+                           '%(_out)s.wav.jpg' % locals()]:
             if os.path.isfile(_temp_file):
                 os.remove(_temp_file)
         return True
     except:
         pass
     return False
-        
+
 def gst_wav_to_media(_title='untitled',
                      _work='',
                      _image='',
@@ -2002,7 +2027,7 @@ def gst_wav_to_media(_title='untitled',
     if _out:
         if os.path.isfile(_out):
             print('''`gst_wav_to_media` says:
-`%(_out)s` already_exists. Exiting.''' %locals())
+`%(_out)s` already_exists. Exiting.''' % locals())
             return True
         s_out_extension = os.path.splitext(_out)[1].lower()
     b_audible = lax_bool(_audible)
@@ -2611,7 +2636,7 @@ def path2url(_file_path):  # -> str
         # Fall back works on Posix
         return ''.join(['file://', _file_path.replace(' ', '%20')])
 
- 
+
 def play_wav_no_ui(file_path=''):  # -> bool
     '''
     Opens using command line shell.
@@ -2631,7 +2656,7 @@ def play_wav_no_ui(file_path=''):  # -> bool
             a_app = 'Windows Media Player'
             _winm = WinMediaPlay()
             if _winm.app_ok(file_path):
-                print('[>] %(a_app)s playing `%(display_file)s`' %locals())
+                print('[>] %(a_app)s playing `%(display_file)s`' % locals())
                 _winm.play(file_path)
                 return True
             else:
@@ -2643,7 +2668,7 @@ def play_wav_no_ui(file_path=''):  # -> bool
         else:
             try:
                 import winsound
-                print('[>] %(a_app)s playing `%(display_file)s`' %locals())                
+                print('[>] %(a_app)s playing `%(display_file)s`' % locals())
                 winsound.PlaySound(file_path,
                                    winsound.SND_FILENAME | winsound.SND_NOWAIT)
                 return True
@@ -2660,7 +2685,7 @@ def play_wav_no_ui(file_path=''):  # -> bool
         players = [
             ['afplay', 'afplay',  # Darwin
              ' "%(file_path)s"' % locals(), os.path.splitext(
-                file_path)[1] in afplay_exts],
+                 file_path)[1] in afplay_exts],
             ['esdplay', 'esdplay',
              ' "%(file_path)s"' % locals(), False],
             ['ossplay', 'ossplay',
@@ -2711,9 +2736,9 @@ def play_wav_no_ui(file_path=''):  # -> bool
 
     if _command:
         if os.path.getsize(file_path) == 0:
-            print('''[>]  %(a_app)s cannot play `%(display_file)s`''' %locals())
+            print('''[>]  %(a_app)s cannot play `%(display_file)s`''' % locals())
             return True
-        print('[>] %(a_app)s playing `%(display_file)s`' %locals())
+        print('[>] %(a_app)s playing `%(display_file)s`' % locals())
         my_os_system(_command)
         return True
     return False

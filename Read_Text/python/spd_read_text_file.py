@@ -655,7 +655,7 @@ configurations.
         if self.xml_tool.use_mode in ['text']:
             _message = ' " %(_txt)s"' % locals()
         else:
-            _txt = self.xml_tool.clean_for_xml(_txt, False).replace('\\"', ' ')
+            _txt = self.xml_tool.clean_for_xml(_txt, False).replace('\\"', '"')
             _message = '''<?xml version='1.0'?>
 <speak version='1.1' xml:lang='%(language)s'>%(_txt)s</speak>''' % locals()
         _time = guess_time(_txt, i_rate, _file_spec, language)
@@ -667,26 +667,132 @@ configurations.
             _client_voices = self.list_synthesis_voices(language.split('-')[0])
         except [AttributeError, TypeError]:
             _client_voices = [""]
-        if language in ['en-AS', 'en-PH', 'en-PR', 'en-UM', 'en-US',
+        if language[:2] == 'de':
+            if self._switch_to_female(voice):
+                _voice_list = ['eva_k', 'hokuspokus', 'kerstin',
+                               'rebecca_braunert_plunkett',
+                               'karlsson', 'pavoque', 'thorsten',
+                               'German+female1']
+            else:
+                _voice_list = ['karlsson', 'pavoque', 'thorsten',
+                               'eva_k', 'hokuspokus', 'kerstin',
+                               'rebecca_braunert_plunkett',
+                               'German']
+        elif language in ['en-AS', 'en-PH', 'en-PR', 'en-UM', 'en-US',
                         'en-VI']:
             if self._switch_to_female(voice):
-                _voice_list = ['Slt', 'Clb', 'samantha', 'Bdl', 'Alan',
+                _voice_list = ['Slt', 'cmu_slt', 'Clb', 'cmu_clb', 'ek',
+                               'harvard', 'judy_bieber', 'kathleen',
+                               'ljspeech', 'cmu_eey', 'cmu_ljm', 'cmu_lnh',
+                               'blizzard_lessac', 'mary_ann', 'samantha',
+                               'blizzard_fls', 'southern_english_female',
+                               'cmu_slp', 'Bdl', 'cmu_bdl', 'Alan',
+                               'southern_english_male',
+                               'northern_english_male', 'cmu_ahw',
+                               'cmu_aup', 'cmu_fem', 'cmu_jmk', 'cmu_ksp',
+                               'cmu_rms', 'cmu_rxr', 'scottish_english_male',
                                'English (America)+female1']
             else:
-                _voice_list = ['Bdl', 'Alan', 'Clb', 'Slt', 'samantha',
+                _voice_list = ['Bdl', 'cmu_bdl', 'Alan',
+                               'southern_english_male',
+                               'northern_english_male',
+                               'cmu_ahw', 'cmu_aup', 'cmu_fem', 'cmu_jmk',
+                               'cmu_ksp', 'cmu_rms', 'cmu_rxr',
+                               'scottish_english_male',
+                               'Clb', 'cmu_clb', 'ek', 'harvard',
+                               'judy_bieber', 'kathleen', 'ljspeech',
+                               'cmu_eey', 'cmu_ljm', 'cmu_lnh', 'Slt',
+                               'cmu_slt', 'blizzard_lessac', 'mary_ann',
+                               'samantha', 'blizzard_fls',
+                               'southern_english_female', 'cmu_slp',
                                'English (America)+male1']
+        elif language == 'en-IN':
+            if self._switch_to_female(voice):
+                _voice_list = ['cmu_slp', 'serena', 'blizzard_fls',
+                               'southern_english_female', 'blizzard_lessac',
+                               'mary_ann', 'Slt', 'cmu_slt', 'Clb',
+                               'cmu_clb', 'ek', 'harvard', 'judy_bieber',
+                               'kathleen', 'ljspeech', 'cmu_eey', 'cmu_ljm',
+                               'cmu_lnh', 'cmu_ahw', 'Alan',
+                               'southern_english_male',
+                               'northern_english_male', 'cmu_aew', 'cmu_aup',
+                               'cmu_fem', 'cmu_jmk', 'cmu_ksp', 'cmu_rms',
+                               'cmu_rxr', 'scottish_english_male', 'Bdl',
+                               'cmu_bdl', 'English+female1']
+            else:
+                _voice_list = ['cmu_ahw', 'Alan', 'southern_english_male',
+                               'northern_english_male', 'cmu_aew', 'cmu_aup',
+                               'cmu_fem', 'cmu_jmk', 'cmu_ksp', 'cmu_rms',
+                               'cmu_rxr', 'scottish_english_male', 'Bdl',
+                               'cmu_bdl', 'blizzard_lessac', 'mary_ann',
+                               'cmu_slp', 'Clb', 'cmu_clb', 'ek', 'harvard',
+                               'judy_bieber', 'kathleen', 'ljspeech',
+                               'cmu_eey', 'cmu_ljm', 'cmu_lnh', 'Slt',
+                               'cmu_slt', 'serena', 'blizzard_fls',
+                               'southern_english_female',
+                               'English']            
         elif language[:2] == 'en':
             if self._switch_to_female(voice):
-                _voice_list = ['serena', 'Slt', 'Clb', 'Alan', 'Bdl',
+                _voice_list = ['serena', 'blizzard_fls',
+                               'southern_english_female',
+                               'blizzard_lessac', 'mary_ann', 'cmu_slp',
+                               'Slt', 'cmu_slt', 'Clb', 'cmu_clb', 'ek',
+                               'harvard', 'judy_bieber', 'kathleen',
+                               'ljspeech', 'cmu_eey', 'cmu_ljm', 'cmu_lnh',
+                               'Alan', 'southern_english_male',
+                               'northern_english_male', 'cmu_aew',
+                               'cmu_ahw', 'cmu_aup', 'cmu_fem', 'cmu_jmk',
+                               'cmu_ksp', 'cmu_rms', 'cmu_rxr',
+                               'scottish_english_male', 'Bdl', 'cmu_bdl',
                                'English+female1']
             else:
-                _voice_list = ['Alan', 'Bdl', 'Clb', 'Slt', 'serena',
+                _voice_list = ['Alan', 'southern_english_male',
+                               'northern_english_male', 'cmu_aew', 'cmu_ahw',
+                               'cmu_aup', 'cmu_fem', 'cmu_jmk', 'cmu_ksp',
+                               'cmu_rms', 'cmu_rxr', 'scottish_english_male',
+                               'Bdl', 'cmu_bdl', 'blizzard_lessac',
+                               'mary_ann', 'Clb', 'cmu_clb', 'ek', 'harvard',
+                               'judy_bieber', 'kathleen', 'ljspeech',
+                               'cmu_eey', 'cmu_ljm', 'cmu_lnh', 'Slt',
+                               'cmu_slt', 'serena', 'blizzard_fls',
+                               'southern_english_female', 'cmu_slp', 
                                'English']
+        elif language[:2] == 'es':
+            if self._switch_to_female(voice):
+                _voice_list = ['karen_savage', 'carlfm', 'Spanish+female1']
+            else:
+                _voice_list = ['carlfm', 'karen_savage', 'Spanish']
+        elif language == 'fr-CA':
+            if self._switch_to_female(voice):
+                _voice_list = ['siwis', 'tom', 'gilles_le_blanc',
+                               'French+female1']
+            else:
+                _voice_list = ['tom', 'gilles_le_blanc', 'siwis',
+                               'French']
+        elif language[:2] == 'fr':
+            if self._switch_to_female(voice):
+                _voice_list = ['siwis', 'gilles_le_blanc', 'tom'
+                               'French+female1']
+            else:
+                _voice_list = ['gilles_le_blanc', 'tom', 'siwis',
+                               'French']
+        elif language[:2] == 'it':
+            if self._switch_to_female(voice):
+                _voice_list = ['lisa', 'riccardo_fasol', 'Italian+female1']
+            else:
+                _voice_list = ['riccardo_fasol', 'lisa', 'Italian']
         elif language[:2] == 'kg':
             if self._switch_to_female(voice):
                 _voice_list = ['Azamat', 'Nazgul', 'Kyrgyz+female1']
             else:
                 _voice_list = ['Nazgul', 'Azamat', 'Kyrgyz']
+        elif language[:2] == 'nl':
+            if self._switch_to_female(voice):
+                _voice_list = ['nathalie', 'bart_de_leeuw', 'flemishguy',
+                               'rdh', 'Dutch+female1']
+            else:
+                _voice_list = ['bart_de_leeuw', 'flemishguy', 'rdh',
+                               'nathalie', 'Dutch']
         elif language[:2] == 'pl':
             if self._switch_to_female(voice):
                 _voice_list = ['Magda', 'Natan', 'Polish+female1']
@@ -695,10 +801,21 @@ configurations.
         elif language[:2] == 'ru':
             if self._switch_to_female(voice):
                 _voice_list = ['Anna', 'Elena', 'Aleksandr', 'Artemiy',
+                               'hajdurova', 'minaev', 'nikolaev',
                                'Russian+female1']
             else:
-                _voice_list = ['Aleksandr', 'Artemiy', 'Anna', 'Elena',
-                               'Russian']
+                _voice_list = ['Aleksandr', 'Artemiy', 'hajdurova', 'minaev',
+                               'nikolaev', 'Anna', 'Elena', 'Russian']
+        elif language[:2] == 'sv':
+            if self._switch_to_female(voice):
+                _voice_list = ['talesyntese', 'Swedish+female1']
+            else:
+                _voice_list = ['talesyntese', 'Swedish']
+        elif language[:2] == 'sw':
+            if self._switch_to_female(voice):
+                _voice_list = ['biblia_takatifu', 'Swahili+female1']
+            else:
+                _voice_list = ['biblia_takatifu', 'Swahili']
         elif language[:2] == 'uk':
             if self._switch_to_female(voice):
                 _voice_list = ['Natalia', 'Anatol', 'Ukrainian+female1']
@@ -744,7 +861,7 @@ configurations.
         return None
 
     def list_synthesis_voices(self, _language=''):  # -> (tuple | None)
-        '''List synthesis voices. i. e.: ('Alan', 'Slt',...)'''
+        '''List synthesis voices. i. e.: ('Alan', 'southern_english_male', 'northern_english_male', 'Slt',...)'''
         string_list = ''
         if bool(self.client):
             for _item in self.client.list_synthesis_voices():

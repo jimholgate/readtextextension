@@ -58,6 +58,11 @@ import sys
 import readtexttools
 
 try:
+    from qrcode.image.pil import PilImage
+    IMAGE_OK = True
+except ImportError:
+    IMAGE_OK = False
+try:
     import qrcode
 except ImportError:
     if len(readtexttools.find_local_pip('qrcode')) != 0:
@@ -65,7 +70,9 @@ except ImportError:
         try:
             import qrcode
         except:
-            print('''
+            IMAGE_OK = False
+if not IMAGE_OK:
+    print('''
 A python tool cannot find a library that it
 needs to create a QR code. Try 
 
@@ -145,7 +152,7 @@ def qrencode(_content='',
         if _size == str(i + 1):
             _checked_size = i + 1
             break
-    if not _level in ['L', 'M', 'Q', 'H']:
+    if _level not in ['L', 'M', 'Q', 'H']:
         _level = "L"
     _content = _content.strip()
     _image_out = _image_out.strip()
@@ -187,7 +194,7 @@ def qrencode(_content='',
             readtexttools.show_with_app(_image_out)
             return True
         return False
-    except (ValueError):
+    except ValueError:
         qrencode(_content, _image_out, _size, _level, 'black', 'white')
     except NameError:
         usage()
@@ -223,7 +230,7 @@ def main():  # -> NoReturn
             opts, args = getopt.getopt(
                 sys.argv[1:], "hoslfb",
                 ["help", "output=", "size=", "level=", "fill=", "background="])
-        except (getopt.GetoptError):
+        except getopt.GetoptError:
             # print help information and exit:
             print("option was not recognized")
             usage()
