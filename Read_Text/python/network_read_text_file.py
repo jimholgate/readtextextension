@@ -602,7 +602,7 @@ To use the larynx speech synthesis client, you need to initiate `larynx-server`.
             return False
         except AttributeError:
             try:
-                response = urllib.urlopen(''.join([self.url, 'api/vocoders']))
+                response = urllib.urlopen(''.join([self.url, '/api/vocoders']))
                 data_response = response.read()
                 data = json.loads(data_response)
             except [AttributeError, urllib.error.URLError]:
@@ -649,7 +649,7 @@ To use the larynx speech synthesis client, you need to initiate `larynx-server`.
             return False
         except AttributeError:
             try:
-                response = urllib.urlopen(''.join([self.url, 'api/voices']))
+                response = urllib.urlopen(''.join([self.url, '/api/voices']))
                 data_response = response.read()
                 data = json.loads(data_response)
             except [AttributeError, urllib.error.URLError]:
