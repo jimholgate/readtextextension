@@ -205,10 +205,10 @@ computer's ability to run system python libraries.
     except ImportError:
         USE_SPEECHD = False
 
-NET_SERVICE_LIST = ['AUTO', 'NETWORK', 'AWS',
-                    'AZURE', 'GOOGLECLOUD', 'GTTS']
+NET_SERVICE_LIST = ['AUTO', 'NETWORK', 'AWS', 'AZURE', 'GOOGLECLOUD', 'GTTS']
 
-def about_script(player='speech-dispatcher'): # -> str
+
+def about_script(player='speech-dispatcher'):  # -> str
     '''Information about the python script'''
     if not bool(player):
         return ''
@@ -285,7 +285,7 @@ To say the text slower - minimum -100
 To say the text faster - maximum 100
     spd_read_text_file.py --rate "20" "TextFile.txt"
 
-[More](%(more_url)s)''' %locals()
+[More](%(more_url)s)''' % locals()
 
 
 def get_whoami():  # -> str
@@ -323,26 +323,14 @@ def filterinputs(s0):
             s1 = s1.replace("'", "\\'")
 
         # Check for shellshock
-        a1 = [
-            '{',
-            '}',
-            '(',
-            ')',
-            ';',
-            ':'
-            ]
+        a1 = ['{', '}', '(', ')', ';', ':']
         for i, item in enumerate(a1):
             if (a1[i] in s1) is False:
                 bsafe = True
                 break
 
         if bsafe is False:
-            a2 = [
-                '{',
-                '}',
-                '(',
-                ')'
-                ]
+            a2 = ['{', '}', '(', ')']
             # Escape the problem characters with `\`
             for i, item in enumerate(a2):
                 s1 = s1.replace(a2[i], ''.join(['\\', a2[i]]))
@@ -403,8 +391,10 @@ def guess_time(second_string, word_rate, _file_path, _language):  # -> int
     return retval
 
 
-def net_play(_file_spec='', _language='en-US', i_rate=0,
-             _requested_voice=''): # -> bool
+def net_play(_file_spec='',
+             _language='en-US',
+             i_rate=0,
+             _requested_voice=''):  # -> bool
     '''Attempt to play a sound from the network.'''
     if network_read_text_file.network_ok(_language):
         if _requested_voice in NET_SERVICE_LIST:
@@ -412,9 +402,8 @@ def net_play(_file_spec='', _language='en-US', i_rate=0,
             if i_rate < 0:
                 net_rate = 110
             ret_val = network_read_text_file.network_main(
-                _file_spec, _language, 'false', 'true', '',
-                '', '', '', '600x600', net_rate,
-                _requested_voice)
+                _file_spec, _language, 'false', 'true', '', '', '', '',
+                '600x600', net_rate, _requested_voice)
             readtexttools.unlock_my_lock()
             return bool(ret_val)
         else:
@@ -445,14 +434,15 @@ configurations.
         # voices for all languages, so a tool might substitute
         # a missing voice for one that it does have.
 
-        self.all_voices = ['MALE3', 'MALE2', 'MALE1',
-                           'FEMALE3', 'FEMALE2', 'FEMALE1',
-                           'CHILD_MALE', 'CHILD_FEMALE',
-                           'AUTO', 'NETWORK', 'AWS',
-                           'AZURE', 'GOOGLECLOUD', 'GTTS']
-        self.spd_voices = ['MALE3', 'MALE2', 'MALE1',
-                           'FEMALE3', 'FEMALE2', 'FEMALE1',
-                           'CHILD_MALE', 'CHILD_FEMALE']
+        self.all_voices = [
+            'MALE3', 'MALE2', 'MALE1', 'FEMALE3', 'FEMALE2', 'FEMALE1',
+            'CHILD_MALE', 'CHILD_FEMALE', 'AUTO', 'NETWORK', 'AWS', 'AZURE',
+            'GOOGLECLOUD', 'GTTS'
+        ]
+        self.spd_voices = [
+            'MALE3', 'MALE2', 'MALE1', 'FEMALE3', 'FEMALE2', 'FEMALE1',
+            'CHILD_MALE', 'CHILD_FEMALE'
+        ]
         self.stop_voice = 'TriggerAssertionError'
         # NOTE: speechd might reject a language when length of item > 2
         self.language_list = espeak_read_text_file.espk_languages()
@@ -466,14 +456,14 @@ configurations.
         try:
             if len(os.getenv('HOME')) != 0:
                 local_config = os.path.join(
-                    os.getenv('HOME'),
-                    '.config/speech-dispatcher/modules')
+                    os.getenv('HOME'), '.config/speech-dispatcher/modules')
                 if os.path.isdir(local_config):
                     self.local_config = local_config
         except Exception:
             pass
 
-    def is_a_supported_language(self, _lang='en',
+    def is_a_supported_language(self,
+                                _lang='en',
                                 experimental=False):  # -> Bool
         '''Verify that your installed speech synthesisers are *registered* with
         the selected language. If there's an error and `experimental` is `True`,
@@ -488,7 +478,9 @@ configurations.
             _rhvoice = rhvoice_read_text_file.RhVoiceClass()
             if _short_lang in self.language_list:
                 return True
-            elif os.path.isfile('/usr/share/espeak-ng-data/%(_short_lang)s_dict' %locals()):
+            elif os.path.isfile(
+                    '/usr/share/espeak-ng-data/%(_short_lang)s_dict' %
+                    locals()):
                 return True
             elif _rhvoice.voice_available(_short_lang):
                 # rhvoice includes Ukrainian and other languages that might
@@ -517,13 +509,13 @@ configurations.
                 # Your computer uses an older version of python3.
                 # Sometimes speech-dispatcher sounds distorted and echoes
                 # on first run.
-                bug_cleaner = speechd.SSIPClient(
-                    self.client_app, self.client_user, None, None)
+                bug_cleaner = speechd.SSIPClient(self.client_app,
+                                                 self.client_user, None, None)
                 bug_cleaner.speak('\t')
                 time.sleep(0.2)
                 bug_cleaner.close()
-            self.client = speechd.SSIPClient(
-                self.client_app, self.client_user, None, None)
+            self.client = speechd.SSIPClient(self.client_app, self.client_user,
+                                             None, None)
             return True
         except (AttributeError, ImportError, NameError, speechd.SpawnError,
                 speechd.SSIPCommunicationError):
@@ -535,14 +527,20 @@ configurations.
             return True
         return False
 
-    def speak_spd(self, output_module='', language='',
-                  voice='', i_rate=0, _file_spec=''): # -> bool
+    def speak_spd(self,
+                  output_module='',
+                  language='',
+                  voice='',
+                  i_rate=0,
+                  _file_spec=''):  # -> bool
         '''Set user configuration settings'''
         _lock = readtexttools.get_my_lock("lock")
         _try_voice = voice
         if voice not in self.all_voices:
-            if voice not in ['none', 'None', language,
-                             language.split('-')[0].split('_')[0]]:
+            if voice not in [
+                    'none', 'None', language,
+                    language.split('-')[0].split('_')[0]
+            ]:
                 if self.is_named_voice(language, voice):
                     _try_voice = voice.strip()
                 else:
@@ -579,8 +577,7 @@ configurations.
                     readtexttools.unlock_my_lock()
                     return True
                 elif not self.is_a_supported_language(
-                        language, not os.path.isfile(
-                            '/usr/bin/spd-say')):
+                        language, not os.path.isfile('/usr/bin/spd-say')):
                     self.client.close()
                     hard_reset('speech-dispatcher')
                     time.sleep(0.2)
@@ -591,17 +588,16 @@ configurations.
                         # media creator returns an audio file that is
                         # normally playable with your computer's media
                         # player.
-                        for _player in ['avplay', 'ffplay', 'vlc',
-                                        'gst-launch-1.0']:
+                        for _player in [
+                                'avplay', 'ffplay', 'vlc', 'gst-launch-1.0'
+                        ]:
                             hard_reset(_player)
                         os.remove(self.local_json)
                     else:
                         self.json_content = self.json_tools.set_json_content(
-                            language, voice, i_rate,
-                            _file_spec, output_module)
-                        readtexttools.write_plain_text_file(self.local_json,
-                                                            self.json_content,
-                                                            'utf-8')
+                            language, voice, i_rate, _file_spec, output_module)
+                        readtexttools.write_plain_text_file(
+                            self.local_json, self.json_content, 'utf-8')
                         retval = net_play(_file_spec, language, i_rate, voice)
                         if not retval:
                             print(network_read_text_file.network_problem(voice))
@@ -614,11 +610,9 @@ configurations.
         except (ImportError, NameError, speechd.SpawnError):
             if len(voice) != 0:
                 self.json_content = self.json_tools.set_json_content(
-                    language, voice, i_rate,
-                    _file_spec, output_module)
+                    language, voice, i_rate, _file_spec, output_module)
                 readtexttools.write_plain_text_file(self.local_json,
-                                                    self.json_content,
-                                                    'utf-8')
+                                                    self.json_content, 'utf-8')
                 retval = net_play(_file_spec, language, i_rate, voice)
                 os.remove(self.local_json)
                 readtexttools.unlock_my_lock()
@@ -665,98 +659,92 @@ configurations.
         # Try to match requested gender and locale for supported synthesizers
         try:
             _client_voices = self.list_synthesis_voices(language.split('-')[0])
-        except [AttributeError, TypeError]:
+            # Bare `except` because when using a Linux appimage, we get a
+            # TypeError: catching classes that do not inherit from
+            # BaseException is not allowed if we include specific exceptions.
+        except:
             _client_voices = [""]
         if language[:2] == 'de':
             if self._switch_to_female(voice):
-                _voice_list = ['eva_k', 'hokuspokus', 'kerstin',
-                               'rebecca_braunert_plunkett',
-                               'karlsson', 'pavoque', 'thorsten',
-                               'German+female1']
+                _voice_list = [
+                    'eva_k', 'hokuspokus', 'kerstin',
+                    'rebecca_braunert_plunkett', 'karlsson', 'pavoque',
+                    'thorsten', 'German+female1'
+                ]
             else:
-                _voice_list = ['karlsson', 'pavoque', 'thorsten',
-                               'eva_k', 'hokuspokus', 'kerstin',
-                               'rebecca_braunert_plunkett',
-                               'German']
-        elif language in ['en-AS', 'en-PH', 'en-PR', 'en-UM', 'en-US',
-                        'en-VI']:
+                _voice_list = [
+                    'karlsson', 'pavoque', 'thorsten', 'eva_k', 'hokuspokus',
+                    'kerstin', 'rebecca_braunert_plunkett', 'German'
+                ]
+        elif language in ['en-AS', 'en-PH', 'en-PR', 'en-UM', 'en-US', 'en-VI']:
             if self._switch_to_female(voice):
-                _voice_list = ['Slt', 'cmu_slt', 'Clb', 'cmu_clb', 'ek',
-                               'harvard', 'judy_bieber', 'kathleen',
-                               'ljspeech', 'cmu_eey', 'cmu_ljm', 'cmu_lnh',
-                               'blizzard_lessac', 'mary_ann', 'samantha',
-                               'blizzard_fls', 'southern_english_female',
-                               'cmu_slp', 'Bdl', 'cmu_bdl', 'Alan',
-                               'southern_english_male',
-                               'northern_english_male', 'cmu_ahw',
-                               'cmu_aup', 'cmu_fem', 'cmu_jmk', 'cmu_ksp',
-                               'cmu_rms', 'cmu_rxr', 'scottish_english_male',
-                               'English (America)+female1']
+                _voice_list = [
+                    'Slt', 'cmu_slt', 'Clb', 'cmu_clb', 'ek', 'harvard',
+                    'judy_bieber', 'kathleen', 'ljspeech', 'cmu_eey', 'cmu_ljm',
+                    'cmu_lnh', 'blizzard_lessac', 'mary_ann', 'samantha',
+                    'blizzard_fls', 'southern_english_female', 'cmu_slp', 'Bdl',
+                    'cmu_bdl', 'Alan', 'southern_english_male',
+                    'northern_english_male', 'cmu_ahw', 'cmu_aup', 'cmu_fem',
+                    'cmu_jmk', 'cmu_ksp', 'cmu_rms', 'cmu_rxr',
+                    'scottish_english_male', 'English (America)+female1'
+                ]
             else:
-                _voice_list = ['Bdl', 'cmu_bdl', 'Alan',
-                               'southern_english_male',
-                               'northern_english_male',
-                               'cmu_ahw', 'cmu_aup', 'cmu_fem', 'cmu_jmk',
-                               'cmu_ksp', 'cmu_rms', 'cmu_rxr',
-                               'scottish_english_male',
-                               'Clb', 'cmu_clb', 'ek', 'harvard',
-                               'judy_bieber', 'kathleen', 'ljspeech',
-                               'cmu_eey', 'cmu_ljm', 'cmu_lnh', 'Slt',
-                               'cmu_slt', 'blizzard_lessac', 'mary_ann',
-                               'samantha', 'blizzard_fls',
-                               'southern_english_female', 'cmu_slp',
-                               'English (America)+male1']
+                _voice_list = [
+                    'Bdl', 'cmu_bdl', 'Alan', 'southern_english_male',
+                    'northern_english_male', 'cmu_ahw', 'cmu_aup', 'cmu_fem',
+                    'cmu_jmk', 'cmu_ksp', 'cmu_rms', 'cmu_rxr',
+                    'scottish_english_male', 'Clb', 'cmu_clb', 'ek', 'harvard',
+                    'judy_bieber', 'kathleen', 'ljspeech', 'cmu_eey', 'cmu_ljm',
+                    'cmu_lnh', 'Slt', 'cmu_slt', 'blizzard_lessac', 'mary_ann',
+                    'samantha', 'blizzard_fls', 'southern_english_female',
+                    'cmu_slp', 'English (America)+male1'
+                ]
         elif language == 'en-IN':
             if self._switch_to_female(voice):
-                _voice_list = ['cmu_slp', 'serena', 'blizzard_fls',
-                               'southern_english_female', 'blizzard_lessac',
-                               'mary_ann', 'Slt', 'cmu_slt', 'Clb',
-                               'cmu_clb', 'ek', 'harvard', 'judy_bieber',
-                               'kathleen', 'ljspeech', 'cmu_eey', 'cmu_ljm',
-                               'cmu_lnh', 'cmu_ahw', 'Alan',
-                               'southern_english_male',
-                               'northern_english_male', 'cmu_aew', 'cmu_aup',
-                               'cmu_fem', 'cmu_jmk', 'cmu_ksp', 'cmu_rms',
-                               'cmu_rxr', 'scottish_english_male', 'Bdl',
-                               'cmu_bdl', 'English+female1']
+                _voice_list = [
+                    'cmu_slp', 'serena', 'blizzard_fls',
+                    'southern_english_female', 'blizzard_lessac', 'mary_ann',
+                    'Slt', 'cmu_slt', 'Clb', 'cmu_clb', 'ek', 'harvard',
+                    'judy_bieber', 'kathleen', 'ljspeech', 'cmu_eey', 'cmu_ljm',
+                    'cmu_lnh', 'cmu_ahw', 'Alan', 'southern_english_male',
+                    'northern_english_male', 'cmu_aew', 'cmu_aup', 'cmu_fem',
+                    'cmu_jmk', 'cmu_ksp', 'cmu_rms', 'cmu_rxr',
+                    'scottish_english_male', 'Bdl', 'cmu_bdl', 'English+female1'
+                ]
             else:
-                _voice_list = ['cmu_ahw', 'Alan', 'southern_english_male',
-                               'northern_english_male', 'cmu_aew', 'cmu_aup',
-                               'cmu_fem', 'cmu_jmk', 'cmu_ksp', 'cmu_rms',
-                               'cmu_rxr', 'scottish_english_male', 'Bdl',
-                               'cmu_bdl', 'blizzard_lessac', 'mary_ann',
-                               'cmu_slp', 'Clb', 'cmu_clb', 'ek', 'harvard',
-                               'judy_bieber', 'kathleen', 'ljspeech',
-                               'cmu_eey', 'cmu_ljm', 'cmu_lnh', 'Slt',
-                               'cmu_slt', 'serena', 'blizzard_fls',
-                               'southern_english_female',
-                               'English']            
+                _voice_list = [
+                    'cmu_ahw', 'Alan', 'southern_english_male',
+                    'northern_english_male', 'cmu_aew', 'cmu_aup', 'cmu_fem',
+                    'cmu_jmk', 'cmu_ksp', 'cmu_rms', 'cmu_rxr',
+                    'scottish_english_male', 'Bdl', 'cmu_bdl',
+                    'blizzard_lessac', 'mary_ann', 'cmu_slp', 'Clb', 'cmu_clb',
+                    'ek', 'harvard', 'judy_bieber', 'kathleen', 'ljspeech',
+                    'cmu_eey', 'cmu_ljm', 'cmu_lnh', 'Slt', 'cmu_slt', 'serena',
+                    'blizzard_fls', 'southern_english_female', 'English'
+                ]
         elif language[:2] == 'en':
             if self._switch_to_female(voice):
-                _voice_list = ['serena', 'blizzard_fls',
-                               'southern_english_female',
-                               'blizzard_lessac', 'mary_ann', 'cmu_slp',
-                               'Slt', 'cmu_slt', 'Clb', 'cmu_clb', 'ek',
-                               'harvard', 'judy_bieber', 'kathleen',
-                               'ljspeech', 'cmu_eey', 'cmu_ljm', 'cmu_lnh',
-                               'Alan', 'southern_english_male',
-                               'northern_english_male', 'cmu_aew',
-                               'cmu_ahw', 'cmu_aup', 'cmu_fem', 'cmu_jmk',
-                               'cmu_ksp', 'cmu_rms', 'cmu_rxr',
-                               'scottish_english_male', 'Bdl', 'cmu_bdl',
-                               'English+female1']
+                _voice_list = [
+                    'serena', 'blizzard_fls', 'southern_english_female',
+                    'blizzard_lessac', 'mary_ann', 'cmu_slp', 'Slt', 'cmu_slt',
+                    'Clb', 'cmu_clb', 'ek', 'harvard', 'judy_bieber',
+                    'kathleen', 'ljspeech', 'cmu_eey', 'cmu_ljm', 'cmu_lnh',
+                    'Alan', 'southern_english_male', 'northern_english_male',
+                    'cmu_aew', 'cmu_ahw', 'cmu_aup', 'cmu_fem', 'cmu_jmk',
+                    'cmu_ksp', 'cmu_rms', 'cmu_rxr', 'scottish_english_male',
+                    'Bdl', 'cmu_bdl', 'English+female1'
+                ]
             else:
-                _voice_list = ['Alan', 'southern_english_male',
-                               'northern_english_male', 'cmu_aew', 'cmu_ahw',
-                               'cmu_aup', 'cmu_fem', 'cmu_jmk', 'cmu_ksp',
-                               'cmu_rms', 'cmu_rxr', 'scottish_english_male',
-                               'Bdl', 'cmu_bdl', 'blizzard_lessac',
-                               'mary_ann', 'Clb', 'cmu_clb', 'ek', 'harvard',
-                               'judy_bieber', 'kathleen', 'ljspeech',
-                               'cmu_eey', 'cmu_ljm', 'cmu_lnh', 'Slt',
-                               'cmu_slt', 'serena', 'blizzard_fls',
-                               'southern_english_female', 'cmu_slp', 
-                               'English']
+                _voice_list = [
+                    'Alan', 'southern_english_male', 'northern_english_male',
+                    'cmu_aew', 'cmu_ahw', 'cmu_aup', 'cmu_fem', 'cmu_jmk',
+                    'cmu_ksp', 'cmu_rms', 'cmu_rxr', 'scottish_english_male',
+                    'Bdl', 'cmu_bdl', 'blizzard_lessac', 'mary_ann', 'Clb',
+                    'cmu_clb', 'ek', 'harvard', 'judy_bieber', 'kathleen',
+                    'ljspeech', 'cmu_eey', 'cmu_ljm', 'cmu_lnh', 'Slt',
+                    'cmu_slt', 'serena', 'blizzard_fls',
+                    'southern_english_female', 'cmu_slp', 'English'
+                ]
         elif language[:2] == 'es':
             if self._switch_to_female(voice):
                 _voice_list = ['karen_savage', 'carlfm', 'Spanish+female1']
@@ -764,18 +752,19 @@ configurations.
                 _voice_list = ['carlfm', 'karen_savage', 'Spanish']
         elif language == 'fr-CA':
             if self._switch_to_female(voice):
-                _voice_list = ['siwis', 'tom', 'gilles_le_blanc',
-                               'French+female1']
+                _voice_list = [
+                    'siwis', 'tom', 'gilles_le_blanc', 'French+female1'
+                ]
             else:
-                _voice_list = ['tom', 'gilles_le_blanc', 'siwis',
-                               'French']
+                _voice_list = ['tom', 'gilles_le_blanc', 'siwis', 'French']
         elif language[:2] == 'fr':
             if self._switch_to_female(voice):
-                _voice_list = ['siwis', 'gilles_le_blanc', 'tom'
-                               'French+female1']
+                _voice_list = [
+                    'siwis', 'gilles_le_blanc', 'tom'
+                    'French+female1'
+                ]
             else:
-                _voice_list = ['gilles_le_blanc', 'tom', 'siwis',
-                               'French']
+                _voice_list = ['gilles_le_blanc', 'tom', 'siwis', 'French']
         elif language[:2] == 'it':
             if self._switch_to_female(voice):
                 _voice_list = ['lisa', 'riccardo_fasol', 'Italian+female1']
@@ -788,11 +777,14 @@ configurations.
                 _voice_list = ['Nazgul', 'Azamat', 'Kyrgyz']
         elif language[:2] == 'nl':
             if self._switch_to_female(voice):
-                _voice_list = ['nathalie', 'bart_de_leeuw', 'flemishguy',
-                               'rdh', 'Dutch+female1']
+                _voice_list = [
+                    'nathalie', 'bart_de_leeuw', 'flemishguy', 'rdh',
+                    'Dutch+female1'
+                ]
             else:
-                _voice_list = ['bart_de_leeuw', 'flemishguy', 'rdh',
-                               'nathalie', 'Dutch']
+                _voice_list = [
+                    'bart_de_leeuw', 'flemishguy', 'rdh', 'nathalie', 'Dutch'
+                ]
         elif language[:2] == 'pl':
             if self._switch_to_female(voice):
                 _voice_list = ['Magda', 'Natan', 'Polish+female1']
@@ -800,12 +792,15 @@ configurations.
                 _voice_list = ['Natan', 'Magda', 'Polish']
         elif language[:2] == 'ru':
             if self._switch_to_female(voice):
-                _voice_list = ['Anna', 'Elena', 'Aleksandr', 'Artemiy',
-                               'hajdurova', 'minaev', 'nikolaev',
-                               'Russian+female1']
+                _voice_list = [
+                    'Anna', 'Elena', 'Aleksandr', 'Artemiy', 'hajdurova',
+                    'minaev', 'nikolaev', 'Russian+female1'
+                ]
             else:
-                _voice_list = ['Aleksandr', 'Artemiy', 'hajdurova', 'minaev',
-                               'nikolaev', 'Anna', 'Elena', 'Russian']
+                _voice_list = [
+                    'Aleksandr', 'Artemiy', 'hajdurova', 'minaev', 'nikolaev',
+                    'Anna', 'Elena', 'Russian'
+                ]
         elif language[:2] == 'sv':
             if self._switch_to_female(voice):
                 _voice_list = ['talesyntese', 'Swedish+female1']
@@ -828,7 +823,7 @@ configurations.
                 try:
                     self.client.set_synthesis_voice(test_voice)
                     break
-                except(AttributeError, SyntaxError, TypeError):
+                except (AttributeError, SyntaxError, TypeError):
                     pass
         self.client.speak(_message)
         time.sleep(_time)
@@ -903,6 +898,7 @@ class SayFormats(object):
     or else the function returns "".  See the help for each public
     `def` for more information.
     '''
+
     def __init__(self):
         '''
         Def that initializes characteristics of the installed version
@@ -920,9 +916,9 @@ class SayFormats(object):
             if os.path.isfile('/usr/bin/say'):
                 self.app = '/usr/bin/say'
             try:
-                s1 = (subprocess.check_output(
-                    ''.join([self.app, ' --voice="?"']),
-                    shell=True))
+                s1 = (subprocess.check_output(''.join(
+                    [self.app, ' --voice="?"']),
+                                              shell=True))
                 # Python 3 : a bytes-like
                 # object is required
                 self._i = codecs.decode(s1, 'utf-8')
@@ -951,9 +947,9 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
 
         if self.is_mac:
             try:
-                s1 = (subprocess.check_output(
-                    ''.join([self.app, " --file-format=? "]),
-                    shell=True))
+                s1 = (subprocess.check_output(''.join(
+                    [self.app, " --file-format=? "]),
+                                              shell=True))
                 # Python 3 : a bytes-like
                 # object is required
                 self._f = codecs.decode(s1, 'utf-8')
@@ -965,13 +961,10 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
                 self._f = ''
         if len(self._f) == 0:
             if os.name == 'nt':
-                self._f = (
-                    "                           (,) []\n"
-                    )
+                self._f = ("                           (,) []\n")
             else:
                 self._f = (
-                    "WAVE  WAVE                 (.wav) [lpcm,ulaw,alaw]\n"
-                    )
+                    "WAVE  WAVE                 (.wav) [lpcm,ulaw,alaw]\n")
         self._a3 = self._f.split('\n')
         self._a4 = []
         for line in self._f.splitlines():
@@ -1093,7 +1086,10 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
             _voice = "Alex"
         return m_rate, _voice
 
-    def say_aloud(self, _file_spec='', _voice='', _requested_voice='',
+    def say_aloud(self,
+                  _file_spec='',
+                  _voice='',
+                  _requested_voice='',
                   i_rate=0):  # -> bool
         '''Read aloud using a MacOS system voice if the voice
         is not already talking. Returns `True` if there is no
@@ -1112,11 +1108,10 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
                 return False
             readtexttools.lock_my_lock()
             _command = ''.join([
-                    self.app,
-                    "%(m_rate)s %(v_tag)s%(_voice)s -f '%(_file_spec)s'" %locals()])
-            s1 = (subprocess.check_output(
-                _command,
-                shell=True))
+                self.app,
+                "%(m_rate)s %(v_tag)s%(_voice)s -f '%(_file_spec)s'" % locals()
+            ])
+            s1 = (subprocess.check_output(_command, shell=True))
             readtexttools.unlock_my_lock()
             return len(s1) == 0
         except TypeError:
@@ -1126,7 +1121,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
                 readtexttools.unlock_my_lock()
                 return True
             except:
-                print('Cannot execute command: `%(_command)s`' %locals())
+                print('Cannot execute command: `%(_command)s`' % locals())
                 return False
         except subprocess.CalledProcessError:
             # You clicked a button to cancel reading aloud, so `killall` stopped
@@ -1136,8 +1131,12 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
             return False
 
     def save_audio(self,
-                   _file_spec='', _voice='', i_rate=0, _media_out='',
-                   _audible=False, _visible=False):  # -> bool
+                   _file_spec='',
+                   _voice='',
+                   i_rate=0,
+                   _media_out='',
+                   _audible=False,
+                   _visible=False):  # -> bool
         '''
 
 + `_file_spec` - Text file to speak
@@ -1165,7 +1164,8 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_media_out, _icon, 'OUT')
         # Determine the temporary file name
-        _media_work = readtexttools.get_work_file_path(_media_out, _icon, 'TEMP') + '.aiff'
+        _media_work = readtexttools.get_work_file_path(_media_out, _icon,
+                                                       'TEMP') + '.aiff'
 
         # Remove old files.
         if os.path.isfile(_media_work):
@@ -1173,7 +1173,8 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         if os.path.isfile(_media_out):
             os.remove(_media_out)
         _app = self.app
-        _command = "%(_app)s%(m_rate)s %(v_tag)s%(_voice)s -o '%(_media_work)s' -f '%(_file_spec)s' " %locals()
+        _command = "%(_app)s%(m_rate)s %(v_tag)s%(_voice)s -o '%(_media_work)s' -f '%(_file_spec)s' " % locals(
+        )
         try:
             readtexttools.my_os_system(_command)
         except:
@@ -1184,7 +1185,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
                 return False
             _writer = ''
             _size = '600x600'
-            _info = "Apple MacOS Speech Synthesis Voice: %(_voice)s" %locals()
+            _info = "Apple MacOS Speech Synthesis Voice: %(_voice)s" % locals()
             readtexttools.process_wav_media(_info, _media_work, _icon,
                                             _media_out, _audible, _visible,
                                             _writer, _size)
@@ -1224,7 +1225,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
             s3 = ''
             s2 = ''
             s1 = ''
-            i1 = (len(s5) * - 1) + 1
+            i1 = (len(s5) * -1) + 1
 
             for i, item in enumerate(self._a1):
                 s2 = self._getlanguagecountry(i).lower()
@@ -1239,7 +1240,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
                     break
             if len(s5) == 0 or s5 == '~':
                 s1 = s1[1:-1]
-            elif s5[: i1] == '~':
+            elif s5[:i1] == '~':
                 s1 = s1[1:]
             elif len(s1) == 0:
                 # No exact match; trying language match
@@ -1305,10 +1306,9 @@ def main():
         usage()
         sys.exit(0)
     try:
-        opts, args = getopt.getopt(
-            sys.argv[1:], "hmolvr",
-            ["help", "output_module=", "output=", "language=", "voice=",
-             "rate="])
+        opts, args = getopt.getopt(sys.argv[1:], "hmolvr", [
+            "help", "output_module=", "output=", "language=", "voice=", "rate="
+        ])
     except getopt.GetoptError:
         print('option was not recognized')
         usage()
@@ -1341,7 +1341,7 @@ def main():
         mac_reader = _say_formats.voice(_language)
         if bool(_voice):
             for line in _say_formats._a1:
-                if line.startswith('%(_voice)s ' %locals()):
+                if line.startswith('%(_voice)s ' % locals()):
                     mac_reader = _voice
                     break
         if len(_output) == 0:
@@ -1358,8 +1358,7 @@ def main():
         if not USE_SPEECHD:
             readtexttools.web_info_translate(
                 '''The `speechd` library is not compatible with your application
-or platform.''',
-                _language)
+or platform.''', _language)
             sys.exit(0)
         _spd_formats = SpdFormats()
         if not _spd_formats.spd_ok:
@@ -1367,13 +1366,14 @@ or platform.''',
             usage()
             sys.exit(0)
         if not _spd_formats.set_up():
-            print('''The python 3 `speechd` setup failed. Check for a system update and
+            print(
+                '''The python 3 `speechd` setup failed. Check for a system update and
 restart your computer.''')
             usage()
             sys.exit(0)
         _testing = False
-        if not _spd_formats.speak_spd(_output_module, _language,
-                                      _voice, i_rate, __file_spec):
+        if not _spd_formats.speak_spd(_output_module, _language, _voice, i_rate,
+                                      __file_spec):
             # Error - Try resetting `speechd`
             hard_reset('speech-dispatcher')
     sys.exit(0)

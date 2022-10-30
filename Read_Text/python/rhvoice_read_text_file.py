@@ -453,8 +453,7 @@ def main():  # -> NoReturn
     _speech_rate = 100
     _iso_lang = 'en-US'
     try:
-        _iso_lang = readtexttools.default_lang().replace(
-            '_', '-')
+        _iso_lang = readtexttools.default_lang().replace('_', '-')
     except AttributeError:
         pass
     _media_out = ''

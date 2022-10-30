@@ -445,9 +445,10 @@ class ReadFestivalClass(object):
         '''Third party voices installed in the festival directory might
         not be compatible with the `text2wave` program, and cause a crash.'''
         if _lang[:2] in ['uk', 'tt', 'sq', 'ru', 'pt', 'pl', 'mk', 'kg', 'eo']:
-            for third_party in ['/usr/share/doc/rhvoice',
-                                '/usr/local/share/doc/rhvoice',
-                                '/opt/rhvoice']:
+            for third_party in [
+                    '/usr/share/doc/rhvoice', '/usr/local/share/doc/rhvoice',
+                    '/opt/rhvoice'
+            ]:
                 if os.path.isdir(third_party):
                     return False
         return True
@@ -722,7 +723,8 @@ reads the file aloud.
         else:
             assert False, 'unhandled option'
     if not _read_festival.language_ok(_eval_lang):
-        print('FAIL: `%(_eval_lang)s` - incompatible language or voice.' %locals())
+        print('FAIL: `%(_eval_lang)s` - incompatible language or voice.' %
+              locals())
         sys.exit(0)
     _content = _imported_meta.meta_from_file(_file_path)
     if len(_content) == 0:

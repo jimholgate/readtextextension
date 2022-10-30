@@ -1,6 +1,5 @@
 ﻿#!/usr/bin/env python
 # -*- coding: UTF-8-*-
-
 '''
 Read text
 =========
@@ -115,6 +114,7 @@ Usage
        "input.txt"
 ''')
 
+
 def espeak_path():  # -> str
     '''Returns path to espeak program, name or `''` if it cannot be found.'''
     if os.name == 'nt':
@@ -126,27 +126,31 @@ def espeak_path():  # -> str
                 return app_name
     return ''
 
+
 def espk_languages():  # -> list[str]
     '''If using `espeak-ng`, return a language_list of voices that `espeak-ng`
     supported in 2022.07, otherwise return a list of supported`espeak` voices.
     '''
     _app_name = espeak_path()
-    if _app_name.count('-ng') !=0:
-        return ['af', 'am', 'an', 'ar', 'az', 'ba', 'bg', 'bn', 'bpy', 'bs',
-                'ca', 'cmn', 'cs', 'cy', 'da', 'de', 'el', 'en', 'en-GB',
-                'en-US', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gd',
-                'gn', 'grc', 'gu', 'hak', 'hi', 'hr', 'ht', 'hu', 'hy', 'hyw',
-                'ia', 'id', 'is', 'it', 'ja', 'jbo', 'ka', 'kk', 'kl', 'kn',
-                'ko', 'kok', 'ku', 'ky', 'la', 'lfn', 'lt', 'lv', 'mi', 'mk',
-                'ml', 'mr', 'ms', 'mt', 'mt', 'my', 'nb', 'nci', 'ne', 'nl',
-                'om', 'or', 'pap', 'pt', 'py', 'quc', 'ro', 'ru', 'sd', 'shn',
-                'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te', 'tn', 'tn',
-                'tn', 'tr', 'tt', 'ur', 'uz', 'vi', 'yue']
+    if _app_name.count('-ng') != 0:
+        return [
+            'af', 'am', 'an', 'ar', 'az', 'ba', 'bg', 'bn', 'bpy', 'bs', 'ca',
+            'cmn', 'cs', 'cy', 'da', 'de', 'el', 'en', 'en-GB', 'en-US', 'eo',
+            'es', 'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gd', 'gn', 'grc', 'gu',
+            'hak', 'hi', 'hr', 'ht', 'hu', 'hy', 'hyw', 'ia', 'id', 'is', 'it',
+            'ja', 'jbo', 'ka', 'kk', 'kl', 'kn', 'ko', 'kok', 'ku', 'ky', 'la',
+            'lfn', 'lt', 'lv', 'mi', 'mk', 'ml', 'mr', 'ms', 'mt', 'mt', 'my',
+            'nb', 'nci', 'ne', 'nl', 'om', 'or', 'pap', 'pt', 'py', 'quc', 'ro',
+            'ru', 'sd', 'shn', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te',
+            'tn', 'tn', 'tn', 'tr', 'tt', 'ur', 'uz', 'vi', 'yue'
+        ]
     else:
-        return ['af', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'eo', 'fi',
-                'fr', 'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ku', 'la',
-                'lv', 'mk', 'nl', 'pl', 'ro', 'ru', 'sk', 'sq', 'sr', 'sv',
-                'sw', 'ta', 'tr', 'vi']
+        return [
+            'af', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'eo', 'fi', 'fr',
+            'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ku', 'la', 'lv', 'mk',
+            'nl', 'pl', 'ro', 'ru', 'sk', 'sq', 'sr', 'sv', 'sw', 'ta', 'tr',
+            'vi'
+        ]
 
 
 def espkread(_text_path, _lang, _visible, _audible, _tmp0, _image, _title,
@@ -210,11 +214,12 @@ reads the file aloud.
             s = 'zh'
     elif _concise_lang in espk_languages():
         s = _concise_lang
-    elif os.path.isfile('/usr/share/espeak-ng-data/%(_concise_lang)s_dict' %locals()):
+    elif os.path.isfile('/usr/share/espeak-ng-data/%(_concise_lang)s_dict' %
+                        locals()):
         s = _concise_lang
     else:
         print('''`espeak_read_text_file.py` says:
-`%(_lang)s` is an unsupported language.  Exiting.''' %locals())
+`%(_lang)s` is an unsupported language.  Exiting.''' % locals())
         return 0
     _voice = s  # standard espeak dictionary
     if _post_process == 'process_wav_media':
@@ -407,9 +412,11 @@ reads the file aloud.
         elif _post_process == "process_wav_media":
             if os.path.getsize(_work_file) == 0:
                 return 0
-            if bool(readtexttools.process_wav_media(_title, _work_file, _image,
-                                                    _out_file, _audible, _visible,
-                                                    _author, _dimensions)):
+            if bool(
+                    readtexttools.process_wav_media(_title, _work_file, _image,
+                                                    _out_file, _audible,
+                                                    _visible, _author,
+                                                    _dimensions)):
                 return readtexttools.sound_length_seconds(_work_file)
         elif _post_process == "show_sound_length_seconds":
             _seconds = readtexttools.sound_length_seconds(_work_file)
@@ -511,8 +518,7 @@ def main():  # -> NoReturn
         usage()
         sys.exit(0)
     elif not bool(espeak_path()):
-        print(
-            'Please install espeak.  Use `sudo apt-get install espeak-ng`')
+        print('Please install espeak.  Use `sudo apt-get install espeak-ng`')
         usage()
         sys.exit(0)
     try:
