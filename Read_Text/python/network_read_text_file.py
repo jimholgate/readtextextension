@@ -674,17 +674,37 @@ class LarynxClass(object):
             'child_male', 'male1', 'male2', 'male3', 'larynx', 'localhost',
             'docker', 'local_server'
         ]
-        self.spd_fm = ['child_female', 'female1', 'female2', 'female3']
-        # The default voice should come last so the routine
-        # prioritizes a voice you chose to install.
-        _default_voice = 'mary_ann'
+        self.spd_fm = ['female1', 'female2', 'female3', 'child_female']
+        self.spd_m = ['male1', 'male2', 'male3', 'child_male']
+
+        # The routine uses the default voice as a fallback. The routine
+        # prioritizes a voice that you chose to install.
+        self.default_lang = readtexttools.default_lang()
+        self.default_voice = 'mary_ann'
+        self.larynx_v1 = None
+        if '_IN' in self.default_lang:
+            self.larynx_v1 = [ 'cmu_aup', 'cmu_ksp', 'cmu_slp']
+        elif self.default_lang == 'en_CA':
+            self.larynx_v1 = ['cmu_jmk']
+        elif self.default_lang == 'es_ES':
+            self.larynx_v1 = ['carlfm', 'karen_savage']
+        elif self.default_lang == 'fr_FR':
+            self.larynx_v1 = ['gilles_le_blanc', 'siwis']
+        elif self.default_lang == 'it_IT':
+            self.larynx_v1 = ['lisa', 'riccardo_fasol']
+        elif self.default_lang not in ['en_PH', 'en_US', 'es_MX']:
+            self.larnx_v1 = [
+                'blizzard_fls', 'ek', 'harvard', 'northern_english_male',
+                'scottish_english_male', 'southern_english_female',
+                'southern_english_male']
+        # https://community.rhasspy.org/t/preview-of-new-tts-voices/2556
         self.larynx_fm = [
             'eva_k', 'hokuspokus', 'kerstin', 'rebecca_braunert_plunkett',
             'blizzard_fls', 'blizzard_lessac', 'cmu_clb', 'cmu_eey', 'cmu_ljm',
             'cmu_lnh', 'cmu_rms', 'cmu_slp', 'cmu_slt', 'ek', 'harvard',
             'judy_bieber', 'kathleen', 'ljspeech', 'southern_english_female',
             'karen_savage', 'siwis', 'lisa', 'nathalie', 'hajdurova',
-            _default_voice
+            self.default_voice
         ]
         self.voice_id = ''
         try:
@@ -737,6 +757,53 @@ Try restarting `larynx-server`.''')
             _nsv = ''.join([_nsv, data[_jint]['id'], '\n'])
         self.vocoders = _nsv[:-1].split('\n')
         return True
+
+    def _spd_voice_to_larynx_voice(self,
+                                  _search='female1',
+                                  larynx_names='mary_ann'):  # -> str
+        '''Assign a larynx name like `scottish_english_male` to a spd_voice
+        like `male1` '''
+        _search = _search.lower().strip('\'" \n')
+        if len(_search) == 0:
+            return ''
+        elif len(larynx_names.strip()) == 0:
+            return ''
+        # data_list has a minimum of four items.
+        # Not using Modulo Operator (`%`)
+        _data = 5 * '''%(larynx_names)s\n''' % locals()
+        _data_list = _data.strip().split('\n')
+        _resultat = ''
+        count_f = 0
+
+        for count, _item in enumerate(self.spd_m):
+            if _item == _search:
+                count_f = count
+                break
+        _voices = ''
+        if not 'female' in _search:
+            for _voice in (_data_list):
+                if _voice not in self.larynx_fm:
+                    _voices = ''.join([_voices, _voice, '\n'])
+            try:
+                _resultat = _voices.strip().split('\n')[count_f]
+            except IndexError:
+                _resultat = ''
+        if len(_resultat) != 0:
+            return _resultat
+        count_f = 0
+        for count, _item in enumerate(self.spd_fm):
+            if _item == _search:
+                count_f = count
+                break
+        _voices = ''
+        for _voice in (_data_list):
+            if _voice in self.larynx_fm:
+                _voices = ''.join([_voices, _voice, '\n'])
+        try:
+            _resultat = _voices.strip().split('\n')[count_f]
+        except IndexError:
+            _resultat = ''
+        return _resultat
 
     def language_supported(self,
                            iso_lang='en-US',
@@ -795,7 +862,36 @@ Try restarting `larynx-server`.''')
         # Find the first voice that meets the criteria. If found, then
         # return `True`, otherwise return `False`.
         _voice_id = ''
+        larynx_names = ''
+        for _item in data:
+            if data[_item]['downloaded']:
+                if _lang1 in data[_item]['language']:
+                    larynx_names = ''.join([larynx_names, '\n', data[_item]['name']])
+                elif _lang2 == data[_item]['language'].split('-')[0]:
+                    larynx_names = ''.join([larynx_names, '\n', data[_item]['name']])
+        larynx_names = larynx_names.strip()
         _vox = vox.lower()
+        _verified_name = self._spd_voice_to_larynx_voice(_vox, larynx_names)
+        if _verified_name in self.larynx_v1:
+            _logo = ''.join([u' \u263B  (', self.default_lang,')' ])
+        else:
+            _logo = ''.join([u' \u263A  (', _lang2,')' ])
+        if len(_verified_name) != 0:
+            if len(larynx_names) != 0:
+                display_names = larynx_names.replace(
+                    _verified_name, u'%(_verified_name)s %(_logo)s  %(_vox)s' % locals())
+                print('''
+Loading larynx voices for `%(_lang2)s`
+==============================
+
+%(display_names)s
+''' % locals())
+            for _item in data:
+                if data[_item]['name'] == _verified_name:
+                    self.voice_id = data[_item]['id']
+                    self.ok = True
+                    return self.ok
+        self.ok = False
         for _item in data:
             if data[_item]['downloaded']:
                 if _vox in [data[_item]['name'], data[_item]['id']]:
@@ -810,24 +906,10 @@ Try restarting `larynx-server`.''')
                 elif _lang2 == data[_item]['language'].split('-')[0]:
                     _voice_id = data[_item]['id']
                 if len(_voice_id) != 0:
-                    for _pass in [0, 1]:
-                        if _pass == 0:
-                            if _vox in self.spd_fm:
-                                if data[_item]['name'] in self.larynx_fm:
-                                    self.voice_id = _voice_id
-                                    break
-                        else:
-                            if _vox not in self.spd_fm:
-                                if data[_item]['name'] not in self.larynx_fm:
-                                    self.voice_id = _voice_id
-                                    break
-                if len(self.voice_id) != 0:
+                    self.voice_id = _voice_id
+                    self.ok = True
                     break
-            if len(self.voice_id) != 0:
-                break
-        if len(self.voice_id) == 0:
-            self.voice_id = _voice_id
-        self.ok = len(self.voice_id) != 0
+                self.ok = False
         return self.ok
 
     def read(self,
@@ -876,8 +958,8 @@ Try restarting `larynx-server`.''')
             elif len(_media_out) > 0:
                 # Medium quality when saving file.
                 _vocoder = self.vocoders[1]
-            elif len(_text.split()) > 20:
-                # Word count > 20 so use fastest setting.
+            elif len(_text.split()) > 30:
+                # Word count > 30 so use fastest setting.
                 _vocoder = self.vocoders[0]
             else:
                 _vocoder = self.vocoders[1]
@@ -914,6 +996,7 @@ Try restarting `larynx-server`.''')
                 },
                 headers={
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'User-Agent' : 'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
                 },
                 data=_text.encode('utf-8', 'ignore'),
                 timeout=(_ok_wait, _end_wait))

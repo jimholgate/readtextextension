@@ -1882,10 +1882,14 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		&quot;.png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	End If
 	If fbHaveNetworkTTS() And fsGetOS() = &quot;UNIX&quot; Then
-		s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot; --voice=&quot;&quot;FEMALE1&quot;&quot;&quot;
-		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-		s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE) --voice=&quot;&quot;FEMALE1&quot;&quot;&quot;
-		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+		Redim _opts : _opts = Array(_
+					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
+		For n = Lbound(_opts) To Ubound(_opts)
+			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot; --voice=&quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
+			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE) --voice=&quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
+			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+		Next
 		s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot;&quot;
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
         s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE)&quot;
