@@ -256,8 +256,8 @@ class XmlTransform(object):
                          ["}", ""], ["(", ""], [")", ""]]:
                 test_text = test_text.replace(pair[0], pair[1])
             return test_text
-        for pair in [["&", "&amp;"], ['"', '\\"'], ["<", "&gt;"], [">",
-                                                                   "&lt;"]]:
+        for pair in [["&", "&amp;"], ['"', '\\"'], ["<", "&gt;"],
+                     [">", "&lt;"]]:
             test_text = test_text.replace(pair[0], pair[1])
         return test_text
 
@@ -1022,7 +1022,7 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
     * Determine the temporary file name
     `_work = readtexttools.get_work_file_path(_work, _image, 'TEMP')`
     * Determine the output file name
-    `_out = readtexttools.get_work_file_path(_work, _image, 'OUT')`TreeBuilder
+    `_out = readtexttools.get_work_file_path(_work, _image, 'OUT')`
     '''
     _extension_table = ExtensionTable()
     _out = ''
@@ -1063,12 +1063,12 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
     elif lax_mime_match(_work_ext, '.mp3'):
         # _extension_table = ExtensionTable()
         if media_converter_installed():
-            if (os.path.isfile('/usr/share/doc/liblame0/copyright') or
-                    os.path.isfile('/usr/share/doc/libmp3lame0/copyright') or
-                    have_posix_app('lame', False) or
+            if (os.path.isfile('/usr/share/doc/liblame0/copyright')
+                    or os.path.isfile('/usr/share/doc/libmp3lame0/copyright')
+                    or have_posix_app('lame', False) or
                     os.path.isfile('/usr/lib/x86_64-linux-gnu/libmp3lame.so.0')
-                    or os.path.isfile(_extension_table.vlc) or
-                    bool(get_nt_path('lame', 'lame'))):
+                    or os.path.isfile(_extension_table.vlc)
+                    or bool(get_nt_path('lame', 'lame'))):
                 _out = _work
                 _work = '%(_out)s.wav' % locals()
             else:
@@ -1081,8 +1081,8 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
             _work = _out
     elif _work_ext in ['.mp2']:
         if media_converter_installed():
-            if (os.path.isfile('/usr/share/doc/libtwolame0/copyright') or
-                    bool(get_nt_path('twolame', 'twolame'))):
+            if (os.path.isfile('/usr/share/doc/libtwolame0/copyright')
+                    or bool(get_nt_path('twolame', 'twolame'))):
                 _out = _work
                 _work = '%(_out)s.wav' % locals()
             else:
@@ -1094,10 +1094,10 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
             _work = _out
     elif lax_mime_match(_work_ext, '.ogg'):
         if media_converter_installed():
-            if (os.path.isfile('/usr/share/doc/libogg0/copyright') or
-                    os.path.isfile(_extension_table.vlc) or
-                    bool(get_nt_path('oggenc', 'oggenc')) or
-                    bool(get_nt_path('oggenc2', 'oggenc2'))):
+            if (os.path.isfile('/usr/share/doc/libogg0/copyright')
+                    or os.path.isfile(_extension_table.vlc)
+                    or bool(get_nt_path('oggenc', 'oggenc'))
+                    or bool(get_nt_path('oggenc2', 'oggenc2'))):
                 _out = _work
                 _work = '%(_out)s.wav' % locals()
             else:
@@ -1250,7 +1250,8 @@ def process_wav_media(_title='untitled',
     for _test in _extension_table.extension_test:
         if out_ext in _test[_extension_table.extension]:
             if have_posix_app('afconvert', False):
-                if not vlc_wav_to_media(_work, _out, _audible, _visible, False):
+                if not vlc_wav_to_media(_work, _out, _audible, _visible,
+                                        False):
                     wav_to_media(_title, _work, _image, _out, _audible,
                                  _visible, _artist, _dimensions)
                 break
@@ -1463,8 +1464,8 @@ def sound_length_seconds(_work):  # -> int
             snd_read.close()
         except:
             pass
-    elif _mime == (mimetypes.types_map['.aif'] or
-                   _mime == mimetypes.types_map['.aifc']):
+    elif _mime == (mimetypes.types_map['.aif']
+                   or _mime == mimetypes.types_map['.aifc']):
         try:
             snd_read = aifc.open(_work, 'r')
             _return_value = math.ceil(
@@ -1987,7 +1988,8 @@ class WinMediaPlay(object):
         like `.wav` the Windows python3 `winsound` library is much faster.'''
         if self.rest == 0:
             return False
-        mythread = threading.Thread(target=self._windowsmedia, args=[file_path])
+        mythread = threading.Thread(target=self._windowsmedia,
+                                    args=[file_path])
         mythread.start()
         time.sleep(self.rest)
         try:
@@ -2128,8 +2130,8 @@ def gst_wav_to_media(_title='untitled',
             show_with_app(_out)
         elif b_audible:
             unlock_my_lock()
-            gst_wav_to_media(_title, _out, '', _image, 'true', 'false', _artist,
-                             _dimensions)
+            gst_wav_to_media(_title, _out, '', _image, 'true', 'false',
+                             _artist, _dimensions)
         elif b_visible:
             print('''Play is off - file will not play.
 The file was saved to:  %(_out)s''' % locals())
@@ -2297,12 +2299,14 @@ def wav_to_media(_title='',
                     % locals())
         elif _out_ext in ['.aac']:
             if have_posix_app('afconvert', False):
-                my_os_system('afconvert -f adts -d aac "%(_work)s" "%(_out)s"' %
-                             locals())
+                my_os_system(
+                    'afconvert -f adts -d aac "%(_work)s" "%(_out)s"' %
+                    locals())
         elif _out_ext in ['.m4a', 'm4r']:
             if have_posix_app('afconvert', False):
-                my_os_system('afconvert -f m4af -d aac "%(_work)s" "%(_out)s"' %
-                             locals())
+                my_os_system(
+                    'afconvert -f m4af -d aac "%(_work)s" "%(_out)s"' %
+                    locals())
         elif lax_mime_match(_out_ext, '.mp3'):
             # Try lame for mp3 or 'audio/mpeg' files that haven't been
             #  dealt with above.
@@ -2569,16 +2573,16 @@ def get_my_lock(_lock=''):  # -> str
     if env_path is not None and os.path.isdir(env_path) and os.access(
             env_path, os.W_OK):
         if os.name == 'nt':
-            return os.path.join(env_path,
-                                app_sign + '.' + os.getenv('USERNAME') + p_lock)
+            return os.path.join(
+                env_path, app_sign + '.' + os.getenv('USERNAME') + p_lock)
         elif have_posix_app('say', False):
             if bool(os.getenv('USERNAME')):
                 return os.path.join(
                     env_path, app_sign + '.' + os.getenv('USERNAME') + p_lock)
             else:
                 # MacOS 11
-                return os.path.join(env_path,
-                                    app_sign + '.' + os.getenv('USER') + p_lock)
+                return os.path.join(
+                    env_path, app_sign + '.' + os.getenv('USER') + p_lock)
         else:
             return os.path.join(env_path,
                                 app_sign + '.' + os.getenv('USER') + p_lock)
@@ -2656,8 +2660,8 @@ def play_wav_no_ui(file_path=''):  # -> bool
     uri_path = path2url(file_path)
     afplay_exts = [
         '.3gp', '.3g2', '.aac', '.adts', '.aifc', '.aiff', '.aif', '.amr',
-        '.m4a', '.m4r', '.m4b', '.caf', '.ec3', '.flac', '.mp1', '.mp2', '.mp3',
-        '.mpeg', '.mpa', '.mp4', '.snd', '.au', '.wav', '.w64'
+        '.m4a', '.m4r', '.m4b', '.caf', '.ec3', '.flac', '.mp1', '.mp2',
+        '.mp3', '.mpeg', '.mpa', '.mp4', '.snd', '.au', '.wav', '.w64'
     ]
     display_file = os.path.split(file_path)[1]
     if os.name == 'nt':
@@ -2713,8 +2717,10 @@ def play_wav_no_ui(file_path=''):  # -> bool
                 'roarcatplay', 'roarcatplay',
                 ' "%(file_path)s"' % locals(), False
             ],
-            ['aplay', 'aplay',
-             ' --nonblock "%(file_path)s"' % locals(), False],
+            [
+                'aplay', 'aplay',
+                ' --nonblock "%(file_path)s"' % locals(), False
+            ],
             [
                 'ffmpeg', 'ffplay',
                 ' -autoexit -hide_banner -loglevel info -nostats -nodisp "%(file_path)s"'
@@ -2751,7 +2757,8 @@ def play_wav_no_ui(file_path=''):  # -> bool
             if len(_pipe) == 0:
                 _apt_get_list = ''
                 for app in players:
-                    _apt_get_list = '\n * '.join([_apt_get_list, app[_apt_get]])
+                    _apt_get_list = '\n * '.join(
+                        [_apt_get_list, app[_apt_get]])
                 print('You need an audio player:%(_apt_get_list)s' % locals())
 
     if _command:

@@ -17,7 +17,7 @@
 		<OpenOffice.org-minimal-version value="3.3" d:name="OpenOffice.org 3.3" />
 	</dependencies>
 	<registration>
-		<simple-license  accept-by="admin" suppress-on-update="true" >
+		<simple-license accept-by="admin" suppress-on-update="true">
 			<license-text xlink:href="registration/LICENSE" lang="en" />
 			<license-text xlink:href="registration/LICENSE.de" lang="de" />
 			<license-text xlink:href="registration/LICENSE.es" lang="es" />

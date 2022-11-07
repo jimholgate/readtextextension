@@ -140,9 +140,9 @@ def espk_languages():  # -> list[str]
             'hak', 'hi', 'hr', 'ht', 'hu', 'hy', 'hyw', 'ia', 'id', 'is', 'it',
             'ja', 'jbo', 'ka', 'kk', 'kl', 'kn', 'ko', 'kok', 'ku', 'ky', 'la',
             'lfn', 'lt', 'lv', 'mi', 'mk', 'ml', 'mr', 'ms', 'mt', 'mt', 'my',
-            'nb', 'nci', 'ne', 'nl', 'om', 'or', 'pap', 'pt', 'py', 'quc', 'ro',
-            'ru', 'sd', 'shn', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta', 'te',
-            'tn', 'tn', 'tn', 'tr', 'tt', 'ur', 'uz', 'vi', 'yue'
+            'nb', 'nci', 'ne', 'nl', 'om', 'or', 'pap', 'pt', 'py', 'quc',
+            'ro', 'ru', 'sd', 'shn', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta',
+            'te', 'tn', 'tn', 'tn', 'tr', 'tt', 'ur', 'uz', 'vi', 'yue'
         ]
     else:
         return [

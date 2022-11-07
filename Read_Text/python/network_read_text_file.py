@@ -108,6 +108,23 @@ Usage
 Relies on optional external libraries and an on-line connection. With long
 strings, or using a slow network, the latency might be longer than two
 seconds, or retrieving the online resource might fail.
+
+Local Server
+------------
+
+The extension can use a local server that is compatible with the applcation
+programming interface (API) of a `rhasspy/larynx` speech server daemon.
+
+The default larnyx address is <http://0.0.0.0:5002>.
+
+You can use a different local address and port in the command options:
+
+    network_read_text_file.py --language=en-US --url="http://localhost:5002" "input.txt"
+
+It is normal for `larynx` to take a moment to start speaking the first time
+that you use it.
+
+[About Larynx...](https://github.com/rhasspy/larynx)
 ''')
 
 
@@ -118,7 +135,11 @@ def network_problem(voice='default'):  # -> str
     
 + The `%(voice)s` on-line voice is currently unavailable.
 + It might help to restart your device, refresh the network
-  or check your on-line account status.''' % locals()
+  or check your on-line account status.
++ If you are using a `localhost` server, it might help to
+  enter the local speech server command in a terminal and
+  read what it prints out. (i. e.: `larynx-server`)
+  ''' % locals()
 
 
 class AmazonClass(object):
@@ -574,8 +595,8 @@ Setup
                                           _msg, 5000, _provider_logo, 0)
         except gtts.tts.gTTSError:
             readtexttools.pop_message(
-                "`gtts-%(_version)s` failed to connect." % locals(), _msg, 5000,
-                _error_icon, 2)
+                "`gtts-%(_version)s` failed to connect." % locals(), _msg,
+                5000, _error_icon, 2)
             self.ok = False
             return False
         except (AssertionError, NameError, ValueError, RuntimeError):
@@ -625,7 +646,7 @@ Setup
         return False
 
 
-class LarynxClass(object):
+class LocalClass(object):
     '''Larynx is a text to speech local http voice server that a
     Raspberry Pi computer can use with automated devices. Larynx
     can support SSML and codes in plain text strings to suggest
@@ -683,7 +704,7 @@ class LarynxClass(object):
         self.default_voice = 'mary_ann'
         self.larynx_v1 = None
         if '_IN' in self.default_lang:
-            self.larynx_v1 = [ 'cmu_aup', 'cmu_ksp', 'cmu_slp']
+            self.larynx_v1 = ['cmu_aup', 'cmu_ksp', 'cmu_slp']
         elif self.default_lang == 'en_CA':
             self.larynx_v1 = ['cmu_jmk']
         elif self.default_lang == 'es_ES':
@@ -696,7 +717,8 @@ class LarynxClass(object):
             self.larnx_v1 = [
                 'blizzard_fls', 'ek', 'harvard', 'northern_english_male',
                 'scottish_english_male', 'southern_english_female',
-                'southern_english_male']
+                'southern_english_male'
+            ]
         # https://community.rhasspy.org/t/preview-of-new-tts-voices/2556
         self.larynx_fm = [
             'eva_k', 'hokuspokus', 'kerstin', 'rebecca_braunert_plunkett',
@@ -720,13 +742,13 @@ class LarynxClass(object):
             self.base_curl = None
         self.is_x86_64 = sys.maxsize > 2**32
 
-    def _set_vocoders(self, alt_larynx_url=''):  # -> bool
+    def _set_vocoders(self, alt_local_url=''):  # -> bool
         '''If the server is running, then get the list of voice coders.
-        + `alt_larynx_url` If you are connecting to a local network's
+        + `alt_local_url` If you are connecting to a local network's
            larynx server using a different computer, you might need to use
            a different url.'''
-        if alt_larynx_url.startswith("http"):
-            self.url = alt_larynx_url
+        if alt_local_url.startswith("http"):
+            self.url = alt_local_url
         data = {}
         if bool(self.vocoders):
             return True
@@ -759,8 +781,8 @@ Try restarting `larynx-server`.''')
         return True
 
     def _spd_voice_to_larynx_voice(self,
-                                  _search='female1',
-                                  larynx_names='mary_ann'):  # -> str
+                                   _search='female1',
+                                   larynx_names='mary_ann'):  # -> str
         '''Assign a larynx name like `scottish_english_male` to a spd_voice
         like `male1` '''
         _search = _search.lower().strip('\'" \n')
@@ -807,15 +829,15 @@ Try restarting `larynx-server`.''')
 
     def language_supported(self,
                            iso_lang='en-US',
-                           alt_larynx_url='',
+                           alt_local_url='',
                            vox='auto'):  # -> bool
         '''Is the language or voice supported?
         + `iso_lang` can be in the form `en-US` or a voice like `eva_k`
-        + `alt_larynx_url` If you are connecting to a local network's
-           larynx server using a different computer, you might need to use
+        + `alt_local_url` If you are connecting to a local network's
+           speech server using a different computer, you might need to use
            a different url.'''
-        if alt_larynx_url.startswith("http"):
-            self.url = alt_larynx_url
+        if alt_local_url.startswith("http"):
+            self.url = alt_local_url
         if int(platform.python_version_tuple()[0]) < 3 or int(
                 platform.python_version_tuple()[1]) < 9:
             self.ok = False
@@ -839,8 +861,8 @@ Try restarting `larynx-server`.''')
         _lang2 = iso_lang.lower().split('-')[0].split('_')[0]
         data = {}
         try:
-            response = urllib.request.urlopen(''.join([self.url,
-                                                       '/api/voices']))
+            response = urllib.request.urlopen(''.join(
+                [self.url, '/api/voices']))
             data_response = response.read()
             data = json.loads(data_response)
         except urllib.error.URLError:
@@ -866,20 +888,23 @@ Try restarting `larynx-server`.''')
         for _item in data:
             if data[_item]['downloaded']:
                 if _lang1 in data[_item]['language']:
-                    larynx_names = ''.join([larynx_names, '\n', data[_item]['name']])
+                    larynx_names = ''.join(
+                        [larynx_names, '\n', data[_item]['name']])
                 elif _lang2 == data[_item]['language'].split('-')[0]:
-                    larynx_names = ''.join([larynx_names, '\n', data[_item]['name']])
+                    larynx_names = ''.join(
+                        [larynx_names, '\n', data[_item]['name']])
         larynx_names = larynx_names.strip()
         _vox = vox.lower()
         _verified_name = self._spd_voice_to_larynx_voice(_vox, larynx_names)
         if _verified_name in self.larynx_v1:
-            _logo = ''.join([u' \u263B  (', self.default_lang,')' ])
+            _logo = ''.join([u' \u263B  (', self.default_lang, ')'])
         else:
-            _logo = ''.join([u' \u263A  (', _lang2,')' ])
+            _logo = ''.join([u' \u263A  (', _lang2, ')'])
         if len(_verified_name) != 0:
             if len(larynx_names) != 0:
                 display_names = larynx_names.replace(
-                    _verified_name, u'%(_verified_name)s %(_logo)s  %(_vox)s' % locals())
+                    _verified_name,
+                    u'%(_verified_name)s %(_logo)s  %(_vox)s' % locals())
                 print('''
 Loading larynx voices for `%(_lang2)s`
 ==============================
@@ -945,7 +970,8 @@ Loading larynx voices for `%(_lang2)s`
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
-        _media_work = readtexttools.get_work_file_path(_out_path, _icon, 'TEMP')
+        _media_work = readtexttools.get_work_file_path(_out_path, _icon,
+                                                       'TEMP')
         _voice = self.voice_id
         _lengthScale = '0.85'
         try:
@@ -995,8 +1021,10 @@ Loading larynx voices for `%(_lang2)s`
                     'ssml': _ssml
                 },
                 headers={
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'User-Agent' : 'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
+                    'Content-Type':
+                    'application/x-www-form-urlencoded',
+                    'User-Agent':
+                    'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
                 },
                 data=_text.encode('utf-8', 'ignore'),
                 timeout=(_ok_wait, _end_wait))
@@ -1012,7 +1040,8 @@ Loading larynx voices for `%(_lang2)s`
         else:
             print('''The application cannot load a sound file.
 Your computer is missing a required library.
-Use `pip3 install requests` or `apt-get install python3-requests` to fix it.''')
+Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
+                  )
             self.ok = False
             return False
         if os.path.getsize(_media_work) == 0:
@@ -1060,15 +1089,15 @@ def speech_wpm(_percent='100%'):  # -> int
     return i2
 
 
-def network_ok(_iso_lang='en-US'):  # -> bool
+def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
     '''Do at least one of the classes support an on-line speech library?'''
     _gtts_class = GoogleTranslateClass()
     _continue = False
     if _gtts_class.check_version(2.2):
         _continue = True
     if not _continue:
-        _larynx = LarynxClass()
-        _continue = _larynx.language_supported(_iso_lang, '', 'AUTO')
+        _larynx = LocalClass()
+        _continue = _larynx.language_supported(_iso_lang, _local_url, 'AUTO')
     if not _continue:
         _amazon_class = AmazonClass()
         _continue = bool(_amazon_class.language_supported(_iso_lang))
@@ -1091,30 +1120,34 @@ def network_main(_text_file_in='',
                  _icon='',
                  _size='600x600',
                  _speech_rate=160,
-                 vox=''):  # -> boolean
+                 _vox='',
+                 _local_url=''):  # -> boolean
     '''Read a text file aloud using a network resource.'''
     _imported_meta = readtexttools.ImportedMetaData()
-    _larynx = LarynxClass()
+    _larynx = LocalClass()
     _amazon_class = AmazonClass()
     _azure_class = AzureClass()
     _google_cloud_class = GoogleCloudClass()
     _gtts_class = GoogleTranslateClass()
     _continue = False
-    vox = vox.strip('\'" \t\n').lower()
-    _continue = _larynx.language_supported(_iso_lang, '',
-                                           vox) and vox in _larynx.accept_voice
+    _vox = _vox.strip('\'" \t\n').lower()
+    _continue = _larynx.language_supported(
+        _iso_lang,
+        _local_url,
+        _vox,
+    ) and _vox in _larynx.accept_voice
     if not _continue:
         _continue = _gtts_class.check_version(
-            2.2) and vox in _gtts_class.accept_voice
+            2.2) and _vox in _gtts_class.accept_voice
     if not _continue:
         _continue = bool(_amazon_class.language_supported(
-            _iso_lang)) and vox in _amazon_class.accept_voice
+            _iso_lang)) and _vox in _amazon_class.accept_voice
     if not _continue:
         _continue = bool(_azure_class.language_supported(
-            _iso_lang)) and vox in _azure_class.accept_voice
+            _iso_lang)) and _vox in _azure_class.accept_voice
     if not _continue:
         _continue = bool(_google_cloud_class.language_supported(
-            _iso_lang)) and vox in _google_cloud_class.accept_voice
+            _iso_lang)) and _vox in _google_cloud_class.accept_voice
     if not _continue:
         print(
             'No working network server was found, or the requested voice is unavailable.\n'
@@ -1130,13 +1163,14 @@ def network_main(_text_file_in='',
         # If the library does not require a postprocess, use `0`,
         # otherwise use the item corresponding to the next action.
         _post_processes = [
-            None, 'process_mp3_media', 'process_playlist', 'process_riff_media',
-            'process_vorbis_media', 'process_wav_media', 'process_audio_media'
+            None, 'process_mp3_media', 'process_playlist',
+            'process_riff_media', 'process_vorbis_media', 'process_wav_media',
+            'process_audio_media'
         ]
         if _amazon_class.language_supported(_iso_lang):
-            _amazon_class.read(_text, _iso_lang, _visible, _audible, _media_out,
-                               _icon, clip_title, _post_processes[1], _info,
-                               _size, _speech_rate)
+            _amazon_class.read(_text, _iso_lang, _visible, _audible,
+                               _media_out, _icon, clip_title,
+                               _post_processes[1], _info, _size, _speech_rate)
         elif _azure_class.language_supported(_iso_lang):
             _azure_class.read(_text, _iso_lang, _visible, _audible, _media_out,
                               _icon, clip_title, _post_processes[1], _info,
@@ -1192,6 +1226,7 @@ def main():  # -> NoReturn
     _writer = ''
     _size = '600x600'
     _speaker = 'AUTO'
+    _local_url = ''
     _text_file_in = sys.argv[-1]
 
     if os.path.isfile(_text_file_in):
@@ -1199,10 +1234,10 @@ def main():  # -> NoReturn
             usage()
             sys.exit(0)
         try:
-            opts, args = getopt.getopt(sys.argv[1:], 'hovalritndsx', [
-                'help', 'output=', 'visible=', 'audible=', 'language=', 'rate=',
-                'image=', 'title=', 'artist=', 'dimensions=', 'speaker=',
-                'voice='
+            opts, args = getopt.getopt(sys.argv[1:], 'hovalritndsxu', [
+                'help', 'output=', 'visible=', 'audible=', 'language=',
+                'rate=', 'image=', 'title=', 'artist=', 'dimensions=',
+                'speaker=', 'voice=', 'url='
             ])
         except getopt.GetoptError:
             print('option -a not recognized')
@@ -1237,10 +1272,13 @@ def main():  # -> NoReturn
                 _speaker = a
             elif o in ('-x', '--voice'):
                 _speaker = a
+            elif o in ('-u', '--url'):
+                _local_url = a
             else:
                 assert False, 'unhandled option'
         network_main(_text_file_in, _iso_lang, _visible, _audible, _media_out,
-                     _writer, _title, _icon, _size, _speech_rate, _speaker)
+                     _writer, _title, _icon, _size, _speech_rate, _speaker,
+                     _local_url)
     sys.exit(0)
 
 

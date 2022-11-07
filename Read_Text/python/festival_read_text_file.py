@@ -184,13 +184,13 @@ class ReadFestivalClass(object):
 
         self.domain_table = [{
             'package':
-                'american_english',
+            'american_english',
             'sample':
-                'Hello. I am an English system voice.',
+            'Hello. I am an English system voice.',
             'iso_code':
-                'US',
+            'US',
             'lang1':
-                'en',
+            'en',
             'voices': [
                 "us/cmu_us_slt_arctic_hts", "us/cmu_us_slt_cg",
                 "us/cmu_us_awb_arctic_hts", "us/cmu_us_awb_cg",
@@ -209,13 +209,13 @@ class ReadFestivalClass(object):
             ]
         }, {
             'package':
-                'british_english',
+            'british_english',
             'sample':
-                'Hello. I am an English system voice.',
+            'Hello. I am an English system voice.',
             'iso_code':
-                'GB',
+            'GB',
             'lang1':
-                'en',
+            'en',
             'voices': [
                 "english/kal_diphone", "english/ked_diphone",
                 "english/don_diphone", "english/en1_mbrola",
@@ -223,13 +223,13 @@ class ReadFestivalClass(object):
             ]
         }, {
             'package':
-                'english',
+            'english',
             'sample':
-                'Hello. I am an English system voice.',
+            'Hello. I am an English system voice.',
             'iso_code':
-                'GB',
+            'GB',
             'lang1':
-                'en',
+            'en',
             'voices': [
                 "us/cmu_us_slt_arctic_hts", "us/cmu_us_slt_cg",
                 "english/kal_diphone", "english/ked_diphone",
@@ -237,10 +237,14 @@ class ReadFestivalClass(object):
                 "english/gsw_diphone", "english/rab_diphone"
             ]
         }, {
-            'package': 'italian',
-            'sample': 'Ciao. Sono una voce di sistema italiana.',
-            'iso_code': 'IT',
-            'lang1': 'it',
+            'package':
+            'italian',
+            'sample':
+            'Ciao. Sono una voce di sistema italiana.',
+            'iso_code':
+            'IT',
+            'lang1':
+            'it',
             'voices': ["italian/lp_diphone", "italian/pc_diphone"]
         }, {
             'package': 'catalan',
@@ -261,20 +265,25 @@ class ReadFestivalClass(object):
             'lang1': 'ru',
             'voices': ["russian/msu_ru_nsh_clunits"]
         }, {
-            'package': 'finnish',
-            'sample': "Hei. Olen suomalainen järjestelmäääni.",
-            'iso_code': 'FI',
-            'lang1': 'fi',
-            'voices': ["finnish/hy_fi_mv_diphone", "finnish/suo_fi_lj_diphone"]
+            'package':
+            'finnish',
+            'sample':
+            "Hei. Olen suomalainen järjestelmäääni.",
+            'iso_code':
+            'FI',
+            'lang1':
+            'fi',
+            'voices':
+            ["finnish/hy_fi_mv_diphone", "finnish/suo_fi_lj_diphone"]
         }, {
             'package':
-                'czech',
+            'czech',
             'sample':
-                "Ahoj. Jsem český systémový hlas.",
+            "Ahoj. Jsem český systémový hlas.",
             'iso_code':
-                'CZ',
+            'CZ',
             'lang1':
-                'cz',
+            'cz',
             'voices': [
                 "czech/czech_dita", "czech/czech_krb", "czech/czech_machac",
                 "czech/czech_ph"
@@ -305,25 +314,24 @@ class ReadFestivalClass(object):
             'voices': ["telugu/telugu_NSK_diphone"]
         }, {
             'package':
-                'vietnamese',
+            'vietnamese',
             'sample':
-                "Xin chào. Tôi là một giọng nói việt nam.",
+            "Xin chào. Tôi là một giọng nói việt nam.",
             'iso_code':
-                'VN',
+            'VN',
             'lang1':
-                'vi',
-            'voices': [
-                "vietnamese/wow_vi_liz_diphone", "vietnamese/wow_vi_ptn_diphone"
-            ]
+            'vi',
+            'voices':
+            ["vietnamese/wow_vi_liz_diphone", "vietnamese/wow_vi_ptn_diphone"]
         }, {
             'package':
-                'welsh',
+            'welsh',
             'sample':
-                'Helo. Llais system cymraeg ydw i.',
+            'Helo. Llais system cymraeg ydw i.',
             'iso_code':
-                'GB',
+            'GB',
             'lang1':
-                'cy',
+            'cy',
             'voices': [
                 "welsh/cb_cy_llg_diphone",
                 "welsh/cb_cy_cw_diphone",
@@ -348,7 +356,8 @@ class ReadFestivalClass(object):
             ]
         else:
             voice_roots = [
-                '/usr/share/festival/voices/', '/usr/share/festival/lib/voices/'
+                '/usr/share/festival/voices/',
+                '/usr/share/festival/lib/voices/'
             ]
         for _root in voice_roots:
             for _path in _test:
@@ -460,7 +469,8 @@ class ReadFestivalClass(object):
         if not bool(_test_string):
             return None
         if self.punctuation:
-            return str(_test_string.translate(self.punctuation)).split(_divider)
+            return str(_test_string.translate(
+                self.punctuation)).split(_divider)
         for _item in self.replacements:
             _iter = _item
             _test_string = _test_string.replace(

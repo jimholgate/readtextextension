@@ -205,7 +205,9 @@ computer's ability to run system python libraries.
     except ImportError:
         USE_SPEECHD = False
 
-NET_SERVICE_LIST = ['AUTO', 'NETWORK', 'AWS', 'AZURE', 'GOOGLECLOUD', 'GTTS']
+NET_SERVICE_LIST = [
+    'AUTO', 'NETWORK', 'AWS', 'AZURE', 'GOOGLECLOUD', 'GTTS', 'LARYNX'
+]
 
 
 def about_script(player='speech-dispatcher'):  # -> str
@@ -600,7 +602,8 @@ configurations.
                             self.local_json, self.json_content, 'utf-8')
                         retval = net_play(_file_spec, language, i_rate, voice)
                         if not retval:
-                            print(network_read_text_file.network_problem(voice))
+                            print(
+                                network_read_text_file.network_problem(voice))
                         os.remove(self.local_json)
                         return retval
                     return False
@@ -676,17 +679,20 @@ configurations.
                     'karlsson', 'pavoque', 'thorsten', 'eva_k', 'hokuspokus',
                     'kerstin', 'rebecca_braunert_plunkett', 'German'
                 ]
-        elif language in ['en-AS', 'en-PH', 'en-PR', 'en-UM', 'en-US', 'en-VI']:
+        elif language in [
+                'en-AS', 'en-PH', 'en-PR', 'en-UM', 'en-US', 'en-VI'
+        ]:
             if self._switch_to_female(voice):
                 _voice_list = [
                     'Slt', 'cmu_slt', 'Clb', 'cmu_clb', 'ek', 'harvard',
-                    'judy_bieber', 'kathleen', 'ljspeech', 'cmu_eey', 'cmu_ljm',
-                    'cmu_lnh', 'blizzard_lessac', 'mary_ann', 'samantha',
-                    'blizzard_fls', 'southern_english_female', 'cmu_slp', 'Bdl',
-                    'cmu_bdl', 'Alan', 'southern_english_male',
-                    'northern_english_male', 'cmu_ahw', 'cmu_aup', 'cmu_fem',
-                    'cmu_jmk', 'cmu_ksp', 'cmu_rms', 'cmu_rxr',
-                    'scottish_english_male', 'English (America)+female1'
+                    'judy_bieber', 'kathleen', 'ljspeech', 'cmu_eey',
+                    'cmu_ljm', 'cmu_lnh', 'blizzard_lessac', 'mary_ann',
+                    'samantha', 'blizzard_fls', 'southern_english_female',
+                    'cmu_slp', 'Bdl', 'cmu_bdl', 'Alan',
+                    'southern_english_male', 'northern_english_male',
+                    'cmu_ahw', 'cmu_aup', 'cmu_fem', 'cmu_jmk', 'cmu_ksp',
+                    'cmu_rms', 'cmu_rxr', 'scottish_english_male',
+                    'English (America)+female1'
                 ]
             else:
                 _voice_list = [
@@ -694,10 +700,11 @@ configurations.
                     'northern_english_male', 'cmu_ahw', 'cmu_aup', 'cmu_fem',
                     'cmu_jmk', 'cmu_ksp', 'cmu_rms', 'cmu_rxr',
                     'scottish_english_male', 'Clb', 'cmu_clb', 'ek', 'harvard',
-                    'judy_bieber', 'kathleen', 'ljspeech', 'cmu_eey', 'cmu_ljm',
-                    'cmu_lnh', 'Slt', 'cmu_slt', 'blizzard_lessac', 'mary_ann',
-                    'samantha', 'blizzard_fls', 'southern_english_female',
-                    'cmu_slp', 'English (America)+male1'
+                    'judy_bieber', 'kathleen', 'ljspeech', 'cmu_eey',
+                    'cmu_ljm', 'cmu_lnh', 'Slt', 'cmu_slt', 'blizzard_lessac',
+                    'mary_ann', 'samantha', 'blizzard_fls',
+                    'southern_english_female', 'cmu_slp',
+                    'English (America)+male1'
                 ]
         elif language == 'en-IN':
             if self._switch_to_female(voice):
@@ -705,11 +712,12 @@ configurations.
                     'cmu_slp', 'serena', 'blizzard_fls',
                     'southern_english_female', 'blizzard_lessac', 'mary_ann',
                     'Slt', 'cmu_slt', 'Clb', 'cmu_clb', 'ek', 'harvard',
-                    'judy_bieber', 'kathleen', 'ljspeech', 'cmu_eey', 'cmu_ljm',
-                    'cmu_lnh', 'cmu_ahw', 'Alan', 'southern_english_male',
-                    'northern_english_male', 'cmu_aew', 'cmu_aup', 'cmu_fem',
-                    'cmu_jmk', 'cmu_ksp', 'cmu_rms', 'cmu_rxr',
-                    'scottish_english_male', 'Bdl', 'cmu_bdl', 'English+female1'
+                    'judy_bieber', 'kathleen', 'ljspeech', 'cmu_eey',
+                    'cmu_ljm', 'cmu_lnh', 'cmu_ahw', 'Alan',
+                    'southern_english_male', 'northern_english_male',
+                    'cmu_aew', 'cmu_aup', 'cmu_fem', 'cmu_jmk', 'cmu_ksp',
+                    'cmu_rms', 'cmu_rxr', 'scottish_english_male', 'Bdl',
+                    'cmu_bdl', 'English+female1'
                 ]
             else:
                 _voice_list = [
@@ -719,8 +727,9 @@ configurations.
                     'scottish_english_male', 'Bdl', 'cmu_bdl',
                     'blizzard_lessac', 'mary_ann', 'cmu_slp', 'Clb', 'cmu_clb',
                     'ek', 'harvard', 'judy_bieber', 'kathleen', 'ljspeech',
-                    'cmu_eey', 'cmu_ljm', 'cmu_lnh', 'Slt', 'cmu_slt', 'serena',
-                    'blizzard_fls', 'southern_english_female', 'English'
+                    'cmu_eey', 'cmu_ljm', 'cmu_lnh', 'Slt', 'cmu_slt',
+                    'serena', 'blizzard_fls', 'southern_english_female',
+                    'English'
                 ]
         elif language[:2] == 'en':
             if self._switch_to_female(voice):
@@ -876,6 +885,22 @@ configurations.
         return None
 
 
+def app_info_extract(app='say',
+                     tmp_file_name='say.txt',
+                     ask='voice'):  # -> str
+    '''Write app info to a temporary text file, then return the file
+    content.'''
+    _fmd = readtexttools.ImportedMetaData()
+    _remove = False
+    _app_out = readtexttools.get_my_lock(tmp_file_name)
+    if not os.path.isfile(_app_out):
+        os.system('%(app)s --%(ask)s="?" > %(_app_out)s' % locals())
+    if os.path.isfile(_app_out):
+        if os.path.getsize(_app_out) != 0:
+            return _fmd.meta_from_file(_app_out, _remove)
+    return ''
+
+
 class SayFormats(object):
     '''
     MacOS voices
@@ -904,61 +929,344 @@ class SayFormats(object):
         Def that initializes characteristics of the installed version
         of say.
             '''
+        self.debug = 0
         s1 = ''
         self._i = ''
         self._f = ''
         self.is_mac = os.path.isfile('/usr/bin/say')
         # On MacOS systems, we specify the complete path`/usr/bin/say`.
+        # Modify default word rate for a voice using last column in
+        # the spd_table
+        try:
+            self.uname_major_ver = int(os.uname().release.split('.')[0])
+        except [AttributeError, IndexError, ValueError]:
+            self.uname_major_ver = 0
+        self.word_rate = 135
         self.app = ''
         self.lock = readtexttools.get_my_lock("lock")
+        self.always = -1
+        self.premium = 4
+        self.osx_11_13 = 3
+        self.osx_13 = 2
+        self.old = 1
+        if self.uname_major_ver > 21:
+            self.editions = [self.osx_13, self.osx_11_13, self.always]
+        else:
+            self.editions = [self.old, self.osx_11_13, self.always]
+        self.spd_table = [
+            ['Alex', 'en_US', self.always, 'MALE1', 135],
+            ['Daniel', 'en_GB', self.osx_11_13, 'MALE1', 135],
+            ['Juan', 'es_MX', self.old, 'MALE1', 135],
+            ['Jorge', 'es_ES', self.old, 'MALE1', 135],
+            ['Diego', 'es_AR', self.old, 'MALE1', 135],
+            ['Eddy (Finnish (Finland))', 'fi_FI', self.osx_13, 'MALE1', 135],
+            ['Eddy (French (Canada))', 'fr_CA', self.osx_13, 'MALE1', 135],
+            ['Eddy (German (Germany))', 'de_DE', self.osx_13, 'MALE1', 135],
+            ['Eddy (Italian (Italy))', 'it_IT', self.osx_13, 'MALE1', 135],
+            ['Eddy (Spanish (Mexico))', 'es_MX', self.osx_13, 'MALE1', 135],
+            ['Eddy (Spanish (Spain))', 'es_ES', self.osx_13, 'MALE1', 135],
+            ['Luca', 'it_IT', self.old, 'MALE1', 135],
+            ['Maged', 'ar_SA', self.old, 'MALE1', 135],
+            ['Rishi', 'en_IN', self.osx_13, 'MALE1', 135],
+            ['Samantha', 'en_US', self.osx_11_13, 'FEMALE1', 135],
+            ['Serena', 'en_GB', self.osx_13, 'FEMALE1', 135],
+            ['Thomas', 'fr_FR', self.osx_11_13, 'MALE1', 135],
+            ['Xander', 'nl_NL', self.osx_11_13, 'MALE1', 135],
+            ['Yelda', 'tr_TR', self.osx_11_13, 'MALE1', 135],
+            ['Yuri', 'ru_RU', self.old, 'MALE1', 135],
+            ['Alice', 'it_IT', self.osx_11_13, 'FEMALE1', 135],
+            ['Alva', 'sv_SE', self.osx_11_13, 'FEMALE1', 135],
+            ['Amelie', 'fr_CA', self.old, 'FEMALE1', 135],
+            ['Amélie', 'fr_CA', self.osx_13, 'FEMALE1', 135],
+            ['Anna', 'de_DE', self.osx_11_13, 'FEMALE1', 135],
+            ['Carmit', 'he_IL', self.osx_11_13, 'FEMALE1', 135],
+            ['Ellen', 'nl_BE', self.osx_11_13, 'FEMALE1', 135],
+            ['Flo (French (France))', 'fr_FR', self.osx_13, 'FEMALE1', 135],
+            ['Flo (Spanish (Mexico))', 'es_MX', self.osx_13, 'FEMALE1', 135],
+            ['Ioana', 'ro_RO', self.osx_11_13, 'FEMALE1', 135],
+            ['Kanya', 'th_TH', self.osx_11_13, 'FEMALE1', 135],
+            ['Karen', 'en_AU', self.old, 'FEMALE1', 135],
+            ['Kyoko', 'ja_JP', self.osx_11_13, 'FEMALE1', 135],
+            ['Laura', 'sk_SK', self.osx_11_13, 'FEMALE1', 135],
+            ['Lekha', 'hi_IN', self.osx_11_13, 'FEMALE1', 135],
+            ['Luciana', 'pt_BR', self.osx_11_13, 'FEMALE1', 135],
+            ['Mariska', 'hu_HU', self.old, 'FEMALE1', 135],
+            ['Mei-Jia', 'zh_TW', self.old, 'FEMALE1', 135],
+            ['Melina', 'el_GR', self.osx_11_13, 'FEMALE1', 135],
+            ['Milena', 'ru_RU', self.osx_11_13, 'FEMALE1', 135],
+            ['Moira', 'en_IE', self.osx_11_13, 'FEMALE1', 135],
+            ['Monica', 'es_ES', self.old, 'FEMALE1', 135],
+            ['Mónica', 'es_ES', self.osx_13, 'FEMALE1', 135],
+            ['Nora', 'nb_NO', self.osx_11_13, 'FEMALE1', 135],
+            ['Paulina', 'es_MX', self.osx_11_13, 'FEMALE1', 135],
+            ['Paulina', 'es_MX', self.osx_11_13, 'FEMALE1', 135],
+            ['Sara', 'da_DK', self.osx_11_13, 'FEMALE1', 135],
+            ['Satu', 'fi_FI', self.osx_11_13, 'FEMALE1', 135],
+            ['Sin-ji', 'zh_HK', self.old, 'FEMALE1', 135],
+            ['Tessa', 'en_ZA', self.osx_11_13, 'FEMALE1', 135],
+            ['Ting-Ting', 'zh_CN', self.old, 'FEMALE1', 135],
+            ['Veena', 'en_IN', self.osx_11_13, 'FEMALE1', 135],
+            ['Yuna', 'ko_KR', self.osx_11_13, 'FEMALE1', 135],
+            ['Zosia', 'pl_PL', self.osx_11_13, 'FEMALE1', 135],
+            ['Zuzana', 'cs_CZ', self.osx_11_13, 'FEMALE1', 135],
+            ['Eddy (English (U.S.))', 'en_US', self.osx_13, 'MALE2', 135],
+            ['Grandpa (English (U.S.))', 'en_US', self.osx_13, 'MALE3', 135],
+            ['Reed (English (U.S.))', 'en_US', self.osx_13, 'MALE4', 135],
+            ['Rocko (English (U.S.))', 'en_US', self.osx_13, 'MALE5', 135],
+            ['Bruce', 'en_US', self.osx_13, 'MALE6', 135],
+            ['Fred', 'en_US', self.osx_13, 'MALE7', 135],
+            ['Ralph', 'en_US', self.osx_13, 'MALE8', 135],
+            ['Junior', 'en_US', self.osx_13, 'CHILD_MALE', 135],
+            ['Superstar', 'en_US', self.osx_13, 'CHILD_FEMALE2', 135],
+            ['Flo (English (U.S.))', 'en_US', self.osx_13, 'FEMALE2', 135],
+            ['Grandma (English (U.S.))', 'en_US', self.osx_13, 'FEMALE3', 135],
+            ['Shelley (English (U.S.))', 'en_US', self.osx_13, 'FEMALE4', 135],
+            [
+                'Sandy (English (U.S.))', 'en_US', self.osx_13, 'CHILD_FEMALE',
+                135
+            ],
+            ['Oliver', 'en_GB', self.osx_11_13, 'MALE2', 135],
+            ['Flo (German (Germany))', 'de_DE', self.osx_13, 'FEMALE2', 135],
+            [
+                'Grandma (German (Germany))', 'de_DE', self.osx_13, 'FEMALE3',
+                135
+            ],
+            [
+                'Shelley (German (Germany))', 'de_DE', self.osx_13, 'FEMALE4',
+                135
+            ],
+            [
+                'Sandy (German (Germany))', 'de_DE', self.osx_13,
+                'CHILD_FEMALE', 135
+            ],
+            ['Grandpa (German (Germany))', 'de_DE', self.osx_13, 'MALE2', 135],
+            ['Reed (German (Germany))', 'de_DE', self.osx_13, 'MALE3', 135],
+            ['Rocko (German (Germany))', 'de_DE', self.osx_13, 'MALE4', 135],
+            ['Flo (English (U.K.))', 'en_GB', self.osx_13, 'FEMALE2', 135],
+            ['Grandma (English (U.K.))', 'en_GB', self.osx_13, 'FEMALE3', 135],
+            ['Kate', 'en_GB', self.osx_13, 'FEMALE4', 135],
+            [
+                'Sandy (English (U.K.))', 'en_GB', self.osx_13, 'CHILD_FEMALE',
+                135
+            ],
+            ['Albert', 'en_US', self.osx_13, 'NOVELTY1',
+             135],  # You can use a novelty
+            ['Bad_News', 'en_US', self.osx_13, 'NOVELTY2',
+             135],  # voice for comedy or to
+            ['Bahh', 'en_US', self.osx_13, 'NOVELTY3',
+             135],  # alert a local user of
+            ['Bells', 'en_US', self.osx_13, 'NOVELTY4',
+             135],  # problems or to request
+            ['Boing', 'en_US', self.osx_13, 'NOVELTY5',
+             135],  # immediate action.
+            ['Bubbles', 'en_US', self.osx_13, 'NOVELTY6', 135],
+            ['Cellos', 'en_US', self.osx_13, 'NOVELTY7', 135],
+            ['Good_News', 'en_US', self.osx_13, 'NOVELTY8', 135],
+            ['Jester', 'en_US', self.osx_13, 'NOVELTY9', 135],
+            ['Kathy', 'en_US', self.osx_13, 'NOVELTY10', 135],
+            ['Organ', 'en_US', self.osx_13, 'NOVELTY12', 135],
+            ['Trinoids', 'en_US', self.osx_13, 'NOVELTY13', 135],
+            ['Whisper', 'en_US', self.osx_13, 'NOVELTY14', 135],
+            ['Wobble', 'en_US', self.osx_13, 'NOVELTY15', 135],
+            ['Zarvox', 'en_US', self.osx_13, 'NOVELTY16', 135],
+            ['Flo (Spanish (Spain))', 'es_ES', self.osx_13, 'FEMALE2', 135],
+            [
+                'Grandma (Spanish (Spain))', 'es_ES', self.osx_13, 'FEMALE3',
+                135
+            ],
+            [
+                'Shelley (Spanish (Spain))', 'es_ES', self.osx_13, 'FEMALE4',
+                135
+            ],
+            [
+                'Sandy (Spanish (Spain))', 'es_ES', self.osx_13,
+                'CHILD_FEMALE', 135
+            ],
+            ['Grandpa (Spanish (Spain))', 'es_ES', self.osx_13, 'MALE2', 135],
+            ['Reed (Spanish (Spain))', 'es_ES', self.osx_13, 'MALE3', 135],
+            ['Rocko (Spanish (Spain))', 'es_ES', self.osx_13, 'MALE4', 135],
+            [
+                'Grandma (Spanish (Mexico))', 'es_MX', self.osx_13, 'FEMALE2',
+                135
+            ],
+            [
+                'Shelley (Spanish (Mexico))', 'es_MX', self.osx_13, 'FEMALE3',
+                135
+            ],
+            [
+                'Sandy (Spanish (Mexico))', 'es_MX', self.osx_13,
+                'CHILD_FEMALE', 135
+            ],
+            ['Grandpa (Spanish (Mexico))', 'es_MX', self.osx_13, 'MALE2', 135],
+            ['Reed (Spanish (Mexico))', 'es_MX', self.osx_13, 'MALE3', 135],
+            ['Rocko (Spanish (Mexico))', 'es_MX', self.osx_13, 'MALE4', 135],
+            [
+                'Grandma (French (France))', 'fr_FR', self.osx_13, 'FEMALE2',
+                135
+            ],
+            [
+                'Shelley (French (France))', 'fr_FR', self.osx_13, 'FEMALE3',
+                135
+            ],
+            [
+                'Sandy (French (France))', 'fr_FR', self.osx_13,
+                'CHILD_FEMALE', 135
+            ],
+            ['Jacques', 'fr_FR', self.osx_13, 'MALE2', 135],
+            ['Eddy (French (France))', 'fr_FR', self.osx_13, 'MALE3', 135],
+            ['Grandpa (French (France))', 'fr_FR', self.osx_13, 'MALE4', 135],
+            ['Rocko (French (France))', 'fr_FR', self.osx_13, 'MALE5', 135],
+            ['Flo (French (Canada))', 'fr_CA', self.osx_13, 'FEMALE2', 135],
+            [
+                'Grandma (French (Canada))', 'fr_CA', self.osx_13, 'FEMALE3',
+                135
+            ],
+            [
+                'Shelley (French (Canada))', 'fr_CA', self.osx_13, 'FEMALE4',
+                135
+            ],
+            [
+                'Sandy (French (Canada))', 'fr_CA', self.osx_13,
+                'CHILD_FEMALE', 135
+            ],
+            ['Grandpa (French (Canada))', 'fr_CA', self.osx_13, 'MALE2', 135],
+            ['Reed (French (Canada))', 'fr_CA', self.osx_13, 'MALE3', 135],
+            ['Rocko (French (Canada))', 'fr_CA', self.osx_13, 'MALE4', 135],
+            ['Flo (Finnish (Finland))', 'fi_FI', self.osx_13, 'FEMALE2', 135],
+            [
+                'Grandma (Finnish (Finland))', 'fi_FI', self.osx_13, 'FEMALE3',
+                135
+            ],
+            [
+                'Sandy (Finnish (Finland))', 'fi_FI', self.osx_13,
+                'CHILD_FEMALE', 135
+            ],
+            [
+                'Shelley (Finnish (Finland))', 'fi_FI', self.osx_13, 'FEMALE2',
+                135
+            ],
+            [
+                'Grandpa (Finnish (Finland))', 'fi_FI', self.osx_13, 'MALE2',
+                135
+            ],
+            ['Reed (Finnish (Finland))', 'fi_FI', self.osx_13, 'MALE3', 135],
+            ['Rocko (Finnish (Finland))', 'fi_FI', self.osx_13, 'MALE4', 135],
+            ['Flo (Italian (Italy))', 'it_IT', self.osx_13, 'FEMALE2', 135],
+            [
+                'Grandma (Italian (Italy))', 'it_IT', self.osx_13, 'FEMALE3',
+                135
+            ],
+            [
+                'Shelley (Italian (Italy))', 'it_IT', self.osx_13, 'FEMALE4',
+                135
+            ],
+            [
+                'Sandy (Italian (Italy))', 'it_IT', self.osx_13,
+                'CHILD_FEMALE', 135
+            ],
+            ['Grandpa (Italian (Italy))', 'it_IT', self.osx_13, 'MALE2', 135],
+            ['Reed (Italian (Italy))', 'it_IT', self.osx_13, 'MALE3', 135],
+            ['Rocko (Italian (Italy))', 'it_IT', self.osx_13, 'MALE4', 135],
+            [
+                'Flo (Portuguese (Brazil))', 'pt_BR', self.osx_13, 'FEMALE2',
+                135
+            ],
+            [
+                'Grandma (Portuguese (Brazil))', 'pt_BR', self.osx_13,
+                'FEMALE3', 135
+            ],
+            [
+                'Shelley (Portuguese (Brazil))', 'pt_BR', self.osx_13,
+                'FEMALE4', 135
+            ],
+            [
+                'Sandy (Portuguese (Brazil))', 'pt_BR', self.osx_13,
+                'CHILD_FEMALE', 135
+            ],
+            ['Eddy (Portuguese (Brazil))', 'pt_BR', self.osx_13, 'MALE2', 135],
+            [
+                'Grandpa (Portuguese (Brazil))', 'pt_BR', self.osx_13, 'MALE3',
+                135
+            ],
+            ['Reed (Portuguese (Brazil))', 'pt_BR', self.osx_13, 'MALE4', 135],
+            [
+                'Rocko (Portuguese (Brazil))', 'pt_BR', self.osx_13, 'MALE5',
+                135
+            ],
+            ['Fiona', 'en-GB', self.old, 'FEMALE2', 135],
+            ['Fred', 'en_US', self.old, 'MALE2', 135],
+            ['Lee', 'en_AU', self.premium, 'lee/male', 136],
+            ['Fiona', 'en-GB', self.premium, 'fiona/female', 136],
+        ]
+        # You could parse a list of currently available premium voice settings:
+        #
+        #     plutil -convert json ~/Library/Preferences/com.apple.speech.voice.prefs.plist -o ~/Desktop/voices.json
+        #
+        # + Is the added latency acceptable?
+        # + Are errors possible when using a dynamically updated file?
+        # + Is the data private to MacOS? (i. e. The format changes over time)
+        #
+        # See <https://github.com/mklement0/voices/blob/master/bin/voices>
         if self.is_mac:
             self.app = 'say'
             if os.path.isfile('/usr/bin/say'):
                 self.app = '/usr/bin/say'
+            _app = self.app
             try:
-                s1 = (subprocess.check_output(''.join(
-                    [self.app, ' --voice="?"']),
+                s1 = (subprocess.check_output('%(_app)s  --voice="?"' %
+                                              locals(),
                                               shell=True))
                 # Python 3 : a bytes-like
                 # object is required
                 self._i = codecs.decode(s1, 'utf-8')
-            except Exception:
-                self._i = ''
-                # We may need to use sample values, if the local
-                # `say -v?` command returns nothing.
-                s1 = ''
-        if len(self._i) == 0:
-            self._i = ('''
-Alex                en_US    # [[pbas -6]][[rate -40]] Stop, Dave.[[pbas -6]][[rate -40]My mind is going.
-Amelie              fr_CA    # Salut! On m’appelle  Amelie. J’utilise une voix québécoise.
-Audrey              fr_FR    # Bonjour, je m’appelle Audrey. J’utilise une voix française.
-Felix               fr_CA    # Salut! On m’appelle Felix. J’utilise une voix canadienne.
-Fred                en_US    # I'm Fred and I truly enjoy living inside this chic aluminum box.
-Samantha            en_US    # Hi, my name is Samantha. I use an American-English voice.
-Thomas              fr_FR    # Bonjour, je m’appelle Thomas. J’utilise une voix française.
-Victoria            en_US    # Isn't it great to use a computer that can talk to you?
-Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une voix française.
-                ''')
-        self._a1 = self._i.split('\n')
+            except TypeError:
+                self._i = app_info_extract(self.app, 'say.txt', 'voice')
+        if len(self._i.strip()) == 0:
+            self._i = ''
+            for _item in self.spd_table:
+                _name = _item[0]
+                _locale = _item[1]
+                _edition_check = _item[2]
+                _spd_voice = _item[3]
+                if _edition_check in self.editions:
+                    self._i = '\n'.join([
+                        self._i,
+                        '%(_name)s           %(_locale)s     # %(_spd_voice)s'
+                        % locals()
+                    ])
+                if bool(self.debug):
+                    if _edition_check in [self.premium]:
+                        _edition = str(_edition_check)
+                        print(
+                            "'['%(_name)s', '%(_locale)s', %(_edition)s, '%(_spd_voice)s'],  # testing"
+                            % locals())
+            self._i = self._i.strip()
+        self._a1 = self._i.strip().split('\n')
         s1 = ''
         self._a2 = []
+        _div = 11 * " "
+        # Handle long voice names like `Shelley (Portuguese (Brazil))`
+        self._i = self._i.strip().replace(') ',
+                                          ')%(_div)s' % locals()).replace(
+                                              '# ', '%(_div)s' % locals())
         for line in self._i.splitlines():
-            self._a2.append(tuple(line.split("           ")))
-
+            _item1 = tuple(line.split(_div))
+            if len(_item1) == 3:
+                self._a2.append(_item1)
+            else:
+                _line = line
+                print('''INFO: `say` said `%(_line)s`''' % locals())
         if self.is_mac:
             try:
                 s1 = (subprocess.check_output(''.join(
-                    [self.app, " --file-format=? "]),
+                    [self.app, " --file-format='?' "]),
                                               shell=True))
                 # Python 3 : a bytes-like
                 # object is required
                 self._f = codecs.decode(s1, 'utf-8')
-            except:
-                # We may need to use sample values, if the local
-                # `say --file-format=?` command
-                # returns nothing.
-                s1 = ''
-                self._f = ''
+            except TypeError:
+                self._f = app_info_extract(self.app, 'say_f.txt',
+                                           'file-format')
         if len(self._f) == 0:
             if os.name == 'nt':
                 self._f = ("                           (,) []\n")
@@ -990,10 +1298,59 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         s1 = self._getlanguagecountry(inti)
         return s1.split('-')[0].lower()
 
+    def spd_voice_to_say_voice(self,
+                               _spd_voice='FEMALE1',
+                               _lang='en-US'):  # -> str
+        '''Given a voice in speechd request format, tries to return a
+        matching MacOS voice.'''
+        _match_list = ['CHILD'[:4], 'FEMALE1'[:4], 'MALE1'[:4], 'NOVELTY'[:4]]
+        if not _spd_voice.upper()[:4] in _match_list:
+            return _spd_voice
+        _lang = _lang.replace('-', '_').split('.')[0]
+        _i_say = 0
+        _i_lang = 1
+        _i_edition = 2
+        _i_spd = 3
+        _i_word_rate = 4
+        _spd_voice = _spd_voice.upper().strip(' \'"\t')
+        _spd_root = ''.join(
+            [readtexttools.remove_unsafe_chars(_spd_voice, '1234567890')])
+        _index = 1
+        try:
+            # `NOVELTY010` -> `NOVELTY10`
+            if not _spd_voice == _spd_root:
+                _index = int(_spd_voice.replace(_spd_root, '0'))
+        except [TypeError, ValueError]:
+            pass
+        _spd_voices = [
+            ''.join([_spd_root, str(_index)]),
+            ''.join([_spd_root, '1']),
+        ]
+        _display_lang = _lang.replace('_', '-')
+        _alt_lang = ''.join([_lang.split('_')[0], '_'])
+        if ' %(_lang)s ' % locals() in self._i:
+            _langs = [_lang]
+        else:
+            _langs = [_alt_lang]
+        for _lang_string in _langs:
+            for _voice in _spd_voices:
+                for _list in self.spd_table:
+                    if _list[_i_lang].startswith(_lang_string):
+                        if _list[_i_spd] == _voice:
+                            if _list[_i_edition] in self.editions:
+                                _say_voice = _list[_i_say]
+                                _spd_voice = _list[_i_spd]
+                                self.word_rate = _list[_i_word_rate]
+                                print(
+                                    "['%(_spd_voice)s', '%(_display_lang)s', '%(_say_voice)s']"
+                                    % locals())
+                                return _say_voice
+        return ''
+
     def _getsamplephrase(self, inti):
         s1 = ''
         try:
-            s1 = self._a2[inti][1].split('#')[1].strip()
+            s1 = self._a2[inti][2].strip()
         except:
             s1 = ''
         return s1
@@ -1017,7 +1374,11 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
 
         **Example 2**: `mydata.languagecountry('Ailani')` returns ""
         because no voice called "Ailani" is supported on any version
-        of say.'''
+        of say.
+        
+        Note: If this python cannot read `say` output, then this tool
+        returns a generated string like `MALE1` or `FEMALE3`.
+        '''
         s1 = filterinputs(s0).upper()
         s2 = ''
         s3 = ''
@@ -1076,13 +1437,16 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         m_rate = ''
         if bool(i_rate):
             try:
-                if i_rate < 0:
-                    m_rate = ' -r 110'
-                elif i_rate != 0:
-                    m_rate = ' -r 240'
+                if i_rate < .25:
+                    m_rate = ' -r 32'  # 110
+                elif i_rate > 3:
+                    m_rate = ' -r 350'
+                else:
+                    _wpm = str(int(i_rate * self.word_rate))
+                    m_rate = ' -r %(_wpm)s' % locals()
             except:
                 pass
-        if _voice in ['Agnes', 'Albert']:
+        if _voice in ['Agnes', 'Albert', 'Lee']:
             _voice = "Alex"
         return m_rate, _voice
 
@@ -1100,35 +1464,40 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         _speaker_conf = [self._i_rate_voice(i_rate, _voice)]
         m_rate = _speaker_conf[0][0]
         _voice = _speaker_conf[0][1]
-        try:
-            # We need to use subprocess here, because we want to test for
-            # `CalledProcessError`.
-            v_tag = '-v '
-            if len(_voice) == 0:
-                return False
-            readtexttools.lock_my_lock()
-            _command = ''.join([
-                self.app,
-                "%(m_rate)s %(v_tag)s%(_voice)s -f '%(_file_spec)s'" % locals()
-            ])
-            s1 = (subprocess.check_output(_command, shell=True))
-            readtexttools.unlock_my_lock()
-            return len(s1) == 0
-        except TypeError:
-            # fork_exec() takes exactly 21 arguments (17 given)
-            try:
-                os.system(_command)
+        v_tag = '-v '
+        if len(_voice) == 0:
+            v_tag = ''
+        if 'm4af  Apple MPEG-4 Audio' in self._f:
+            _media_test = readtexttools.get_my_lock('say.m4a')
+        else:
+            _media_test = readtexttools.get_my_lock('say.aiff')
+
+        _app = self.app
+        _command = "%(_app)s %(m_rate)s %(v_tag)s'%(_voice)s' -f '%(_file_spec)s'" % locals(
+        )
+        _base_command = "%(_app)s  -f '%(_file_spec)s'" % locals()
+        _test_command = "%(_app)s %(m_rate)s -v '%(_requested_voice)s' -o '%(_media_test)s' '1 2 3'" % locals(
+        )
+        if len(_voice) == 0:
+            os.system(_test_command)
+            if os.path.isfile(_media_test):
+                os.remove(_media_test)
+                _command = "%(_app)s %(m_rate)s -v '%(_requested_voice)s' -f '%(_file_spec)s'" % locals(
+                )
+            else:
                 readtexttools.unlock_my_lock()
-                return True
-            except:
-                print('Cannot execute command: `%(_command)s`' % locals())
                 return False
-        except subprocess.CalledProcessError:
-            # You clicked a button to cancel reading aloud, so `killall` stopped
-            # the running process, with a `subprocess.CalledProcessError` here.
-            # Let's tidy up for the next run.
+        if bool(self.debug):
+            print(['=' * 75, '\n', _command, '=' * 75])
+        try:
+            _result = os.system(_command)
+            if bool(_result):
+                _result = os.system(_base_command)
             readtexttools.unlock_my_lock()
-            return False
+            return not bool(_result)
+        except:
+            print('Cannot execute command: `%(_command)s`' % locals())
+        return False
 
     def save_audio(self,
                    _file_spec='',
@@ -1151,7 +1520,8 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
             return False
         m_rate = ''
         v_tag = '-v '
-
+        if len(_voice) == 0:
+            v_tag = ''
         _error_icon = readtexttools.net_error_icon()
         _speech_rate = readtexttools.safechars(i_rate, '1234567890')
         _speaker_conf = [self._i_rate_voice(_speech_rate, _voice)]
@@ -1173,7 +1543,7 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
         if os.path.isfile(_media_out):
             os.remove(_media_out)
         _app = self.app
-        _command = "%(_app)s%(m_rate)s %(v_tag)s%(_voice)s -o '%(_media_work)s' -f '%(_file_spec)s' " % locals(
+        _command = "%(_app)s %(m_rate)s %(v_tag)s'%(_voice)s' -o '%(_media_work)s' -f '%(_file_spec)s' " % locals(
         )
         try:
             readtexttools.my_os_system(_command)
@@ -1278,9 +1648,8 @@ Virginie            fr_FR    # Bonjour, je m’appelle Virginie. J’utilise une
 def main():
     '''Command line speech-dispatcher tool. Some implimentations of python
     require the long command line switch'''
-
     _xml_tool = readtexttools.XmlTransform()
-    __file_spec = sys.argv[-1]
+    _file_spec = sys.argv[-1]
     _txt = ''
     i_rate = 0
     _language = ''
@@ -1298,7 +1667,7 @@ def main():
     if not _language:
         _language = 'en'
     concise_lang = _language[:2].lower()
-    if not os.path.isfile(__file_spec):
+    if not os.path.isfile(_file_spec):
         print("I was unable to find the text file you specified!")
         usage()
         sys.exit(0)
@@ -1330,29 +1699,53 @@ def main():
             _voice = a
         elif o in ("-r", "--rate"):
             try:
-                i_rate = int(a)
+                if a.endswith('%'):
+                    i_rate = (int(readtexttools.remove_unsafe_chars(a)) * 0.01)
+                else:
+                    i_rate = int(readtexttools.remove_unsafe_chars(a))
             except ValueError:
-                pass
+                i_rate = 0
         else:
             assert False, "unhandled option"
 
     if os.path.isfile('/usr/bin/say'):
         _say_formats = SayFormats()
         mac_reader = _say_formats.voice(_language)
+        _voice = _say_formats.spd_voice_to_say_voice(_voice, _language)
         if bool(_voice):
             for line in _say_formats._a1:
                 if line.startswith('%(_voice)s ' % locals()):
                     mac_reader = _voice
                     break
         if len(_output) == 0:
-            if not _say_formats.say_aloud(__file_spec, mac_reader, _voice,
-                                          i_rate):
+            resultat = _say_formats.say_aloud(_file_spec, mac_reader, _voice,
+                                              i_rate)
+            if not resultat:
                 if _voice in NET_SERVICE_LIST:
-                    if not net_play(__file_spec, _language, i_rate, _voice):
+                    if not net_play(_file_spec, _language, i_rate, _voice):
                         print(network_read_text_file.network_problem(_voice))
         else:
-            _say_formats.save_audio(__file_spec, mac_reader, i_rate, _output,
-                                    False, False)
+            if not _say_formats.save_audio(_file_spec, mac_reader, i_rate,
+                                           _output, False, False):
+                if len(_language) != 0:
+                    try:
+                        _ext = os.path.splitext(_output)[1]
+                    except IndexError:
+                        _ext = ''
+                    if _voice in NET_SERVICE_LIST:
+                        if not network_read_text_file.network_main(
+                                _file_spec, _language, 'false', 'false',
+                                _output, '', '', '', '600x600', i_rate, _voice,
+                                ''):
+                            readtexttools.pop_message(
+                                'Network : Spoken content',
+                                'No `%(_language)s` voice\n%(_voice)s: No `%(_ext)s` audio exported.'
+                                % locals())
+                    else:
+                        readtexttools.pop_message(
+                            'Accessibility : Spoken content',
+                            'No `%(_language)s` voice\nNo `%(_ext)s` audio exported.'
+                            % locals())
         sys.exit(0)
     elif os.name in ['posix']:
         if not USE_SPEECHD:
@@ -1372,8 +1765,8 @@ restart your computer.''')
             usage()
             sys.exit(0)
         _testing = False
-        if not _spd_formats.speak_spd(_output_module, _language, _voice, i_rate,
-                                      __file_spec):
+        if not _spd_formats.speak_spd(_output_module, _language, _voice,
+                                      i_rate, _file_spec):
             # Error - Try resetting `speechd`
             hard_reset('speech-dispatcher')
     sys.exit(0)

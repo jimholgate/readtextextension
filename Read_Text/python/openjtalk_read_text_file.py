@@ -79,8 +79,10 @@ Usage
      openjtalk_read_text_file.py --audible "false" --output "output.wav"
        "input.txt" ''')
 
+
 class OpenJTalkClass(object):
     '''Japanese language text to speech'''
+
     def __init__(self):
         '''Defaults'''
         self.app = 'open_jtalk'
@@ -130,9 +132,11 @@ class OpenJTalkClass(object):
             if not (os.path.isfile(resource) or os.path.isdir(resource)):
                 return False
         # Determine the output file name
-        _out_file = readtexttools.get_work_file_path(_media_file, _image, 'OUT')
+        _out_file = readtexttools.get_work_file_path(_media_file, _image,
+                                                     'OUT')
         # Determine the temporary file name
-        _work_file = readtexttools.get_work_file_path(_media_file, _image, 'TEMP')
+        _work_file = readtexttools.get_work_file_path(_media_file, _image,
+                                                      'TEMP')
         # Delete old versions
         if os.path.isfile(_work_file):
             os.remove(_work_file)
@@ -147,8 +151,9 @@ class OpenJTalkClass(object):
                 if os.path.getsize(_work_file) == 0:
                     return False
                 if readtexttools.process_wav_media(_title, _work_file, _image,
-                                                _out_file, _audible, _visible,
-                                                _artist, _dimensions):
+                                                   _out_file, _audible,
+                                                   _visible, _artist,
+                                                   _dimensions):
                     return True
         except IOError:
             print('`openjtalk_read_text_file.py` was unable to read!')
@@ -212,9 +217,9 @@ def main():  # -> NoReturn
 
         _artist_ok = readtexttools.check_artist(_artist)
         _title_ok = readtexttools.check_title(_title, "open_jtalk")
-        _open_jtalk.openjtalk_read(_file_path, _language, _visible,
-                                   _audible, _output,_image, _title_ok,
-                                   _artist_ok, _dimensions)
+        _open_jtalk.openjtalk_read(_file_path, _language, _visible, _audible,
+                                   _output, _image, _title_ok, _artist_ok,
+                                   _dimensions)
     else:
         print('I was unable to find the file you specified!')
     sys.exit(0)

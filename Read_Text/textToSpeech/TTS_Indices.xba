@@ -1725,29 +1725,61 @@ Function fsGetHomeDir() As String
 End Function
 
 
-Function fsGetMacOS11Voice() As String
+Function fbIsLegacyMac() As Boolean
+	&apos; The `environ(&quot;LANG&quot;)` command doesn&apos;t work on MacOS 11, so the
+	&apos; script can&apos;t use the system `LANG` value to guess your language.
+	&apos; See also: `fsGetMyTunesApp()`
+	Dim _env As String
+	_env = Environ(&quot;LANG&quot;)
+	Select Case Len(_env)
+		Case 0
+		fbIsLegacyMac = True
+		Case Else
+		fbIsLegacyMac = False
+	End Select
+End Function
+
+
+Function fvGetIsoLangArray() As Variant
+	&apos; Returns an array of ISO strings from specific to
+	&apos; non-specific.
+	Dim _env As String
+
+	If fbIsLegacyMac() Then
+		_env = &quot;en-US&quot;
+	Else
+		_env = fsReplaceText(_
+		fsReplaceText(_
+		_env, &quot;.UTF-8&quot;, &quot;&quot;), &quot;_&quot;, &quot;-&quot;)
+	End If
+	fvGetIsoLangArray = Array(_
+	fsSelectionLanguageAndRegion(True),_
+	fsSelectionLanguage(),_
+	fsDocLanguage() &amp; &quot;-&quot; &amp; fsDocCountry(),_
+	fsDocLanguage(),_
+	fsGetLanguage() &amp; &quot;-&quot; &amp; fsGetCountry(),_
+	fsGetLanguage(),_
+	_env)
+End Function
+
+
+Function fsGetMacOsBaseVoice() As String
 	&apos; Most MacOS voice codes resemble ISO conventions, but some idioms
 	&apos; like Scottish English and Hong Kong Cantonese are different.
-	&apos; `say --voice=&quot;?&quot;` generated this list of voices using MacOS 11.5.2
+	&apos; `say --voice &quot;?&quot;` generated this list of voices using MacOS 11.5.2
 	&apos; (en-US) on 2021-09-09. You might be able to change the default voice
 	&apos; for your region by adding your language and region code to the
 	&apos; case options. For example, if your region is `en-SG`, you might
 	&apos; prefer Daniel&apos;s voice instead of Alex&apos;s voice as a default.
-	&apos; The BASIC `environ()` command doesn&apos;t work on MacOS 11, so the
-	&apos; script can&apos;t use the system `LANG` value to guess your language.
 	Dim n As Integer
 	n = 0
 	Dim s1$
 	s1 = &quot;&quot;
-	Dim a1(7) As String
-	a1(0) = fsSelectionLanguageAndRegion(True)
-	a1(1) = fsSelectionLanguage()
-	a1(2) = fsDocLanguage() &amp; &quot;-&quot; &amp; fsDocCountry()
-	a1(3) = fsDocLanguage()
-	a1(4) = fsGetLanguage() &amp; &quot;-&quot; &amp; fsGetCountry()
-	a1(5) = fsGetLanguage()
-	a1(6) = &quot;en-US&quot;
-	
+	Dim a1() As Variant
+	a1 = fvGetIsoLangArray()
+	Dim bIsLegacyMac As Boolean
+	bIsLegacyMac = fbIsLegacyMac()
+
 	For n = 0 To 3
 		Select Case a1(n)
 			Case &quot;ar-SA&quot;,&quot;ar&quot;
@@ -1803,7 +1835,11 @@ Function fsGetMacOS11Voice() As String
 			Case &quot;tr-TR&quot;,&quot;tr&quot;
 			s1 = &quot;Yelda&quot;
 			Case &quot;zh-CN&quot;,&quot;zh-SG&quot;, &quot;zh-CHS&quot;, &quot;zh&quot;
-			s1 = &quot;Ting-Ting&quot;
+			If bIsLegacyMac Then
+				s1 = &quot;Ting-Ting&quot;
+			Else
+				s1 = &quot;Tingting&quot;
+			End If
 			Case &quot;en-AU&quot;
 			s1 = &quot;Karen&quot;
 			Case &quot;en-GB&quot;
@@ -1814,8 +1850,6 @@ Function fsGetMacOS11Voice() As String
 			s1 = &quot;Rishi&quot;
 			Case &quot;en-IN&quot;
 			s1 = &quot;Veena&quot;
-			Case &quot;en-scotland&quot;, &quot;en-GB-SCT&quot;
-			s1 = &quot;Fiona&quot;
 			Case &quot;en-US&quot;
 			s1 = &quot;Fred&quot;
 			Case &quot;en-US&quot;
@@ -1833,7 +1867,11 @@ Function fsGetMacOS11Voice() As String
 			Case &quot;es-MX&quot;
 			s1 = &quot;Paulina&quot;
 			Case &quot;fr-CA&quot;
-			s1 = &quot;Amelie&quot;
+				If bIsLegacyMac Then
+					s1 = &quot;Amelie&quot;
+				Else
+					s1 = &quot;Amélie&quot;
+				End If
 			Case &quot;it-IT&quot;
 			s1 = &quot;Luca&quot;
 			Case &quot;nl-BE&quot;
@@ -1843,13 +1881,48 @@ Function fsGetMacOS11Voice() As String
 			Case &quot;ru-RU&quot;
 			s1 = &quot;Yuri&quot;
 			Case &quot;zh-HK&quot;, &quot;zh-MO&quot;, &quot;zh-yue&quot;, &quot;yue&quot;
-			s1 = &quot;Sin-ji&quot;
+			If bIsLegacyMac Then
+				s1 = &quot;Sin-ji&quot;
+			Else
+				s1 = &quot;Sinji&quot;
+			End If
 			Case &quot;zh-TW&quot;, &quot;zh-CHT&quot;
-			s1 = &quot;Mei-Jia&quot;
+			If bIsLegacyMac Then
+				s1 = &quot;Mei-Jia&quot;
+			Else
+				s1 = &quot;Meijia&quot;
+			End If
 		End Select
 		If Len(s1) &lt;&gt; 0 Then Exit For
+		If Not fbIsLegacyMac() Then
+			Select Case a1(n)
+				Case &quot;ar_001&quot;
+				s1 = &quot;Majed&quot;
+				Case &quot;bg&quot;
+				s1 = &quot;Daria&quot;
+				Case &quot;ca&quot;
+				s1 = &quot;Montse&quot;
+				Case &quot;he&quot;
+				s1 = &quot;Carmit&quot;
+				Case &quot;hr&quot;
+				s1 = &quot;Lana&quot;
+				Case &quot;hu&quot;
+				s1 = &quot;Tünde&quot;
+				Case &quot;id&quot;
+				s1 = &quot;Damayanti&quot;
+				Case &quot;ms&quot;
+				s1 = &quot;Amira&quot;
+				Case &quot;uk&quot;
+				s1 = &quot;Lesya&quot;
+				Case &quot;vi&quot;
+				s1 = &quot;Linh&quot;
+				Case Else
+				s1 = &quot;&quot;
+			End Select		
+		End If
+		If Len(s1) &lt;&gt; 0 Then Exit For
 	Next
-	fsGetMacOS11Voice = s1
+	fsGetMacOsBaseVoice = s1
 End Function
 
 

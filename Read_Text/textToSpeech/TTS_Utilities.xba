@@ -1273,7 +1273,7 @@ Function fsMacVoice( _
 		Case &quot;en-AU&quot;,&quot;en-NZ&quot;
 		s1 = &quot;Lee,Karen&quot;
 		Case &quot;en-GB&quot;,&quot;en-BD&quot;,&quot;en-BS&quot;,&quot;en-GH&quot;,&quot;en-HK&quot;,&quot;en-JM&quot;,&quot;en-TT&quot;
-		s1 = &quot;Fiona,Daniel&quot;
+		s1 = &quot;Daniel&quot;
 		Case &quot;en-IE&quot;
 		s1 = &quot;Moira&quot;
 		Case &quot;en-IN&quot;,&quot;en-PK&quot;
@@ -1349,7 +1349,6 @@ Function fsMacVoice( _
 		&quot;Moira&quot;, _
 		&quot;Karen&quot;, _
 		&quot;Fred&quot;, _
-		&quot;Fiona&quot;, _
 		&quot;Daniel&quot;, _
 		&quot;Alex&quot;), _
 		&quot;,&quot;)
@@ -1423,16 +1422,15 @@ Sub dialog1Combo2ShowSAYChoices( _
 		If fsMacVoice(n, selection_IsoLang) = &quot;&quot; Then
 			Exit For
 		Else
-			&apos;--voice=Moira -f &quot;(TMP)&quot; -o &quot;(HOME)(NOW).aiff&quot;
 			For o = LBound(aA) To UBound(aA)
-				s1 = &quot;--voice=&quot; &amp; _
+				s1 = &quot;--voice &quot; &amp; _
 				fsMacVoice(n, selection_IsoLang) &amp; _
 				&quot; -f &quot;&quot;(TMP)&quot;&quot; -o &quot;&quot;(HOME)(NOW).&quot; &amp; _
 				aA(o) &amp; _
 				&quot;&quot;&quot;&quot;
 				oComboBox.addItem(s1,0)
 			Next
-			s1 = &quot;--voice=&quot; &amp; _
+			s1 = &quot;--voice &quot; &amp; _
 			fsMacVoice(n, selection_IsoLang) &amp; _
 			&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
 			oComboBox.addItem(s1,0)
@@ -1813,15 +1811,27 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 					&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;)
 				End If
 				Case &quot;MacOS&quot;
-				Redim _opts
-				If Len(fsGetMacOS11Voice()) = 0 Then
-					_opts = Array(_
-					&quot;Veena&quot;, &quot;Moira&quot;, &quot;Karen&quot;, &quot;Fiona&quot;, &quot;AUTO&quot;)
-				Else
-					_opts = Array(_
-					&quot;Veena&quot;, &quot;Moira&quot;, &quot;Karen&quot;, &quot;Fiona&quot;, fsGetMacOS11Voice(),_
-					&quot;AUTO&quot;)				
-				End If
+				Select Case FileExists(&quot;/usr/bin/python3&quot;)
+					Case True
+					If fbHaveNetworkTTS() Then
+						Redim _opts : _opts = Array(_
+						&quot;MALE4&quot;, &quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;,_
+						&quot;FEMALE2&quot;, &quot;FEMALE1&quot;, &quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;, &quot;AUTO&quot;)
+					Else
+						Redim _opts : _opts = Array(_
+						&quot;MALE4&quot;, &quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;,_
+						&quot;FEMALE2&quot;, &quot;FEMALE1&quot;, &quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;)
+					End If			
+					Case Else
+					If fbHaveNetworkTTS() Then
+						Redim _opts : _opts = Array(_
+						&quot;MALE1&quot;, &quot;FEMALE1&quot;, &quot;AUTO&quot;)
+					Else
+						Redim _opts : _opts = Array(_
+						&quot;MALE1&quot;, &quot;FEMALE1&quot;)
+					End If					
+					
+					End Select
 				Case Else
 				Redim _opts : _opts = Array(_
 				&quot;MALE1&quot;, &quot;FEMALE1&quot;)
@@ -1885,14 +1895,14 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		Redim _opts : _opts = Array(_
 					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
 		For n = Lbound(_opts) To Ubound(_opts)
-			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot; --voice=&quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
+			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
 			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE) --voice=&quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
+			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE) --voice &quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
 			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
 		Next
-		s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot;&quot;
+		s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot;&quot;
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-        s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language=(SELECTION_LANGUAGE_CODE)&quot;
+        s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE)&quot;
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
 	End If
 	If len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or _
@@ -1931,21 +1941,21 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)	
 	End If
 	If fbOKWithRhVoice(sLanguage) Then
-		s4 = &quot;&quot;&quot;(RHVOICE_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		s4 = &quot;&quot;&quot;(RHVOICE_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)  &apos; 2022.08 voices ignored rate and pitch
 	End If
 	If fbHaveEspeak() Or _
 		fileexists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
 		fileexists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
-		s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &apos; &amp; &quot; --rate=100% --pitch=100% &quot;
+		s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &apos; &amp; &quot; --rate 100% --pitch 100% &quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
 	End If
 	If Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0  Then
-		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language=(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
 	End If
 	If Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 Then
-		s4 = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; --language=ja-JP&quot;
+		s4 = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; --language ja-JP&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 	End If
 	If Len(s1) &gt; 0 Then
@@ -1974,7 +1984,7 @@ Function fspyPlayOption( _
 	&apos; online or legacy format audio might not work or it might increase risk
 	&apos; of arbitrary code execution from an unverified source.
 	 fspyPlayOption = Chr(10) &amp; _
-		s4 &amp; &quot; --visible=False &quot;&quot;(TMP)&quot;&quot;&quot;
+		s4 &amp; &quot; --visible False &quot;&quot;(TMP)&quot;&quot;&quot;
 End Function
 
 
@@ -2079,7 +2089,7 @@ Function fspyOutOptions( _
 
 				If fbHaveLame() Then
 					s1 = s1 &amp; CR &amp; s4 &amp; _
-					&quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
+					&quot; --image=&quot;&quot;(POSTER_IMG)&quot;&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
 					s3
 				End If
 				s1 = s1 &amp; CR &amp; s4 &amp; _
@@ -2089,11 +2099,11 @@ Function fspyOutOptions( _
 				&apos; `opus` replaces `.spx` and `.ogg`.
 				&apos; `lame` (.mp3) replaces `mp1` and `.mp2`.
 				If fbHaveLame() Then
-					_mp3_image = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+					_mp3_image = &quot; --image=&quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
 				End If
 				If fbHaveFfmpeg() Then
-					_mp3_image = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
-					_ogg_image = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+					_mp3_image = &quot; --image=&quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+					_ogg_image = &quot; --image=&quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
 				End If
 				extension = Array(_
 				Array(&quot;.wav&quot;, &quot;libgstwavenc&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;, &quot;&quot;), _
@@ -2164,10 +2174,10 @@ Function fspyOutOptions( _
 		&apos; End File Write section
 		If bPitchSpeed Then
 			s1 = s1 &amp; CR &amp; s4 &amp; _
-			&quot; --rate=75% --pitch=100%&quot; &amp; s3
-			&apos; Nominal rate and pitch is --rate=100% --pitch=100% &quot;
+			&quot; --rate 75% --pitch 100%&quot; &amp; s3
+			&apos; Nominal rate and pitch is --rate 100% --pitch 100% &quot;
 			s1 = s1 &amp; CR &amp; s4 &amp; _
-			&quot; --rate=125% --pitch=100%&quot; &amp; s3
+			&quot; --rate 125% --pitch 100%&quot; &amp; s3
 		End If
 		s1 = s1 &amp; CR &amp; s4 &amp; &quot;&quot; &amp; s3
 	End If
@@ -4870,6 +4880,8 @@ End Function
 
 
 Function fsGetMyTunesApp() As String
+	&apos; Some old Macs use iTunes.app. New Macs use Music.app
+	&apos; See also: `fbIsLegacyMac()`
 	fsGetMyTunesApp = &quot;&quot;
 	Dim n As Integer
 	n = 0
@@ -5088,7 +5100,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;    set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; fsMyTempLock(&quot;lock&quot;) &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set myOption to &quot;&quot;&quot; &amp; sArguments &amp; &quot;&quot;&quot;&quot;, _
-		&quot;    set myReader to &quot;&quot;&quot; &amp; fsGetMacOS11Voice() &amp; &quot;&quot;&quot;&quot;, _
+		&quot;    set myReader to &quot;&quot;&quot; &amp; fsGetMacOsBaseVoice() &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set mySys to &quot;&quot;&quot; &amp; sGetOS &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set myURL to &quot;&quot;&quot;&quot;&quot;, _
 		&quot;    set notOkaySound to OKSound(&quot;&quot;Sosumi&quot;&quot;)&quot;, _
@@ -5484,7 +5496,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;    set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; fsMyTempLock(&quot;lock&quot;) &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set myOption to &quot;&quot;&quot; &amp; sArguments &amp; &quot;&quot;&quot;&quot;, _
-		&quot;    set myVoice to &quot;&quot;&quot; &amp; fsGetMacOS11Voice() &amp; &quot;&quot;&quot;&quot;, _
+		&quot;    set myVoice to &quot;&quot;&quot; &amp; fsGetMacOsBaseVoice() &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set textFile to quoted form of POSIX path of &quot;&quot;&quot; &amp; sF &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    -- ------------------------------------------------------&quot;, _
 		&quot;    set b to (do shell script &quot;&quot;touch &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
@@ -5517,8 +5529,13 @@ Function fswriteMacOSSpeechScript( _
 	&quot;    return theArray&quot;, _
 	&quot;end theSplit&quot;, _
 	&quot;on extractVoice(str0)&quot;, _
-	&quot;    set iIndex to offset of &quot;&quot;  &quot;&quot; in str0&quot;, _
-	&quot;    return characters 1 thru (iIndex - 1) of str0 as text&quot;, _
+	&quot;    if isInString(str0, &quot;&quot;) &quot;&quot;) then&quot;, _
+	&quot;        set iIndex to offset of &quot;&quot;) &quot;&quot; in str0&quot;, _
+	&quot;        return characters 1 thru (iIndex) of str0 as text&quot;, _
+	&quot;    else&quot;, _
+	&quot;        set iIndex to offset of &quot;&quot;  &quot;&quot; in str0&quot;, _
+	&quot;        return characters 1 thru (iIndex - 1) of str0 as text&quot;, _
+	&quot;    end if&quot;, _
 	&quot;end extractVoice&quot;, _
 	&quot;on isInString(str0, str1)&quot;, _
 	&quot;    set retval to true&quot;, _
@@ -5549,7 +5566,7 @@ Function fswriteMacOSSpeechScript( _
 	&quot;end testTheString&quot;, _
 	&quot;on fsGetthevoice(sLang)&quot;, _
 	&quot;    try&quot;, _
-	&quot;        set str0 to (do shell script &quot;&quot;say --voice=&apos;?&apos;&quot;&quot;)&quot;, _
+	&quot;        set str0 to (do shell script &quot;&quot;say --voice &apos;?&apos;&quot;&quot;)&quot;, _
 	&quot;        set myArray to my theSplit(str0, (ASCII character 13))&quot;, _
 	&quot;        set retval to testTheString(myArray, sLang, &quot;&quot; &quot;&quot;)&quot;, _
 	&quot;        if retval is &quot;&quot;&quot;&quot; then&quot;, _
@@ -5559,12 +5576,13 @@ Function fswriteMacOSSpeechScript( _
 	&quot;            set retval to testTheString(myArray, sLang, &quot;&quot;-&quot;&quot;)&quot;, _
 	&quot;        end if&quot;, _
 	&quot;        if retval is &quot;&quot;&quot;&quot; then&quot;, _
-	&quot;            set retval to &quot;&quot;&quot; &amp; fsGetMacOS11Voice() &amp; &quot;&quot;&quot;&quot;, _
+	&quot;            set retval to &quot;&quot;&quot; &amp; fsGetMacOsBaseVoice() &amp; &quot;&quot;&quot;&quot;, _
 	&quot;        end if&quot;, _
 	&quot;    on error&quot;, _
-	&quot;        set retval to &quot;&quot;&quot; &amp; fsGetMacOS11Voice() &amp; &quot;&quot;&quot;&quot;, _
+	&quot;        set retval to &quot;&quot;&quot; &amp; fsGetMacOsBaseVoice() &amp; &quot;&quot;&quot;&quot;, _
 	&quot;    end try&quot;, _
-	&quot;    if retval is &quot;&quot;Agnes&quot;&quot; or retval is &quot;&quot;Albert&quot;&quot; or retval is &quot;&quot;&quot;&quot; then&quot;, _
+	&quot;    -- On MacOS 13.0, Lee is an optional en_AU voice&quot;, _
+	&quot;    if retval is &quot;&quot;Agnes&quot;&quot; or retval is &quot;&quot;Albert&quot;&quot; or retval is &quot;&quot;Lee&quot;&quot; or retval is &quot;&quot;&quot;&quot; then&quot;, _
 	&quot;        set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
 	&quot;    end if&quot;, _
 	&quot;    return retval&quot;, _
@@ -6599,8 +6617,8 @@ Function fbLetButtonInterruptPosixPlayer() As Boolean
 	&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;)
 	&apos; don&apos;t interrupt if we are using a graphical player.
 	If fbCreatingMediaFile( _
-		&quot;--visible=true,--visible=&apos;true&apos;,--visible=&quot;&quot;true&quot;&quot;&quot;) Or _
-		Not (fbCreatingMediaFile(&quot;--visible=&quot;)) Then
+		&quot;--visible true,--visible &apos;true&apos;,--visible &quot;&quot;true&quot;&quot;&quot;) Or _
+		Not (fbCreatingMediaFile(&quot;--visible &quot;)) Then
 		b1 = False
 	End If
 	fbLetButtonInterruptPosixPlayer = b1

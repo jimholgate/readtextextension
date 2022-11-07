@@ -150,13 +150,13 @@ class RhVoiceClass(object):
             },
             {
                 'package':
-                    'English',
+                'English',
                 'sample':
-                    'Hello. I am an English system voice.',
+                'Hello. I am an English system voice.',
                 'iso_code':
-                    'CA',
+                'CA',
                 'lang1':
-                    'en',
+                'en',
                 'voices': [
                     "alan",  # en_GB.scotland Male
                     "bdl",  # en-US Male
@@ -176,13 +176,13 @@ class RhVoiceClass(object):
             },
             {
                 'package':
-                    'English',
+                'English',
                 'sample':
-                    'Hello. I am an English system voice.',
+                'Hello. I am an English system voice.',
                 'iso_code':
-                    'GB',
+                'GB',
                 'lang1':
-                    'en',
+                'en',
                 'voices': [
                     "alan",
                     "slt",
@@ -218,13 +218,13 @@ class RhVoiceClass(object):
             },
             {
                 'package':
-                    'English',
+                'English',
                 'sample':
-                    'Hello. I am an English system voice.',
+                'Hello. I am an English system voice.',
                 'iso_code':
-                    'US',
+                'US',
                 'lang1':
-                    'en',
+                'en',
                 'voices': [
                     "bdl",
                     "slt",
@@ -327,7 +327,8 @@ class RhVoiceClass(object):
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
-        _media_work = readtexttools.get_work_file_path(_out_path, _icon, 'TEMP')
+        _media_work = readtexttools.get_work_file_path(_out_path, _icon,
+                                                       'TEMP')
         _text_work = ''.join([_media_work, '.txt'])
 
         # Remove old files.
@@ -360,8 +361,8 @@ class RhVoiceClass(object):
             _msg = "Could not play a rhvoice media file locally."
             if bool(_media_out):
                 _msg = "Could not save a rhvoice media file locally."
-            readtexttools.pop_message("Python `rhvoice`" % locals(), _msg, 5000,
-                                      _error_icon, 1)
+            readtexttools.pop_message("Python `rhvoice`" % locals(), _msg,
+                                      5000, _error_icon, 1)
         self.ok = False
         return False
 
@@ -523,8 +524,9 @@ def main():  # -> NoReturn
         # If the library does not require a postprocess, use `0`,
         # otherwise use the item corresponding to the next action.
         _post_processes = [
-            None, 'process_mp3_media', 'process_playlist', 'process_riff_media',
-            'process_vorbis_media', 'process_wav_media', 'process_audio_media'
+            None, 'process_mp3_media', 'process_playlist',
+            'process_riff_media', 'process_vorbis_media', 'process_wav_media',
+            'process_audio_media'
         ]
         _rhvoice_cl.read(_text, _iso_lang, _visible, _audible, _media_out,
                          _icon, clip_title, _post_processes[5], _info, _size,
