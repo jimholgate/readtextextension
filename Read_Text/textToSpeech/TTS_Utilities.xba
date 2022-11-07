@@ -2089,7 +2089,7 @@ Function fspyOutOptions( _
 
 				If fbHaveLame() Then
 					s1 = s1 &amp; CR &amp; s4 &amp; _
-					&quot; --image=&quot;&quot;(POSTER_IMG)&quot;&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
+					&quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
 					s3
 				End If
 				s1 = s1 &amp; CR &amp; s4 &amp; _
@@ -2099,11 +2099,11 @@ Function fspyOutOptions( _
 				&apos; `opus` replaces `.spx` and `.ogg`.
 				&apos; `lame` (.mp3) replaces `mp1` and `.mp2`.
 				If fbHaveLame() Then
-					_mp3_image = &quot; --image=&quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+					_mp3_image = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
 				End If
 				If fbHaveFfmpeg() Then
-					_mp3_image = &quot; --image=&quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
-					_ogg_image = &quot; --image=&quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+					_mp3_image = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+					_ogg_image = &quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
 				End If
 				extension = Array(_
 				Array(&quot;.wav&quot;, &quot;libgstwavenc&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;, &quot;&quot;), _
