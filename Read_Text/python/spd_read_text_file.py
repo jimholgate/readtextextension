@@ -492,7 +492,7 @@ configurations.
         if _percent_int > 320:
             return 100
         for _item in self.rate_scales:
-            if _percent_int <= _item[0] and _percent_int >= _item[1]:              
+            if _percent_int <= _item[0] and _percent_int >= _item[1]:
                 print(''.join(['speech rate : -100 [', _item[2], '] 100']))
                 return _item[3]
         return 0
@@ -1012,6 +1012,7 @@ class SayFormats(object):
         self.osx_11_13 = 3
         self.osx_13 = 2
         self.old = 1
+        self.voice_found = ''
         if self.uname_major_ver > 21:
             self.editions = [self.osx_13, self.osx_11_13, self.always]
         else:
@@ -1488,6 +1489,8 @@ class SayFormats(object):
                             ])
                             _count[_xyxx] = _count[_xyxx] + 1
                     if len(found_g) != 0:
+                        if len(self.voice_found) == 0:
+                            self.voice_found = found_g
                         _country = _line.split('_')[1].split(' ')[0]
                         _display_lang = ''.join([_alt_lang,
                                                  _country]).replace('_', '-')
@@ -1497,16 +1500,17 @@ class SayFormats(object):
                             [found_g, _display_lang, _say_voice, word_rate])
         if self.debug and 1:
             print(_a4)
+        _tts_system = ''.join([os.uname().sysname, '_tts']).lower()
         for _voice in _a4:
             if _spd_voice == _voice[0]:
                 self.word_rate = _voice[3]
                 _gender = 'male'
                 if 'FEMALE' in _spd_voice:
                     _gender = 'female'
+                    self.voice_found = _voice[0]
                 _lcase_lang = _voice[1].lower()
                 _vox = _voice[2]
                 _vox_id = _vox.replace(' ', '_').lower()
-                _tts_system = ''.join([os.uname().sysname, '_tts']).lower()
                 _key = """%(_lcase_lang)s/%(_vox_id)s-%(_tts_system)s""" % locals(
                 )
                 _sample_url = 'https://google.com/search?q=MacOS+say+%(_vox)s' % locals(
@@ -1531,7 +1535,9 @@ class SayFormats(object):
                 else:
                     print(_voice)
                 return _voice[2]
-        if 'FEMALE' in _spd_voice.upper():
+        if len(self.voice_found) != 0:
+            return self.voice_found
+        elif 'FEMALE' in _spd_voice.upper():
             return 'Samantha'
         return 'Alex'
 
