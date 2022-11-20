@@ -161,6 +161,38 @@ def get_temp_prefix():  # -> str
     return tempfile.gettempdir()
 
 
+def have_posix_app(posix_app='vlc', do_test=True):  # -> bool
+    '''if the app exists and understands a `--version` or `--help` switch,
+    then returns `True`, otherwise returns `False`.
+
+    If `do_test` is `False`, then only look for the app installed in the
+    standard system-wide location, otherwise test for a manual or help
+    response. A container version of an app might test `True`, but the
+    python program might not be able to run the posix app.
+    '''
+    os_sep = os.sep
+    mute_response = '&> %(os_sep)sdev%(os_sep)snull &' % locals()
+    if os.name != 'posix':
+        return False
+    if not bool(posix_app):
+        return False
+    if os.path.isfile('/usr/bin/%(posix_app)s' % locals()):
+        return True
+    if os_sep in posix_app:
+        posix_app = os.path.basename(posix_app)
+    if bool(do_test) and my_os_system(
+            'man -w %(posix_app)s %(mute_response)s' % locals()):
+        return True
+    if bool(do_test):
+        for tester in ['--version', '--help', '-h', '-?']:
+            app_switch = tester
+            if my_os_system('%(posix_app)s %(app_switch)s %(mute_response)s' %
+                            locals()):
+                # No error
+                return True
+    return False
+
+
 class XmlTransform(object):
     '''Prepare text for XML encoding.'''
 
@@ -807,38 +839,6 @@ def my_os_system(_command):  # -> bool
         return not bool(retval)
 
 
-def have_posix_app(posix_app='vlc', do_test=True):  # -> bool
-    '''if the app exists and understands a `--version` or `--help` switch,
-    then returns `True`, otherwise returns `False`.
-
-    If `do_test` is `False`, then only look for the app installed in the
-    standard system-wide location, otherwise test for a manual or help
-    response. A container version of an app might test `True`, but the
-    python program might not be able to run the posix app.
-    '''
-    os_sep = os.sep
-    mute_response = '&> %(os_sep)sdev%(os_sep)snull &' % locals()
-    if os.name != 'posix':
-        return False
-    if not bool(posix_app):
-        return False
-    if os.path.isfile('/usr/bin/%(posix_app)s' % locals()):
-        return True
-    if os_sep in posix_app:
-        posix_app = os.path.basename(posix_app)
-    if bool(do_test) and my_os_system(
-            'man -w %(posix_app)s %(mute_response)s' % locals()):
-        return True
-    if bool(do_test):
-        for tester in ['--version', '--help', '-h', '-?']:
-            app_switch = tester
-            if my_os_system('%(posix_app)s %(app_switch)s %(mute_response)s' %
-                            locals()):
-                # No error
-                return True
-    return False
-
-
 def get_nt_path(name='ffmpeg', app='ffplay'):  # -> str
     '''
     Return the path to a Windows program if it is installed
@@ -1064,8 +1064,10 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
     elif lax_mime_match(_work_ext, '.mp3'):
         # _extension_table = ExtensionTable()
         if media_converter_installed():
-            if (os.path.isfile('/usr/share/doc/liblame0/copyright')
+            if (len(gst_plugin_path('libgstlame')) != 0
+                    or os.path.isfile('/usr/share/doc/liblame0/copyright')
                     or os.path.isfile('/usr/share/doc/libmp3lame0/copyright')
+                    or os.path.isdir('/usr/share/doc/lame-libs/')
                     or have_posix_app('lame', False) or
                     os.path.isfile('/usr/lib/x86_64-linux-gnu/libmp3lame.so.0')
                     or os.path.isfile(_extension_table.vlc)
@@ -1082,7 +1084,8 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
             _work = _out
     elif _work_ext in ['.mp2']:
         if media_converter_installed():
-            if (os.path.isfile('/usr/share/doc/libtwolame0/copyright')
+            if (len(gst_plugin_path('libgstlame')) != 0
+                    or os.path.isfile('/usr/share/doc/libtwolame0/copyright')
                     or bool(get_nt_path('twolame', 'twolame'))):
                 _out = _work
                 _work = '%(_out)s.wav' % locals()
@@ -1095,7 +1098,8 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
             _work = _out
     elif lax_mime_match(_work_ext, '.ogg'):
         if media_converter_installed():
-            if (os.path.isfile('/usr/share/doc/libogg0/copyright')
+            if (len(gst_plugin_path('libgstogg')) != 0
+                    or os.path.isfile('/usr/share/doc/libogg0/copyright')
                     or os.path.isfile(_extension_table.vlc)
                     or bool(get_nt_path('oggenc', 'oggenc'))
                     or bool(get_nt_path('oggenc2', 'oggenc2'))):
@@ -1117,19 +1121,30 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
             _out = '%(_work)s.wav' % locals()
             _work = _out
     elif lax_mime_match(_work_ext, '.flac'):
-        if (media_converter_installed() or bool(get_nt_path('flac', 'flac'))):
+        # WARNING: `flac` audio file authoring might not work on all platforms.
+        if len(gst_plugin_path('libgstflac')) != 0 or bool(
+                get_nt_path('flac', 'flac')):
             _out = _work
             _work = '%(_out)s.wav' % locals()
         else:
             # Can't make flac, so make wav
             _out = '%(_work)s.wav' % locals()
-            _work = _out
+            _work = _outv
     elif lax_mime_match(_work_ext, '.opus'):
-        if media_converter_installed():
+        if len(gst_plugin_path('libgstopus')) != 0:
             _out = _work
             _work = '%(_out)s.wav' % locals()
         else:
             # Can't make opus, so make wav
+            _out = '%(_work)s.wav' % locals()
+            _work = _out
+    elif lax_mime_match(_work_ext, '.spx'):
+        # DEPRECIATED: `opus` replaces `spx` audio compression.
+        if len(gst_plugin_path('libgstspeex')) != 0:
+            _out = _work
+            _work = '%(_out)s.wav' % locals()
+        else:
+            # Can't make spx, so make wav
             _out = '%(_work)s.wav' % locals()
             _work = _out
     elif 'video/' in _mime:
@@ -2655,6 +2670,98 @@ def path2url(_file_path):  # -> str
         return ''.join(['file://', _file_path.replace(' ', '%20')])
 
 
+class PosixAudioPlayers(object):
+    '''Check for an available player on platforms like Linux and MacOS'''
+
+    def __init__(self):
+        '''List of known sound file players'''
+        self.afplay_exts = [
+            '.3gp', '.3g2', '.aac', '.adts', '.aifc', '.aiff', '.aif', '.amr',
+            '.m4a', '.m4r', '.m4b', '.caf', '.ec3', '.flac', '.mp1', '.mp2',
+            '.mp3', '.mpeg', '.mpa', '.mp4', '.snd', '.au', '.wav', '.w64'
+        ]
+        self.apt_get = 0
+        self.app = 1
+        self.command_get = 2
+        self.universal_play = 3  # verified to play compressed formats
+        self.found_player = 'Unknown player'
+        self.players = [
+            [
+                'afplay',
+                'afplay',  # Darwin
+                '"%(file_path)s"',
+                True
+            ],
+            ['esdplay', 'esdplay', '"%(file_path)s"', False],
+            ['ossplay', 'ossplay', '"%(file_path)s"', False],
+            ['paplay', 'paplay', '"%(file_path)s"', False],
+            ['artsplay', 'artsplay', '"%(file_path)s"', False],
+            ['roarcat', 'roarcat', '"%(file_path)s"', False],
+            ['roarcatplay', 'roarcatplay', '"%(file_path)s"', False],
+            ['aplay', 'aplay', ' --nonblock "%(file_path)s"', False],
+            [
+                'ffmpeg', 'ffplay',
+                ' -autoexit -hide_banner -loglevel info -nostats -nodisp "%(file_path)s"',
+                True
+            ],
+            ['avconv', 'avplay', ' -autoexit -nodisp "%(file_path)s"', True],
+            ['vlc', 'vlc', ' --intf dummy %(uri_path)s vlc://quit ', True],
+            [
+                'gstreamer1.0-tools', 'gst-launch-1.0',
+                'playbin uri="%(uri_path)s" ', True
+            ],
+            ['sox', 'play', '"%(file_path)s"', True],
+        ]
+
+    def player_packages(self):  # -> list
+        '''Player package list (suggestions for `apt-get` or `dnf`
+        package managers)'''
+        _list = []
+        for _item in self.players:
+            _list.append(_item[self.apt_get])
+        return _list
+
+    def player_applications(self):  # -> list
+        '''Posix player application list including uninstalled applications'''
+        _list = []
+        for _item in self.players:
+            _list.append(_item[self.app])
+        return _list
+
+    def player_command(self, file_path='/path/rte-play.ec3'):  # -> str
+        '''Get an audio player command on your system
+        that is compatible with the audio file type.'''
+        if not '.' in file_path:
+            return ''
+        if not os.path.isfile(file_path):
+            return ''
+        uri_path = path2url(file_path)
+        for player in self.players:
+            if player == 'afplay':
+                b_play_more = os.path.splitext(
+                    file_path)[1] in self.afplay_exts
+            else:
+                b_play_more = player[self.universal_play]
+            if have_posix_app(player[self.app], False):
+                if os.path.splitext(
+                        file_path)[1].lower() == '.wav' or b_play_more:
+                    self.found_player = player[self.app]
+                    return ' '.join([
+                        player[self.app], player[self.command_get] % locals()
+                    ])
+        return ''
+
+    def player_app(self, file_path='/path/rte-play.ec3'):  # -> str
+        '''Get the an audio player on your system that is
+        compatible with the audio file type.'''
+        if not '.' in file_path:
+            return ''
+        _command = self.player_command(file_path)
+        if len(_command) != 0:
+            return self.found_player
+        return ''
+
+
 def play_wav_no_ui(file_path=''):  # -> bool
     '''
     Opens using command line shell.
@@ -2662,12 +2769,8 @@ def play_wav_no_ui(file_path=''):  # -> bool
     _command = ''
     a_app = 'System audio'
     uri_path = path2url(file_path)
-    afplay_exts = [
-        '.3gp', '.3g2', '.aac', '.adts', '.aifc', '.aiff', '.aif', '.amr',
-        '.m4a', '.m4r', '.m4b', '.caf', '.ec3', '.flac', '.mp1', '.mp2',
-        '.mp3', '.mpeg', '.mpa', '.mp4', '.snd', '.au', '.wav', '.w64'
-    ]
     display_file = os.path.split(file_path)[1]
+    _pipe = ''
     if os.name == 'nt':
         # Windows
         _win_ext = os.path.splitext(file_path)[1].lower()
@@ -2696,62 +2799,8 @@ def play_wav_no_ui(file_path=''):  # -> bool
                 except:
                     return False
     else:
-        _apt_get = 0
-        _app = 1
-        _i_command = 2
-        _universal_play = 3  # verified to play compressed formats
-        players = [
-            [
-                'afplay',
-                'afplay',  # Darwin
-                ' "%(file_path)s"' % locals(),
-                os.path.splitext(file_path)[1] in afplay_exts
-            ],
-            ['esdplay', 'esdplay',
-             ' "%(file_path)s"' % locals(), False],
-            ['ossplay', 'ossplay',
-             ' "%(file_path)s"' % locals(), False],
-            ['paplay', 'paplay',
-             ' "%(file_path)s"' % locals(), False],
-            ['artsplay', 'artsplay',
-             ' "%(file_path)s"' % locals(), False],
-            ['roarcat', 'roarcat',
-             ' "%(file_path)s"' % locals(), False],
-            [
-                'roarcatplay', 'roarcatplay',
-                ' "%(file_path)s"' % locals(), False
-            ],
-            [
-                'aplay', 'aplay',
-                ' --nonblock "%(file_path)s"' % locals(), False
-            ],
-            [
-                'ffmpeg', 'ffplay',
-                ' -autoexit -hide_banner -loglevel info -nostats -nodisp "%(file_path)s"'
-                % locals(), True
-            ],
-            [
-                'avconv', 'avplay',
-                ' -autoexit -nodisp "%(file_path)s"' % locals(), True
-            ],
-            [
-                'vlc', 'vlc',
-                ' --intf dummy %(uri_path)s vlc://quit ' % locals(), True
-            ],
-            [
-                'gstreamer1.0-tools', 'gst-launch-1.0',
-                'playbin uri="%(uri_path)s" ' % locals(), True
-            ],
-            ['sox', 'play', ' "%(file_path)s"' % locals(), True],
-        ]
-        for player in players:
-            if os.path.isfile('/usr/bin/' + player[_app]):
-                if os.path.splitext(file_path)[1].lower(
-                ) == '.wav' or player[_universal_play]:
-                    a_app = player[_app]
-                    a_command = player[_i_command]
-                    _command = '%(a_app)s %(a_command)s' % locals()
-                    break
+        _audio_play = PosixAudioPlayers()
+        _command = _audio_play.player_command(file_path)
         if len(_command) == 0:
             try:
                 if bool(Gst):
@@ -2762,26 +2811,29 @@ def play_wav_no_ui(file_path=''):  # -> bool
             if len(_pipe) == 0:
                 try:
                     import webbrowser
+                    print(
+                        '[>] %(a_app)s (default) is playing `%(display_file)s`'
+                        % locals())
+                    webbrowser.open(uri_path)
+                    return True
                 except ImportError:
                     _apt_get_list = ''
-                    for app in players:
+                    for app in _audio_play.player_packages():
                         _apt_get_list = '\n * '.join(
-                            [_apt_get_list, app[_apt_get]])
+                            [_apt_get_list, app[_audio_play.apt_get]])
                     print(
                         '-' * 78,
                         '\nPython could not access a player for `%(display_file)s`:%(_apt_get_list)s\n'
                         % locals())
                     return False
-                print('-' * 78, '''\nUsing the system sound player.''')
-                webbrowser.open(uri_path)
-                return True
     if len(_command) != 0:
+        a_app = _audio_play.found_player
         if os.path.getsize(file_path) == 0:
             print('''[>]  %(a_app)s cannot play `%(display_file)s`''' %
                   locals())
             return True
         print('[>] %(a_app)s playing `%(display_file)s`' % locals())
-        return my_os_system(_command) == 0
+        return os.system(_command) == 0
     return False
 
 

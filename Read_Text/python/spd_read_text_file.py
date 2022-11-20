@@ -348,9 +348,9 @@ def filterinputs(s0):
 
 def hard_reset(sd='speech-dispatcher'):  # -> bool
     '''kill posix process'''
-    if not bool(sd):
+    if not readtexttools.have_posix_app(sd, False):
         return False
-    if not readtexttools.have_posix_app('killall'):
+    if not readtexttools.have_posix_app('killall', False):
         return False
     whoami = get_whoami()
     command = '''killall %(sd)s''' % locals()
@@ -442,7 +442,16 @@ configurations.
         # Speech dispatcher and network tools do not have all
         # voices for all languages, so a tool might substitute
         # a missing voice for one that it does have.
-
+        self.rate_scales = [[320, 289, '---------|', 100],
+                            [288, 195, '--------|-', 35],
+                            [194, 132, '-------|--', 22],
+                            [131, 193, '------|---', 15],
+                            [192, 130, '-----|----', 10],
+                            [129, 103, '----|----', 0],
+                            [102, 96, '---|-----', -35],
+                            [95, 66, '--|------', -42],
+                            [65, 33, '-|-------', -50],
+                            [32, 0, '|--------', -100]]
         self.all_voices = [
             'MALE3', 'MALE2', 'MALE1', 'FEMALE3', 'FEMALE2', 'FEMALE1',
             'CHILD_MALE', 'CHILD_FEMALE', 'AUTO', 'NETWORK', 'AWS', 'AZURE',
@@ -470,6 +479,23 @@ configurations.
                     self.local_config = local_config
         except Exception:
             pass
+
+    def percent_to_spd(self, _percent_int=100):  # -> int
+        '''Given a percent, returns an integer representing a speech
+        rate to pass to speech-dispatcher. It is between `-100` and
+        `100` but the actual speed will depend on the language, voice,
+        settings and the text to speech tool.'''
+        try:
+            _percent_int = int(_percent_int)
+        except AttributeError:
+            return 0
+        if _percent_int > 320:
+            return 100
+        for _item in self.rate_scales:
+            if _percent_int <= _item[0] and _percent_int >= _item[1]:              
+                print(''.join(['speech rate : -100 [', _item[2], '] 100']))
+                return _item[3]
+        return 0
 
     def is_a_supported_language(self,
                                 _lang='en',
@@ -544,6 +570,7 @@ configurations.
                   _file_spec=''):  # -> bool
         '''Set user configuration settings'''
         _lock = readtexttools.get_my_lock("lock")
+        _audio_players = readtexttools.PosixAudioPlayers()
         _try_voice = voice
         if voice not in self.all_voices:
             if voice not in [
@@ -597,10 +624,9 @@ configurations.
                         # media creator returns an audio file that is
                         # normally playable with your computer's media
                         # player.
-                        for _player in [
-                                'avplay', 'ffplay', 'vlc', 'gst-launch-1.0'
-                        ]:
-                            hard_reset(_player)
+                        for _application in _audio_players.player_applications(
+                        ):
+                            hard_reset(_application)
                         os.remove(self.local_json)
                     else:
                         self.json_content = self.json_tools.set_json_content(
@@ -616,7 +642,10 @@ configurations.
                     return False
             else:
                 pass
-            self.client.set_rate(i_rate)
+            try:
+                self.client.set_rate(i_rate)
+            except AssertionError:
+                pass
         except (ImportError, NameError, speechd.SpawnError):
             if len(voice) != 0:
                 self.json_content = self.json_tools.set_json_content(
@@ -1828,10 +1857,12 @@ class SayFormats(object):
 def main():
     '''Command line speech-dispatcher tool. Some implimentations of python
     require the long command line switch'''
-    _xml_tool = readtexttools.XmlTransform()
+    _spd_formats = SpdFormats()
     _file_spec = sys.argv[-1]
     _txt = ''
     i_rate = 0
+    sd_rate = 0
+    _word_rate = 160
     _language = ''
     _output = ''
     _output_module = ''
@@ -1880,7 +1911,10 @@ def main():
         elif o in ("-r", "--rate"):
             try:
                 if a.endswith('%'):
-                    i_rate = (int(readtexttools.remove_unsafe_chars(a)) * 0.01)
+                    _rate = (int(readtexttools.remove_unsafe_chars(a)))
+                    i_rate = _rate * 0.01
+                    sd_rate = _spd_formats.percent_to_spd(_rate)
+                    _word_rate = network_read_text_file.speech_wpm(a)
                 else:
                     i_rate = int(readtexttools.remove_unsafe_chars(a))
             except ValueError:
@@ -1937,11 +1971,31 @@ def main():
         sys.exit(0)
     elif os.name in ['posix']:
         if not USE_SPEECHD:
-            readtexttools.web_info_translate(
+            print(
                 '''The `speechd` library is not compatible with your application
-or platform.''', _language)
+or platform. Try a networked speech tool like `larynx-server`.''')
+            if i_rate == 0:
+                _word_rate = 160
+            if not network_read_text_file.network_main(
+                    _file_spec, _language, 'false', 'false', _output, '', '',
+                    '', '600x600', _word_rate, _voice, ''):
+                _imported_metadata = readtexttools.ImportedMetaData()
+                _web_message = _imported_metadata.meta_from_file(
+                    _file_spec).strip()
+                _max_message_len = 4999
+                if len(_web_message) > _max_message_len:
+                    for punct in [
+                            '\n', '\t', '?', '!', '.', ',', ';', ':', ' '
+                    ]:
+                        if punct in _web_message:
+                            _web_message = _web_message.split(punct)[0]
+                            if not len(_web_message) > _max_message_len:
+                                break
+                if len(_web_message) > _max_message_len:
+                    exit(0)
+                readtexttools.web_info_translate(_web_message, _language)
             sys.exit(0)
-        _spd_formats = SpdFormats()
+
         if not _spd_formats.spd_ok:
             print("The `speechd` python 3 library is required.")
             usage()
@@ -1954,7 +2008,7 @@ restart your computer.''')
             sys.exit(0)
         _testing = False
         if not _spd_formats.speak_spd(_output_module, _language, _voice,
-                                      i_rate, _file_spec):
+                                      sd_rate, _file_spec):
             # Error - Try resetting `speechd`
             hard_reset('speech-dispatcher')
     sys.exit(0)

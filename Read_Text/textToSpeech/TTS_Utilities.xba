@@ -1793,6 +1793,14 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
 	n = oComboBox.getItemCount()
 	oComboBox.removeItems(0,n)
+
+	If fbIsSandboxed() Then
+		&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
+		s1 = s1 &amp; CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;-m webbrowser -t &quot;&quot;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
+	End If
 	If fbHaveNetworkTTS() or Instr(Environ(&quot;PATH&quot;), &quot;/snap/&quot;) = 1 Then
 		If fsGetOS() = &quot;UNIX&quot; Then
 			&apos; Include settings for [larynx-server](https://github.com/rhasspy/larynx)
@@ -1895,13 +1903,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 				Redim _opts : _opts = Array(_
 				&quot;MALE1&quot;, &quot;FEMALE1&quot;)
 			End Select
-			If fbIsSandboxed() Then
-				&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
-				s1 = s1 &amp; CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
-				&quot;-m webbrowser -t &quot;&quot;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&quot;&quot;&quot; &amp; CR &amp; _
-				&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
-				&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
-			Else
+			If Not fbIsSandboxed() Then
 				If Len(fsFindAppPath(&quot;afconvert&quot;)) &lt;&gt; 0 Then
 					s4 = sProg &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 					s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
@@ -1987,7 +1989,8 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		
 		a1 = Split(s1, CR)
 		For n = LBound(a1) + 1 To UBound(a1)
-			If Instr(a1(n), &quot;&quot;&quot;(TMP)&quot;&quot;&quot;) &lt;&gt; 0 Then
+			If Instr(a1(n), &quot;&quot;&quot;(TMP)&quot;&quot;&quot;) &lt;&gt; 0 or _
+			Instr(a1(n), &quot;WEBTEXT&quot;) &lt;&gt; 0 Then
 				oComboBox.addItem(a1(n), 0)
 			End If
 		Next
@@ -4501,6 +4504,7 @@ Function fbIsAMediaPlayer( _
 	&quot;/usr/bin/ffplay&quot;, _
 	&quot;/usr/bin/gmplayer&quot;, _
 	&quot;/usr/bin/gnome-open&quot;, _
+	&quot;/usr/bin/gst-launch-1.0&quot;, _
 	&quot;/usr/bin/kaffeine&quot;, _
 	&quot;/usr/bin/kde-open&quot;, _
 	&quot;/usr/bin/kplayer&quot;, _
@@ -4509,6 +4513,7 @@ Function fbIsAMediaPlayer( _
 	&quot;/usr/bin/mplayer&quot;, _
 	&quot;/usr/bin/noatun&quot;, _
 	&quot;/usr/bin/parole&quot;, _
+	&quot;/usr/bin/play&quot;, _
 	&quot;/usr/bin/sensible-browser&quot;, _
 	&quot;/usr/bin/totem&quot;, _
 	&quot;/usr/bin/xdg-open&quot;, _

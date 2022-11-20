@@ -56,7 +56,10 @@ import codecs
 import os
 import sys
 import readtexttools
-
+try:
+    import webbrowser
+except ImportError:
+    pass
 try:
     from qrcode.image.pil import PilImage
     IMAGE_OK = True
@@ -143,6 +146,8 @@ def qrencode(_content='',
     * _size - The dimension of each QR Code square
     * _level - The degree of redundant data for error correction
     '''
+    _url = 'https://chart.apis.google.com/chart?chs=350x350&cht=qr&chl=%(_content)s' % locals(
+    )
     if not bool(_size):
         _size = '3'
     _fill_color = rgb_to_tuple(_fill_color, 'black')
@@ -199,14 +204,19 @@ def qrencode(_content='',
     except NameError:
         usage()
         _content = _content.replace(' ', '%20')
-        _url = 'https://chart.apis.google.com/chart?chs=350x350&cht=qr&chl=%(_content)s' % locals(
-        )
+
         _msg = '''<%(_url)s>''' % locals()
         if not readtexttools.pop_message(
                 "`qrcode` missing. `pip3 install qrcode[pil]`", _msg, 5000,
                 readtexttools.net_error_icon(), 1):
-            readtexttools.show_with_app(_url)
+            webbrowser.open(_url)
         return False
+    except Exception:
+        try:
+            webbrowser.open(_url)
+        except [AttributeError, TypeError]:
+            readtexttools.web_info_translate(
+                'Exception - `qrcode`, `Pillow` or `webbrowser` failure', 'en')
 
 
 def main():  # -> NoReturn

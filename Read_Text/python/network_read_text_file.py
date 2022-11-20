@@ -402,7 +402,7 @@ Setup
 
 + See: <https://gtts.readthedocs.io/en/latest/>
 + Package Manager: `sudo dnf install python3-pip` or `sudo apt install python3-pip`
-+ Pip Installer: `pip3 install gtts` (*Not* `sudo`!)
++ Pip Installer: `pip3 install gTTS gTTS-token` (*Not* `sudo`!)
 
 + `_text` - Text to speak
 + `_iso_lang` - Supported letter language code - defaults to English
@@ -618,9 +618,9 @@ Setup
                                             _writer, _size)
             return True
         else:
-            _msg = "Could not play a network media file locally. Try `pip3 install gtts`."
+            _msg = "Could not play a network media file locally. Try `pip3 install gTTS gTTS-token`."
             if bool(_media_out):
-                _msg = "Could not save a network media file locally. Try `pip3 install gtts`."
+                _msg = "Could not save a network media file locally. Try `pip3 install gTTS gTTS-token`."
             readtexttools.pop_message("Python `gtts-%(_version)s`" % locals(),
                                       _msg, 5000, _error_icon, 1)
         self.ok = False
@@ -730,6 +730,23 @@ class LocalClass(object):
             self.default_voice
         ]
         self.voice_id = ''
+        self.pause_list = [
+            '(', '\n', '\r', u"\u2026", u'\u201C', u"\u2014", u"\u2013",
+            u'\u00A0'
+        ]
+        try:
+            self.add_pause = str.maketrans({
+                '\n': ';\n',
+                '\r': ';\r',
+                '(': ' ( ',
+                u'\u201C': u'\u201C;',
+                u'\u2026': u'\u2026;',
+                u'\u2014': u'\u2014;',
+                u'\u2013': u'\u2013;',
+                u'\u00A0': ' '
+            })
+        except AttributeError:
+            self.add_pause = None
         try:
             self.base_curl = str.maketrans({
                 '\\': ' ',
@@ -944,6 +961,15 @@ Loading larynx voices for `%(_lang2)s`
                 self.ok = False
         return self.ok
 
+    def get_voc_type(self, _type='small'):  # -> str
+        '''Try to get the appropriate voc type for the platform.'''
+        if not _type in ['small', 'medium', 'large']:
+            return ''
+        for coder in self.vocoders:
+            if coder.endswith(_type):
+                return coder
+        return ''   
+
     def read(self,
              _text="",
              _iso_lang='en-US',
@@ -980,24 +1006,30 @@ Loading larynx voices for `%(_lang2)s`
         _media_work = os.path.join(tempfile.gettempdir(), 'larynx.wav')
         _voice = self.voice_id
         _lengthScale = '0.85'
+        if bool(self.add_pause) and not ssml:
+            for _symbol in self.pause_list:
+                if _symbol in _text:
+                    _text = _text.translate(self.add_pause).replace('..', '.')
+                    break
         try:
             if not self.is_x86_64:
                 # Unknown platform - try the fastest setting.
-                _vocoder = self.vocoders[0]
-            elif quality in range(0, len(self.vocoders)):
-                # Set manually
+                _vocoder = self.get_voc_type('small')
+            elif quality in range(0, len(self.vocoders) - 1):
+                # Set manually - I don't know which order the
+                # voices are on your platform, so if it does
+                # not work as expected, try a different number.
                 _vocoder = self.vocoders[quality]
-            elif len(_media_out) > 0:
-                # Medium quality when saving file.
-                _vocoder = self.vocoders[1]
-            elif len(_text.split()) > 30:
-                # Word count > 30 so use fastest setting.
-                _vocoder = self.vocoders[0]
+            elif len(_text.split()) < 3:
+                # A single word
+                _vocoder = self.get_voc_type('large')
             else:
-                _vocoder = self.vocoders[1]
+                _vocoder = self.get_voc_type('medium')
+            if len(_vocoder) == 0:
+                _vocoder = self.vocoders[len(self.vocoders) - 1]
         except IndexError:
             if bool(self.vocoders):
-                _vocoder = self.vocoders[0]
+                _vocoder = self.vocoders[len(self.vocoders) - 1]
             else:
                 return False
         _ssml = 'false'
@@ -1039,6 +1071,7 @@ Loading larynx voices for `%(_lang2)s`
         elif readtexttools.have_posix_app('curl', False):
             if not bool(self.base_curl):
                 return False
+            _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
             _text = str(_text.translate(self.base_curl))
             _curl = '''curl -d "%(_text)s" "%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiserStrength)s&noiseScale=%(_noiseScale)s&lengthScale=%(_lengthScale)s&ssml=%(_ssml)s" -o "%(_media_work)s"''' % locals(
             )
@@ -1090,7 +1123,9 @@ def speech_wpm(_percent='100%'):  # -> int
             i2 = math.ceil(i1)
     except TypeError:
         return _normal
-    if i2 <= _minimum:
+    if i2 == 0:
+        return _normal
+    elif i2 <= _minimum:
         return _minimum
     elif i2 >= _maximum:
         return _maximum
@@ -1164,8 +1199,6 @@ def network_main(_text_file_in='',
         return False
     _text = _imported_meta.meta_from_file(_text_file_in)
     if len(_text) != 0:
-        _text = readtexttools.clean_str(_text, True).strip()
-        _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
         _info = readtexttools.check_artist(_writer)
         clip_title = readtexttools.check_title(_title, 'espeak')
         # If the library does not require a postprocess, use `0`,
