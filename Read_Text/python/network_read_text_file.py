@@ -968,7 +968,7 @@ Loading larynx voices for `%(_lang2)s`
         for coder in self.vocoders:
             if coder.endswith(_type):
                 return coder
-        return ''   
+        return ''
 
     def read(self,
              _text="",
