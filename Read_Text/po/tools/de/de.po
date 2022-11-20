@@ -362,3 +362,10 @@ msgctxt ""
 msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
 msgstr "Read Text – Sprachsynthese\n=========\n\n>_Markieren Sie eine Textpassage.  Wählen Sie „Extras - Add-Ons - Impress-Ansicht”, um die Präsentation zu starten._\n\n##Impress – Ansicht\n\n- Markieren Sie eine Textpassage.\n- Wählen Sie „Extras - Add-Ons - Impress-Ansicht”, um die Präsentation zu starten.\n\n`© 2015 James Holgate.  [cc by 4.0](http://de.creativecommons.org)`"
 
+#: template.src
+msgctxt ""
+"Get on-line help for snap? Read Text uses a http speech daemon like "
+"[larynx-server](https://github.com/rhasspy/larynx)."
+msgstr ""
+"Schnellstart Snap: Read Text verwendet ein Sprachwerkzeug wie "
+"[larynx-server](https://github.com/rhasspy/larynx)."

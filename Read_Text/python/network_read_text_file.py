@@ -49,6 +49,7 @@ import math
 import os
 import platform
 import sys
+import tempfile
 import time
 import readtexttools
 try:
@@ -706,7 +707,7 @@ class LocalClass(object):
         if '_IN' in self.default_lang:
             self.larynx_v1 = ['cmu_aup', 'cmu_ksp', 'cmu_slp']
         elif self.default_lang == 'en_CA':
-            self.larynx_v1 = ['cmu_jmk']
+            self.larynx_v1 = ['mary_ann', 'cmu_jmk']
         elif self.default_lang == 'es_ES':
             self.larynx_v1 = ['carlfm', 'karen_savage']
         elif self.default_lang == 'fr_FR':
@@ -839,7 +840,7 @@ Try restarting `larynx-server`.''')
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
         if int(platform.python_version_tuple()[0]) < 3 or int(
-                platform.python_version_tuple()[1]) < 9:
+                platform.python_version_tuple()[1]) < 8:
             self.ok = False
             return self.ok
         if not REQUESTS_OK:
@@ -873,10 +874,16 @@ Try restarting `larynx-server`.''')
             return False
         except AttributeError:
             try:
+                # catching classes that do not inherit from BaseExceptions
+                # is not allowed.
                 response = urllib.urlopen(''.join([self.url, '/api/voices']))
                 data_response = response.read()
                 data = json.loads(data_response)
-            except [AttributeError, urllib.error.URLError]:
+            except Exception:
+                try:
+                    os.system('larynx-server')
+                except OSError:
+                    pass
                 self.ok = False
                 return False
         if len(data) == 0:
@@ -970,8 +977,7 @@ Loading larynx voices for `%(_lang2)s`
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
-        _media_work = readtexttools.get_work_file_path(_out_path, _icon,
-                                                       'TEMP')
+        _media_work = os.path.join(tempfile.gettempdir(), 'larynx.wav')
         _voice = self.voice_id
         _lengthScale = '0.85'
         try:
@@ -1050,8 +1056,10 @@ Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
                 'process_audio_media', 'process_wav_media'
         ]:
             if os.path.getsize(_media_work) == 0:
+                print('Unable to write media work file.')
                 return False
             # NOTE: Calling process must unlock_my_lock()
+            readtexttools.unlock_my_lock()
             readtexttools.process_wav_media(_info, _media_work, _icon,
                                             _media_out, _audible, _visible,
                                             _writer, _size)

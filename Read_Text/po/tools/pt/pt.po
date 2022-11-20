@@ -357,10 +357,15 @@ msgctxt ""
 msgid "Year"
 msgstr "Ano"
 
-
-
 #: template.src
 msgctxt ""
 msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
 msgstr "Read Text – Síntese de fala\n=========\n\n>_Abri um documento e selecionai texto. Escolha “Ferramentas – Suplementos – Impress-Ver” para executar a apresentação._\n\nImpress – Ver\n--------------\n\n- Abri um documento e selecionai texto.\n- Escolha “Ferramentas – Suplementos – Impress-Ver” para executar a apresentação.\n\n`© 2015 James Holgate.  [cc by 4.0](http://www.creativecommons.org.br/)`"
 
+#: template.src
+msgctxt ""
+"Get on-line help for snap? Read Text uses a http speech daemon like "
+"[larynx-server](https://github.com/rhasspy/larynx)."
+msgstr ""
+"Ajuda para snap? Read Text usa uma ferramenta de fala como "
+"[larynx-server](https://github.com/rhasspy/larynx)"

@@ -1774,12 +1774,13 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	Dim sGetOS As String : sGetOS = fsGetOS()
 	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then bIsAppImage = True
 	CR = Chr(10)
-	s1 = &quot;&quot;
+	s1 = CR
 	s3 = &quot;&quot;
 	s4 = &quot;&quot;
 	Dim bEnableRate As Boolean
 	bEnableRate = True
 	sLanguage = LCase(fsGetLanguage())
+	Dim sProg As String : sProg = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
 	Select Case sGetOS
 		Case &quot;WINDOWS&quot; &apos; Show examples
 		s1 = s1 &amp; CR &amp; &quot;-c &quot;&quot;import os; os.startfile(&apos;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
@@ -1792,77 +1793,21 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
 	n = oComboBox.getItemCount()
 	oComboBox.removeItems(0,n)
-	If InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/python3&quot;) &lt;&gt; 0 or _
-	bIsAppImage Then
-		If fileexists(environ(&quot;HOME&quot;) &amp; _
-			&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or fileexists( _
-			environ(&quot;HOME&quot;) &amp; _
-			&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or bIsAppImage Or _
-			Not(fbHaveEspeak()) or Len(fsGetPipLibPath(&quot;speechd&quot;, False)) &lt;&gt; 0 Then
-			Select Case fsGetOS()
-				Case &quot;UNIX&quot;
-				If fbHaveNetworkTTS() Then
-					Redim _opts : _opts = Array(_
-					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
-					&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;, &quot;AUTO&quot;)
-				Else
-					Redim _opts : _opts = Array(_
-					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
-					&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;)
-				End If
-				Case &quot;MacOS&quot;
-				Select Case FileExists(&quot;/usr/bin/python3&quot;)
-					Case True
-					If fbHaveNetworkTTS() Then
-						Redim _opts : _opts = Array(_
-						&quot;MALE4&quot;, &quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;,_
-						&quot;FEMALE2&quot;, &quot;FEMALE1&quot;, &quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;, &quot;AUTO&quot;)
-					Else
-						Redim _opts : _opts = Array(_
-						&quot;MALE4&quot;, &quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;,_
-						&quot;FEMALE2&quot;, &quot;FEMALE1&quot;, &quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;)
-					End If			
-					Case Else
-					If fbHaveNetworkTTS() Then
-						Redim _opts : _opts = Array(_
-						&quot;MALE1&quot;, &quot;FEMALE1&quot;, &quot;AUTO&quot;)
-					Else
-						Redim _opts : _opts = Array(_
-						&quot;MALE1&quot;, &quot;FEMALE1&quot;)
-					End If					
-					
-					End Select
-				Case Else
-				Redim _opts : _opts = Array(_
-				&quot;MALE1&quot;, &quot;FEMALE1&quot;)
-			End Select
-			If fbIsSandboxed() Then
-				&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
-				s1 = CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
-				&quot;-m webbrowser -t &quot;&quot;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&quot;&quot;&quot; &amp; CR &amp; _
-				&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
-				&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
-			Else
-				If Len(fsFindAppPath(&quot;afconvert&quot;)) &lt;&gt; 0 Then
-					s4 = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-					s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
-				End If
-				For n = Lbound(_opts) To Ubound(_opts)
-					If bEnableRate Then
-						s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
-						&quot;&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-					End If
-					s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
-					&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-				Next
-				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			End If
+	If fbHaveNetworkTTS() or Instr(Environ(&quot;PATH&quot;), &quot;/snap/&quot;) = 1 Then
+		If fsGetOS() = &quot;UNIX&quot; Then
+			&apos; Include settings for [larynx-server](https://github.com/rhasspy/larynx)
+			Redim _opts : _opts = Array(&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
+			For n = Lbound(_opts) To Ubound(_opts)
+				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
+				s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE) --voice &quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
+				s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+			Next
 		End If
+		s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot;&quot;
+		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+        s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE)&quot;
+		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
 	End If
 	If fbHavePyQrCode() Then
 		Redim _opts : _opts = Array(_
@@ -1890,21 +1835,98 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		&quot; - &quot; &amp; _
 		fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
 		&quot;.png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+	End If	
+	
+	If InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/python3&quot;) &lt;&gt; 0 or _
+	bIsAppImage Then
+		If fileexists(Environ(&quot;HOME&quot;) &amp; _
+			&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or fileexists( _
+			Environ(&quot;HOME&quot;) &amp; _
+			&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or bIsAppImage Or _
+			Not(fbHaveEspeak()) or Len(fsGetPipLibPath(&quot;speechd&quot;, False)) &lt;&gt; 0 Then
+			Select Case fsGetOS()
+				Case &quot;UNIX&quot;
+				If fbHaveNetworkTTS() Then
+					Redim _opts : _opts = Array(_
+					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+					&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;, &quot;AUTO&quot;)
+				Else
+					Redim _opts : _opts = Array(_
+					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+					&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;)
+				End If
+				Case &quot;MacOS&quot;
+				Select Case FileExists(&quot;/usr/bin/python3&quot;)
+					Case True
+					If fbHaveNetworkTTS() Then
+						Redim _opts : _opts = Array(_
+						&quot;MALE8&quot;, &quot;MALE7&quot;, &quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;,_
+						&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE8&quot;, &quot;FEMALE7&quot;, &quot;FEMALE6&quot;,_
+						&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+						&quot;AUTO&quot;)
+					Else
+						Redim _opts : _opts = Array(_
+						&quot;MALE8&quot;, &quot;MALE7&quot;, &quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;,_
+						&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE8&quot;, &quot;FEMALE7&quot;, &quot;FEMALE6&quot;,_
+						&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
+					End If			
+					Case Else
+					If sLanguage = &quot;en&quot; Then
+						If fbHaveNetworkTTS() Then
+							Redim _opts : _opts = Array(_
+							&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+							&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;AUTO&quot;)
+						Else
+							Redim _opts : _opts = Array(_
+							&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+							&quot;MALE2&quot;, &quot;MALE1&quot;)
+						End If
+					Else
+						If fbHaveNetworkTTS() Then
+							Redim _opts : _opts = Array(_
+							&quot;FEMALE1&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;AUTO&quot;)
+						Else
+							Redim _opts : _opts = Array(_
+							&quot;FEMALE1&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;)
+						End If					
+					End If
+					End Select
+				Case Else
+				Redim _opts : _opts = Array(_
+				&quot;MALE1&quot;, &quot;FEMALE1&quot;)
+			End Select
+			If fbIsSandboxed() Then
+				&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
+				s1 = s1 &amp; CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;-m webbrowser -t &quot;&quot;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
+			Else
+				If Len(fsFindAppPath(&quot;afconvert&quot;)) &lt;&gt; 0 Then
+					s4 = sProg &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+					s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
+				End If
+				For n = Lbound(_opts) To Ubound(_opts)
+					If bEnableRate Then
+						s1 = s1 &amp; CR &amp; sProg &amp; _
+						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
+						&quot;&quot;&quot; --rate &quot;&quot;140%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+						s1 = s1 &amp; CR &amp; sProg &amp; _
+						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
+						&quot;&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+					End If
+					s1 = s1 &amp; CR &amp; sProg &amp; _
+					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
+					&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				Next
+				s1 = s1 &amp; CR &amp; sProg &amp; _
+				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
+				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			End If
+		End If
 	End If
-	If fbHaveNetworkTTS() And fsGetOS() = &quot;UNIX&quot; Then
-		Redim _opts : _opts = Array(_
-					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
-		For n = Lbound(_opts) To Ubound(_opts)
-			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
-			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE) --voice &quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
-			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-		Next
-		s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE) --rate &quot;&quot;70%&quot;&quot;&quot;
-		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-        s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE)&quot;
-		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-	End If
+
 	If len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or _
 		fileexists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave.exe&quot;) Or _
 		fileexists(fsProgramDirectory() &amp; &quot;festival\texttowave.exe&quot;) Then
@@ -1965,7 +1987,9 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		
 		a1 = Split(s1, CR)
 		For n = LBound(a1) + 1 To UBound(a1)
-			oComboBox.addItem(a1(n), 0)
+			If Instr(a1(n), &quot;&quot;&quot;(TMP)&quot;&quot;&quot;) &lt;&gt; 0 Then
+				oComboBox.addItem(a1(n), 0)
+			End If
 		Next
 	End If
 	n = oComboBox.getItemCount()
@@ -1984,7 +2008,7 @@ Function fspyPlayOption( _
 	&apos; online or legacy format audio might not work or it might increase risk
 	&apos; of arbitrary code execution from an unverified source.
 	 fspyPlayOption = Chr(10) &amp; _
-		s4 &amp; &quot; --visible False &quot;&quot;(TMP)&quot;&quot;&quot;
+		s4 &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 End Function
 
 
@@ -4399,7 +4423,7 @@ End Function
 
 
 Function fsHomeDrive() As String
-	fsHomeDrive = environ(&quot;HOMEDRIVE&quot;)
+	fsHomeDrive = Environ(&quot;HOMEDRIVE&quot;)
 	If fsHomeDrive = &quot;&quot; Then
 		If fsGetOS = &quot;WINDOWS&quot; Then
 			fsHomeDrive = &quot;C:&quot;
@@ -4413,7 +4437,7 @@ End Function
 Function fsProgramDirectory() As String
 	Dim c As String
 	
-	c = environ(&quot;ProgramFiles&quot;)
+	c = Environ(&quot;ProgramFiles&quot;)
 	If InStr(c,&quot;\&quot;) &lt;&gt; 0 Then
 		fsProgramDirectory = c &amp; &quot;\&quot;
 	Else
@@ -4425,7 +4449,7 @@ End Function
 Function fsProgramDirectoryx86() As String
 	Dim c As String
 	
-	c = environ(&quot;ProgramFiles(x86)&quot;)
+	c = Environ(&quot;ProgramFiles(x86)&quot;)
 	If InStr(c,&quot;\&quot;) &lt;&gt; 0 Then
 		fsProgramDirectoryx86 = c &amp; &quot;\&quot;
 	Else
@@ -4450,7 +4474,7 @@ Function fbIsWin64Program( _
 		installPath = fsInstallPath()
 	End If
 	If fsGetOS = &quot;WINDOWS&quot; And _
-		UCase(environ(&quot;PROCESSOR_ARCHITECTURE&quot;)) = &quot;AMD64&quot; And _
+		UCase(Environ(&quot;PROCESSOR_ARCHITECTURE&quot;)) = &quot;AMD64&quot; And _
 		InStr(LCase(installPath), &quot;(x86)&quot;) = 0 Then
 		fbIsWin64Program = True
 	Else
@@ -5690,7 +5714,7 @@ Sub WarnNoSpeech()
 		Case &quot;MacOS&quot;
 		webHelp(&quot;https://sites.google.com/site/readtextextension/home/apple-MacOS&quot;)
 		Case Else
-		Select Case environ(&quot;DESKTOP_SESSION&quot;)
+		Select Case Environ(&quot;DESKTOP_SESSION&quot;)
 			Case &quot;debian&quot;
 			webHelp(&quot;apt:espeak&quot;)
 			Case &quot;ubuntu&quot;
@@ -5756,7 +5780,7 @@ Function fbCheckPosixSpeech() As Boolean
 	Select Case fsGetOS()
 		Case &quot;UNIX&quot;
 		_app = Array(_
-		&quot;festival&quot;, &quot;pico2wave&quot;, &quot;RHVoice-test&quot;, &quot;spd-say&quot;)
+		&quot;festival&quot;, &quot;open_jtalk&quot;, &quot;pico2wave&quot;, &quot;RHVoice-test&quot;, &quot;spd-say&quot;)
 		Case &quot;MacOS&quot;
 		_app = Array(&quot;say&quot;)
 		Case Else
@@ -5782,8 +5806,19 @@ Sub CheckUnixSpeech()
 	&apos; Check the first time the application runs.
 	If fsGetOS() = &quot;UNIX&quot; Then
 		If Not(fileexists(fsFullPathOf(fsExtensionSettingsIni))) Then
-			If Not fbCheckPosixSpeech() Then
-				WarnNoSpeech()
+			If Instr(Environ(&quot;PATH&quot;), &quot;/snap/&quot;) = 1 Then
+				&apos; RFC - Does flatpak work? mary-tts on snap?
+				&apos; What did you do?
+				&apos; Translate this message for your language
+				If (MsgBox(_(_
+				&quot;Get on-line help for snap? Read Text uses a http speech daemon like [larynx-server](https://github.com/rhasspy/larynx).&quot;,_
+				&quot;tools&quot;, fsDisplayLanguage(), -1), 68, fsLookUpTerm(&quot;s_read-text&quot;)) = 6) Then
+					webHelp(&quot;https://github.com/rhasspy/larynx#samples&quot;)
+				End If
+			Else
+				If Not fbCheckPosixSpeech() Then
+					WarnNoSpeech()
+				End If
 			End If
 		End If
 	End If
@@ -5873,7 +5908,7 @@ Function fbHavePyQrCode() As Boolean
 	Dim x# : x = 0
 	Dim Tokens : Tokens = Array(_
 	&quot;/usr/lib/python3/dist-packages/qrcode/release.py&quot;, _
-	environ(&quot;HOME&quot;) &amp; &quot;/.local/bin/qr&quot;)
+	Environ(&quot;HOME&quot;) &amp; &quot;/.local/bin/qr&quot;)
 	
 	If FileExists(fsNetworkTtsDoc()) And _
 	Len(fsContainerResourcePath(&quot;python&quot;)) = 0 And _
@@ -6169,8 +6204,8 @@ Function fsMyFfmpeg() As String
 	For i = LBound(aC) To UBound(aC)
 		sProgramPaths = sProgramPaths &amp; &quot;file:///usr/bin/&quot; &amp; aC(i) &amp; cR &amp; _
 		&quot;file:///Applications/Shotcut.app/Contents/MacOS/&quot; &amp; aC(i) &amp; cR &amp; _
-		converttourl(environ(&quot;HOMEDRIVE&quot;)) &amp; &quot;/opt/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
-		converttourl(environ(&quot;USERPROFILE&quot;)) &amp; &quot;/opt/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
+		converttourl(Environ(&quot;HOMEDRIVE&quot;)) &amp; &quot;/opt/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
+		converttourl(Environ(&quot;USERPROFILE&quot;)) &amp; &quot;/opt/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
 		&quot;file:///usr/local/bin/&quot; &amp; aC(i) &amp; cR &amp; _
 		&quot;file:///opt/&quot; &amp; aC(i) &amp; cR &amp; _
 		&quot;file:///opt/local/&quot; &amp; aC(i) &amp; cR &amp; _
@@ -6247,16 +6282,16 @@ Function fsFindAppPath(sa) As String
 	Select Case fsGetOS()
 		Case &quot;WINDOWS&quot;
 		a1 = Array( _
-		converttourl(environ(&quot;READTEXTHELPER&quot;) &amp; &quot;\&quot;), _
-		converttourl(environ(&quot;LOCALAPPDATA&quot;) &amp; &quot;\&quot;), _
-		converttourl(environ(&quot;ProgramFiles&quot;) &amp; &quot;\&quot;), _
-		converttourl(environ(&quot;ProgramFiles(x86)&quot;) &amp; &quot;\&quot;), _
-		converttourl(environ(&quot;ProgramW6432&quot;) &amp; &quot;\&quot;), _
-		converttourl(environ(&quot;HOMEDRIVE&quot;) &amp; &quot;\opt\&quot;), _
-		converttourl(environ(&quot;SystemRoot&quot;) &amp; &quot;\&quot;), _
-		converttourl(environ(&quot;USERPROFILE&quot;) &amp; &quot;\opt\&quot;), _
-		converttourl(environ(&quot;HOMEDRIVE&quot;) &amp; &quot;\opt\&quot;), _
-		converttourl(environ(&quot;LOCALAPPDATA&quot;) &amp; &quot;\Programs\&quot;))
+		converttourl(Environ(&quot;READTEXTHELPER&quot;) &amp; &quot;\&quot;), _
+		converttourl(Environ(&quot;LOCALAPPDATA&quot;) &amp; &quot;\&quot;), _
+		converttourl(Environ(&quot;ProgramFiles&quot;) &amp; &quot;\&quot;), _
+		converttourl(Environ(&quot;ProgramFiles(x86)&quot;) &amp; &quot;\&quot;), _
+		converttourl(Environ(&quot;ProgramW6432&quot;) &amp; &quot;\&quot;), _
+		converttourl(Environ(&quot;HOMEDRIVE&quot;) &amp; &quot;\opt\&quot;), _
+		converttourl(Environ(&quot;SystemRoot&quot;) &amp; &quot;\&quot;), _
+		converttourl(Environ(&quot;USERPROFILE&quot;) &amp; &quot;\opt\&quot;), _
+		converttourl(Environ(&quot;HOMEDRIVE&quot;) &amp; &quot;\opt\&quot;), _
+		converttourl(Environ(&quot;LOCALAPPDATA&quot;) &amp; &quot;\Programs\&quot;))
 		Case &quot;MacOS&quot;
 		a1 = Array( _
 		&quot;file:///Applications/&quot;, _
@@ -6723,11 +6758,11 @@ Function fsThisDocAuthor() As String
 		&apos; Fallback - system user name
 		Select Case fsGetOS()
 			Case &quot;WINDOWS&quot;
-			s1 = environ(&quot;USERNAME&quot;)
+			s1 = Environ(&quot;USERNAME&quot;)
 			Case &quot;MacOS&quot;
-			s1 = environ(&quot;USERNAME&quot;)
+			s1 = Environ(&quot;USERNAME&quot;)
 			Case Else  &apos; UNIX
-			s1 = environ(&quot;USER&quot;)
+			s1 = Environ(&quot;USER&quot;)
 		End Select
 	End If
 	&apos; Final fallback - extension name and version.

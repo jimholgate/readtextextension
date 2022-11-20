@@ -450,7 +450,7 @@ Sub AboutAddOn( _
 			sA = replaceLocalTokensWithStr(config(fiFestivalComboChoice()))
 			sA = replacePublicTokensWithStr(sA)
 			.GetControl(&quot;TextField2&quot;).model.Text = sA
-		ElseIf config(fiExternalOption()) and Not fbIsSandBoxed() Then
+		ElseIf config(fiExternalOption()) Then
 			sA = replaceLocalTokensWithStr(config(fiExternalCommand()))
 			sA = replacePublicTokensWithStr(sA)
 			.GetControl(&quot;TextField3&quot;).model.Text = &quot;&quot;&quot;&quot; &amp; config(fiExternalProgramPath) &amp; &quot;&quot;&quot; &quot; &amp; sA

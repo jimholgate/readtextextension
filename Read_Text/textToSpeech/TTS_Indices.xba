@@ -638,9 +638,9 @@ End Function
 
 Function fsUser() As String
 	Dim s1
-	s1 = environ(&quot;USER&quot;)
+	s1 = Environ(&quot;USER&quot;)
 	If s1 = &quot;&quot; Then
-		s1 = environ(&quot;USERNAME&quot;)
+		s1 = Environ(&quot;USERNAME&quot;)
 	End If
 	If s1 = &quot;&quot; Then
 		s1 = &quot;UNKNOWN-USER&quot;
@@ -685,7 +685,7 @@ Function fsMyTempLock(ByVal sExt) As String
 &apos;&apos;  files.
 &apos;&apos;  
 	For i = LBound(a1) To UBound(a1)
-		sTemp = environ(a1(i))
+		sTemp = Environ(a1(i))
 		If Len(sTemp) &gt; 0 Then
 			If fbTestDirRW(sTemp) Then
 				Exit For
@@ -697,7 +697,7 @@ Function fsMyTempLock(ByVal sExt) As String
 	If sTemp = &quot;&quot; Then
 		&apos; An environmental setting is missing or the directory is locked. 
 		&apos; The routine checks for an alternative directory using specific paths.
-		sHome = environ(&quot;HOME&quot;)
+		sHome = Environ(&quot;HOME&quot;)
 		a2 = Array(&quot;/tmp&quot;, _
 		sHome &amp; &quot;/.config&quot;, _
 		sHome &amp; &quot;/.tmp&quot;, _
@@ -1064,13 +1064,13 @@ Function fsGetOS() As String
 		Case 4
 		If fileexists(&quot;/usr/bin/osascript&quot;) Then
 			fsGetOS = &quot;MacOS&quot;
-		ElseIf Len(environ(&quot;ANDROID_ROOT&quot;)) &gt; 0 Then
+		ElseIf Len(Environ(&quot;ANDROID_ROOT&quot;)) &gt; 0 Then
 			fsGetOS = &quot;ANDROID&quot;
 		Else
 			fsGetOS = &quot;UNIX&quot;
 		End If
 		Case Else
-		If Len(environ(&quot;ANDROID_ROOT&quot;)) &gt; 0 Then
+		If Len(Environ(&quot;ANDROID_ROOT&quot;)) &gt; 0 Then
 			fsGetOS = &quot;ANDROID&quot;
 		Else
 			fsGetOS = &quot;UNKNOWN&quot;
@@ -1685,9 +1685,9 @@ End Function
 
 
 Function fsUserName() As String
-	fsUserName = environ(&quot;USERNAME&quot;)
+	fsUserName = Environ(&quot;USERNAME&quot;)
 	If fsUserName = &quot;&quot; Then
-		fsUserName = environ(&quot;USER&quot;)
+		fsUserName = Environ(&quot;USER&quot;)
 	End If
 End Function
 
@@ -1707,9 +1707,9 @@ Function fsGetHomeDir() As String
 		fsGetHomeDir = s1
 	Else
 		s1 = ConvertFromURL(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;) &amp; cr
-		s1 = s1 &amp; environ(&quot;pwd&quot;) &amp; &quot;/&quot; &amp; cr
-		s1 = s1 &amp; environ(&quot;HOMEPATH&quot;) &amp; &quot;\&quot; &amp; cr
-		s1 = s1 &amp; environ(&quot;HOME&quot;) &amp; &quot;/&quot; &amp; cr
+		s1 = s1 &amp; Environ(&quot;pwd&quot;) &amp; &quot;/&quot; &amp; cr
+		s1 = s1 &amp; Environ(&quot;HOMEPATH&quot;) &amp; &quot;\&quot; &amp; cr
+		s1 = s1 &amp; Environ(&quot;HOME&quot;) &amp; &quot;/&quot; &amp; cr
 		a1 = Split(s1, cr)
 		For n = LBound(a1) To UBound(a1)
 			If Len(a1(n)) &gt; 0 Then
@@ -1726,7 +1726,7 @@ End Function
 
 
 Function fbIsLegacyMac() As Boolean
-	&apos; The `environ(&quot;LANG&quot;)` command doesn&apos;t work on MacOS 11, so the
+	&apos; The `Environ(&quot;LANG&quot;)` command doesn&apos;t work on MacOS 11, so the
 	&apos; script can&apos;t use the system `LANG` value to guess your language.
 	&apos; See also: `fsGetMyTunesApp()`
 	Dim _env As String

@@ -375,3 +375,10 @@ msgstr ""
 "\n"
 "`© 2015 James Holgate.  [cc by 4.0](http://www.creativecommons.it/)`"
 
+#: template.src
+msgctxt ""
+"Get on-line help for snap? Read Text uses a http speech daemon like "
+"[larynx-server](https://github.com/rhasspy/larynx)."
+msgstr ""
+"Aiuto per snap? Read Text utilizza uno strumento vocale come "
+"[larynx-server] (https://github.com/rhasspy/larynx)"

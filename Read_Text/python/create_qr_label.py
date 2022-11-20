@@ -218,7 +218,8 @@ def main():  # -> NoReturn
     _back_color = '255, 255, 255'  # `white` `rgb(255, 255, 255)`
 
     try:
-        _image_out = readtexttools.get_temp_prefix() + "-qr-code.png"
+        _image_out = os.path.join(readtexttools.get_temp_prefix(),
+                                  "rte-qr-code.png")
     except:
         _image_out = ""
     _text_file_in = sys.argv[-1]

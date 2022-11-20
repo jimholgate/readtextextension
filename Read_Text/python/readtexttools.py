@@ -60,6 +60,7 @@ import os
 import platform
 import sunau
 import sys
+import tempfile
 import threading
 import time
 
@@ -157,11 +158,7 @@ def get_temp_prefix():  # -> str
      -sound.wav for sound
      -image.png for image
     '''
-    if os.name == 'nt':
-        return os.path.join(os.getenv('TMP'), os.getenv('USERNAME'))
-    elif have_posix_app('say', False):
-        return os.path.join(os.getenv('TMPDIR'), os.getenv('USER'))
-    return os.path.join('/tmp', os.getenv('USER'))
+    return tempfile.gettempdir()
 
 
 class XmlTransform(object):
@@ -788,7 +785,11 @@ def my_os_system(_command):  # -> bool
     * Returns `True` if there is no error
     * Returns `False` if there is an error
     '''
-    _command = _command.encode('utf-8')
+    try:
+        _command = _command.encode('utf-8')
+    except AttributeError:
+        # Not a string
+        return False
     if os.name == 'nt':
         try:
             retcode = subprocess.call(_command, shell=False)
@@ -1029,9 +1030,9 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
     _alt_ext = ''
     if _work == '':
         if have_posix_app('say', False):
-            _work = get_temp_prefix() + u'-speech.aiff'
+            _work = os.path.join(get_temp_prefix(), 'rte-speech.aiff')
         else:
-            _work = get_temp_prefix() + u'-speech.wav'
+            _work = os.path.join(get_temp_prefix(), 'rte-speech.wav')
     _work_ext = os.path.splitext(_work)[1].lower()
     _wanted_ext = _work_ext
     _image_ext = os.path.splitext(_image)[1].lower()
@@ -1250,8 +1251,8 @@ def process_wav_media(_title='untitled',
     for _test in _extension_table.extension_test:
         if out_ext in _test[_extension_table.extension]:
             if have_posix_app('afconvert', False):
-                if not vlc_wav_to_media(_work, _out, _audible, _visible,
-                                        False):
+                if not vlc_wav_to_media(_work, _out, _audible, _visible, False,
+                                        _title):
                     wav_to_media(_title, _work, _image, _out, _audible,
                                  _visible, _artist, _dimensions)
                 break
@@ -1264,7 +1265,8 @@ def process_wav_media(_title='untitled',
             elif gst_plugin_path(_test[_extension_table.filter]):
                 if not gst_wav_to_media(_title, _work, _image, _out, _audible,
                                         _visible, _artist, _dimensions):
-                    vlc_wav_to_media(_work, _out, _audible, _visible, False)
+                    vlc_wav_to_media(_work, _out, _audible, _visible, False,
+                                     _title)
                 break
     clean_temp_files(_work)
     if os.path.isfile(_work):
@@ -1759,7 +1761,7 @@ class ImportedMetaData(object):
     <title>Playlist</title>
     <trackList>
         <track>
-            <location>[%(out_uri)s]</location>
+            <location>%(out_uri)s</location>
             <creator>%(x_author)s</creator>
             <album>%(x_album)s</album>
             <duration>%(seconds)s500</duration>
@@ -2143,7 +2145,8 @@ def vlc_wav_to_media(in_sound_path='',
                      _audible='true',
                      _visible='false',
                      allow_linux_snap=False,
-                     _show_meta=True):  # -> bool
+                     _show_meta=True,
+                     _title='untitled'):  # -> bool
     '''Converts a wav audio file to a plain mp3 or ogg muxed audio file.
     This conversion does not include meta-data. Retunrs `True` if a new
     file is created, otherwise `False`.'''
@@ -2566,6 +2569,7 @@ def get_my_lock(_lock=''):  # -> str
     '''
     if not _lock:
         return ''
+    _lock = remove_unsafe_chars(_lock, '[]\\{}%|*/')
     p_lock = '.%(_lock)s' % locals()
     app_sign = app_signature()
     env_path = os.getenv('READTEXTTEMP')
@@ -2694,7 +2698,7 @@ def play_wav_no_ui(file_path=''):  # -> bool
     else:
         _apt_get = 0
         _app = 1
-        _command = 2
+        _i_command = 2
         _universal_play = 3  # verified to play compressed formats
         players = [
             [
@@ -2737,17 +2741,18 @@ def play_wav_no_ui(file_path=''):  # -> bool
             [
                 'gstreamer1.0-tools', 'gst-launch-1.0',
                 'playbin uri="%(uri_path)s" ' % locals(), True
-            ]
+            ],
+            ['sox', 'play', ' "%(file_path)s"' % locals(), True],
         ]
         for player in players:
             if os.path.isfile('/usr/bin/' + player[_app]):
                 if os.path.splitext(file_path)[1].lower(
                 ) == '.wav' or player[_universal_play]:
                     a_app = player[_app]
-                    a_command = player[_command]
+                    a_command = player[_i_command]
                     _command = '%(a_app)s %(a_command)s' % locals()
                     break
-        if not _command:
+        if len(_command) == 0:
             try:
                 if bool(Gst):
                     _pipe = 'playbin uri="%(uri_path)s" ' % locals()
@@ -2755,20 +2760,28 @@ def play_wav_no_ui(file_path=''):  # -> bool
             except:
                 _pipe = ''
             if len(_pipe) == 0:
-                _apt_get_list = ''
-                for app in players:
-                    _apt_get_list = '\n * '.join(
-                        [_apt_get_list, app[_apt_get]])
-                print('You need an audio player:%(_apt_get_list)s' % locals())
-
-    if _command:
+                try:
+                    import webbrowser
+                except ImportError:
+                    _apt_get_list = ''
+                    for app in players:
+                        _apt_get_list = '\n * '.join(
+                            [_apt_get_list, app[_apt_get]])
+                    print(
+                        '-' * 78,
+                        '\nPython could not access a player for `%(display_file)s`:%(_apt_get_list)s\n'
+                        % locals())
+                    return False
+                print('-' * 78, '''\nUsing the system sound player.''')
+                webbrowser.open(uri_path)
+                return True
+    if len(_command) != 0:
         if os.path.getsize(file_path) == 0:
             print('''[>]  %(a_app)s cannot play `%(display_file)s`''' %
                   locals())
             return True
         print('[>] %(a_app)s playing `%(display_file)s`' % locals())
-        my_os_system(_command)
-        return True
+        return my_os_system(_command) == 0
     return False
 
 
