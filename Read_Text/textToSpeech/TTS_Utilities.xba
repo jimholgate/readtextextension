@@ -1,35 +1,651 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Utilities" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  * 
-Option Explicit
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Utilities" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  *
+&apos;&apos;
 &apos;&apos; # TTS_Utilities
+&apos;&apos; 
+&apos;&apos; These functions handle events, create combo box listings, read and write
+&apos;&apos; strings to files, get selected text, clean up strings, etc. There are
+&apos;&apos; some strings that may need to be modified over time, including URLs and
+&apos;&apos; command lines for programs that get revised or don’t work anymore.
+&apos;&apos; 
+&apos;&apos; In this program, external scripts do the work. The script language is
+&apos;&apos; different for each major platform. In Apple MacOS, the language is
+&apos;&apos; osascript, also known as Apple Script. Linux and other Unix-like
+&apos;&apos; platforms use python scripts. Windows uses vbs. Read the script and
+&apos;&apos; command line for your platform by clicking the **About…** button from
+&apos;&apos; the main dialogue window.
+&apos;&apos; 
+&apos;&apos; The abilities of Read Text vary by platform and installed software. for
+&apos;&apos; example, in Windows, installing iTunes allows you to save files in the
+&apos;&apos; .m4a format for portable players. In Linux, `avconv` or `ffmpeg` allow
+&apos;&apos; you to save sounds in various audio formats according to the packages
+&apos;&apos; installed on your computer. if you install a new program, then the Read
+&apos;&apos; Text dialogue updates to reflect the new capabilities of your computer.
+&apos;&apos; 
+&apos;&apos; Specific information for your platform is included in the program
+&apos;&apos; listing shown when you view the **About** dialogue.
+&apos;&apos; 
+&apos;&apos; ## System Clipboard.
+&apos;&apos; 
+&apos;&apos; In some circumstances, the extension might use the system clipboard to
+&apos;&apos; retrieve text. (*Tools - Addons - Read clipboard*) If your computer uses
+&apos;&apos; an accessibility tool that also uses the clipboard to retrieve text,
+&apos;&apos; check whether the extension interferes with your software or hardware
+&apos;&apos; before using the extension to read the clipboard.
+&apos;&apos; 
+&apos;&apos; ## Windows dialogue
+&apos;&apos; 
+&apos;&apos; **Read text** reads text aloud, saves audio files and can use resources
+&apos;&apos; from the web based on the selected text.
+&apos;&apos; 
+&apos;&apos; -   Select text.
+&apos;&apos; -   Click the *Read selection* button.
+&apos;&apos; -   To read aloud, accept the default in the dialogue, or choose another
+&apos;&apos;     action from the menus.
+&apos;&apos; 
+&apos;&apos; ### Saving files
+&apos;&apos; 
+&apos;&apos; Windows lets you save sound files in an uncompressed`.wav` format. To
+&apos;&apos; save space, convert `.wav` files to small `.m4a` or `mp3` files that you
+&apos;&apos; can share on most mobile phones, music players and tablets.
+&apos;&apos; 
+&apos;&apos; ### Language support
+&apos;&apos; 
+&apos;&apos; This script uses the Windows speech application programming interface
+&apos;&apos; (`SAPI`). Depending on the version and locale of Windows, voices in
+&apos;&apos; different languages may be available.
+&apos;&apos; 
+&apos;&apos; ### Examples:
+&apos;&apos; 
+&apos;&apos; External program:
+&apos;&apos; 
+&apos;&apos;     C:\Windows\SysWOW64\wscript.exe
+&apos;&apos; 
+&apos;&apos; Command line options (default):
+&apos;&apos; 
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; &quot;(TMP)&quot;
+&apos;&apos; 
+&apos;&apos; or (save as a .wav file in the home directory):
+&apos;&apos; 
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /soundfile:&quot;(HOME)(NOW).wav&quot; &quot;(TMP)&quot;
+&apos;&apos; 
+&apos;&apos; or (use a named voice)
+&apos;&apos; 
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /voice:&quot;Microsoft Hortense Desktop - French&quot; &quot;(TMP)&quot;
+&apos;&apos; 
+&apos;&apos; or (read a little slower)
+&apos;&apos; 
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /rate:-3 &quot;(TMP)&quot;
+&apos;&apos; 
+&apos;&apos; or (change voice by language)
+&apos;&apos; 
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &quot;(TMP)&quot;
+&apos;&apos; 
+&apos;&apos; **Note**: Selecting this option doesn’t work with the SAPI speech
+&apos;&apos; synthesizer if you haven’t installed a voice in the language.
+&apos;&apos; 
+&apos;&apos; ## Optional formats
+&apos;&apos; 
+&apos;&apos; ### VLC
+&apos;&apos; 
+&apos;&apos; [VLC](https://videolan.org/vlc) is a free cross platform audio player.
+&apos;&apos; The full desktop version can save audio files in many different formats.
+&apos;&apos; This extension does not add additional metadata when you use VLC.
+&apos;&apos; 
+&apos;&apos; ### Flac
+&apos;&apos; 
+&apos;&apos; Makes free lossless audio codec (FLAC) files.
+&apos;&apos; 
+&apos;&apos; -   Install `flac.exe` in `C:\opt\`
+&apos;&apos; 
+&apos;&apos; -   [flac encoder](https://xiph.org/flac/links.html#software)
+&apos;&apos; 
+&apos;&apos; -   [Players and plugins](https://xiph.org/flac/)
+&apos;&apos; 
+&apos;&apos;     “(TTS_WSCRIPT_VBS)” /use-optional-app:“True”
+&apos;&apos;     /soundfile:“(HOME)en(NOW).flac” “(TMP)”
+&apos;&apos; 
+&apos;&apos; ### iTunes
+&apos;&apos; 
+&apos;&apos; **iTunes** is a visual music manager from Apple available at no cost.
+&apos;&apos; 
+&apos;&apos; Use [iTunes](https://www.apple.com/itunes/) to convert sound files with
+&apos;&apos; metadata and album cover art. The first time you use it, iTunes takes a
+&apos;&apos; few moments to start. iTunes creates the audio file in it’s own
+&apos;&apos; directory and signals you with a sound. Read Text Extension puts a copy
+&apos;&apos; in a sound directory in your home directory.
+&apos;&apos; 
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).aif&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).m4a&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
+&apos;&apos; 
+&apos;&apos; ### Lame
+&apos;&apos; 
+&apos;&apos; Lame is a free command line file converter.
+&apos;&apos; 
+&apos;&apos; Play mp3 compatible encoded sound files with most music players Use
+&apos;&apos; `lame.exe` to make an mp3 compatible file.
+&apos;&apos; 
+&apos;&apos; -   Install `lame.exe` in `C:\opt\`
+&apos;&apos; 
+&apos;&apos; -   [Lame encoder](http://www.rarewares.org/mp3-lame-bundle.php)
+&apos;&apos; 
+&apos;&apos;     “(TTS_WSCRIPT_VBS)” /use-optional-app:“True”
+&apos;&apos;     /soundfile:“(HOME)en(NOW).mp3” “(TMP)”
+&apos;&apos; 
+&apos;&apos; ### FFmpeg
+&apos;&apos; 
+&apos;&apos; [ffmpeg](https://www.ffmpeg.org) is a free visual music and video
+&apos;&apos; converter.
+&apos;&apos; 
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
+&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
+&apos;&apos; 
+&apos;&apos; ### Ogg
+&apos;&apos; 
+&apos;&apos; Play ogg encoded sound files with firefox, chrome or chromium. Use
+&apos;&apos; `oggenc.exe` or `oggenc2.exe` to make an ogg file
+&apos;&apos; 
+&apos;&apos; -   The ogg converter program must be installed in `C:\opt\`.
+&apos;&apos; 
+&apos;&apos; -   [oggenc2 encoder](http://www.rarewares.org/ogg-oggenc.php)
+&apos;&apos; 
+&apos;&apos; -   [Players and plugins](https://xiph.org/vorbis/)
+&apos;&apos; 
+&apos;&apos;     “(TTS_WSCRIPT_VBS)” /use-optional-app:“True”
+&apos;&apos;     /soundfile:“(HOME)en(NOW).ogg” “(TMP)”
+&apos;&apos; 
+&apos;&apos; ## Apple MacOS
+&apos;&apos; 
+&apos;&apos; **Read Text** reads text aloud, saves audio or video files from text,
+&apos;&apos; and can use resources from the web based on the selected text.
+&apos;&apos; 
+&apos;&apos; -   Select text.
+&apos;&apos; -   Click the *Read selection…* button.
+&apos;&apos; -   To read aloud, accept the default in the dialogue, or choose another
+&apos;&apos;     action from the menus.
+&apos;&apos; 
+&apos;&apos; Read Aloud
+&apos;&apos; 
+&apos;&apos;     &quot;(SAY_APPLESCRIPT)&quot;
+&apos;&apos; 
+&apos;&apos; ### Python option
+&apos;&apos; 
+&apos;&apos; Recent releases of the MacOS operating system use python 3. With
+&apos;&apos; python3, you can use python instead of Apple Script.
+&apos;&apos; 
+&apos;&apos; Python’s added options include the ability to use various local
+&apos;&apos; `python-pip3` libraries like `qrcode` and speech servers available on a
+&apos;&apos; local http server or an online resource.
+&apos;&apos; 
+&apos;&apos; Read with a female voice
+&apos;&apos; 
+&apos;&apos;     &quot;(SPD_READ_TEXT_PY)&quot; --language &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; --voice &quot;FEMALE1&quot; &quot;(TMP)&quot;
+&apos;&apos; 
+&apos;&apos; #### QR Code
+&apos;&apos; 
+&apos;&apos; `pip3 install Pillow qrcode`
+&apos;&apos; 
+&apos;&apos;     &quot;(CREATE_QR_LABEL_PY)&quot; --size 12 --output &quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).png&quot; &quot;(TMP)&quot;
+&apos;&apos; 
+&apos;&apos; #### Network speech synthesis
+&apos;&apos; 
+&apos;&apos; `pip3 install gTTS`
+&apos;&apos; 
+&apos;&apos;     &quot;(NETWORK_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_CODE) &quot;(TMP)&quot;
+&apos;&apos; 
+&apos;&apos; &lt;span id=&quot;ch014.xhtml&quot;&gt;&lt;/span&gt;
+&apos;&apos; 
+&apos;&apos; ## Linux
+&apos;&apos; 
+&apos;&apos; ### Festival
+&apos;&apos; 
+&apos;&apos; Reads a text file using festival.
+&apos;&apos; 
+&apos;&apos; The festival engine is a software speech synthesizer.
+&apos;&apos; 
+&apos;&apos; Install festival using a package manager to install a festivox or
+&apos;&apos; festival voice. The package manager should automatically select the
+&apos;&apos; festival package and the required support files.
+&apos;&apos; 
+&apos;&apos; Festival scripts allow you to change the speed, the pitch and the voice.
+&apos;&apos; You can add music or sound effects to the output.
+&apos;&apos; 
+&apos;&apos; ### Python
+&apos;&apos; 
+&apos;&apos; [Python](https://python.org) is an interpreted, interactive,
+&apos;&apos; object-oriented programming language.
+&apos;&apos; 
+&apos;&apos; Read Text uses python to access operating system commands in Linux.
+&apos;&apos; 
+&apos;&apos; External program:
+&apos;&apos; 
+&apos;&apos;     /usr/bin/python3
+&apos;&apos; 
+&apos;&apos; #### Command line options:
+&apos;&apos; 
+&apos;&apos; The command line options vary depending on the resources available on
+&apos;&apos; your computer. Both [avconv](https://libav.org/avconv.html) and
+&apos;&apos; [ffmpeg](https://ffmpeg.org) are capable of adding a poster image to an
+&apos;&apos; mp3 file as well as normal metadata.
+&apos;&apos; 
+&apos;&apos; #### Larynx
+&apos;&apos; 
+&apos;&apos; If you have downloaded a container version of LibreOffice from a
+&apos;&apos; `flatpak` or `snap` repository, you can use `larynx-server` to read text
+&apos;&apos; aloud with high quality voices. The `larynx-server` works like the
+&apos;&apos; `cups` print server. When the server is running you can access a
+&apos;&apos; `localhost` speech tool at &lt;http://0.0.0.0:5002&gt;. The read text
+&apos;&apos; extension uses the larynx python application program interface to read
+&apos;&apos; text aloud.
+&apos;&apos; 
+&apos;&apos; ##### Fedora, Red Hat, CentOS…
+&apos;&apos; 
+&apos;&apos;     sudo dnf install docker
+&apos;&apos; 
+&apos;&apos; ##### Debian, Ubuntu, Mint…
+&apos;&apos; 
+&apos;&apos;     apt-get install docker
+&apos;&apos; 
+&apos;&apos; ##### All
+&apos;&apos; 
+&apos;&apos;     docker run \
+&apos;&apos;         -it \
+&apos;&apos;         -p 5002:5002 \
+&apos;&apos;         -e &quot;HOME=${HOME}&quot; \
+&apos;&apos;         -v &quot;$HOME:${HOME}&quot; \
+&apos;&apos;         -v /usr/share/ca-certificates:/usr/share/ca-certificates \
+&apos;&apos;         -v /etc/ssl/certs:/etc/ssl/certs \
+&apos;&apos;         -w &quot;${PWD}&quot; \
+&apos;&apos;         --user &quot;$(id -u):$(id -g)&quot; \
+&apos;&apos;         rhasspy/larynx
+&apos;&apos; 
+&apos;&apos; You can find out more about Larynx at the `rhsspy larynx` website.
+&apos;&apos; 
+&apos;&apos; &lt;https://github.com/rhasspy/larynx&gt;
+&apos;&apos; 
+&apos;&apos; #### More
+&apos;&apos; 
+&apos;&apos; See the manual page for *python* for more detailed information about
+&apos;&apos; python. Click the *About…* button in the extension dialogue for
+&apos;&apos; information about specific options available to you.
+&apos;&apos; 
+&apos;&apos; ## Cross Platform information
+&apos;&apos; 
+&apos;&apos; ### Reset Speech
+&apos;&apos; 
+&apos;&apos; if you are having problems with speech it is easy to reset the extension
+&apos;&apos; to the default settings. Simply type some random characters into the
+&apos;&apos; *External program* box in the main dialogue. The extension shows an
+&apos;&apos; error message and deletes the settings files that the extension creates.
+&apos;&apos; When you click the *Read Selection* button, the settings are rebuilt
+&apos;&apos; from scratch.
+&apos;&apos; 
+&apos;&apos; ### Reading files
+&apos;&apos; 
+&apos;&apos; All extensions run in the **trusted** zone on your computer. This means
+&apos;&apos; that this extension, like all extensions, can read files on your
+&apos;&apos; computer without notifying you. Make sure that extensions you use come
+&apos;&apos; from a trusted source.
+&apos;&apos; 
+&apos;&apos; ### Temporary Files
+&apos;&apos; 
+&apos;&apos; This extension uses temporary files for two purposes:
+&apos;&apos; 
+&apos;&apos; -   Communicate with an external script or program.
+&apos;&apos; -   Remember your preferences.
+&apos;&apos; 
+&apos;&apos; The location of temporary and settings files are determined by your
+&apos;&apos; operating system. Depending on the security set up of your computer,
+&apos;&apos; other users or programs might be able to read the contents of the
+&apos;&apos; settings or temporary files. if you are concerned about privacy, launch
+&apos;&apos; this add-on again with no text selected to replace the temporary file
+&apos;&apos; that contains the text you want to remain confidential. The path and
+&apos;&apos; name of the temporary file is shown in the Command and Script areas of
+&apos;&apos; the *About…* dialogue.
+&apos;&apos; 
+&apos;&apos; ### Customizing speech
+&apos;&apos; 
+&apos;&apos; Speech can be modified by command line arguments, platform settings and
+&apos;&apos; codes embedded into the speech text string.
+&apos;&apos; 
+&apos;&apos; When creating spoken records of written documents, pauses are important.
+&apos;&apos; Text is more understandable and less fatiguing to listen to when it is
+&apos;&apos; punctuated by pauses between paragraphs or ideas.
+&apos;&apos; 
+&apos;&apos; Modern speech synthesizers take care of most of the pauses required due
+&apos;&apos; to punctuation and line breaks, but under some circumstances, an author
+&apos;&apos; of a speech document may need to add a break manually.
+&apos;&apos; 
+&apos;&apos; ### Windows
+&apos;&apos; 
+&apos;&apos; All currently supported versions of Windows can use [W3 Synchronized
+&apos;&apos; Multimedia Integration Language](https://www.w3.org/TR/SMIL3/). **SMIL**
+&apos;&apos; markup enables responsive speech as well as incorporating specific
+&apos;&apos; languages, pitch, volume, speed and pauses.
+&apos;&apos; 
+&apos;&apos; ### Linux
+&apos;&apos; 
+&apos;&apos; Linux support for SMIL varies by speech synthesizer. In some speech
+&apos;&apos; synthesizers, it is disabled by default, but can be enabled using a
+&apos;&apos; command line switch.
+&apos;&apos; 
+&apos;&apos; ### MacOS
+&apos;&apos; 
+&apos;&apos; MacOS uses a [custom
+&apos;&apos; markup](https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/Introduction/Introduction.html)
+&apos;&apos; for speech synthesis instead of SMIL. The markup can incorporate changes
+&apos;&apos; in pitch, speed and volume, but does not specify language. for US
+&apos;&apos; English users, the markup includes a context driven means of specifying
+&apos;&apos; a particular way to pronounce a word in an ambiguous context.
+&apos;&apos; 
+&apos;&apos; MacOS computers require a short gap at the end of short synthesized
+&apos;&apos; speech utterances when recording sound to a file.
+&apos;&apos; 
+&apos;&apos; Very short words cause an osascript error when adding metadata via
+&apos;&apos; iTunes on MacOS. As well, single words in synthesized speech are easier
+&apos;&apos; to understand if we add about half a second of silence to the end of
+&apos;&apos; each utterance, especially if gapless playback is enabled.
+&apos;&apos; 
+&apos;&apos; The [inline
+&apos;&apos; code](https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/FineTuning/FineTuning.html#//apple_ref/doc/uid/TP40004365-CH5-SW10)
+&apos;&apos; `[[slnc 400]]` causes the speech synthesizer to include 400 milliseconds
+&apos;&apos; of silence.
+&apos;&apos; 
+&apos;&apos; ### Media Directories
+&apos;&apos; 
+&apos;&apos; Read Text Extension can create media files for playback on portable
+&apos;&apos; devices or for embedding into other content you create.
+&apos;&apos; 
+&apos;&apos; -   if you are using iTunes, the iTunes program creates a media file in
+&apos;&apos;     the iTunes music directory. The extension makes a copy in your home
+&apos;&apos;     directory in a folder named with the iso code of your language -
+&apos;&apos;     *en* for English, *de* for German, *es* for Spanish etc.
+&apos;&apos; -   if you are using a command-line program to convert your media files,
+&apos;&apos;     then the media file is saved to home directory in a folder named
+&apos;&apos;     with the iso code of your language.
+&apos;&apos; 
+&apos;&apos; ### Custom Directories
+&apos;&apos; 
+&apos;&apos; if you don’t like the defaults, set the name of the directory yourself.
+&apos;&apos; The extension will attempt to create the directory if it is a valid
+&apos;&apos; path.
+&apos;&apos; 
+&apos;&apos; ### Tokens
+&apos;&apos; 
+&apos;&apos; The extension replaces strings in the main dialogue with path names or
+&apos;&apos; command arguments at run time. You can preview the actual command line
+&apos;&apos; using the *About…* dialogue.
+&apos;&apos; 
+&apos;&apos; for more information about tokens, look in the office help for *Read
+&apos;&apos; Text Extension - Setting Up Read Text Extension - Command and Script
+&apos;&apos; Tokens*.
+&apos;&apos; 
+&apos;&apos; ## Language and Region
+&apos;&apos; 
+&apos;&apos; The extension can determine the language of the selected text and pass
+&apos;&apos; the value to a speech synthesizer. The languages on your computer vary
+&apos;&apos; depending on the platform, release version and locale of the operating
+&apos;&apos; system as well as software you might have installed.
+&apos;&apos; 
+&apos;&apos; Most computers include at least a simple English voice. if you are not
+&apos;&apos; certain whether speech is installed, try a using a simple English voice
+&apos;&apos; with plain ASCII text.
+&apos;&apos; 
+&apos;&apos; ### Complex languages
+&apos;&apos; 
+&apos;&apos; Complex languages need special handling because their Unicode strings
+&apos;&apos; use directional markers.
+&apos;&apos; 
+&apos;&apos; Gurmukhi script is used for Punjabi. Devanagari script is for Hindi and
+&apos;&apos; other Indic languages. Other complex languages include Dogri, Bodo,
+&apos;&apos; Maithili, Khmer, Thaana, Dhiveh, Urdu, Farsi, Arabic, Kashmiri, Kurdish,
+&apos;&apos; Hebrew, Bengali, Gurjarti, Oriya, Tamil, Telugu, Kannada, Malayalam,
+&apos;&apos; Burmese (Myanmar), Thai, Lao, Tibetan, Dzongkha, Ethiopic, Ethiopic
+&apos;&apos; Supplement, Limbu, and Ethopic Extended. Some languages use either
+&apos;&apos; western or complex letters depending on region and media.
+&apos;&apos; 
+&apos;&apos; ### Asian languages
+&apos;&apos; 
+&apos;&apos; Asian languages may include a large porportion of ideagrams, or
+&apos;&apos; non-phonetic letters. The direction of Asian text is top to bottom or
+&apos;&apos; left to right. Korean Hangul traditionally incorporated Chinese-like
+&apos;&apos; characters, but contemporary script is primarily phonetic. Japanese
+&apos;&apos; includes Chinese-like characters as well as different phonetic letter
+&apos;&apos; sets for some Japanese and imported words.
+&apos;&apos; 
+&apos;&apos; ## Reference
+&apos;&apos; 
+&apos;&apos; ### MsgSpeak (Basic command)
+&apos;&apos; 
+&apos;&apos; if you want to get your hands dirty with a little Basic programming, you
+&apos;&apos; can use the `msgspeak` command in your own slide shows or programs to
+&apos;&apos; synthesize speech.
+&apos;&apos; 
+&apos;&apos; The command reads the string using the language and region of the the
+&apos;&apos; current document using the current settings of extension. if the
+&apos;&apos; extension is set up to go to a web page or save a file, that is what it
+&apos;&apos; will do when you activate the command.
+&apos;&apos; 
+&apos;&apos; This example shows how to use the command in your own script:
+&apos;&apos; 
+&apos;&apos;     sub OnClickMySlide1Image1()
+&apos;&apos;         &apos; Read text aloud.
+&apos;&apos;         dim oSvc
+&apos;&apos;         dim sURL
+&apos;&apos;         dim sArg
+&apos;&apos; 
+&apos;&apos;         sArg = &quot;Hello world!&quot;
+&apos;&apos;         sURL = &quot;https://sites.google.com/site/readtextextension/&quot;
+&apos;&apos;         on error goto OnClickMySlide1Image1Err
+&apos;&apos;         msgSpeak(sArg)
+&apos;&apos;         exit sub
+&apos;&apos;         OnClickMySlide1Image1Err:
+&apos;&apos;         if msgbox(&quot;The button couldn&apos;t find a &quot;&quot;text to speech&quot;&quot; add-on.&quot; &amp; _
+&apos;&apos;                 chr(10) &amp; _
+&apos;&apos;                 sArg &amp; _
+&apos;&apos;                 chr(10) &amp; _
+&apos;&apos;                 &quot;Get on-line help?&quot;, _
+&apos;&apos;                 4, _
+&apos;&apos;                 &quot;Read Text&quot;) &lt;&gt; 7 then
+&apos;&apos;             oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+&apos;&apos;             oSvc.execute(sURL,&quot;&quot;,0)
+&apos;&apos;         end if
+&apos;&apos;     end sub
+&apos;&apos; 
+&apos;&apos; ### Help in LibreOffice
+&apos;&apos; 
+&apos;&apos; LibreOffice does not show an extension’s help documents if the
+&apos;&apos; application’s help documents are not installed. In this case, we show
+&apos;&apos; web based extension help in a browser window
+&apos;&apos; 
+&apos;&apos; ### Time formats
+&apos;&apos; 
+&apos;&apos; Speech synthesizers may be able to convert strings written in a standard
+&apos;&apos; machine language style to normal speech. if you are not sure how to
+&apos;&apos; communicate a time and date to someone who does not speak your language,
+&apos;&apos; a standard time format is useful.
+&apos;&apos; 
+&apos;&apos; -   The Internet Engineering Task force [RFC
+&apos;&apos;     3339](https://www.ietf.org/rfc/rfc3339.txt).
+&apos;&apos; -   Unix `man date`
+&apos;&apos; 
+&apos;&apos; Unix commands to generate formatted time strings
+&apos;&apos; 
+&apos;&apos;     date +%F-T%X%:z &gt; &quot;$HOME/date.txt&quot;
+&apos;&apos;     date -u +%F-T%X-00:00 &gt; &quot;$HOME/date.txt&quot;
+&apos;&apos; 
+&apos;&apos; &lt;span id=&quot;ch018.xhtml&quot;&gt;&lt;/span&gt;
+&apos;&apos; 
+&apos;&apos; ## iTunes for Windows
+&apos;&apos; 
+&apos;&apos; People with Apple branded devices or subscribers to Apple services can
+&apos;&apos; use iTunes for Windows to access streaming media and to manage their
+&apos;&apos; devices.
+&apos;&apos; 
+&apos;&apos; A Windows computer can use iTunes to convert text to speech audio files
+&apos;&apos; in WAV format to MP3 or M4A audio files for mobile devices.
+&apos;&apos; 
+&apos;&apos; ### More information
+&apos;&apos; 
+&apos;&apos; -   [Windows 7](https://www.apple.com/itunes/download/win64)
+&apos;&apos; -   Windows 8, 10 and 11 [Microsoft  
+&apos;&apos;     store](https://www.microsoft.com/en-us/p/itunes/9pb2mz1zmb1s?activetab=pivot:overviewtab)
+&apos;&apos;     (recommended)
+&apos;&apos; 
+&apos;&apos; ### Graphic sizes
+&apos;&apos; 
+&apos;&apos; Impress presentation software can convert slide images to **.jpeg** or
+&apos;&apos; **.png** files. it’s an easy way to add titles to a photo or to prepare
+&apos;&apos; a picture with a specific size for publication on a blog or news site.
+&apos;&apos; 
+&apos;&apos; When you publish a graphic, it looks best and renders fastest if you set
+&apos;&apos; it to the exact size needed. Cameras usually use resolution settings
+&apos;&apos; that are much larger than needed for viewing on a screen. The large size
+&apos;&apos; is required because images are often cropped or straightened. On low
+&apos;&apos; cost portable devices, these large images may take a long time to render
+&apos;&apos; or may be distorted.
+&apos;&apos; 
+&apos;&apos; The [Participatory Culture
+&apos;&apos; Foundation](https://web.archive.org/web/20160526113720/http://develop.participatoryculture.org/index.php/ConversionMatrix)
+&apos;&apos; published a matrix that shows standard screen resolutions as well as
+&apos;&apos; resolutions for many portable devices. Here are several popular formats:
+&apos;&apos; 
+&apos;&apos; -   **1200x800** A classic 35 mm camera format that looks good on a HDMI
+&apos;&apos;     screen or a full screen MacBook
+&apos;&apos; -   **640x480** VGA projector or NTSC broadcast 4:3
+&apos;&apos; -   **720x576** PAL broadcast
+&apos;&apos; -   **1366x768** Windows laptop 16:9
+&apos;&apos; -   **1280x800** Apple MacBook
+&apos;&apos; -   **1440x900** Apple MacBook Air
+&apos;&apos; -   **1920x1080** 1080p High Def TV 16:9
+&apos;&apos; 
+&apos;&apos; Some media players will distort album cover art if it is not square.
+&apos;&apos; 
+&apos;&apos; -   **600x600** Small square format for audio players
+&apos;&apos; 
+&apos;&apos; ### FFmpeg
+&apos;&apos; 
+&apos;&apos; [FFmpeg](https://www.ffmpeg.org) is a general purpose command line
+&apos;&apos; video, graphic and sound converter for Linux, MacOS, UNIX and Windows.
+&apos;&apos; Read Text can use it to convert speech recordings to different formats.
+&apos;&apos; 
+&apos;&apos; [AVconv](https://libav.org/avconv.html) is a *fork* of FFmpeg, and
+&apos;&apos; shares many of the same commands and capabilities. On [Ubuntu
+&apos;&apos; Linux](https://ubuntu.com), the `avconv` project is included in the
+&apos;&apos; repository instead of `ffmpeg`. Read text can use either.
+&apos;&apos; 
+&apos;&apos;     sudo apt-get install avconv
+&apos;&apos; 
+&apos;&apos;     &apos; or return `` if the application isn&apos;t in the path.
+&apos;&apos; 
+&apos;&apos; ### Stopping Speech
+&apos;&apos; 
+&apos;&apos; To stop speech, click the Read selection button while the voice is
+&apos;&apos; speaking.
+&apos;&apos; 
+&apos;&apos; ### Windows
+&apos;&apos; 
+&apos;&apos; Stopping the speech is handled in the external script.
+&apos;&apos; 
+&apos;&apos; ### MacOS
+&apos;&apos; 
+&apos;&apos; Stopping the speech is handled in the `resetSpeechDispatcher` procedure
+&apos;&apos; in the TTS Utilities module of the extension.
+&apos;&apos; 
+&apos;&apos; ### Linux
+&apos;&apos; 
+&apos;&apos; Stopping the speech is handled in the `resetSpeechDispatcher` procedure
+&apos;&apos; in the TTS Utilities module of the extension.
+&apos;&apos; 
+&apos;&apos; **Speech Dispatcher** is an optional speech manager for Linux. It isn’t
+&apos;&apos; needed for read text extension.
+&apos;&apos; 
+&apos;&apos; You can manually edit the speech-dispatcher settings files to use
+&apos;&apos; specific speech engines for different languages. for example, you could
+&apos;&apos; set up English and Spanish to use pico and Catalan to use festival. if
+&apos;&apos; the speech dispatcher voice becomes distorted or stops working, you can
+&apos;&apos; try resetting it using `killall speech-dispatcher`, or by logging out
+&apos;&apos; and logging in again. Specific voice settings are in the extension’s
+&apos;&apos; main menu dialogue.
+&apos;&apos; 
+&apos;&apos; [Speech-dispatcher
+&apos;&apos; help](https://www.unix.com/man-page/all/1/speech-dispatcher/)
+&apos;&apos; 
+&apos;&apos; To install speech-dispatcher, use:
+&apos;&apos; 
+&apos;&apos;     sudo apt-get install speech-dispatcher
+&apos;&apos; 
+&apos;&apos; ## Your personal information
+&apos;&apos; 
+&apos;&apos; Extensions run in the **trusted zone**. All extensions have access to
+&apos;&apos; the information that you entered into *Tools - Options - User Data*.
+&apos;&apos; Read Text extension uses your first and last name to provide *artist*
+&apos;&apos; information to sound or video files that you create only if the original
+&apos;&apos; author of a document is ambiguous or missing.
+&apos;&apos; 
+&apos;&apos; ### Where is your personal information stored?
+&apos;&apos; 
+&apos;&apos; Apache OpenOffice and LibreOffice store the personal information in a
+&apos;&apos; registry file, coded in xml format in a UTF-8 text document. You can
+&apos;&apos; review the data in the file,
+&apos;&apos; `&lt;&lt;OOo-Profile/3/user/registry/data&gt;&gt; /org/openoffice/UserProfile.xcu`.
+&apos;&apos; The information is located in the XML-node labelled *Data*. Find out
+&apos;&apos; more at the [Apache OpenOffice
+&apos;&apos; forum](http://forum.openoffice.org/en/forum/viewtopic.php?f=20&amp;t=14750).
+&apos;&apos; 
+&apos;&apos; Depending on your office application and version, you may be able to
+&apos;&apos; uncheck a box labelled *Use data for document properties* in the *User
+&apos;&apos; Data* dialogue.
+&apos;&apos; 
+&apos;&apos; ## Making release notes
+&apos;&apos; 
+&apos;&apos; Each xba script includes up-to-date notes as **markdown** text. To
+&apos;&apos; create an *About* document in Linux or MacOS, use the terminal command
+&apos;&apos; shown in the input box shown when you run the `fsReleasenotesCMD`
+&apos;&apos; procedure.
+&apos;&apos; 
+&apos;&apos; You can use [Python Markdown](https://pypi.python.org/pypi/Markdown) or
+&apos;&apos; [Dingus](https://daringfireball.net/projects/markdown/dingus), an
+&apos;&apos; on-line markdown converter, to convert the help file to html. You can
+&apos;&apos; use [calibre-ebook](https://calibre-ebook.com/) to convert markdown text
+&apos;&apos; to many other formats.
+&apos;&apos; 
+&apos;&apos; ### About Markdown
+&apos;&apos; 
+&apos;&apos; [Markdown](https://daringfireball.net/projects/markdown/) is a simple
+&apos;&apos; way to format text for blogs, email, news, education and technical
+&apos;&apos; support documentation.
+&apos;&apos; 
+&apos;&apos; There are forks and extensions of the original release. To provide
+&apos;&apos; compatibility across platforms, use plain and simple markdown that is
+&apos;&apos; compatible with python-markdown.
+&apos;&apos; 
+&apos;&apos; [Python-markdown](https://pypi.python.org/pypi/Markdown) comes with
+&apos;&apos; [calibre-ebook](https://calibre-ebook.com/) or is available on Debian
+&apos;&apos; and Ubuntu Linux with:
+&apos;&apos; 
+&apos;&apos;     sudo apt-get install python-markdown
+&apos;&apos; 
+&apos;&apos; ### Copyright And License
+&apos;&apos; 
+&apos;&apos; \(c\) 2008-2022 James Holgate Vancouver, CANADA (readtextextension (a)
+&apos;&apos; outlook.com)
+&apos;&apos; 
+&apos;&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER
+&apos;&apos; THE TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE
+&apos;&apos; SOFTWARE FOUNDATION; EITHER VERSION 2 OF THE LICENSE, OR (AT YOUR
+&apos;&apos; OPTION) ANY LATER VERSION. THIS SCRIPT IS DISTRIBUTED IN THE HOPE THAT
+&apos;&apos; IT WILL BE USEFUL, BUT WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
+&apos;&apos; WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. SEE THE
+&apos;&apos; GNU GENERAL PUBLIC LICENSE FOR MORE DETAILS.
+&apos;&apos; 
+&apos;&apos; YOU SHOULD HAVE RECEIVED A COPY OF THE GNU GENERAL PUBLIC LICENSE ALONG
+&apos;&apos; WITH THIS SOFTWARE; if not, WRITE TO THE FREE SOFTWARE FOUNDATION,INC.,
+&apos;&apos; 59 TEMPLE PLACE,SUITE 330,BOSTON,MA 02111-1307 USA
 &apos;&apos;
-&apos;&apos; These functions handle events, create combo box listings,
-&apos;&apos; read and write strings to files, get selected text, clean
-&apos;&apos; up strings, etc.  There are some strings that may need to
-&apos;&apos; be modified over time, including URLs and command lines
-&apos;&apos; for programs that get revised or don&apos;t work anymore.
-&apos;&apos;
-&apos;&apos; In this program, external scripts do the work.  The script
-&apos;&apos; language is different for each major platform.  In Apple
-&apos;&apos; MacOS, the language is osascript, also known as Apple Script.
-&apos;&apos; Linux and other Unix-like platforms use python scripts.
-&apos;&apos; Windows uses vbs.  Read the script and command line for
-&apos;&apos; your platform by clicking the **About...** button from the
-&apos;&apos; main dialogue window.
-&apos;&apos;
-&apos;&apos; The abilities of Read Text vary by platform and installed
-&apos;&apos; software.  for example, in Windows, installing iTunes allows
-&apos;&apos; you to save files in the .m4a format for portable players.
-&apos;&apos; In Linux, `avconv` or `ffmpeg` allow you to save sounds in
-&apos;&apos; various audio formats according to the packages installed
-&apos;&apos; on your computer.  if you install a new program, then the
-&apos;&apos; Read Text dialogue updates to reflect the new capabilities
-&apos;&apos; of your computer.
-&apos;&apos;
-&apos;&apos; Specific information for your platform is included in the
-&apos;&apos; program listing shown when you view the **About** dialogue.
-&apos;&apos;
+Option Explicit
 
 Sub OK_MouseUp( _
 	Event As Object)
@@ -272,22 +888,7 @@ End Sub
 
 
 Function fbUsingTouchScreen() As Boolean
-&apos;&apos;
-&apos;&apos; # Touch Screen
-&apos;&apos;
-&apos;&apos; if you are using a touch screen or another pointing device that makes it difficult
-&apos;&apos; to manually select text, you can enable enhanced text selection by checking the
-&apos;&apos; *Touch Screen* checkbox in the main dialogue.  The extension will try to
-&apos;&apos; determine what you want to select before processing the text.  for example, 
-&apos;&apos; in the word processor, the extension will read to the end of the paragraph 
-&apos;&apos; containing the cursor, then move the cursor to the beginning of the next 
-&apos;&apos; paragraph.
-&apos;&apos;
-&apos;&apos; When the Touch Screen function is enabled, the extension might use the system 
-&apos;&apos; clipboard to retrieve text.  if you are using accessibility software or hardware
-&apos;&apos; that also uses the clipboard to retrieve text, check whether the extension 
-&apos;&apos; interferes with your software or hardware when you enable the Touch Screen function.
-&apos;&apos;
+&apos; System Clipboard.
 	Dim sFile As String
 	Dim iSmart As Integer
 	Dim config
@@ -340,7 +941,7 @@ End Function
 
 
 Function fsProgramCommand() As String
-&apos;&apos;
+
 	Dim sFile As String
 	Dim sSmart As String
 	Dim config
@@ -948,146 +1549,7 @@ End Function
 
 Sub dialog1Combo2ShowSAPIChoices( _
 	oDialog)
-&apos;&apos;
-&apos;&apos; # Windows dialogue
-&apos;&apos; 
-&apos;&apos; **Read text** reads text aloud, saves audio files and
-&apos;&apos; can use resources from the web based on the selected
-&apos;&apos; text.
-&apos;&apos;
-&apos;&apos; * Select text.
-&apos;&apos; * Click the *Read selection* button.
-&apos;&apos; * To read aloud, accept the default in the dialogue, or choose
-&apos;&apos;   another action from the menus.
-&apos;&apos;
-&apos;&apos; Saving files
-&apos;&apos; ------------
-&apos;&apos;
-&apos;&apos; Windows lets you save sound files in an uncompressed`.wav` format.
-&apos;&apos; To save space, convert `.wav` files to small `.m4a` or `mp3` files
-&apos;&apos; that you can share on most mobile phones, music players and tablets.
-&apos;&apos;
-&apos;&apos; Language support
-&apos;&apos; ----------------
-&apos;&apos;
-&apos;&apos; This script uses the Windows speech application programming
-&apos;&apos; interface (`SAPI`). Depending on the version and locale of
-&apos;&apos; Windows, voices in different languages may be available.
-&apos;&apos;
-&apos;&apos; Examples:
-&apos;&apos; ---------
-&apos;&apos;
-&apos;&apos; External program:
-&apos;&apos;
-&apos;&apos;     C:\Windows\SysWOW64\wscript.exe
-&apos;&apos;
-&apos;&apos; Command line options (default):
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; &quot;(TMP)&quot;
-&apos;&apos;
-&apos;&apos; or (save as a .wav file in the home directory):
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /soundfile:&quot;(HOME)(NOW).wav&quot; &quot;(TMP)&quot;
-&apos;&apos;
-&apos;&apos; or (use a named voice)
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /voice:&quot;Microsoft Hortense Desktop - French&quot; &quot;(TMP)&quot;
-&apos;&apos;
-&apos;&apos; or (read a little slower)
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /rate:-3 &quot;(TMP)&quot;
-&apos;&apos;
-&apos;&apos; or (change voice by language)
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &quot;(TMP)&quot;
-&apos;&apos;
-&apos;&apos; **note**: Selecting this option doesn&apos;t work with the SAPI
-&apos;&apos; speech synthesizer if you haven&apos;t installed a voice in the
-&apos;&apos; language.
-&apos;&apos;
-&apos;&apos; Optional formats
-&apos;&apos; ================
-&apos;&apos;
-&apos;&apos; ## Audacity
-&apos;&apos;
-&apos;&apos; [Audacity](https://sourceforge.net/projects/audacity/) is a free cross platform audio editor. It can
-&apos;&apos; use an [FFmpeg](https://ffmpeg.org/) library to save audio files in different formats.
-&apos;&apos;
-&apos;&apos; ### FFmpeg for Audacity
-&apos;&apos;
-&apos;&apos; Windows security policies may prevent you from installing the Audacity FFmpeg converter
-&apos;&apos; library using the `ffmpeg-win-2.2.2.exe` installer.  You can install the FFmpeg library
-&apos;&apos; by downloading the `ffmpeg-win-2.2.2.zip` archive and copying the contents to a
-&apos;&apos; directory that is available to all users.
-&apos;&apos;
-&apos;&apos; 1. Log in with an administrator account.
-&apos;&apos; 2. Go to the [MP3 for Audacity page](https://lame.buanzo.org/#lamewindl).
-&apos;&apos; 3. Directly underneath &quot;for FFmpeg/LAME on Windows click below:&quot;, left-click the link
-&apos;&apos;   `ffmpeg-win-2.2.2.zip` and save the file anywhere on your computer.
-&apos;&apos; 4. Double-click `ffmpeg-win-2.2.2.zip` to open the archive.
-&apos;&apos; 5. if the directory `C:\opt` doesn&apos;t exist, create it. Copy the contents of the zip
-&apos;&apos;    file to `C:\opt`.
-&apos;&apos; 6. Any user can now set up Audacity to use ffmpeg by opening Audacity, then setting
-&apos;&apos;    *Edit - Preferences... - Libraries - FFmpeg library* to `C:\opt`.
-&apos;&apos; 7. Read text extension now shows .mp3 and .ogg formats as export options.
-&apos;&apos; 8. You can use Audacity to add music or special effects to your sound files.
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
-&apos;&apos;
-&apos;&apos; ## Flac
-&apos;&apos;
-&apos;&apos; Makes free lossless audio codec (FLAC) files.
-&apos;&apos;
-&apos;&apos;  * Install `flac.exe` in `C:\opt\`
-&apos;&apos;  * [flac encoder](https://xiph.org/flac/links.html#software)
-&apos;&apos;  * [Players and plugins](https://xiph.org/flac/)
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).flac&quot; &quot;(TMP)&quot;
-&apos;&apos;
-&apos;&apos; ## iTunes
-&apos;&apos;
-&apos;&apos; **iTunes** is a visual music manager from Apple available at no cost.
-&apos;&apos;
-&apos;&apos; Use [iTunes](https://www.apple.com/itunes/) to convert sound files with metadata
-&apos;&apos; and album cover art. The first time you use it, iTunes takes a few moments to start.
-&apos;&apos; iTunes creates the audio file in it&apos;s own directory and signals you with a sound.
-&apos;&apos; Read Text Extension puts a copy in a sound directory in your home directory.
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).aif&quot; &quot;(TMP)&quot;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).m4a&quot; &quot;(TMP)&quot;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /language:&quot;en-US&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
-&apos;&apos;
-&apos;&apos; ## Lame
-&apos;&apos;
-&apos;&apos; Lame is a free command line file converter.
-&apos;&apos;
-&apos;&apos; Play mp3 compatible encoded sound files with most music players
-&apos;&apos; Use `lame.exe` to make an mp3 compatible file.
-&apos;&apos;
-&apos;&apos;  * Install `lame.exe` in `C:\opt\`
-&apos;&apos;  * [Lame encoder](http://www.rarewares.org/mp3-lame-bundle.php)
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
-&apos;&apos;
-&apos;&apos; ## FFmpeg
-&apos;&apos;
-&apos;&apos; [ffmpeg](https://www.ffmpeg.org) is a free visual music and video converter.
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).mp3&quot; &quot;(TMP)&quot;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
-&apos;&apos;
-&apos;&apos; ## Ogg
-&apos;&apos;
-&apos;&apos; Play ogg encoded sound files with firefox, chrome or chromium.
-&apos;&apos; Use `oggenc.exe` or `oggenc2.exe` to make an ogg file
-&apos;&apos;
-&apos;&apos;  * The ogg converter program must be installed in `C:\opt\`.
-&apos;&apos;  * [oggenc2 encoder](http://www.rarewares.org/ogg-oggenc.php)
-&apos;&apos;  * [Players and plugins](https://xiph.org/vorbis/)
-&apos;&apos;
-&apos;&apos;     &quot;(TTS_WSCRIPT_VBS)&quot; /use-optional-app:&quot;True&quot; /soundfile:&quot;(HOME)en\(NOW).ogg&quot; &quot;(TMP)&quot;
-&apos;&apos;
+&apos; Windows dialogue
 	Dim Sapi As Object
 	Dim n As Integer
 	Dim aLineOfText As String,myScriptPath As String
@@ -1363,23 +1825,7 @@ End Function
 
 Sub dialog1Combo2ShowSAYChoices( _
 	oDialog)
-&apos;&apos;
-&apos;&apos; # Apple MacOS
-&apos;&apos; 
-&apos;&apos; **Read Text** reads text aloud, saves audio or video files
-&apos;&apos; from text, and can use resources from the web based on the
-&apos;&apos; selected text.
-&apos;&apos; 
-&apos;&apos;  * Select text.
-&apos;&apos;  * Click the *Read selection...* button.
-&apos;&apos;  * To read aloud, accept the default in the dialogue, or choose
-&apos;&apos;    another action from the menus.
-&apos;&apos; 
-&apos;&apos; Read Aloud
-&apos;&apos; 
-&apos;&apos;     &quot;(SAY_APPLESCRIPT)&quot;
-&apos;&apos; 
-&apos;&apos; 
+&apos; Apple MacOS
 	Dim n, o As Integer
 	Dim s1 As String
 	Dim oComboBox As Variant
@@ -1434,7 +1880,6 @@ Sub dialog1Combo2ShowSAYChoices( _
 			fsMacVoice(n, selection_IsoLang) &amp; _
 			&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
 			oComboBox.addItem(s1,0)
-			&apos;&apos;n=n+1
 		End If
 	Next
 	s1 = &quot;-f &quot;&quot;(TMP)&quot;&quot;&quot;
@@ -1664,23 +2109,7 @@ End Sub
 
 Sub dialog1Combo1ShowFestivalScripts( _
 	oDialog)
-&apos;&apos;
-&apos;&apos; # Linux 
-&apos;&apos;
-&apos;&apos; Festival
-&apos;&apos; --------
-&apos;&apos; 
-&apos;&apos; Reads a text file using festival.
-&apos;&apos; 
-&apos;&apos; The festival engine is a software speech synthesizer.
-&apos;&apos; 
-&apos;&apos; Install festival using a package manager to install a festivox or festival
-&apos;&apos; voice.  The package manager should automatically select the festival package
-&apos;&apos; and the required support files.
-&apos;&apos;
-&apos;&apos; Festival scripts allow you to change the speed, the pitch and the voice.  You can 
-&apos;&apos; add music or sound effects to the output.
-&apos;&apos;
+&apos; Linux
 	Dim n As Integer
 	Dim n2 As Integer
 	Dim s1 As String
@@ -1732,33 +2161,7 @@ End Function
 
 Function fiDialog1Combo2ShowMyPythonChoices( _
 	oDialog) As Integer
-&apos;&apos;
-&apos;&apos; Python
-&apos;&apos; ------
-&apos;&apos; 
-&apos;&apos; [Python][SMPC1] is an interpreted, interactive, object-oriented
-&apos;&apos; programming language.
-&apos;&apos;
-&apos;&apos; Read Text uses python to access operating system commands in Linux.
-&apos;&apos; 
-&apos;&apos; External program:
-&apos;&apos; 
-&apos;&apos;     /usr/bin/python3
-&apos;&apos; 
-&apos;&apos; Command line options:
-&apos;&apos; 
-&apos;&apos; The command line options vary depending on the speech resources available on
-&apos;&apos; your computer.  for Linux, an audio file converter that can add metadata tags
-&apos;&apos; is recommended.  Both [avconv][SMPC2] and [ffmpeg][SMPC3] are capable.
-&apos;&apos; 
-&apos;&apos; See the manual page for *python* for more detailed information about python.
-&apos;&apos; Click the *About...* button in the extension dialogue for information about
-&apos;&apos; specific options available to you.
-&apos;&apos;
-&apos;&apos; [SMPC1]: https://python.org
-&apos;&apos; [SMPC2]: https://libav.org/avconv.html
-&apos;&apos; [SMPC3]: https://ffmpeg.org
-&apos;&apos;
+	&apos; Python
 	&apos; Show the python script options
 	Dim n As Integer
 	Dim n2 As Integer
@@ -2255,9 +2658,6 @@ Function AppleScriptPath() As String
 	AppleScriptPath = &quot;/usr/bin/osascript&quot;
 End Function
 
-&apos;&apos;
-&apos;&apos; # Cross Platform information
-&apos;&apos;
 
 Function fsMyTitleInputBox( _
 	ByVal b_skip_windows, _
@@ -2306,15 +2706,7 @@ End Function
 
 
 Sub resetSpeech()
-&apos;&apos; Reset Speech
-&apos;&apos; ------------
-&apos;&apos;
-&apos;&apos; if you are having problems with speech it is easy to reset the extension to the
-&apos;&apos; default settings.  Simply type some random characters into the *External program*
-&apos;&apos; box in the main dialogue.  The extension shows an error message and deletes the 
-&apos;&apos; settings files that the extension creates. When you click  the *Read Selection*
-&apos;&apos; button, the settings are rebuilt from scratch.
-&apos;&apos;
+&apos; Reset Speech
 	Dim aFile, CR As String
 	Dim a1
 	Dim n As Integer
@@ -2394,14 +2786,7 @@ End Function
 Function getTextFromFile( _
 	sFilePath, _
 	sEncoding) As String
-&apos;&apos;
-&apos;&apos; Reading files
-&apos;&apos; -------------
-&apos;&apos; 
-&apos;&apos; All extensions run in the **trusted** zone on your computer. This means that
-&apos;&apos; this extension, like all extensions, can read files on your computer without
-&apos;&apos; notifying you.  Make sure that extensions you use come from a trusted source.
-&apos;&apos;
+&apos; Reading files
 	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t=53813
 	&apos; Use simpleFileAccess instead of Basic file handling to 
 	&apos; translate encoded text
@@ -2530,24 +2915,7 @@ Sub ttsActuate( _
 	media_list = &quot;.3gp,.aac,.aif,.aiff,.alsa,.ape,.asf,.au,.avi,.caf,.dts,.flac,&quot; &amp; _
 		&quot;.m4a,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.oma,.opus,.riff,.rm,.smp,.snd,.sou,.spx,&quot; &amp; _
 		&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;
-&apos;&apos;
-&apos;&apos; Temporary Files
-&apos;&apos; ---------------
-&apos;&apos; 
-&apos;&apos; This extension uses temporary files for two purposes:
-&apos;&apos; 
-&apos;&apos; - Communicate with an external script or program.
-&apos;&apos; - Remember your preferences.
-&apos;&apos; 
-&apos;&apos; The location of temporary and settings files are determined by your
-&apos;&apos; operating system.  Depending on the security set up of your computer,
-&apos;&apos;  other users or programs might be able to read the contents of the
-&apos;&apos; settings or temporary files. if you are concerned about privacy, 
-&apos;&apos; launch this add-on again with no text selected to replace the temporary
-&apos;&apos; file that contains the text you want to remain confidential. The path
-&apos;&apos; and name of the temporary file is shown in the Command and Script areas
-&apos;&apos; of the *About...* dialogue.
-&apos;&apos;    
+&apos; Temporary Files
 	On Error Goto errorHandler
 	&apos;Choose what to speak
 	If sTextToSpeak = &quot;&quot; Then
@@ -2676,58 +3044,7 @@ Sub ttsActuate( _
 		If bAddTime Then
 			sTextToSpeak = sTextToSpeak &amp; &quot; [[slnc 400]]&quot;
 		End If
-		&apos;&apos;
-		&apos;&apos; Customizing speech
-		&apos;&apos; ------------------
-		&apos;&apos; 
-		&apos;&apos; Speech can be modified by command line arguments, platform settings
-		&apos;&apos; and codes embedded into the speech text string.
-		&apos;&apos;
-		&apos;&apos; When creating spoken records of written documents, pauses are important.
-		&apos;&apos; Text is more understandable and less fatiguing to listen to when it is
-		&apos;&apos; punctuated by pauses between paragraphs or ideas.
-		&apos;&apos;
-		&apos;&apos; Modern speech synthesizers take care of most of the pauses required due
-		&apos;&apos; to punctuation and line breaks, but under some circumstances, an author
-		&apos;&apos; of a speech document may need to add a break manually.
-		&apos;&apos;
-		&apos;&apos; ### Windows
-		&apos;&apos; 
-		&apos;&apos; All currently supported versions of Windows can use 
-		&apos;&apos; [W3 Synchronized Multimedia Integration Language][SMIL2]. 
-		&apos;&apos; **SMIL** markup enables responsive speech as well as incorporating
-		&apos;&apos; specific languages, pitch, volume, speed and pauses.
-		&apos;&apos; 
-		&apos;&apos; ### Linux
-		&apos;&apos;
-		&apos;&apos; Linux support for SMIL varies by speech synthesizer.  In some speech
-		&apos;&apos; synthesizers, it is disabled by default, but can be enabled using a
-		&apos;&apos; command line switch.
-		&apos;&apos;
-		&apos;&apos; ### MacOS
-		&apos;&apos;
-		&apos;&apos; MacOS uses a [custom markup][SMIL1] for speech synthesis
-		&apos;&apos; instead of SMIL.  The markup can incorporate changes in pitch, speed
-		&apos;&apos; and volume, but does not specify language.  for US English users,
-		&apos;&apos; the markup includes a context driven means of specifying a particular
-		&apos;&apos; way to pronounce a word in an ambiguous context.
-		&apos;&apos;
-		&apos;&apos; MacOS computers require a short gap at the end of short synthesized speech 
-		&apos;&apos; utterances when recording sound to a file.
-		&apos;&apos;
-		&apos;&apos; Very short words cause an osascript error when adding metadata via
-		&apos;&apos; iTunes on MacOS.  As well, single words in synthesized speech are easier 
-		&apos;&apos; to understand if we add about half a second of silence to the end of
-		&apos;&apos; each utterance, especially if gapless playback is enabled.  
-		&apos;&apos; 
-		&apos;&apos; The [inline code][SMIL3] `[[slnc 400]]` causes the speech synthesizer
-		&apos;&apos; to include 400 milliseconds of silence. 
-		&apos;&apos;
-		&apos;&apos; [SMIL1]: https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/Introduction/Introduction.html
-		&apos;&apos; [SMIL2]: https://www.w3.org/TR/SMIL3/
-		&apos;&apos; [SMIL3]: https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/SpeechSynthesisProgrammingGuide/FineTuning/FineTuning.html#//apple_ref/doc/uid/TP40004365-CH5-SW10
-		&apos;&apos;
-		
+&apos; Customizing speech		
 		CreateFile(fsTemporaryTextDoc(), sTextToSpeak, scodec)
 		If sGetOS = &quot;MacOS&quot; Then
 			If InStr(sCommand,&quot;&quot;&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;&quot;&quot;) = 1 Then
@@ -2867,27 +3184,7 @@ End Sub
 Function fbCreateMissingMediaDirectory( _
 	ByVal sCommandLine) As Boolean
 	&apos; To put a media file in a directory that does not exist.
-&apos;&apos;    
-&apos;&apos; Media Directories
-&apos;&apos; -----------------
-&apos;&apos;
-&apos;&apos; Read Text Extension can create media files for playback on portable devices
-&apos;&apos; or for embedding into other content you create.
-&apos;&apos; 
-&apos;&apos; - if you are using iTunes, the iTunes program creates a media file in the iTunes
-&apos;&apos;   music directory.  The extension makes a copy in your home directory in a folder
-&apos;&apos;   named with the iso code of your language - *en* for English, *de* for German, 
-&apos;&apos;   *es* for Spanish etc. 
-&apos;&apos; - if you are using a command-line program to convert your media files, then the
-&apos;&apos;   media file is saved to  home directory in a folder named with the iso code of 
-&apos;&apos;   your language.
-&apos;&apos;
-&apos;&apos; Custom Directories
-&apos;&apos; ------------------
-&apos;&apos;
-&apos;&apos; if you don&apos;t like the defaults, set the name of the directory yourself.  The extension
-&apos;&apos; will attempt to create the directory if it is a valid path.
-&apos;&apos;
+&apos; Media Directories
 	fbCreateMissingMediaDirectory = False
 	Dim s1, s2 As String
 	Dim n, o As Integer
@@ -2994,18 +3291,7 @@ Function replaceLocalTokensWithStr( _
 	sA As String) As String
 	&apos; This function takes a String with tokens And replaces each
 	&apos; token with a useful String
-&apos;&apos;
-&apos;&apos; Tokens
-&apos;&apos; ------
-&apos;&apos;
-&apos;&apos; The extension replaces strings in the main dialogue with path
-&apos;&apos; names or command arguments at run time.  You can preview the 
-&apos;&apos; actual command line using the *About...* dialogue.
-&apos;&apos;
-&apos;&apos; for more information about tokens, look in the office help for 
-&apos;&apos; *Read Text Extension - Setting Up Read Text Extension - Command 
-&apos;&apos; and Script Tokens*. 
-&apos;&apos;
+&apos; Tokens
 	Dim sFind As String
 	Dim sReplace As String
 	Dim sB As String
@@ -3288,18 +3574,7 @@ End Function
 Function fsSelectionLanguageAndRegion( _
 	Optional bIgnoreInstalledVoices) As String
 	Dim sA, sB As String
-&apos;&apos;
-&apos;&apos; # Language and Region
-&apos;&apos; 
-&apos;&apos; The extension can determine the language of the selected text and pass the value
-&apos;&apos; to a speech synthesizer.  The languages on your computer vary depending on the
-&apos;&apos; platform, release version and locale of the operating system as well as software
-&apos;&apos; you might have installed.  
-&apos;&apos;
-&apos;&apos; Most computers include at least a simple English voice.  if you are not certain
-&apos;&apos; whether speech is installed, try a using a simple English voice with plain ASCII
-&apos;&apos; text.
-&apos;&apos;
+&apos;Language and Region
 	If s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot; Then
 		If ismissing(bIgnoreInstalledVoices) Then
 			bIgnoreInstalledVoices = True
@@ -4047,40 +4322,11 @@ Function fsComplexAsiaOrWest( _
 	Dim x As Integer
 	
 	sA = Trim(sA)
-	
-&apos;&apos;
-&apos;&apos; Complex languages
-&apos;&apos; -----------------
-&apos;&apos;
-&apos;&apos; Complex languages need special handling because their
-&apos;&apos; Unicode strings use directional markers.
-&apos;&apos;
-&apos;&apos; Gurmukhi script is used for Punjabi.  Devanagari script is for
-&apos;&apos; Hindi and other Indic languages.  Other complex languages include
-&apos;&apos; Dogri, Bodo, Maithili, Khmer, Thaana, Dhiveh, Urdu,
-&apos;&apos; Farsi, Arabic, Kashmiri, Kurdish, Hebrew, Bengali, Gurjarti,
-&apos;&apos; Oriya, Tamil, Telugu, Kannada, Malayalam, Burmese (Myanmar),
-&apos;&apos; Thai, Lao, Tibetan, Dzongkha, Ethiopic, Ethiopic Supplement,
-&apos;&apos; Limbu, and Ethopic Extended.  Some languages use either western
-&apos;&apos; or complex letters depending on region and media.
-&apos;&apos;
-&apos;&apos;
+&apos; Complex languages
 	If fbHasLTRMarker(sA) Or fbHasRTLMarker(sA) Then
 		fsComplexAsiaOrWest = &quot;COMPLEX&quot;
 		Exit Function
 	End If
-&apos;&apos;
-&apos;&apos; Asian languages
-&apos;&apos; ---------------
-&apos;&apos;
-&apos;&apos; Asian languages may include a large porportion of ideagrams, or
-&apos;&apos; non-phonetic letters.  The direction of Asian text is top to 
-&apos;&apos; bottom or left to right.  Korean Hangul traditionally incorporated
-&apos;&apos; Chinese-like characters, but contemporary script is primarily 
-&apos;&apos; phonetic.  Japanese includes Chinese-like characters as well as
-&apos;&apos; different phonetic letter sets for some Japanese and imported words.
-&apos;&apos; 
-	&apos;
 	&apos; Ignore numbers, basic punctuation, telephone network code and 
 	&apos; western currency symbols that Asian languages commonly use
 	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤&quot; &amp; _
@@ -4263,51 +4509,11 @@ Function fsDrawProperty( _
 	fsDrawProperty = &quot;&quot;
 End Function
 
-&apos;&apos;
-&apos;&apos; # Reference
-&apos;&apos;
+&apos; Reference
 
 Sub MsgSpeak( _
 	strA As String)
-&apos;&apos;
-&apos;&apos; MsgSpeak (Basic command)
-&apos;&apos; ------------------------
-&apos;&apos;
-&apos;&apos; if you want to get your hands dirty with a little Basic programming,
-&apos;&apos; you can use the `msgspeak` command in your own slide shows or programs
-&apos;&apos; to synthesize speech. 
-&apos;&apos;
-&apos;&apos; The command reads the string using the language and region of the
-&apos;&apos; the current document using the current settings of extension. if 
-&apos;&apos; the extension is set up to go to a web page or save a file, that is
-&apos;&apos; what it will do when you activate the command.
-&apos;&apos; 
-&apos;&apos; This example shows how to use the command in your own script:
-&apos;&apos;
-&apos;&apos;     sub OnClickMySlide1Image1()
-&apos;&apos;         &apos; Read text aloud. 
-&apos;&apos;         dim oSvc
-&apos;&apos;         dim sURL
-&apos;&apos;         dim sArg
-&apos;&apos; 
-&apos;&apos;         sArg = &quot;Hello world!&quot;
-&apos;&apos;         sURL = &quot;https://sites.google.com/site/readtextextension/&quot;
-&apos;&apos;         on error goto OnClickMySlide1Image1Err
-&apos;&apos;         msgSpeak(sArg)
-&apos;&apos;         exit sub
-&apos;&apos;         OnClickMySlide1Image1Err:
-&apos;&apos;         if msgbox(&quot;The button couldn&apos;t find a &quot;&quot;text to speech&quot;&quot; add-on.&quot; &amp; _
-&apos;&apos;                 chr(10) &amp; _
-&apos;&apos;                 sArg &amp; _
-&apos;&apos;                 chr(10) &amp; _
-&apos;&apos;                 &quot;Get on-line help?&quot;, _
-&apos;&apos;                 4, _
-&apos;&apos;                 &quot;Read Text&quot;) &lt;&gt; 7 then
-&apos;&apos;             oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
-&apos;&apos;             oSvc.execute(sURL,&quot;&quot;,0)
-&apos;&apos;         end if
-&apos;&apos;     end sub
-&apos;&apos;
+&apos; MsgSpeak (Basic command)
 	Dim sFile As String
 	Dim i1 As Integer
 	Dim msgs() As Variant
@@ -4676,14 +4882,7 @@ End Function
 
 
 Sub libreHelp()
-&apos;&apos;
-&apos;&apos; Help in LibreOffice
-&apos;&apos; -------------------
-&apos;&apos;
-&apos;&apos; LibreOffice does not show an extension&apos;s help documents if the
-&apos;&apos; application&apos;s help documents are not installed. In this case,
-&apos;&apos; we show web based extension help in a browser window
-&apos;&apos;
+&apos; Help in LibreOffice
 	If Not fbHelpIsInstalled() Then
 		WebHelp(fsHttpHelpUrl())
 	End If
@@ -4717,26 +4916,7 @@ End Function
 
 
 Function fsNow() As String
-&apos;&apos;
-&apos;&apos; Time formats
-&apos;&apos; ------------
-&apos;&apos; 
-&apos;&apos; Speech synthesizers may be able to convert strings written in a standard
-&apos;&apos; machine language style to normal speech.  if you are not sure how to 
-&apos;&apos; communicate a time and date to someone who does not speak your language,
-&apos;&apos; a standard time format is useful.
-&apos;&apos; 
-&apos;&apos; * The Internet Engineering Task force [RFC 3339][RFC1].
-&apos;&apos; * Unix `man date`
-&apos;&apos;
-&apos;&apos; Unix commands to generate formatted time strings
-&apos;&apos;
-&apos;&apos;     date +%F-T%X%:z &gt; &quot;$HOME/date.txt&quot;
-&apos;&apos;     date -u +%F-T%X-00:00 &gt; &quot;$HOME/date.txt&quot;
-&apos;&apos;
-&apos;&apos;
-&apos;&apos; [RFC1]: https://www.ietf.org/rfc/rfc3339.txt
-&apos;&apos;
+&apos; Time formats
 	Dim sA As String
 	
 	sA = Year(Now) &amp; &quot;-&quot; &amp; _
@@ -4849,24 +5029,7 @@ End Function
 
 
 Function fbHaveItunes() As Boolean
-&apos;&apos;
-&apos;&apos; iTunes for Windows
-&apos;&apos; ==================
-&apos;&apos;
-&apos;&apos; People with Apple branded devices or subscribers to Apple services can use
-&apos;&apos; iTunes for Windows to access streaming media and to manage their devices.
-&apos;&apos;
-&apos;&apos; A Windows computer can use iTunes to convert text to speech audio files
-&apos;&apos; in WAV format to MP3 or M4A audio files for mobile devices. 
-&apos;&apos;
-&apos;&apos; More information
-&apos;&apos; ----------------
-&apos;&apos;
-&apos;&apos; + [Windows 7](https://www.apple.com/itunes/download/win64)
-&apos;&apos; + Windows 8, 10 and 11 [Microsoft  
-&apos;&apos; store](https://www.microsoft.com/en-us/p/itunes/9pb2mz1zmb1s?activetab=pivot:overviewtab)
-&apos;&apos; (recommended)
-&apos;&apos;
+&apos; iTunes for Windows
 	fbHaveItunes = False
 	Dim iversion As Integer
 	iversion = 0
@@ -4932,6 +5095,7 @@ Function fsGetMyTunesApp() As String
 	Next
 End Function
 
+&apos; Graphic sizes
 
 Function fswriteMacOSSpeechScript( _
 	ByVal sArguments, _
@@ -5058,44 +5222,7 @@ Function fswriteMacOSSpeechScript( _
 		Else
 			sTitle = fsThisSoundTitle(&quot;`&gt;_ &quot;)
 		End If
-		
-		
-		&apos;&apos;
-		&apos;&apos; Graphic sizes
-		&apos;&apos; -------------
-		&apos;&apos;
-		&apos;&apos; Impress presentation software can convert slide images to **.jpeg** or
-		&apos;&apos; **.png** files.  it&apos;s an easy way to add titles to a photo or to
-		&apos;&apos; prepare a picture with a specific size for publication on a blog
-		&apos;&apos; or news site.
-		&apos;&apos;
-		&apos;&apos; When you publish a graphic, it looks best and renders fastest if you
-		&apos;&apos; set it to the exact size needed.  Cameras usually use resolution settings
-		&apos;&apos; that are much larger than needed for viewing on a screen.  The large
-		&apos;&apos; size is required because images are often cropped or straightened.
-		&apos;&apos; On low cost portable devices, these large images may take a long time
-		&apos;&apos; to render or may be distorted.
-		&apos;&apos;
-		&apos;&apos; The [Participatory Culture Foundation][WMacOSSS1] published a matrix that
-		&apos;&apos; shows standard screen resolutions as well as resolutions for many
-		&apos;&apos; portable devices.  Here are several popular formats:
-		&apos;&apos; 
-		&apos;&apos; - **1200x800** A classic 35 mm camera format that looks good on a HDMI
-		&apos;&apos;   screen or a full screen MacBook
-		&apos;&apos; - **640x480** VGA projector or NTSC broadcast 4:3
-		&apos;&apos; - **720x576** PAL broadcast
-		&apos;&apos; - **1366x768** Windows laptop 16:9
-		&apos;&apos; - **1280x800** Apple MacBook
-		&apos;&apos; - **1440x900** Apple MacBook Air
-		&apos;&apos; - **1920x1080** 1080p High Def TV 16:9
-		&apos;&apos;
-		&apos;&apos; Some media players will distort album cover art if it is not square.
-		&apos;&apos;
-		&apos;&apos; - **600x600** Small square format for audio players
-		&apos;&apos;
-		&apos;&apos; [WMacOSSS1]: https://web.archive.org/web/20160526113720/http://develop.participatoryculture.org/index.php/ConversionMatrix
-		&apos;&apos;
-		
+
 		If fbCreatingMacOSType1Media() Then
 			sBPostPlay = &quot;true&quot;
 		Else
@@ -6105,6 +6232,11 @@ Function msAzureJson()
 End Function
 
 
+Function ibmWatsonJson()
+	ibmWatsonJson = fsFullPathOf(&quot;ibm/watson/speech/config.json&quot;)
+End Function
+
+
 Function fbHaveNetworkTTS() As Boolean
 	&apos; See: &lt;https://github.com/pndurette/gTTS&gt;
 	&apos; If you are not running libreoffice from normal home directory, then
@@ -6127,6 +6259,7 @@ Function fbHaveNetworkTTS() As Boolean
 	AwsBoto3Json(), _
 	AwsPolyJson(), _
 	GoogleApisJson(), _
+	ibmWatsonJson(), _
 	msAzureJson())
 	Select Case home
 		Case Environ(&quot;PWD&quot;)
@@ -6181,22 +6314,7 @@ End Function
 
 
 Function fsMyFfmpeg() As String
-&apos;&apos;
-&apos;&apos; FFmpeg
-&apos;&apos; ------
-&apos;&apos;
-&apos;&apos; [FFmpeg](https://www.ffmpeg.org) is a general purpose command 
-&apos;&apos; line video, graphic and sound converter for Linux, MacOS, UNIX and 
-&apos;&apos; Windows.  Read Text can use it to convert speech recordings
-&apos;&apos; to different formats.
-&apos;&apos;
-&apos;&apos; [AVconv](https://libav.org/avconv.html) is a *fork* of FFmpeg, and shares many
-&apos;&apos;  of the same commands and capabilities.  On [Ubuntu Linux](https://ubuntu.com),
-&apos;&apos; the `avconv` project is included in the repository instead of `ffmpeg`. 
-&apos;&apos; Read text can use either.
-&apos;&apos;
-&apos;&apos;     sudo apt-get install avconv
-&apos;&apos;
+&apos; FFmpeg
 	Dim sProgramPaths, sWebURL, cR, sA, sB, sC, sD, sE As String
 	Dim aC, aD
 	Dim i As Integer
@@ -6363,9 +6481,7 @@ End Function
 
 
 Function flacPath() As String
-&apos;&apos;&apos;
-	&apos; Returns path to the flac audio file converter program.
-&apos;&apos;&apos;
+&apos; Returns path to the flac audio file converter program.
 	flacPath = &quot;&quot;
 	Dim n
 	Dim found_value$
@@ -6397,9 +6513,7 @@ End Function
 
 
 Function lamePath() As String
-&apos;&apos;&apos;
 	&apos; Returns path to the lame mp3 converter program.
-&apos;&apos;&apos;
 	lamePath = &quot;&quot;
 	Dim n
 	Dim found_value$
@@ -6436,9 +6550,7 @@ End Function
 
 
 Function neroPath() As String
-&apos;&apos;&apos;
 	&apos; Returns path to the nero aac converter program.
-&apos;&apos;&apos;
 	neroPath = &quot;&quot;
 	Dim n
 	Dim found_value$
@@ -6470,9 +6582,7 @@ End Function
 
 
 Function oggPath() As String
-&apos;&apos;&apos;
 	&apos; Returns path to the ogg converter program.
-&apos;&apos;&apos;
 	oggPath = &quot;&quot;
 	Dim n
 	Dim found_value$
@@ -6511,47 +6621,7 @@ End Function
 
 Sub resetSpeechDispatcher( _
 	bAll As Boolean)
-&apos;&apos; # Stopping Speech
-&apos;&apos; 
-&apos;&apos; To stop speech, click the Read selection button while the voice is 
-&apos;&apos; speaking.
-&apos;&apos;
-&apos;&apos; Windows
-&apos;&apos; -------
-&apos;&apos; 
-&apos;&apos; Stopping the speech is handled in the external script.
-&apos;&apos;
-&apos;&apos; MacOS
-&apos;&apos; ---
-&apos;&apos;
-&apos;&apos; Stopping the speech is handled in the `resetSpeechDispatcher` procedure
-&apos;&apos; in the TTS Utilities module of the extension.
-&apos;&apos;
-&apos;&apos; Linux
-&apos;&apos; -----
-&apos;&apos;
-&apos;&apos; Stopping the speech is handled in the `resetSpeechDispatcher` procedure
-&apos;&apos; in the TTS Utilities module of the extension.
-&apos;&apos;
-&apos;&apos; **Speech Dispatcher** is an optional speech manager for Linux.  It isn&apos;t
-&apos;&apos; needed for read text extension.
-&apos;&apos;
-&apos;&apos; You can manually edit the speech-dispatcher settings files to use specific 
-&apos;&apos; speech engines for different languages.  for example, you could set
-&apos;&apos; up English and Spanish to use pico and Catalan to use festival. 
-&apos;&apos; if the speech dispatcher voice becomes distorted or stops working,
-&apos;&apos; you can try resetting it using `killall speech-dispatcher`,
-&apos;&apos; or by logging out and logging in again.  Specific voice settings
-&apos;&apos; are in the extension&apos;s main menu dialogue.
-&apos;&apos; 
-&apos;&apos; [Speech-dispatcher help][fvTts1]
-&apos;&apos;
-&apos;&apos; To install speech-dispatcher, use:
-&apos;&apos;
-&apos;&apos;     sudo apt-get install speech-dispatcher
-&apos;&apos;
-&apos;&apos; [fvTts1]: https://www.unix.com/man-page/all/1/speech-dispatcher/
-&apos;&apos;
+&apos;Stopping Speech
 	Dim a1
 	Dim i# : i = 0
 	Dim errorCode
@@ -6785,30 +6855,7 @@ End Function
 
 Function fsGetThisUsers( _
 	Optional cType As String) As String
-&apos;&apos;
-&apos;&apos; # Your personal information
-&apos;&apos;
-&apos;&apos; Extensions run in the **trusted zone**.  All extensions have access to the
-&apos;&apos; information that you entered into *Tools - Options - User Data*.  Read Text 
-&apos;&apos; extension uses your first and last name to provide *artist* information to
-&apos;&apos; sound or video files that you create only if the original author of a document 
-&apos;&apos; is ambiguous or missing.
-&apos;&apos;
-&apos;&apos; Where is your personal information stored?
-&apos;&apos; ------------------------------------------
-&apos;&apos;
-&apos;&apos; Apache OpenOffice and LibreOffice store the personal information in a registry
-&apos;&apos; file, coded in xml format in a UTF-8 text document.  You can review the data
-&apos;&apos; in the file, `&lt;&lt;OOo-Profile/3/user/registry/data&gt;&gt; /org/openoffice/UserProfile.xcu`.
-&apos;&apos; The information is located in the XML-node labelled *Data*.  Find out more
-&apos;&apos; at the [Apache OpenOffice forum][FGTU1].
-&apos;&apos;
-&apos;&apos; Depending on your office application and version, you may be able to uncheck
-&apos;&apos; a box labelled *Use data for document properties* in the *User Data* dialogue.
-&apos;&apos;
-&apos;&apos; [FGTU1]: http://forum.openoffice.org/en/forum/viewtopic.php?f=20&amp;t=14750
-&apos;&apos;
-	
+&apos;Your personal information
 	If ismissing(cType) Then
 		cType = &quot;fn&quot;
 	End If
@@ -8725,41 +8772,7 @@ End Sub
 
 Function fsReleasenotesCMD( _
 	sA As String) As String
-&apos;&apos;
-&apos;&apos; # Making release notes
-&apos;&apos; 
-&apos;&apos; Each xba script includes up-to-date notes as **markdown** text.
-&apos;&apos; To create an *About* document in Linux or MacOS, use the terminal 
-&apos;&apos; command shown in the input box shown when you run the 
-&apos;&apos; `fsReleasenotesCMD` procedure.
-&apos;&apos;
-&apos;&apos; You can use [Python Markdown][MAHF0] or [Dingus][MAHF1], an 
-&apos;&apos; on-line markdown converter, to convert the help file to html.
-&apos;&apos; You can use [calibre-ebook][MAHF2] to convert markdown text 
-&apos;&apos; to many other formats.
-&apos;&apos;
-&apos;&apos;  [MAHF0]: https://pypi.python.org/pypi/Markdown
-&apos;&apos;  [MAHF1]: https://daringfireball.net/projects/markdown/dingus
-&apos;&apos;  [MAHF2]: https://calibre-ebook.com/
-&apos;&apos;
-&apos;&apos;
-&apos;&apos; About Markdown
-&apos;&apos; --------------
-&apos;&apos;
-&apos;&apos; [Markdown](https://daringfireball.net/projects/markdown/) is a
-&apos;&apos; simple way to format text for blogs, email, news, education
-&apos;&apos; and technical support documentation.
-&apos;&apos;
-&apos;&apos; There are forks and extensions of the original release.  To
-&apos;&apos; provide compatibility across platforms, use plain and simple
-&apos;&apos; markdown that is compatible with python-markdown.
-&apos;&apos;
-&apos;&apos; [Python-markdown](https://pypi.python.org/pypi/Markdown) comes
-&apos;&apos; with [calibre-ebook](https://calibre-ebook.com/) or is available
-&apos;&apos; on Debian and Ubuntu Linux with:
-&apos;&apos;
-&apos;&apos;     sudo apt-get install python-markdown
-&apos;&apos;
+&apos;Making release notes
 	&apos; sA - Name of xba file to convert
 	&apos; - TextToSpeech
 	&apos; - ThirdPartyCode

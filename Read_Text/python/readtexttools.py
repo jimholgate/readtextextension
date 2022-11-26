@@ -780,9 +780,19 @@ class ExtensionTable(object):
         return ''
 
 
-def find_local_pip(lib_name='qrcode'):  # -> str
+def find_local_pip(lib_name='qrcode', latest=True):  # -> str
     '''If you installed a pip tool as a local user, then
-    return the library path, otherwise return `''` '''
+    return the library path, otherwise return `''`.
+
+    If `latest` is `True`, return the last match, otherwise
+    return the first match. When there is a history of several
+    versions of python installed, there might be several
+    pip libraries with different tools or different versions
+    of the tools. A current good practice for programmers
+    is to use `venv`. A good practice for users is to delete
+    and rebuild your pip libraries when you do a major version
+    upgrade of your system or of python.'''
+    retval = ''
     if int(platform.python_version_tuple()[0]) < 3:
         return ''
     elif os.name == 'nt':
@@ -798,16 +808,20 @@ def find_local_pip(lib_name='qrcode'):  # -> str
         for _site in site_list:
             if os.getenv("PWD") in _site and len(os.getenv) != 0:
                 if os.path.isdir(os.path.join(_site, lib_name)):
-                    return _site
-        return ''
+                    retval = _site
+                    if not latest:
+                        return retval
+        return retval
     py_path = ''
     with os.scandir(path1) as it:
         for entry in it:
             if not entry.name.startswith('.') and entry.is_dir():
                 py_path = ''.join([path1, entry.name, path2, os.sep, lib_name])
                 if os.path.isdir(py_path):
-                    return ''.join([path1, entry.name, path2])
-    return ''
+                    retval = ''.join([path1, entry.name, path2])
+                    if not latest:
+                        return retval
+    return retval
 
 
 def my_os_system(_command):  # -> bool
@@ -878,6 +892,29 @@ def app_icon_image(image_selection=''):  # -> str
     return ''
 
 
+def is_container_instance():  # -> bool
+    '''If `is_container_instance` is `True` python3 cannot rely on expected
+    desktop paths and user interactions.'''
+    try:
+        if int(platform.python_version_tuple()[0]) < 3:
+            return True
+    except:
+        pass
+    if os.name == 'posix':
+        for _test in [
+                '/meta/', '/org.libreoffice.LibreOffice/', '/run/', '/snap/',
+                '/.var/'
+        ]:
+            if _test in os.path.realpath(__file__):
+                return True
+        # ChromeOS, Server
+        block_dist = ['penguin', 'server']
+        if os.uname().version.lower() in block_dist:
+            return True
+        return os.uname().sysname.lower() not in ['darwin', 'linux']
+    return False
+
+
 def pop_message(summary="Note",
                 msg='',
                 m_sec=8000,
@@ -908,6 +945,7 @@ def pop_message(summary="Note",
                 my_icon = icon
                 break
     try:
+        path_root = os.path.split(os.path.realpath(__file__))[0]
         if bool(dbus):
             item = "org.freedesktop.Notifications"
             _interface = dbus.Interface(
@@ -926,6 +964,8 @@ def pop_message(summary="Note",
                 return True
         except (AttributeError, NameError, ValueError):
             pass
+    except Exception:
+        pass
     if have_posix_app('notify-send', False):
         my_os_system(
             'notify-send -i "%(my_icon)s" -t %(m_sec)s "%(summary)s" "%(msg)s"'

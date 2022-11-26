@@ -14,33 +14,85 @@ provider. There may be acceptable use policies, limits or costs.
 * Online services could be terminated without warning.
 * Your content might not be private or secure.
 * Your organization or local laws might restrict use of online
-  data services provided outside of your country's jurisdiction.
+  data services. For example, services provided outside of your
+  country's jurisdiction might be restricted.
 * An online provider could block your access because your use
   is excessive or otherwise violates their terms of service.
+
+Larynx
+------
+
+You can configure Read Text Extension to use Larynx. Larynx
+works with most Linux distributions, even if provides your
+office application using a container distribution platform
+like `flatpak` or `snap`.
+
+Using Larynx does not require an on-line connection. The
+`larynx-server` application provides speech on a `localhost`
+web service similarly to how [`cups`](https://www.cups.org/)
+provides printing services using a `localhost` server on many
+Posix computers like MacOS and desktop Linux distributions.
+
+> Offline end-to-end text to speech system using gruut and
+> onnx (architecture). There are 50 voices available across
+> 9 languages.
+
+-- [Rhasspy Larynx
+Website](https://github.com/rhasspy/larynx)
+
+<https://hub.docker.com/r/rhasspy/larynx>
+
++ Is the larynx server running? Consider setting up `larynx-server`
+  to automatically start up when you log in.
++ Is the language of the selected text supported and installed?
+
+If you are using a Docker network service, it might take a little
+more time to than usual to start up when the package updates
+it's files. If you are using a system docker application with a
+personal account, then you might need to manually download updated
+speech resources if the docker application stops working with
+locally installed languages. A system administrator can change your
+account's ability to access a docker service or for the docker
+package to access locally installed resources.
+
+### Docker Desktop
+
+`docker-desktop` can make it easier to view and manage docker resources
+graphically.
+
+> Images and containers deployed on the Linux Docker Engine
+(before installation) are not available in Docker Desktop for Linux.
+
+-- [Docker
+docs](https://docs.docker.com/desktop/install/linux-install/)
+
+[Rhasspy community](https://community.rhasspy.org/)
 
 It doesn't work?
 ----------------
 
+The first step is to check if the network is available. The
+network service might offer an account status report page or
+a help document to assist you.
+
 The tool relies on external libraries or packages, and python
-might not have access to the current required package.
+might not have access to the current required packages.
 
-The version of python that LibreOffice includes with Windows,
-MacOS and Linux distributions that use application containment
-do not normally apply python modifications like user installed
-python libraries. This script won't work because it can't use
-the required libraries.
+Some ways of installing your office application restrict the
+application's ability to run third party extensions. You or
+your system administrator might need to set permissions for
+this extension to run or for the extension to access a
+network resource.
 
-If you use python pip to install libraries, you might have to
+Some of the network tools require specific versions of python
+or a specific system platform like `amd64`, `arm64` or `v7`.
+This script might not work because it can't use the required
+libraries on an unsupported version of python.
+
+If you use python pip to install local libraries, you might have to
 manually update them from time to time. Packages that are managed
-by update utilities like `apt-get`, `yum` and `dnf` are managed
+by update utilities like `apt-get`, `yum` and `dnf` are upgraded
 by the distribution.
-
-If you are using a docker service, your docker application might
-take a more time to than usual to start up when the package updates
-it's files. If you are using a system docker application with a
-personal account, then you might need to manually download updated
-speech resources if the docker application stops working with
-locally installed languages.
 '''
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
@@ -84,6 +136,10 @@ except ImportError:
     pass
 try:
     import gcloudserver
+except ImportError:
+    pass
+try:
+    import watsonserver
 except ImportError:
     pass
 
@@ -157,7 +213,8 @@ class AmazonClass(object):
         self.ok = True
         self.accept_voice = [
             '', 'all', 'auto', 'child_female', 'female1', 'female2', 'female3',
-            'child_male', 'male1', 'male2', 'male3', 'aws'
+            'female4', 'female5', 'female6', 'child_male', 'male1', 'male2',
+            'male3', 'male4', 'male5', 'male6', 'aws'
         ]
 
     def version(self):  # -> string
@@ -323,6 +380,65 @@ class GoogleCloudClass(object):
         return False
 
 
+class WatsonClass(object):
+    u''' The following notice should be displayed in a dialog when users click
+    *About...* or the equivalent in their language when this class is enabled.
+
+    Powered by IBM\u2122
+
+    "IBM" and "Ask Watson" are trademarks of International Business Machines
+    Corporation ("IBM").'''
+
+    # * <https://www.ibm.com/docs/en/watson-explorer/11.0.0?topic=modules-installing-watson-explorer-from-command-line>
+    # * <https://www.ibm.com/docs/en/watson-explorer/11.0.0?topic=components-requirements>
+    def __init__(self):  # -> None
+        '''Initialize data'''
+        self.ok = True
+        self.accept_voice = [
+            '', 'all', 'auto', 'child_female', 'female1', 'female2', 'female3',
+            'child_male', 'male1', 'male2', 'male3', 'watson'
+        ]
+
+    def language_supported(self, iso_lang='ca-ES'):  # -> bool
+        '''Is the language supported?'''
+        try:
+            self.ok = watsonserver.language_supported(iso_lang)
+        except (AttributeError, NameError):
+            self.ok = False
+        return self.ok
+
+    def read(self,
+             _text="",
+             _iso_lang='en-US',
+             _visible="false",
+             _audible="true",
+             _out_path="",
+             _icon="",
+             _info="",
+             _post_process=None,
+             _writer='',
+             _size='600x600',
+             _speech_rate=160):  # -> bool
+        '''stub'''
+        if not self.ok:
+            return False
+        try:
+            return watsonserver.read(_text="",
+                                     _iso_lang='en-US',
+                                     _visible="false",
+                                     _audible="true",
+                                     _out_path="",
+                                     _icon="",
+                                     _info="",
+                                     _post_process=None,
+                                     _writer='',
+                                     _size='600x600',
+                                     _speech_rate=160)
+        except (AttributeError, NameError):
+            pass
+        return False
+
+
 class GoogleTranslateClass(object):
     u''' The following notice should be displayed in a dialog when users click
     *About...* or the equivalent in their language when this class is enabled.
@@ -339,7 +455,7 @@ class GoogleTranslateClass(object):
     enabling the `GoogleTranslateClass` class.
 
     The `gtts` library can only be enabled by electing to install it on a supported
-    platform. Read the documentation for help installing `gtts`  or to help with
+    platform. Read the documentation for help installing `gtts` or to get help with
     troubleshooting if `gtts` does not work when using your Linux package manager.
 
         sudo apt -y install python3-gtts
@@ -670,6 +786,12 @@ class LocalClass(object):
     For most consumer computers, the recommended setting is `1` or
     `Medium Quality`.
 
+    If the implementation of dbus allows it, this class displays a
+    pop-up menu if you have not created a directory in
+    `~/.local/share/larynx/`. If your `larynx-server` is set up to
+    allow it, this is the directory where the server stores and reads
+    downloaded voices.
+
     [Default larnyx address](http://0.0.0.0:5002)
 
     [About Larynx...](https://github.com/rhasspy/larynx)'''
@@ -677,32 +799,48 @@ class LocalClass(object):
     def __init__(self):  # -> None
         '''Initialize data. See
         <https://github.com/rhasspy/larynx#basic-synthesis>'''
-        _metadata = readtexttools.ImportedMetaData()
+        self.debug = [0, 1, 2, 3][0]
         self.ok = True
         # This is the default. You can set up Larynx to use a different port.
         self.url = 'http://0.0.0.0:5002'  # localhost port 5002
+        self.help_icon = 'usr/share/icons/HighContrast/32x32/apps/web-browser.png'
+        self.help_heading = 'Rhasspy Larynx'
+        self.help_url = 'https://github.com/rhasspy/larynx#larynx'
+        self.local_dir = os.path.expanduser('~/.local/share/larynx/')
         self.vocoders = None  # ordered fast+normal to slow+high quality
         self.ssmls = [False, True]  # false = TEXT or true = SSML
+        self.rate_denominator = 1
         self.length_scales = [
-            [320, 289, '---------|', '0.50'], [288, 257, '--------|-', '0.55'],
-            [256, 225, '-------|--', '0.62'], [224, 193, '------|---', '0.71'],
-            [192, 161, '-----|----', '0.83'], [128, 97, '---|-----', '1.25'],
-            [96, 66, '--|------', '1.66'], [64, 33, '-|-------', '2.50'],
-            [32, 0, '|--------', '5.00']
+            [320, 289, '---------|', 0.50], [288, 257, '--------|-', 0.55],
+            [256, 225, '-------|--', 0.62], [224, 193, '------|---', 0.71],
+            [192, 161, '-----|----', 0.83], [128, 97, '---|-----', 1.25],
+            [96, 66, '--|------', 1.66], [64, 33, '-|-------', 2.50],
+            [32, 0, '|--------', 5.00]
         ]  # A lower speed corresponds to a longer duration.
         # larynx `glow_tts` voices from larynx version 1.1.
         self.accept_voice = [
             '', 'all', 'auto', 'child_female', 'female1', 'female2', 'female3',
-            'child_male', 'male1', 'male2', 'male3', 'larynx', 'localhost',
-            'docker', 'local_server'
+            'female4', 'female5', 'female6', 'female7', 'female8', 'female9',
+            'child_female1', 'child_male', 'male1', 'male2', 'male3', 'male4',
+            'male5', 'male6', 'male7', 'male8', 'male9', 'child_male1',
+            'larynx', 'localhost', 'docker', 'local_server'
         ]
-        self.spd_fm = ['female1', 'female2', 'female3', 'child_female']
-        self.spd_m = ['male1', 'male2', 'male3', 'child_male']
+        self.spd_fm = [
+            'female1', 'female2', 'female3', 'female4', 'female5', 'female6',
+            'female7', 'female8', 'female9', 'child_female', 'child_female1'
+        ]
+        self.spd_m = [
+            'male1', 'male2', 'male3', 'male4', 'male5', 'male6', 'male7',
+            'male8', 'male9', 'child_male', 'child_male1'
+        ]
 
         # The routine uses the default voice as a fallback. The routine
         # prioritizes a voice that you chose to install.
         self.default_lang = readtexttools.default_lang()
         self.default_voice = 'mary_ann'
+        # `mary_ann` is the default voice, and it is always installed. It
+        # will not appear in a downloaded voices directory. It will always
+        # be included in the server's json request response.
         self.larynx_v1 = None
         if '_IN' in self.default_lang:
             self.larynx_v1 = ['cmu_aup', 'cmu_ksp', 'cmu_slp']
@@ -721,6 +859,7 @@ class LocalClass(object):
                 'southern_english_male'
             ]
         # https://community.rhasspy.org/t/preview-of-new-tts-voices/2556
+
         self.larynx_fm = [
             'eva_k', 'hokuspokus', 'kerstin', 'rebecca_braunert_plunkett',
             'blizzard_fls', 'blizzard_lessac', 'cmu_clb', 'cmu_eey', 'cmu_ljm',
@@ -730,6 +869,7 @@ class LocalClass(object):
             self.default_voice
         ]
         self.voice_id = ''
+        self.voice_name = ''
         self.pause_list = [
             '(', '\n', '\r', u"\u2026", u'\u201C', u"\u2014", u"\u2013",
             u'\u00A0'
@@ -803,6 +943,11 @@ Try restarting `larynx-server`.''')
                                    larynx_names='mary_ann'):  # -> str
         '''Assign a larynx name like `scottish_english_male` to a spd_voice
         like `male1` '''
+        if self.debug and 1:
+            print([
+                '`LocalClass` > `_spd_voice_to_larynx_voice`', _search,
+                larynx_names
+            ])
         _search = _search.lower().strip('\'" \n')
         if len(_search) == 0:
             return ''
@@ -827,7 +972,7 @@ Try restarting `larynx-server`.''')
             try:
                 _resultat = _voices.strip().split('\n')[count_f]
             except IndexError:
-                _resultat = ''
+                _resultat = self.voice_name
         if len(_resultat) != 0:
             return _resultat
         count_f = 0
@@ -842,7 +987,7 @@ Try restarting `larynx-server`.''')
         try:
             _resultat = _voices.strip().split('\n')[count_f]
         except IndexError:
-            _resultat = ''
+            _resultat = self.voice_name
         return _resultat
 
     def language_supported(self,
@@ -871,6 +1016,8 @@ Try restarting `larynx-server`.''')
             self.ok = False
             return False
         if len(self.voice_id) != 0:
+            self.help_url = self.url
+            self.help_icon = '/usr/share/icons/HighContrast/scalable/actions/system-run.svg'
             return True
         # format of json dictionary item: 'de-de/eva_k-glow_tts'
         # "voice" or "language and region"
@@ -914,7 +1061,8 @@ Try restarting `larynx-server`.''')
                 if _lang1 in data[_item]['language']:
                     larynx_names = ''.join(
                         [larynx_names, '\n', data[_item]['name']])
-                elif _lang2 == data[_item]['language'].split('-')[0]:
+                elif _lang2 == data[_item]['language'].split('-')[0].split(
+                        '_')[0]:
                     larynx_names = ''.join(
                         [larynx_names, '\n', data[_item]['name']])
         larynx_names = larynx_names.strip()
@@ -935,30 +1083,39 @@ Loading larynx voices for `%(_lang2)s`
 
 %(display_names)s
 ''' % locals())
+            # Check for a specific matching SPD name
+            # Search examples - `FEMALE2`, `MALE1`
             for _item in data:
                 if data[_item]['name'] == _verified_name:
+                    if self.debug and 1:
+                        print([
+                            '`LocalClass` > `language_supported` found: ',
+                            data[_item]['name'], 'Setting `id` to: ',
+                            data[_item]['id']
+                        ])
                     self.voice_id = data[_item]['id']
+                    self.voice_name = data[_item]['name']
                     self.ok = True
                     return self.ok
         self.ok = False
+        iso_lower = iso_lang.replace('_', '-').lower()
+        # Find a voice id that matches Larynx name, id or language
+        # Search examples: ``, `AUTO`, `LARYNX`
         for _item in data:
             if data[_item]['downloaded']:
-                if _vox in [data[_item]['name'], data[_item]['id']]:
-                    _voice_id = data[_item]['id']
-                    self.voice_id = _voice_id
-                    break
-                elif _lang1 in [
-                        data[_item]['id'], data[_item]['language'],
-                        data[_item]['name']
+                for try_lang in [
+                        data[_item]['language'],
+                        data[_item]['language'].split('-')[0]
                 ]:
-                    _voice_id = data[_item]['id']
-                elif _lang2 == data[_item]['language'].split('-')[0]:
-                    _voice_id = data[_item]['id']
-                if len(_voice_id) != 0:
-                    self.voice_id = _voice_id
-                    self.ok = True
-                    break
-                self.ok = False
+                    for argument in [_vox, iso_lower, _lang1]:
+                        if argument in [
+                                try_lang, data[_item]['name'],
+                                data[_item]['id']
+                        ]:
+                            self.voice_id = data[_item]['id']
+                            self.voice_name = data[_item]['name']
+                            self.ok = True
+                            return self.ok
         return self.ok
 
     def get_voc_type(self, _type='small'):  # -> str
@@ -999,13 +1156,21 @@ Loading larynx voices for `%(_lang2)s`
             return False
         if len(self.voice_id) == 0:
             self.voice_id = 'en-us/mary_ann-glow_tts'
+            self.voice_name = 'mary_ann'
+        if not os.path.isdir(self.local_dir):
+            if not readtexttools.is_container_instance():
+                readtexttools.pop_message(self.help_heading,
+                                          ''.join(['<', self.help_url, '>']),
+                                          8000, self.help_icon, 1)
         _media_out = ''
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
         _media_work = os.path.join(tempfile.gettempdir(), 'larynx.wav')
-        _voice = self.voice_id
-        _lengthScale = '0.85'
+        _voice = self.voice_name
+        if self.debug and 1:
+            print(['`LocalClass` > ` `read`', 'Request `_voice`: ', _voice])
+        _i_lengthScale = 0.85
         if bool(self.add_pause) and not ssml:
             for _symbol in self.pause_list:
                 if _symbol in _text:
@@ -1022,6 +1187,7 @@ Loading larynx voices for `%(_lang2)s`
                 _vocoder = self.vocoders[quality]
             elif len(_text.split()) < 3:
                 # A single word
+                self.rate_denominator = 0.85  # speak slower
                 _vocoder = self.get_voc_type('large')
             else:
                 _vocoder = self.get_voc_type('medium')
@@ -1044,10 +1210,12 @@ Loading larynx voices for `%(_lang2)s`
                         '\n+ voice encoder: ', _vocoder, '\n+ voice id: ',
                         _voice, '\n'
                     ]))
-                _lengthScale = _item[3]
+                _i_lengthScale = _item[3]
                 break
+        _lengthScale = str(_i_lengthScale / self.rate_denominator)
         if REQUESTS_OK:
-            _text = '\n'.join(['', _text, ''])
+            _strips = '\n .;'
+            _text = '\n'.join(['', _text.strip(_strips), ''])
             response = requests.post(
                 _url,
                 params={
@@ -1150,6 +1318,9 @@ def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
     if not _continue:
         _google_cloud_class = GoogleCloudClass()
         _continue = bool(_google_cloud_class.language_supported(_iso_lang))
+    if not _continue:
+        _watson_class = WatsonClass()
+        _continue = bool(_watson_class.language_supported(_iso_lang))
     return _continue
 
 
@@ -1171,6 +1342,7 @@ def network_main(_text_file_in='',
     _amazon_class = AmazonClass()
     _azure_class = AzureClass()
     _google_cloud_class = GoogleCloudClass()
+    _watson_class = WatsonClass()
     _gtts_class = GoogleTranslateClass()
     _continue = False
     _vox = _vox.strip('\'" \t\n').lower()
@@ -1191,6 +1363,9 @@ def network_main(_text_file_in='',
     if not _continue:
         _continue = bool(_google_cloud_class.language_supported(
             _iso_lang)) and _vox in _google_cloud_class.accept_voice
+    if not _continue:
+        _continue = bool(_watson_class.language_supported(
+            _iso_lang)) and _vox in _watson_class.accept_voice
     if not _continue:
         print(
             'No working network server was found, or the requested voice is unavailable.\n'

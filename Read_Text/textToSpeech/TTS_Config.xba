@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Config" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  * 
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Config" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  *
+&apos;&apos; # Configuration tools
+&apos;&apos; 
+&apos;&apos; These procedures make dialogues, get settings and write settings.
+&apos;&apos; Dialogues in Read Text Extension are updated each time that you see
+&apos;&apos; them. You can immediately change the dialogue language from the display
+&apos;&apos; preferences field of the main dialogue.
+&apos;&apos; 
+&apos;&apos; ## Audio tracks
+&apos;&apos; 
+&apos;&apos; An mp3 album can have up to 255 tracks. This extension uses the document
+&apos;&apos; *title* as the album title. The track number is the number of times you
+&apos;&apos; have created a sound file from a document with the same title. if the
+&apos;&apos; track number is over 255, then the counter restarts at 1.
+&apos;&apos; 
+&apos;&apos; ### Title vs. file name
+&apos;&apos; 
+&apos;&apos; The document title is *not* the same as the file name, and any number of
+&apos;&apos; files can have the same title. The title is used as the album name of
+&apos;&apos; exported sound files. You can assemble an album made up of different
+&apos;&apos; documents, by setting the title of each document to the same value. Use
+&apos;&apos; *File - Properties - Description - Title* to set a document title.
+&apos;&apos;
 Option Explicit
 &apos; Variable holding the dialog box.
 Private f_dlgSpeechSetup As Variant
@@ -12,13 +34,6 @@ global i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack As Integer
 global s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage As String
 global b_CaBcVancouverHolgateJamesReadtextextensionHideExports As Boolean
 global i_CaBcVancouverHolgateJamesReadtextextensionWinItunesVersion As Integer
-&apos;&apos; # Configuration tools
-&apos;&apos;  
-&apos;&apos; These procedures make dialogues, get settings and write settings.
-&apos;&apos; Dialogues in Read Text Extension are updated each time that you
-&apos;&apos; see them.  You can immediately change the dialogue language from
-&apos;&apos; the display preferences field of the main dialogue.
-&apos;&apos; 
 
 Sub ClearWorkingCountryLanguage()
 	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot;
@@ -29,26 +44,7 @@ Sub SetWorkingCountryLanguage()
 End Sub
 
 Function fiMyCurrentAudioTrack( _
-	ByVal bIncrement) As Integer
-&apos;&apos; # Audio tracks
-&apos;&apos;
-&apos;&apos; An mp3 album can have up to 255 tracks.  This extension uses
-&apos;&apos; the document *title* as the album title.  The track number is
-&apos;&apos; the number of times you have created a sound file from a 
-&apos;&apos; document with the same title. if the track number is over
-&apos;&apos; 255, then the counter restarts at 1.
-&apos;&apos;
-&apos;&apos; Title vs. file name
-&apos;&apos; -------------------
-&apos;&apos;
-&apos;&apos; The document title is *not* the same as the file name, and
-&apos;&apos; any number of files can have the same title.  The title is
-&apos;&apos; used as the album name of exported sound files.  You can
-&apos;&apos; assemble an album made up of different documents, by setting
-&apos;&apos; the title of each document to the same value.  Use
-&apos;&apos; *File - Properties - Description - Title* to set a document
-&apos;&apos; title.
-&apos;&apos;    
+	ByVal bIncrement) As Integer  
 	fiMyCurrentAudioTrack = 1
 	On error Goto fiMyCurrentAudioTrackErr
 	If bIncrement Then

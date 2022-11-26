@@ -1,6 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Indices" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  * 
+&apos;&apos; # Language editing
+&apos;&apos; 
+&apos;&apos; -   [PoEdit](https://poedit.net/) is an open source language string
+&apos;&apos;     editor for Linux, MacOS, and Windows.
+&apos;&apos; -   [Virtaal](https://virtaal.translatehouse.org/download.html) is
+&apos;&apos;     another one.
+&apos;&apos; 
+&apos;&apos; The format of **PO** translation files is described in the [PO Files
+&apos;&apos; Manual](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html).
+&apos;&apos; Having separate language files is best practice because it makes
+&apos;&apos; translating easier and forces programs to have a single reliable method
+&apos;&apos; of getting text. GetText is available in
+&apos;&apos; [Python](https://docs.python.org/2/library/gettext.html) as a library.
+&apos;&apos; The [Invent with
+&apos;&apos; Python](https://inventwithpython.com/blog/2014/12/20/translate-your-python-3-program-with-the-gettext-module/)
+&apos;&apos; blog has a set of instructions.
+&apos;&apos; 
+&apos;&apos; In [StarBasic](http://www.oooforum.org/forum/viewtopic.phtml?t=85441),
+&apos;&apos; there is a script that does basic interpretation of PO files.
+&apos;&apos; 
+&apos;&apos; The wording of dialogues and menu items of %PRODUCTNAME and Apache
+&apos;&apos; %PRODUCTNAME include a few differences, which reflect different program
+&apos;&apos; features or simply different writing styles. if you notice a difference
+&apos;&apos; in your language, you should, if possible, use wording that works for
+&apos;&apos; either program.
+&apos;&apos; 
+&apos;&apos; Program help is available online on a
+&apos;&apos; [wiki](https://help.libreoffice.org/Writer/Edit#Select_Text) that
+&apos;&apos; reflects the menus and dialogues of a recent version of the program. As
+&apos;&apos; well, a comprehensive file that includes translations of phrases for all
+&apos;&apos; supported languages is maintained at the [download
+&apos;&apos; site](https://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz).
+&apos;&apos; 
+&apos;&apos; The `zzy` language is used internally in the code of the extension. for
+&apos;&apos; example, the phrase for ““English”” is `en`, and the code for
+&apos;&apos; ““Traditional Chinese”” is `zh-tw`.
+&apos;&apos; 
+&apos;&apos; ## What other files include language strings?
+&apos;&apos; 
+&apos;&apos; ### Dialog
+&apos;&apos; 
+&apos;&apos;     /textToSpeech/Dialog1.xdl
+&apos;&apos; 
+&apos;&apos; ComboBox3 of Dialog1 contains two letter strings of the ISO codes for
+&apos;&apos; currently supported languages.
+&apos;&apos; 
+&apos;&apos; ### Description files
+&apos;&apos; 
+&apos;&apos;      /description/component.*
+&apos;&apos;      /description.xml
+&apos;&apos; 
+&apos;&apos; ### Help files
+&apos;&apos; 
+&apos;&apos;      /help/*/help.tree
+&apos;&apos;      /help/*/[$unique.id]/install.xhp
+&apos;&apos;      /help/*/[$unique.id]/online.xhp
+&apos;&apos;      /help/*/[$unique.id]/read_clipboard.xhp
+&apos;&apos;      /help/*/[$unique.id]/read_selection.xhp
+&apos;&apos;      /help/*/[$unique.id]/set_up.xhp
+&apos;&apos;      /help/*/[$unique.id]/tokens.xhp
+&apos;&apos; 
+&apos;&apos; ### Registry files
+&apos;&apos; 
+&apos;&apos;      /registration/LICENSE.*
+&apos;&apos;      /registry/data/org/openoffice/Office/Addons.xcu
+&apos;&apos; 
+&apos;&apos; ### Scripts
+&apos;&apos; 
+&apos;&apos;      /script/tts_wscript.vbs
+&apos;&apos; 
+&apos;&apos; ## PO language function
+&apos;&apos; 
+&apos;&apos; This extension uses external **PO** files to index the text in the
+&apos;&apos; dialogues to various languages.
+&apos;&apos; 
+&apos;&apos; English text is used as the index string. Therefore, English
+&apos;&apos; capitalization and spacing must be consistent for language translation
+&apos;&apos; to work.
+&apos;&apos; 
+&apos;&apos; The function’s name is a single underscore character `_(s1)`
+&apos;&apos; 
+&apos;&apos; -   [Virtaal](https://sourceforge.net/projects/translate/files/Virtaal/)
+&apos;&apos;     -   Simple and responsive PO editor.
+&apos;&apos; -   [Poedit](https://poedit.net/) - PO Editor with features. On Linux,
+&apos;&apos;     you can use other program’s language resources as models and use
+&apos;&apos;     installed dictionaries to check spelling.
+&apos;&apos; 
+&apos;&apos; ### Code
+&apos;&apos; 
+&apos;&apos;      sub poExample
+&apos;&apos;          REM Default language lookup
+&apos;&apos;          msgbox _(&quot;Cancel&quot;)
+&apos;&apos;          REM With specific arguments
+&apos;&apos;          REM You must reset UpdatePoSettingsDone before changing languages.
+&apos;&apos;          UpdatePoSettingsDone = -1
+&apos;&apos;          msgbox _(&quot;Read with an external program&quot;, &quot;tools&quot;, &quot;fr&quot;)
+&apos;&apos;          REM Setting the optional fourth parameter to 1
+&apos;&apos;          REM does a reverse translation to English.
+&apos;&apos;          msgbox _(&quot;Le script du Festival&quot;, &quot;tools&quot;, &quot;fr&quot;, 1)
+&apos;&apos;          REM You must reset UpdatePoSettingsDone before changing languages.
+&apos;&apos;          UpdatePoSettingsDone = -1
+&apos;&apos;          msgbox _(&quot;s_cancel&quot;, &quot;tools&quot;, &quot;zzy&quot;, 1)
+&apos;&apos;      end sub
+&apos;&apos; 
+&apos;&apos; ## Use a custom environment variable
+&apos;&apos; 
+&apos;&apos; The extension may use a system temporary directory to write temporary
+&apos;&apos; files like lock files. On some systems, the default temporary directory
+&apos;&apos; may be locked to users or processes that do not have sufficient reading
+&apos;&apos; or writing privileges.
+&apos;&apos; 
+&apos;&apos; The preferred way of looking up a temporary directory is to use an
+&apos;&apos; environmental variable. if you have a custom platform, you can set the
+&apos;&apos; `READTEXTTEMP` variable using the `env` or `set` command in a terminal
+&apos;&apos; to prioritize a specific directory as the temporary directory. if the
+&apos;&apos; `READTEXTTEMP` variable is set, then it is the first place that the
+&apos;&apos; extension looks to read and write temporary files.
+&apos;&apos;
 Option Explicit
 global UpdatePoSettingsDone As Integer
 
@@ -8,89 +126,6 @@ global mMyTranslationId(0) As Variant
 global mMyTranslationIdPlur(0) As Variant
 global mMyTranslationStr(0,0) As Variant
 
-&apos;&apos;  Language editing
-&apos;&apos;  ================
-&apos;&apos;   
-&apos;&apos;   - [PoEdit][1] is an open source language string editor for Linux, MacOS, and
-&apos;&apos;     Windows.
-&apos;&apos;   - [Virtaal][2] is another one.
-&apos;&apos;   
-&apos;&apos;   The format of **PO** translation files is described in the [PO Files Manual][3].
-&apos;&apos;   Having separate language files is best practice because it makes translating
-&apos;&apos;   easier and forces programs to have a single reliable method of getting text.
-&apos;&apos;   GetText is available in [Python][4] as a library. The [Invent with Python][5]
-&apos;&apos;   blog has a set of instructions.
-&apos;&apos;   
-&apos;&apos;   In [StarBasic][6], there is a script that does basic interpretation of PO files.
-&apos;&apos;   
-&apos;&apos;   The wording of dialogues and menu items of %PRODUCTNAME and Apache %PRODUCTNAME
-&apos;&apos;   include a few differences, which reflect different program features or simply
-&apos;&apos;   different writing styles.  if you notice a difference in your language, you
-&apos;&apos;   should, if possible, use wording that works for either program.
-&apos;&apos;   
-&apos;&apos;   Program help is available online on a [wiki][7] that reflects the menus
-&apos;&apos;   and dialogues of a recent version of the program.  As well, a comprehensive file
-&apos;&apos;   that includes translations of phrases for all supported languages is maintained
-&apos;&apos;   at the [download site][8].
-&apos;&apos;   
-&apos;&apos;   The `zzy` language is used internally in the code of the extension.  for
-&apos;&apos;   example, the phrase for &quot;&quot;English&quot;&quot; is `en`, and the code for &quot;&quot;Traditional
-&apos;&apos;   Chinese&quot;&quot; is `zh-tw`.
-&apos;&apos;   
-&apos;&apos;  What other files include language strings?
-&apos;&apos;  ------------------------------------------
-&apos;&apos;   
-&apos;&apos;  ### Dialog
-&apos;&apos;   
-&apos;&apos;   ```
-&apos;&apos;   /textToSpeech/Dialog1.xdl
-&apos;&apos;   ```
-&apos;&apos;   
-&apos;&apos;   ComboBox3 of Dialog1 contains two letter strings of the ISO codes
-&apos;&apos;   for currently supported languages.
-&apos;&apos;   
-&apos;&apos;  ### Description files
-&apos;&apos;   
-&apos;&apos;   
-&apos;&apos;       /description/component.*
-&apos;&apos;       /description.xml
-&apos;&apos;   
-&apos;&apos;   
-&apos;&apos;  ### Help files
-&apos;&apos;   
-&apos;&apos;   
-&apos;&apos;       /help/*/help.tree
-&apos;&apos;       /help/*/[$unique.id]/install.xhp
-&apos;&apos;       /help/*/[$unique.id]/online.xhp
-&apos;&apos;       /help/*/[$unique.id]/read_clipboard.xhp
-&apos;&apos;       /help/*/[$unique.id]/read_selection.xhp
-&apos;&apos;       /help/*/[$unique.id]/set_up.xhp
-&apos;&apos;       /help/*/[$unique.id]/tokens.xhp
-&apos;&apos;   
-&apos;&apos;   
-&apos;&apos;  ### Registry files
-&apos;&apos;   
-&apos;&apos;   
-&apos;&apos;       /registration/LICENSE.*
-&apos;&apos;       /registry/data/org/openoffice/Office/Addons.xcu
-&apos;&apos;   
-&apos;&apos;   
-&apos;&apos;  ### Scripts
-&apos;&apos;   
-&apos;&apos;   
-&apos;&apos;       /script/tts_wscript.vbs
-&apos;&apos;   
-&apos;&apos;   
-&apos;&apos;   [1]: https://poedit.net/
-&apos;&apos;   [2]: https://virtaal.translatehouse.org/download.html
-&apos;&apos;   [3]: https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
-&apos;&apos;   [4]: https://docs.python.org/2/library/gettext.html
-&apos;&apos;   [5]: https://inventwithpython.com/blog/2014/12/20/translate-your-python-3-program-with-the-gettext-module/
-&apos;&apos;   [6]: http://www.oooforum.org/forum/viewtopic.phtml?t=85441
-&apos;&apos;   [7]: https://help.libreoffice.org/Writer/Edit#Select_Text
-&apos;&apos;   [8]: https://download.documentfoundation.org/libreoffice/src/4.4.2/libreoffice-translations-4.4.2.2.tar.xz
-&apos;&apos;  
-&apos;&apos;
 Function fsLookUpTerm( _
 	ByVal sTermCode As String) As String
 	&apos; Look up a term using your language
@@ -169,49 +204,6 @@ Function _( _
 	&apos; sMyLang = language to match with English
 	&apos; iAlt = if False, then converts from English
 	&apos; and if true, then converts to English
-	
-&apos;&apos; PO language function
-&apos;&apos; ====================
-&apos;&apos;  
-&apos;&apos;  This extension uses external **PO** files to index the
-&apos;&apos;  text in the dialogues to various languages.
-&apos;&apos;  
-&apos;&apos;  English text is used as the index string.  Therefore, English 
-&apos;&apos;  capitalization and spacing must be consistent for language
-&apos;&apos;  translation to work.
-&apos;&apos;
-&apos;&apos;  The function&apos;s name is a single underscore character `_(s1)`
-&apos;&apos;  
-&apos;&apos;  + [Virtaal][1] - Simple and responsive PO editor.
-&apos;&apos;  + [Poedit][2] - PO Editor with features.  On Linux, you
-&apos;&apos;    can use other program&apos;s language resources as models
-&apos;&apos;    and use installed dictionaries to check spelling.
-&apos;&apos;  
-&apos;&apos; Code
-&apos;&apos; ----
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos;      sub poExample
-&apos;&apos;          REM Default language lookup
-&apos;&apos;          msgbox _(&quot;Cancel&quot;)
-&apos;&apos;          REM With specific arguments
-&apos;&apos;          REM You must reset UpdatePoSettingsDone before changing languages.
-&apos;&apos;          UpdatePoSettingsDone = -1
-&apos;&apos;          msgbox _(&quot;Read with an external program&quot;, &quot;tools&quot;, &quot;fr&quot;)
-&apos;&apos;          REM Setting the optional fourth parameter to 1 
-&apos;&apos;          REM does a reverse translation to English.
-&apos;&apos;          msgbox _(&quot;Le script du Festival&quot;, &quot;tools&quot;, &quot;fr&quot;, 1)
-&apos;&apos;          REM You must reset UpdatePoSettingsDone before changing languages.
-&apos;&apos;          UpdatePoSettingsDone = -1
-&apos;&apos;          msgbox _(&quot;s_cancel&quot;, &quot;tools&quot;, &quot;zzy&quot;, 1)
-&apos;&apos;      end sub
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos;  
-&apos;&apos;    [1]: https://sourceforge.net/projects/translate/files/Virtaal/
-&apos;&apos;    [2]: https://poedit.net/
-&apos;&apos;  
 	Dim i As Integer
 	Dim iMax As Integer
 	Dim trad As String
@@ -665,25 +657,6 @@ Function fsMyTempLock(ByVal sExt) As String
 	
 	fsMyTempLock = &quot;&quot;
 	a1 = Array(&quot;READTEXTTEMP&quot;,&quot;TEMP&quot;,&quot;TMP&quot;,&quot;TMPDIR&quot;,&quot;TEMPDIR&quot;)
-&apos;&apos;
-&apos;&apos;  Use a custom environment variable
-&apos;&apos;  =================================
-&apos;&apos;  
-&apos;&apos;  The extension may use a system temporary directory to
-&apos;&apos;  write temporary files like lock files.  On some systems,
-&apos;&apos;  the default temporary directory may be locked to users
-&apos;&apos;  or processes that do not have sufficient reading or writing 
-&apos;&apos;  privileges.
-&apos;&apos;  
-&apos;&apos;  The preferred way of looking up a temporary directory is
-&apos;&apos;  to use an environmental variable.  if you have a custom
-&apos;&apos;  platform, you can set the `READTEXTTEMP` variable using
-&apos;&apos;  the `env` or `set` command in a terminal to prioritize 
-&apos;&apos;  a specific directory as the temporary directory.  if the
-&apos;&apos;  `READTEXTTEMP` variable is set, then it is the first 
-&apos;&apos;  place that the extension looks to read and write temporary
-&apos;&apos;  files.
-&apos;&apos;  
 	For i = LBound(a1) To UBound(a1)
 		sTemp = Environ(a1(i))
 		If Len(sTemp) &gt; 0 Then

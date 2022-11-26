@@ -468,7 +468,10 @@ configurations.
         self.local_config = ''
         self.local_json = readtexttools.get_my_lock('json')
         self.json_content = ''
-        self.spd_ok = bool(speechd)
+        try:
+            self.spd_ok = bool(speechd)
+        except:
+            self.spd_ok = False
         if self.spd_ok:
             self.spd_ok = int(self.py_m) > 2
         try:
@@ -1884,6 +1887,7 @@ def main():
     if not _language:
         _language = 'en'
     concise_lang = _language[:2].lower()
+
     if not os.path.isfile(_file_spec):
         print("I was unable to find the text file you specified!")
         usage()
@@ -1927,7 +1931,6 @@ def main():
                 i_rate = 0
         else:
             assert False, "unhandled option"
-
     if os.path.isfile('/usr/bin/say'):
         if os.path.isfile(readtexttools.get_my_lock('lock')):
             hard_reset('say')

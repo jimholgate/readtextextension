@@ -2,43 +2,44 @@
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TextToSpeech" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  * 
 Option Explicit
-
 &apos;&apos; # Read Text Extension
-&apos;&apos;
-&apos;&apos; **Read Text** reads text aloud, saves audio or video files
-&apos;&apos; from text, and can use resources from the web based on the
-&apos;&apos; selected text.
-&apos;&apos;
-&apos;&apos; * Select text.
-&apos;&apos; * Click the *Read selection...* button.
-&apos;&apos; * To read aloud, accept the default in the dialogue, or choose
-&apos;&apos;   another action from the menus.
-&apos;&apos;
-&apos;&apos; Features
-&apos;&apos; --------
-&apos;&apos;
-&apos;&apos; * Automatically change languages according to the text language.
-&apos;&apos; * Create sound or still-image speech files for listening on the go.
-&apos;&apos; * Use web resources to translate, look up, listen, post, or
-&apos;&apos;   interface with web applications.
-&apos;&apos;
-&apos;&apos; Installation
-&apos;&apos; ------------
-&apos;&apos;
-&apos;&apos; Get *Read Text* from the download page and install it by double-clicking it.
-&apos;&apos;
-&apos;&apos; [Apache OpenOffice](https://extensions.services.openoffice.org/en/project/read-text)  
-&apos;&apos; [LibreOffice](https://extensions.libreoffice.org/extension-center/read-text)
-&apos;&apos;
-&apos;&apos; Read text speech API
-&apos;&apos; --------------------
-&apos;&apos;
-&apos;&apos; if you want to include speech in your own scripts, use `msgSpeak(sString)`.
-&apos;&apos; This sample shows how to handle a scripting error if a computer does not 
-&apos;&apos; have the extension.
-&apos;&apos;
+&apos;&apos; 
+&apos;&apos; ![Read Text
+&apos;&apos; Logo](https://github.com/jimholgate/readtextextension/blob/master/Read_Text/images/textToSpeechAbout_64h.png?raw=true)
+&apos;&apos; 
+&apos;&apos; **Read Text** reads text aloud, saves audio or video files from text,
+&apos;&apos; and can use resources from the web based on the selected text.
+&apos;&apos; 
+&apos;&apos; -   Select text.
+&apos;&apos; -   Click the *Read selection…* button.
+&apos;&apos; -   To read aloud, accept the default in the dialogue, or choose another
+&apos;&apos;     action from the menus.
+&apos;&apos; 
+&apos;&apos; ## Features
+&apos;&apos; 
+&apos;&apos; -   Automatically change languages according to the text language.
+&apos;&apos; -   Create sound or still-image speech files for listening on the go.
+&apos;&apos; -   Use web resources to translate, look up, listen, post, or interface
+&apos;&apos;     with web applications.
+&apos;&apos; 
+&apos;&apos; ## Installation
+&apos;&apos; 
+&apos;&apos; Get *Read Text* from the download page and install it by double-clicking
+&apos;&apos; it.
+&apos;&apos; 
+&apos;&apos; -   [Apache
+&apos;&apos;     OpenOffice](https://extensions.services.openoffice.org/en/project/read-text)
+&apos;&apos; -   [LibreOffice](https://extensions.libreoffice.org/extension-center/read-text)
+&apos;&apos; -   [GitHub](https://github.com/jimholgate/readtextextension)
+&apos;&apos; 
+&apos;&apos; ## Read text speech API
+&apos;&apos; 
+&apos;&apos; if you want to include speech in your own scripts, use
+&apos;&apos; `msgSpeak(sString)`. This sample shows how to handle a scripting error
+&apos;&apos; if a computer does not have the extension.
+&apos;&apos; 
 &apos;&apos;     sub OnClickMySlide1Image1()
-&apos;&apos;         &apos; Read text aloud. 
+&apos;&apos;         &apos; Read text aloud.
 &apos;&apos;         dim oSvc
 &apos;&apos;         dim sURL
 &apos;&apos;         dim sArg
@@ -60,51 +61,97 @@ Option Explicit
 &apos;&apos;             oSvc.execute(sURL,&quot;&quot;,0)
 &apos;&apos;         end if
 &apos;&apos;     end sub
-&apos;&apos;
-&apos;&apos; Mixed Asian, Complex and Western Text
-&apos;&apos; -------------------------------------
 &apos;&apos; 
-&apos;&apos; Speech synthesis for text with mixed Asian, complex
-&apos;&apos; and western contents may not work as you expect.
+&apos;&apos; ### Mixed Asian, Complex and Western Text
 &apos;&apos; 
-&apos;&apos; * In writer, you can check the language of the selected text
-&apos;&apos;   in the status bar. *Mixed* text includes an ambiguous or
-&apos;&apos;   undefined text string. 
-&apos;&apos; * if mixed text is interpreted as undefined or western,
-&apos;&apos;   the speech synthesizer might be silent or it might spell 
-&apos;&apos;   our character codes instead of using Asian or complex
-&apos;&apos;   speech synthesis.
+&apos;&apos; Speech synthesis for text with mixed Asian, complex and western contents
+&apos;&apos; may not work as you expect.
 &apos;&apos; 
-&apos;&apos; Copyright And License
-&apos;&apos; ---------------------
-&apos;&apos;
-&apos;&apos; (c) 2008-2022 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
-&apos;&apos;
-&apos;&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS
-&apos;&apos; OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION;
-&apos;&apos; EITHER VERSION 2 OF THE LICENSE, OR (AT YOUR OPTION) ANY LATER VERSION.  THIS SCRIPT
-&apos;&apos; IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL, BUT WITHOUT ANY WARRANTY;
-&apos;&apos; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
-&apos;&apos; SEE THE GNU GENERAL PUBLIC LICENSE FOR MORE DETAILS.
-&apos;&apos;
-&apos;&apos; YOU SHOULD HAVE RECEIVED A COPY OF THE GNU GENERAL PUBLIC LICENSE ALONG WITH THIS SOFTWARE;
-&apos;&apos; if not, WRITE TO THE FREE SOFTWARE FOUNDATION,INC., 59 TEMPLE PLACE,SUITE 330,BOSTON,MA
-&apos;&apos; 02111-1307  USA
-&apos;&apos;
-&apos;&apos; # Procedures
-&apos;&apos;
+&apos;&apos; -   In writer, you can check the language of the selected text in the
+&apos;&apos;     status bar. *Mixed* text includes an ambiguous or undefined text
+&apos;&apos;     string.
+&apos;&apos; -   if mixed text is interpreted as undefined or western, the speech
+&apos;&apos;     synthesizer might be silent or it might spell our character codes
+&apos;&apos;     instead of using Asian or complex speech synthesis.
+&apos;&apos; 
+&apos;&apos; ------------------------------------------------------------------------
+&apos;&apos; 
+&apos;&apos; ## Procedures
+&apos;&apos; 
 &apos;&apos; Procedures are called from menu items or from the tool bar.
+&apos;&apos; 
+&apos;&apos; ### Use *Read Selection* on the tool bar
+&apos;&apos; 
+&apos;&apos; The first time you use the extension, you can use this button to set it
+&apos;&apos; up. Once you uncheck *Always show this dialogue*, in the dialogue, this
+&apos;&apos; button will simply do the action that you set up, like, for example,
+&apos;&apos; reading text aloud.
+&apos;&apos; 
+&apos;&apos; ### Tools - Add-ons - Read Selection…
+&apos;&apos; 
+&apos;&apos; Use this to setup the text conversion options and to read the text
+&apos;&apos; aloud.
+&apos;&apos; 
+&apos;&apos; ### Tools - Add-ons - Read Clipboard
+&apos;&apos; 
+&apos;&apos; Use this to read the clipboard from any module that supports a text
+&apos;&apos; clipboard, including the Macro editor. You normally fill the clipboard
+&apos;&apos; by selecting some text, then using *Edit - Copy*. if this is useful,
+&apos;&apos; assign a key combination to the macro with *Tools - Customize*.
+&apos;&apos; 
+&apos;&apos; #### Clipboard disabled?
+&apos;&apos; 
+&apos;&apos; if the program shows an input box when you select *Tools - Read
+&apos;&apos; Clipboard* it is because the current version of the office suite or the
+&apos;&apos; computer platform doesn’t read the clipboard reliably. Please paste text
+&apos;&apos; into the input box.
+&apos;&apos; 
+&apos;&apos; #### Resetting the clipboard lock
+&apos;&apos; 
+&apos;&apos; To reset the clipboard lock after a updating your office suite, type
+&apos;&apos; some random characters into the *External program* box in the main
+&apos;&apos; dialogue. The extension shows an error message and deletes the settings
+&apos;&apos; files that the extension creates. When you click the *Read Selection*
+&apos;&apos; button, the settings are rebuilt from scratch.
+&apos;&apos; 
+&apos;&apos; ### Tools - Add-ons - Impress-View
+&apos;&apos; 
+&apos;&apos; Use this to open the selected text as an Impress document with the full
+&apos;&apos; text in the notes and a summary on the slide itself. The font is big and
+&apos;&apos; the format is square to make it easy to export sounds using the image of
+&apos;&apos; the presentation as album cover art for music players. Exporting cover
+&apos;&apos; art requires a compatible converter program like [Nero AAC
+&apos;&apos; Encoder](https://www.nero.com), [avconv](https://libav.org/),
+&apos;&apos; [FFmpeg](https://www.ffmpeg.org) or
+&apos;&apos; [iTunes](https://www.apple.com/itunes/).
+&apos;&apos; 
+&apos;&apos; ### Read the note
+&apos;&apos; 
+&apos;&apos; if you created a presentation using *Tools - Add-ons - Impress-View*,
+&apos;&apos; you can show a presentation and read the text of the note aloud.
+&apos;&apos; 
+&apos;&apos; -   if the slideshow isn’t showing, use *Slide Show - Start from first
+&apos;&apos;     slide*
+&apos;&apos; -   Click the text to read the text aloud.
+&apos;&apos; -   Click the text while the speech synthesizer is talking to switch the
+&apos;&apos;     speech synthesizer off.
+&apos;&apos; -   To go to the next slide, press the down arrow or the right arrow on
+&apos;&apos;     your keyboard.
+&apos;&apos; 
+&apos;&apos; The computer needs [read text
+&apos;&apos; extension](https://extensions.services.openoffice.org/en/project/read-text)
+&apos;&apos; to execute this procedure. if the computer doesn’t have the extension,
+&apos;&apos; clicking the shape will show a dialogue telling you that it couldn’t
+&apos;&apos; find the script.
+&apos;&apos; 
+&apos;&apos; The name of the function `ReadTheSlidenote` shows in the dialogue that
+&apos;&apos; Impress displays when a computer that doesn’t have read text extension
+&apos;&apos; calls the procedure.
 &apos;&apos;
 
 Sub ReadTextAloud
-&apos;&apos; Use *Read Selection* on the tool bar
-&apos;&apos; ------------------------------------
-&apos;&apos;
-&apos;&apos; The first time you use the extension, you can use this button to set it up.
-&apos;&apos; Once you uncheck *Always show this dialogue*, in the dialogue, this button
-&apos;&apos; will simply do the action that you set up, like, for example, reading text
-&apos;&apos; aloud.
-&apos;&apos;
+&apos; Use *Read Selection* on the tool bar
+
 	Dim sFile As String
 	Dim msgs()As Variant
 	Dim errorCode As Integer : errorCode = 0
@@ -134,41 +181,13 @@ End Sub
 
 
 Sub SetupReadTextAloud
-&apos;&apos; Tools - Add-ons - Read Selection...
-&apos;&apos; -----------------------------------
-&apos;&apos;
-&apos;&apos; Use this to setup the text conversion options and to read the text aloud.
-&apos;&apos;
+&apos; Tools - Add-ons - Read Selection...
 	ConfigureReadTextAloud()
 End Sub
 
 
 Sub ReadClipBoard
-&apos;&apos;  
-&apos;&apos; Tools - Add-ons - Read Clipboard
-&apos;&apos; --------------------------------
-&apos;&apos;  
-&apos;&apos; Use this to read the clipboard from any module that supports a
-&apos;&apos; text clipboard, including the Macro editor.  You normally
-&apos;&apos; fill the clipboard by selecting some text, then using *Edit - Copy*.
-&apos;&apos; if this is useful, assign a key combination to the macro with
-&apos;&apos; *Tools - Customize*.
-&apos;&apos;  
-&apos;&apos; ### Clipboard disabled? ###
-&apos;&apos;  
-&apos;&apos; if the program shows an input box when you select *Tools - Read Clipboard*
-&apos;&apos; it is because the current version of the office suite or the computer 
-&apos;&apos; platform  doesn&apos;t read the clipboard reliably.  Please paste text into 
-&apos;&apos; the input box.
-&apos;&apos;  
-&apos;&apos; ### Resetting the clipboard lock ###
-&apos;&apos;  
-&apos;&apos;  To reset the clipboard lock after a updating your office suite, type some
-&apos;&apos;  random characters into the *External program* box in the main dialogue.  The 
-&apos;&apos;  extension shows an error message and deletes the settings files that the 
-&apos;&apos;  extension creates.  When you click the *Read Selection* button, the settings 
-&apos;&apos;  are rebuilt from scratch.
-&apos;&apos;  
+&apos; Tools - Add-ons - Read Clipboard
 	Dim s1$
 	s1 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
 	Dim s2$
@@ -221,21 +240,7 @@ End Sub
 
 
 Sub ReadImpress()
-&apos;&apos; Tools - Add-ons - Impress-View
-&apos;&apos; ------------------------------
-&apos;&apos; 
-&apos;&apos; Use this to open the selected text as an Impress document with the full 
-&apos;&apos; text in the notes and a summary on the slide itself. The font is big and
-&apos;&apos; the format is square to make it easy to export sounds using the image of
-&apos;&apos; the presentation as album cover art for music players.  Exporting cover
-&apos;&apos; art requires a compatible converter program like [Nero AAC Encoder][PS1],
-&apos;&apos; [avconv][PS2], [FFmpeg][PS3] or [iTunes][PS4].
-&apos;&apos;
-&apos;&apos; [PS1]: https://www.nero.com
-&apos;&apos; [PS2]: https://libav.org/
-&apos;&apos; [PS3]: https://www.ffmpeg.org
-&apos;&apos; [PS4]: https://www.apple.com/itunes/
-&apos;&apos;
+&apos; Tools - Add-ons - Impress-View
 	PresentSelection2(fsGetLanguage())
 End Sub
 
@@ -314,30 +319,7 @@ End Sub
 
 
 Sub ReadTheSlidenote
-&apos;&apos;
-&apos;&apos; Read the note
-&apos;&apos; -------------
-&apos;&apos;
-&apos;&apos; if you created a presentation using *Tools - Add-ons - Impress-View*,
-&apos;&apos; you can show a presentation and read the text of the note aloud.
-&apos;&apos;
-&apos;&apos; * if the slideshow isn&apos;t showing, use *Slide Show - Start from first slide*
-&apos;&apos; * Click the text to read the text aloud.
-&apos;&apos; * Click the text while the speech synthesizer is talking to switch the
-&apos;&apos;   speech synthesizer off. 
-&apos;&apos; * To go to the next slide, press the down arrow or the right arrow on your
-&apos;&apos;   keyboard.
-&apos;&apos; 
-&apos;&apos; The computer needs [read text extension][1] to execute this procedure.
-&apos;&apos; if the computer doesn&apos;t have the extension, clicking the shape
-&apos;&apos; will show a dialogue telling you that it couldn&apos;t find the script.
-&apos;&apos; 
-&apos;&apos; The name of the function `ReadTheSlidenote` shows in the dialogue
-&apos;&apos; that Impress displays when a computer that doesn&apos;t have read text
-&apos;&apos; extension calls the procedure. 
-&apos;&apos; 
-&apos;&apos; [1]: https://extensions.services.openoffice.org/en/project/read-text
-&apos;&apos;
+&apos; Read the note
 	Dim s1 As String
 	Dim nPage As Integer
 	
