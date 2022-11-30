@@ -163,6 +163,7 @@ Sub ReadTextAloud
 		If config(fiAlwaysShowDialogCheckBox()) = 1 Then
 			ConfigureReadTextAloud()
 		Else
+			On Error Resume Next
 			ClearWorkingCountryLanguage
 			If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
 				kill fsMyTempLock(&quot;lock&quot;)

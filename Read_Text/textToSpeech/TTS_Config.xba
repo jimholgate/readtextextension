@@ -168,6 +168,7 @@ Sub ConfigureReadTextAloud()
 						Shell(&quot;killall&quot;, 0, &quot;flite&quot;, True)
 					End If
 				End If
+				On Error Resume Next
 				If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
 					kill fsMyTempLock()
 				End If
@@ -177,6 +178,7 @@ Sub ConfigureReadTextAloud()
 			&apos;Replace the old settings file
 			config() = fvCurrentDialogConfig()
 			.Dispose()
+			On Error Resume Next
 			If fileexists(sFile) Then
 				kill sFile
 			End If

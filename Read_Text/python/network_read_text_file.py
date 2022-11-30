@@ -841,7 +841,7 @@ class LocalClass(object):
         # `mary_ann` is the default voice, and it is always installed. It
         # will not appear in a downloaded voices directory. It will always
         # be included in the server's json request response.
-        self.larynx_v1 = None
+        self.larynx_v1 = ['mary_ann']
         if '_IN' in self.default_lang:
             self.larynx_v1 = ['cmu_aup', 'cmu_ksp', 'cmu_slp']
         elif self.default_lang == 'en_CA':
