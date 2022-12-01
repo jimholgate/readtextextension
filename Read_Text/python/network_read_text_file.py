@@ -549,6 +549,8 @@ Setup
         _provider = self.translator
         _provider_logo = '/usr/share/icons/hicolor/scalable/apps/goa-account-%(_domain)s.svg' % locals(
         )
+        if not os.path.isfile(_provider_logo):
+            _provider_logo = '/usr/share/icons/HighContrast/scalable/actions/system-run.svg'
 
         if '-' in _iso_lang:
             _lang = _iso_lang.split('-')[0]
@@ -803,7 +805,7 @@ class LocalClass(object):
         self.ok = True
         # This is the default. You can set up Larynx to use a different port.
         self.url = 'http://0.0.0.0:5002'  # localhost port 5002
-        self.help_icon = 'usr/share/icons/HighContrast/32x32/apps/web-browser.png'
+        self.help_icon = '/usr/share/icons/HighContrast/32x32/apps/web-browser.png'
         self.help_heading = 'Rhasspy Larynx'
         self.help_url = 'https://github.com/rhasspy/larynx#larynx'
         self.local_dir = os.path.expanduser('~/.local/share/larynx/')
