@@ -691,6 +691,7 @@ configurations.
         if self.xml_tool.use_mode in ['text']:
             _message = ' " %(_txt)s"' % locals()
         else:
+            # This tool uses standard XML; no need to modify text beyond cleanup.
             _txt = self.xml_tool.clean_for_xml(_txt, False).replace('\\"', '"')
             _message = '''<?xml version='1.0'?>
 <speak version='1.1' xml:lang='%(language)s'>%(_txt)s</speak>''' % locals()
@@ -1732,13 +1733,10 @@ class SayFormats(object):
 + `_file_spec` - Text file to speak
 + `_voice` - Supported voice
 + `i_rate` - Speech speed if supported
-+ `_visible` - Use a graphic media player, or False for invisible player
 + `_media_out` - Name of desired output media file
 + `_audible` - If false, then don't play the sound file
-+ `_visible` - If false, then try playing in the background.
++ `_visible` - Use a graphic media player, or False for invisible player
     '''
-        if len(_media_out) == 0:
-            return False
         m_rate = ''
         v_tag = '-v '
         if len(_voice) == 0:
@@ -1757,7 +1755,6 @@ class SayFormats(object):
         # Determine the temporary file name
         _media_work = readtexttools.get_work_file_path(_media_out, _icon,
                                                        'TEMP') + '.aiff'
-
         # Remove old files.
         if os.path.isfile(_media_work):
             os.remove(_media_work)
@@ -1875,6 +1872,7 @@ def main():
     _language = ''
     _output = ''
     _output_module = ''
+    _visible = False
     _voice = 'MALE1'
     verbose_language = readtexttools.default_lang()
     py_m = platform.python_version_tuple()[0]
@@ -1896,8 +1894,9 @@ def main():
         usage()
         sys.exit(0)
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hmolvr", [
-            "help", "output_module=", "output=", "language=", "voice=", "rate="
+        opts, args = getopt.getopt(sys.argv[1:], "hmolvri", [
+            "help", "output_module=", "output=", "language=", "voice=",
+            "rate=", "visible="
         ])
     except getopt.GetoptError:
         print('option was not recognized')
@@ -1929,6 +1928,9 @@ def main():
                     i_rate = int(readtexttools.remove_unsafe_chars(a))
             except ValueError:
                 i_rate = 0
+        elif o in ("-i", "--visible"):
+            if a.lower() in ['true']:
+                _visible = True
         else:
             assert False, "unhandled option"
     if os.path.isfile('/usr/bin/say'):
@@ -1947,17 +1949,20 @@ def main():
                 if line.startswith('%(_voice)s ' % locals()):
                     mac_reader = _voice
                     break
-        if len(_output) == 0:
+
+        if len(_output) == 0 and not (_visible):
             resultat = _say_formats.say_aloud(_file_spec, mac_reader, _voice,
                                               i_rate)
+
             if not resultat:
                 readtexttools.unlock_my_lock()
                 if _voice in NET_SERVICE_LIST:
                     if not net_play(_file_spec, _language, i_rate, _voice):
                         print(network_read_text_file.network_problem(_voice))
         else:
+            _audible = _visible
             if not _say_formats.save_audio(_file_spec, mac_reader, i_rate,
-                                           _output, False, False):
+                                           _output, _audible, _visible):
                 if len(_language) != 0:
                     try:
                         _ext = os.path.splitext(_output)[1]
@@ -1965,7 +1970,7 @@ def main():
                         _ext = ''
                     if _voice in NET_SERVICE_LIST:
                         if not network_read_text_file.network_main(
-                                _file_spec, _language, 'false', 'false',
+                                _file_spec, _language, _visible, _audible,
                                 _output, '', '', '', '600x600', i_rate, _voice,
                                 ''):
                             readtexttools.pop_message(

@@ -191,6 +191,8 @@ class ReadFestivalClass(object):
             'US',
             'lang1':
             'en',
+            'amp':
+            'and',
             'voices': [
                 "us/cmu_us_slt_arctic_hts", "us/cmu_us_slt_cg",
                 "us/cmu_us_awb_arctic_hts", "us/cmu_us_awb_cg",
@@ -216,6 +218,8 @@ class ReadFestivalClass(object):
             'GB',
             'lang1':
             'en',
+            'amp':
+            'and',
             'voices': [
                 "english/kal_diphone", "english/ked_diphone",
                 "english/don_diphone", "english/en1_mbrola",
@@ -230,6 +234,8 @@ class ReadFestivalClass(object):
             'GB',
             'lang1':
             'en',
+            'amp':
+            'and',
             'voices': [
                 "us/cmu_us_slt_arctic_hts", "us/cmu_us_slt_cg",
                 "english/kal_diphone", "english/ked_diphone",
@@ -245,24 +251,29 @@ class ReadFestivalClass(object):
             'IT',
             'lang1':
             'it',
+            'amp':
+            'e',
             'voices': ["italian/lp_diphone", "italian/pc_diphone"]
         }, {
             'package': 'catalan',
             'sample': 'Hola. Sóc una veu del sistema castellà.',
             'iso_code': 'ES',
             'lang1': 'ca',
+            'amp': 'i',
             'voices': ["catalan/upc_ca_ona_hts"]
         }, {
             'package': 'castillian_spanish',
             'sample': 'Hola. Soy un vox del sistema castellano.',
             'iso_code': 'ES',
             'lang1': 'es',
+            'amp': 'y',
             'voices': ["spanish/el_diphone"]
         }, {
             'package': 'russian',
             'sample': 'Здравствуйте. Я - русский голос системы.',
             'iso_code': 'RU',
             'lang1': 'ru',
+            'amp': u'\u0438',
             'voices': ["russian/msu_ru_nsh_clunits"]
         }, {
             'package':
@@ -273,6 +284,8 @@ class ReadFestivalClass(object):
             'FI',
             'lang1':
             'fi',
+            'amp':
+            'ja',
             'voices':
             ["finnish/hy_fi_mv_diphone", "finnish/suo_fi_lj_diphone"]
         }, {
@@ -284,6 +297,8 @@ class ReadFestivalClass(object):
             'CZ',
             'lang1':
             'cz',
+            'amp':
+            'a',
             'voices': [
                 "czech/czech_dita", "czech/czech_krb", "czech/czech_machac",
                 "czech/czech_ph"
@@ -293,24 +308,28 @@ class ReadFestivalClass(object):
             'sample': "Hallo. Ich bin eine deutsche Stimme.",
             'iso_code': 'DE',
             'lang1': 'de',
+            'amp': 'und',
             'voices': ["german/german_de2_os"]
         }, {
             'package': 'hindi',
             'sample': "Namaskāra. Mī ēka marāṭhī āvāja āhē.",
             'iso_code': 'IN',
             'lang1': 'hi',
+            'amp': 'और',
             'voices': ["hindi/hindi_NSK_diphone"]
         }, {
             'package': 'marathi',
             'sample': "Namaskāra. Mī ēka marāṭhī āvāja āhē.",
             'iso_code': 'IN',
             'lang1': 'mr',
+            'amp': 'आणि',
             'voices': ["marathi/marathi_NSK_diphone"]
         }, {
             'package': 'telugu',
             'sample': "Halō. Nēnu telugu vāṇini.",
             'iso_code': 'IN',
             'lang1': 'te',
+            'amp': 'మరియు',
             'voices': ["telugu/telugu_NSK_diphone"]
         }, {
             'package':
@@ -321,6 +340,8 @@ class ReadFestivalClass(object):
             'VN',
             'lang1':
             'vi',
+            'amp':
+            'và',
             'voices':
             ["vietnamese/wow_vi_liz_diphone", "vietnamese/wow_vi_ptn_diphone"]
         }, {
@@ -332,6 +353,8 @@ class ReadFestivalClass(object):
             'GB',
             'lang1':
             'cy',
+            'amp':
+            'a',
             'voices': [
                 "welsh/cb_cy_llg_diphone",
                 "welsh/cb_cy_cw_diphone",
@@ -757,15 +780,15 @@ reads the file aloud.
                                      _image_size)
     else:
         # Prepare Sable XML (To SLOW DOWN speech use --RATE=75%)
+        _domain_table = _read_festival.domain_table
+        for i in range(len(_domain_table)):
+            if _domain_table[i]['lang1'] == concise_lang:
+                _content = _content.replace('&', _domain_table[i]['amp'])
+                break
         _content = _xml_tool.clean_for_xml(_content, True)
-        _file_content = ''.join([
-            '<SABLE>\n', '<SPEAKER NAME="', _sable_speaker + '">\n',
-            '<RATE SPEED="', _sable_rate + '">\n', '<PITCH BASE="',
-            _sable_pitch, '">\n', _content, '\n</PITCH>',
-            '\n</RATE>\n</SPEAKER>', '\n</SABLE>'
-        ])
-        # os.remove(_file_path)
-
+        _file_content = '''<SABLE><SPEAKER NAME="%(_sable_speaker)s">
+<RATE SPEED="%(_sable_rate)s"><PITCH BASE="%(_sable_pitch)s">
+%(_content)s</PITCH></RATE></SPEAKER></SABLE>''' % locals()
         _sable = _file_path + ".sable"
         readtexttools.write_plain_text_file(_sable, _file_content, 'utf-8')
         _writer = readtexttools.check_artist(_writer)

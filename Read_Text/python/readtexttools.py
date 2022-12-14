@@ -312,9 +312,12 @@ def safechars(_test_string='', _allowed='1234567890,'):  # -> string
     '''Removes unwanted characters from a string.'''
     if not bool(_test_string):
         return ''
-    for _letter in _test_string:
-        if not _letter in _allowed:
-            _test_string = _test_string.replace(_letter, '')
+    try:
+        for _letter in _test_string:
+            if not _letter in _allowed:
+                _test_string = _test_string.replace(_letter, '')
+    except TypeError:
+        return safechars(str(_test_string), _allowed)
     return _test_string
 
 
@@ -992,6 +995,8 @@ def lax_bool(_test):  # -> bool
     `True`, otherwise returns `False`.'''
     if not bool(_test):
         return False
+    if _test == True:
+        return True
     try:
         if _test.lower() in ['true', 'yes', '-1', '1']:
             return True
@@ -1169,7 +1174,7 @@ def get_work_file_path(_work='', _image='', _type=''):  # -> str
         else:
             # Can't make flac, so make wav
             _out = '%(_work)s.wav' % locals()
-            _work = _outv
+            _work = _out
     elif lax_mime_match(_work_ext, '.opus'):
         if len(gst_plugin_path('libgstopus')) != 0:
             _out = _work
@@ -2678,16 +2683,66 @@ def get_my_lock(_lock=''):  # -> str
     return ''
 
 
+def media_mac_os_ok(_out=''):  # -> bool
+    '''MacOS native apps can play the media type'''
+    return os.path.splitext(_out)[1] in [
+        ".aif", ".aifc", ".aiff", ".wav", ".aac", "mp4", ".mp3", ".m4v",
+        ".m4a", ".mov", ".dv", ".mpeg", ".avi"
+    ]
+
+
+def media_open_browser_ok(_out=''):  # -> bool
+    '''Most web browser apps can play the media type'''
+    return os.path.splitext(_out)[1] in [
+        ".flac", "mp2", ".mp3", ".m4a", ".mpeg", ".ogg", ".opus", ".spx",
+        ".webm"
+    ]
+
+
+def app_mac_os_command(_app='Safari', _out=''):  # -> str
+    '''If a GUI Media App is installed in a normal Application directory then
+    return a command to play a media file, otherwise return `''`.'''
+    _search = ''.join([_app.replace('.app', ''), '.app'])
+    _app_description = _app.lower().replace('.app', '')
+    for _prefix in [
+            '/', '/System',
+            os.path.expanduser('~/'),
+            os.path.expanduser('~/System')
+    ]:
+        _dir = os.path.join(_prefix, 'Applications', _search)
+        if os.path.exists(_dir):
+            return 'open -a "%(_app_description)s" "%(_out)s"' % locals()
+    return ''
+
+
 def show_with_app(_out):  # -> bool
     '''
-    Same as double clicking the document - opens in default
-    application.
+    Same as double clicking the document - opens in default application.
     '''
     if have_posix_app('say', False):
-        # MacOS
-        _command = 'open "%(_out)s"' % locals()
-        my_os_system(_command)
-        return True
+        # MacOS - override defaults for audio media
+        _command = ''
+        if media_open_browser_ok(_out) or media_mac_os_ok(_out):
+            for _application in ['Brave', 'Chrome', 'Edge', 'VLC']:
+                _command = app_mac_os_command(_application, _out)
+                if len(_command) != 0:
+                    break
+        if len(_command) == 0:
+            if media_open_browser_ok(_out):
+                for _application in ['Firefox', 'Firefox LTS']:
+                    _command = app_mac_os_command(_application, _out)
+                    if len(_command) != 0:
+                        break
+        if len(_command) == 0:
+            if media_mac_os_ok(_out):
+                for _application in ['Orion', 'Safari', 'QuickTime Player']:
+                    _command = app_mac_os_command(_application, _out)
+                    if len(_command) != 0:
+                        break
+        if len(_command) == 0:
+            # Default for MacOS.
+            _command = 'open "%(_out)s"' % locals()
+        return my_os_system(_command)
     elif os.name == 'nt':
         # Windows
         os.startfile(_out)

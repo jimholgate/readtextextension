@@ -475,6 +475,7 @@ class GoogleTranslateClass(object):
         ]
         self.translator = 'Google'
         self.translator_domain = self.translator.lower()
+        self.default_extension = '.mp3'
 
     def version(self):  # -> string
         '''Returns the version in the form `nn.nn.nn`.'''
@@ -676,7 +677,8 @@ Setup
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
         _media_work = ''.join([
-            readtexttools.get_work_file_path(_out_path, _icon, 'TEMP'), '.mp3'
+            readtexttools.get_work_file_path(_out_path, _icon, 'TEMP'),
+            self.default_extension
         ])
 
         # Remove old files.
@@ -840,6 +842,7 @@ class LocalClass(object):
         # prioritizes a voice that you chose to install.
         self.default_lang = readtexttools.default_lang()
         self.default_voice = 'mary_ann'
+        self.default_extension = '.wav'
         # `mary_ann` is the default voice, and it is always installed. It
         # will not appear in a downloaded voices directory. It will always
         # be included in the server's json request response.
@@ -961,7 +964,6 @@ Try restarting `larynx-server`.''')
         _data_list = _data.strip().split('\n')
         _resultat = ''
         count_f = 0
-
         for count, _item in enumerate(self.spd_m):
             if _item == _search:
                 count_f = count
@@ -1060,6 +1062,7 @@ Try restarting `larynx-server`.''')
         larynx_names = ''
         for _item in data:
             if data[_item]['downloaded']:
+                self.accept_voice.append(data[_item]['name'])
                 if _lang1 in data[_item]['language']:
                     larynx_names = ''.join(
                         [larynx_names, '\n', data[_item]['name']])
@@ -1069,7 +1072,11 @@ Try restarting `larynx-server`.''')
                         [larynx_names, '\n', data[_item]['name']])
         larynx_names = larynx_names.strip()
         _vox = vox.lower()
-        _verified_name = self._spd_voice_to_larynx_voice(_vox, larynx_names)
+        if _vox in larynx_names.split('\n'):
+            _verified_name = _vox
+        else:
+            _verified_name = self._spd_voice_to_larynx_voice(
+                _vox, larynx_names)
         if _verified_name in self.larynx_v1:
             _logo = ''.join([u' \u263B  (', self.default_lang, ')'])
         else:

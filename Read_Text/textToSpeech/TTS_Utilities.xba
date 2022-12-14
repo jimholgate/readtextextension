@@ -1696,6 +1696,10 @@ Sub dialog1Combo2ShowSAPIChoices( _
 	&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).wav&quot;&quot;&quot; &amp; _
 	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	oComboBox.addItem(s1, 0)
+	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /visible:&quot;&quot;True&quot;&quot;&quot; &amp; _
+	sSelectionLangCountryTag &amp; _
+	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+	oComboBox.addItem(s1, 0)
 	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 	sSelectionLangCountryTag &amp; _
 	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
@@ -2219,6 +2223,13 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
         s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_CODE)&quot;
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+		If fbInPaths(&quot;larynx-server&quot;) Then
+			s1 = s1 &amp; CR &amp; _
+			&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --visible True --language (SELECTION_LANGUAGE_CODE) &quot;&quot;(TMP)&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --voice &quot;&quot;mary_ann&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+		End If
+		s1 = s1 &amp; CR &amp; _
+		&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	End If
 	If fbHavePyQrCode() Then
 		Redim _opts : _opts = Array(_
@@ -2325,6 +2336,9 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 					&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 				Next
 				s1 = s1 &amp; CR &amp; sProg &amp; _
+				&quot; --visible True --voice &quot;&quot;AUTO&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
+				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				s1 = s1 &amp; CR &amp; sProg &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
@@ -2368,16 +2382,22 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)	
 	End If
 	If fbOKWithRhVoice(sLanguage) Then
+		s4 = &quot;&quot;&quot;(RHVOICE_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 		s4 = &quot;&quot;&quot;(RHVOICE_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)  &apos; 2022.08 voices ignored rate and pitch
 	End If
 	If fbHaveEspeak() Or _
 		fileexists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
 		fileexists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
+		s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 		s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &apos; &amp; &quot; --rate 100% --pitch 100% &quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
 	End If
 	If Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0  Then
+		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
 	End If
@@ -2392,9 +2412,11 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		
 		a1 = Split(s1, CR)
 		For n = LBound(a1) + 1 To UBound(a1)
-			If Instr(a1(n), &quot;&quot;&quot;(TMP)&quot;&quot;&quot;) &lt;&gt; 0 or _
-			Instr(a1(n), &quot;WEBTEXT&quot;) &lt;&gt; 0 Then
-				oComboBox.addItem(a1(n), 0)
+			If Not(Instr(a1(n), &quot;--output&quot;) &lt;&gt; 0 and Instr(Lcase(a1(n)), &quot;--visible true&quot;) &lt;&gt; 0) Then
+				If Instr(a1(n), &quot;&quot;&quot;(TMP)&quot;&quot;&quot;) &lt;&gt; 0 or _
+				Instr(a1(n), &quot;WEBTEXT&quot;) &lt;&gt; 0 Then
+					oComboBox.addItem(a1(n), 0)
+				End If
 			End If
 		Next
 	End If

@@ -155,6 +155,16 @@ def picoread(_text, _language, _visible, _audible, _media_file, _image, _title,
 
 def main():  # -> NoReturn
     '''Pico read text tools'''
+    _map = [
+        # mapped by number of speakers worldwide
+        # [_language[:2].lower(), '&', '>', '<'],
+        ['en', 'and', 'greater than', 'less than'],
+        ['es', 'y', 'más que', 'menos que'],
+        ['fr', 'et', 'plus que', 'moins que'],
+        ['pt', 'e', 'mais que', 'menos que'],
+        ['de', 'und', 'größer als', 'weniger als'],
+        ['it', 'e', 'più di', 'meno di'],
+    ]
     _imported_meta = readtexttools.ImportedMetaData()
     _language = 'en-US'
     _output = ''
@@ -219,19 +229,32 @@ def main():  # -> NoReturn
             assert False, 'unhandled option'
     _text = _imported_meta.meta_from_file(_file_path)
     if len(_text) != 0:
-        _text = _xml_transform.clean_for_xml(_text,
-                                             readtexttools.lax_bool(_strict))
-    if len(_text) != 0:
-        if not _language[:2].lower() in ['de', 'es', 'en', 'fr', 'it']:
-            _language = 'en-US'
         _text = readtexttools.strip_mojibake(_language, _text)
-        _xml_text = ''.join([
-            '"<speed level = \'', _rate, '\'>', "<pitch level = '", _pitch,
-            '\'>', _text, '</pitch></speed>"'
-        ])
+        language_2 = _language[:2].lower()
+        if not language_2 in ['de', 'es', 'en', 'fr', 'it']:
+            _language = 'en-US'
+            language_2 = 'en'
+        if _pitch == '100%' and _rate == '100%':
+            _text = _text.replace('"', '\\"').replace('{',
+                                                      ' ').replace('}', ' ')
+            _pico_text = '"%(_text)s"' % locals()
+        else:
+            # Svox pico does not handle `&amp;'` or `&#38;` in XML correctly.
+            # Substitute the local words for `&`, `<`, and `>`.
+            for _map_list in _map:
+                if language_2 == _map_list[0]:
+                    _text = _text.replace("&", _map_list[1]).replace(
+                        ">", _map_list[2]).replace("<", _map_list[3]).replace(
+                            '{', ' ').replace('}', ' ')
+                    break
+            _text = _xml_transform.clean_for_xml(
+                _text.strip(), readtexttools.lax_bool(_strict))
+            _pico_text = '''"<speed level = '%(_rate)s'>
+<pitch level = '%(_pitch)s'>'%(_text)s</pitch></speed>"''' % locals()
+    if len(_pico_text) != 0:
         _artist_ok = readtexttools.check_artist(_artist)
         _title_ok = readtexttools.check_title(_title, "pico")
-        picoread(_xml_text, _language, _visible, _audible, _output, _image,
+        picoread(_pico_text, _language, _visible, _audible, _output, _image,
                  _title_ok, _artist_ok, _dimensions)
     sys.exit(0)
 
