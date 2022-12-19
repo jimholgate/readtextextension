@@ -3312,6 +3312,7 @@ Sub main()
 		sOutFile = WScript.Arguments.Named.Item("wavefile") 'depreciated
 	End If
 	s0 = WScript.Arguments.Unnamed.Item(0)
+
 	Select Case s0
 		Case "-h","--help","/h","-?"
 			Usage "Help"

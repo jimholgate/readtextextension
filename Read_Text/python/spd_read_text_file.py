@@ -1963,6 +1963,7 @@ def main():
             _audible = _visible
             if not _say_formats.save_audio(_file_spec, mac_reader, i_rate,
                                            _output, _audible, _visible):
+
                 if len(_language) != 0:
                     try:
                         _ext = os.path.splitext(_output)[1]

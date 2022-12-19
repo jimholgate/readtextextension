@@ -767,7 +767,7 @@ Setup
         return False
 
 
-class LocalClass(object):
+class LarynxClass(object):
     '''Larynx is a text to speech local http voice server that a
     Raspberry Pi computer can use with automated devices. Larynx
     can support SSML and codes in plain text strings to suggest
@@ -950,7 +950,7 @@ Try restarting `larynx-server`.''')
         like `male1` '''
         if self.debug and 1:
             print([
-                '`LocalClass` > `_spd_voice_to_larynx_voice`', _search,
+                '`LarynxClass` > `_spd_voice_to_larynx_voice`', _search,
                 larynx_names
             ])
         _search = _search.lower().strip('\'" \n')
@@ -1098,7 +1098,7 @@ Loading larynx voices for `%(_lang2)s`
                 if data[_item]['name'] == _verified_name:
                     if self.debug and 1:
                         print([
-                            '`LocalClass` > `language_supported` found: ',
+                            '`LarynxClass` > `language_supported` found: ',
                             data[_item]['name'], 'Setting `id` to: ',
                             data[_item]['id']
                         ])
@@ -1178,12 +1178,12 @@ Loading larynx voices for `%(_lang2)s`
         _media_work = os.path.join(tempfile.gettempdir(), 'larynx.wav')
         _voice = self.voice_name
         if self.debug and 1:
-            print(['`LocalClass` > ` `read`', 'Request `_voice`: ', _voice])
+            print(['`LarynxClass` > ` `read`', 'Request `_voice`: ', _voice])
         _i_lengthScale = 0.85
         if bool(self.add_pause) and not ssml:
             for _symbol in self.pause_list:
                 if _symbol in _text:
-                    _text = _text.translate(self.add_pause).replace('..', '.')
+                    _text = _text.translate(self.add_pause).replace('.;', '.')
                     break
         try:
             if not self.is_x86_64:
@@ -1277,6 +1277,324 @@ Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
         return False
 
 
+class MaryTtsClass(object):
+    '''You can use `synesthesiam/docker-marytts` text to speech localhost
+    http server for 8 languages. When you use this docker container, it
+    includes all the available languages and voices in the container. This
+    client currently only supports basic text to speech functionality.
+
+See https://github.com/synesthesiam/docker-marytts
+    [Default MaryTts address](http://0.0.0.0:59125)
+
+    [About MaryTts...](See https://github.com/synesthesiam/docker-marytts)'''
+
+    def __init__(self):  # -> None
+        '''Initialize data. See
+        <https://github.com/synesthesiam/docker-marytts>'''
+        self.debug = [0, 1, 2, 3][0]
+        self.ok = True
+        self.response = ''
+        # This is the default. You can set up MaryTts to use a different port.
+        self.url = 'http://0.0.0.0:59125'  # localhost port 59125
+        self.help_icon = '/usr/share/icons/HighContrast/32x32/apps/web-browser.png'
+        self.help_heading = 'Rhasspy MaryTTS'
+        self.help_url = 'https://github.com/synesthesiam/docker-marytts'
+        self.audio_format = 'WAVE_FILE'
+        self.input_types = [
+            'TEXT', 'SIMPLEPHONEMES', 'SABLE', 'SSML', 'APML', 'EMOTIONML'
+        ]
+        self.accept_voice = [
+            '', 'all', 'auto', 'child_female', 'female1', 'female2', 'female3',
+            'female4', 'female5', 'female6', 'female7', 'female8', 'female9',
+            'child_female1', 'child_male', 'male1', 'male2', 'male3', 'male4',
+            'male5', 'male6', 'male7', 'male8', 'male9', 'child_male1',
+            'marytts', 'localhost', 'docker', 'local_server'
+        ]
+        self.voice_locale = ''
+        self.pause_list = [
+            '(', '\n', '\r', u"\u2026", u'\u201C', u"\u2014", u"\u2013",
+            u'\u00A0'
+        ]
+        try:
+            self.add_pause = str.maketrans({
+                '\n': ';\n',
+                '\r': ';\r',
+                '(': ' ( ',
+                u'\u201C': u'\u201C;',
+                u'\u2026': u'\u2026;',
+                u'\u2014': u'\u2014;',
+                u'\u2013': u'\u2013;',
+                u'\u00A0': ' '
+            })
+        except AttributeError:
+            self.add_pause = None
+        try:
+            self.base_curl = str.maketrans({
+                '\\': ' ',
+                '"': '\\"',
+                '''
+''': '''\
+''',
+                '\r': ' '
+            })
+        except AttributeError:
+            self.base_curl = None
+
+    def language_supported(self,
+                           iso_lang='en-US',
+                           alt_local_url=''):  # -> bool
+        '''Is the language or voice supported?
+        + `iso_lang` can be in the form `en-US` or `en`.
+        + `alt_local_url` If you are connecting to a local network's
+           speech server using a different computer, you might need to use
+           a different url.'''
+        if alt_local_url.startswith("http"):
+            self.url = alt_local_url
+        if int(platform.python_version_tuple()[0]) < 3 or int(
+                platform.python_version_tuple()[1]) < 8:
+            self.ok = False
+            return self.ok
+        if not REQUESTS_OK:
+            if not readtexttools.have_posix_app('curl', False):
+                self.ok = False
+                return False
+            if not bool(self.base_curl):
+                self.ok = False
+                return False
+        if len(self.voice_locale) != 0:
+            self.help_url = self.url
+            self.help_icon = '/usr/share/icons/HighContrast/scalable/actions/system-run.svg'
+            return True
+        _lang1 = iso_lang.replace('-', '_')
+        # concise language
+        _lang2 = _lang1.split('_')[0]
+        try:
+            response = urllib.request.urlopen(''.join([self.url, '/locales']))
+            _locales = str(response.read(), 'utf-8')
+        except urllib.error.URLError:
+            print(
+                '''Requested [marytts-server](https://github.com/synesthesiam/docker-marytts)
+            It did not respond correctly.''')
+            self.ok = False
+            return False
+        except AttributeError:
+            try:
+                # catching classes that do not inherit from BaseExceptions
+                # is not allowed.
+                response = urllib.urlopen(''.join([self.url, '/locales']))
+                _locales = str(response.read(), 'utf-8')
+            except AttributeError:
+                self.ok = False
+                return False
+        if len(_locales) == 0:
+            return False
+        # Find the first voice that meets the criteria. If found, then
+        # return `True`, otherwise return `False`.
+        self.ok = False
+        if _lang1 in _locales.split('\n'):
+            self.ok = True
+            self.voice_locale = _lang1
+        elif _lang2 in _locales.split() or _lang2 == 'en':
+            self.ok = True
+            if _lang2 == 'en':
+                if _lang1[-2:].lower() in [
+                        'au', 'bd', 'bs', 'gb', 'gh', 'hk', 'ie', 'in', 'jm',
+                        'nz', 'pk', 'sa', 'tt'
+                ]:
+                    self.voice_locale = 'en_GB'
+                else:
+                    self.voice_locale = 'en_US'
+            else:
+                self.voice_locale = _lang2.lower()
+        return self.ok
+
+    def marytts_voice(self,
+                      _voice='female1',
+                      _iso_lang='en-US',
+                      _prefer_gendered_fallback=True):  # -> str
+        '''If the MaryTTS API includes the voice description, return a
+        marytts voice description like `cmu-bdl-hsmm`, otherwise return
+        `''`.'''
+        if len(_voice) == 0:
+            return ''
+        try:
+            response = urllib.request.urlopen(''.join([self.url, '/voices']))
+            _voices = str(response.read(), 'utf-8')
+        except urllib.error.URLError:
+            print(
+                '''Requested [docker-marytts](https://github.com/synesthesiam/docker-marytts)
+            It did not respond correctly.''')
+            return ''
+        except AttributeError:
+            try:
+                # catching classes that do not inherit from BaseExceptions
+                # is not allowed.
+                response = urllib.urlopen(''.join([self.url, '/voices']))
+                _voices = str(response.read(), 'utf-8')
+            except AttributeError:
+                return ''
+        if len(_voices) == 0:
+            return ''
+        _locale = _iso_lang.replace('-', '_')
+        if _voices.count(_locale) == 0:
+            # i. e.: en_AU, en_CA ... en_ZA etc.
+            # Disregard the region code and use all voices for the language.
+            _locale = _locale.split('_')[0]
+        _voice_list = _voices.split('\n')
+        for _tester in _voice_list:
+            _row = _tester.split(' ')
+            if _row[0].count(_voice.lower()) != 0:
+                self.voice_locale = _row[1]
+                return _row[0]
+        matches = []
+        last_match = ''
+        gendered_fallback = ''
+        if _voice not in self.accept_voice:
+            return last_match
+        for _tester in _voice_list:
+            _row = _tester.split(' ')
+            try:
+                if _row[1].startswith(_locale):
+                    last_match = _row[0]
+                    if _voice.lower().startswith(_row[2]):
+                        # preferred gender
+                        matches.append(_row[0])
+                        if len(gendered_fallback) == 0:
+                            gendered_fallback = last_match
+            except IndexError:
+                pass
+        for i in reversed(range(0, len(matches))):
+            if _voice.endswith(str(len(matches) - i)):
+                return matches[i]
+        if _prefer_gendered_fallback:
+            if len(gendered_fallback) != 0:
+                return gendered_fallback
+        return last_match
+
+    def read(self,
+             _text="",
+             _iso_lang='en-US',
+             _visible="false",
+             _audible="true",
+             _out_path="",
+             _icon="",
+             _info="",
+             _post_process=None,
+             _writer='',
+             _size='600x600',
+             ssml=False,
+             _vox='male1',
+             _ok_wait=4,
+             _end_wait=30):  # -> bool
+        '''
+        The read tool supports a small subset of MaryTTS functions. Not
+        all voices, languages and synthesisers support all of the features
+        of the server.
+        '''
+        if not self.ok:
+            return False
+        _media_out = ''
+        # Determine the output file name
+        _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
+        # Determine the temporary file name
+        _media_work = os.path.join(tempfile.gettempdir(), 'MaryTTS.wav')
+        if bool(self.add_pause) and not ssml:
+            for _symbol in self.pause_list:
+                if _symbol in _text:
+                    _text = _text.translate(self.add_pause).replace('.;', '.')
+                    break
+        _input_type = self.input_types[0]
+        if ssml:
+            _input_type = self.input_types[3]
+        _url = ''.join([self.url, '/process'])
+        _locale = _iso_lang.replace('-', '_')
+        _found_locale = 'en_US'
+        if len(self.voice_locale) != 0:
+            _found_locale = self.voice_locale
+        _audio_format = self.audio_format
+        _output_type = 'AUDIO'
+        _mary_vox = self.marytts_voice(_vox, _iso_lang)
+        print('''
+Docker MaryTTS
+==============
+
+* Audio: `%(_audio_format)s`
+* Input Type: `%(_input_type)s`
+* Locale: `%(_found_locale)s`
+* Mapped Voice : `%(_vox)s`
+* Output Type: `%(_output_type)s`
+* Voice : `%(_mary_vox)s`
+
+[Docker MaryTTS](https://github.com/synesthesiam/docker-marytts)
+''' % locals())
+        if REQUESTS_OK:
+            if len(_mary_vox) == 0:
+                request_params = {
+                    'AUDIO': _audio_format,
+                    'OUTPUT_TYPE': _output_type,
+                    'INPUT_TYPE': _input_type,
+                    'LOCALE': _found_locale,
+                    'INPUT_TEXT': _text,
+                }
+            else:
+                request_params = {
+                    'AUDIO': _audio_format,
+                    'OUTPUT_TYPE': _output_type,
+                    'INPUT_TYPE': _input_type,
+                    'LOCALE': _found_locale,
+                    'VOICE': _mary_vox,
+                    'INPUT_TEXT': _text,
+                }
+            _strips = ';\n .;'
+            _text = '\n'.join(['', _text.strip(_strips), ''])
+            response = requests.post(
+                _url,
+                params=request_params,
+                headers={
+                    'Content-Type':
+                    'application/x-www-form-urlencoded',
+                    'User-Agent':
+                    'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
+                },
+                data=_text.encode('utf-8', 'ignore'),
+                timeout=(_ok_wait, _end_wait))
+            with open(_media_work, 'wb') as f:
+                f.write(response.content)
+        elif readtexttools.have_posix_app('curl', False):
+            if not bool(self.base_curl):
+                return False
+            _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
+            _text = str(_text.translate(self.base_curl))
+            vcommand = '&VOICE=%(_mary_vox)s' % locals()
+            if len(_mary_vox) == 0:
+                vcommand = ''
+            _curl = '''curl %(_url)s?AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)sINPUT_TEXT="%(_text)s"''' % locals(
+            )
+            os.system(_curl)
+        else:
+            print('''The application cannot load a sound file.
+Your computer is missing a required library.
+Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
+                  )
+            self.ok = False
+            return False
+        if os.path.getsize(_media_work) == 0:
+            time.sleep(2)
+        if os.path.isfile(_media_work) and _post_process in [
+                'process_audio_media', 'process_wav_media'
+        ]:
+            if os.path.getsize(_media_work) == 0:
+                print('Unable to write media work file.')
+                return False
+            # NOTE: Calling process must unlock_my_lock()
+            readtexttools.unlock_my_lock()
+            readtexttools.process_wav_media(_info, _media_work, _icon,
+                                            _media_out, _audible, _visible,
+                                            _writer, _size)
+            return True
+        return False
+
+
 def speech_wpm(_percent='100%'):  # -> int
     '''
     _percent - rate expressed as a percentage.
@@ -1316,8 +1634,11 @@ def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
     if _gtts_class.check_version(2.2):
         _continue = True
     if not _continue:
-        _larynx = LocalClass()
+        _larynx = LarynxClass()
         _continue = _larynx.language_supported(_iso_lang, _local_url, 'AUTO')
+    if not _continue:
+        _mary_tts = MaryTtsClass()
+        _continue = _mary_tts.language_supported(_iso_lang, _local_url)
     if not _continue:
         _amazon_class = AmazonClass()
         _continue = bool(_amazon_class.language_supported(_iso_lang))
@@ -1347,7 +1668,8 @@ def network_main(_text_file_in='',
                  _local_url=''):  # -> boolean
     '''Read a text file aloud using a network resource.'''
     _imported_meta = readtexttools.ImportedMetaData()
-    _larynx = LocalClass()
+    _larynx = LarynxClass()
+    _marytts = MaryTtsClass()
     _amazon_class = AmazonClass()
     _azure_class = AzureClass()
     _google_cloud_class = GoogleCloudClass()
@@ -1360,6 +1682,8 @@ def network_main(_text_file_in='',
         _local_url,
         _vox,
     ) and _vox in _larynx.accept_voice
+    if not _continue:
+        _continue = _marytts.language_supported(_iso_lang, _local_url)
     if not _continue:
         _continue = _gtts_class.check_version(
             2.2) and _vox in _gtts_class.accept_voice
@@ -1415,6 +1739,11 @@ def network_main(_text_file_in='',
             _larynx.read(_text, _iso_lang, _visible, _audible, _media_out,
                          _icon, clip_title, _post_processes[5], _info, _size,
                          _speech_rate, _quality, _ssml)
+        elif _marytts.language_supported(_iso_lang):
+            _ssml = '</speak>' in _text and '<speak' in _text
+            _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
+                          _icon, clip_title, _post_processes[5], _info, _size,
+                          _ssml, _vox, 4, 30)
         elif _gtts_class.language_supported(_iso_lang):
 
             _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,
