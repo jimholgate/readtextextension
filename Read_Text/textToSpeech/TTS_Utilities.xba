@@ -647,6 +647,17 @@
 &apos;&apos;
 Option Explicit
 
+
+Function isSnap() As Boolean
+	isSnap = Instr(Environ(&quot;PATH&quot;), &quot;/snap/&quot;) = 1
+End Function
+
+
+Function isFlatPak() As Boolean
+	isFlatPak = Instr(Environ(&quot;PATH&quot;), &quot;/app/bin:/usr/bin&quot;) = 1
+End Function
+
+
 Sub OK_MouseUp( _
 	Event As Object)
 	&apos; This sub uses the current dialog settings without dismissing
@@ -2208,7 +2219,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
 	End If
-	If fbHaveNetworkTTS() or Instr(Environ(&quot;PATH&quot;), &quot;/snap/&quot;) = 1 Then
+	If fbHaveNetworkTTS() or isSnap() or isFlatPak() Then
 		If fsGetOS() = &quot;UNIX&quot; Then
 			&apos; Include settings for [larynx-server](https://github.com/rhasspy/larynx)
 			Redim _opts : _opts = Array(&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
@@ -5959,11 +5970,10 @@ End Function
 Sub CheckUnixSpeech()
 	&apos; Linux may not include a speech synthesiser by default.
 	&apos; Check the first time the application runs.
+
 	If fsGetOS() = &quot;UNIX&quot; Then
 		If Not(fileexists(fsFullPathOf(fsExtensionSettingsIni))) Then
-			If Instr(Environ(&quot;PATH&quot;), &quot;/snap/&quot;) = 1 Then
-				&apos; RFC - Does flatpak work? mary-tts on snap?
-				&apos; What did you do?
+			If isSnap() or isFlatPak() Then
 				&apos; Translate this message for your language
 				If (MsgBox(_(_
 				&quot;Get on-line help for snap? Read Text uses a http speech daemon like [larynx-server](https://github.com/rhasspy/larynx).&quot;,_

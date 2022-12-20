@@ -1,7 +1,6 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: UTF-8-*-
 '''
-
 Reads a text file using an web service and a media player.
 Online services require a network connection and installation
 of an online connection library.
@@ -55,16 +54,36 @@ locally installed languages. A system administrator can change your
 account's ability to access a docker service or for the docker
 package to access locally installed resources.
 
-### Docker Desktop
+MaryTTS
+-------
 
-`docker-desktop` can make it easier to view and manage docker resources
-graphically.
+[MaryTTS](http://mary.dfki.de/) (Modular Architecture for Research in Synthesis)
+is an open-source, multilingual Text-to-Speech Synthesis platform written in Java.
+It can turn text into speech in many different languages. It runs on a `localhost`
+web resource on your computer using a Docker container. Using MaryTTS does not
+require an on-line connection. 
 
-> Images and containers deployed on the Linux Docker Engine
-(before installation) are not available in Docker Desktop for Linux.
+You can make it sound like you by recording your voice and using MaryTTS 
+[Import Tools](https://github.com/marytts/marytts-wiki/blob/master/VoiceImportToolsTutorial.md)
+to create a personalized voice.
 
--- [Docker
-docs](https://docs.docker.com/desktop/install/linux-install/)
+The Rhsspy MaryTTS docker image is an easy-to install web application that
+includes voices in several languages by default, including,
+
+* English
+* French
+* German
+* Italian
+* Swedish
+* Russian
+* Telugu
+* Turkish
+
+See also:
+
+[Adding-voices](https://rhasspy.readthedocs.io/en/v2.4.20/text-to-speech/#adding-voices)
+
+[Docker image](https://hub.docker.com/r/synesthesiam/marytts)
 
 [Rhasspy community](https://community.rhasspy.org/)
 
@@ -93,6 +112,9 @@ If you use python pip to install local libraries, you might have to
 manually update them from time to time. Packages that are managed
 by update utilities like `apt-get`, `yum` and `dnf` are upgraded
 by the distribution.
+
+See also:
+[Docker docs](https://docs.docker.com/desktop/install/linux-install/)
 '''
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
@@ -197,6 +219,54 @@ def network_problem(voice='default'):  # -> str
   enter the local speech server command in a terminal and
   read what it prints out. (i. e.: `larynx-server`)
   ''' % locals()
+
+
+class LocalCommons(object):
+    '''Shared items for local speech servers'''
+
+    def __init__(self):  # -> None
+        self.debug = [0, 1, 2, 3][0]
+
+        self.default_lang = readtexttools.default_lang()
+        self.default_extension = '.wav'
+        self.help_icon = '/usr/share/icons/HighContrast/32x32/apps/web-browser.png'
+        self.spd_fm = [
+            'female1', 'female2', 'female3', 'female4', 'female5', 'female6',
+            'female7', 'female8', 'female9', 'child_female', 'child_female1'
+        ]
+        self.spd_m = [
+            'male1', 'male2', 'male3', 'male4', 'male5', 'male6', 'male7',
+            'male8', 'male9', 'child_male', 'child_male1'
+        ]
+        self.pause_list = [
+            '(', '\n', '\r', u"\u2026", u'\u201C', u"\u2014", u"\u2013",
+            u'\u00A0'
+        ]
+        try:
+            self.add_pause = str.maketrans({
+                '\n': ';\n',
+                '\r': ';\r',
+                '(': ' ( ',
+                u'\u201C': u'\u201C;',
+                u'\u2026': u'\u2026;',
+                u'\u2014': u'\u2014;',
+                u'\u2013': u'\u2013;',
+                u'\u00A0': ' '
+            })
+        except AttributeError:
+            self.add_pause = None
+        try:
+            self.base_curl = str.maketrans({
+                '\\': ' ',
+                '"': '\\"',
+                '''
+''': '''\
+''',
+                '\r': ' '
+            })
+        except AttributeError:
+            self.base_curl = None
+        self.is_x86_64 = sys.maxsize > 2**32
 
 
 class AmazonClass(object):
@@ -451,14 +521,19 @@ class GoogleTranslateClass(object):
     by Google nor does the documention represent the views or opinions of Google or
     Google personnel.
 
-    The creators of the `gtts` python library are the originators of the library
+    The creators of the `gTTS` python library are the originators of the library
     enabling the `GoogleTranslateClass` class.
 
-    The `gtts` library can only be enabled by electing to install it on a supported
-    platform. Read the documentation for help installing `gtts` or to get help with
-    troubleshooting if `gtts` does not work when using your Linux package manager.
+    The `gTTS` library can only be enabled by electing to install it on a supported
+    platform. Read the documentation for help installing `gTTS` or to get help with
+    troubleshooting if `gTTS` does not work when using your Linux package manager.
 
         sudo apt -y install python3-gtts
+
+
+    or
+
+        pip3 install gTTS gTTS-token
 
     See:
 
@@ -803,11 +878,12 @@ class LarynxClass(object):
     def __init__(self):  # -> None
         '''Initialize data. See
         <https://github.com/rhasspy/larynx#basic-synthesis>'''
-        self.debug = [0, 1, 2, 3][0]
+        _common = LocalCommons()
+        self.debug = _common.debug
         self.ok = True
         # This is the default. You can set up Larynx to use a different port.
         self.url = 'http://0.0.0.0:5002'  # localhost port 5002
-        self.help_icon = '/usr/share/icons/HighContrast/32x32/apps/web-browser.png'
+        self.help_icon = _common.help_icon
         self.help_heading = 'Rhasspy Larynx'
         self.help_url = 'https://github.com/rhasspy/larynx#larynx'
         self.local_dir = os.path.expanduser('~/.local/share/larynx/')
@@ -829,20 +905,14 @@ class LarynxClass(object):
             'male5', 'male6', 'male7', 'male8', 'male9', 'child_male1',
             'larynx', 'localhost', 'docker', 'local_server'
         ]
-        self.spd_fm = [
-            'female1', 'female2', 'female3', 'female4', 'female5', 'female6',
-            'female7', 'female8', 'female9', 'child_female', 'child_female1'
-        ]
-        self.spd_m = [
-            'male1', 'male2', 'male3', 'male4', 'male5', 'male6', 'male7',
-            'male8', 'male9', 'child_male', 'child_male1'
-        ]
+        self.spd_fm = _common.spd_fm
+        self.spd_m = _common.spd_m
 
         # The routine uses the default voice as a fallback. The routine
         # prioritizes a voice that you chose to install.
-        self.default_lang = readtexttools.default_lang()
+        self.default_lang = _common.default_lang
         self.default_voice = 'mary_ann'
-        self.default_extension = '.wav'
+        self.default_extension = _common.default_extension
         # `mary_ann` is the default voice, and it is always installed. It
         # will not appear in a downloaded voices directory. It will always
         # be included in the server's json request response.
@@ -875,35 +945,10 @@ class LarynxClass(object):
         ]
         self.voice_id = ''
         self.voice_name = ''
-        self.pause_list = [
-            '(', '\n', '\r', u"\u2026", u'\u201C', u"\u2014", u"\u2013",
-            u'\u00A0'
-        ]
-        try:
-            self.add_pause = str.maketrans({
-                '\n': ';\n',
-                '\r': ';\r',
-                '(': ' ( ',
-                u'\u201C': u'\u201C;',
-                u'\u2026': u'\u2026;',
-                u'\u2014': u'\u2014;',
-                u'\u2013': u'\u2013;',
-                u'\u00A0': ' '
-            })
-        except AttributeError:
-            self.add_pause = None
-        try:
-            self.base_curl = str.maketrans({
-                '\\': ' ',
-                '"': '\\"',
-                '''
-''': '''\
-''',
-                '\r': ' '
-            })
-        except AttributeError:
-            self.base_curl = None
-        self.is_x86_64 = sys.maxsize > 2**32
+        self.pause_list = _common.pause_list
+        self.add_pause = _common.add_pause
+        self.base_curl = _common.base_curl 
+        self.is_x86_64 = _common.is_x86_64
 
     def _set_vocoders(self, alt_local_url=''):  # -> bool
         '''If the server is running, then get the list of voice coders.
@@ -969,8 +1014,8 @@ Try restarting `larynx-server`.''')
                 count_f = count
                 break
         _voices = ''
-        if not 'female' in _search:
-            for _voice in (_data_list):
+        if 'female' not in _search:
+            for _voice in _data_list:
                 if _voice not in self.larynx_fm:
                     _voices = ''.join([_voices, _voice, '\n'])
             try:
@@ -985,7 +1030,7 @@ Try restarting `larynx-server`.''')
                 count_f = count
                 break
         _voices = ''
-        for _voice in (_data_list):
+        for _voice in _data_list:
             if _voice in self.larynx_fm:
                 _voices = ''.join([_voices, _voice, '\n'])
         try:
@@ -1035,9 +1080,13 @@ Try restarting `larynx-server`.''')
             data_response = response.read()
             data = json.loads(data_response)
         except urllib.error.URLError:
-            print(
-                '''Requested [larynx-server](https://github.com/rhasspy/larynx)
-            It did not respond correctly.''')
+            _eurl = self.url
+            if self.is_x86_64 and not os.path.isfile('/usr/bin/say'):
+                print('''
+[larynx-server](https://github.com/rhasspy/larynx)
+can synthesize speech privately using %(_eurl)s. Run
+
+    larynx-server''' % locals())
             self.ok = False
             return False
         except AttributeError:
@@ -1150,8 +1199,8 @@ Loading larynx voices for `%(_lang2)s`
              _speech_rate=160,
              quality=1,
              ssml=False,
-             _denoiserStrength=0.02,
-             _noiseScale=0.333,
+             _denoiser_strength=0.02,
+             _noise_scale=0.333,
              _ok_wait=4,
              _end_wait=30):  # -> bool
         '''
@@ -1179,7 +1228,7 @@ Loading larynx voices for `%(_lang2)s`
         _voice = self.voice_name
         if self.debug and 1:
             print(['`LarynxClass` > ` `read`', 'Request `_voice`: ', _voice])
-        _i_lengthScale = 0.85
+        _length_scale = 0.85
         if bool(self.add_pause) and not ssml:
             for _symbol in self.pause_list:
                 if _symbol in _text:
@@ -1219,9 +1268,9 @@ Loading larynx voices for `%(_lang2)s`
                         '\n+ voice encoder: ', _vocoder, '\n+ voice id: ',
                         _voice, '\n'
                     ]))
-                _i_lengthScale = _item[3]
+                _length_scale = _item[3]
                 break
-        _lengthScale = str(_i_lengthScale / self.rate_denominator)
+        _length_scale = str(_length_scale / self.rate_denominator)
         if REQUESTS_OK:
             _strips = '\n .;'
             _text = '\n'.join(['', _text.strip(_strips), ''])
@@ -1230,9 +1279,9 @@ Loading larynx voices for `%(_lang2)s`
                 params={
                     'voice': _voice,
                     'vocoder': _vocoder,
-                    'denoiserStrength': _denoiserStrength,
-                    'noiseScale': _noiseScale,
-                    'lengthScale': _lengthScale,
+                    'denoiserStrength': _denoiser_strength,
+                    'noiseScale': _noise_scale,
+                    'lengthScale': _length_scale,
                     'ssml': _ssml
                 },
                 headers={
@@ -1250,7 +1299,7 @@ Loading larynx voices for `%(_lang2)s`
                 return False
             _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
             _text = str(_text.translate(self.base_curl))
-            _curl = '''curl -d "%(_text)s" "%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiserStrength)s&noiseScale=%(_noiseScale)s&lengthScale=%(_lengthScale)s&ssml=%(_ssml)s" -o "%(_media_work)s"''' % locals(
+            _curl = '''curl -d "%(_text)s" "%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s" -o "%(_media_work)s"''' % locals(
             )
             os.system(_curl)
         else:
@@ -1279,24 +1328,36 @@ Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
 
 class MaryTtsClass(object):
     '''You can use `synesthesiam/docker-marytts` text to speech localhost
-    http server for 8 languages. When you use this docker container, it
-    includes all the available languages and voices in the container. This
-    client currently only supports basic text to speech functionality.
+http server for 8 languages. You can find other docker containers that can
+use the same application program interface with a different selection of
+voices, speech technology, and language options. For example,
+[Larynx MaryTTS Compatible API](https://github.com/rhasspy/larynx#marytts-compatible-api)
 
-See https://github.com/synesthesiam/docker-marytts
-    [Default MaryTts address](http://0.0.0.0:59125)
+    docker run \
+        -it \
+        -p 59125:5002 \
+        -e "HOME=${HOME}" \
+        -v "$HOME:${HOME}" \
+        -v /usr/share/ca-certificates:/usr/share/ca-certificates \
+        -v /etc/ssl/certs:/etc/ssl/certs \
+        -w "${PWD}" \
+        --user "$(id -u):$(id -g)" \
+        rhasspy/larynx
 
-    [About MaryTts...](See https://github.com/synesthesiam/docker-marytts)'''
+Default MaryTts server: <http://0.0.0.0:59125>
+
+[About MaryTts...](https://github.com/synesthesiam/docker-marytts)'''
 
     def __init__(self):  # -> None
         '''Initialize data. See
         <https://github.com/synesthesiam/docker-marytts>'''
-        self.debug = [0, 1, 2, 3][0]
+        _common = LocalCommons()
+        self.debug = _common.debug
         self.ok = True
         self.response = ''
         # This is the default. You can set up MaryTts to use a different port.
         self.url = 'http://0.0.0.0:59125'  # localhost port 59125
-        self.help_icon = '/usr/share/icons/HighContrast/32x32/apps/web-browser.png'
+        self.help_icon = _common.help_icon
         self.help_heading = 'Rhasspy MaryTTS'
         self.help_url = 'https://github.com/synesthesiam/docker-marytts'
         self.audio_format = 'WAVE_FILE'
@@ -1311,34 +1372,10 @@ See https://github.com/synesthesiam/docker-marytts
             'marytts', 'localhost', 'docker', 'local_server'
         ]
         self.voice_locale = ''
-        self.pause_list = [
-            '(', '\n', '\r', u"\u2026", u'\u201C', u"\u2014", u"\u2013",
-            u'\u00A0'
-        ]
-        try:
-            self.add_pause = str.maketrans({
-                '\n': ';\n',
-                '\r': ';\r',
-                '(': ' ( ',
-                u'\u201C': u'\u201C;',
-                u'\u2026': u'\u2026;',
-                u'\u2014': u'\u2014;',
-                u'\u2013': u'\u2013;',
-                u'\u00A0': ' '
-            })
-        except AttributeError:
-            self.add_pause = None
-        try:
-            self.base_curl = str.maketrans({
-                '\\': ' ',
-                '"': '\\"',
-                '''
-''': '''\
-''',
-                '\r': ' '
-            })
-        except AttributeError:
-            self.base_curl = None
+        self.pause_list = _common.pause_list
+        self.add_pause = _common.add_pause
+        self.base_curl = _common.base_curl
+        self.is_x86_64 = _common.is_x86_64
 
     def language_supported(self,
                            iso_lang='en-US',
@@ -1372,9 +1409,13 @@ See https://github.com/synesthesiam/docker-marytts
             response = urllib.request.urlopen(''.join([self.url, '/locales']))
             _locales = str(response.read(), 'utf-8')
         except urllib.error.URLError:
-            print(
-                '''Requested [marytts-server](https://github.com/synesthesiam/docker-marytts)
-            It did not respond correctly.''')
+            _eurl = self.url
+            if self.is_x86_64 and not os.path.isfile('/usr/bin/say'):
+                print('''
+[MaryTTS](https://github.com/synesthesiam/docker-marytts)
+can synthesize speech privately using %(_eurl)s. Run
+
+    docker run -it -p 59125:59125 synesthesiam/marytts:5.2''' % locals())
             self.ok = False
             return False
         except AttributeError:
@@ -1436,6 +1477,7 @@ See https://github.com/synesthesiam/docker-marytts
         if len(_voices) == 0:
             return ''
         _locale = _iso_lang.replace('-', '_')
+        _voice = _voice.lower()
         if _voices.count(_locale) == 0:
             # i. e.: en_AU, en_CA ... en_ZA etc.
             # Disregard the region code and use all voices for the language.
@@ -1443,7 +1485,7 @@ See https://github.com/synesthesiam/docker-marytts
         _voice_list = _voices.split('\n')
         for _tester in _voice_list:
             _row = _tester.split(' ')
-            if _row[0].count(_voice.lower()) != 0:
+            if _row[0].count(_voice) != 0:
                 self.voice_locale = _row[1]
                 return _row[0]
         matches = []
@@ -1453,16 +1495,20 @@ See https://github.com/synesthesiam/docker-marytts
             return last_match
         for _tester in _voice_list:
             _row = _tester.split(' ')
+            _add_name = ''
             try:
                 if _row[1].startswith(_locale):
                     last_match = _row[0]
-                    if _voice.lower().startswith(_row[2]):
-                        # preferred gender
-                        matches.append(_row[0])
-                        if len(gendered_fallback) == 0:
-                            gendered_fallback = last_match
+                    for _standard in [_row[2], ''.join(['child_', _row[2]])]:
+                        if _voice.startswith(_standard):
+                            _add_name = last_match
+                            break
+                if len(_add_name) != 0:
+                    matches.append(_add_name)
+                    if len(gendered_fallback) == 0:
+                        gendered_fallback = last_match
             except IndexError:
-                pass
+                continue
         for i in reversed(range(0, len(matches))):
             if _voice.endswith(str(len(matches) - i)):
                 return matches[i]
@@ -1506,7 +1552,8 @@ See https://github.com/synesthesiam/docker-marytts
         _input_type = self.input_types[0]
         if ssml:
             _input_type = self.input_types[3]
-        _url = ''.join([self.url, '/process'])
+        _url1 = self.url
+        _url = ''.join([_url1, '/process'])
         _locale = _iso_lang.replace('-', '_')
         _found_locale = 'en_US'
         if len(self.voice_locale) != 0:
@@ -1523,6 +1570,7 @@ Docker MaryTTS
 * Locale: `%(_found_locale)s`
 * Mapped Voice : `%(_vox)s`
 * Output Type: `%(_output_type)s`
+* Server URL: `%(_url1)s`
 * Voice : `%(_mary_vox)s`
 
 [Docker MaryTTS](https://github.com/synesthesiam/docker-marytts)
@@ -1601,30 +1649,32 @@ def speech_wpm(_percent='100%'):  # -> int
     Use '100%' for default rate of 160 words per minute (wpm).
     Returns rate between 20 and 640.
     '''
-    i1 = 0
-    i2 = 0
+    _calc_product = 0
+    _result = 0
     _minimum = 20
     _maximum = 640
     _normal = 160
-    s1 = ''
+    _p_cent = ''
 
     try:
         if '%' in _percent:
-            s1 = _percent.replace('%', '')
-            i1 = (float(s1) if '.' in s1 else int(s1) / 100)
-            i2 = math.ceil(i1 * _normal)
+            _p_cent = _percent.replace('%', '')
+            _calc_product = (float(_p_cent)
+                             if '.' in _p_cent else int(_p_cent) / 100)
+            _result = math.ceil(_calc_product * _normal)
         else:
-            i1 = (float(_percent) if '.' in _percent else int(_percent))
-            i2 = math.ceil(i1)
+            _calc_product = (float(_percent)
+                             if '.' in _percent else int(_percent))
+            _result = math.ceil(_calc_product)
     except TypeError:
         return _normal
-    if i2 == 0:
+    if _result == 0:
         return _normal
-    elif i2 <= _minimum:
+    elif _result <= _minimum:
         return _minimum
-    elif i2 >= _maximum:
+    elif _result >= _maximum:
         return _maximum
-    return i2
+    return _result
 
 
 def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
