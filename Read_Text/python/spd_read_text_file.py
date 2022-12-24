@@ -1022,11 +1022,11 @@ class SayFormats(object):
         else:
             self.editions = [self.old, self.osx_11_13, self.always]
         self.wpm = 0
-        # First occurance of a locale, use a default suitable for learners.
+        # For a first occurance of a locale, use a rate suitable for learners.
         # Subsequent occurances of the locale (MALE2 etc.) can use different
         # rates. Local users can adjust the rates in the main menu.
         self.spd_table = [
-            ['Alex', 'en_US', self.always, 'MALE1', 146],
+            ['Alex', 'en_US', self.always, 'MALE1', 161],
             ['Daniel', 'en_GB', self.osx_11_13, 'MALE1', 181],
             ['Juan', 'es_MX', self.old, 'MALE1', 181],
             ['Jorge', 'es_ES', self.old, 'MALE1', 181],
@@ -1036,7 +1036,7 @@ class SayFormats(object):
             ['Rishi', 'en_IN', self.osx_13, 'MALE1', 181],
             ['Samantha', 'en_US', self.osx_11_13, 'FEMALE1', 161],
             ['Serena', 'en_GB', self.osx_13, 'FEMALE1', 181],
-            ['Thomas', 'fr_FR', self.osx_11_13, 'MALE1', 145],
+            ['Thomas', 'fr_FR', self.osx_11_13, 'MALE1', 161],
             ['Xander', 'nl_NL', self.osx_11_13, 'MALE1', 145],
             ['Yelda', 'tr_TR', self.osx_11_13, 'MALE1', 145],
             ['Yuri', 'ru_RU', self.old, 'MALE1', 145],

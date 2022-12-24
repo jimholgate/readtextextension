@@ -191,7 +191,11 @@ Function fvTts_config_createDefaultConfig( _
 		config(fiExternalOption()) = True
 		config(fiHtmlOption()) = False
 		config(fiSmartSelectCheckBox()) = 0
-		config(fiHtmlComboURL()) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+		If Len(fsLocalHostSpeech()) = 0 Then
+			config(fiHtmlComboURL()) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+		Else
+			config(fiHtmlComboURL()) = fsLocalHostSpeech()
+		End If
 		If fsGetOS() = &quot;UNIX&quot; Then
 			&apos; Linux
 			If Len(PosixPythonPath()) &lt;&gt; 0 Then

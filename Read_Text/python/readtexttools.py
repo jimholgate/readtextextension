@@ -345,21 +345,48 @@ def net_error_icon():  # -> string
     return ''
 
 
-def strip_mojibake(concise_lang='en', _raw_text=''):
-    '''Remove parts of text strings containing characters that a
+def strip_mojibake(concise_lang='en', _raw_text='', _strict=False):  # -> str
+    '''If possible, remove parts of text strings containing characters that a
     speech synthesizer cannot pronounce correctly.
 
     * `concise_lang` - The language in the form `en` or `en-US`
-    * `_raw_text - The text to check and modify'''
+    * `_raw_text` - The text to check and modify
+    * `_strict` - If not strict, then use all supported unicode characters if
+      the text contains western European accented characters that English
+      might employ. (i. e.: café, cliché, La Niña...). If strict, allow
+      only plain characters (i. e.: computer safe code). `utf-8` encoded text
+      uses `ascii` for the first 127 characters and `latin-1` for the first
+      255 characters.'''
+    rare_chars = 'ĿŀǾǿĲĳŠšŽžŠšŽžŒœŸÿẞŐőŰűḂḃĊċḊḋḞḟĠġṀṁṖṗṠṡṪṫẀẁẂẃŴŵẄẅỲỳŶŷŸ'
+    if _strict:
+        _ubound = 126
+    else:
+        _ubound = 255
+    safe_chars = ''.join((chr(i) for i in range(1, _ubound)))
     if not _raw_text:
         return ''
     try:
         concise_lang = concise_lang[:2].lower()
     except (AttributeError, TypeError):
         concise_lang = 'en'
-    if concise_lang in ('en', 'sw'):
-        # Use Western European encoded characters.
-        _coding = 'latin_1'
+    if concise_lang in [
+            'af', 'br', 'co', 'cy', 'de', 'en', 'es', 'et', 'eu', 'fi', 'fo',
+            'fr', 'ga', 'gd', 'gl', 'gv', 'hu', 'id', 'is', 'it', 'lb', 'nl',
+            'oc', 'pt', 'rm', 'sq', 'sv', 'tl', 'wa'
+    ]:
+        # Use Western European supported characters.
+        # French, German, Portuguese and other languages that mainly use
+        # latin-1 script can include `rare_chars` glyphs that latin-1 doesn't
+        # cover.
+        _coding = 'utf-8'
+        if len(set(_raw_text).intersection(rare_chars)) == 0:
+            try:
+                returnval = set(_raw_text).intersection(safe_chars)
+                return returnval.strip('\n\t .;\\{\\}()[]')
+            except AttributeError:
+                pass
+    elif concise_lang in ['haw', 'roo', 'sw']:
+        _coding = 'latin-1'
     else:
         # Use all supported unicode characters.
         _coding = 'utf-8'

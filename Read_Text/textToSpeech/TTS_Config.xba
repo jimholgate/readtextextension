@@ -34,6 +34,7 @@ global i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack As Integer
 global s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage As String
 global b_CaBcVancouverHolgateJamesReadtextextensionHideExports As Boolean
 global i_CaBcVancouverHolgateJamesReadtextextensionWinItunesVersion As Integer
+global s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI As String
 
 Sub ClearWorkingCountryLanguage()
 	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot;
@@ -391,7 +392,7 @@ Sub AboutAddOn( _
 		&quot; &quot; &amp; fsLookUpTerm2(&quot;s_read-text&quot;, s1) &amp; _
 		&quot; &quot; &amp; fsExtensionVersion()
 		If fbHelpIsInstalled() Then
-			.model.HelpURL = fsAppSignature &amp; &quot;/set_up.xhp&quot;
+			.model.HelpURL = fsAppSignature() &amp; &quot;/set_up.xhp&quot;
 		End If
 		.GetControl(&quot;CommandButton1&quot;).model.Label = fsLookUpTerm2(&quot;s_ok&quot;, s1)
 		.GetControl(&quot;CommandButton2&quot;).model.helpText = fsLookUpTerm2(&quot;s_http-help-url&quot;, s1)
@@ -400,16 +401,16 @@ Sub AboutAddOn( _
 		.GetControl(&quot;FrameControl2&quot;).model.Label = fsLookUpTerm2(&quot;s_script&quot;, s1)
 		.GetControl(&quot;FrameControl3&quot;).model.Label = fsLookUpTerm2(&quot;s_command&quot;, s1)
 		.GetControl(&quot;ImageControl1&quot;).model.helpText = .model.Title
-		.GetControl(&quot;ImageControl1&quot;).model.ImageURL = fsExtensionLogo
+		.GetControl(&quot;ImageControl1&quot;).model.ImageURL = fsExtensionLogo()
 		.GetControl(&quot;ImageControl2&quot;).model.helpText = fsLookUpTerm2(&quot;s_test&quot;, s1)
-		.GetControl(&quot;ImageControl2&quot;).model.ImageURL = fsSpeakerLogo
+		.GetControl(&quot;ImageControl2&quot;).model.ImageURL = fsSpeakerLogo()
 		.GetControl(&quot;ImageControl3&quot;).model.helpText = Left(fsGetTextSelection(False, False),99)
-		.GetControl(&quot;ImageControl3&quot;).model.ImageURL = fsSelectionLogo
+		.GetControl(&quot;ImageControl3&quot;).model.ImageURL = fsSelectionLogo()
 		
 		If fbIsWin64Program() Then
 			&apos; 2022 - If the clipboard is empty, then the program
 			&apos; might crash in Windows.
-			.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo
+			.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo()
 			.GetControl(&quot;ImageControl4&quot;).model.Enabled = False
 			.GetControl(&quot;Label2&quot;).model.Enabled = False
 		Else
@@ -437,7 +438,7 @@ Sub AboutAddOn( _
 			.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm2( _
 			&quot;s_system-settings&quot;, s1)
 		End If
-		.GetControl(&quot;ImageControl5&quot;).model.ImageURL = fsToolBoxLogo
+		.GetControl(&quot;ImageControl5&quot;).model.ImageURL = fsToolBoxLogo()
 		.GetControl(&quot;Label1&quot;).model.helpText = Left(fsGetTextSelection(False, False),99)
 		.GetControl(&quot;Label1&quot;).model.Label = Len(fsGetTextSelection(False, False))
 		

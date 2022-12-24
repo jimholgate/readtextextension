@@ -731,7 +731,7 @@ Function fsExtensionVersion() As String
 	Dim s1 As String
 	Dim s2 As String
 	
-	s1 = fsMyURL &amp; &quot;/description.xml&quot;
+	s1 = fsMyURL() &amp; &quot;/description.xml&quot;
 	s2 = &quot;&quot;
 	aFile = ConvertFromURL(s1)
 	iNumber = Freefile
@@ -816,7 +816,7 @@ End Function
 
 
 Function fsPoster2Png() As String
-	fsPoster2Png = fsMyURL &amp; &quot;/images/poster-002.png&quot;
+	fsPoster2Png = fsMyURL() &amp; &quot;/images/poster-002.png&quot;
 End Function
 
 
@@ -826,27 +826,27 @@ End Function
 
 
 Function fsExtensionLogo() As String
-	fsExtensionLogo = fsMyURL &amp; &quot;/images/textToSpeechAbout_64.png&quot;
+	fsExtensionLogo = fsMyURL() &amp; &quot;/images/textToSpeechAbout_64.png&quot;
 End Function
 
 
 Function fsSpeakerLogo() As String
-	fsSpeakerLogo = fsMyURL &amp; &quot;/images/testSound_26.png&quot;
+	fsSpeakerLogo = fsMyURL() &amp; &quot;/images/testSound_26.png&quot;
 End Function
 
 
 Function fsClipBoardLogo() As String
-	fsClipboardLogo = fsMyURL &amp; &quot;/images/clipboard_26h.png&quot;
+	fsClipboardLogo = fsMyURL() &amp; &quot;/images/clipboard_26h.png&quot;
 End Function
 
 
 Function fsSelectionLogo() As String
-	fsSelectionLogo = fsMyURL &amp; &quot;/images/textToSpeech_26h.png&quot;
+	fsSelectionLogo = fsMyURL() &amp; &quot;/images/textToSpeech_26h.png&quot;
 End Function
 
 
 Function fsToolBoxLogo() As String
-	fsToolBoxLogo = fsMyURL &amp; &quot;/images/toolbox_26.png&quot;
+	fsToolBoxLogo = fsMyURL() &amp; &quot;/images/toolbox_26.png&quot;
 End Function
 
 

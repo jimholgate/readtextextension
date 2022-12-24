@@ -947,7 +947,7 @@ class LarynxClass(object):
         self.voice_name = ''
         self.pause_list = _common.pause_list
         self.add_pause = _common.add_pause
-        self.base_curl = _common.base_curl 
+        self.base_curl = _common.base_curl
         self.is_x86_64 = _common.is_x86_64
 
     def _set_vocoders(self, alt_local_url=''):  # -> bool
@@ -1081,12 +1081,10 @@ Try restarting `larynx-server`.''')
             data = json.loads(data_response)
         except urllib.error.URLError:
             _eurl = self.url
-            if self.is_x86_64 and not os.path.isfile('/usr/bin/say'):
+            if self.is_x86_64:
                 print('''
 [larynx-server](https://github.com/rhasspy/larynx)
-can synthesize speech privately using %(_eurl)s. Run
-
-    larynx-server''' % locals())
+can synthesize speech privately using %(_eurl)s.''' % locals())
             self.ok = False
             return False
         except AttributeError:
@@ -1362,8 +1360,8 @@ Default MaryTts server: <http://0.0.0.0:59125>
         self.help_url = 'https://github.com/synesthesiam/docker-marytts'
         self.audio_format = 'WAVE_FILE'
         self.input_types = [
-            'TEXT', 'SIMPLEPHONEMES', 'SABLE', 'SSML', 'APML', 'EMOTIONML'
-        ]
+            'TEXT', 'SIMPLEPHONEMES', 'SABLE', 'SSML', 'APML', 'EMOTIONML',
+        'RAWMARYXML']
         self.accept_voice = [
             '', 'all', 'auto', 'child_female', 'female1', 'female2', 'female3',
             'female4', 'female5', 'female6', 'female7', 'female8', 'female9',
@@ -1376,6 +1374,23 @@ Default MaryTts server: <http://0.0.0.0:59125>
         self.add_pause = _common.add_pause
         self.base_curl = _common.base_curl
         self.is_x86_64 = _common.is_x86_64
+
+    def marytts_xml(self, _text='', _speech_rate=160):  # -> str
+        '''Change the speed that MaryTTS reads plain text aloud using
+        `RAWMARYXML`. `maryxml` correctly uses standard XML conventions like 
+        `&amp;`, `&gt;` and `&lt;`, so the charactrs that they represent use
+        corrected XML.'''
+        _xmltransform = readtexttools.XmlTransform()
+        _text = _xmltransform.clean_for_xml(_text, False)
+        try:
+            # 160 wpm (Words per minute) yields 100% prosody rate
+            _rate = ''.join([str(int(_speech_rate / 1.6)), '%'])
+        except [AttributeError, TypeError]:
+            _rate = '100%'
+        return '''<?xml version="1.0" encoding="UTF-8"?>
+<maryxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
+<prosody rate="%(_rate)s">%(_text)s</prosody></p></maryxml>''' % locals()
 
     def language_supported(self,
                            iso_lang='en-US',
@@ -1410,10 +1425,11 @@ Default MaryTts server: <http://0.0.0.0:59125>
             _locales = str(response.read(), 'utf-8')
         except urllib.error.URLError:
             _eurl = self.url
-            if self.is_x86_64 and not os.path.isfile('/usr/bin/say'):
-                print('''
+            if self.is_x86_64:
+                if not os.path.isfile('/usr/bin/say'):
+                    print('''
 [MaryTTS](https://github.com/synesthesiam/docker-marytts)
-can synthesize speech privately using %(_eurl)s. Run
+can synthesize speech privately using %(_eurl)s.
 
     docker run -it -p 59125:59125 synesthesiam/marytts:5.2''' % locals())
             self.ok = False
@@ -1491,6 +1507,7 @@ can synthesize speech privately using %(_eurl)s. Run
         matches = []
         last_match = ''
         gendered_fallback = ''
+
         if _voice not in self.accept_voice:
             return last_match
         for _tester in _voice_list:
@@ -1528,12 +1545,13 @@ can synthesize speech privately using %(_eurl)s. Run
              _post_process=None,
              _writer='',
              _size='600x600',
+             _speech_rate=160,
              ssml=False,
              _vox='male1',
              _ok_wait=4,
              _end_wait=30):  # -> bool
         '''
-        The read tool supports a small subset of MaryTTS functions. Not
+        The read tool supports a subset of MaryTTS functions because not
         all voices, languages and synthesisers support all of the features
         of the server.
         '''
@@ -1549,9 +1567,13 @@ can synthesize speech privately using %(_eurl)s. Run
                 if _symbol in _text:
                     _text = _text.translate(self.add_pause).replace('.;', '.')
                     break
-        _input_type = self.input_types[0]
         if ssml:
             _input_type = self.input_types[3]
+        elif _speech_rate == 160:
+            _input_type = self.input_types[0]
+        else:
+            _input_type = self.input_types[6]
+            _text = self.marytts_xml(_text, _speech_rate)
         _url1 = self.url
         _url = ''.join([_url1, '/process'])
         _locale = _iso_lang.replace('-', '_')
@@ -1594,7 +1616,7 @@ Docker MaryTTS
                     'INPUT_TEXT': _text,
                 }
             _strips = ';\n .;'
-            _text = '\n'.join(['', _text.strip(_strips), ''])
+            _text = _text.strip(_strips)
             response = requests.post(
                 _url,
                 params=request_params,
@@ -1793,7 +1815,7 @@ def network_main(_text_file_in='',
             _ssml = '</speak>' in _text and '<speak' in _text
             _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
                           _icon, clip_title, _post_processes[5], _info, _size,
-                          _ssml, _vox, 4, 30)
+                          _speech_rate, _ssml, _vox, 4, 30)
         elif _gtts_class.language_supported(_iso_lang):
 
             _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,

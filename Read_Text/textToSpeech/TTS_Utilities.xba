@@ -654,7 +654,50 @@ End Function
 
 
 Function isFlatPak() As Boolean
-	isFlatPak = Instr(Environ(&quot;PATH&quot;), &quot;/app/bin:/usr/bin&quot;) = 1
+	isFlatPak = instr(Environ(&quot;PATH&quot;), &quot;/app/bin:/usr/bin&quot;) = 1
+End Function
+
+
+Function fbLocalHostOk(_url As String) As Boolean
+	&apos; Check if a web api resource that returns text is available.
+	On Error GoTo fbLocalHostOkErr
+	If Len(_url) = 0 Then
+		&apos; rhasspy/larynx speech server
+		_url = &quot;http://0.0.0.0:5002/api/voices&quot;
+	End If
+	Dim args(0) As New &quot;com.sun.star.beans.PropertyValue&quot;
+	args(0).name = &quot;Hidden&quot;
+	args(0).Value = True
+	Dim doc As Object : doc = StarDesktop.LoadComponentFromURL(_url, &quot;_blank&quot;, 0, args)
+	doc.Close(True)
+	fbLocalHostOk = True
+	Exit Function
+	fbLocalHostOkErr:
+	fbLocalHostOk = False
+End Function
+
+
+Function fsLocalHostSpeech() As String
+	&apos; Return the localhost address for `larynx-server` or `marytts-server`
+	&apos; http://0.0.0.0:5002/api/tts?voice=en&amp;text=Hello+world
+	&apos; http://0.0.0.0:59125?AUDIO=WAVE_FILE&amp;OUTPUT_TYPE=AUDIO&amp;INPUT_TYPE=TEXT&amp;LOCALE=de&amp;INPUT_TEXT=Hallo+welt
+	fsLocalHostSpeech = &quot;&quot;
+	Dim _larynx$ : _larynx = &quot;http://0.0.0.0:5002&quot;
+	Dim _marytts$ : _marytts = &quot;http://0.0.0.0:59125&quot;
+	Select Case fsGetOS()
+		Case &quot;UNIX&quot;
+		Select Case s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI
+			Case _marytts, _larynx
+			fsLocalHostSpeech = s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI
+			Case Else
+			If fbLocalHostOk(&quot;http://0.0.0.0:5002/api/voices&quot;) Then
+				fsLocalHostSpeech = _larynx
+			ElseIf fbLocalHostOk(&quot;http://0.0.0.0:59125/voices&quot;) Then
+				fsLocalHostSpeech = _marytts
+			End If
+			s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI = fsLocalHostSpeech
+		End Select
+	End Select
 End Function
 
 
@@ -2071,12 +2114,15 @@ Sub dialog1Combo2ShowMEDIAChoices( _
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
 	Rem first remove all old items from the list
 	n1 = oComboBox.getItemCount()
-	oComboBox.removeItems(0,n1)
-	&apos; &quot;https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;
+	oComboBox.removeItems(0, n1)
+
 	s1 = &quot;https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;
-	oComboBox.addItem(s1,0)
+	oComboBox.addItem(s1, 0)
 	s1 = &quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;
-	oComboBox.addItem(s1,0)	
+	oComboBox.addItem(s1, 0)
+	If Len(fsLocalHostSpeech()) &lt;&gt; 0 Then
+		oComboBox.addItem(fsLocalHostSpeech(), 0)
+	End If
 End Sub
 
 
@@ -2174,6 +2220,19 @@ Function fiCountFestivalVoices() As Integer
 End Function
 
 
+Sub CheckComboBox4UrlList(oDialog)
+	&apos; ComboBox4 should include a localhost address if a localhost
+	&apos; speech service in a web browser is enabled.
+	Dim sLocalHostSpeech$ : sLocalHostSpeech = fsLocalHostSpeech()
+	If Len(sLocalHostSpeech) &lt;&gt; 0 Then
+		Dim oComboBox As Variant : oComboBox = oDialog.getControl(&quot;ComboBox4&quot;)
+		With oComboBox 
+			.addItem(sLocalHostSpeech, 0)
+		End With
+	End If
+End Sub
+
+
 Function fiDialog1Combo2ShowMyPythonChoices( _
 	oDialog) As Integer
 	&apos; Python
@@ -2242,6 +2301,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		End If
 		s1 = s1 &amp; CR &amp; _
 		&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+		CheckComboBox4UrlList(oDialog)
 	End If
 	If fbHavePyQrCode() Then
 		Redim _opts : _opts = Array(_
@@ -4821,7 +4881,9 @@ Sub windowsSAPIControl()
 			oSvc.execute(sA, &quot;&quot;, 0)
 		End If
 		Case Else
-		If Len(sA) &lt;&gt; 0 Then
+		If Len(fsLocalHostSpeech()) &lt;&gt; 0 Then
+			webHelp(fsLocalHostSpeech())
+		ElseIf Len(sA) &lt;&gt; 0 Then
 			Shell(sA, 0, &quot;&quot;, False)
 		End If		
 	End Select
