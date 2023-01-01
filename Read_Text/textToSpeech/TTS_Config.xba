@@ -47,7 +47,7 @@ End Sub
 Function fiMyCurrentAudioTrack( _
 	ByVal bIncrement) As Integer  
 	fiMyCurrentAudioTrack = 1
-	On error Goto fiMyCurrentAudioTrackErr
+	On Error Goto fiMyCurrentAudioTrackErr
 	If bIncrement Then
 		&apos; Add one to the track index
 		If s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle = fsThisDocTitle Then
@@ -98,7 +98,7 @@ Sub ConfigureReadTextAloud()
 		&apos; dialogue.  High Sierra and newer versions of MscOS do not 
 		&apos; include a built-in telnet command.
 		If Not( _
-			fileexists( _
+			FileExists( _
 			&quot;/usr/bin/telnet&quot;)) Then
 			Select Case fsGetMyTunesApp()
 				Case &quot;Music&quot;
@@ -122,7 +122,7 @@ Sub ConfigureReadTextAloud()
 		config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
 		&apos;Load the settings you used last time
 		sFile = fsFullPathOf(fsExtensionSettingsIni)
-		If fileexists(sFile) Then
+		If FileExists(sFile) Then
 			tts_config_parseFile(sFile, config(), errorCode)
 		Else
 			&apos; The &quot;About&quot; dialog needs this file to show current information
@@ -158,19 +158,19 @@ Sub ConfigureReadTextAloud()
 		&apos; or delete the Windows temporary lock file so speech ends.
 		&apos; The speech only stops if you use the one of the scripts shown
 		&apos; by default in the extension dialogue.
-		If fileexists(sFile) Or fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+		If FileExists(sFile) Or FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 			If .GetControl(&quot;OptionButton2&quot;).Model.State Then
 				resetSpeechDispatcher(True)
 			ElseIf .GetControl(&quot;OptionButton1&quot;).Model.State Then
-				If fileexists(&quot;/usr/bin/killall&quot;) Or fileexists(&quot;/usr/local/bin/killall&quot;) Then
-					If fileexists(&quot;/usr/bin/festival&quot;) Then
+				If FileExists(&quot;/usr/bin/killall&quot;) Or FileExists(&quot;/usr/local/bin/killall&quot;) Then
+					If FileExists(&quot;/usr/bin/festival&quot;) Then
 						Shell(&quot;killall&quot;, 0, &quot;festival&quot;, True)
-					ElseIf fileexists(&quot;/usr/bin/flite&quot;) Then
+					ElseIf FileExists(&quot;/usr/bin/flite&quot;) Then
 						Shell(&quot;killall&quot;, 0, &quot;flite&quot;, True)
 					End If
 				End If
 				On Error Resume Next
-				If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+				If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 					kill fsMyTempLock()
 				End If
 			End If
@@ -180,7 +180,7 @@ Sub ConfigureReadTextAloud()
 			config() = fvCurrentDialogConfig()
 			.Dispose()
 			On Error Resume Next
-			If fileexists(sFile) Then
+			If FileExists(sFile) Then
 				kill sFile
 			End If
 			tts_config_writeFile(config(), sfile)
@@ -420,7 +420,7 @@ Sub AboutAddOn( _
 			&apos; needs a dummy run of function before evaluating
 			&apos; the results.
 			&apos; if it crashes, then we are left with a lock file.
-			If fileexists(s3) Then  &apos; unlock clipboard
+			If FileExists(s3) Then  &apos; unlock clipboard
 				kill s3
 			End If
 			s4 = fsGetClipBoard(False)

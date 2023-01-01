@@ -1,6 +1,14 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 '''
+This Posix Speech Toolkit enables multilingual speech on Posix operating
+systems like MacOS and Linux. It includes tools to configure Speech Dispatcher
+and Python scripts to enable text-to-speech conversion. It is possible to use
+an online speech synthesizer in case the built-in speech synthesizer does not
+support the requested language.
+
+-----
+
 Posix Speech Toolkit
 ====================
 
@@ -1863,6 +1871,7 @@ class SayFormats(object):
 def main():
     '''Command line speech-dispatcher tool. Some implimentations of python
     require the long command line switch'''
+    _imported_metadata = readtexttools.ImportedMetaData()
     _spd_formats = SpdFormats()
     _file_spec = sys.argv[-1]
     _txt = ''
@@ -1949,7 +1958,17 @@ def main():
                 if line.startswith('%(_voice)s ' % locals()):
                     mac_reader = _voice
                     break
-
+        _message_old = _imported_metadata.meta_from_file(_file_spec).strip()
+        _message = readtexttools.local_pronunciation(
+            _language, _message_old, 'macos_say', 'MACOS_SAY_USER_DIRECTORY').strip()
+        if len(_message) != 0:
+            # Found misspoken words or phrases. MacOS does not support any phonetic
+            # code, so you need to approximate the correct sound using similar words
+            # in the json document.
+            if not _message == _message_old:
+                os.remove(_file_spec)
+                readtexttools.write_plain_text_file(_file_spec, _message,
+                                                    'utf-8')
         if len(_output) == 0 and not (_visible):
             resultat = _say_formats.say_aloud(_file_spec, mac_reader, _voice,
                                               i_rate)
@@ -1994,7 +2013,6 @@ or platform. Try a networked speech tool like `larynx-server`.''')
             if not network_read_text_file.network_main(
                     _file_spec, _language, 'false', 'false', _output, '', '',
                     '', '600x600', _word_rate, _voice, ''):
-                _imported_metadata = readtexttools.ImportedMetaData()
                 _web_message = _imported_metadata.meta_from_file(
                     _file_spec).strip()
                 _max_message_len = 4999

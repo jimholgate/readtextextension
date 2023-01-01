@@ -1,12 +1,22 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: UTF-8-*-
 '''
-Reads a text file using an web service and a media player.
-Online services require a network connection and installation
-of an online connection library.
+This text explains how to use a web service and media player to read a text
+file. It outlines the terms and conditions associated with using the on-line
+service, as well as the potential privacy and security risks. It introduces
+two text-to-speech tools, Larynx and MaryTTS, and how to use them. It also
+mentions the need to check if the network is available and to set permissions
+when using these tools. Lastly, it provides advice on how to update local
+libraries and packages when using these tools.
 
-Check the terms and conditions that apply to the on-line service
-provider. There may be acceptable use policies, limits or costs.
+-----
+
+This python tool reads a text file using an web service and a media player.
+Online services require a network connection and installation of an online
+connection library.
+
+Check the terms and conditions that apply to the on-line service provider.
+There may be acceptable use policies, limits or costs.
 
 * Variants like speech rate, pitch, voice and gender might
   not apply to all services or to all languages.
@@ -1039,6 +1049,18 @@ Try restarting `larynx-server`.''')
             _resultat = self.voice_name
         return _resultat
 
+    def local_pronunciation(self, iso_lang='en-CA', text=''):  # -> str
+        '''Given a language and region, return or larynx compatible code for
+        localized words and phrases. Larynx code is similar to IPA, but you 
+        need to check it and possibly edit it for correct pronunciation.   
+
+        Uses json rows in the form:
+
+        `"en-US_00023":{"g":" Z ","p":" [`zi:ə] "},`      
+        '''
+        return readtexttools.local_pronunciation(iso_lang, text, 'larynx',
+                                                 'LARYNX_USER_DIRECTORY')
+
     def language_supported(self,
                            iso_lang='en-US',
                            alt_local_url='',
@@ -1197,8 +1219,8 @@ Loading larynx voices for `%(_lang2)s`
              _speech_rate=160,
              quality=1,
              ssml=False,
-             _denoiser_strength=0.02,
-             _noise_scale=0.333,
+             _denoiser_strength=0.005,
+             _noise_scale=0.667,
              _ok_wait=4,
              _end_wait=30):  # -> bool
         '''
@@ -1269,6 +1291,7 @@ Loading larynx voices for `%(_lang2)s`
                 _length_scale = _item[3]
                 break
         _length_scale = str(_length_scale / self.rate_denominator)
+        _text = self.local_pronunciation(_iso_lang, _text)
         if REQUESTS_OK:
             _strips = '\n .;'
             _text = '\n'.join(['', _text.strip(_strips), ''])
@@ -1361,7 +1384,8 @@ Default MaryTts server: <http://0.0.0.0:59125>
         self.audio_format = 'WAVE_FILE'
         self.input_types = [
             'TEXT', 'SIMPLEPHONEMES', 'SABLE', 'SSML', 'APML', 'EMOTIONML',
-        'RAWMARYXML']
+            'RAWMARYXML'
+        ]
         self.accept_voice = [
             '', 'all', 'auto', 'child_female', 'female1', 'female2', 'female3',
             'female4', 'female5', 'female6', 'female7', 'female8', 'female9',
@@ -1737,7 +1761,9 @@ def network_main(_text_file_in='',
                  _size='600x600',
                  _speech_rate=160,
                  _vox='',
-                 _local_url=''):  # -> boolean
+                 _local_url='',
+                 _denoiser_strength=0.005,
+                 _noise_scale=0.667):  # -> boolean
     '''Read a text file aloud using a network resource.'''
     _imported_meta = readtexttools.ImportedMetaData()
     _larynx = LarynxClass()
@@ -1810,7 +1836,8 @@ def network_main(_text_file_in='',
                     _ssml = False
             _larynx.read(_text, _iso_lang, _visible, _audible, _media_out,
                          _icon, clip_title, _post_processes[5], _info, _size,
-                         _speech_rate, _quality, _ssml)
+                         _speech_rate, _quality, _ssml, _denoiser_strength,
+                         _noise_scale)
         elif _marytts.language_supported(_iso_lang):
             _ssml = '</speak>' in _text and '<speak' in _text
             _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
@@ -1847,6 +1874,8 @@ def main():  # -> NoReturn
     _text = ''
     _percent_rate = '100%'
     _speech_rate = speech_wpm(_percent_rate)
+    _denoiser_strength = 0.005
+    _noise_scale = 0.667
     _icon = ''
     _title = ''
     _writer = ''
@@ -1860,10 +1889,11 @@ def main():  # -> NoReturn
             usage()
             sys.exit(0)
         try:
-            opts, args = getopt.getopt(sys.argv[1:], 'hovalritndsxu', [
+            opts, args = getopt.getopt(sys.argv[1:], 'hovalritndsxuec', [
                 'help', 'output=', 'visible=', 'audible=', 'language=',
                 'rate=', 'image=', 'title=', 'artist=', 'dimensions=',
-                'speaker=', 'voice=', 'url='
+                'speaker=', 'voice=', 'url=', 'denoiser_strength=',
+                'noise_scale='
             ])
         except getopt.GetoptError:
             print('option -a not recognized')
@@ -1900,11 +1930,25 @@ def main():  # -> NoReturn
                 _speaker = a
             elif o in ('-u', '--url'):
                 _local_url = a
+            elif o in ('-e', '--denoiser_strength'):
+                try:
+                    _denoiser_strength = float(o)
+                except (AttributeError, TypeError, ValueError):
+                    pass
+                if not bool(_denoiser_strength):
+                    _denoiser_strength = 0.005
+            elif o in ('-c', '--noise_scale'):
+                try:
+                    _noise_scale = float(o)
+                except (AttributeError, TypeError, ValueError):
+                    pass
+                if not bool(_noise_scale):
+                    _noise_scale = 0.667
             else:
                 assert False, 'unhandled option'
         network_main(_text_file_in, _iso_lang, _visible, _audible, _media_out,
                      _writer, _title, _icon, _size, _speech_rate, _speaker,
-                     _local_url)
+                     _local_url, _denoiser_strength, _noise_scale)
     sys.exit(0)
 
 

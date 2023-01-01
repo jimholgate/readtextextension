@@ -1,0 +1,11 @@
+{
+    "en_00001":{"g":"&","p":" and "},
+    "en_00002":{"g":">","p":" greater than "},
+    "en_00003":{"g":"<","p":" less than "},
+    "en_00004":{"g":"{","p":" left curly bracket "},
+    "en_00005":{"g":"}","p":" right curly bracket "},
+    "en_00006":{"g":" does live ","p":" does liv "},
+    "en_00007":{"g":" both live ","p":" both liv "},
+    "en_00008":{"g":" does not live ","p":" does not liv "},
+    "en_99999":{"g":"Read Text Extension","p":"reed text extension"}
+}

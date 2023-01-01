@@ -70,6 +70,11 @@ except ImportError:
     pass
 
 try:
+    import json
+except ImportError:
+    pass
+
+try:
     import site
 except ImportError:
     pass
@@ -898,9 +903,9 @@ def get_nt_path(name='ffmpeg', app='ffplay'):  # -> str
     return _extension_table.win_search(name, app)
 
 
-def app_icon_image(image_selection=''):  # -> str
-    '''The path to an extension icon image, if it exists,
-    or `''` if it doesn't exist.'''
+def app_icon_image(image_selection='', asset_dir='images'):  # -> str
+    '''The path to an extension icon image or other asset, if it exists, or
+    `''` if it doesn't exist.'''
     path_root = os.path.split(os.path.realpath(__file__))[0]
     os_sep = os.sep
     folders = path_root.split(os_sep)
@@ -910,9 +915,9 @@ def app_icon_image(image_selection=''):  # -> str
     for _x in folders:
         test_root = os_sep.join(folders[:count])
         for image in [
-                os.path.join(test_root, 'images', image_selection),
-                os.path.join(test_root, 'images', 'textToSpeech.svg'),
-                os.path.join(test_root, 'images', 'schooltools_42.svg'),
+                os.path.join(test_root, asset_dir, image_selection),
+                os.path.join(test_root, asset_dir, 'textToSpeech.svg'),
+                os.path.join(test_root, asset_dir, 'schooltools_42.svg'),
         ]:
             if os.path.isfile(image):
                 return image
@@ -2790,6 +2795,51 @@ def path2url(_file_path):  # -> str
     except NameError:
         # Fall back works on Posix
         return ''.join(['file://', _file_path.replace(' ', '%20')])
+
+
+def local_pronunciation(iso_lang='en-CA',
+                        text='',
+                        my_dir='macos_say',
+                        my_env='MACOS_SAY_USER_DIRECTORY'):  # -> str
+    '''Given a language and region, compatible audible lexical code for
+    localized words and phrases.      
+    '''
+    _json_file = ''
+    _user_dir = os.path.join(os.environ["HOME"],
+                             '/read_text/%(my_dir)s/' % locals())
+    if my_env in os.environ:
+        _user_dir = os.environ[my_env]
+    for _lang in [iso_lang, iso_lang.split('-')[0].split('_')[0]]:
+        _test = _lang
+        _json_search1 = app_icon_image('%(_test)s_lexicon.json' % locals(),
+                                       'po/%(my_dir)s' % locals())
+        _json_search2 = os.path.join(_user_dir,
+                                     '%(_test)s_lexicon.json' % locals())
+        for _json_search in [_json_search2, _json_search1]:
+            if len(_json_search) != 0:
+                if os.path.isfile(_json_search):
+                    _json_file = _json_search
+                    break
+        if len(_json_file) != 0:
+            break
+    if len(_json_file) == 0:
+        return text
+    try:
+        with codecs.open(_json_file,
+                         mode='r',
+                         encoding='utf-8',
+                         errors='replace') as file_obj:
+            data = json.load(file_obj)
+            l_text = text.lower()
+            for _item in data:
+                grapheme = data[_item]['g'].lower()
+                if l_text.count(grapheme) != 0:
+                    text = text.replace(data[_item]['g'],
+                                        data[_item]['p']).replace(
+                                            grapheme, data[_item]['p'])
+    except:
+        pass
+    return text
 
 
 class PosixAudioPlayers(object):

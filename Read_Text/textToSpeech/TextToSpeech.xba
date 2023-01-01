@@ -46,7 +46,7 @@ Option Explicit
 &apos;&apos; 
 &apos;&apos;         sArg = &quot;Hello world!&quot;
 &apos;&apos;         sURL = &quot;https://sites.google.com/site/readtextextension/&quot;
-&apos;&apos;         on error goto OnClickMySlide1Image1Err
+&apos;&apos;         On Error Goto OnClickMySlide1Image1Err
 &apos;&apos;         msgSpeak(sArg)
 &apos;&apos;         exit sub
 &apos;&apos;         OnClickMySlide1Image1Err:
@@ -158,14 +158,14 @@ Sub ReadTextAloud
 	Dim config(fiCountConfigOptions)As Variant
 	
 	sFile = fsFullPathOf(fsExtensionSettingsIni)
-	If fileexists(sFile) Then
+	If FileExists(sFile) Then
 		tts_config_parseFile(sFile, config(), errorCode)
 		If config(fiAlwaysShowDialogCheckBox()) = 1 Then
 			ConfigureReadTextAloud()
 		Else
 			On Error Resume Next
 			ClearWorkingCountryLanguage
-			If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+			If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 				kill fsMyTempLock(&quot;lock&quot;)
 				resetSpeechDispatcher(True)
 			Else
@@ -194,13 +194,13 @@ Sub ReadClipBoard
 	Dim s2$
 	s2 = &quot;&quot;
 	
-	On error Goto ReadClipBoardErr
+	On Error Goto ReadClipBoardErr
 	ClearWorkingCountryLanguage
-	If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+	If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 		resetSpeechDispatcher(True)
 	Else
-		If fileexists(s1) Or fbClipBoardAvailable() = False Then
-			If fileexists(s1) Then
+		If FileExists(s1) Or fbClipBoardAvailable() = False Then
+			If FileExists(s1) Then
 				If fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getTextFromFile(s1, &quot;UTF-8&quot;) Then
 					&apos; You updated office after a crash, so resume
 					&apos; the normal operation on the next run.
@@ -220,7 +220,7 @@ Sub ReadClipBoard
 			CreateFile(s1, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)
 			fsGetClipBoard(False)
 			&apos; Try it - if it crashes, then we are left with the lock file
-			If fileexists(s1) Then
+			If FileExists(s1) Then
 				kill s1
 			End If
 			msgSpeak(fsGetClipBoard(True))
@@ -303,7 +303,7 @@ Sub PresentSelection2(sB)
 		b1 = True
 	End If
 	sA = fsGetTextSelection(True, False)
-	If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+	If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 		resetSpeechDispatcher(True)
 	End If
 	If Len(sA) &gt; 1 Then
@@ -330,7 +330,7 @@ Sub ReadTheSlidenote
 		&apos; not a valid index or document
 		Exit Sub
 	Else
-		If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+		If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 			resetSpeechDispatcher(False)
 		Else
 			s1 = ThisComponent.getDrawPages( _

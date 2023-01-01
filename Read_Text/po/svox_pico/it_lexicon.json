@@ -1,0 +1,8 @@
+{
+    "it_00001":{"g":"&","p":" e "},
+    "it_00002":{"g":">","p":"più di "},
+    "it_00003":{"g":"<","p":"meno di "},
+    "it_00004":{"g":"{","p":" parentesi graffa sinistra "},
+    "it_00005":{"g":"}","p":" parentesi graffa destra "},
+    "it_99999":{"g":"Read Text Extension","p":"reed text extension"}
+}

@@ -158,34 +158,6 @@ def picoread(_text, _language, _visible, _audible, _media_file, _image, _title,
 
 def main():  # -> NoReturn
     '''Pico read text tools'''
-    _map = [
-        # mapped by number of speakers worldwide
-        # [_language[:2].lower(), '&', '>', '<', '{', '}'],
-        [
-            'en', ' and ', ' greater than ', ' less than ',
-            ' left curly bracket ', ' right curly bracket '
-        ],
-        [
-            'es', ' y ', ' más que ', ' menos que ', ' corchete izquierdo ',
-            ' corchete derecho '
-        ],
-        [
-            'fr', ' et ', ' plus que ', ' moins que ', ' accolade gauche ',
-            ' accolade droite '
-        ],
-        [
-            'pt', ' e ', ' mais que ', ' menos que ', ' colchete esquerdo ',
-            ' colchete direito '
-        ],
-        [
-            'de', ' und ', ' größer als ', ' weniger als ',
-            ' linke geschweifte klammer ', ' rechte geschweifte klammer '
-        ],
-        [
-            'it', ' e ', 'più di ', 'meno di ', ' parentesi graffa sinistra ',
-            ' parentesi graffa destra '
-        ],
-    ]
     _imported_meta = readtexttools.ImportedMetaData()
     _language = 'en-US'
     _output = ''
@@ -250,28 +222,16 @@ def main():  # -> NoReturn
             assert False, 'unhandled option'
     _text = _imported_meta.meta_from_file(_file_path)
     if len(_text) != 0:
-        language_2 = _language[:2].lower()
-        if not language_2 in ['de', 'es', 'en', 'fr', 'it']:
+        if not _language[:2].lower() in ['de', 'es', 'en', 'fr', 'it']:
             _language = 'en-US'
-            language_2 = 'en'
+        _text = readtexttools.local_pronunciation(_language, _text,
+                                                  'svox_pico',
+                                                  'SVOX_PICO_USER_DIRECTORY')
         if _pitch == '100%' and _rate == '100%':
             _text = _text.replace('"', '\\"')
-            for _map_list in _map:
-                if language_2 == _map_list[0]:
-                    _text = _text.replace('{', _map_list[4]).replace(
-                        '}', _map_list[5])
-                    break
             _text = readtexttools.strip_mojibake(_language, _text)
             _pico_text = '"%(_text)s"' % locals()
         else:
-            # Svox pico does not handle `&amp;'` or `&#38;` in XML correctly.
-            # Substitute the local words for `&`, `<`, and `>`.
-            for _map_list in _map:
-                if language_2 == _map_list[0]:
-                    _text = _text.replace("&", _map_list[1]).replace(
-                        ">", _map_list[2]).replace("<", _map_list[3]).replace(
-                            '{', _map_list[4]).replace('}', _map_list[5])
-                    break
             _text = readtexttools.strip_mojibake(_language, _text)
             _text = _xml_transform.clean_for_xml(
                 _text.strip(), readtexttools.lax_bool(_strict))

@@ -438,7 +438,7 @@
 &apos;&apos; 
 &apos;&apos;         sArg = &quot;Hello world!&quot;
 &apos;&apos;         sURL = &quot;https://sites.google.com/site/readtextextension/&quot;
-&apos;&apos;         on error goto OnClickMySlide1Image1Err
+&apos;&apos;         On Error Goto OnClickMySlide1Image1Err
 &apos;&apos;         msgSpeak(sArg)
 &apos;&apos;         exit sub
 &apos;&apos;         OnClickMySlide1Image1Err:
@@ -660,7 +660,7 @@ End Function
 
 Function fbLocalHostOk(_url As String) As Boolean
 	&apos; Check if a web api resource that returns text is available.
-	On Error GoTo fbLocalHostOkErr
+	On Error Goto fbLocalHostOkErr
 	If Len(_url) = 0 Then
 		&apos; rhasspy/larynx speech server
 		_url = &quot;http://0.0.0.0:5002/api/voices&quot;
@@ -867,7 +867,7 @@ Sub AboutButton_MouseUp( _
 	Dim errorCode As Integer
 	
 	If Event.Buttons Then
-		If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+		If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 			resetSpeechDispatcher(True)
 		Else
 			ttsActuate(fvCurrentDialogConfig(),msgs(),errorCode,fsAbout())
@@ -924,7 +924,7 @@ End Function
 
 Sub webHelp(ByVal sURL)
 	Dim oSvc
-	On error Goto webHelpErr
+	On Error Goto webHelpErr
 	If Len(sURL) &gt; 12 Then
 		oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 		Select Case fsGetOS()
@@ -948,9 +948,9 @@ Function fbUsingTouchScreen() As Boolean
 	Dim config
 	Dim errorCode
 	
-	On error Goto fbUsingTouchScreenErr
+	On Error Goto fbUsingTouchScreenErr
 	sFile = fsFullPathOf(fsExtensionSettingsIni)
-	If fileexists(sFile)Then
+	If FileExists(sFile)Then
 		tts_config_parseFile(sFile,config(),errorCode)
 		iSmart = config(fiSmartSelectCheckBox())
 	Else
@@ -1002,13 +1002,13 @@ Function fsProgramCommand() As String
 	Dim errorCode
 	Dim msgs
 	
-	On error Goto fsProgramCommandErr
+	On Error Goto fsProgramCommandErr
 	sFile = fsFullPathOf(fsExtensionSettingsIni)
 	&apos;Load default settings, so any settings undefined by settings file are not empty
 	config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
 	&apos;Load the settings you used last time
 	sFile = fsFullPathOf(fsExtensionSettingsIni)
-	If fileexists(sFile) Then
+	If FileExists(sFile) Then
 		tts_config_parseFile(sFile, config(), errorCode)
 	Else
 		&apos; The &quot;About&quot; dialog needs this file to show current information
@@ -1051,7 +1051,7 @@ Function fiReportMetaData( _
 	Dim n As Integer
 	n = iYes
 	
-	On error Goto fiReportMetaDataErr
+	On Error Goto fiReportMetaDataErr
 	
 	CR = Chr(10)
 	sA = Join(Array(fsLookUpTerm(&quot;s_album&quot;), &quot; : &quot;&quot;&quot;, fsThisDocTitle(), &quot;&quot;&quot;&quot;, CR, _
@@ -1094,7 +1094,7 @@ Function fiReportOnlineRequest() As Integer
 	Dim CR As String
 	Dim n As Integer
 	
-	On error Goto fiReportOnlineRequestErr
+	On Error Goto fiReportOnlineRequestErr
 	iYes = 6
 	iNo = 7
 	iCancel = 2
@@ -1120,13 +1120,13 @@ Function fbHelpIsInstalled() As Boolean
 	Dim sA As String
 	
 	sA = fsPathSettings(&quot;Help&quot;) &amp; &quot;/&quot;
-	If fileexists(sA &amp; fsGetLanguage()) Then
+	If FileExists(sA &amp; fsGetLanguage()) Then
 		fbHelpIsInstalled = True
-	ElseIf fileexists(sA &amp; &quot;en&quot;) Then
+	ElseIf FileExists(sA &amp; &quot;en&quot;) Then
 		fbHelpIsInstalled = True
-	ElseIf fileexists(sA &amp; &quot;fr&quot;) Then
+	ElseIf FileExists(sA &amp; &quot;fr&quot;) Then
 		fbHelpIsInstalled = True
-	ElseIf fileexists(sA &amp; &quot;de&quot;) Then
+	ElseIf FileExists(sA &amp; &quot;de&quot;) Then
 		fbHelpIsInstalled = True
 	Else
 		fbHelpIsInstalled = False
@@ -1152,7 +1152,7 @@ End Function
 Function fbEnhancedRTVersion() As Boolean
 	&apos; Version 9 of the Read Text Extension enables smart text
 	&apos; and includes a help file for Tools - Add-ons - Impress-view.
-	fbEnhancedRTVersion = fileexists(fsMyURL() &amp; _
+	fbEnhancedRTVersion = FileExists(fsMyURL() &amp; _
 	&quot;/help/en/&quot; &amp; _
 	fsAppSignature() &amp; _
 	&quot;/impress_view.xhp&quot;)
@@ -1378,7 +1378,7 @@ Function fbGoToMark(MarkType) As Boolean
 	Dim dispatcher As object
 	Dim args1(1) As New com.sun.star.beans.PropertyValue
 	
-	On error Goto fbGoToMarkErr
+	On Error Goto fbGoToMarkErr
 	document = ThisComponent.CurrentController.Frame
 	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
 	args1(0).Name = &quot;Count&quot;
@@ -1410,10 +1410,10 @@ Function fbClipBoardAvailable() As Boolean
 	&apos; if program has crashed or is a version known to 
 	&apos; crash when reading the clipboard, provide
 	&apos; an alternative to reading the clipboard directly.
-	On Error GoTo fbClipBoardAvailableErr
+	On Error Goto fbClipBoardAvailableErr
 	fbClipBoardAvailable = fbOfficeSupports(_
 	&quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;)
-	If fileexists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
+	If FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
 		fbClipBoardAvailable = False
 	End If
 	If fbIsWin64Program() And _
@@ -1480,7 +1480,7 @@ Function fsGetClipBoard( _
 	iPlainLoc =  - 1
 	Dim s$
 	s$ = &quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;
-	On Error GoTo fsGetClipBoardErr
+	On Error Goto fsGetClipBoardErr
 	oClip = createUnoService(s$)
 	oConverter = createUnoService(&quot;com.sun.star.script.Converter&quot;)
 	&apos;Print &quot;Clipboard name=&quot; &amp; oClip.getName()
@@ -1529,7 +1529,7 @@ Function WinSpeechProgramPath() As String
 	Dim y As Integer
 	For y = Lbound(_app) to Ubound(_app)
 		For x = Lbound(sub_path) To Ubound(sub_path)
-			If fileexists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; _app(y)) Then
+			If FileExists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; _app(y)) Then
 				WinSpeechProgramPath = s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; _app(y)
 					Exit Function
 			End If
@@ -1563,7 +1563,7 @@ Function fbWindowsHasAnInternationalVoice( _
 	
 	s2 = &quot;&quot;
 	cr = Chr(10)
-	On error Goto fbWindowsHasAnInternationalVoiceErr
+	On Error Goto fbWindowsHasAnInternationalVoiceErr
 	b1 = True
 	If fsGetOS = &quot;WINDOWS&quot; Then
 		Dim sapi As Object
@@ -1639,7 +1639,7 @@ Sub dialog1Combo2ShowSAPIChoices( _
 		Next
 		n = n + 1
 	WEnd
-	On Error GoTo FichierKO
+	On Error Goto FichierKO
 	For n1 = 10 To - 10 step - 2
 		oComboBox.addItem( &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
@@ -1762,7 +1762,7 @@ Sub dialog1Combo2ShowSAPIChoices( _
 	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	oComboBox.addItem(s1, 0)
-	If fileexists(myTextPath) Then
+	If FileExists(myTextPath) Then
 		Kill myTextPath
 	End If
 	Exit Sub
@@ -2079,20 +2079,20 @@ Sub dialog1Combo2ShowESPEAKChoices( _
 			oComboBox.addItem(s1,0)
 			Case Else
 		End Select
-		If fileexists(&quot;/usr/bin/mbrola&quot;) Or _
-			fileexists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Or _
-			fileexists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Then
+		If FileExists(&quot;/usr/bin/mbrola&quot;) Or _
+			FileExists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Or _
+			FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Then
 			s1 = s3 &amp; &quot;-v mb-(SELECTION_LANGUAGE_CODE)1 &quot; &amp; s2(n)
 			&apos;fsTTSListVoicesVBS            oComboBox.addItem(s1,0)
 		End If
 		For n2 = 0 To fiCountEspeakMbrolaLanguage()
 			s4 = fsGetEspeakMbrolaLanguage(n2,1)
-			If fileexists(&quot;/usr/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) Or _
-				fileexists(&quot;/usr/local/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) Or _
-				fileexists(&quot;/usr/share/mbrola/voices/&quot; &amp; s4) Or _
-				fileexists(&quot;/usr/local/share/mbrola/voices/&quot; &amp; s4) Or _
-				fileexists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Or _
-				fileexists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Then
+			If FileExists(&quot;/usr/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) Or _
+				FileExists(&quot;/usr/local/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) Or _
+				FileExists(&quot;/usr/share/mbrola/voices/&quot; &amp; s4) Or _
+				FileExists(&quot;/usr/local/share/mbrola/voices/&quot; &amp; s4) Or _
+				FileExists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Or _
+				FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Then
 				s1 = s3 &amp; &quot;-v mb-&quot; &amp; s4 &amp; &quot; &quot; &amp; s2(n)
 				oComboBox.addItem(s1,0)
 			End If
@@ -2187,14 +2187,14 @@ Sub dialog1Combo1ShowFestivalScripts( _
 	s2(3) = &quot;(SayText &quot;&quot;The selection says: &quot;&quot;)( tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
 	s2(2) = &quot;(SayText &quot;&quot;On (WEEKDAY), (DATE) at (TIME), (AUTHOR) said: &quot;&quot;)( tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
 	s2(1) = &quot;(set! utt1 (Utterance Phrase ((Phrase ((name B))The (selected ((EMPH 3)))text )(Phrase ((name BB)) says: ))))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
-	If fileexists(soundsDirectory() &amp; &quot;apert.wav&quot;) Then
+	If FileExists(soundsDirectory() &amp; &quot;apert.wav&quot;) Then
 		s2(0) = &quot;(set! utt1 (Utterance Wave (SOUND_GALLERY)apert.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
 	Else
 		s2(0) = &quot;(set! utt1 (Utterance Wave /usr/share/sounds/alsa/Noise.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
 	End If
 	For n2 = 0 To fiCountFestivalDirectory()
 		For n = 0 To 4
-			If fileexists(fsFestivalDirectory(n2)) Then
+			If FileExists(fsFestivalDirectory(n2)) Then
 				If n = 4 Or InStr(fsFestivalDirectory(n2) ,&quot;english&quot;) &lt;&gt; 0 Then
 					s1 = &quot;(voice_&quot; &amp; fsFestivalVoice(n2) &amp; &quot;)&quot;
 					oComboBox.addItem(s1 &amp; s2(n),0)
@@ -2213,7 +2213,7 @@ Function fiCountFestivalVoices() As Integer
 	Dim n# : n = 0
 	fiCountFestivalVoices = 0
 	For n = 0 To fiCountFestivalDirectory()
-		If fileexists(fsFestivalDirectory(n)) Then
+		If FileExists(fsFestivalDirectory(n)) Then
 			fiCountFestivalVoices = fiCountFestivalVoices + 1
 		End If
 	Next
@@ -2333,8 +2333,8 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	
 	If InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/python3&quot;) &lt;&gt; 0 or _
 	bIsAppImage Then
-		If fileexists(Environ(&quot;HOME&quot;) &amp; _
-			&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or fileexists( _
+		If FileExists(Environ(&quot;HOME&quot;) &amp; _
+			&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or FileExists( _
 			Environ(&quot;HOME&quot;) &amp; _
 			&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or bIsAppImage Or _
 			Not(fbHaveEspeak()) or Len(fsGetPipLibPath(&quot;speechd&quot;, False)) &lt;&gt; 0 Then
@@ -2419,8 +2419,8 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	End If
 
 	If len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or _
-		fileexists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave.exe&quot;) Or _
-		fileexists(fsProgramDirectory() &amp; &quot;festival\texttowave.exe&quot;) Then
+		FileExists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave.exe&quot;) Or _
+		FileExists(fsProgramDirectory() &amp; &quot;festival\texttowave.exe&quot;) Then
 		Select Case fiCountFestivalVoices()
 			Case 0
 			&apos; pass
@@ -2438,7 +2438,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 			End If		
 			Case 2
 			For n = 0 To fiCountFestivalDirectory()
-				If fileexists(fsFestivalDirectory(n)) Then
+				If FileExists(fsFestivalDirectory(n)) Then
 					s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(voice_&quot; &amp; fsFestivalVoice(n) &amp; &quot;)&quot;&quot;&quot;
 					s1 = s1 &amp; fspyOutOptions(oDialog, s4, bEnableRate)
 				End If
@@ -2460,8 +2460,8 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)  &apos; 2022.08 voices ignored rate and pitch
 	End If
 	If fbHaveEspeak() Or _
-		fileexists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
-		fileexists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
+		FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
+		FileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
 		s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 		s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &apos; &amp; &quot; --rate 100% --pitch 100% &quot;
@@ -2513,7 +2513,7 @@ End Function
 
 
 Function gst_plugin_path() As String
-	&apos; Enumerate Array fileexists(dir)
+	&apos; Enumerate Array FileExists(dir)
 	gst_plugin_path = &quot;&quot;
 	Dim x As Integer
 	Dim _paths As Variant
@@ -2547,7 +2547,7 @@ Function gst_plugin_path() As String
 	&quot;/usr/local/lib/s390x-linux-gnu/gstreamer-1.0/&quot;, _
 	&quot;/usr/lib/s390x-linux-gnu/gstreamer-1.0/&quot;)
 	For x = Lbound(_paths) to Ubound(_paths)
-		If fileexists(_paths(x)) Then
+		If FileExists(_paths(x)) Then
 			gst_plugin_path = _paths(x)
 			Exit Function
 		End If
@@ -2637,7 +2637,7 @@ Function fspyOutOptions( _
 				Array(&quot;.flac&quot;, &quot;libgstflac&quot;, &quot;gstreamer1.0-plugins-good/copyright&quot;, &quot;&quot;))
 
 				For x = Lbound(extension) To Ubound(extension)
-					If fileexists(_plugin_path &amp; extension(x)(1) &amp; &quot;.so&quot;) Then 
+					If FileExists(_plugin_path &amp; extension(x)(1) &amp; &quot;.so&quot;) Then 
 						ReDim Preserve command_list(_x_ok)
 						command_list(_x_ok) = s4 &amp; _
 						extension(x)(3) &amp; _
@@ -2649,7 +2649,7 @@ Function fspyOutOptions( _
 
 				If _x_ok = 0 Then
 					For x = Lbound(extension) To Ubound(extension)
-						If fileexists(&quot;/usr/share/doc/&quot; &amp; extension(x)(2)) Then 
+						If FileExists(&quot;/usr/share/doc/&quot; &amp; extension(x)(2)) Then 
 							ReDim Preserve command_list(_x_ok)
 							command_list(_x_ok) = s4 &amp; _
 							&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; _
@@ -2677,8 +2677,8 @@ Function fspyOutOptions( _
 			Array(&quot;.flac&quot;, _vlc, flacPath()), _
 			Array(&quot;.aac&quot;, _vlc, neroPath()))
 			For x = Lbound(extension) To Ubound(extension)
-				If fileexists(extension(x)(2)) Or _
-				fileexists(extension(x)(1)) Then
+				If FileExists(extension(x)(2)) Or _
+				FileExists(extension(x)(1)) Then
 					ReDim Preserve command_list(_x_ok)
 					command_list(_x_ok) = s4 &amp; _
 					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)\(NOW)&quot; &amp; _
@@ -2818,7 +2818,7 @@ Sub resetSpeech()
 	fsTemporaryTtsAppleScript()
 	a1 = Split(aFile, CR)
 	For n = LBound(a1) To UBound(a1)
-		If fileexists(a1(n)) Then
+		If FileExists(a1(n)) Then
 			kill a1(n)
 		End If
 	Next
@@ -2894,12 +2894,12 @@ Function getTextFromFile( _
 	myTextFile = createUnoService(&quot;com.sun.star.io.TextInputStream&quot;)
 	myTextFile.InputStream = fileStream
 	myTextFile.Encoding = sEncoding
-	Do while Not myTextFile.IsEOF
+	Do While Not myTextFile.IsEOF
 		getTextFromFile = getTextFromFile &amp; myTextFile.readLine &amp; Chr(13)
 	Loop
 	fileStream.closeInput
 	myTextFile.closeInput
-	On Error GoTo 0
+	On Error Goto 0
 	Exit Function
 	FichierKO:
 	
@@ -2910,7 +2910,7 @@ Function getTextFromFile( _
 	MsgBox(&quot;File read Error !&quot;,16)
 	fileStream.closeInput
 	myTextFile.closeInput
-	On Error GoTo 0
+	On Error Goto 0
 End Function
 
 
@@ -3016,7 +3016,7 @@ Sub ttsActuate( _
 		sTextToSpeak = fsGetTextSelection(False, True)
 	End If
 	For n = LBound(a1) To UBound(a1)
-		If fileexists(fsMyTempLock(&quot;lock.&quot; &amp; a1(n))) Then
+		If FileExists(fsMyTempLock(&quot;lock.&quot; &amp; a1(n))) Then
 			Kill fsMyTempLock(&quot;lock.&quot; &amp; a1(n))
 		End If
 	Next
@@ -3027,7 +3027,6 @@ Sub ttsActuate( _
 	oFrame = ThisComponent.getCurrentController().getFrame()
 	oBar = oFrame.createStatusIndicator()
 	oBar.start(fsLookUpTerm(&quot;s_read-text&quot;), 100)
-	&apos;On Error Goto ErrorHandler
 	
 	&apos;Get rid of the old files containing a script And/or plain text of selected String
 	resetSpeech
@@ -3077,9 +3076,7 @@ Sub ttsActuate( _
 		&apos; 
 		i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 0
 	End If
-	&apos;On Error Resume Next
 	oBar.Value = 70
-	&apos; On Error Goto errorHandler
 	If config(fiFestivalOption()) Then
 		&apos;Write the Festival script and the file to read aloud
 		sProgram = config(fiFestivalPath())
@@ -3138,10 +3135,14 @@ Sub ttsActuate( _
 		If bAddTime Then
 			sTextToSpeak = sTextToSpeak &amp; &quot; [[slnc 400]]&quot;
 		End If
-&apos; Customizing speech		
+		&apos; Customizing speech		
 		CreateFile(fsTemporaryTextDoc(), sTextToSpeak, scodec)
 		If sGetOS = &quot;MacOS&quot; Then
-			If InStr(sCommand,&quot;&quot;&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;&quot;&quot;) = 1 Then
+			If InStr(sCommand, &quot;_PY)&quot;&quot;&quot;) &lt;&gt; 0 Then
+				&apos; If you chose a Python script, you need to use python
+				&apos; but you don&apos;t need to write an osascript document.
+				sProgram = PosixPythonPath()
+			ElseIf InStr(sCommand,&quot;&quot;&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;&quot;&quot;) = 1 Then
 				fswriteMacOSSpeechScript(&quot;-r 110 &quot;, _
 				fsSelectionLanguageAndRegion(True), sArtURL)
 			ElseIf InStr(sCommand,&quot;&quot;&quot;(SAY_APPLESCRIPT_QUICKLY)&quot;&quot;&quot;) = 1 Then
@@ -3182,7 +3183,7 @@ Sub ttsActuate( _
 		oBar.End()
 		Exit Sub
 	End If
-	If fileexists(sProgram) Then
+	If FileExists(sProgram) Then
 		&apos; program path
 		&apos; 0 - focus is On the hidden program window,
 		&apos; program parameter strings,
@@ -3230,10 +3231,10 @@ Sub ttsActuate( _
 		&quot; &quot; &amp; _
 		fsLookUpTerm(&quot;s_string-cannot-be-analyzed&quot;), 64 , _
 		fsLookUpTerm(&quot;s_read-text&quot;))
-		If fileexists(fsFullPathOf(fsExtensionSettingsIni)) Then
+		If FileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
 			kill fsFullPathOf(fsExtensionSettingsIni)
 		End If
-		If fileexists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
+		If FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
 			kill fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
 		End If
 		resetSpeech
@@ -3245,11 +3246,11 @@ Sub ttsActuate( _
 			&apos; The Windows `tts_wscript.vbs` script must deal with the
 			&apos; custom image because removing it here may cause an error.
 		Else
-			If fileexists(sArtURL) Then
+			If FileExists(sArtURL) Then
 				For n = 0 To 30
 					Wait 500
-					If Not(fileexists(fsMyTempLock(&quot;lock&quot;))) Then
-						If fileexists(sArtURL) Then
+					If Not(FileExists(fsMyTempLock(&quot;lock&quot;))) Then
+						If FileExists(sArtURL) Then
 							Kill sArtURL
 						End If
 						Exit For
@@ -3265,11 +3266,11 @@ Sub ttsActuate( _
 	
 	MsgBox(fsLookUpTerm( &quot;s_string-cannot-be-analyzed&quot;), 48, _
 	fsLookUpTerm( &quot;s_read-text&quot;))
-	If fileexists(fsFullPathOf(fsExtensionSettingsIni)) Then
+	If FileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
 		kill fsFullPathOf(fsExtensionSettingsIni)
 	End If
-	If fileexists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
-		kill fileexists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
+	If FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
+		kill FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
 	End If
 	resetSpeech
 End Sub
@@ -3289,7 +3290,7 @@ Function fbCreateMissingMediaDirectory( _
 		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
 	End If
 	
-	On error Goto fbCreateMissingMediaDirectoryErr
+	On Error Goto fbCreateMissingMediaDirectoryErr
 	
 	Select Case fsGetOS()
 		Case &quot;WINDOWS&quot;
@@ -3353,7 +3354,7 @@ Function fbCreateMissingMediaDirectory( _
 			For o = LBound(a2) To UBound(a2)
 				If GetFileNameExtension(s2) = a2(o) Then
 					s2 = ConvertToUrl(s2)
-					If fileexists(DirectoryNameoutofPath(s2, &quot;/&quot;)) Then
+					If FileExists(DirectoryNameoutofPath(s2, &quot;/&quot;)) Then
 						fbCreateMissingMediaDirectory = True
 					Else
 						fbCreateMissingMediaDirectory = fbcreateDirectory(_
@@ -3717,7 +3718,6 @@ Function fbWindowsHasVoiceInThisLanguage( _
 	End If
 	sLang = LCase(sLang)
 	fbWindowsHasVoiceInThisLanguage = False
-	&apos;on Error goto VoiceTestError
 	Set Sapi = CreateObject(&quot;Sapi.SpVoice&quot;)
 	s1 = LCase(isoToEnglish(sLang))
 	&apos;let&apos;s see if we recognize the language s1
@@ -4336,7 +4336,6 @@ Function fsSelectionCountry( _
 		sFilter = &quot;&quot;
 	End If
 	On Error Resume Next
-	&apos;On Error Goto SELECTCOUNTRYERROR
 	sA = &quot;&quot;
 	sB = &quot;&quot;
 	sC = &quot;&quot;
@@ -4573,7 +4572,7 @@ Function fsDrawProperty( _
 	Dim oSelection As Object
 	Dim s1r As String
 	
-	On error Goto fsDrawPropertyErr
+	On Error Goto fsDrawPropertyErr
 	s1r = &quot;&quot;
 	oDoc = ThisComponent
 	oController = oDoc.getCurrentController()
@@ -4615,7 +4614,7 @@ Sub MsgSpeak( _
 	Dim config(fiCountConfigOptions) As Variant
 	
 	sFile = fsFullPathOf(fsExtensionSettingsIni)
-	If fileexists(sFile) Then
+	If FileExists(sFile) Then
 		If fbCreatingMediaFile() Then
 			&apos; We show you the settings and ask you to
 			&apos; verify that you really want to create
@@ -4663,7 +4662,7 @@ Sub MsgSpeak( _
 			ConfigureReadTextAloud
 		Else
 			&apos; Read strA aloud
-			If fileexists(sFile) Then
+			If FileExists(sFile) Then
 				tts_config_parseFile(sFile,config(),errorCode)
 				ttsActuate(config(), _
 				msgs(), _
@@ -4844,22 +4843,22 @@ Sub myBeep()
 	Dim sA As String
 	Dim oSvc As Object
 	sA = soundsDirectory() &amp; &quot;apert.wav&quot;
-	If fileexists(sA) Then
+	If FileExists(sA) Then
 		Select Case fsGetOS()
 			Case &quot;UNIX&quot;
 			sA = ConvertToURL(sA)
 		End Select
-	ElseIf fileexists(&quot;/usr/share/sounds/alsa/Noise.wav&quot;) Then
+	ElseIf FileExists(&quot;/usr/share/sounds/alsa/Noise.wav&quot;) Then
 		sA = convertToURL(&quot;/usr/share/sounds/alsa/Noise.wav&quot;)
 	Else
 		sA = convertToURL(&quot;/usr/share/sounds/speech-dispatcher/test.wav&quot;)
 	End If
-	If fileexists(&quot;/usr/bin/afplay&quot;) Then
+	If FileExists(&quot;/usr/bin/afplay&quot;) Then
 		Shell(&quot;afplay&quot;, 0, sA)
-	ElseIf fileexists(&quot;/usr/bin/gst-play-1.0&quot;) Then
+	ElseIf FileExists(&quot;/usr/bin/gst-play-1.0&quot;) Then
 		Shell(&quot;gst-play-1.0&quot;, 0, sA)
 	Else
-		On Error GoTo myBeepErr
+		On Error Goto myBeepErr
 		oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 		oSvc.execute(sA, &quot;&quot;, 1)
 	End If
@@ -4897,7 +4896,7 @@ Function faWindowsTestArray() As Variant
 	faWindowsTestArray = Array()
 	Dim _div$ : _div = Chr(13)
 	Dim _win_dir$ : _win_dir = &quot;C:\Windows&quot;
-	On Error GoTo faWindowsTestArrayErr
+	On Error Goto faWindowsTestArrayErr
 	If Len(Environ(&quot;windir&quot;)) &lt;&gt; 0 Then
 		win_dir = Environ(&quot;windir&quot;)
 	End If
@@ -4942,20 +4941,20 @@ Function fswindowsSAPIControl() As String
 			sub_path = faWindowsTestArray()
 		s2 = fsHomeDrive()
 		For x = Lbound(sub_path) To Ubound(sub_path)
-			If fileexists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\Speech\SpeechUX\sapi.cpl&quot;) Then
+			If FileExists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\Speech\SpeechUX\sapi.cpl&quot;) Then
 				fswindowsSAPIControl = s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\Speech\SpeechUX\sapi.cpl&quot;
 				Exit Function
 			End If
 		Next
-		If fileexists(fsProgramDirectory() &amp; _
+		If FileExists(fsProgramDirectory() &amp; _
 		&quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;) Then
 			fswindowsSAPIControl = fsProgramDirectory() &amp; _
 			&quot;Common Files\Microsoft Shared\Speech\sapi.cpl&quot;
-		ElseIf fileexists(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;) Then
+		ElseIf FileExists(s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;) Then
 			fswindowsSAPIControl = s2 &amp; &quot;\WINDOWS\ServicePackFiles\i386\sapi.cpl&quot;
 		Else
 			For x = Lbound(sub_path) To Ubound(sub_path)
-				If fileexists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\access.cpl&quot;) Then
+				If FileExists(s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\access.cpl&quot;) Then
 					fswindowsSAPIControl = s2 &amp; &quot;\Windows\&quot; &amp; sub_path(x) &amp; &quot;\access.cpl&quot;
 					Exit Function
 				End If
@@ -4968,7 +4967,7 @@ Function fswindowsSAPIControl() As String
 		&quot;systemsettings&quot;, &quot;xfce-setting-show&quot;, &quot;gnome-control-center&quot;, _
 		&quot;mate-control-center&quot;, &quot;unity-control-center&quot;)
 		For x = Lbound(sub_path) To Ubound(sub_path)
-			If fileexists(&quot;/usr/bin/&quot; &amp; sub_path(x)) Then
+			If FileExists(&quot;/usr/bin/&quot; &amp; sub_path(x)) Then
 				fswindowsSAPIControl = &quot;/usr/bin/&quot; &amp; sub_path(x)
 				Exit Function
 			End If
@@ -4988,7 +4987,7 @@ End Sub
 Function fbcreateDirectory( _
 	sPath) As Boolean
 	&apos; `sPath` is a URI, not a file path
-	On error Goto fbcreateDirectoryErr
+	On Error Goto fbcreateDirectoryErr
 	Dim sA As String
 	
 	If Len(sPath) &lt; Len(&quot;file:///c/d&quot;) Then
@@ -5001,7 +5000,7 @@ Function fbcreateDirectory( _
 			sA = sPath &amp; &quot;/&quot; &amp; &quot;temp-&quot; &amp; Trim(Second(Now)) &amp; &quot;.txt&quot;
 		End If
 		fbcreateDirectory = CreateFile(sA, fsAppSignature(), &quot;UTF-8&quot;)
-		If fileexists(sA) Then
+		If FileExists(sA) Then
 			kill sA
 		End If
 	End If
@@ -5133,7 +5132,7 @@ Function fbHaveItunes() As Boolean
 	iOldVersion = 9
 	Dim iFailVersion#
 	iFailVersion = 1
-	On error Goto fbHaveItunesErr
+	On Error Goto fbHaveItunesErr
 	If Len(fsGetMyTunesApp()) &lt;&gt; 0 Then
 		fbHaveItunes = True
 		Exit Function
@@ -5181,7 +5180,7 @@ Function fsGetMyTunesApp() As String
 	a2 = Array(&quot;/Applications/&quot;, &quot;/System/Applications/&quot;)
 	For n = LBound(a1) To UBound(a1)
 		For o = LBound(a2) To UBound(a2)
-			If fileexists(a2(o) &amp; _
+			If FileExists(a2(o) &amp; _
 				a1(n) &amp; _
 				&quot;.app/&quot;) Then
 				fsGetMyTunesApp = a1(n)
@@ -5256,10 +5255,10 @@ Function fswriteMacOSSpeechScript( _
 		bestEncoder = &quot;MP3&quot;
 		confirmMetaData = &quot;.aif,.aiff,.caf,.mp3&quot;
 	End Select
-	If fileexists(sFile) Then
+	If FileExists(sFile) Then
 		kill sFile
 	End If
-	If fileexists(sFile) Then
+	If FileExists(sFile) Then
 		&apos; if we can&apos;t make a fresh file, then we don&apos;t want to run an
 		&apos; arbitrary script.
 		Exit Function
@@ -5295,7 +5294,7 @@ Function fswriteMacOSSpeechScript( _
 		&apos; MacOS 10 iTunes or MacOS 11 Music programs can generate
 		&apos; audio files and playlists.
 		If ArtPath = &quot;&quot; Or _
-			Not(fileexists(ArtPath)) Then
+			Not(FileExists(ArtPath)) Then
 			ArtPath = Trim(convertfromURL(fsPosterImg()))
 		Else
 			ArtPath = Trim(convertfromURL(ArtPath))
@@ -5328,7 +5327,7 @@ Function fswriteMacOSSpeechScript( _
 		sF = ConvertFromURL(fsTemporaryTextDoc())
 		
 		sB = Join(Array( _
-		&quot;#/usr/bin/osascript&quot;, _
+		&quot;#&quot; &amp; AppleScriptPath(), _
 		&quot;(*&quot;, _
 		fsAboutAbilityToolsApple(), _
 		&quot;*)&quot; , _
@@ -5374,17 +5373,17 @@ Function fswriteMacOSSpeechScript( _
 		&quot;            set argv1 to (item 1 of arguments)&quot;, _
 		&quot;        end if&quot;, _
 		&quot;        set astring to fsChangecase(getExtension(argv1), &quot;&quot;lower&quot;&quot;)&quot;, _
-		&quot;    on error&quot;, _
+		&quot;    On Error&quot;, _
 		&quot;        set argv1 to &quot;&quot;&quot;&quot;&quot;, _
 		&quot;    end try&quot;, _
 		&quot;    try&quot;, _
 		&quot;        set argv2 to (item 2 of arguments)&quot;, _
-		&quot;    on error&quot;, _
+		&quot;    On Error&quot;, _
 		&quot;        set argv2 to defaultImg&quot;, _
 		&quot;    end try&quot;, _
 		&quot;    try&quot;, _
 		&quot;        set argv3 to (item 3 of arguments)&quot;, _
-		&quot;    on error&quot;, _
+		&quot;    On Error&quot;, _
 		&quot;        set argv3 to defaultSize&quot;, _
 		&quot;    end try&quot;, _
 		&quot;    if myLang is &quot;&quot;&quot;&quot; then&quot;, _
@@ -5438,7 +5437,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;                theMsg(argv1, myVoice, myLang, okaySound)&quot;, _
 		&quot;            end if&quot;, _
 		&quot;        end if&quot;, _
-		&quot;    on error&quot;, _
+		&quot;    On Error&quot;, _
 		&quot;        if argv1 is not &quot;&quot;&quot;&quot; then&quot;, _
 		&quot;            theMsg(err1 &amp; &quot;&quot;: Cancel&quot;&quot;, myVoice, myLang, notOkaySound)&quot;, _
 		&quot;            set donemessage to err1&quot;, _
@@ -5574,7 +5573,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;        try&quot;, _
 		&quot;            set myURL to quoted form of POSIX path of aFile&quot;, _
 		&quot;                set str0 to (do shell script &quot;&quot;cp -f &quot;&quot; &amp; sTaggedURL &amp; &quot;&quot; &quot;&quot; &amp; myURL)&quot;, _
-		&quot;        on error&quot;, _
+		&quot;        On Error&quot;, _
 		&quot;            set sTaggedURL to quoted form of myURL&quot;, _
 		&quot;        end try&quot;, _
 		&quot;    end tell&quot;, _
@@ -5604,7 +5603,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;                delay 1&quot;, _
 		&quot;            end if&quot;, _
 		&quot;        end repeat&quot;, _
-		&quot;    on error&quot;, _
+		&quot;    On Error&quot;, _
 		&quot;        set b4 to False&quot;, _
 		&quot;    end    try&quot;, _
 		&quot;    return b4&quot;, _
@@ -5662,7 +5661,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;		set command_line to afc_app &amp; &quot;&quot; &quot;&quot; &amp; audio_codec &amp; &quot;&quot; &quot;&quot; &amp; dq &amp; in_sound_path &amp; dq &amp; &quot;&quot; &quot;&quot; &amp; dq &amp; out_sound_path &amp; dq&quot;, _
 		&quot;		try&quot;, _
 		&quot;			set b to (do shell script command_line)&quot;, _
-		&quot;		on error&quot;, _
+		&quot;		On Error&quot;, _
 		&quot;			return false&quot;, _
 		&quot;		end try&quot;, _
 		&quot;	end if&quot;, _
@@ -5714,7 +5713,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;       set command_line to dq &amp; vlc_app &amp; dq &amp; &quot;&quot; &quot;&quot; &amp; dq &amp; in_sound_path &amp; dq &amp; &quot;&quot; --intf dummy &quot;&quot; &amp; verbosity &amp; &quot;&quot;--sout=&quot;&quot; &amp; dq &amp; &quot;&quot;#transcode{vcodec=none,acodec=&quot;&quot; &amp; audio_codec &amp; &quot;&quot;,ab=&quot;&quot; &amp; average_bitrate &amp; &quot;&quot;,channels=&quot;&quot; &amp; channel_count &amp; &quot;&quot;,samplerate=&quot;&quot; &amp; sample_rate &amp; &quot;&quot;}:std{access=file,mux=ogg,dst=&apos;&quot;&quot; &amp; out_sound_path &amp; &quot;&quot;&apos;}&quot;&quot; &amp; dq &amp; &quot;&quot; vlc://quit&quot;&quot;&quot;, _
 		&quot;        try&quot;, _
 		&quot;            set b to (do shell script command_line)&quot;, _
-		&quot;        on error&quot;, _
+		&quot;        On Error&quot;, _
 		&quot;            return false&quot;, _
 		&quot;        end try&quot;, _
 		&quot;    end if&quot;, _
@@ -5734,7 +5733,7 @@ Function fswriteMacOSSpeechScript( _
 		&apos; &quot;Speech synthesis using `say`&quot;
 		sB = Join( _
 		Array( _
-		&quot;#/usr/bin/osascript&quot;, _
+		&quot;#&quot; &amp; AppleScriptPath(), _
 		&quot;(*&quot;, _
 		fsAboutAbilityToolsApple(), _
 		&quot;*)&quot;, _
@@ -5761,7 +5760,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;    try&quot;, _
 		&quot;        set err1 to &quot;&quot;Say command&quot;&quot;&quot;, _
 		&quot;        set b to (do shell script &quot;&quot;say &quot;&quot; &amp; myOption &amp; myVoiceCommand &amp; &quot;&quot; -f &quot;&quot; &amp; textFile &amp; &quot;&quot; &quot;&quot;)&quot;, _
-		&quot;    on error&quot;, _
+		&quot;    On Error&quot;, _
 		&quot;        set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
 		&quot;    end try&quot;, _
 		&quot;    set b to (do shell script &quot;&quot;rm -f &apos;&quot;&quot; &amp; myLock &amp; &quot;&quot;&apos;&quot;&quot;)&quot;, _
@@ -5830,7 +5829,7 @@ Function fswriteMacOSSpeechScript( _
 	&quot;        if retval is &quot;&quot;&quot;&quot; then&quot;, _
 	&quot;            set retval to &quot;&quot;&quot; &amp; fsGetMacOsBaseVoice() &amp; &quot;&quot;&quot;&quot;, _
 	&quot;        end if&quot;, _
-	&quot;    on error&quot;, _
+	&quot;    On Error&quot;, _
 	&quot;        set retval to &quot;&quot;&quot; &amp; fsGetMacOsBaseVoice() &amp; &quot;&quot;&quot;&quot;, _
 	&quot;    end try&quot;, _
 	&quot;    -- On MacOS 13.0, Lee is an optional en_AU voice&quot;, _
@@ -5841,14 +5840,12 @@ Function fswriteMacOSSpeechScript( _
 	&quot;end fsGetthevoice&quot;, _
 	&quot;&quot;), _
 	CR)
-
 	CreateFile( _
 	sFile, _
 	sB, _
 	&quot;UTF-8&quot;)
 	fswriteMacOSSpeechScript = sB
 End Function
-
 
 
 Function fsTemporaryTtsAppleScript() As String
@@ -5884,7 +5881,7 @@ Function CreateFile( _
 		End Select
 	End If
 	On Error Goto CreateFileError
-	If fileexists(sFilePath) Then
+	If FileExists(sFilePath) Then
 		kill sFilePath
 	End If
 	oOutputAccess = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
@@ -5925,7 +5922,7 @@ End Function
 Sub WarnNoSpeech()
 	Dim s1 As String
 	s1 = fsLookUpTerm(&quot;s_speech-synthesis&quot;)
-	On error Goto WarnNoSpeechErr
+	On Error Goto WarnNoSpeechErr
 	If (6 = MsgBox(s1 &amp; _
 		Chr(10) &amp; _
 		String(Len(s1), &quot;=&quot;) &amp; _
@@ -6019,7 +6016,7 @@ Function fbCheckPosixSpeech() As Boolean
 			fbCheckPosixSpeech = True
 		Else
 			For x = Lbound(_app) To Ubound(_app)
-				If fileexists(&quot;/usr/bin/&quot; &amp; _app(x)) Then
+				If FileExists(&quot;/usr/bin/&quot; &amp; _app(x)) Then
 					fbCheckPosixSpeech = True
 					Exit Function
 				End If
@@ -6034,7 +6031,7 @@ Sub CheckUnixSpeech()
 	&apos; Check the first time the application runs.
 
 	If fsGetOS() = &quot;UNIX&quot; Then
-		If Not(fileexists(fsFullPathOf(fsExtensionSettingsIni))) Then
+		If Not(FileExists(fsFullPathOf(fsExtensionSettingsIni))) Then
 			If isSnap() or isFlatPak() Then
 				&apos; Translate this message for your language
 				If (MsgBox(_(_
@@ -6079,8 +6076,8 @@ Function fbHaveEspeak() As Boolean
 			Exit Function
 		End If
 	Next
-	If fileexists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
-			fileexists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
+	If FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
+			FileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
 		fbHaveEspeak = True
 	End If
 End Function
@@ -6161,12 +6158,12 @@ Function fbOKWithRhVoice(_
 		&quot;RHVoice-test&quot;)
 	Dim x As Integer : x = 0
 
-    If Not Fileexists(fsRhVoiceTtsDoc()) Then
+    If Not FileExists(fsRhVoiceTtsDoc()) Then
         Exit Function
     End If
     
 	For x = Lbound(a1) to Ubound(a1)
-		If Fileexists(&quot;/usr/bin/&quot; &amp; a1(x)) Then
+		If FileExists(&quot;/usr/bin/&quot; &amp; a1(x)) Then
 			_test = a1(x)
 			Exit For
 		End If
@@ -6437,7 +6434,7 @@ Function fsMyFfmpeg() As String
 	aD = Split(fsSuperTrim(sProgramPaths, &quot;&quot;), cR)
 	sE = &quot;&quot;
 	For i = LBound(aD) To UBound(aD)
-		If fileexists(aD(i)) Then
+		If FileExists(aD(i)) Then
 			sE = (aD(i))
 			Exit For
 		End If
@@ -6527,7 +6524,7 @@ Function fsFindAppPath(sa) As String
 	If Len(sa) &gt; 0 Then
 		For n = LBound(a1) To UBound(a1)
 			If Len(a1(n)) &gt; Len(&quot;file:///&quot;) Then
-				If fileexists(a1(n) &amp; sa) Then
+				If FileExists(a1(n) &amp; sa) Then
 					fsFindAppPath = a1(n) &amp; sa
 					Exit Function
 				End If
@@ -6736,30 +6733,30 @@ Sub resetSpeechDispatcher( _
 	On Error Goto resetSpeechDispatcherErr
     Select Case fsGetOS()
     	Case &quot;WINDOWS&quot;
-		If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+		If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 			kill fsMyTempLock(&quot;lock&quot;)
 		End if
 
     	Case &quot;MacOS&quot;
-		If fileexists(&quot;/usr/bin/say&quot;) Then
+		If FileExists(&quot;/usr/bin/say&quot;) Then
 			If Not (fbCreatingMacOSMediaFile()) Then
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;say&quot;, True)
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;afplay&quot;, True)
-				If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+				If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 					kill fsMyTempLock(&quot;lock&quot;)
 				End If
 			End If
 		End If
 
     	Case Else  &apos; UNIX
-		If fileexists(&quot;/usr/bin/spd-say&quot;) Or _
-			fileexists(&quot;/usr/local/bin/spd-say&quot;) Then
+		If FileExists(&quot;/usr/bin/spd-say&quot;) Or _
+			FileExists(&quot;/usr/local/bin/spd-say&quot;) Then
 			If bAll Then
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet speech-dispatcher&quot;, True)
 			Else
 				errorCode = Shell(&quot;spd-say&quot;, 0, &quot;--cancel&quot;, True)
 			End If
-		ElseIf fileexists(&quot;/usr/bin/speech-dispatcher&quot;) Then	
+		ElseIf FileExists(&quot;/usr/bin/speech-dispatcher&quot;) Then	
 			errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet speech-dispatcher&quot;, True)
 		End If
 		
@@ -6788,24 +6785,24 @@ Sub resetSpeechDispatcher( _
 			&quot;speak_ng&quot;, _
 			&quot;text2wave&quot;)
 			For i = LBound(a1) To UBound(a1)
-				If fileexists(&quot;/usr/bin/&quot; &amp; a1(i)) Or _
-					fileexists(&quot;/usr/local/bin/&quot; &amp; a1(i)) Then
+				If FileExists(&quot;/usr/bin/&quot; &amp; a1(i)) Or _
+					FileExists(&quot;/usr/local/bin/&quot; &amp; a1(i)) Then
 					errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet &quot; &amp; a1(i), True)
 				End If
 			Next
-			If fbHaveNetworkTTS() And fileexists(&quot;/usr/bin/vlc&quot;) Then
+			If fbHaveNetworkTTS() And FileExists(&quot;/usr/bin/vlc&quot;) Then
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet vlc&quot;, True)
 			End If
 		End If
-		If fileexists(fsMyTempLock(&quot;lock&quot;)) Then
+		If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 			kill fsMyTempLock(&quot;lock&quot;)
 		End If
-		If fileexists(fsTemporaryTextDoc() &amp; &quot;.sable&quot;) Then
+		If FileExists(fsTemporaryTextDoc() &amp; &quot;.sable&quot;) Then
 			kill fsTemporaryTextDoc() &amp; &quot;.sable&quot;
 		End If
 
     End Select
-	If fileexists(fsTemporaryTextDoc()) Then
+	If FileExists(fsTemporaryTextDoc()) Then
 		kill fsTemporaryTextDoc()
 	End If
 	On Error Resume Next
@@ -6923,7 +6920,7 @@ Function fsThisDocAuthor() As String
 	Dim s1 As String
 	Dim s2 As String
 	
-	On error Goto fsThisDocAuthorErr
+	On Error Goto fsThisDocAuthorErr
 	s1 = ThisComponent.DocumentProperties.Author
 	If Len(Trim(s1)) = 0 Then
 		s1 = fsGetThisUsers(&quot;fullname&quot;)
@@ -7026,7 +7023,7 @@ Function fsThisSoundTitle( _
 	If Len(strip_these) = 0  Then
 		strip_these = &quot; &quot;
 	End If
-	On error Goto fsThisSoundTitleErr
+	On Error Goto fsThisSoundTitleErr
 	s1 = fsTrimSpecial(fsQuickTitle(6, 60), Chr(13) &amp; Chr(10) &amp; strip_these)
 	fsThisSoundTitle = fsSmarten(s1)
 	Exit Function
@@ -7039,7 +7036,7 @@ End Function
 Function fsThisDocTitle() As String
 	Dim sC As String
 	
-	On error Goto fsThisDocTitleErr
+	On Error Goto fsThisDocTitleErr
 	If Not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
 	End If
@@ -7073,7 +7070,7 @@ End Function
 Function fsThisDocGenre() As String
 	Dim sA, sB As String
 	
-	On error Goto fsThisDocGenreErr
+	On Error Goto fsThisDocGenreErr
 	sA = fsLookUpTerm(&quot;s_speech-synthesis&quot;)
 	If fsGetLanguage = fsSelectionLanguage() Then
 		sB = &quot;&quot;
@@ -7222,7 +7219,7 @@ Function fsQuickTitle( _
 		a4 = Split(fsGetTextSelection(True, False), Chr(10))
 		sText = a4(LBound(a4))
 	End If
-	On error Goto fsQuickTitleErr
+	On Error Goto fsQuickTitleErr
 	If fsComplexAsiaOrWest(sText) = &quot;ASIA&quot; Then
 		&apos; Use the greater of word count or string length.
 		&apos; We need to assess Asian text differently.
@@ -7461,7 +7458,7 @@ End Function
 
 Function fiGetSlidenoteIndex( _
 	Optional nPage) As Integer
-	On error Goto fiGetSlidenoteIndexErr
+	On Error Goto fiGetSlidenoteIndexErr
 	Dim oDoc As Object
 	Dim i As Integer
 	Dim sA As String
@@ -7558,11 +7555,10 @@ Function fsExportAlbumCover( _
 		wait 1000
 		
 		&apos; Make sure we have a writable folder
-		&apos;on error goto ExportAlbumCoverErr
 		CreateFile(sPath &amp; &quot;.txt&quot; , fsAppSignature(), &quot;UTF-8&quot;)
-		If fileexists(sPath &amp; &quot;.txt&quot;) Then
+		If FileExists(sPath &amp; &quot;.txt&quot;) Then
 			kill sPath &amp; &quot;.txt&quot;
-			If fileexists(sPath) Then
+			If FileExists(sPath) Then
 				kill sPath
 			End If
 		Else
@@ -8314,7 +8310,7 @@ Sub addTextToSlide( _
 		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
 	End If
 	iITALIC = 2
-	On error Goto addTextToSlideErr
+	On Error Goto addTextToSlideErr
 	If ismissing(o1) Then
 		o1 = StarDesktop.loadComponentFromUrl(&quot;private:factory/simpress&quot;, _
 		&quot;_blank&quot;, _
@@ -8712,7 +8708,7 @@ End Sub
 
 
 Function fiCurrentSlideIndex() As Integer
-	On error Goto fiGetCurrentSlideIndexerror
+	On Error Goto fiGetCurrentSlideIndexerror
 	fiCurrentSlideIndex = ThisComponent.Presentation.Controller.getCurrentSlideIndex()
 	Exit Function
 	fiGetCurrentSlideIndexerror:

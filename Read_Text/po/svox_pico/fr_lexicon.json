@@ -1,0 +1,8 @@
+{
+    "fr_00001":{"g":"&","p":" et "},
+    "fr_00002":{"g":">","p":" plus que "},
+    "fr_00003":{"g":"<","p":" moins que "},
+    "fr_00004":{"g":"{","p":" accolade gauche "},
+    "fr_00005":{"g":"}","p":" accolade droite "},
+    "fr_99999":{"g":"Read Text Extension","p":"reed text extension"}
+    }

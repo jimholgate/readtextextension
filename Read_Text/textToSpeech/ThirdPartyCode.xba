@@ -131,7 +131,7 @@ Function PosixPythonPath() As String
 		
 		For y = Lbound(a0) to Ubound(a0)
 			For x = Lbound(a1) To Ubound(a1)
-				If fileexists(a0(y) &amp; &quot;/bin/&quot; &amp; a1(x)) Then
+				If FileExists(a0(y) &amp; &quot;/bin/&quot; &amp; a1(x)) Then
 					PosixPythonPath = a0(y) &amp; &quot;/bin/&quot; &amp; a1(x)
 					Exit Function
 				End If
@@ -143,7 +143,7 @@ End Function
 
 Function fbOsaScriptOk(_command) As Boolean
 	&apos; Return `True` if MacOS `osascript` is executable
-	On Error GoTo fbOsaScriptOkErr
+	On Error Goto fbOsaScriptOkErr
 	If Len(_command) = 0 Then
 		_command = &quot;-e &apos;set checked to &quot;&quot;osascript ok&quot;&quot;&apos;&quot;
 	End If
@@ -165,7 +165,7 @@ Function fvTts_config_createDefaultConfig( _
 	If GetGUIType() = 1 Then
 		&apos; Windows
 		config(fiFestivalOption()) = False
-		If fileexists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) Then
+		If FileExists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) Then
 			config(fiFestivalPath()) = fsProgramDirectoryx86() &amp; &quot;festival\festival.exe&quot;
 		Else
  			config(fiFestivalPath()) = fsProgramDirectory() &amp; &quot;festival\festival.exe&quot;
@@ -218,8 +218,8 @@ Function fvTts_config_createDefaultConfig( _
 				&apos; Japanese
 				config(fiExternalCommand()) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf fileexists(Environ(&quot;HOME&quot;) &amp; _
-				&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or fileexists( _
+			ElseIf FileExists(Environ(&quot;HOME&quot;) &amp; _
+				&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or FileExists( _
 				Environ(&quot;HOME&quot;) &amp; _
 				&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or Len( _
 				fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
@@ -527,7 +527,7 @@ Function fsGetPicturePath() As String
 	Dim oBar
 	Dim sFilePickerArgs
 	
-	On error Goto fsGetPicturePathErr
+	On Error Goto fsGetPicturePathErr
 	oDialog = createUnoService(&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
 	sFilePickerArgs = Array(com.sun.star.ui.dialogs.TemplateDescription.FILEOPEN_LINK_PREVIEW)
 	oDialog.Initialize(sFilePickerArgs())

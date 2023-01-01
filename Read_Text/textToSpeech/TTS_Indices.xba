@@ -270,7 +270,7 @@ Function fbTranslateTable( _
 	Dim s1$
 	s1 = &quot;&quot;
 	fbTranslateTable = False
-	On error Goto fbTranslateTableErr
+	On Error Goto fbTranslateTableErr
 	If message = &quot;&quot; Then Exit Function
 	If sMyTranslationType = &quot;id&quot; Then
 		s1 = Join(Array(mMyTranslationId(cntMsg), message), &quot;&quot;)
@@ -307,7 +307,7 @@ Function UpdatePoSettings( _
 	&apos; [UpdatePoSettings1]: http://www.oooforum.org/forum/viewtopic.phtml?t=85441
 	&apos;
 	UpdatePoSettings = False
-	On error Goto UpdatePoSettingsErr
+	On Error Goto UpdatePoSettingsErr
 	Dim lenLineRead#
 	lenLineRead = 0  &apos; &apos;length of line read
 	Dim cntMsg#
@@ -362,7 +362,7 @@ Function UpdatePoSettings( _
 
 	cntMsg =  - 1
 	nbPluralMax = 0
-	Do while not myTextFile.IsEOF
+	Do While not myTextFile.IsEOF
 		lineRead = myTextFile.readLine
 		lenLineRead = Len(lineRead)
 		idquo = InStr(lineRead,&quot;&quot;&quot;&quot;) + 1
@@ -474,7 +474,7 @@ Function fsZzxToEnglish( _
 	Dim bFound As Boolean
 	bFound = Not(True)
 	
-	On error Goto fsZzxToEnglishErr
+	On Error Goto fsZzxToEnglishErr
 	
 	Select Case LCase(sMyLang)
 		Case &quot;zzy&quot; &apos;Machine language
@@ -776,7 +776,7 @@ Function fsPosterImg() As String
 	Dim o As Integer
 	n = 0
 	For n = LBound(a2) To UBound(a2)
-		If fileexists(s1 &amp; a2(n)) Then
+		If FileExists(s1 &amp; a2(n)) Then
 			fsPosterImg = s1 &amp; a2(n)
 			Exit For
 		End If
@@ -786,7 +786,7 @@ Function fsPosterImg() As String
 			fsPosterImg = fsMyURL() &amp; &quot;/images/poster-001&quot; &amp; a2(o)
 			For n = LBound(a1) To UBound(a1)
 				
-				If fileexists(s3 &amp; _
+				If FileExists(s3 &amp; _
 					a1(n) &amp; _
 					&quot;/poster-&quot; &amp; _
 					Right(&quot;000&quot; &amp; _
@@ -797,9 +797,9 @@ Function fsPosterImg() As String
 					&quot;/poster-&quot; &amp; _
 					Right(&quot;000&quot; &amp; _
 					Trim(str(fiMyCurrentAudioTrack(False))), 3) + a2(o)
-				ElseIf fileexists(s3 &amp; a1(n) &amp; &quot;/poster-001&quot; &amp; a2(o)) Then
+				ElseIf FileExists(s3 &amp; a1(n) &amp; &quot;/poster-001&quot; &amp; a2(o)) Then
 					s2 = s3 &amp; a1(n) &amp; &quot;/poster-001&quot; &amp;  + a2(o)
-				ElseIf fileexists(fsMyURL &amp; &quot;/images/poster-&quot; &amp; a1(n) &amp; a2(o)) Then
+				ElseIf FileExists(fsMyURL &amp; &quot;/images/poster-&quot; &amp; a1(n) &amp; a2(o)) Then
 					s2 = fsMyURL &amp; &quot;/images/poster-&quot; &amp; a1(n) &amp; a2(o)
 				End If
 				If Len(s2) &lt;&gt; 0 Then
@@ -854,9 +854,9 @@ Function fsLicenseDoc() As String
 	Dim s1 As String
 	
 	s1 = fsMyURL &amp; &quot;/license/LICENSE&quot;
-	If fileexists(s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()) Then
+	If FileExists(s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()) Then
 		fsLicenseDoc = s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()
-	ElseIf fileexists(s1 &amp; &quot;.&quot; &amp; fsGetLanguage()) Then
+	ElseIf FileExists(s1 &amp; &quot;.&quot; &amp; fsGetLanguage()) Then
 		fsLicenseDoc = s1 &amp; &quot;.&quot; &amp; fsGetLanguage()
 	Else
 		fsLicenseDoc = s1
@@ -908,9 +908,9 @@ Function fsDescriptionDoc() As String
 	Dim s1 As String
 	
 	s1 = fsMyURL &amp; &quot;/description/component.txt&quot;
-	If fileexists(s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()) Then
+	If FileExists(s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()) Then
 		fsDescriptionDoc = s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()
-	ElseIf fileexists(s1 &amp; &quot;.&quot; &amp; fsGetLanguage()) Then
+	ElseIf FileExists(s1 &amp; &quot;.&quot; &amp; fsGetLanguage()) Then
 		fsDescriptionDoc = s1 &amp; &quot;.&quot; &amp; fsGetLanguage()
 	Else
 		fsDescriptionDoc = s1
@@ -1035,7 +1035,7 @@ Function fsGetOS() As String
 		Case 1
 		fsGetOS = &quot;WINDOWS&quot;
 		Case 4
-		If fileexists(&quot;/usr/bin/osascript&quot;) Then
+		If FileExists(AppleScriptPath()) Then
 			fsGetOS = &quot;MacOS&quot;
 		ElseIf Len(Environ(&quot;ANDROID_ROOT&quot;)) &gt; 0 Then
 			fsGetOS = &quot;ANDROID&quot;
@@ -1075,7 +1075,7 @@ End Function
 
 
 Function fsDisplayLanguage() As String
-	On error Goto DISPLAYLANGUAGEERROR
+	On Error Goto DISPLAYLANGUAGEERROR
 	Dim s1$
 	s1 = f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text
 	
@@ -1093,7 +1093,7 @@ End Function
 
 
 Function fsDocLanguage() As String
-	On error Goto fsDocLanguageErr
+	On Error Goto fsDocLanguageErr
 	fsDocLanguage = ThisComponent.CharLocale.Language
 	Exit Function
 	fsDocLanguageErr:
@@ -1103,7 +1103,7 @@ End Function
 
 
 Function fsDocCountry() As String
-	On error Goto fsDocCountryErr
+	On Error Goto fsDocCountryErr
 	fsDocCountry = ThisComponent.CharLocale.Country
 	Exit Function
 	fsDocCountryErr:
@@ -1166,7 +1166,7 @@ Function fsFestivalDirectory( _
 	&apos; with the latest version of Festival.
 	Select Case fsGetOS()
 		Case &quot;WINDOWS&quot;
-		If fileexists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
+		If FileExists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
 			s2 = converttourl(fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;)
 		Else
 			s2 = converttourl(fsProgramDirectory &amp; &quot;Festival\voices\&quot;)
@@ -1265,7 +1265,7 @@ Function fsFestivalLanguage( _
 	&apos; with the latest version of Festival.
 	Select Case fsGetOS()
 		Case &quot;WINDOWS&quot;
-		If fileexists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
+		If FileExists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
 			s2 = converttourl(fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;)
 		Else
 			s2 = converttourl(fsProgramDirectory &amp; &quot;Festival\voices\&quot;)
@@ -1676,7 +1676,7 @@ Function fsGetHomeDir() As String
 	cr = Chr(10)
 	fsGetHomeDir = &quot;&quot;
 	s1 = ConvertFromURL(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;)
-	If fileexists(s1) Then
+	If FileExists(s1) Then
 		fsGetHomeDir = s1
 	Else
 		s1 = ConvertFromURL(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;) &amp; cr
