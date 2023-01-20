@@ -24,7 +24,7 @@ To add languages, add the appropriate packages
 
 The command line interface that this script uses is depreciated, so
 it might not continue to work, or it might not work as well as it
-does when using `speech-dispatcher`, `docker rhvoice-get` or `orca`.
+does when using `speech-dispatcher`, `docker rhvoice-rest` or `orca`.
 
 If you configure `speech-dispatcher` to use `rhvoice` and enter
 `"(SPD_READ_TEXT_PY)" "(TMP)"` in Read Text Extension's main
@@ -35,7 +35,9 @@ To enable rhvoice for speech-dispatcher in Ubuntu 22.04, use:
 
     sudo apt install speech-dispatcher-rhvoice
 
-To install rhvoice on other linux platforms, use a docker image.
+To install rhvoice on other linux platforms, use a docker image
+like <https://hub.docker.com/r/aculeasis/rhvoice-rest>.
+
 The available voices might vary according to the specific image. 
 '''
 
