@@ -369,3 +369,28 @@ msgctxt ""
 msgstr ""
 "Get on-line help for snap? Read Text uses a http speech daemon like "
 "[larynx-server](https://github.com/rhasspy/larynx)."
+
+#: sw/inc/strings.hrc:30 (en)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "Reset"
+
+#: sw/inc/strings.hrc:33 (en)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Apply"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (en)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Save As"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (en)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "Save As..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (en)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Open"

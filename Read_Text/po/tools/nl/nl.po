@@ -336,3 +336,27 @@ msgstr ""
 "\n"
 "`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.nl/)`"
 
+#: sw/inc/strings.hrc:30 (nl)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "Herstellen"
+
+#: sw/inc/strings.hrc:33 (nl)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Toepassen"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (nl)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Opslaan als"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (nl)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "Ops_laan als..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (nl)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Openen"

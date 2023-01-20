@@ -317,3 +317,27 @@ msgctxt ""
 msgid "Arabic"
 msgstr "Arab"
 
+#: sw/inc/strings.hrc:30 (hu)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "Visszaállítás"
+
+#: sw/inc/strings.hrc:33 (hu)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Alkalmaz"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (hu)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Mentés másként"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (hu)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "Men_tés másként..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (hu)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Megnyitás"

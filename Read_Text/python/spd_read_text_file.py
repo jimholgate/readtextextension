@@ -186,7 +186,7 @@ See also:
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2010 - 2022 James Holgate
+Copyright (c) 2010 - 2023 James Holgate
 '''
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
@@ -221,7 +221,8 @@ computer's ability to run system python libraries.
         USE_SPEECHD = False
 
 NET_SERVICE_LIST = [
-    'AUTO', 'NETWORK', 'AWS', 'AZURE', 'GOOGLECLOUD', 'GTTS', 'LARYNX'
+    'AUTO', 'NETWORK', 'AWS', 'AZURE', 'GOOGLECLOUD', 'GTTS', 'LARYNX',
+    'MARYTTS'
 ]
 
 
@@ -414,7 +415,7 @@ def net_play(_file_spec='',
              _requested_voice=''):  # -> bool
     '''Attempt to play a sound from the network.'''
     if network_read_text_file.network_ok(_language):
-        if _requested_voice in NET_SERVICE_LIST:
+        if _requested_voice.upper() in NET_SERVICE_LIST:
             net_rate = 160
             if i_rate < 0:
                 net_rate = 110
@@ -569,7 +570,7 @@ configurations.
 
     def _switch_to_female(self, voice=''):  # -> bool
         '''If voice includes `FEMALE` or a network voice, return `True`'''
-        if voice.count('FEMALE') != 0 or voice in NET_SERVICE_LIST:
+        if voice.count('FEMALE') != 0 or voice.upper() in NET_SERVICE_LIST:
             return True
         return False
 
@@ -1583,7 +1584,7 @@ class SayFormats(object):
         **Example 2**: `mydata.languagecountry('Ailani')` returns ""
         because no voice called "Ailani" is supported on any version
         of say.
-        
+
         Note: If this python cannot read `say` output, then this tool
         returns a generated string like `MALE1` or `FEMALE3`.
         '''
@@ -1675,7 +1676,7 @@ class SayFormats(object):
         # and unlock my lock
         if os.path.isfile(readtexttools.get_my_lock('lock')):
             return False
-        if _requested_voice in NET_SERVICE_LIST:
+        if _requested_voice.upper() in NET_SERVICE_LIST:
             # Accept if you literally ask for these voices, but replace a
             # requested "AUTO" or "NETWORK" request with the default system
             # voice instead.
@@ -1871,6 +1872,7 @@ class SayFormats(object):
 def main():
     '''Command line speech-dispatcher tool. Some implimentations of python
     require the long command line switch'''
+    _is_dev = False
     _imported_metadata = readtexttools.ImportedMetaData()
     _spd_formats = SpdFormats()
     _file_spec = sys.argv[-1]
@@ -1960,11 +1962,14 @@ def main():
                     break
         _message_old = _imported_metadata.meta_from_file(_file_spec).strip()
         _message = readtexttools.local_pronunciation(
-            _language, _message_old, 'macos_say', 'MACOS_SAY_USER_DIRECTORY').strip()
+            _language, _message_old, 'macos_say', 'MACOS_SAY_USER_DIRECTORY',
+            _is_dev)[0].strip()
         if len(_message) != 0:
-            # Found misspoken words or phrases. MacOS does not support any phonetic
-            # code, so you need to approximate the correct sound using similar words
-            # in the json document.
+            # Found misspoken words or phrases. MacOS does not support all phonetic
+            # codes, so you need to approximate the correct sound using similar words
+            # in the json document. See:
+            # * <https://www.internationalphoneticalphabet.org/ipa-chart-audio/index.html>
+            # * <https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-ssml-phonetic-sets>
             if not _message == _message_old:
                 os.remove(_file_spec)
                 readtexttools.write_plain_text_file(_file_spec, _message,
@@ -1975,7 +1980,7 @@ def main():
 
             if not resultat:
                 readtexttools.unlock_my_lock()
-                if _voice in NET_SERVICE_LIST:
+                if _voice.upper() in NET_SERVICE_LIST:
                     if not net_play(_file_spec, _language, i_rate, _voice):
                         print(network_read_text_file.network_problem(_voice))
         else:
@@ -1988,7 +1993,7 @@ def main():
                         _ext = os.path.splitext(_output)[1]
                     except IndexError:
                         _ext = ''
-                    if _voice in NET_SERVICE_LIST:
+                    if _voice.upper() in NET_SERVICE_LIST:
                         if not network_read_text_file.network_main(
                                 _file_spec, _language, _visible, _audible,
                                 _output, '', '', '', '600x600', i_rate, _voice,
@@ -2007,12 +2012,13 @@ def main():
         if not USE_SPEECHD:
             print(
                 '''The `speechd` library is not compatible with your application
-or platform. Try a networked speech tool like `larynx-server`.''')
+or platform. Try a networked speech tool like `larynx-server` or `docker-marytts`.''')
             if i_rate == 0:
                 _word_rate = 160
             if not network_read_text_file.network_main(
                     _file_spec, _language, 'false', 'false', _output, '', '',
                     '', '600x600', _word_rate, _voice, ''):
+
                 _web_message = _imported_metadata.meta_from_file(
                     _file_spec).strip()
                 _max_message_len = 4999

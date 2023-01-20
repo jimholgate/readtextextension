@@ -45,7 +45,7 @@ Currently, python3 is *required* for `speech-dispatcher`.  Python2 requires the
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2022 James Holgate
+Copyright (c) 2011 - 2023 James Holgate
 '''
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
@@ -129,6 +129,13 @@ except:
     pass
 
 LOOK_UPS = 0
+IPA_SUBSET = [
+    '+', '-', '=', '(', ')', 'ʕ', 'ʔ', 'b', 'β', 'c', 'ɕ', 'd', 'ð', 'f', 'ɸ',
+    'g', 'ɡ', 'ɣ', 'h', 'ɦ', 'j', 'ɟ', 'ʝ', 'k', 'l', 'ɭ', 'ʟ', 'm', 'ɱ', 'n',
+    'ɲ', 'ɳ', 'ŋ', 'ɴ', 'p', 'r', 'ɹ', 'ɻ', 'ʁ', 's', 'ʂ', 'ʃ', 't', 'θ', 'v',
+    'ʋ', 'w', 'ɰ', 'x', 'ɥ', 'z', 'ʑ', 'ʐ', 'ʒ', 'a', 'ɐ', 'ᴂ', 'ɑ', 'e', 'ə',
+    'ɜ', 'ɛ', 'i', 'ɪ', 'ɨ', 'o', 'ɒ', 'ɔ', 'ɵ', 'ʌ', 'u', 'ɯ', 'ʊ', 'ʉ', 'y'
+]
 
 
 def write_plain_text_file(_file_path='',
@@ -1455,7 +1462,8 @@ class JsonTools(object):
     def __init__(self):
         try:
             self.safe_json = str.maketrans({
-                "{": "'\\u007B'",
+                "\\": "\\u005C",
+                "{": "\\u007B",
                 "}": "\\u0070",
                 '"': "\\u0022",
                 "@": "\\u0040"
@@ -1466,19 +1474,20 @@ class JsonTools(object):
     def sanitize_json(self, content=''):  # -> str
         '''Escape json characters in content'''
         try:
-            test_text = content.strip()
+            test_text = content.strip('\{\}\n\t')
         except AttributeError:
             try:
-                test_text = str(content).strip()
+                test_text = str(content).strip('\'\{\}\n\t')
                 if test_text == 'None':
                     return ''
             except AttributeError:
                 return ''
         if bool(self.safe_json):
             return str(test_text.translate(self.safe_json))
-        return test_text.replace('{',
-                                 '\\u007B').replace('}', '\\u0070').replace(
-                                     '"', '\\u0022').replace('@', '\\u0040')
+        return test_text.replace('\\', '\\u005C').replace(
+            '{', '\\u007B').replace('}', '\\u0070').replace('"',
+                                                            '\\u0022').replace(
+                                                                '@', '\\u0040')
 
     def set_json_content(self,
                          language='en',
@@ -1774,8 +1783,10 @@ class ImportedMetaData(object):
         x_author = _xml_transform.clean_for_xml(author)
         x_genre = _xml_transform.clean_for_xml(genre)
         x_title = _xml_transform.clean_for_xml(title)
-        x_display_path = _xml_transform.clean_for_xml(out_path).replace(
-            os.getenv('HOME'), '~')
+        x_display_path = '~/...'
+        if len(os.getenv('HOME')) != 0:
+            x_display_path = _xml_transform.clean_for_xml(out_path).replace(
+                os.getenv('HOME'), '~')
         out_uri = ''
         if out_path:
             out_uri = path2url(out_path)
@@ -2017,6 +2028,16 @@ track=%(track)s''' % locals()
         else:
             self.get_defaults()
         return self.album
+
+    def custom_lexicon_path(self, erase=True):  # -> str
+        '''
+        Returns the path to a lexicon settings directory.
+        '''
+        returned_value = self.meta_from_file(get_my_lock('lock.lexicon'),
+                                             erase)
+        if bool(returned_value):
+            return returned_value
+        return ''
 
 
 class WinMediaPlay(object):
@@ -2797,25 +2818,62 @@ def path2url(_file_path):  # -> str
         return ''.join(['file://', _file_path.replace(' ', '%20')])
 
 
+def office_user_dir():
+    '''Returns the local user directory where office stores user assets like
+    uno_packages, settings and images. See also `app_icon_image()` for a
+    resource search restricted to this extension directory, which your program
+    should treat as read-only.'''
+    path_root = os.path.split(os.path.realpath(__file__))[0]
+    os_sep = os.sep
+    folders = path_root.split(os_sep)
+    drill = os_sep
+    if os.name == 'nt':
+        drill = ''
+    for _subdir in folders:
+        if _subdir == 'uno_packages':
+            return drill
+        drill = os.path.join(drill, _subdir)
+    return drill
+
+
+def memory_warning():
+    '''Memory warning for local pronunciation. A looping
+    function can increase exponentially with malicious data'''
+    return '''
+WARNING: A user entered phoneme string values that cause an
+unexpected increase in the string size. Check the phoneme values
+for an unusually large length. Python is breaking now to protect
+your system. Some words might not be pronounced correctly.'''
+
+
 def local_pronunciation(iso_lang='en-CA',
                         text='',
                         my_dir='macos_say',
-                        my_env='MACOS_SAY_USER_DIRECTORY'):  # -> str
+                        my_env='MACOS_SAY_USER_DIRECTORY',
+                        is_dev=False):  # -> list [str]
     '''Given a language and region, compatible audible lexical code for
-    localized words and phrases.      
+    localized words and phrases. If `is_dev` is `True`, then the last
+    item of the list is a json string representing grapheme to phoneme
+    transliterations with a correct and concise format, otherwise returns
+    `''`. It's normally `False` to reduce extra processing.
     '''
     _json_file = ''
-    _user_dir = os.path.join(os.environ["HOME"],
-                             '/read_text/%(my_dir)s/' % locals())
+    _json_text = ''
+    _json_tools = JsonTools()
+    _imported_meta = ImportedMetaData()
+    _user_dir = os.path.join(office_user_dir(), 'config', 'lexicons', my_dir)
     if my_env in os.environ:
-        _user_dir = os.environ[my_env]
+        _user_dir = os.getenv(my_env)
     for _lang in [iso_lang, iso_lang.split('-')[0].split('_')[0]]:
         _test = _lang
         _json_search1 = app_icon_image('%(_test)s_lexicon.json' % locals(),
                                        'po/%(my_dir)s' % locals())
         _json_search2 = os.path.join(_user_dir,
                                      '%(_test)s_lexicon.json' % locals())
-        for _json_search in [_json_search2, _json_search1]:
+        _json_search3 = os.path.join(_imported_meta.custom_lexicon_path(),
+                                     my_dir,
+                                     '%(_test)s_lexicon.json' % locals())
+        for _json_search in [_json_search3, _json_search2, _json_search1]:
             if len(_json_search) != 0:
                 if os.path.isfile(_json_search):
                     _json_file = _json_search
@@ -2823,7 +2881,7 @@ def local_pronunciation(iso_lang='en-CA',
         if len(_json_file) != 0:
             break
     if len(_json_file) == 0:
-        return text
+        return [text, _json_text]
     try:
         with codecs.open(_json_file,
                          mode='r',
@@ -2831,15 +2889,53 @@ def local_pronunciation(iso_lang='en-CA',
                          errors='replace') as file_obj:
             data = json.load(file_obj)
             l_text = text.lower()
+            if is_dev:
+                _count_j = 0
+                _date = time.strftime('%Y-%m-%d_%H:%M:%S')
+                _ohs = 5 * '0'
+                _json_text = '{\n'
+                for _item in data:
+                    _grapheme = _json_tools.sanitize_json(data[_item]['g'])
+                    _phoneme = _json_tools.sanitize_json(data[_item]['p'])
+                    if '$[' in _grapheme:
+                        continue
+                    _count_j += 1
+                    _json_text = ''.join([
+                        _json_text, '    "', _test, '_',
+                        (_ohs + str(_count_j))[-5:], '":{"g":"', _grapheme,
+                        '","p":"', _phoneme, '"},\n'
+                    ])
+                _json_text = ''.join([
+                    _json_text,
+                    '''    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},
+    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}
+}''' % locals()
+                ])
+                print(_json_text)
+            _len_text3 = len(text) * 3
+            try:
+                if _len_text3 > sys.maxsize / 2:
+                    _len_text3 = sys.maxsize / 2
+            except [AttributeError, NameError]:
+                _len_text3 = 279496122328932608
             for _item in data:
+                if len(data[_item]['g']) == 0:
+                    continue
+                elif len(text) == 0:
+                    break
+                elif len(text) > _len_text3:
+                    print(memory_warning())
+                    break
                 grapheme = data[_item]['g'].lower()
-                if l_text.count(grapheme) != 0:
+                if l_text.count(grapheme) != 0 or ']' in grapheme:
                     text = text.replace(data[_item]['g'],
                                         data[_item]['p']).replace(
                                             grapheme, data[_item]['p'])
-    except:
-        pass
-    return text
+    except json.decoder.JSONDecodeError:
+        print('''WARNING: A text string was not edited because a `json` lexicon
+file is missing or is incorrectly formatted for this application.
+        %(_json_file)s.''' % locals())
+    return [text, _json_text]
 
 
 class PosixAudioPlayers(object):
@@ -3075,7 +3171,7 @@ if __name__ == '__main__':
 #
 # Copyright And License
 #
-# (c) 2022 [James Holgate Vancouver, CANADA](readtextextension(a)outlook.com)
+# (c) 2023 [James Holgate Vancouver, CANADA](readtextextension(a)outlook.com)
 #
 # THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE
 # TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE

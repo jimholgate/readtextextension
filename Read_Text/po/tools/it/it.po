@@ -382,3 +382,28 @@ msgctxt ""
 msgstr ""
 "Aiuto per snap? Read Text utilizza uno strumento vocale come "
 "[larynx-server] (https://github.com/rhasspy/larynx)"
+
+#: sw/inc/strings.hrc:30 (it)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "Ripristina"
+
+#: sw/inc/strings.hrc:33 (it)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Applica"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (it)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Salva con nome"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (it)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "Salva con nome..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (it)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Apri"

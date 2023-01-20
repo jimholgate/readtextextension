@@ -223,7 +223,7 @@ Function _( _
 	Dim sMyPoFile
 	sMyPoFile = &quot;&quot;
 	sMyPoFile = convertfromurl( _
-	fsMyURL &amp; _
+	fsMyURL() &amp; _
 	&quot;/po/&quot; &amp; _
 	sDirPo &amp; _
 	&quot;/&quot; &amp; _
@@ -850,6 +850,11 @@ Function fsToolBoxLogo() As String
 End Function
 
 
+Function fsRewindLogo() As String
+	fsRewindLogo = fsMyURL() &amp; &quot;/images/material_rewind_26.png&quot;
+End Function
+
+
 Function fsLicenseDoc() As String
 	Dim s1 As String
 	
@@ -949,6 +954,11 @@ End Function
 
 Function fsExtensionSettingsIni() As String
 	fsExtensionSettingsIni = &quot;ooo_text-to-speech.ini&quot;
+End Function
+
+
+Function fsExtensionSetJson(po_dir, _lang As String) As String
+	fsExtensionSetJson = po_dir &amp; &quot;/&quot; &amp; _lang &amp; &quot;_lexicon.json&quot;
 End Function
 
 

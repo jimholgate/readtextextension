@@ -357,4 +357,27 @@ msgctxt ""
 msgid "Year"
 msgstr "년"
 
+#: sw/inc/strings.hrc:30 (ko)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr ""
 
+#: sw/inc/strings.hrc:33 (ko)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "적용"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (ko)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "다른 이름으로 저장"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (ko)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "다른 이름으로 저장(_A)..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (ko)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "열기"

@@ -369,3 +369,28 @@ msgctxt ""
 msgstr ""
 "Schnellstart Snap: Read Text verwendet ein Sprachwerkzeug wie "
 "[larynx-server](https://github.com/rhasspy/larynx)."
+
+#: sw/inc/strings.hrc:30 (de)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+#: sw/inc/strings.hrc:33 (de)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Anwenden"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (de)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Speichern als"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (de)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "Speichern _als…"
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (de)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Öffnen"

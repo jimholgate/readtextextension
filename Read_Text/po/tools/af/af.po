@@ -357,3 +357,27 @@ msgctxt ""
 msgid "Year"
 msgstr "Year"
 
+#: sw/inc/strings.hrc:30 (af)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "Terugstel"
+
+#: sw/inc/strings.hrc:33 (af)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Pas toe"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (af)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Stoor as"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (af)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "Stoor _as..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (af)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Open"

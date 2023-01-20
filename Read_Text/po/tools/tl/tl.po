@@ -317,3 +317,7 @@ msgctxt ""
 msgid "Arabic"
 msgstr "Arabe"
 
+#: template.src `tl`
+msgctxt ""
+msgid "Reset"
+msgstr "I-reset"

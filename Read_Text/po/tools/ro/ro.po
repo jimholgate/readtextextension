@@ -318,3 +318,32 @@ msgctxt ""
 msgid "Arabic"
 msgstr "Arab"
 
+#: template.src `ro`
+msgctxt ""
+msgid "Reset"
+msgstr "Resetați"
+
+#: sw/inc/strings.hrc:30 (ro)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr ""
+
+#: sw/inc/strings.hrc:33 (ro)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr ""
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (ro)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Salvează ca"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (ro)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "S_alvează ca..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (ro)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Deschide"

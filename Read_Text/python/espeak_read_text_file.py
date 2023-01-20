@@ -75,7 +75,7 @@ See the manual page for `espeak` for more detailed information
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2022 James Holgate
+Copyright (c) 2011 - 2023 James Holgate
 
 '''
 from __future__ import (absolute_import, division, print_function,
@@ -129,7 +129,7 @@ def espeak_path():  # -> str
 
 def espk_languages():  # -> list[str]
     '''If using `espeak-ng`, return a language_list of voices that `espeak-ng`
-    supported in 2022.07, otherwise return a list of supported`espeak` voices.
+    supported in 2023.07, otherwise return a list of supported`espeak` voices.
     '''
     _app_name = espeak_path()
     if _app_name.count('-ng') != 0:

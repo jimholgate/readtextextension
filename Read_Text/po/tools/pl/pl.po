@@ -323,3 +323,27 @@ msgctxt ""
 msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
 msgstr "Read Text – Synteza mowy\n=========\n\n>_Musisz otworzyć dokument i wybierz tekst. Wybierz “Narzędzia – Dodatki – Impress-Widok” aby uruchomić pokaz._\n\nImpress – Widok\n--------------\n\n- Musisz otworzyć dokument i wybierz tekst.\n- Wybierz “Narzędzia – Dodatki – Impress-Widok” aby uruchomić pokaz.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.pl)`"
 
+#: sw/inc/strings.hrc:30 (pl)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "Resetuj"
+
+#: sw/inc/strings.hrc:33 (pl)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Zastosuj"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (pl)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Zapisz jako"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (pl)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "Z_apisz jako..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (pl)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Otwórz"

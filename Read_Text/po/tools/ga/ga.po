@@ -318,3 +318,27 @@ msgctxt ""
 msgid "Arabic"
 msgstr "Araibis"
 
+#: template.src `ga`
+msgctxt ""
+msgid "Reset"
+msgstr "Athshocraigh"
+
+#: template.sr `ga`
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Nuashonrú"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (ga)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Sábháil Mar"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (ga)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "Sábháil _Mar..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (ga)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Oscail"

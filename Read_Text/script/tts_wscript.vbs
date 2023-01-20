@@ -146,7 +146,7 @@
 '' 
 '' [Read Text Extension](https://sites.google.com/site/readtextextension/)
 '' 
-'' Copyright (c) 2011 - 2022 James Holgate
+'' Copyright (c) 2011 - 2023 James Holgate
 '''
 Const ForReading = 1
 Const ForWriting = 3
@@ -1623,7 +1623,7 @@ Function compressWaveAudioWithFfmpeg(sWaveName, sOutName, sImage, sDimensions)
 		End If
 		b1 = doExecute(doJob1, True)
 	Case ".m4v"
-		' 2022-12 : Can view with VideoLAN VLC; WebM recommended
+		' 2023-12 : Can view with VideoLAN VLC; WebM recommended
 		' because the format is strictly defined.
 		doJob1 = Join(Array(_
 				"""", _

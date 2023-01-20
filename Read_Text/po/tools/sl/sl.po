@@ -318,3 +318,27 @@ msgctxt ""
 msgid "Arabic"
 msgstr "Arabic"
 
+#: sw/inc/strings.hrc:30 (sl)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "Ponastavi"
+
+#: sw/inc/strings.hrc:33 (sl)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Uporabi"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (sl)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Shrani kot"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (sl)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "Shrani _kot ..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (sl)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Odpri"

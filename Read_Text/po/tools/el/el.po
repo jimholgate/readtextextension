@@ -137,3 +137,27 @@ msgctxt ""
 msgid "Speech"
 msgstr "Σύνθεση ομιλίας"
 
+#: sw/inc/strings.hrc:30 (el)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "Επαναφορά"
+
+#: sw/inc/strings.hrc:33 (el)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Εφαρμογή"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (el)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Αποθήκευση ως"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (el)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "_Αποθήκευση ως..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (el)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Άνοιγμα"

@@ -149,9 +149,8 @@ Option Explicit
 &apos;&apos; calls the procedure.
 &apos;&apos;
 
-Sub ReadTextAloud
+Sub ReadTextAloud()
 &apos; Use *Read Selection* on the tool bar
-
 	Dim sFile As String
 	Dim msgs()As Variant
 	Dim errorCode As Integer : errorCode = 0

@@ -317,3 +317,27 @@ msgctxt ""
 msgid "Arabic"
 msgstr "アラビア語"
 
+#: sw/inc/strings.hrc:30 (ja)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "元に戻す"
+
+#: sw/inc/strings.hrc:33 (ja)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "適用"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (ja)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "名前を付けて保存"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (ja)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "名前を付けて保存(_A)..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (ja)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "開く"

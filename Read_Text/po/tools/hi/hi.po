@@ -142,3 +142,27 @@ msgctxt ""
 msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
 msgstr "“पाठ पढ़ा – भाषण संश्लेषण”\n=========\n\n> लीब्रऑफ़िस एक मुफ्त तथा मुक्त स्रोत साफ्टवेयर है जो अनेक परिचालन तंत्रों के लिये उपलब्ध है।  [लीब्रऑफ़िस](http://hi.wikipedia.org/s/7y79)\n\nइंप्रेस – देखें\n--------------\n\n- जिस पाठ की नक़ल बनाना चाहते हैं, उसे चुनें\n- “औज़ार – सहयंत्र – इंप्रेस–देखें”, चुनें\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
 
+#: sw/inc/strings.hrc:30 (hi)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "_reset"
+
+#: sw/inc/strings.hrc:33 (hi)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "_apply"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (hi)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "ऐसे सहेजें"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (hi)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "ऐसे सहेजें (_A)..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (hi)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "खोलें"

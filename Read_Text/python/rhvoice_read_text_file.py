@@ -49,12 +49,21 @@ import os
 import sys
 import readtexttools
 
+try:
+    import urllib
+except ImportError:
+    pass
+try:
+    import requests
+    REQUESTS_OK = True
+except:
+    REQUESTS_OK = False
+
 
 def usage():  # -> None
     '''
     Command line help
     '''
-
     print('''
 RhVoice Speech Synthesis
 ========================
@@ -120,7 +129,7 @@ class RhVoiceClass(object):
     supported platform. Read the documentation for help installing the
     libraries or to help with troubleshooting if the tools do not work
     when using your Linux package manager.
-        
+
     See:
 
     * <https://github.com/RHVoice/RHVoice>
@@ -366,17 +375,22 @@ class RhVoiceClass(object):
         self.ok = False
         return False
 
-    def voice_available(self, iso_lang='en-US'):  # -> bool
+    def voice_available(self, iso_lang='en-US', _check_list=None):  # -> bool
         '''Check if you have installed a language resource for
         a language or a voice.'''
         _voice = self.language_to_voice(iso_lang)
-        if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' % locals()):
-            self.ok = True
-            return True
+        if bool(_check_list):
+            if _voice in _check_list:
+                self.ok = True
+                return True
+        else:
+            if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' % locals()):
+                self.ok = True
+                return True
         self.ok = False
         return False
 
-    def first_good_voice(self, _voices=None):  # -> string
+    def first_good_voice(self, _voices=None, _check_list=None):  # -> string
         '''Check the default Linux installation for the first
         voice available from the `_voices` list. The preferred
         voice in English depends on the region. If English is not
@@ -385,14 +399,18 @@ class RhVoiceClass(object):
             try:
                 _voice = test_voice.strip()
                 if bool(_voice):
-                    if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' %
-                                     locals()):
-                        return _voice
+                    if bool(_check_list):
+                        if _voice in _check_list:
+                            return _voice
+                    else:
+                        if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' %
+                                         locals()):
+                            return _voice
             except (AttributeError, SyntaxError):
                 pass
         return ''
 
-    def language_to_voice(self, iso_lang='en-US'):  # -> str
+    def language_to_voice(self, iso_lang='en-US', _check_list=None):  # -> str
         '''Check if the library supports the language or voice.
         If so, return a voice in the language, otherwise return
         `''`.'''
@@ -430,15 +448,15 @@ class RhVoiceClass(object):
                         if not '-' in _test:
                             return _test
                 elif _test.lower() == _region.lower():
-                    return self.first_good_voice(_voices)
+                    return self.first_good_voice(_voices, _check_list)
                 elif _test.lower() == _lang1:
-                    return self.first_good_voice(_voices)
+                    return self.first_good_voice(_voices, _check_list)
                 elif _test.lower() == _tld.lower():
-                    return self.first_good_voice(_voices)
+                    return self.first_good_voice(_voices, _check_list)
                 elif _test in _voices:
                     return _test
                 elif _test.lower() in _voices:
-                    return self.first_good_voice(_voices)
+                    return self.first_good_voice(_voices, _check_list)
         except NameError:
             pass
         return ''
@@ -535,4 +553,6 @@ def main():  # -> NoReturn
 
 
 if __name__ == '__main__':
-    main()
+    _test = RhvoiceLocalHost()
+    print(_test.checklist)
+    # main()

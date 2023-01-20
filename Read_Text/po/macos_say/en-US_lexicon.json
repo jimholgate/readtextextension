@@ -1,6 +1,6 @@
 {
-    "en-US_00001":{"g":" does live ","p":" does liv "},
-    "en-US_00002":{"g":" both live ","p":" both liv "},
-    "en-US_00003":{"g":" does not live ","p":" does not liv "},
-    "en-US_99999":{"g":"Read Text Extension","p":"reed text extension"}
+"en-US_00001":{"g":"Read Text Extension","p":"[ried] text extension"},
+"en-US_00002":{"g":"Read text extension","p":"[ried] text extension"},
+"en-US_99998":{"g":"$[LOCALE]","p":"en-US"},
+"en-US_99999":{"g":"$[REVISION]","p":"2023-01-02_13:26:59"}
 }

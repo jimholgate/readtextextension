@@ -52,7 +52,7 @@ See the manual page for `pico2wave` for more detailed information
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2022 James Holgate
+Copyright (c) 2011 - 2023 James Holgate
 
 '''
 from __future__ import (absolute_import, division, print_function,
@@ -226,7 +226,8 @@ def main():  # -> NoReturn
             _language = 'en-US'
         _text = readtexttools.local_pronunciation(_language, _text,
                                                   'svox_pico',
-                                                  'SVOX_PICO_USER_DIRECTORY')
+                                                  'SVOX_PICO_USER_DIRECTORY',
+                                                  False)[0]
         if _pitch == '100%' and _rate == '100%':
             _text = _text.replace('"', '\\"')
             _text = readtexttools.strip_mojibake(_language, _text)

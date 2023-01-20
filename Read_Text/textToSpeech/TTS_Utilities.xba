@@ -630,7 +630,7 @@
 &apos;&apos; 
 &apos;&apos; ### Copyright And License
 &apos;&apos; 
-&apos;&apos; \(c\) 2008-2022 James Holgate Vancouver, CANADA (readtextextension (a)
+&apos;&apos; \(c\) 2008-2023 James Holgate Vancouver, CANADA (readtextextension (a)
 &apos;&apos; outlook.com)
 &apos;&apos; 
 &apos;&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER
@@ -646,6 +646,12 @@
 &apos;&apos; 59 TEMPLE PLACE,SUITE 330,BOSTON,MA 02111-1307 USA
 &apos;&apos;
 Option Explicit
+
+Type KeyValueType
+	&apos; key value pairs as strings
+	key As String
+	value As String
+End Type
 
 
 Function isSnap() As Boolean
@@ -674,30 +680,6 @@ Function fbLocalHostOk(_url As String) As Boolean
 	Exit Function
 	fbLocalHostOkErr:
 	fbLocalHostOk = False
-End Function
-
-
-Function fsLocalHostSpeech() As String
-	&apos; Return the localhost address for `larynx-server` or `marytts-server`
-	&apos; http://0.0.0.0:5002/api/tts?voice=en&amp;text=Hello+world
-	&apos; http://0.0.0.0:59125?AUDIO=WAVE_FILE&amp;OUTPUT_TYPE=AUDIO&amp;INPUT_TYPE=TEXT&amp;LOCALE=de&amp;INPUT_TEXT=Hallo+welt
-	fsLocalHostSpeech = &quot;&quot;
-	Dim _larynx$ : _larynx = &quot;http://0.0.0.0:5002&quot;
-	Dim _marytts$ : _marytts = &quot;http://0.0.0.0:59125&quot;
-	Select Case fsGetOS()
-		Case &quot;UNIX&quot;
-		Select Case s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI
-			Case _marytts, _larynx
-			fsLocalHostSpeech = s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI
-			Case Else
-			If fbLocalHostOk(&quot;http://0.0.0.0:5002/api/voices&quot;) Then
-				fsLocalHostSpeech = _larynx
-			ElseIf fbLocalHostOk(&quot;http://0.0.0.0:59125/voices&quot;) Then
-				fsLocalHostSpeech = _marytts
-			End If
-			s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI = fsLocalHostSpeech
-		End Select
-	End Select
 End Function
 
 
@@ -1517,7 +1499,7 @@ End Function
 
 
 Function WinSpeechProgramPath() As String
-	&apos; 2022-07-22
+	&apos; 2023-07-22
 	&apos; Always default to wscript.
 	&apos; The dialog shows all compatible SAPI5 voices
 	&apos; SAPI5 can&apos;t use Microsoft Speech Server voices
@@ -2801,22 +2783,14 @@ End Function
 
 Sub resetSpeech()
 &apos; Reset Speech
-	Dim aFile, CR As String
-	Dim a1
+	Dim a1 As Variant
 	Dim n As Integer
-	
-	CR = Chr(10)
-	aFile = fsMyTempLock(&quot;lock&quot;) &amp; CR &amp; _
-	fsMyTempLock(&quot;lock.id&quot;) &amp; CR &amp; _
-	fsMyTempLock(&quot;lock.title&quot;) &amp; CR &amp; _
-	fsMyTempLock(&quot;lock.album&quot;) &amp; CR &amp; _
-	fsMyTempLock(&quot;lock.genre&quot;) &amp; CR &amp; _
-	fsMyTempLock(&quot;lock.track&quot;) &amp; CR &amp; _
-	fsFestivalScriptName() &amp; CR &amp; _
-	fsTemporaryTextDoc() &amp; CR &amp; _
-	fsTemporaryTextDoc() &amp; &quot;.sable&quot; &amp; CR &amp; _
-	fsTemporaryTtsAppleScript()
-	a1 = Split(aFile, CR)
+	fbRemoveTextLocks()
+	a1 = Array(_
+	fsFestivalScriptName(),_
+	fsTemporaryTextDoc(),_
+	fsTemporaryTextDoc() &amp; &quot;.sable&quot;,_
+	fsTemporaryTtsAppleScript())
 	For n = LBound(a1) To UBound(a1)
 		If FileExists(a1(n)) Then
 			kill a1(n)
@@ -2969,6 +2943,75 @@ Function fsGetActuateExtension( _
 End Function
 
 
+Function faSettingsArray(_
+		title As String,_
+		track As Integer) As Variant
+&apos; Key Value pairs for media production and audio formatting
+	faSettingsArray = Array(_				
+	Array(&quot;id&quot;, fsThisDocAuthor()),_
+	Array(&quot;album&quot;, fsThisDocTitle()),_
+	Array(&quot;title&quot;, title),_
+	Array(&quot;genre&quot;, fsThisDocGenre()),_
+	Array(&quot;track&quot;, Trim(Str(track))),_
+	Array(&quot;lexicon&quot;, CustomLexiconDir())_
+	)
+End Function
+
+
+Function fbRemoveTextLocks() As Boolean
+	fbRemoveTextLocks = False
+	On Local Error GoTo fbRemoveTextLocksErr
+	Dim x As Integer
+	Dim a1 As Variant
+	Dim _str As String
+	a1 = faSettingsArray(&quot;_title&quot;, 1)
+	For x = Lbound(a1) To Ubound(a1)
+		_str = fsMyTempLock(&quot;lock.&quot; &amp; a1(x)(0))
+		If FileExists(_str) Then
+			kill _str
+		End If
+	Next
+	fbRemoveTextLocks = True
+Exit Function
+	fbRemoveTextLocksErr:
+	fbRemoveTextLocks = False
+End Function
+
+
+Function fbWriteTextLocks(_
+		title As String,_
+		track As Integer) As Boolean
+	fbWriteTextLocks = False
+	On Local Error GoTo fbWriteTextLocksErr
+	Dim x As Integer
+	Dim a1 As Variant
+	a1 = faSettingsArray(title, track)
+	For x = Lbound(a1) To Ubound(a1)
+		CreateFile(fsMyTempLock(&quot;lock.&quot; &amp; a1(x)(0)), a1(x)(1), &quot;UTF-8&quot;)
+	Next
+Exit Function
+	fbWriteTextLocksErr:
+	fbWriteTextLocks = False
+End Function
+
+
+Function fsJsonSettings(_
+		title As String,_
+		track As Integer) As String
+	fsJsonSettings = &quot;&quot;
+	Dim x As Integer
+	Dim CR As String : CR = Chr(13)
+	Dim _str as String : _str = &quot;{&quot;&quot;read_text&quot;&quot;:{&quot; &amp; CR
+	Dim a1 As Variant
+	a1 = faSettingsArray(title, track)
+	For x = Lbound(a1) To Ubound(a1)
+		_str = _str &amp; &quot;    &quot;&quot;&quot; &amp; a1(x)(0) &amp; &quot;&quot;&quot;:&quot;&quot;&quot; &amp; fsJsonSafe(a1(x)(_
+		1)) &amp; &quot;&quot;&quot;,&quot; &amp; CR
+	Next
+	fsJsonSettings = fsReplaceText(_str &amp; &quot;}}&quot;, &quot;,&quot; &amp; CR &amp; &quot;}}&quot;, CR &amp; &quot;}}&quot;)
+End Function
+
+
 Sub ttsActuate( _
 	config() As Variant, _
 	msgs() As Variant, _
@@ -3063,11 +3106,13 @@ Sub ttsActuate( _
 						Exit Sub
 					End If
 				End Select
-				CreateFile(fsMyTempLock(&quot;lock.id&quot;), fsThisDocAuthor(), &quot;UTF-8&quot;)
-				CreateFile(fsMyTempLock(&quot;lock.album&quot;), fsThisDocTitle(), &quot;UTF-8&quot;)
-				CreateFile(fsMyTempLock(&quot;lock.title&quot;), s1, &quot;UTF-8&quot;)
-				CreateFile(fsMyTempLock(&quot;lock.genre&quot;), fsThisDocGenre(), &quot;UTF-8&quot;)
-				CreateFile(fsMyTempLock(&quot;lock.track&quot;), Trim(Str(n)), &quot;UTF-8&quot;)
+				fbWriteTextLocks(s1, n)  &apos; title As String, track as Integer
+				&apos;CreateFile(fsMyTempLock(&quot;lock.id&quot;), fsThisDocAuthor(), &quot;UTF-8&quot;)
+				&apos;CreateFile(fsMyTempLock(&quot;lock.album&quot;), fsThisDocTitle(), &quot;UTF-8&quot;)
+				&apos;CreateFile(fsMyTempLock(&quot;lock.title&quot;), s1, &quot;UTF-8&quot;)
+				&apos;CreateFile(fsMyTempLock(&quot;lock.genre&quot;), fsThisDocGenre(), &quot;UTF-8&quot;)
+				&apos;CreateFile(fsMyTempLock(&quot;lock.track&quot;), Trim(Str(n)), &quot;UTF-8&quot;)
+				&apos;CreateFile(fsMyTempLock(&quot;lock.lexicon&quot;), CustomLexiconDir(), &quot;UTF-8&quot;)
 			End If
 		End If
 	Else
@@ -3075,6 +3120,7 @@ Sub ttsActuate( _
 		&apos; if we aren&apos;t creating a media file.
 		&apos; 
 		i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 0
+		CreateFile(fsMyTempLock(&quot;lock.lexicon&quot;), CustomLexiconDir(), &quot;UTF-8&quot;)
 	End If
 	oBar.Value = 70
 	If config(fiFestivalOption()) Then
@@ -4867,24 +4913,69 @@ Sub myBeep()
 End Sub
 
 
-Sub windowsSAPIControl()
+Function fiMyMouseEventToInt(_
+		Event) As Double
+	&apos; Returns an integer depending on the
+	&apos; mouse event.
+	&apos; 0 - cancel
+	&apos; 1 - main mouse click (Left)
+	&apos; 2 - alternate mouse click (Right) 
+	&apos; 3 - scroll or centre click
+	fiMyMouseEventToInt = 0
+	On Local Error GoTo fiMyMouseEventToIntErr
+	If Event.Buttons and _
+			com.sun.star.awt.MouseButton.RIGHT Then
+		fiMyMouseEventToInt = 2
+	ElseIf Event.Buttons and _
+			com.sun.star.awt.MouseButton.MIDDLE Then
+		fiMyMouseEventToInt = 3
+	Else
+		fiMyMouseEventToInt = 1
+	End If	
+	Exit Function
+	fiMyMouseEventToIntErr:
+	fiMyMouseEventToInt = 0
+End Function
+
+
+Sub windowsSAPIControl(Event As Object)
+	&apos; MouseButtonReleased Dialog3, ImageControl5
 	Dim sA as String
 	Dim oSvc As Object
+	Dim MouseMain As Integer : MouseMain = 1
+	Dim MouseAlt As Integer : MouseAlt = 2
+	Dim MouseOther As Integer : MouseOther = 3
+	Dim MouseEvent As Integer : MouseEvent = fiMyMouseEventToInt(Event)
+
 	oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 	sA = fswindowsSAPIControl()
 	Select Case fsGetOS()
 		Case &quot;MacOS&quot;
-		Shell(&quot;open&quot;, 0, &quot;-b com.apple.systempreferences&quot;, False)
+			Select Case MouseEvent
+				Case 0
+				&apos;pass
+				Case MouseAlt
+				EditJsonPhonemeTable()
+				Case Else
+				Shell(&quot;open&quot;, 0, &quot;-b com.apple.systempreferences&quot;, False)
+			End Select
 		Case &quot;WINDOWS&quot;
 		If Len(sA) &lt;&gt; 0 Then
 			oSvc.execute(sA, &quot;&quot;, 0)
 		End If
 		Case Else
-		If Len(fsLocalHostSpeech()) &lt;&gt; 0 Then
-			webHelp(fsLocalHostSpeech())
-		ElseIf Len(sA) &lt;&gt; 0 Then
-			Shell(sA, 0, &quot;&quot;, False)
-		End If		
+		Select Case MouseEvent
+			Case 0
+			&apos;pass
+			Case MouseAlt
+			EditJsonPhonemeTable()
+			Case Else
+			If Len(fsLocalHostSpeech()) &lt;&gt; 0 Then
+				webHelp(fsLocalHostSpeech())
+			ElseIf Len(sA) &lt;&gt; 0 Then
+				Shell(sA, 0, &quot;&quot;, False)
+			End If
+		End Select
 	End Select
 End Sub
 

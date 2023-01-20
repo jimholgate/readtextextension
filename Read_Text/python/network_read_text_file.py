@@ -71,9 +71,9 @@ MaryTTS
 is an open-source, multilingual Text-to-Speech Synthesis platform written in Java.
 It can turn text into speech in many different languages. It runs on a `localhost`
 web resource on your computer using a Docker container. Using MaryTTS does not
-require an on-line connection. 
+require an on-line connection.
 
-You can make it sound like you by recording your voice and using MaryTTS 
+You can make it sound like you by recording your voice and using MaryTTS
 [Import Tools](https://github.com/marytts/marytts-wiki/blob/master/VoiceImportToolsTutorial.md)
 to create a personalized voice.
 
@@ -221,7 +221,7 @@ def network_problem(voice='default'):  # -> str
     '''Return suggestions to make an on-line voice work.'''
     return '''Is the network connected?
 =========================
-    
+
 + The `%(voice)s` on-line voice is currently unavailable.
 + It might help to restart your device, refresh the network
   or check your on-line account status.
@@ -1051,15 +1051,16 @@ Try restarting `larynx-server`.''')
 
     def local_pronunciation(self, iso_lang='en-CA', text=''):  # -> str
         '''Given a language and region, return or larynx compatible code for
-        localized words and phrases. Larynx code is similar to IPA, but you 
-        need to check it and possibly edit it for correct pronunciation.   
+        localized words and phrases. Larynx code is similar to IPA, but you
+        need to check it and possibly edit it for correct pronunciation.
 
         Uses json rows in the form:
 
-        `"en-US_00023":{"g":" Z ","p":" [`zi:ə] "},`      
+        `"en-US_00023":{"g":" Z ","p":" [`zi:ə] "},`
         '''
         return readtexttools.local_pronunciation(iso_lang, text, 'larynx',
-                                                 'LARYNX_USER_DIRECTORY')
+                                                 'LARYNX_USER_DIRECTORY',
+                                                 False)[0]
 
     def language_supported(self,
                            iso_lang='en-US',
@@ -1401,7 +1402,7 @@ Default MaryTts server: <http://0.0.0.0:59125>
 
     def marytts_xml(self, _text='', _speech_rate=160):  # -> str
         '''Change the speed that MaryTTS reads plain text aloud using
-        `RAWMARYXML`. `maryxml` correctly uses standard XML conventions like 
+        `RAWMARYXML`. `maryxml` correctly uses standard XML conventions like
         `&amp;`, `&gt;` and `&lt;`, so the charactrs that they represent use
         corrected XML.'''
         _xmltransform = readtexttools.XmlTransform()
@@ -1448,14 +1449,6 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             response = urllib.request.urlopen(''.join([self.url, '/locales']))
             _locales = str(response.read(), 'utf-8')
         except urllib.error.URLError:
-            _eurl = self.url
-            if self.is_x86_64:
-                if not os.path.isfile('/usr/bin/say'):
-                    print('''
-[MaryTTS](https://github.com/synesthesiam/docker-marytts)
-can synthesize speech privately using %(_eurl)s.
-
-    docker run -it -p 59125:59125 synesthesiam/marytts:5.2''' % locals())
             self.ok = False
             return False
         except AttributeError:
@@ -1591,6 +1584,13 @@ can synthesize speech privately using %(_eurl)s.
                 if _symbol in _text:
                     _text = _text.translate(self.add_pause).replace('.;', '.')
                     break
+        _view_json = self.debug and 1
+        response = readtexttools.local_pronunciation(
+            _iso_lang, _text, 'mary_tts', 'MARY_TTS_USER_DIRECTORY',
+            _view_json)
+        _text = response[0]
+        if _view_json:
+            print(response[1])
         if ssml:
             _input_type = self.input_types[3]
         elif _speech_rate == 160:
@@ -1674,6 +1674,327 @@ Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
             return False
         if os.path.getsize(_media_work) == 0:
             time.sleep(2)
+        if os.path.isfile(_media_work) and _post_process in [
+                'process_audio_media', 'process_wav_media'
+        ]:
+            if os.path.getsize(_media_work) == 0:
+                print('Unable to write media work file.')
+                return False
+            # NOTE: Calling process must unlock_my_lock()
+            readtexttools.unlock_my_lock()
+            readtexttools.process_wav_media(_info, _media_work, _icon,
+                                            _media_out, _audible, _visible,
+                                            _writer, _size)
+            return True
+        return False
+
+
+class RhvoiceLocalHost(object):
+    '''[Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest) is
+    a docker image that allows Linux users to use speech synthesis (text
+    to speech) while running Read Text Extension in a protected container like
+    a snap or a flatpak. It provides a `localhost` http server to convert text
+    that you select to speech. Docker images come with all the necessary files
+    and settings packaged in a tamper-resistant container. 
+
+    This Rhvoice docker container can read English, Esperanto, Georgian, Kyrgyz,
+    Macedonian, Portuguese, Russian, Tatar and Ukrainian.
+
+    The `rhvoice` libraries are enabled by electing to install it on a
+    supported platform. Read the documentation for help installing the
+    libraries or to help with troubleshooting if the tools do not work
+    when using your Linux package manager.
+
+    The following notice should be displayed in a dialog when users click
+    `About...` or the equivalent in their language when this class is enabled.
+
+    The main library is distributed under LGPL v2.1 or later. But it relies on
+    MAGE for better responsiveness. MAGE is distributed under GPL v3 or later,
+    so the combination is under GPL v3 or later. If you want to use the library
+    in your program under GPL v2 or LGPL, compile the library without MAGE.
+
+    The following restrictions apply to some of the voices:    
+
+    All voices from RHVoice Lab's site are distributed under the Creative 
+    Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public
+    License.
+
+    The licenses for other optional third party voices are available at GitHub:
+
+    <https://github.com/RHVoice/RHVoice/blob/master/doc/en/License.md>
+
+    The contents of this resource are not affiliated with, sponsored by, or
+    endorsed by RHVoice Lab nor does the documention represent the views or
+    opinions of RHVoice Lab or RHVoice Lab personnel.
+
+    The creators of the rhvoice libraries are the originators of the libraries
+    enabling the `RhVoiceClass` class.
+
+    See:
+
+    * <https://github.com/RHVoice/RHVoice>
+    * <https://github.com/RHVoice/RHVoice/issues>
+    * <https://rhvoice.org/>'''
+
+    def __init__(self):  # -> None
+        '''The docker image doesn't expose details of the directory structure
+        to the localhost API, so functions in the parent that rely on a specific
+        file path do not work.'''
+        _common = LocalCommons()
+        self.add_pause = _common.add_pause
+        self.pause_list = _common.pause_list
+        self.base_curl = _common.base_curl
+        self.debug = _common.debug
+        self.url = 'http://0.0.0.0:8080'  # localhost port 8080
+        self.help_icon = _common.help_icon
+        self.help_heading = 'Rhvoice Rest'
+        self.help_url = 'https://github.com/Aculeasis/rhvoice-rest/'
+        self.audio_format = ['wav', 'mp3', 'opus', 'flac'][0]
+        self.input_types = ['TEXT']
+        self.accept_voice = [
+            '', 'all', 'auto', 'child_female', 'female1', 'female2', 'female3',
+            'female4', 'female5', 'female6', 'female7', 'female8', 'female9',
+            'child_female1', 'child_male', 'male1', 'male2', 'male3', 'male4',
+            'male5', 'male6', 'male7', 'male8', 'male9', 'child_male1',
+            'rhvoice', 'localhost', 'docker', 'local_server'
+        ]
+        self.ok = False
+        self.voice = ''
+        self.female = 2
+        self.male = 1
+        self.checked_lang = ''
+        # This is a list for testing if the API fails. Normally, using
+        # the json data at <http://0.0.0.0:8080/info> enables updates
+        # and forks of the original docker image to use current data.
+        # As of 2023.01,18 the API `country` field might not reflect
+        # the accent of the named speaker.
+        # [lang | lang-region], ['male' | 'female'], name
+        self.checklist = [['zzy', 'male', '_no_name']]
+
+        self.verified_voices = []
+        self.length_scales = [[320, 289, '---------|', 100],
+                              [288, 257, '--------|-', 95],
+                              [256, 225, '-------|--', 85],
+                              [224, 193, '------|---', 75],
+                              [192, 161, '-----|----', 65],
+                              [160, 127, '----|----', 50],
+                              [128, 97, '---|-----', 35],
+                              [96, 66, '--|------', 20],
+                              [64, 33, '-|-------', 10],
+                              [32, 0, '|--------', 0]]
+
+    def update_rhvoice_checklist(self):  # -> list
+        '''Create a list table in the same format as `self.checklist`
+        using a json data adapted from the rhvoice-rest API.
+
+        See: <https://www.iso.org/obp/ui/#iso:code:3166:UA>'''
+        _url = ''.join([self.url, '/info'])
+        _default_list = self.checklist
+        try:
+            response = urllib.request.urlopen(_url)
+            data_response = response.read()
+            data = json.loads(data_response)
+        except urllib.error.URLError:
+            self.ok = False
+            return _default_list
+        except AttributeError:
+            try:
+                response = urllib.urlopen(_url)
+                data_response = response.read()
+                data = json.loads(data_response)
+            except [AttributeError, urllib.error.URLError]:
+                self.ok = False
+                return _default_list
+        except:
+            return _default_list
+        voice_lib = data['rhvoice_wrapper_voices_info']
+        key_list = []
+        return_list = []
+        for _item in voice_lib:
+            key_list.append(_item)
+            self.accept_voice.append(_item)
+            self.verified_voices = key_list
+        try:
+            for _key in key_list:
+                _iso = ''.join(
+                    [voice_lib[_key]['lang'], '-', voice_lib[_key]['country']])
+                for iso_c in [['-NaN', ''], ['-UK', '-UA']]:
+                    _iso = _iso.replace(iso_c[0], iso_c[1])
+                return_list.append([
+                    _iso, voice_lib[_key]['gender'],
+                    voice_lib[_key]['name'].lower()
+                ])
+        except KeyError:
+            return _default_list
+        self.checklist = return_list
+        self.ok = True
+        return self.checklist
+
+    def language_supported(self,
+                           _iso_lang='en-US',
+                           alt_local_url=''):  # -> bool
+        '''Is the language or voice supported in rhvoice rest?
+        + `iso_lang` can be in the form `en-US` or `en`.'''
+        if alt_local_url.startswith("http"):
+            self.url = alt_local_url
+        if self.ok:
+            return self.ok
+        if not bool(self.verified_voices):
+            self.update_rhvoice_checklist()
+            if not bool(self.verified_voices):
+                self.ok = False
+                return False
+        for _search in [_iso_lang.lower(), _iso_lang.split('-')[0].lower()]:
+            for item in self.checklist:
+                if item[0].lower().startswith(_search):
+                    self.checked_lang = item[0]
+                    self.ok = True
+                    break
+            if len(self.checked_lang) != 0:
+                break
+        if len(self.checked_lang) != 0:
+            for item in self.checklist:
+                if item[2] == _iso_lang.lower():
+                    self.checked_lang = item[0]
+                    self.ok = True
+                    break
+        if self.ok:
+            if not REQUESTS_OK:
+                if not readtexttools.have_posix_app('curl', False):
+                    self.ok = False
+                if not bool(self.base_curl):
+                    self.ok = False
+        return self.ok
+
+    def rhvoice_voice(self,
+                      _voice='female1',
+                      _iso_lang='en-US',
+                      _prefer_gendered_fallback=True):  # -> str
+        '''If the Rhvoice API includes the voice description, return a
+        rhvoice voice description like `cmu-bdl-hsmm`, otherwise return
+        `''`.'''
+        if len(_voice) == 0:
+            return ''
+        if not bool(self.verified_voices):
+            self.update_rhvoice_checklist()
+            if not bool(self.verified_voices):
+                self.ok = False
+                return ''
+        _voice = _voice.lower()
+        if _voice in self.verified_voices:
+            return _voice
+        _found_locale = self.checked_lang
+        if len(_found_locale) == 0:
+            _found_locale = readtexttools.default_lang().replace('_', '-')
+        _found_locale = _found_locale.split('-')[0].split('_')[0]
+        matches = []
+        _add_name = ''
+        gendered_fallback = ''
+        last_match = ''
+        i_lang = 0
+        i_gender = 1
+        i_name = 2
+        for _row in self.checklist:
+            try:
+                if _row[i_lang].startswith(_found_locale):
+                    last_match = _row[i_name]
+                    for _standard in [
+                            _row[i_gender], ''.join(['child_', _row[i_gender]])
+                    ]:
+                        _add_name = ''
+                        if _voice.startswith(_standard):
+                            _add_name = last_match
+                            break
+                if len(_add_name) != 0 and _add_name not in matches:
+                    matches.append(_add_name)
+                    if len(gendered_fallback) == 0:
+                        gendered_fallback = last_match
+            except IndexError:
+                break
+        for i in range(0, len(matches)):
+            if _voice.endswith(str(i + 1)):
+                return matches[i]
+        if _prefer_gendered_fallback:
+            if len(gendered_fallback) != 0:
+                return gendered_fallback
+        return last_match
+
+    def read(self,
+             _text="",
+             _iso_lang='en-US',
+             _visible="false",
+             _audible="true",
+             _out_path="",
+             _icon="",
+             _info="",
+             _post_process=None,
+             _writer='',
+             _size='600x600',
+             _speech_rate=160,
+             _vox='female1',
+             _ok_wait=4,
+             _end_wait=30):  # -> bool
+        '''Read text using <https://hub.docker.com/r/aculeasis/rhvoice-rest>'''
+        if not self.ok:
+            return False
+        _media_out = ''
+        # Determine the output file name
+        _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
+        # Determine the temporary file name
+        _media_work = os.path.join(tempfile.gettempdir(), 'Rhvoice-rest.wav')
+        if bool(self.add_pause):
+            for _symbol in self.pause_list:
+                if _symbol in _text:
+                    _text = _text.translate(self.add_pause).replace('.;', '.')
+                    break
+        _view_json = self.debug and 1
+        response = readtexttools.local_pronunciation(
+            _iso_lang, _text, 'rhvoice_rest', 'RHVOICE_REST_USER_DIRECTORY',
+            _view_json)
+        _text = response[0]
+        if _view_json:
+            print(response[1])
+        _length_scale = 50
+        for _item in self.length_scales:
+            if not _speech_rate > _item[0] and not _speech_rate < _item[1]:
+                _length_scale = _item[3]
+                break
+        _length_scale = str(_length_scale)
+        _url1 = self.url
+        _url = '%(_url1)s/say' % locals()
+        _audio_format = self.audio_format
+        _voice = self.rhvoice_voice(_vox, _iso_lang, True)
+        if REQUESTS_OK:
+            try:
+                _strips = '\n .;'
+                _text = '\n'.join(['', _text.strip(_strips), ''])
+                response = requests.get(_url,
+                                        params={
+                                            'format': _audio_format,
+                                            'rate': _length_scale,
+                                            'pitch': '50',
+                                            'volume': '50',
+                                            'voice': _voice,
+                                            'text':
+                                            _text.encode('utf-8', 'ignore')
+                                        },
+                                        timeout=(_ok_wait))
+                with open(_media_work, 'wb') as f:
+                    f.write(response.content)
+            except requests.exceptions.ConnectionError:
+                self.ok = False
+                return self.ok
+        elif readtexttools.have_posix_app('curl', False):
+            if not bool(self.base_curl):
+                return False
+            _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
+            _text = str(_text.translate(self.base_curl))
+            _text = urllib.parse.quote(_text)
+            _curl = '''curl "%(_url)s?format=%(_audio_format)s&rate=%(_length_scale)s&pitch=50&volume=50&voice=%(_voice)s&text=%(_text)s" -o "%(_media_work)s"''' % locals(
+            )
+            os.system(_curl)
+        else:
+            return False
         if os.path.isfile(_media_work) and _post_process in [
                 'process_audio_media', 'process_wav_media'
         ]:
@@ -1773,6 +2094,7 @@ def network_main(_text_file_in='',
     _google_cloud_class = GoogleCloudClass()
     _watson_class = WatsonClass()
     _gtts_class = GoogleTranslateClass()
+    _rhvoice_rest = RhvoiceLocalHost()
     _continue = False
     _vox = _vox.strip('\'" \t\n').lower()
     _continue = _larynx.language_supported(
@@ -1797,6 +2119,8 @@ def network_main(_text_file_in='',
     if not _continue:
         _continue = bool(_watson_class.language_supported(
             _iso_lang)) and _vox in _watson_class.accept_voice
+    if not _continue:
+        _continue = _rhvoice_rest.language_supported(_iso_lang, _local_url)
     if not _continue:
         print(
             'No working network server was found, or the requested voice is unavailable.\n'
@@ -1843,6 +2167,11 @@ def network_main(_text_file_in='',
             _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
                           _icon, clip_title, _post_processes[5], _info, _size,
                           _speech_rate, _ssml, _vox, 4, 30)
+        elif _rhvoice_rest.language_supported(_iso_lang, _local_url):
+            _rhvoice_rest.read(_text, _iso_lang, _visible, _audible,
+                               _media_out, _icon, clip_title,
+                               _post_processes[5], _info, _size, _speech_rate,
+                               _vox, 4, 30)
         elif _gtts_class.language_supported(_iso_lang):
 
             _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,

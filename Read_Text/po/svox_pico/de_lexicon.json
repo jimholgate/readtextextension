@@ -4,5 +4,7 @@
     "de_00003":{"g":"<","p":" weniger als "},
     "de_00004":{"g":"{","p":" linke geschweifte klammer "},
     "de_00005":{"g":"}","p":" rechte geschweifte klammer "},
-    "de_99999":{"g":"Read Text Extension","p":"reed text extension"}
+    "de_00006":{"g":"Read Text Extension","p":"reed text extension"},
+    "de_99998":{"g":"$[LOCALE]","p":"de"},
+    "de_99999":{"g":"$[REVISION]","p":"2023-01-02_13:26:59"}
 }

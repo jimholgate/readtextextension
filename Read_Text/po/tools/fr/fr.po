@@ -369,3 +369,28 @@ msgctxt ""
 msgstr ""
 "Obtenir de l'aide en ligne pour snap? Read Text utilise un outil "
 "vocal comme [larynx-server](https://github.com/rhasspy/larynx)."
+
+#: sw/inc/strings.hrc:30 (fr)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "Réinitialiser"
+
+#: sw/inc/strings.hrc:33 (fr)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "Appliquer"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (fr)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "Enregistrer sous"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (fr)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "Enregistrer _sous..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (fr)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "Ouvrir"

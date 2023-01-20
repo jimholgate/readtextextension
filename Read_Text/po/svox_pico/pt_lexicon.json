@@ -4,5 +4,7 @@
     "pt_00003":{"g":"<","p":" menos que "},
     "pt_00004":{"g":"{","p":" colchete esquerdo "},
     "pt_00005":{"g":"}","p":" colchete direito "},
-    "pt_99999":{"g":"Read Text Extension","p":"reed text extension"}
+    "pt_00006":{"g":"Read Text Extension","p":"reed text extension"},
+    "pt_99998":{"g":"$[LOCALE]","p":"pt"},
+    "pt_99999":{"g":"$[REVISION]","p":"2023-01-02_13:26:59"}
 }

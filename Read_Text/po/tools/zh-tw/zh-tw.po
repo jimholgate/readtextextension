@@ -317,3 +317,27 @@ msgctxt ""
 msgid "Arabic"
 msgstr "阿拉伯語"
 
+#: sw/inc/strings.hrc:30 (zh-TW)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "重設"
+
+#: sw/inc/strings.hrc:33 (zh-TW)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "套用"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (zh-TW)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "另存為"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (zh-TW)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "儲存新檔(_A)..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (zh-TW)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "開啟"

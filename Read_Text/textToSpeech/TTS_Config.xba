@@ -26,6 +26,7 @@
 Option Explicit
 &apos; Variable holding the dialog box.
 Private f_dlgSpeechSetup As Variant
+Private f_dlgJsonEdit As Variant
 Private f_dlgAboutReadSelection As Variant
 &apos; Persistent information about the current recording track and 
 &apos; the URL of last processed document.
@@ -36,13 +37,16 @@ global b_CaBcVancouverHolgateJamesReadtextextensionHideExports As Boolean
 global i_CaBcVancouverHolgateJamesReadtextextensionWinItunesVersion As Integer
 global s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI As String
 
+
 Sub ClearWorkingCountryLanguage()
 	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot;
 End Sub
 
+
 Sub SetWorkingCountryLanguage()
 	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = fsSelectionLanguageAndRegion(True)
 End Sub
+
 
 Function fiMyCurrentAudioTrack( _
 	ByVal bIncrement) As Integer  
@@ -78,6 +82,522 @@ Function fiMyCurrentAudioTrack( _
 End Function
 
 
+Function SaveAsJsonDialog(_default As String) As String
+	&apos;&apos;&apos; Returns a URI file path or `&apos;&apos;` if you hit *Cancel*&apos;&apos;&apos;
+	Dim _file_list As Object
+	SaveAsJsonDialog = &quot;&quot;
+	Dim _file_picker_args As Variant : _file_picker_args = Array(_
+	com.sun.star.ui.dialogs.TemplateDescription.FILESAVE_AUTOEXTENSION )	
+	Dim oDlg As Object : oDlg = createUnoService(_
+	&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
+	With oDlg
+		.initialize(_file_picker_args())
+		.setMultiSelectionMode(False)
+		.SetDefaultName(_default)
+		.appendFilter(&quot;JavaScript Object Notation (.json)&quot;, &quot;*.json&quot;)
+		.appendFilter(&quot;JavaScript (.js)&quot;, &quot;*.js&quot;)
+		.CurrentFilter = &quot;JavaScript Object Notation (.json)&quot;
+		.setTitle(fsLookUpTerm2(_
+			&quot;s_speech-properties&quot;, fsDisplayLanguage()))
+		If .execute() then
+			_file_list = .getFiles()
+			SaveAsJsonDialog = _file_list(0)
+		End If
+	End With
+End Function
+
+
+Function OpenJsonFileDialog() As String
+	&apos; Returns a file path if found or `&apos;&apos;` if Cancelled.
+	&apos; Adapted from LibreOffice Ref Card LibreOffice Basic Dialogs
+	&apos; v. 103, 2018.01.17 
+	&apos; &lt;https://documentation.libreoffice.org&gt;
+	OpenJsonFileDialog = &quot;&quot;
+	Dim FileName As String : FileName = &quot;&quot;
+	Dim oFilePicker As Object : oFilePicker = CreateUnoService(_
+	&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
+	With oFilePicker
+		.DisplayDirectory = ConvertToURL(fsGetHomeDir())
+		.appendFilter(&quot;JavaScript Object Notation (.json)&quot;, &quot;*.json&quot;)
+		.appendFilter(&quot;JavaScript (.js)&quot;, &quot;*.js&quot;)
+		.CurrentFilter = &quot;JavaScript Object Notation (.json)&quot;
+		.Title = fsLookUpTerm2(_
+			&quot;s_speech-properties&quot;, fsDisplayLanguage())
+		If .execute = _
+			com.sun.star.ui.dialogs.ExecutableDialogResults.OK Then
+			FileName = .Files(0)
+		End If
+	End With
+	OpenJsonFileDialog = FileName
+End Function
+
+
+Sub ImportJsonPhonemeTable()
+	&apos; Dialog2 _trash
+	Dim _in_file As String : _in_file = OpenJsonFileDialog()
+	Dim _file As String : _file = &quot;&quot;
+	Dim _language As String
+	Dim _model As String
+	Dim _json_display As String
+	If Len(_in_file) = 0 Then
+		Exit Sub
+	End If
+	_json_display = getTextFromFile(_in_file, &quot;UTF-8&quot;)
+	If Instr(_json_display, &quot;&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot;) = 0 Or Instr(_
+	_json_display, &quot;}&quot;) = 0 Then
+		Exit Sub
+	End If
+
+	With f_dlgJsonEdit
+		_language = .GetControl(&quot;_test1&quot;).model.helpText
+		_model = .GetControl(&quot;_test2&quot;).model.helpText
+		_file = .GetControl(&quot;_json_text&quot;).model.helpText
+		.GetControl(&quot;_json_text&quot;).visible = False
+		.GetControl(&quot;_json_text&quot;).model.Text = _json_display
+		.GetControl(&quot;_json_text&quot;).visible = True
+		CreateFile(_file, _json_display, &quot;UTF-8&quot;)
+		If FileExists(_file) Then
+			.GetControl(&quot;_phoneme&quot;).model.enabled = False
+			.GetControl(&quot;_phoneme&quot;).model.Text = &quot;&quot;
+			.GetControl(&quot;_grapheme&quot;).model.enabled = False
+			.GetControl(&quot;_grapheme&quot;).model.Text = &quot;&quot;
+			.GetControl(&quot;_add&quot;).model.enabled = False
+			.GetControl(&quot;_test1&quot;).model.enabled = False
+			.GetControl(&quot;_test2&quot;).model.enabled = False
+		End If
+	End With
+End Sub
+
+
+Sub ExportJsonPhonemeTable(Event)
+	&apos; Dialog2 _add .RIGHT
+	&apos; See also : ImportJsonPhonemeTable()
+	Dim _mouse_alt As Integer : _mouse_alt = 2
+	Dim _mouse_event As Integer : _mouse_event = fiMyMouseEventToInt(Event)
+	Dim _out_file As String : _out_file = &quot;&quot;
+	Dim _json_display As String : _json_display = &quot;&quot;
+	Dim _language As String : _language = &quot;&quot;
+	Dim _model As String : _model = &quot;&quot;
+	Dim _python_path As String : _python_path = &quot;&quot;
+	Dim _control As Variant : _control = Split(f_dlgJsonEdit.GetControl(_
+	&quot;_json_text&quot;).model.helpText, &quot;/&quot;)
+	Dim _default As String : _default =_control(Ubound(_
+	_control)-1) &amp; &quot;_&quot; &amp; _control(Ubound(_control))
+	Select Case _mouse_event
+		Case _mouse_alt
+		_out_file = SaveAsJsonDialog(_default)
+		If Len(_out_file) &lt;&gt; 0 Then
+			With f_dlgJsonEdit
+				_language = .GetControl(&quot;_test1&quot;).model.helpText
+				_model = .GetControl(&quot;_test2&quot;).model.helpText
+				_json_display = .GetControl(&quot;_json_text&quot;).model.Text
+				CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
+			End With
+		End If
+	End Select
+End Sub
+
+
+Sub SaveJsonPhonemeTable(Event)
+	&apos; Dialog
+	&apos; See also : ImportJsonPhonemeTable()
+	Dim _mouse_event As Integer : _mouse_event = fiMyMouseEventToInt(Event)
+	Dim _out_file As String : _out_file = &quot;&quot;
+	Dim _json_display As String : _json_display = &quot;&quot;
+	Dim _language As String : _language = &quot;&quot;
+	Dim _model As String : _model = &quot;&quot;
+	Dim _python_path As String : _python_path = &quot;&quot;
+	Dim _control As Variant : _control = Split(f_dlgJsonEdit.GetControl(_
+	&quot;_json_text&quot;).model.helpText, &quot;/&quot;)
+	Dim _default As String : _default =_control(Ubound(_
+	_control)-1) &amp; &quot;_&quot; &amp; _control(Ubound(_control))
+	Select Case _mouse_event
+		Case Else
+		_out_file = SaveAsJsonDialog(_default)
+		If Len(_out_file) &lt;&gt; 0 Then
+			With f_dlgJsonEdit
+				_language = .GetControl(&quot;_test1&quot;).model.helpText
+				_model = .GetControl(&quot;_test2&quot;).model.helpText
+				_json_display = .GetControl(&quot;_json_text&quot;).model.Text
+				CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
+			End With
+		End If
+	End Select
+End Sub
+
+
+Function fsGetTheSelectedWord()
+	fsGetTheSelectedWord = fsQuickTitle(1, 99, fsTrimSpecial(fsGetTextSelection(False, False),  &quot; `_-*#&gt;_&quot;))
+End Function
+
+
+Function CustomLexiconDir()
+	 CustomLexiconDir = ConvertFromUrl(fsFullPathOf(&quot;lexicons/&quot;))
+End Function
+
+
+Type SpeechHostInfo
+	about as String
+	label as String  &apos; &quot;larynx-server&quot;
+	url as String  &apos; &quot;http://0.0.0.0:5002&quot;
+	url_info as String  &apos; &quot;/api/voices&quot;
+	json_dir as String  &apos; &quot;larynx&quot;
+	sample as String
+	docker as String
+	tags as Variant
+End Type
+
+
+Function LarynxSpeechHostInfo()
+	Dim _info As SpeechHostInfo
+	With _info
+		.about = &quot;End-to-end text to speech system using gruut and onnx.&quot;
+		.label = &quot;larynx-server&quot;
+		.url = &quot;http://0.0.0.0:5002&quot;
+		.url_info = &quot;/api/voices&quot;
+		.json_dir = &quot;larynx&quot;
+		.sample = &quot;http://0.0.0.0:5002/api/tts?voice=en&amp;text=Hello+world&quot;
+		.docker = &quot;https://hub.docker.com/r/rhasspy/larynx&quot;
+		.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;, &quot;extensible&quot;)
+	End With
+	LarynxSpeechHostInfo = _info
+End Function
+
+
+Function MaryTtsSpeechHostInfo()
+	Dim _info As SpeechHostInfo
+	With _info
+		.about = &quot;MaryTTS 5.2 text to speech server with 19 voices for 8 languages&quot;
+		.label = &quot;marytts-server&quot;
+		.url = &quot;http://0.0.0.0:59125&quot;
+		.url_info = &quot;/voices&quot;
+		.json_dir = &quot;mary_tts&quot;
+		.sample = &quot;http://0.0.0.0:59125?AUDIO=WAVE_FILE&amp;OUTPUT_TYPE=AUDIO&amp;INPUT_TYPE=TEXT&amp;LOCALE=de&amp;INPUT_TEXT=Hallo+welt&quot;
+		.docker = &quot;https://hub.docker.com/r/synesthesiam/marytts&quot;
+		.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;)
+	End With
+	MaryTtsSpeechHostInfo = _info
+End Function
+
+
+Function MacOSSpeechHostInfo()
+	Dim _info As SpeechHostInfo
+	Select Case fsGetOS()
+		Case &quot;MacOS&quot;
+		With _info
+			.about = &quot;&quot;
+			.label = &quot;macos-say&quot;
+			.url = fsMyURL() &amp; &quot;/po/macos_say&quot;
+			.url_info = &quot;/en-US_lexicon.json&quot;
+			.json_dir = &quot;macos_say&quot;
+			.sample = &quot;&quot;
+			.docker = &quot;&quot;
+			.tags = Array(&quot;text&quot;, &quot;m4a&quot;, &quot;mp3&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;audio-only-option&quot;)
+		End With
+		Case Else
+		_info = MaryTtsSpeechHostInfo()
+	End Select
+	MacOSSpeechHostInfo = _info
+End Function
+
+
+Function RhvoiceSpeechHostInfo()
+	Dim _info As SpeechHostInfo
+	With _info
+		.about = Join(Array(&quot;A speech synthesizer for Albanian, English, Esperanto, Georgian, Kyrgyz,&quot;,_
+		&quot; Macedonian, Portuguese, Russian, Tatar and Ukrainian&quot;),&quot;&quot;)
+		.label = &quot;rhvoice-rest&quot;
+		.url = &quot;http://0.0.0.0:8080&quot;
+		.url_info = &quot;/info&quot;
+		.json_dir = &quot;rhvoice&quot;
+		.sample = &quot;http://0.0.0.0:8080/say?format=mp3&amp;rate=50&amp;pitch=50&amp;volume=50&amp;voice=slt&amp;text=Hello%20World&quot;
+		.docker = &quot;https://hub.docker.com/r/aculeasis/rhvoice-rest&quot;
+		.tags = Array(&quot;text&quot;, &quot;mp3&quot;, &quot;ogg&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;ubuntu&quot;)
+	End With
+	RhvoiceSpeechHostInfo = _info
+End Function
+
+
+Function SpeechHostInfoList()
+	SpeechHostInfoList = Array(_
+	LarynxSpeechHostInfo(), _
+	MaryTtsSpeechHostInfo(), _
+	RhvoiceSpeechHostInfo(), _
+	)
+End Function
+
+
+Function fsLocalHostSpeech() As String
+	&apos; Return the localhost speech address
+	&apos; i.e.: `larynx-server`, `marytts-server`, `rhvoice-rest`
+	On Error GoTo fsLocalHostSpeechErr
+	fsLocalHostSpeech = &quot;&quot;
+	Dim _info As Variant
+	Dim x As Integer
+	Select Case Len(s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI)
+		Case 0
+		_info = SpeechHostInfoList()
+		For x = Lbound(_info) To Ubound(_info)
+			If Instr(_info(x).url, &quot;http&quot;) = 1 Then
+				If fbLocalHostOk(_info(x).url &amp; _info(x).url_info) Then
+					fsLocalHostSpeech = _info(x).url
+					s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI = fsLocalHostSpeech
+					Exit For
+				End If
+			End If
+		Next
+		Case Else
+		fsLocalHostSpeech = s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI
+	End Select
+	Exit Function
+	fsLocalHostSpeechErr:
+	fsLocalHostSpeech = &quot;&quot;
+End Function
+
+
+Function EditJsonPhonemeTable() As String
+	&apos; This Json editor adds new grapheme / phoneme pairs to json file
+	&apos; so individuals can edit the pronunciation of names and things that
+	&apos; are important to them -like employees and students.
+	EditJsonPhonemeTable = &quot;&quot;
+	Dim _lang As String  &apos; en
+	Dim _select_lang As String  &apos; en-CA
+	Dim _grapheme as String
+	Dim _phoneme as String
+	Dim _out_file As String
+	Dim _in_file As String
+	_select_lang = &quot;&quot;
+	Dim _test_str As String
+	Dim x As Integer
+	Dim _json_display As String
+	_json_display = &quot;&quot;
+	Dim _po_dir As String
+	Dim CR As String
+	CR = Chr(13)
+	Dim is_unique As Boolean
+	Dim _display_phoneme As String
+	Dim _info As Variant
+	Select Case fsGetOS()
+		Case &quot;MacOS&quot;
+		_po_dir = &quot;macos_say&quot;
+		Case Else
+		_po_dir = &quot;svox_pico&quot;
+		_info = SpeechHostInfoList()
+		For x = Lbound(_info) To Ubound(_info)
+			If fbLocalHostOk(_info(x).url &amp; _info(x).url_info) Then
+				_po_dir = _info(x).json_dir
+				Exit For
+			End If
+		Next
+	End Select
+	x = 0
+	Dim lang_array As Variant
+	lang_array = fvGetIsoLangArray
+	For x = Lbound(lang_array) to Ubound(lang_array)
+		If Len(lang_array(x)) &lt;&gt; 0 Then
+			_select_lang = lang_array(x)
+			Exit For
+		End If
+	Next
+	_lang = fsDisplayLanguage()
+	_out_file = fsFullPathOf(fsExtensionSetJson(&quot;lexicons/&quot; &amp; _po_dir, _select_lang))
+	If FileExists(_out_file) Then 
+		_in_file = _out_file
+	Else
+		ReDim lang_array
+		lang_array = Array(_
+		_select_lang, Split(_select_lang, &quot;-&quot;)(0), Split(_select_lang, &quot;_&quot;)(0))
+		For x = Lbound(lang_array) to Ubound(lang_array)
+			_test_str = fsMyURL() &amp; _
+			&quot;/po/&quot; &amp; _
+			fsExtensionSetJson(_po_dir, lang_array(x))
+			If FileExists(_test_str) Then
+				_in_file = _test_str
+				Exit For
+			End If
+		Next
+	End If
+	_grapheme = fsGetTheSelectedWord()
+	_display_phoneme = &quot;&quot;
+	If FileExists(_in_file) Then
+		_json_display = getTextFromFile(_in_file, &quot;UTF-8&quot;)
+		_display_phoneme = bespokeJsonExtraction(_json_display, _grapheme)
+		If Len(_display_phoneme) = 0 Then
+			_display_phoneme = Lcase(_grapheme)
+		End If
+	End If
+	If Instr(_json_display, &quot;{&quot;) = 0 Or Instr(_json_display, &quot;}&quot;) = 0 Then
+		_json_display = Join(Array(&quot;{&quot;,_
+		&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00001&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read Text Extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;},&quot;,_
+		&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00002&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read text extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;}&quot;,_
+		&quot;}&quot;), CR)
+	End If
+	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
+	is_unique = Instr(_json_display, &quot;{&quot;&quot;g&quot;&quot;:&quot;&quot;&quot; &amp; _grapheme &amp; &quot;&quot;&quot;,&quot;&quot;&quot;) = 0
+	If Instr(_json_display, CR) = 0 and Instr(_json_display, Chr(10)) &lt;&gt; 0 Then
+		CR = Chr(10)
+	End If
+	f_dlgJsonEdit = CreateUnoDialog(DialogLibraries.textToSpeech.Dialog2)
+	With f_dlgJsonEdit
+		.model.Title = fsLookUpTerm2(_
+		&quot;s_read-text&quot;, _lang)  &amp; &quot; - &quot; &amp; _po_dir &amp; &quot; - &quot; &amp; fsLookUpTerm2(_
+		&quot;s_speech-properties&quot;, _lang)
+		.GetControl(&quot;_trash&quot;).model.ImageURL = fsRewindLogo()
+		.GetControl(&quot;_trash&quot;).Visible = False
+		.GetControl(&quot;_add&quot;).Model.enabled = True
+		.GetControl(&quot;_cancel&quot;).model.Label = fsLookUpTerm2(&quot;s_cancel&quot;, _lang)
+		.GetControl(&quot;_replace&quot;).model.Label = fsLookUpTerm2(_
+		&quot;s_read-with-an-external-program&quot;, _lang) &amp; &quot; (&quot; &amp;_po_dir &amp; &quot;)&quot;
+		.GetControl(&quot;_open&quot;).model.Label = _(&quot;Open&quot;, &quot;tools&quot;, _lang)
+		.GetControl(&quot;_save_as&quot;).model.Label = _(&quot;Save As&quot;, &quot;tools&quot;, _lang)
+		.GetControl(&quot;_phoneme&quot;).model.helpText = &quot;&quot;&quot;p&quot;&quot;:&quot;
+		If is_unique Then
+			.GetControl(&quot;_add&quot;).model.Label = _(&quot;Apply&quot;, &quot;tools&quot;, _lang)
+			.GetControl(&quot;_phoneme&quot;).model.Text = Lcase(_grapheme)
+			.GetControl(&quot;_grapheme&quot;).model.readonly = False			
+		Else
+			.GetControl(&quot;_add&quot;).model.Label = _(&quot;Reset&quot;, &quot;tools&quot;, _lang)
+			.GetControl(&quot;_phoneme&quot;).model.Text = _display_phoneme
+			.GetControl(&quot;_phoneme&quot;).model.enabled = False
+			.GetControl(&quot;_grapheme&quot;).model.readonly = True
+		End If
+		.GetControl(&quot;_grapheme&quot;).model.Text = _grapheme
+		.GetControl(&quot;_grapheme&quot;).model.helpText = &quot;&quot;&quot;g&quot;&quot;:&quot;
+		.GetControl(&quot;_json_text&quot;).model.Text = _json_display
+		.GetControl(&quot;_json_text&quot;).model.helpText = ConvertFromURL(_out_file)
+		.GetControl(&quot;_edit_frame&quot;).model.Label = fsLookUpTerm2(_
+		&quot;s_speech-synthesis&quot;, _lang)
+		.GetControl(&quot;_test1&quot;).model.Label = fsLookUpTerm2(&quot;s_test&quot;, _lang)
+		.GetControl(&quot;_test1&quot;).model.helpText = _select_lang
+		.GetControl(&quot;_test2&quot;).model.Label = fsLookUpTerm2(&quot;s_test&quot;, _lang)
+		.GetControl(&quot;_test2&quot;).model.helpText = _po_dir
+		.GetControl(&quot;_test2&quot;).model.enabled = is_unique
+		.GetControl(&quot;_code_frame&quot;).model.Label = fsLookUpTerm2(&quot;s_script&quot;, _lang)
+		.GetControl(&quot;_find&quot;).model.Label = Join(Array(_
+		fsGetSetting(&quot;ooname&quot;), &quot;-&quot;, fsLookUpTerm2(&quot;s_display&quot;, _lang)))
+		If .Execute() &lt;&gt; 0 Then
+			If Len(fsJsonSafe(_
+			.GetControl(_
+			&quot;_grapheme&quot;).model.Text)) = 0 Or Len(fsJsonSafe(_
+			.GetControl(_
+			&quot;_phoneme&quot;).model.Text)) = 0 Then
+				Exit Function
+			End If
+			If is_unique Then
+				_json_display = fsReplaceText(_json_display,_
+				Join(_
+				Array(_
+				&quot;{&quot;,_
+				&quot;    &quot;),_
+				CR),_
+				Join(_
+				Array(_
+				&quot;{&quot;,_
+				&quot;    &quot;&quot;DT_&quot; &amp; fsFileTime(_
+				) &amp; &quot;&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;&quot; &amp; fsJsonSafe(_
+				.GetControl(_
+				&quot;_grapheme&quot;).model.Text) &amp; &quot;&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot; &amp; fsJsonSafe(_
+				.GetControl(_
+				&quot;_phoneme&quot;).model.Text) &amp; &quot;&quot;&quot;},&quot;, &quot;    &quot;), CR))
+			Else
+				_json_display = bespokeJsonDeletion(_
+				_json_display,_
+				_grapheme)
+			End If
+			CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
+		End If
+	End With
+	If FileExists(_out_file) Then
+		EditJsonPhonemeTable = _out_file
+	End If
+End Function
+
+
+Function bespokeJsonDeletion(_
+	_json_display As String,_
+	_grapheme As String)
+	&apos; TODO: Connect to a python script. The Function currently depends on the
+	&apos; specific formatting of the data, so verify the results before clicking.
+	Dim CR$ : CR = Chr(13)
+	If Instr(_json_display, CR) = 0 Then CR = Chr(10)
+	bespokeJsonDeletion = &quot;&quot;
+	Dim _list As Variant : _list = Split(_json_display, CR)
+	Dim _row As Variant
+	Dim x As Integer
+	If Instr(_json_display, &quot;99999&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;$[REVISION]&quot;&quot;,&quot;&quot;p&quot;&quot;&quot;) = 0 Then
+		bespokeJsonDeletion = _json_display
+		Exit Function
+	End If
+	For x = LBound(_list) To Ubound(_list)
+		If Instr(_list(x), &quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;&quot; &amp; _grapheme &amp; &quot;&quot;&quot;&quot;) = 0 Then
+			bespokeJsonDeletion = bespokeJsonDeletion &amp; _list(x) &amp; CR
+		End If
+	Next
+	bespokeJsonDeletion = Trim(bespokeJsonDeletion)
+End Function
+
+
+Function bespokeJsonExtraction(_
+	_json_display As String,_
+	_grapheme As String)
+	&apos; TODO: Connect to a python script. The Function currently depends on the
+	&apos; specific formatting of the data, so verify the results before clicking OK
+	bespokeJsonExtraction = &quot;&quot;
+	Dim CR$ : CR = Chr(13)
+	If Instr(_json_display, CR) = 0 Then CR = Chr(10)
+	Dim _list As Variant : _list = Split(_json_display, CR)
+	Dim _row As Variant
+	Dim x As Integer
+	For x = LBound(_list) To Ubound(_list)
+		If Instr(_list(x), &quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;&quot; &amp; _grapheme &amp; &quot;&quot;&quot;&quot;) &lt;&gt; 0 Then
+			_row = Split(_list(x), &quot;:&quot;)
+			bespokeJsonExtraction = Mid(_
+			fsReplaceText(_
+			_row(_
+			Ubound(_
+			_row)), &quot;&quot;&quot;},&quot;, &quot;&quot;), 2)
+			Exit Function
+		End If
+	Next
+End Function
+
+
+Function fsJsonSafe(_text As String) As String
+	&apos; Replace json code characters with to safe versions
+	fsJsonSafe = &quot;&quot;
+	If Len(_text) = 0 Then
+		Exit Function
+	End If
+	Dim check_list As Variant
+	check_list = Array(_
+	Array(&quot;\&quot;, &quot;\u005C&quot;),_
+	Array(&quot;&quot;&quot;&quot;, &quot;\&quot;&quot;&quot;),_
+	Array(&quot;{&quot;, &quot;\u007B&quot;),_
+	Array(&quot;}&quot;, &quot;\u0070&quot;),_
+	Array(&quot;@&quot;, &quot;\u0040&quot;)_
+	)
+	Dim x As Integer
+	For x = Lbound(check_list) To Ubound(check_list)
+		_text = fsReplaceText(_text, check_list(x)(0), check_list(x)(1))
+	Next
+	fsJsonSafe = _text
+End Function
+
+
+Sub SpeakGraphemeJson()
+	With f_dlgJsonEdit
+		MsgSpeak(.GetControl(&quot;_grapheme&quot;).model.Text)
+	End With
+End Sub
+
+
+Sub SpeakPhonemeJson()
+	With f_dlgJsonEdit
+		MsgSpeak(.GetControl(&quot;_phoneme&quot;).model.Text)
+	End With
+End Sub
+
+
 Sub ConfigureReadTextAloud()
 	Dim sFile As String
 	Dim msgs() As Variant
@@ -90,7 +610,7 @@ Sub ConfigureReadTextAloud()
 	CheckUnixSpeech()
 	ClearWorkingCountryLanguage()
 	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
-	f_dlgSpeechSetup = CreateUnoDialog(DialogLibraries.textToSpeech.Dialog1 )
+	f_dlgSpeechSetup = CreateUnoDialog(DialogLibraries.textToSpeech.Dialog1)
 	Select Case fsGetOS()
 		Case &quot;MacOS&quot;
 		&apos; New versions of MacOS restrict third party apps from writing

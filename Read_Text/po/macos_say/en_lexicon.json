@@ -1,9 +1,12 @@
 {
-    "en_00001":{"g":" does live ","p":" does liv "},
-    "en_00002":{"g":" both live ","p":" both liv "},
-    "en_00003":{"g":" does not live ","p":" does not liv "},
-    "en_00004":{"g":" Z ","p":" said! "},
-    "en_00005":{"g":" Z.","p":" said!"},
-    "en_00006":{"g":" Z?","p":" said?"},
-    "en_99999":{"g":"Read Text Extension","p":"reed text extension"}
+    "en_00001":{"g":" does live ","p":" does [lɪv]"},
+    "en_00002":{"g":" both live ","p":" both [lɪv]"},
+    "en_00003":{"g":" does not live ","p":" does not [lɪv]"},
+    "en_00004":{"g":" Z ","p":" [zɛd] "},
+    "en_00005":{"g":" Z.","p":" [zɛd]."},
+    "en_00006":{"g":" Z?","p":" [zɛd]?"},
+    "en_00007":{"g":"Read Text Extension","p":"reed text extension"},
+    "en_00008":{"g":"Read text extension","p":"[ried] text extension"},
+    "en_99998":{"g":"$[LOCALE]","p":"en"},
+    "en_99999":{"g":"$[REVISION]","p":"2023-01-02_13:26:59"}
 }

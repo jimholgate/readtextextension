@@ -362,3 +362,27 @@ msgctxt ""
 msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
 msgstr "s_mdsample"
 
+#: sw/inc/strings.hrc:30 (en)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr "s_reset"
+
+#: sw/inc/strings.hrc:33 (en)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr "s_apply"
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (en)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "s_save_as"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (en)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "s_save_as..."
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (en)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "s_open"

@@ -4,5 +4,7 @@
     "fr_00003":{"g":"<","p":" moins que "},
     "fr_00004":{"g":"{","p":" accolade gauche "},
     "fr_00005":{"g":"}","p":" accolade droite "},
-    "fr_99999":{"g":"Read Text Extension","p":"reed text extension"}
+    "fr_00006":{"g":"Read Text Extension","p":"reed text extension"},
+    "fr_99998":{"g":"$[LOCALE]","p":"fr"},
+    "fr_99999":{"g":"$[REVISION]","p":"2023-01-02_13:26:59"}
     }

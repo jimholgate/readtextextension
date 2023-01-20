@@ -142,3 +142,27 @@ msgctxt ""
 msgid "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
 msgstr "Read Text – Speech\n=========\n\n>_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2015 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`"
 
+#: sw/inc/strings.hrc:30 (he)
+msgctxt "STR_RESET_LABEL"
+msgid "Reset"
+msgstr ""
+
+#: sw/inc/strings.hrc:33 (he)
+msgctxt "STR_APPLY_LABEL"
+msgid "Apply"
+msgstr ""
+
+#: sw/uiconfig/swriter/ui/numberingnamedialog.ui:16 (he)
+msgctxt "numberingnamedialog|NumberingNameDialog"
+msgid "Save As"
+msgstr "שמירה בשם"
+
+#: sw/uiconfig/swriter/ui/outlinenumbering.ui:95 (he)
+msgctxt "outlinenumbering|saveas"
+msgid "Save _As..."
+msgstr "שמירה בשם...u\200F" 
+
+#: sw/uiconfig/swriter/ui/tocindexpage.ui:19 (he)
+msgctxt "tocindexpage|open"
+msgid "Open"
+msgstr "פתיחה"

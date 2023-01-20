@@ -9,16 +9,16 @@
   <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="1" dlg:left="3" dlg:top="1" dlg:width="277" dlg:height="66">
    <dlg:title dlg:value="FrameControl1"/>
   </dlg:titledbox>
-  <dlg:textfield dlg:id="TextField1" dlg:tab-index="2" dlg:left="47" dlg:top="9" dlg:width="228" dlg:height="52" dlg:vscroll="true" dlg:multiline="true" dlg:readonly="true"/>
-  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="3" dlg:left="3" dlg:top="108" dlg:width="277" dlg:height="80">
+  <dlg:textfield dlg:id="TextField1" dlg:tab-index="3" dlg:left="47" dlg:top="9" dlg:width="228" dlg:height="52" dlg:vscroll="true" dlg:multiline="true" dlg:readonly="true"/>
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="4" dlg:left="3" dlg:top="108" dlg:width="277" dlg:height="80">
    <dlg:title dlg:value="FrameControl2"/>
   </dlg:titledbox>
-  <dlg:textfield dlg:id="TextField2" dlg:tab-index="4" dlg:left="8" dlg:top="120" dlg:width="268" dlg:height="63" dlg:vscroll="true" dlg:multiline="true" dlg:readonly="true"/>
-  <dlg:titledbox dlg:id="FrameControl3" dlg:tab-index="5" dlg:left="3" dlg:top="69" dlg:width="277" dlg:height="38">
+  <dlg:textfield dlg:id="TextField2" dlg:tab-index="5" dlg:left="8" dlg:top="120" dlg:width="268" dlg:height="63" dlg:vscroll="true" dlg:multiline="true" dlg:readonly="true"/>
+  <dlg:titledbox dlg:id="FrameControl3" dlg:tab-index="6" dlg:left="3" dlg:top="69" dlg:width="277" dlg:height="38">
    <dlg:title dlg:value="FrameControl3"/>
   </dlg:titledbox>
-  <dlg:textfield dlg:id="TextField3" dlg:tab-index="6" dlg:left="8" dlg:top="78" dlg:width="268" dlg:height="24" dlg:vscroll="true" dlg:multiline="true" dlg:readonly="true"/>
-  <dlg:button dlg:id="CommandButton2" dlg:tab-index="7" dlg:left="172" dlg:top="193" dlg:width="66" dlg:height="16" dlg:help-text="https://sites.google.com/site/readtextextension/" dlg:value="CommandButton2" dlg:grab-focus="false">
+  <dlg:textfield dlg:id="TextField3" dlg:tab-index="7" dlg:left="8" dlg:top="78" dlg:width="268" dlg:height="24" dlg:vscroll="true" dlg:multiline="true" dlg:readonly="true"/>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="2" dlg:left="172" dlg:top="193" dlg:width="66" dlg:height="16" dlg:help-text="https://sites.google.com/site/readtextextension/" dlg:value="CommandButton2" dlg:grab-focus="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.webHelpButton?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
   <dlg:img dlg:style-id="0" dlg:id="ImageControl1" dlg:tab-index="8" dlg:left="6" dlg:top="14" dlg:width="39" dlg:height="46" dlg:scale-image="false" dlg:scale-mode="none">
@@ -31,7 +31,7 @@
   <dlg:text dlg:id="Label2" dlg:tab-index="11" dlg:left="112" dlg:top="197" dlg:width="29" dlg:height="14" dlg:value="   "/>
   <dlg:img dlg:style-id="0" dlg:id="ImageControl3" dlg:tab-index="12" dlg:left="37" dlg:top="188" dlg:width="20" dlg:height="26" dlg:scale-image="false" dlg:scale-mode="none"/>
   <dlg:img dlg:style-id="0" dlg:id="ImageControl4" dlg:tab-index="13" dlg:left="90" dlg:top="188" dlg:width="20" dlg:height="26" dlg:scale-image="false" dlg:scale-mode="none"/>
-  <dlg:img dlg:style-id="0" dlg:id="ImageControl5" dlg:tab-index="14" dlg:left="145" dlg:top="188" dlg:width="20" dlg:height="26" dlg:scale-image="false" dlg:scale-mode="none">
+  <dlg:img dlg:style-id="0" dlg:id="ImageControl5" dlg:tab-index="14" dlg:left="143" dlg:top="188" dlg:width="20" dlg:height="26" dlg:scale-image="false" dlg:scale-mode="none">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.windowsSAPIControl?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:img>
  </dlg:bulletinboard>
