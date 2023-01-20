@@ -1974,7 +1974,7 @@ def main():
                 os.remove(_file_spec)
                 readtexttools.write_plain_text_file(_file_spec, _message,
                                                     'utf-8')
-        if len(_output) == 0 and not (_visible):
+        if len(_output) == 0 and not _visible:
             resultat = _say_formats.say_aloud(_file_spec, mac_reader, _voice,
                                               i_rate)
 
