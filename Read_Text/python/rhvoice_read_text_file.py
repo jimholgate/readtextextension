@@ -14,7 +14,7 @@ To enable rhvoice in Ubuntu 22.04, use:
 
 To add languages, add the appropriate packages
 
-    sudo apt install rhvoice-brazilian-portuguese 
+    sudo apt install rhvoice-brazilian-portuguese
     sudo apt install rhvoice-esperanto
     sudo apt install rhvoice-kyrgyz
     sudo apt install rhvoice-russian
@@ -22,12 +22,12 @@ To add languages, add the appropriate packages
     sudo apt install rhvoice-ukrainian
     sudo apt install rhvoice-english
 
-The command line interface that this script uses is depreciated,
-so it might not continue to work, or it might not work as well as
-it does when using `speech-dispatcher` or `orca`.
+The command line interface that this script uses is depreciated, so
+it might not continue to work, or it might not work as well as it
+does when using `speech-dispatcher`, `docker rhvoice-get` or `orca`.
 
 If you configure `speech-dispatcher` to use `rhvoice` and enter
-`"(SPD_READ_TEXT_PY)" "(TMP)"` in Read Text Extension's main 
+`"(SPD_READ_TEXT_PY)" "(TMP)"` in Read Text Extension's main
 dialog then your system might have a smaller delay when you click
 the *Read Selection* button before the voice starts speaking.
 
@@ -35,29 +35,16 @@ To enable rhvoice for speech-dispatcher in Ubuntu 22.04, use:
 
     sudo apt install speech-dispatcher-rhvoice
 
-For information about installing rhvoice to Fedora, refer to:
-
-<https://copr.fedorainfracloud.org/coprs/lostmemories/RHVoice/>
+To install rhvoice on other linux platforms, use a docker image.
+The available voices might vary according to the specific image. 
 '''
 
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-import codecs
 import getopt
-import math
 import os
 import sys
 import readtexttools
-
-try:
-    import urllib
-except ImportError:
-    pass
-try:
-    import requests
-    REQUESTS_OK = True
-except:
-    REQUESTS_OK = False
 
 
 def usage():  # -> None
@@ -108,7 +95,7 @@ class RhVoiceClass(object):
     so the combination is under GPL v3 or later. If you want to use the library
     in your program under GPL v2 or LGPL, compile the library without MAGE.
 
-    The following restrictions apply to some of the voices:    
+    The following restrictions apply to some of the voices:
 
     All voices from RHVoice Lab's site are distributed under the Creative 
     Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public
@@ -384,7 +371,8 @@ class RhVoiceClass(object):
                 self.ok = True
                 return True
         else:
-            if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' % locals()):
+            if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' %
+                             locals()):
                 self.ok = True
                 return True
         self.ok = False
@@ -403,8 +391,9 @@ class RhVoiceClass(object):
                         if _voice in _check_list:
                             return _voice
                     else:
-                        if os.path.isdir('/usr/share/RHVoice/voices/%(_voice)s' %
-                                         locals()):
+                        if os.path.isdir(
+                                '/usr/share/RHVoice/voices/%(_voice)s' %
+                                locals()):
                             return _voice
             except (AttributeError, SyntaxError):
                 pass
@@ -553,6 +542,4 @@ def main():  # -> NoReturn
 
 
 if __name__ == '__main__':
-    _test = RhvoiceLocalHost()
-    print(_test.checklist)
-    # main()
+    main()
