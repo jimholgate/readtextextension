@@ -4,7 +4,7 @@
 This text explains how to use a web service and media player to read a text
 file. It outlines the terms and conditions associated with using the on-line
 service, as well as the potential privacy and security risks. It introduces
-two text-to-speech tools, Larynx and MaryTTS, and how to use them. It also
+text-to-speech tools, Larynx, Rhvoice and MaryTTS, and how to use them. It
 mentions the need to check if the network is available and to set permissions
 when using these tools. Lastly, it provides advice on how to update local
 libraries and packages when using these tools.
@@ -23,10 +23,16 @@ There may be acceptable use policies, limits or costs.
 * Online services could be terminated without warning.
 * Your content might not be private or secure.
 * Your organization or local laws might restrict use of online
-  data services. For example, services provided outside of your
-  country's jurisdiction might be restricted.
+  data services. For example, they might restrict services
+  provided outside of your country's jurisdiction.
 * An online provider could block your access because your use
   is excessive or otherwise violates their terms of service.
+* If you run the application in a prsotected container like a flatpak
+  or snap, some functions might not work because the application
+  does not have permission to execute them.
+* On some systems, you might need to install additional software
+  like `curl` and `ffmpeg` to ensure that libraries are available to
+  download and process files.
 
 Larynx
 ------
@@ -64,6 +70,13 @@ locally installed languages. A system administrator can change your
 account's ability to access a docker service or for the docker
 package to access locally installed resources.
 
+Rhvoice
+-------
+
+[Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest) is
+a docker image container that can read English, Esperanto, Georgian,
+Kyrgyz, Macedonian, Portuguese, Russian, Tatar and Ukrainian.
+
 MaryTTS
 -------
 
@@ -73,8 +86,8 @@ It can turn text into speech in many different languages. It runs on a `localhos
 web resource on your computer using a Docker container. Using MaryTTS does not
 require an on-line connection.
 
-You can make it sound like you by recording your voice and using MaryTTS
-[Import Tools](https://github.com/marytts/marytts-wiki/blob/master/VoiceImportToolsTutorial.md)
+You can make it sound like you by recording your voice and using MaryTTS [Import
+Tools](https://github.com/marytts/marytts-wiki/blob/master/VoiceImportToolsTutorial.md)
 to create a personalized voice.
 
 The Rhsspy MaryTTS docker image is an easy-to install web application that
@@ -115,14 +128,21 @@ network resource.
 
 Some of the network tools require specific versions of python
 or a specific system platform like `amd64`, `arm64` or `v7`.
-This script might not work because it can't use the required
-libraries on an unsupported version of python.
+This script might not work with those tools because it can't use
+the required libraries on an unsupported version of python.
 
 If you use python pip to install local libraries, you might have to
 manually update them from time to time. Packages that are managed
 by update utilities like `apt-get`, `yum` and `dnf` are upgraded
 by the distribution.
 
+If your docker image is not specifically supported here, check if
+it has a `maryTTS` compatibility mode. The compatibility mode
+allows the speech synthesis image to use the maryTTS address and 
+port and the maryTTS Application Program Interface (API) to list
+installed voices and to produce spoken audio files over a local
+web service.
+ 
 See also:
 [Docker docs](https://docs.docker.com/desktop/install/linux-install/)
 '''
@@ -174,6 +194,11 @@ try:
     import watsonserver
 except ImportError:
     pass
+
+NET_SERVICE_LIST = [
+    'AUTO', 'NETWORK', 'AWS', 'AZURE', 'GOOGLECLOUD', 'WATSON', 'GTTS',
+    'LARYNX', 'MARYTTS', 'RHVOICE'
+]
 
 
 def usage():  # -> None
@@ -765,7 +790,9 @@ Setup
             readtexttools.get_work_file_path(_out_path, _icon, 'TEMP'),
             self.default_extension
         ])
-
+        if len(_out_path) == 0 and bool(_post_process):
+            if readtexttools.handle_sound_playing(_media_work):
+                return True
         # Remove old files.
         if os.path.isfile(_media_work):
             os.remove(_media_work)
@@ -1246,6 +1273,9 @@ Loading larynx voices for `%(_lang2)s`
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
         _media_work = os.path.join(tempfile.gettempdir(), 'larynx.wav')
+        if len(_out_path) == 0 and bool(_post_process):
+            if readtexttools.handle_sound_playing(_media_work):
+                return True
         _voice = self.voice_name
         if self.debug and 1:
             print(['`LarynxClass` > ` `read`', 'Request `_voice`: ', _voice])
@@ -1575,10 +1605,14 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
         if not self.ok:
             return False
         _media_out = ''
+
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
         _media_work = os.path.join(tempfile.gettempdir(), 'MaryTTS.wav')
+        if len(_out_path) == 0 and bool(_post_process):
+            if readtexttools.handle_sound_playing(_media_work):
+                return True
         if bool(self.add_pause) and not ssml:
             for _symbol in self.pause_list:
                 if _symbol in _text:
@@ -1681,7 +1715,7 @@ Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
                 print('Unable to write media work file.')
                 return False
             # NOTE: Calling process must unlock_my_lock()
-            readtexttools.unlock_my_lock()
+
             readtexttools.process_wav_media(_info, _media_work, _icon,
                                             _media_out, _audible, _visible,
                                             _writer, _size)
@@ -1859,6 +1893,14 @@ class RhvoiceLocalHost(object):
                     self.ok = True
                     break
         if self.ok:
+            help_heading =self.help_heading
+            help_url = self.help_url
+            print('''
+Checking %(help_heading)s voices for `%(_iso_lang)s`
+========================================
+
+<%(help_url)s>
+''' % locals())
             if not REQUESTS_OK:
                 if not readtexttools.have_posix_app('curl', False):
                     self.ok = False
@@ -1942,6 +1984,9 @@ class RhvoiceLocalHost(object):
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
         _media_work = os.path.join(tempfile.gettempdir(), 'Rhvoice-rest.wav')
+        if len(_out_path) == 0 and bool(_post_process):
+            if readtexttools.handle_sound_playing(_media_work):
+                return True
         if bool(self.add_pause):
             for _symbol in self.pause_list:
                 if _symbol in _text:
@@ -1949,7 +1994,7 @@ class RhvoiceLocalHost(object):
                     break
         _view_json = self.debug and 1
         response = readtexttools.local_pronunciation(
-            _iso_lang, _text, 'rhvoice_rest', 'RHVOICE_REST_USER_DIRECTORY',
+            _iso_lang, _text, 'rhvoice', 'RHVOICE_USER_DIRECTORY',
             _view_json)
         _text = response[0]
         if _view_json:

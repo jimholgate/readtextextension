@@ -5,7 +5,6 @@ import getopt
 import os
 import sys
 
-
 def usage():  # -> None
     '''Show usage'''
     print('''
@@ -24,7 +23,7 @@ differently.
 * `-u`, `--user_environ_dir` - an optional user environment string
   to use for the json file search.
 
-MacOS 13 and MaryTTS can use a subset of the International Phonetic Alphabet.
+Layrnx and MaryTTS can use a subset of the International Phonetic Alphabet.
 Enclose the phonetic substring in square brackets.
 
 Legacy speech systems might require plain text or a use a different standard.
@@ -47,17 +46,49 @@ See:
 * <https://www.internationalphoneticalphabet.org/ipa-chart-audio/index.html>
 * <https://aletheiacui.github.io/tutorials/ipa_mac_users.html>
 
-''')
+New file
+--------
+
+find_replace_phonemes.py --output <path-out> --language en-CA <path-in>
+
+Modify file
+-----------
+
+find_replace_phonemes.py --language en-CA <path-to-file-to-edit>''')
+
+def fix_up_text_file(_text_file_in='', _file_out='',
+                     _language='en-CA', _my_dir='default',
+                     _user_dir='SPEECH_USER_DIRECTORY'):  # -> bool
+    '''Replace incorrect pronunciations in a UTF-8 text file.'''
+    _import_meta = readtexttools.ImportedMetaData()
+    _output_type = [0, 1][0]
+    if not os.path.isfile(_text_file_in):
+        return False
+    if os.path.splitext(_file_out)[1] in ['.json', '.js']:
+        _output_type = [0, 1][1]
+    _content2 = readtexttools.local_pronunciation(
+        _language,
+        _import_meta.meta_from_file(_text_file_in, False), _my_dir, _user_dir, True)
+    if not bool(_file_out):
+        _file_out = _text_file_in
+    if os.path.splitext(_file_out)[1] in ['.json', '.js']:
+        _output_type = [0, 1][1]
+    readtexttools.write_plain_text_file(_file_out, _content2[_output_type],
+                                        'utf-8')
+    print('')
+    return True
 
 
 def main():  # -> NoReturn
     '''Replaces mispronounced words with phonemes'''
     _file_out = ''
-    _output_type = [0, 1][0]  # Selector [text, confirmed json]
+    # _output_type = [0, 1][0]  # Selector [text, confirmed json]
     _language = 'en-CA'
     _my_dir = 'macos_say'
+    if os.name == 'nt':
+        _my_dir = 'windows_sapi'
     _user_dir = 'READ_JSON_USER_DIRECTORY'
-    _import_meta = readtexttools.ImportedMetaData()
+    # _import_meta = readtexttools.ImportedMetaData()
     _text_file_in = sys.argv[-1]
     if os.path.isfile(_text_file_in):
         if sys.argv[-1] == sys.argv[0]:
@@ -88,22 +119,10 @@ def main():  # -> NoReturn
                 assert False, "unhandled option"
         if not os.path.isfile(_text_file_in):
             usage()
-        if os.path.splitext(_file_out)[1] in ['.json', '.js']:
-            _output_type = [0, 1][1]
-        _content2 = readtexttools.local_pronunciation(
-            _language,
-            readtexttools.strip_mojibake(
-                _language, _import_meta.meta_from_file(_text_file_in, False),
-                False), _my_dir, _user_dir, True)
-        if not bool(_file_out):
-            _file_out = _text_file_in
-        if os.path.splitext(_file_out)[1] in ['.json', '.js']:
-            _output_type = [0, 1][1]
-            print(_content2[1])  # json table
-        readtexttools.write_plain_text_file(_file_out, _content2[_output_type],
-                                            'utf-8')
-    else:
-        print('I was unable to find the file you specified!')
+            sys.exit(0)
+        if not fix_up_text_file(_text_file_in, _file_out, 
+             _language, _my_dir,_user_dir):
+            print('I was unable to find the file you specified!')
     sys.exit(0)
 
 

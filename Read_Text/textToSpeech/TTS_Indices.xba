@@ -1655,10 +1655,15 @@ Function fsTimeMyRegion(i As Integer) As String
 		End If
 		Case &quot;en&quot; &apos;1:40 AM ; 2:40 PM (One forty A M; Two forty P M)
 		sL10N = format(Now,&quot;h:mm AM/PM&quot;)
-		Case Else &apos;1:40 ; 14:4
+		Case Else &apos;1:40 ; 14:40
 		sL10N = format(Now,&quot;h:mm&quot;)
 	End Select
 	fsTimeMyRegion = LTrim(RTrim(sL10N))
+End Function
+
+
+Function fsTimeStamp()
+	fsTimeStamp = Replace(format(Now, &quot;YYYY-MM-DD HH:mm:ss&quot;), &quot; &quot;, &quot;_&quot;)
 End Function
 
 

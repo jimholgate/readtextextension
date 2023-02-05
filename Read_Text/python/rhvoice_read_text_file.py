@@ -38,7 +38,7 @@ To enable rhvoice for speech-dispatcher in Ubuntu 22.04, use:
 To install rhvoice on other linux platforms, use a docker image
 like <https://hub.docker.com/r/aculeasis/rhvoice-rest>.
 
-The available voices might vary according to the specific image. 
+The available voices might vary according to the specific image.
 '''
 
 from __future__ import (absolute_import, division, print_function,
@@ -99,7 +99,7 @@ class RhVoiceClass(object):
 
     The following restrictions apply to some of the voices:
 
-    All voices from RHVoice Lab's site are distributed under the Creative 
+    All voices from RHVoice Lab's site are distributed under the Creative
     Commons Attribution-NonCommercial-NoDerivatives 4.0 International Public
     License.
 
@@ -339,8 +339,8 @@ class RhVoiceClass(object):
         readtexttools.write_plain_text_file(_text_work, _text, 'utf-8')
         _app = self.app
         _speech_rate = readtexttools.safechars(_speech_rate, '1234567890')
-        _command = '''%(_app)s -i '%(_text_work)s' -r %(_speech_rate)s -p %(_voice)s -o '%(_media_work)s'  
- ''' % locals()
+        _command = '''%(_app)s -i '%(_text_work)s' -r %(_speech_rate)s -p %(_voice)s -o '%(_media_work)s'
+''' % locals()
         try:
             readtexttools.my_os_system(_command)
         except:

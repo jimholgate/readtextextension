@@ -1,0 +1,19 @@
+{
+    "en_00001":{"g":"'","p":""},
+    "en_00002":{"g":"’","p":""},
+    "en_00003":{"g":"&","p":" and "},
+    "en_00004":{"g":" Z.","p":" zed."},
+    "en_00005":{"g":" Z?","p":" zed?"},
+    "en_00006":{"g":" Z ","p":" zed! "},
+    "en_00007":{"g":"<","p":" less than "},
+    "en_00008":{"g":">","p":" greater than "},
+    "en_00009":{"g":"{","p":" left curly bracket "},
+    "en_00010":{"g":" both live ","p":" both liv "},
+    "en_00011":{"g":" does live ","p":" does liv "},
+    "en_00012":{"g":"}","p":" right curly bracket "},
+    "en_00013":{"g":" does not live ","p":" does not liv "},
+    "en_00014":{"g":"Read Text Extension","p":"reed text extension"},
+    "en_00015":{"g":"Read text extension","p":"reed text extension"},
+    "en_99998":{"g":"$[LOCALE]","p":"en"},
+    "en_99999":{"g":"$[REVISION]","p":"2023-01-30_17:07:27"}
+}

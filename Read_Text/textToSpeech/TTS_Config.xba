@@ -132,8 +132,15 @@ Function OpenJsonFileDialog() As String
 End Function
 
 
-Sub ImportJsonPhonemeTable()
-	&apos; Dialog2 _trash
+Sub ImportJsonPhonemeTable(Event)
+	&apos; Dialog2 _open
+	Dim _mouse_alt As Integer : _mouse_alt = 2
+	Dim _mouse_event As Integer : _mouse_event = fiMyMouseEventToInt(Event)
+	Select Case _mouse_event
+		Case _mouse_alt
+		ResetPhonemesGit()
+		Exit Sub
+	End Select
 	Dim _in_file As String : _in_file = OpenJsonFileDialog()
 	Dim _file As String : _file = &quot;&quot;
 	Dim _language As String
@@ -169,60 +176,41 @@ Sub ImportJsonPhonemeTable()
 End Sub
 
 
-Sub ExportJsonPhonemeTable(Event)
-	&apos; Dialog2 _add .RIGHT
-	&apos; See also : ImportJsonPhonemeTable()
-	Dim _mouse_alt As Integer : _mouse_alt = 2
-	Dim _mouse_event As Integer : _mouse_event = fiMyMouseEventToInt(Event)
-	Dim _out_file As String : _out_file = &quot;&quot;
-	Dim _json_display As String : _json_display = &quot;&quot;
-	Dim _language As String : _language = &quot;&quot;
-	Dim _model As String : _model = &quot;&quot;
-	Dim _python_path As String : _python_path = &quot;&quot;
-	Dim _control As Variant : _control = Split(f_dlgJsonEdit.GetControl(_
-	&quot;_json_text&quot;).model.helpText, &quot;/&quot;)
-	Dim _default As String : _default =_control(Ubound(_
-	_control)-1) &amp; &quot;_&quot; &amp; _control(Ubound(_control))
-	Select Case _mouse_event
-		Case _mouse_alt
-		_out_file = SaveAsJsonDialog(_default)
-		If Len(_out_file) &lt;&gt; 0 Then
-			With f_dlgJsonEdit
-				_language = .GetControl(&quot;_test1&quot;).model.helpText
-				_model = .GetControl(&quot;_test2&quot;).model.helpText
-				_json_display = .GetControl(&quot;_json_text&quot;).model.Text
-				CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
-			End With
-		End If
-	End Select
-End Sub
-
-
 Sub SaveJsonPhonemeTable(Event)
-	&apos; Dialog
+	&apos; Dialog2 _save_as
 	&apos; See also : ImportJsonPhonemeTable()
 	Dim _mouse_event As Integer : _mouse_event = fiMyMouseEventToInt(Event)
+	Dim MouseAlt As Integer : MouseAlt = 2
 	Dim _out_file As String : _out_file = &quot;&quot;
 	Dim _json_display As String : _json_display = &quot;&quot;
 	Dim _language As String : _language = &quot;&quot;
 	Dim _model As String : _model = &quot;&quot;
-	Dim _python_path As String : _python_path = &quot;&quot;
-	Dim _control As Variant : _control = Split(f_dlgJsonEdit.GetControl(_
-	&quot;_json_text&quot;).model.helpText, &quot;/&quot;)
+	Dim _control As Variant : _control = Split(converttourl(_
+	f_dlgJsonEdit.GetControl(&quot;_json_text&quot;).model.helpText), &quot;/&quot;)
 	Dim _default As String : _default =_control(Ubound(_
 	_control)-1) &amp; &quot;_&quot; &amp; _control(Ubound(_control))
 	Select Case _mouse_event
-		Case Else
-		_out_file = SaveAsJsonDialog(_default)
-		If Len(_out_file) &lt;&gt; 0 Then
-			With f_dlgJsonEdit
-				_language = .GetControl(&quot;_test1&quot;).model.helpText
-				_model = .GetControl(&quot;_test2&quot;).model.helpText
-				_json_display = .GetControl(&quot;_json_text&quot;).model.Text
-				CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
-			End With
-		End If
+		Case MouseAlt
+			_default = _control(Ubound(_control))
 	End Select
+	_out_file = SaveAsJsonDialog(_default)
+	If Len(_out_file) = 0 Then
+		Exit Sub
+	End If
+	With f_dlgJsonEdit
+		_language = .GetControl(&quot;_test1&quot;).model.helpText
+		_model = .GetControl(&quot;_test2&quot;).model.helpText
+		_json_display = .GetControl(&quot;_json_text&quot;).model.Text
+		CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
+		Select Case _mouse_event
+			Case MouseAlt
+			&apos; Update json and remove duplicate items.
+			fbUpdateLexiconJsonFile(_language, _model, _out_file)
+			.GetControl(&quot;_json_text&quot;).visible = False
+			.GetControl(&quot;_json_text&quot;).model.Text = getTextFromFile(_out_file, &quot;UTF-8&quot;)
+			.GetControl(&quot;_json_text&quot;).visible = True	
+		End Select
+	End With
 End Sub
 
 
@@ -239,6 +227,7 @@ End Function
 Type SpeechHostInfo
 	about as String
 	label as String  &apos; &quot;larynx-server&quot;
+	token as String
 	url as String  &apos; &quot;http://0.0.0.0:5002&quot;
 	url_info as String  &apos; &quot;/api/voices&quot;
 	json_dir as String  &apos; &quot;larynx&quot;
@@ -253,12 +242,14 @@ Function LarynxSpeechHostInfo()
 	With _info
 		.about = &quot;End-to-end text to speech system using gruut and onnx.&quot;
 		.label = &quot;larynx-server&quot;
+		.token = &quot;&quot;
 		.url = &quot;http://0.0.0.0:5002&quot;
 		.url_info = &quot;/api/voices&quot;
 		.json_dir = &quot;larynx&quot;
 		.sample = &quot;http://0.0.0.0:5002/api/tts?voice=en&amp;text=Hello+world&quot;
 		.docker = &quot;https://hub.docker.com/r/rhasspy/larynx&quot;
-		.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;, &quot;extensible&quot;)
+		.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;,_
+		&quot;extensible&quot;, &quot;optional-voices&quot;)
 	End With
 	LarynxSpeechHostInfo = _info
 End Function
@@ -269,6 +260,7 @@ Function MaryTtsSpeechHostInfo()
 	With _info
 		.about = &quot;MaryTTS 5.2 text to speech server with 19 voices for 8 languages&quot;
 		.label = &quot;marytts-server&quot;
+		.token = &quot;&quot;
 		.url = &quot;http://0.0.0.0:59125&quot;
 		.url_info = &quot;/voices&quot;
 		.json_dir = &quot;mary_tts&quot;
@@ -277,27 +269,6 @@ Function MaryTtsSpeechHostInfo()
 		.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;)
 	End With
 	MaryTtsSpeechHostInfo = _info
-End Function
-
-
-Function MacOSSpeechHostInfo()
-	Dim _info As SpeechHostInfo
-	Select Case fsGetOS()
-		Case &quot;MacOS&quot;
-		With _info
-			.about = &quot;&quot;
-			.label = &quot;macos-say&quot;
-			.url = fsMyURL() &amp; &quot;/po/macos_say&quot;
-			.url_info = &quot;/en-US_lexicon.json&quot;
-			.json_dir = &quot;macos_say&quot;
-			.sample = &quot;&quot;
-			.docker = &quot;&quot;
-			.tags = Array(&quot;text&quot;, &quot;m4a&quot;, &quot;mp3&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;audio-only-option&quot;)
-		End With
-		Case Else
-		_info = MaryTtsSpeechHostInfo()
-	End Select
-	MacOSSpeechHostInfo = _info
 End Function
 
 
@@ -312,9 +283,219 @@ Function RhvoiceSpeechHostInfo()
 		.json_dir = &quot;rhvoice&quot;
 		.sample = &quot;http://0.0.0.0:8080/say?format=mp3&amp;rate=50&amp;pitch=50&amp;volume=50&amp;voice=slt&amp;text=Hello%20World&quot;
 		.docker = &quot;https://hub.docker.com/r/aculeasis/rhvoice-rest&quot;
-		.tags = Array(&quot;text&quot;, &quot;mp3&quot;, &quot;ogg&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;ubuntu&quot;)
+		.tags = Array(&quot;text&quot;, &quot;pitch&quot;, &quot;rate&quot;, &quot;volume&quot;, &quot;mp3&quot;, &quot;ogg&quot;, &quot;flac&quot;, &quot;wav&quot;)
 	End With
 	RhvoiceSpeechHostInfo = _info
+End Function
+
+
+Function MacOSSpeechAppInfo()
+	Dim _info As SpeechHostInfo
+	Select Case fsGetOS()
+		Case &quot;MacOS&quot;
+		With _info
+			.about = &quot;&quot;
+			.label = &quot;macos-say&quot;
+			.token = &quot;&quot;
+			.url = fsMyURL() &amp; &quot;/po/macos_say&quot;
+			.url_info = &quot;/en-US_lexicon.json&quot;
+			.json_dir = &quot;macos_say&quot;
+			.sample = &quot;&quot;
+			.docker = &quot;&quot;
+			.tags = Array(_
+			&quot;always-available&quot;, &quot;text&quot;, &quot;m4a&quot;, &quot;mp3&quot;, &quot;wav&quot;, &quot;rate&quot;, _
+			&quot;audio-only-option&quot;, &quot;optional-voices&quot;)
+		End With
+		Case Else
+		_info = MaryTtsSpeechHostInfo()
+	End Select
+	MacOSSpeechAppInfo = _info
+End Function
+
+
+Function PosixFestivalSpeechAppInfo()
+	&apos; This is available as a speech-dispatcher plugin.
+	Dim _info As SpeechHostInfo
+	With _info
+		.about = &quot;Festival is a speech synthesiser developed in 1995 at the University of Edinburgh.&quot;
+		.label = &quot;festival-tts&quot;
+		.token = &quot;(FESTIVAL_READ_TEXT_PY)&quot;
+		.url = fsMyURL() &amp; &quot;/po/festival&quot;
+		.url_info = &quot;/en-US_lexicon.json&quot;
+		.json_dir = &quot;festival&quot;
+		.sample = &quot;&quot;
+		.docker = &quot;&quot;
+		.tags = Array(&quot;text&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;optional-voices&quot;)
+	End With
+	PosixFestivalSpeechAppInfo = _info
+End Function
+
+
+Function PosixRhvoiceSpeechAppInfo()
+	&apos; This relies on a depreciated &quot;developer&quot; interface. If you are an end user
+	&apos; you can run this application with additional options on a Docker localhost
+	&apos; server or as a speech-dispatcher service.
+	Dim _info As SpeechHostInfo
+	With _info
+		.about = &quot;Olga Yakovleva created RHVoice in 2011. It now includes several languages.&quot;
+		.label = &quot;rhvoice&quot;
+		.token = &quot;(RHVOICE_READ_TEXT_PY)&quot;
+		.url = fsMyURL() &amp; &quot;/po/rhvoice&quot;
+		.url_info = &quot;/en-US_lexicon.json&quot;
+		.json_dir = &quot;rhvoice&quot;
+		.sample = &quot;&quot; &apos; &quot;https://rhvoice.su/downloads/lyubov/demo.mp3?_=11&quot;
+		.docker = &quot;&quot; 
+		.tags = Array(&quot;text&quot;, &quot;wav&quot;, &quot;optional-voices&quot;, &quot;ubuntu&quot;, &quot;developer&quot;, &quot;depreciated&quot;)
+	End With
+	PosixRhvoiceSpeechAppInfo = _info
+End Function
+
+
+Function PosixSvoxPicoSpeechAppInfo()
+	Dim _info As SpeechHostInfo
+	With _info
+		.about = &quot;SVOX Pico is a compact speech synthesiser with low latency.&quot;
+		.label = &quot;svox-pico&quot;
+		.token = &quot;(PICO_READ_TEXT_PY)&quot;
+		.url = fsMyURL() &amp; &quot;/po/svox_pico&quot;
+		.url_info = &quot;/en-US_lexicon.json&quot;
+		.json_dir = &quot;svox_pico&quot;
+		.sample = &quot;&quot;
+		.docker = &quot;&quot;
+		.tags = Array(&quot;text&quot;, &quot;wav&quot;, &quot;rate&quot;)
+	End With
+	PosixSvoxPicoSpeechAppInfo = _info
+End Function
+
+Function WindowsSpeechAppInfo()
+	Dim _info As SpeechHostInfo
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+		With _info
+			.about = &quot;Windows Speech Application Interface (SAPI)&quot;
+			.label = &quot;windows-sapi&quot;
+			.url = fsMyURL() &amp; &quot;/po/windows_sapi&quot;
+			.url_info = &quot;/en-US_lexicon.json&quot;
+			.json_dir = &quot;windows_sapi&quot;
+			.sample = &quot;&quot;
+			.docker = &quot;&quot;
+			.tags = Array(_
+			&quot;always-available&quot;, &quot;text&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;audio-only-option&quot;, _
+			&quot;optional-voices&quot;)
+		End With
+		Case Else
+		_info = MaryTtsSpeechHostInfo()
+	End Select
+	WindowsSpeechAppInfo = _info
+End Function
+
+
+Function fsGitRawJson(_
+		json_dir As String,_
+		lang_region As String,_
+		raw_git As String) As String
+	Dim _fallback_info : _fallback_info = WindowsSpeechAppInfo()
+	&apos; Obtain the most recent published phoneme transcription. If you are editing
+	&apos; or creating a list to publish, note that not all platforms or voices
+	&apos; support the International Phonetic Alphabet. In these cases, you have to
+	&apos; experiment with spelling and similar sounding words to get the 
+	&apos; pronunciation you want. For example:
+	&apos;
+	&apos; + &quot;reed&quot; for the verb &quot;to read&quot; instead of the sound of the colour &quot;red&quot;.
+	&apos; + &quot;qwa-nel&quot; for the town &quot;Quesnel&quot;
+	&apos;
+	&apos; `raw_git` : a custom URL
+	&apos; ------------------------
+	&apos; 
+	&apos; You can use a custom lexicon URL for your class, school or organization.
+	&apos; Set up a server that  points to a private local access point that uses
+	&apos; the same directory structure as the `po` directory in the extension code.
+	&apos;
+	&apos; See
+	&apos;
+	&apos; * &lt;https://forums.docker.com/t/using-localhost-for-to-access-running-container/3148/6&gt;
+	&apos; * &lt;https://docs.docker.com/network/&gt;
+	&apos; * &lt;https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml&gt;
+	&apos; 
+	&apos; The default docker address is &lt;http://localhost:41604/po/&gt;. Developers or
+	&apos; other third parties can use a docker server to provide customized lexicons
+	&apos; to suit your needs.
+	&apos;
+	&apos; For development on your network, you should set `raw-git` to point to a URL
+	&apos; that works on your network using a local environment variable called 
+	&apos; `READTEXT_ONLINE_LEXICON_URL`. The json document location for a region is
+	&apos; `~/po/&lt;speech-engine&gt;/&lt;language&gt;-&lt;locale&gt;_lexicon.json`
+
+	If Len(json_dir) = 0 Then json_dir = _fallback_info.json_dir
+	If Len(lang_region) = 0 Then lang_region = &quot;en-US&quot;
+	Dim home_git$ : home_git = &quot;https://raw.githubusercontent.com/jimholgate/readtextextension/master/Read_Text/po/&quot;
+	&apos; `docker_url` might be assigned to another service. Please set a local server
+	&apos; using the `READTEXT_ONLINE_LEXICON_URL` environment variable to get your
+	&apos; locally hosted lexicon resources.
+	Dim docker_url$ : docker_url = fsGetWebService(&quot;http://localhost:41604/po/&quot;)
+	Dim _temp_json$ :  _temp_json = fsMyTempLock(&quot;rt-git-raw.json&quot;)
+	If Len(raw_git) = 0 Then
+		If Len(docker_url) &lt;&gt; 0 Then
+			raw_git = docker_url
+		Else
+			raw_git = home_git
+		End If
+	End If
+	With f_dlgJsonEdit:
+	raw_git = InputBox(fsLookUpTerm(&quot;s_script&quot;) &amp; &quot; : &quot; &amp; fsLookUpTerm(&quot;s_use-a-web-application&quot;), .Title, raw_git)
+	
+	If Len(raw_git) = 0 Then
+		fsGitRawJson = &quot;&quot;
+		Exit Function
+	End If
+	Dim lang$ : lang = Split(lang_region, &quot;-&quot;)(0)
+	Dim  fallback$ : fallback = Join(Array(_
+	home_git, _fallback_info.json_dir, &quot;/&quot;, &quot;en-US&quot;, &quot;_lexicon.json&quot;), &quot;&quot;)
+	On Error GoTo fsGitRawJsonErr
+	Dim _searches As Variant : _searches = Array(lang_region, fsSelectionLanguage(True), &quot;en-US&quot;, &quot;en&quot;)
+	Dim x As Integer
+	Dim _search$ : _search = &quot;&quot;
+	
+	Dim _get$ : _get = &quot;&quot; 
+	For x = Lbound(_searches) To Ubound(_searches)
+		_search = Join(_
+		Array(raw_git, json_dir, &quot;/&quot;, _searches(x), &quot;_lexicon.json&quot;), &quot;&quot;)
+		_get = fsGetWebService(_search)
+		If Len(_get) &lt;&gt; 0 Then
+			&apos; Update json and remove duplicate items
+			CreateFile(_temp_json, _get, &quot;UTF-8&quot;)
+			fbUpdateLexiconJsonFile(lang_region, json_dir, _temp_json)
+			fsGitRawJson = getTextFromFile(_temp_json, &quot;UTF-8&quot;)
+			kill _temp_json
+			If Len(fsGitRawJson) = 0 Then
+				fsGitRawJson = _get
+			End If
+			Exit Function
+		End If
+	Next
+	End With
+	fsGitRawJson = fsGetWebService(fallback)
+Exit Function
+	fsGitRawJsonErr:
+	fsGitRawJson = &quot;&quot;
+End Function
+
+
+Function fsGetWebService(_
+		ByVal _uri) As String
+	fsGetWebService = &quot;&quot;
+	&apos; Get web text that shows MaryTTS voices
+	&apos; =WEBSERVICE(&quot;http://0.0.0.0:59125/voices&quot;)
+	&apos; Use with tested and trusted sources
+	On Local Error GoTo fsGetWebServiceErr
+	If _uri = &quot;&quot; Then Exit Function
+	Dim fA : fA = CreateUNOService(&quot;com.sun.star.sheet.FunctionAccess&quot;)
+	Dim s1$ : s1 = &quot;WEBSERVICE&quot;
+	Dim s2$ : s2 = fA.callFunction(s1, Array(_uri))
+	fsGetWebService = s2
+	Exit Function
+	fsGetWebServiceErr:
+	fsGetWebService = &quot;&quot;
 End Function
 
 
@@ -355,6 +536,18 @@ Function fsLocalHostSpeech() As String
 End Function
 
 
+Function fsDefaultJson(_select_lang As String) As String
+	Dim CR As String
+	CR = Chr(13)
+	fsDefaultJson = Join(Array(&quot;{&quot;,_
+	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00001&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read Text Extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;},&quot;,_
+	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00002&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read text extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;}&quot;,_
+	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_99998&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;$[LOCALE]&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot; &amp; _select_lang &amp; &quot;&quot;&quot;}&quot;,_
+	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_99999&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;$[REVISION]&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot; &amp; fsTimeStamp() &amp; &quot;&quot;&quot;}&quot;,_
+	&quot;}&quot;), CR)
+End Function
+
+
 Function EditJsonPhonemeTable() As String
 	&apos; This Json editor adds new grapheme / phoneme pairs to json file
 	&apos; so individuals can edit the pronunciation of names and things that
@@ -376,23 +569,37 @@ Function EditJsonPhonemeTable() As String
 	CR = Chr(13)
 	Dim is_unique As Boolean
 	Dim _display_phoneme As String
+	Dim posix_py As String
 	Dim _info As Variant
 	Select Case fsGetOS()
 		Case &quot;MacOS&quot;
-		_po_dir = &quot;macos_say&quot;
+		_po_dir = MacOSSpeechAppInfo().json_dir
+		Case &quot;WINDOWS&quot;
+		_po_dir = WindowsSpeechAppInfo().json_dir
 		Case Else
-		_po_dir = &quot;svox_pico&quot;
-		_info = SpeechHostInfoList()
-		For x = Lbound(_info) To Ubound(_info)
-			If fbLocalHostOk(_info(x).url &amp; _info(x).url_info) Then
-				_po_dir = _info(x).json_dir
-				Exit For
-			End If
-		Next
+		With f_dlgSpeechSetup
+			posix_py = .GetControl(&quot;ComboBox2&quot;).Model.Text
+		End With
+		If InStr(posix_py, PosixSvoxPicoSpeechAppInfo().token) &lt;&gt; 0 Then
+			_po_dir = PosixSvoxPicoSpeechAppInfo().json_dir
+		ElseIf InStr(posix_py, PosixFestivalSpeechAppInfo().token) &lt;&gt; 0 Then
+			_po_dir = PosixFestivalSpeechAppInfo().json_dir
+		ElseIf InStr(posix_py, PosixRhvoiceSpeechAppInfo().token) &lt;&gt; 0 Then
+			_po_dir = PosixRhvoiceSpeechAppInfo().json_dir
+		Else
+			_po_dir = &quot;default&quot;
+		End If
 	End Select
+	_info = SpeechHostInfoList()
+	For x = Lbound(_info) To Ubound(_info)
+		If fbLocalHostOk(_info(x).url &amp; _info(x).url_info) Then
+			_po_dir = _info(x).json_dir
+			Exit For
+		End If
+	Next
 	x = 0
 	Dim lang_array As Variant
-	lang_array = fvGetIsoLangArray
+	lang_array = fvGetIsoLangArray()
 	For x = Lbound(lang_array) to Ubound(lang_array)
 		If Len(lang_array(x)) &lt;&gt; 0 Then
 			_select_lang = lang_array(x)
@@ -427,10 +634,7 @@ Function EditJsonPhonemeTable() As String
 		End If
 	End If
 	If Instr(_json_display, &quot;{&quot;) = 0 Or Instr(_json_display, &quot;}&quot;) = 0 Then
-		_json_display = Join(Array(&quot;{&quot;,_
-		&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00001&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read Text Extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;},&quot;,_
-		&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00002&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read text extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;}&quot;,_
-		&quot;}&quot;), CR)
+		_json_display = fsDefaultJson(_select_lang)
 	End If
 	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
 	is_unique = Instr(_json_display, &quot;{&quot;&quot;g&quot;&quot;:&quot;&quot;&quot; &amp; _grapheme &amp; &quot;&quot;&quot;,&quot;&quot;&quot;) = 0
@@ -594,6 +798,39 @@ End Sub
 Sub SpeakPhonemeJson()
 	With f_dlgJsonEdit
 		MsgSpeak(.GetControl(&quot;_phoneme&quot;).model.Text)
+	End With
+End Sub
+
+
+Sub ResetPhonemesGit()
+	&apos; The online repository of json lexicon tables defaults
+	&apos; to github.com. You can set it to a customized URL by setting
+	&apos; the `READTEXT_ONLINE_LEXICON_URL` environment variable
+	&apos; to specify a local url or a fork of the project on github.com.
+	&apos; This means that you can control shared data that includes
+	&apos; how to pronounce client names or local places and acronyms.
+	&apos;
+	&apos; Back up your home settings on your local Android phone or
+	&apos; device using Wifi File Explorer PRO as a http file server.
+	Dim json_dir As String
+	Dim lang_region As String
+	Dim raw_git As String : raw_git = &quot;&quot;
+	Dim environ_path As String : environ_path = &quot;&quot;
+	On Error Resume Next
+	environ_path = Environ(&quot;READTEXT_ONLINE_LEXICON_URL&quot;)
+	If Len(environ_path) &lt;&gt; 0 Then
+		raw_git = environ_path
+	End If
+	Dim json_data As String : json_data = &quot;&quot;
+	With f_dlgJsonEdit
+ 		json_dir = .GetControl(&quot;_test2&quot;).model.helpText
+ 		lang_region = .GetControl(&quot;_test1&quot;).model.helpText 		
+ 		json_data = fsGitRawJson(json_dir, lang_region, raw_git)
+ 		If Len (json_data) = 0 Then
+ 			json_data = fsDefaultJson(lang_region)
+ 		End If
+ 		.GetControl(&quot;_json_text&quot;).model.Text = json_data
+ 		.Execute
 	End With
 End Sub
 

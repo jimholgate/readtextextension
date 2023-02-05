@@ -220,10 +220,7 @@ computer's ability to run system python libraries.
     except ImportError:
         USE_SPEECHD = False
 
-NET_SERVICE_LIST = [
-    'AUTO', 'NETWORK', 'AWS', 'AZURE', 'GOOGLECLOUD', 'GTTS', 'LARYNX',
-    'MARYTTS'
-]
+NET_SERVICE_LIST = network_read_text_file.NET_SERVICE_LIST
 
 
 def about_script(player='speech-dispatcher'):  # -> str
@@ -689,6 +686,9 @@ configurations.
                                 '-']).split('-')[0].split('_')[0]
         _txt = readtexttools.strip_xml(_txt)
         _txt = readtexttools.strip_mojibake(concise_lang, _txt)
+        _txt = readtexttools.local_pronunciation(language, _txt, 'default',
+                                                 'SPEECH_USER_DIRECTORY',
+                                                 False)[0]
         try:
             if os.uname()[1] in ['centos', 'fedora', 'rhel']:
                 # `espeak-ng` for `speechd` on fedora 5.18.18-200.fc36.x86_64
@@ -2012,7 +2012,8 @@ def main():
         if not USE_SPEECHD:
             print(
                 '''The `speechd` library is not compatible with your application
-or platform. Try a networked speech tool like `larynx-server` or `docker-marytts`.''')
+or platform. Try a networked speech tool like `larynx-server` or `docker-marytts`.'''
+            )
             if i_rate == 0:
                 _word_rate = 160
             if not network_read_text_file.network_main(

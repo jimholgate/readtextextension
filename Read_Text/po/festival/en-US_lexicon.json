@@ -1,0 +1,16 @@
+{
+    "en-US_00001":{"g":"'","p":""},
+    "en-US_00002":{"g":"’","p":""},
+    "en-US_00003":{"g":"&","p":" and "},
+    "en-US_00004":{"g":"<","p":" less than "},
+    "en-US_00005":{"g":">","p":" greater than "},
+    "en-US_00006":{"g":"{","p":" left curly bracket "},
+    "en-US_00007":{"g":" both live ","p":" both liv "},
+    "en-US_00008":{"g":" does live ","p":" does liv "},
+    "en-US_00009":{"g":"}","p":" right curly bracket "},
+    "en-US_00010":{"g":" does not live ","p":" does not liv "},
+    "en-US_00011":{"g":"Read Text Extension","p":"reed text extension"},
+    "en-US_00012":{"g":"Read text extension","p":"reed text extension"},
+    "en-US_99998":{"g":"$[LOCALE]","p":"en-US"},
+    "en-US_99999":{"g":"$[REVISION]","p":"2023-01-30_17:14:22"}
+}

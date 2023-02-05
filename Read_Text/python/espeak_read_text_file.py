@@ -85,6 +85,7 @@ import math
 import os
 import sys
 import readtexttools
+import find_replace_phonemes
 
 
 def usage():
@@ -381,6 +382,9 @@ reads the file aloud.
         # for example: /usr/bin/ or /usr/local/bin/
         _app = espeak_path()
         if bool(_app):
+            find_replace_phonemes.fix_up_text_file(_text_path, '', _lang,
+                                                   'default',
+                                                   'SPEECH_USER_DIRECTORY')
             _command = ''.join([
                 '"', _app, '" -b 1 -p ', _pitch, ' -s ', _rate, ' -v ', _voice,
                 ' -w "', _work_file, '" -f "', _text_path, '"'
@@ -400,6 +404,8 @@ reads the file aloud.
             # text from the text file.
             _app = 'gst-launch-1.0'
             _content = _imported_meta.meta_from_file(_text_path)
+            _content = readtexttools.local_pronunciation(
+                _lang, _content, 'default', 'SPEECH_USER_DIRECTORY', False)[0]
             _content = _imported_meta.escape_gst_pipe_meta(_content)
             _command = '%(_app)s espeak text="%(_content)s" voice=%(_voice)s ! autoaudiosink' % locals(
             )

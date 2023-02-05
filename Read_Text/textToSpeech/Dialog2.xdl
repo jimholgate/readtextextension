@@ -7,9 +7,7 @@
  <dlg:bulletinboard>
   <dlg:textfield dlg:id="_phoneme" dlg:tab-index="1" dlg:left="10" dlg:top="54" dlg:width="218" dlg:height="14" dlg:page="-2" dlg:help-text="[ried] text extension" dlg:vscroll="true"/>
   <dlg:text dlg:id="_replace" dlg:tab-index="9" dlg:left="10" dlg:top="41" dlg:width="263" dlg:height="12" dlg:page="-2" dlg:value="_replace"/>
-  <dlg:button dlg:id="_add" dlg:tab-index="2" dlg:disabled="true" dlg:left="213" dlg:top="193" dlg:width="66" dlg:height="16" dlg:page="-4" dlg:default="true" dlg:value="_add" dlg:button-type="ok">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ExportJsonPhonemeTable?language=Basic&amp;location=application" script:language="Script"/>
-  </dlg:button>
+  <dlg:button dlg:id="_add" dlg:tab-index="2" dlg:disabled="true" dlg:left="213" dlg:top="193" dlg:width="66" dlg:height="16" dlg:page="-4" dlg:default="true" dlg:value="_add" dlg:button-type="ok"/>
   <dlg:button dlg:id="_cancel" dlg:tab-index="3" dlg:left="162" dlg:top="193" dlg:width="45" dlg:height="16" dlg:help-text="https://sites.google.com/site/readtextextension/" dlg:value="_cancel" dlg:button-type="cancel" dlg:grab-focus="false"/>
   <dlg:text dlg:id="_find" dlg:tab-index="8" dlg:left="10" dlg:top="12" dlg:width="264" dlg:height="12" dlg:page="-2" dlg:value="_find"/>
   <dlg:titledbox dlg:id="_code_frame" dlg:tab-index="7" dlg:left="5" dlg:top="76" dlg:width="277" dlg:height="105">

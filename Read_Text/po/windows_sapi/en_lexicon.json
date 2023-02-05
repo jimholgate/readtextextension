@@ -1,0 +1,13 @@
+{
+    "en_00001":{"g":" does live ","p":" does [liv]"},
+    "en_00002":{"g":" both live ","p":" both [liv]"},
+    "en_00003":{"g":" does not live ","p":" does not [liv]"},
+    "en_00004":{"g":" Z ","p":" [zed] "},
+    "en_00005":{"g":" Z.","p":" [zed]."},
+    "en_00006":{"g":" Z?","p":" [zed]?"},
+    "en_00007":{"g":"\u005Cx92","p":"’"},
+    "en_00008":{"g":"Read Text Extension","p":"[ried] text extension"},
+    "en_00009":{"g":"Read text extension","p":"[ried] text extension"},
+    "en_99998":{"g":"$[LOCALE]","p":"en"},
+    "en_99999":{"g":"$[REVISION]","p":"2023-01-22_14:17:26"}
+}

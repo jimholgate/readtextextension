@@ -75,6 +75,11 @@ except ImportError:
     pass
 
 try:
+    import psutil
+except ImportError:
+    pass
+
+try:
     import site
 except ImportError:
     pass
@@ -136,6 +141,26 @@ IPA_SUBSET = [
     'ʋ', 'w', 'ɰ', 'x', 'ɥ', 'z', 'ʑ', 'ʐ', 'ʒ', 'a', 'ɐ', 'ᴂ', 'ɑ', 'e', 'ə',
     'ɜ', 'ɛ', 'i', 'ɪ', 'ɨ', 'o', 'ɒ', 'ɔ', 'ɵ', 'ʌ', 'u', 'ɯ', 'ʊ', 'ʉ', 'y'
 ]
+
+
+def killall_process(_process=''):  # -> bool
+    '''If process is active, then stop it. Posix systems can use the posix
+    `killall` command. Windows requires the `pip3` `psutil` library. Returns
+    `True` if a process was stopped.'''
+    _success = False
+    try:
+        for proc in psutil.process_iter():
+            if proc.name() == _process:
+                proc.kill()
+                _success = True
+        return _success
+    except NameError:
+        if os.name == 'posix':
+            # `killall` might not be available to the script if it is running
+            # in a container that does not include the `killall` command.
+            return os.system('killall %(_process)s' % locals()) == 0
+        print("WARNING: NameError in `killall_process`. Requires pip3 `psutil`")
+    return False
 
 
 def write_plain_text_file(_file_path='',
@@ -1420,7 +1445,8 @@ def do_gst_parse_launch(_pipe=''):  # -> bool
         _player.set_state(Gst.State.READY)
         _player.set_state(Gst.State.NULL)
         return True
-    except:  # gi.repository.GLib.Error: gst_parse_error: no element "filesrc" (1)
+    # gi.repository.GLib.Error: gst_parse_error: no element "filesrc" (1)
+    except:
         try:
             _terminator = u'\u0000'
             Gst.init(None)
@@ -1708,7 +1734,7 @@ class ImportedMetaData(object):
         '''Calculate the number of seconds of a local sound file. Return
         the value as a string and set the `self.seconds` value to an integer.'''
         _extension_table = ExtensionTable()
-        #if self.seconds:
+        # if self.seconds:
         #    return self.seconds
         if not os.path.isfile(file_path):
             self.seconds = 0
@@ -1830,7 +1856,7 @@ class ImportedMetaData(object):
                 ''' -meta:album="%(album)s" -meta:artist="%(author)s" -meta:genre="%(genre)s" -meta:title="%(title)s" -meta:track="%(track)s" -meta:year="%(year)s" '''
                 % locals()
             ],
-            [  #5
+            [  # 5
                 "Lame (Win)",
                 ''' %(lame_image)s --tl "%(album)s" --ta "%(author)s" --tt "%(title)s" --tg "%(genre)s" --tn "%(track)s" --ty %(year)s '''
                 % locals()
@@ -1857,7 +1883,7 @@ class ImportedMetaData(object):
             [  # 11
                 "Genre", "%(genre)s" % locals()
             ],
-            [  #12
+            [  # 12
                 "VLC Playlist",
                 '''<?xml version="1.0" encoding="UTF-8"?>
 <playlist xmlns="http://xspf.org/ns/0/" xmlns:vlc="http://www.videolan.org/vlc/playlist/ns/0/" version="1">
@@ -1881,17 +1907,17 @@ class ImportedMetaData(object):
     </extension>
 </playlist>''' % locals()
             ],
-            [  #13
+            [  # 13
                 "M3U playlist",
                 '''#EXTM3U\nEXTINF:%(seconds)s,%(author)s - %(title)s\n%(out_uri)s\n'''
                 % locals()
             ],
-            [  #14
+            [  # 14
                 "Metadata",
                 ''' * Album: %(album)s\n * Artist: %(author)s\n * Composer: %(composer)s\n * Genre: %(genre)s\n * Title: %(title)s\n * Track: %(track)s\n * Year: %(year)s'''
                 % locals()
             ],
-            [  #15
+            [  # 15
                 "Avconv or ffmpeg Meta File",
                 ''';FFMETADATA1
 ;https://ffmpeg.org/ffmpeg-all.html#toc-Metadata-1
@@ -1902,7 +1928,7 @@ ARTIST=%(author)s
 GENRE=%(genre)s
 track=%(track)s''' % locals()
             ],
-            [  #16
+            [  # 16
                 "Avconv or ffmpeg Meta",
                 ''' -metadata album="%(album)s" -metadata artist="%(author)s" -metadata genre="%(genre)s" -metadata title="%(title)s" -metadata track="%(track)s" -metadata Year="%(year)s" '''
                 % locals()
@@ -1925,7 +1951,7 @@ track=%(track)s''' % locals()
             [  # 21
                 "XML Genre", "%(x_genre)s" % locals()
             ],
-            [  #22
+            [  # 22
                 "Popup Meta",
                 '''<b>%(x_album)s</b>\n%(x_title)s \n<i>%(x_display_path)s</i>'''
                 % locals()
@@ -1938,12 +1964,23 @@ track=%(track)s''' % locals()
         except:
             return option[0]
 
-    def meta_from_file(self, _file_path='', erase=False):  # -> str
-        '''If the specified text file exists, then return the
-        contents, otherwise return `''`. '''
+    def meta_from_file(self,
+                       _file_path='',
+                       erase=False,
+                       _errors='backslashreplace'):  # -> str
+        '''If the specified text file exists, then return the contents,
+        otherwise return `''`.'''
+        return_value = ''
+        _encoding = 'utf-8'
+        if os.name == 'nt':
+            if not sys.stdin.encoding == _encoding:
+                _encoding = 'utf_8_sig'
         try:
             if os.path.isfile(_file_path):
-                f = codecs.open(_file_path, mode='r', encoding='utf-8')
+                f = codecs.open(_file_path,
+                                mode='r',
+                                encoding=_encoding,
+                                errors=_errors)
                 return_value = f.read()
                 f.close()
                 if erase:
@@ -1954,7 +1991,13 @@ track=%(track)s''' % locals()
                 return return_value
             else:
                 return ''
-        except:
+        except UnicodeDecodeError:
+            return_value = self.meta_from_file(_file_path, erase,
+                                               'backslashreplace')
+            print('''WARNING: Could not decode characters in the file:
+`%(_file_path)s`''' % locals())
+            return return_value
+        except Exception:
             return ''
 
     def get_my_id(self, erase=True):  # -> str
@@ -2558,7 +2601,7 @@ the `libx264` or `aac` package to convert media to`video/mp4`.''')
     unlock_my_lock()
 
 
-def clean_str(test_text='', beautify_quotes=True):  #-> str
+def clean_str(test_text='', beautify_quotes=True):  # -> str
     '''
     * `test_text` - string to clean
     * `beautify_quotes` - use smart quotes
@@ -2627,7 +2670,7 @@ def date_for_album():  # -> str
     return time.strftime('%Y-%m-%d')
 
 
-def check_title(_title='', _tool=''):  #-> str
+def check_title(_title='', _tool=''):  # -> str
     '''
     If it is not a working title, replace title.
     '''
@@ -2861,13 +2904,16 @@ def local_pronunciation(iso_lang='en-CA',
     _json_text = ''
     _json_tools = JsonTools()
     _imported_meta = ImportedMetaData()
+    _used_graphemes = [""]
+    _good_list = []
     _user_dir = os.path.join(office_user_dir(), 'config', 'lexicons', my_dir)
     if my_env in os.environ:
         _user_dir = os.getenv(my_env)
     for _lang in [iso_lang, iso_lang.split('-')[0].split('_')[0]]:
         _test = _lang
+        _os_sep = os.sep
         _json_search1 = app_icon_image('%(_test)s_lexicon.json' % locals(),
-                                       'po/%(my_dir)s' % locals())
+                                       'po%(_os_sep)s%(my_dir)s' % locals())
         _json_search2 = os.path.join(_user_dir,
                                      '%(_test)s_lexicon.json' % locals())
         _json_search3 = os.path.join(_imported_meta.custom_lexicon_path(),
@@ -2881,6 +2927,9 @@ def local_pronunciation(iso_lang='en-CA',
         if len(_json_file) != 0:
             break
     if len(_json_file) == 0:
+        print(
+            """NOTE: Did not edit the text because no `%(_test)s_lexicon.json`
+file for `%(my_dir)s` was found.""" % locals())
         return [text, _json_text]
     try:
         with codecs.open(_json_file,
@@ -2889,29 +2938,39 @@ def local_pronunciation(iso_lang='en-CA',
                          errors='replace') as file_obj:
             data = json.load(file_obj)
             l_text = text.lower()
-            if is_dev:
-                _count_j = 0
-                _date = time.strftime('%Y-%m-%d_%H:%M:%S')
-                _ohs = 5 * '0'
-                _json_text = '{\n'
-                for _item in data:
-                    _grapheme = _json_tools.sanitize_json(data[_item]['g'])
-                    _phoneme = _json_tools.sanitize_json(data[_item]['p'])
-                    if '$[' in _grapheme:
-                        continue
-                    _count_j += 1
-                    _json_text = ''.join([
-                        _json_text, '    "', _test, '_',
-                        (_ohs + str(_count_j))[-5:], '":{"g":"', _grapheme,
-                        '","p":"', _phoneme, '"},\n'
-                    ])
-                _json_text = ''.join([
-                    _json_text,
-                    '''    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},
-    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}
-}''' % locals()
-                ])
-                print(_json_text)
+            if bool(data):
+                if is_dev:
+                    # return json with standard formatting and
+                    # removing duplicate graphemes in list item 1
+                    _count_j = 0
+                    _date = time.strftime('%Y-%m-%d_%H:%M:%S')
+                    _ohs = 5 * '0'
+                    _json_text = '{\n'
+                    for _item in data:
+                        _grapheme = _json_tools.sanitize_json(data[_item]['g'])
+                        _phoneme = _json_tools.sanitize_json(data[_item]['p'])
+                        if '$[' in _grapheme or data[_item][
+                                'g'] in _used_graphemes:
+                            continue
+                        _used_graphemes.append(data[_item]['g'])
+                        _good_list.append(''.join([
+                            '":{"g":"', _grapheme, '","p":"', _phoneme, '"},'
+                        ]))
+                    _good_list = sorted(sorted(_good_list), key=len)
+                    for _item in _good_list:
+                        _count_j += 1
+                        _json_text = ''.join([
+                            _json_text, '    "', _test, '_',
+                            (_ohs + str(_count_j))[-5:], _item, '\n'
+                        ])
+                    for _addenda in [
+                            '''    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},'''
+                            % locals(),
+                            '''    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}'''
+                            % locals(), '}', ''
+                    ]:
+                        _json_text = ''.join([_json_text, _addenda, '\n'])
+                    print(_json_text)
             _len_text3 = len(text) * 3
             try:
                 if _len_text3 > sys.maxsize / 2:
@@ -2967,6 +3026,11 @@ class PosixAudioPlayers(object):
             ['roarcat', 'roarcat', '"%(file_path)s"', False],
             ['roarcatplay', 'roarcatplay', '"%(file_path)s"', False],
             ['aplay', 'aplay', ' --nonblock "%(file_path)s"', False],
+            [  # pipewire
+                'pw-cat', 'pw-cat',
+                ' --play "%(file_path)s"',
+                True
+            ],
             [
                 'ffmpeg', 'ffplay',
                 ' -autoexit -hide_banner -loglevel info -nostats -nodisp "%(file_path)s"',
@@ -3102,6 +3166,26 @@ def play_wav_no_ui(file_path=''):  # -> bool
             return True
         print('[>] %(a_app)s playing `%(display_file)s`' % locals())
         return os.system(_command) == 0
+    return False
+
+
+def handle_sound_playing(_media_work=''):  # -> bool
+    '''If a sound is playing in the background, then try to stop it,
+    or at least stop it from starting a new process. Return `False`
+    if it did not find a known player working, otherwise return `True`'''
+    if len(_media_work) == 0:
+        return False
+    if os.path.isfile(get_my_lock('lock')):
+        unlock_my_lock()
+        _audio_players = PosixAudioPlayers()
+        _player_app = _audio_players.player_app(_media_work)
+        if len(_player_app) == 0:
+            return False
+        if killall_process(_player_app):
+            print('[>] %(_player_app)s stopping' % locals())
+        else:
+            print('[>] %(_player_app)s is not ready. Try later.' % locals())
+        return True
     return False
 
 

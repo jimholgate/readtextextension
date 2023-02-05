@@ -373,9 +373,9 @@ class ReadFestivalClass(object):
         path_stem = ''
         if os.name == 'nt':
             voice_roots = [
-                os.path.join(os.getenv('ProgramFiles', 'Festival', 'Voices')),
-                os.path.join(
-                    os.getenv('ProgramFiles(x86)', 'Festival', 'Voices'))
+                os.path.join(os.getenv('ProgramFiles'), 'Festival', 'Voices'),
+                os.path.join(os.getenv('ProgramFiles(x86)'), 'Festival',
+                             'Voices')
             ]
         else:
             voice_roots = [
@@ -575,7 +575,7 @@ reads the file aloud.
                 # try with _switch = '' -- default voice
                 _command = '%(_app)s "%(_file_path)s" -o "%(_work_file)s"' % locals(
                 )
-        except IOError as err:
+        except IOError:
             print('I was unable to read!')
             usage()
             sys.exit(2)
@@ -786,6 +786,9 @@ reads the file aloud.
                 _content = _content.replace('&', _domain_table[i]['amp'])
                 break
         _content = _xml_tool.clean_for_xml(_content, True)
+        _content = readtexttools.local_pronunciation(
+            _eval_lang, _content, 'festival', 'FESTIVAL_TTS_USER_DIRECTORY',
+            False)[0]
         _file_content = '''<SABLE><SPEAKER NAME="%(_sable_speaker)s">
 <RATE SPEED="%(_sable_rate)s"><PITCH BASE="%(_sable_pitch)s">
 %(_content)s</PITCH></RATE></SPEAKER></SABLE>''' % locals()

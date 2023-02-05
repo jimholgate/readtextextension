@@ -1,0 +1,13 @@
+{
+    "en-US_00001":{"g":"'","p":""},
+    "en-US_00002":{"g":"’","p":""},
+    "en-US_00003":{"g":"&","p":" "},
+    "en-US_00004":{"g":"<","p":" "},
+    "en-US_00005":{"g":">","p":" "},
+    "en-US_00006":{"g":"{","p":" "},
+    "en-US_00007":{"g":"}","p":" "},
+    "en-US_00008":{"g":"Read Text Extension","p":"reed text extension"},
+    "en-US_00009":{"g":"Read text extension","p":"reed text extension"},
+    "en-US_99998":{"g":"$[LOCALE]","p":"en-US"},
+    "en-US_99999":{"g":"$[REVISION]","p":"2023-01-30_17:14:22"}
+}
