@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8-*-
-import readtexttools
 import getopt
 import os
 import sys
+import readtexttools
 
 def usage():  # -> None
     '''Show usage'''
@@ -120,8 +120,8 @@ def main():  # -> NoReturn
         if not os.path.isfile(_text_file_in):
             usage()
             sys.exit(0)
-        if not fix_up_text_file(_text_file_in, _file_out, 
-             _language, _my_dir,_user_dir):
+        if not fix_up_text_file(_text_file_in, _file_out,
+                                _language, _my_dir, _user_dir):
             print('I was unable to find the file you specified!')
     sys.exit(0)
 
