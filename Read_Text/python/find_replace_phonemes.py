@@ -5,6 +5,7 @@ import os
 import sys
 import readtexttools
 
+
 def usage():  # -> None
     '''Show usage'''
     print('''
@@ -55,6 +56,7 @@ Modify file
 -----------
 
 find_replace_phonemes.py --language en-CA <path-to-file-to-edit>''')
+
 
 def fix_up_text_file(_text_file_in='', _file_out='',
                      _language='en-CA', _my_dir='default',

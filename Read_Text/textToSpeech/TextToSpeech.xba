@@ -165,7 +165,7 @@ Sub ReadTextAloud()
 			On Error Resume Next
 			ClearWorkingCountryLanguage
 			If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
-				kill fsMyTempLock(&quot;lock&quot;)
+				fbRemoveFile(fsMyTempLock(&quot;lock&quot;))
 				resetSpeechDispatcher(True)
 			Else
 				ttsActuate(config(), _
@@ -203,7 +203,7 @@ Sub ReadClipBoard
 				If fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getTextFromFile(s1, &quot;UTF-8&quot;) Then
 					&apos; You updated office after a crash, so resume
 					&apos; the normal operation on the next run.
-					kill s1
+					fbRemoveFile(s1)
 				End If
 			End If
 			s2 = InputBox( _
@@ -219,9 +219,7 @@ Sub ReadClipBoard
 			CreateFile(s1, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)
 			fsGetClipBoard(False)
 			&apos; Try it - if it crashes, then we are left with the lock file
-			If FileExists(s1) Then
-				kill s1
-			End If
+			fbRemoveFile(s1)
 			msgSpeak(fsGetClipBoard(True))
 		End If
 	End If

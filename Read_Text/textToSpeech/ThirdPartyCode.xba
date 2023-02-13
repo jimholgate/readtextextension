@@ -570,12 +570,12 @@ Function fsGetPicturePath() As String
 	oDialog.setTitle(fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
 	&quot; - &quot; &amp; &quot; (MY_IMAGE)&quot;)
 	If oDialog.execute = 0 Then
-		fsGetPicturePath = ConvertFromURL(fsPosterImg()) &apos;Default picture
+		fsGetPicturePath = ConvertFromUrl(fsPosterImg()) &apos;Default picture
 	End If
 	oAllFiles() = oDialog.getFiles()
-	fsGetPicturePath = ConvertFromURL(oAllFiles(0))
+	fsGetPicturePath = ConvertFromUrl(oAllFiles(0))
 	If fsGetPicturePath = &quot;&quot; Then
-		fsGetPicturePath = ConvertFromURL(fsPosterImg()) &apos;Default picture
+		fsGetPicturePath = ConvertFromUrl(fsPosterImg()) &apos;Default picture
 	End If
 	Exit Function
 	fsGetPicturePathErr:

@@ -303,6 +303,99 @@ class LocalCommons(object):
             self.base_curl = None
         self.is_x86_64 = sys.maxsize > 2**32
 
+    def big_play_list(self, _text=''):  # -> list[str] | None
+        '''Split a long string of plain text into a list'''
+        if len(_text.strip()) == 0:
+            return None
+        elif _text.lower().count('<speak') != 0:
+            _text = readtexttools.strip_xml(_text)
+        return _text.splitlines()
+
+    def do_net_sound(self,
+                     _info='',
+                     _media_work='',
+                     _icon='',
+                     _media_out='',
+                     _audible='true',
+                     _visible='false',
+                     _writer='',
+                     _size='600x600',
+                     _post_process=''):  # -> bool
+        '''Play `_media_work` or export it to `_media_out` format.'''
+        # use `getsize` to ensure that python waits for file to finish download
+        if not os.path.isfile(_media_work):
+            return False
+        if os.path.getsize(_media_work) == 0:
+            time.sleep(2)
+        if os.path.isfile(_media_work) and _post_process in [
+                'process_audio_media', 'process_wav_media'
+        ]:
+            if os.path.getsize(_media_work) == 0:
+                print('Unable to write media work file.')
+                return False
+            # NOTE: Calling process must unlock_my_lock()
+            readtexttools.unlock_my_lock()
+            readtexttools.process_wav_media(_info, _media_work, _icon,
+                                            _media_out, _audible, _visible,
+                                            _writer, _size)
+            return True
+        return False
+
+    def do_posix_os_download(
+            self,
+            _url='',
+            _media_work='',
+            _body_data='AUDIO=WAVE_FILE&OUTPUT_TYPE=AUDIO&INPUT_TYPE=TEXT&LOCALE=en-US&VOICE=cmu-rms-hsmm&INPUT_TEXT=',
+            _text='Testing 123',
+            _method='POST',
+            _iso_lang='en-US',
+            _ok_wait=4,
+            _end_wait=30):  # -> bool
+        '''Use `curl` or `wget` to download a file.'''
+        for _item in [
+                _url, _media_work, _body_data, _text, _method, _iso_lang
+        ]:
+            if len(_item) == 0:
+                return False
+        for _item in [_ok_wait, _end_wait, self.base_curl]:
+            if bool(_item) == False:
+                return False
+        if os.path.isfile(_media_work):
+            os.remove(_media_work)
+        _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
+        _text = str(_text.translate(self.base_curl))
+        _text = urllib.parse.quote(_text)
+        if _method in ['POST']:
+            if readtexttools.have_posix_app('wget', False):
+                _verbose = '-q'  # quiet
+                if bool(self.debug):
+                    _verbose = ''
+                _command = '''wget --no-http-keep-alive %(_verbose)s --header='Content-Type: application/x-www-form-urlencoded' -O '%(_media_work)s' --method %(_method)s  --body-data '%(_body_data)s"%(_text)s"' %(_url)s''' % locals(
+                )
+            elif readtexttools.have_posix_app('curl', False):
+                _verbose = '-s'  # silent
+                if bool(self.debug):
+                    _verbose = '-v'  # verbose
+                _command = '''curl %(_verbose)s -o "%(_media_work)s" --max-time %(_end_wait)s --connect-timeout %(_ok_wait)s -X %(_method)s -d '%(_body_data)s %(_text)s' %(_url)s''' % locals(
+                )
+        elif _method in ['GET']:
+            if readtexttools.have_posix_app('wget', False):
+                _verbose = '-q'  # quiet
+                if bool(self.debug):
+                    _verbose = '-v'
+                _command = '''wget --no-http-keep-alive %(_verbose)s -O '%(_media_work)s' '%(_url)s?%(_body_data)s"%(_text)s"' ''' % locals()
+            elif readtexttools.have_posix_app('curl', False):
+                _verbose = '-s'  # silent
+                if bool(self.debug):
+                    _verbose = '-v'
+                _command = '''curl "%(_url)s?%(_body_data)s%(_text)s" %(_verbose)s -o "%(_media_work)s" --max-time %(_end_wait)s --connect-timeout %(_ok_wait)s ''' % locals(
+                )
+        else:  # Only allow GET and POST
+            return False
+        if bool(self.debug):
+            print(_command)
+        return os.system(_command) == 0
+
 
 class AmazonClass(object):
     u''' The following notice should be displayed in a dialog when users click
@@ -916,7 +1009,9 @@ class LarynxClass(object):
         '''Initialize data. See
         <https://github.com/rhasspy/larynx#basic-synthesis>'''
         _common = LocalCommons()
+        self.common = _common
         self.debug = _common.debug
+        self.default_extension = _common.default_extension
         self.ok = True
         # This is the default. You can set up Larynx to use a different port.
         self.url = 'http://0.0.0.0:5002'  # localhost port 5002
@@ -1075,19 +1170,6 @@ Try restarting `larynx-server`.''')
         except IndexError:
             _resultat = self.voice_name
         return _resultat
-
-    def local_pronunciation(self, iso_lang='en-CA', text=''):  # -> str
-        '''Given a language and region, return or larynx compatible code for
-        localized words and phrases. Larynx code is similar to IPA, but you
-        need to check it and possibly edit it for correct pronunciation.
-
-        Uses json rows in the form:
-
-        `"en-US_00023":{"g":" Z ","p":" [`zi:ə] "},`
-        '''
-        return readtexttools.local_pronunciation(iso_lang, text, 'larynx',
-                                                 'LARYNX_USER_DIRECTORY',
-                                                 False)[0]
 
     def language_supported(self,
                            iso_lang='en-US',
@@ -1263,6 +1345,7 @@ Loading larynx voices for `%(_lang2)s`
         if len(self.voice_id) == 0:
             self.voice_id = 'en-us/mary_ann-glow_tts'
             self.voice_name = 'mary_ann'
+        _done = False
         if not os.path.isdir(self.local_dir):
             if not readtexttools.is_container_instance():
                 readtexttools.pop_message(self.help_heading,
@@ -1273,6 +1356,8 @@ Loading larynx voices for `%(_lang2)s`
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
         _media_work = os.path.join(tempfile.gettempdir(), 'larynx.wav')
+        if os.path.isfile(_media_work):
+            os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
                 return True
@@ -1322,7 +1407,9 @@ Loading larynx voices for `%(_lang2)s`
                 _length_scale = _item[3]
                 break
         _length_scale = str(_length_scale / self.rate_denominator)
-        _text = self.local_pronunciation(_iso_lang, _text)
+        _text = readtexttools.local_pronunciation(_iso_lang, _text, 'larynx',
+                                                  'LARYNX_USER_DIRECTORY',
+                                                  False)[0]
         if REQUESTS_OK:
             _strips = '\n .;'
             _text = '\n'.join(['', _text.strip(_strips), ''])
@@ -1346,36 +1433,38 @@ Loading larynx voices for `%(_lang2)s`
                 timeout=(_ok_wait, _end_wait))
             with open(_media_work, 'wb') as f:
                 f.write(response.content)
-        elif readtexttools.have_posix_app('curl', False):
+                _done = True
+        if not _done:
             if not bool(self.base_curl):
                 return False
             _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
-            _text = str(_text.translate(self.base_curl))
-            _curl = '''curl -d "%(_text)s" "%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s" -o "%(_media_work)s"''' % locals(
-            )
-            os.system(_curl)
-        else:
+            _text = str(_text.translate(self.base_curl))                
+            app_list = [
+                ['curl', '''curl --max-time %(_end_wait)s --connect-timeout %(_ok_wait)s -s -d "%(_text)s" "%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s" -o "%(_media_work)s"''' % locals()], 
+                ['wget', '''wget --no-http-keep-alive -q --post-data="%(_text)s" "%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s" -O "%(_media_work)s"''' % locals()],
+                ]
+            for _app in app_list:
+                if readtexttools.have_posix_app(_app[0], False):
+                    if bool(self.debug):
+                        print(_app[1])
+                    os.system(_app[1])
+                    if not os.path.isfile(_media_work):
+                        continue
+                    if os.path.getsize(_media_work) == 0:
+                        time.sleep(2)
+                    if os.path.isfile(_media_work):
+                        _done = True
+                        break
+        if not _done:
             print('''The application cannot load a sound file.
 Your computer is missing a required library.
 Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
                   )
             self.ok = False
             return False
-        if os.path.getsize(_media_work) == 0:
-            time.sleep(2)
-        if os.path.isfile(_media_work) and _post_process in [
-                'process_audio_media', 'process_wav_media'
-        ]:
-            if os.path.getsize(_media_work) == 0:
-                print('Unable to write media work file.')
-                return False
-            # NOTE: Calling process must unlock_my_lock()
-            readtexttools.unlock_my_lock()
-            readtexttools.process_wav_media(_info, _media_work, _icon,
-                                            _media_out, _audible, _visible,
-                                            _writer, _size)
-            return True
-        return False
+        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
+                                        _audible, _visible, _writer, _size,
+                                        _post_process)
 
 
 class MaryTtsClass(object):
@@ -1404,6 +1493,7 @@ Default MaryTts server: <http://0.0.0.0:59125>
         '''Initialize data. See
         <https://github.com/synesthesiam/docker-marytts>'''
         _common = LocalCommons()
+        self.common = _common
         self.debug = _common.debug
         self.ok = True
         self.response = ''
@@ -1463,8 +1553,9 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             return self.ok
         if not REQUESTS_OK:
             if not readtexttools.have_posix_app('curl', False):
-                self.ok = False
-                return False
+                if not readtexttools.have_posix_app('wget', False):
+                    self.ok = False
+                    return False
             if not bool(self.base_curl):
                 self.ok = False
                 return False
@@ -1688,39 +1779,28 @@ Docker MaryTTS
                 timeout=(_ok_wait, _end_wait))
             with open(_media_work, 'wb') as f:
                 f.write(response.content)
-        elif readtexttools.have_posix_app('curl', False):
-            if not bool(self.base_curl):
-                return False
-            _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
-            _text = str(_text.translate(self.base_curl))
+            _done = os.path.isfile(_media_work)
+        else:
             vcommand = '&VOICE=%(_mary_vox)s' % locals()
             if len(_mary_vox) == 0:
                 vcommand = ''
-            _curl = '''curl %(_url)s?AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)sINPUT_TEXT="%(_text)s"''' % locals(
+            _method = "POST"
+            _body_data = "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT=" % locals(
             )
-            os.system(_curl)
-        else:
+            _done = self.common.do_posix_os_download(_url, _media_work,
+                                                     _body_data, _text,
+                                                     _method, _found_locale,
+                                                     _ok_wait, _end_wait)
+        if not _done:
             print('''The application cannot load a sound file.
 Your computer is missing a required library.
 Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
                   )
             self.ok = False
             return False
-        if os.path.getsize(_media_work) == 0:
-            time.sleep(2)
-        if os.path.isfile(_media_work) and _post_process in [
-                'process_audio_media', 'process_wav_media'
-        ]:
-            if os.path.getsize(_media_work) == 0:
-                print('Unable to write media work file.')
-                return False
-            # NOTE: Calling process must unlock_my_lock()
-
-            readtexttools.process_wav_media(_info, _media_work, _icon,
-                                            _media_out, _audible, _visible,
-                                            _writer, _size)
-            return True
-        return False
+        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
+                                        _audible, _visible, _writer, _size,
+                                        _post_process)
 
 
 class RhvoiceLocalHost(object):
@@ -1775,6 +1855,7 @@ class RhvoiceLocalHost(object):
         to the localhost API, so functions in the parent that rely on a specific
         file path do not work.'''
         _common = LocalCommons()
+        self.common = _common
         self.add_pause = _common.add_pause
         self.pause_list = _common.pause_list
         self.base_curl = _common.base_curl
@@ -1878,6 +1959,7 @@ class RhvoiceLocalHost(object):
             if not bool(self.verified_voices):
                 self.ok = False
                 return False
+        self.ok = False
         for _search in [_iso_lang.lower(), _iso_lang.split('-')[0].lower()]:
             for item in self.checklist:
                 if item[0].lower().startswith(_search):
@@ -1893,7 +1975,7 @@ class RhvoiceLocalHost(object):
                     self.ok = True
                     break
         if self.ok:
-            help_heading =self.help_heading
+            help_heading = self.help_heading
             help_url = self.help_url
             print('''
 Checking %(help_heading)s voices for `%(_iso_lang)s`
@@ -1980,6 +2062,7 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
         if not self.ok:
             return False
         _media_out = ''
+        _done = False
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
@@ -1993,9 +2076,10 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                     _text = _text.translate(self.add_pause).replace('.;', '.')
                     break
         _view_json = self.debug and 1
-        response = readtexttools.local_pronunciation(
-            _iso_lang, _text, 'rhvoice', 'RHVOICE_USER_DIRECTORY',
-            _view_json)
+        response = readtexttools.local_pronunciation(_iso_lang, _text,
+                                                     'rhvoice',
+                                                     'RHVOICE_USER_DIRECTORY',
+                                                     _view_json)
         _text = response[0]
         if _view_json:
             print(response[1])
@@ -2026,33 +2110,19 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                                         timeout=(_ok_wait))
                 with open(_media_work, 'wb') as f:
                     f.write(response.content)
+                    _done = True
             except requests.exceptions.ConnectionError:
                 self.ok = False
                 return self.ok
-        elif readtexttools.have_posix_app('curl', False):
-            if not bool(self.base_curl):
-                return False
-            _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
-            _text = str(_text.translate(self.base_curl))
-            _text = urllib.parse.quote(_text)
-            _curl = '''curl "%(_url)s?format=%(_audio_format)s&rate=%(_length_scale)s&pitch=50&volume=50&voice=%(_voice)s&text=%(_text)s" -o "%(_media_work)s"''' % locals(
-            )
-            os.system(_curl)
         else:
+            _body_data = 'format=%(_audio_format)s&rate=%(_length_scale)s&pitch=50&volume=50&voice=%(_voice)s&text=' % locals()
+            _method = "GET"
+            _done = self.common.do_posix_os_download(_url, _media_work, _body_data, _text, _method, _iso_lang, _ok_wait, _end_wait)
+        if not _done:
             return False
-        if os.path.isfile(_media_work) and _post_process in [
-                'process_audio_media', 'process_wav_media'
-        ]:
-            if os.path.getsize(_media_work) == 0:
-                print('Unable to write media work file.')
-                return False
-            # NOTE: Calling process must unlock_my_lock()
-            readtexttools.unlock_my_lock()
-            readtexttools.process_wav_media(_info, _media_work, _icon,
-                                            _media_out, _audible, _visible,
-                                            _writer, _size)
-            return True
-        return False
+        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
+                                        _audible, _visible, _writer, _size,
+                                        _post_process)
 
 
 def speech_wpm(_percent='100%'):  # -> int
@@ -2101,6 +2171,9 @@ def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
     if not _continue:
         _mary_tts = MaryTtsClass()
         _continue = _mary_tts.language_supported(_iso_lang, _local_url)
+    if not _continue:
+        _rhvoice_rest = RhvoiceLocalHost()
+        _continue = _rhvoice_rest.language_supported(_iso_lang, _local_url)
     if not _continue:
         _amazon_class = AmazonClass()
         _continue = bool(_amazon_class.language_supported(_iso_lang))
@@ -2211,7 +2284,7 @@ def network_main(_text_file_in='',
             _ssml = '</speak>' in _text and '<speak' in _text
             _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
                           _icon, clip_title, _post_processes[5], _info, _size,
-                          _speech_rate, _ssml, _vox, 4, 30)
+                          _speech_rate, _ssml, _vox, 4, 15)
         elif _rhvoice_rest.language_supported(_iso_lang, _local_url):
             _rhvoice_rest.read(_text, _iso_lang, _visible, _audible,
                                _media_out, _icon, clip_title,

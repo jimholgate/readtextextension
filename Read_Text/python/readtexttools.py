@@ -173,10 +173,8 @@ def write_plain_text_file(_file_path='',
     if not bool(_file_path):
         return False
     try:
-        try:
+        if os.path.isfile(_file_path):
             os.remove(_file_path)
-        except:
-            pass
         writer = codecs.open(_file_path,
                              mode='w',
                              encoding=scodeco,
@@ -2698,21 +2696,21 @@ def check_artist(_artist):  # -> str
         return _metas.get_my_id(False)
 
 
-def lock_my_lock():  # -> None
+def lock_my_lock(lock='lock'):  # -> None
     '''
     Create a file that informs the world that the application.
     is at work.
     '''
-    write_plain_text_file(get_my_lock('lock'), app_signature())
+    write_plain_text_file(get_my_lock(lock), app_signature())
 
 
-def unlock_my_lock():  # -> None
+def unlock_my_lock(lock='lock'):  # -> None
     '''
     Create a file that informs the world that the application
     is finished.
     '''
     try:
-        os.remove(get_my_lock('lock'))
+        os.remove(get_my_lock(lock))
     except:
         pass
 
@@ -2874,6 +2872,8 @@ def office_user_dir():
         drill = ''
     for _subdir in folders:
         if _subdir == 'uno_packages':
+            if os.name == 'nt':
+                return drill.replace(':', ':\\')
             return drill
         drill = os.path.join(drill, _subdir)
     return drill
@@ -2931,6 +2931,7 @@ def local_pronunciation(iso_lang='en-CA',
             """NOTE: Did not edit the text because no `%(_test)s_lexicon.json`
 file for `%(my_dir)s` was found.""" % locals())
         return [text, _json_text]
+    _date = time.strftime('%Y-%m-%d_%H:%M:%S')
     try:
         with codecs.open(_json_file,
                          mode='r',
@@ -2943,9 +2944,14 @@ file for `%(my_dir)s` was found.""" % locals())
                     # return json with standard formatting and
                     # removing duplicate graphemes in list item 1
                     _count_j = 0
-                    _date = time.strftime('%Y-%m-%d_%H:%M:%S')
                     _ohs = 5 * '0'
                     _json_text = '{\n'
+                    _footnotes = [
+                            '''    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},'''
+                            % locals(),
+                            '''    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}'''
+                            % locals(), '}', ''
+                    ]
                     for _item in data:
                         _grapheme = _json_tools.sanitize_json(data[_item]['g'])
                         _phoneme = _json_tools.sanitize_json(data[_item]['p'])
@@ -2963,12 +2969,7 @@ file for `%(my_dir)s` was found.""" % locals())
                             _json_text, '    "', _test, '_',
                             (_ohs + str(_count_j))[-5:], _item, '\n'
                         ])
-                    for _addenda in [
-                            '''    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},'''
-                            % locals(),
-                            '''    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}'''
-                            % locals(), '}', ''
-                    ]:
+                    for _addenda in _footnotes:
                         _json_text = ''.join([_json_text, _addenda, '\n'])
                     print(_json_text)
             _len_text3 = len(text) * 3
@@ -2994,6 +2995,12 @@ file for `%(my_dir)s` was found.""" % locals())
         print('''WARNING: A text string was not edited because a `json` lexicon
 file is missing or is incorrectly formatted for this application.
         %(_json_file)s.''' % locals())
+        _json_text = '''{
+    "%(_test)s_99997":{"g":"$[ERROR]","p":"JSONDecodeError"},
+    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},
+    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}
+}''' % locals()
+
     return [text, _json_text]
 
 
@@ -3169,22 +3176,22 @@ def play_wav_no_ui(file_path=''):  # -> bool
     return False
 
 
-def handle_sound_playing(_media_work=''):  # -> bool
+def handle_sound_playing(_media_work='', lock='lock'):  # -> bool
     '''If a sound is playing in the background, then try to stop it,
     or at least stop it from starting a new process. Return `False`
     if it did not find a known player working, otherwise return `True`'''
+    _audio_players = PosixAudioPlayers()
     if len(_media_work) == 0:
         return False
-    if os.path.isfile(get_my_lock('lock')):
-        unlock_my_lock()
-        _audio_players = PosixAudioPlayers()
+    if os.path.isfile(get_my_lock(lock)):
+        unlock_my_lock(lock)
         _player_app = _audio_players.player_app(_media_work)
         if len(_player_app) == 0:
             return False
         if killall_process(_player_app):
-            print('[>] %(_player_app)s stopping' % locals())
+            print('\n[>] %(_player_app)s stopping' % locals())
         else:
-            print('[>] %(_player_app)s is not ready. Try later.' % locals())
+            print('\n[>] %(_player_app)s is not ready. Try later.' % locals())
         return True
     return False
 

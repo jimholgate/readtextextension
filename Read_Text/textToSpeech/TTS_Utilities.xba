@@ -689,6 +689,17 @@ Function fbLocalHostOk(_url As String) As Boolean
 End Function
 
 
+Function fbRemoveFile(FilePath as String) As Boolean
+	&apos; Kill a file if it exists. Return `True` if file does not exist on exit.
+	Dim oUcb as Object
+	oUcb = createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	If oUcb.Exists(FilePath) Then
+		oUcb.Kill(FilePath)
+	End If
+	fbRemoveFile = Not oUcb.Exists(FilePath)
+End Function
+
+
 Sub OK_MouseUp( _
 	Event As Object)
 	&apos; This sub uses the current dialog settings without dismissing
@@ -1048,7 +1059,7 @@ Function fiReportMetaData( _
 	fsLookUpTerm(&quot;s_title&quot;), &quot; : &quot;&quot;&quot;, fsThisSoundTitle(), &quot;&quot;&quot;&quot;, CR, _
 	fsLookUpTerm(&quot;s_track&quot;), &quot; : &quot;&quot;&quot;, fiMyCurrentAudioTrack(False), &quot;&quot;&quot;&quot;, CR, _
 	fsLookUpTerm(&quot;s_year&quot;), &quot; : &quot;&quot;&quot;, Year(Now), &quot;&quot;&quot;&quot;, CR, _
-	fsLookUpTerm(&quot;s_imagedefault&quot;), &quot; : &quot;, Trim(convertfromURL(fsPosterImg())), CR), _
+	fsLookUpTerm(&quot;s_imagedefault&quot;), &quot; : &quot;, Trim(ConvertFromUrl(fsPosterImg())), CR), _
 	&quot;&quot;)
 	If bVerify Then
 		n = MsgBox(sA, _
@@ -1133,7 +1144,7 @@ Function soundsDirectory() As String
 		strA = Left(strA,intA - 1)
 		&apos; We do not want the semi-colon or the string that follows it
 	End If
-	soundsDirectory = ConvertFromURL(strA &amp; &quot;/sounds/&quot;)
+	soundsDirectory = ConvertFromUrl(strA &amp; &quot;/sounds/&quot;)
 End Function
 
 
@@ -1750,9 +1761,7 @@ Sub dialog1Combo2ShowSAPIChoices( _
 	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	oComboBox.addItem(s1, 0)
-	If FileExists(myTextPath) Then
-		Kill myTextPath
-	End If
+	fbRemoveFile(myTextPath)
 	Exit Sub
 	FichierKO:
 	Resume FichierKO2
@@ -2395,9 +2404,12 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
 					&quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 				Next
-				s1 = s1 &amp; CR &amp; sProg &amp; _
-				&quot; --visible True --voice &quot;&quot;AUTO&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				Select Case sGetOS
+					Case &quot;MacOS&quot;
+					s1 = s1 &amp; CR &amp; sProg &amp; _
+					&quot; --visible True --voice &quot;&quot;AUTO&quot;&quot; --language&quot; &amp;_
+					&quot; &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				End Select
 				s1 = s1 &amp; CR &amp; sProg &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
@@ -2704,7 +2716,7 @@ Function fsAppImageResourcePath( _
 	Dim i#
 	i = 0
 	Dim s1$
-	s1 = ConvertFromURL(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
+	s1 = ConvertFromUrl(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
 	
 	fsAppImageResourcePath = &quot;&quot;
 	If (InStr(s1, &quot;/tmp/.mount_&quot;) = 1) Then
@@ -2727,7 +2739,7 @@ Function fsContainerResourcePath( _
 	Dim i#
 	i = 0
 	Dim s1$
-	s1 = ConvertFromURL(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
+	s1 = ConvertFromUrl(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
 	If (InStr(s1, &quot;/snap/&quot;) = 1) Or InStr(s1, &quot;.mount&quot;) &lt;&gt; 0 Then
 		If FileExists(&quot;/snap/core/current/usr/bin/python3&quot;) Then
 			fsContainerResourcePath = &quot;/snap/core/current/usr/bin/python3&quot;
@@ -2798,9 +2810,7 @@ Sub resetSpeech()
 	fsTemporaryTextDoc() &amp; &quot;.sable&quot;,_
 	fsTemporaryTtsAppleScript())
 	For n = LBound(a1) To UBound(a1)
-		If FileExists(a1(n)) Then
-			kill a1(n)
-		End If
+		fbRemoveFile(a1(n))
 	Next
 End Sub
 
@@ -2969,13 +2979,9 @@ Function fbRemoveTextLocks() As Boolean
 	On Local Error GoTo fbRemoveTextLocksErr
 	Dim x As Integer
 	Dim a1 As Variant
-	Dim _str As String
 	a1 = faSettingsArray(&quot;_title&quot;, 1)
 	For x = Lbound(a1) To Ubound(a1)
-		_str = fsMyTempLock(&quot;lock.&quot; &amp; a1(x)(0))
-		If FileExists(_str) Then
-			kill _str
-		End If
+		fbRemoveFile(fsMyTempLock(&quot;lock.&quot; &amp; a1(x)(0)))
 	Next
 	fbRemoveTextLocks = True
 Exit Function
@@ -3071,9 +3077,7 @@ Sub ttsActuate( _
 		sTextToSpeak = fsGetTextSelection(False, True)
 	End If
 	For n = LBound(a1) To UBound(a1)
-		If FileExists(fsMyTempLock(&quot;lock.&quot; &amp; a1(n))) Then
-			Kill fsMyTempLock(&quot;lock.&quot; &amp; a1(n))
-		End If
+		fbRemoveFile(fsMyTempLock(&quot;lock.&quot; &amp; a1(n)))
 	Next
 	If Len(sTextToSpeak) = 0 Then
 		Exit Sub
@@ -3132,7 +3136,7 @@ Sub ttsActuate( _
 	If config(fiFestivalOption()) Then
 		&apos;Write the Festival script and the file to read aloud
 		sProgram = config(fiFestivalPath())
-		sCommand = &quot;&quot;&quot;&quot; &amp; ConvertFromURL(fsFestivalScriptName()) &amp; &quot;&quot;&quot;&quot;
+		sCommand = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsFestivalScriptName()) &amp; &quot;&quot;&quot;&quot;
 		&apos; Windows - don&apos;t limit to SAPI languages
 		sScript = config(fiFestivalComboChoice())
 		sScript = replaceLocalTokensWithStr(sScript)
@@ -3336,12 +3340,8 @@ Sub ttsActuate( _
 		&quot; &quot; &amp; _
 		fsLookUpTerm(&quot;s_string-cannot-be-analyzed&quot;), 64 , _
 		fsLookUpTerm(&quot;s_read-text&quot;))
-		If FileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
-			kill fsFullPathOf(fsExtensionSettingsIni)
-		End If
-		If FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
-			kill fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
-		End If
+		fbRemoveFile(fsFullPathOf(fsExtensionSettingsIni))
+		fbRemoveFile(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
 		resetSpeech
 	End If
 	On Error Resume Next
@@ -3355,9 +3355,7 @@ Sub ttsActuate( _
 				For n = 0 To 30
 					Wait 500
 					If Not(FileExists(fsMyTempLock(&quot;lock&quot;))) Then
-						If FileExists(sArtURL) Then
-							Kill sArtURL
-						End If
+						fbRemoveFile(sArtURL)
 						Exit For
 					End If
 				Next
@@ -3371,327 +3369,8 @@ Sub ttsActuate( _
 	
 	MsgBox(fsLookUpTerm( &quot;s_string-cannot-be-analyzed&quot;), 48, _
 	fsLookUpTerm( &quot;s_read-text&quot;))
-	If FileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
-		kill fsFullPathOf(fsExtensionSettingsIni)
-	End If
-	If FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
-		kill FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
-	End If
-	resetSpeech
-End Sub
-
-Sub ttsActuatex( _
-	config() As Variant, _
-	msgs() As Variant, _
-	errorCode As Integer, _
-	ByVal sTextToSpeak As String)
-	Dim a1
-	a1 = Array(&quot;id&quot;, _
-	&quot;title&quot;, _
-	&quot;album&quot;, _
-	&quot;genre&quot;, _
-	&quot;track&quot;)
-	Dim bAddTime As Boolean
-	bAddTime = False
-	Dim model$
-	model = &quot;&quot;
-	Dim s1$
-	s1 = &quot;&quot;
-	Dim sArtLook$
-	sArtLook = &quot;&quot;
-	Dim sArtURL$
-	sArtURL = &quot;&quot;
-	Dim scodec$
-	scodec = &quot;UTF-8&quot;
-	Dim sCommand$
-	sCommand = &quot;&quot;
-	Dim sGetOS$
-	sGetOS = fsGetOS()
-	Dim sScript$
-	sScript = &quot;&quot;
-	Dim sProgram$
-	sProgram = &quot;&quot;
-	Dim aVal As Integer
-	Dim bWait As Boolean
-	bWait = False
-	Dim n As Integer
-	n = 0
-	Dim oBar    &apos; Generated status bar 
-	Dim oFrame  &apos; Current frame
-	Dim media_list As String
-	media_list = &quot;.3gp,.aac,.aif,.aiff,.alsa,.ape,.asf,.au,.avi,.caf,.dts,.flac,&quot; &amp; _
-		&quot;.m4a,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.oma,.opus,.riff,.rm,.smp,.snd,.sou,.spx,&quot; &amp; _
-		&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;
-&apos; Temporary Files
-	On Error Goto errorHandler
-	&apos;Choose what to speak
-	If sTextToSpeak = &quot;&quot; Then
-		sTextToSpeak = fsGetTextSelection(False, True)
-	End If
-	For n = LBound(a1) To UBound(a1)
-		If FileExists(fsMyTempLock(&quot;lock.&quot; &amp; a1(n))) Then
-			Kill fsMyTempLock(&quot;lock.&quot; &amp; a1(n))
-		End If
-	Next
-	If Len(sTextToSpeak) = 0 Then
-		Exit Sub
-	End If
-	On Error Resume Next
-	oFrame = ThisComponent.getCurrentController().getFrame()
-	oBar = oFrame.createStatusIndicator()
-	oBar.start(fsLookUpTerm(&quot;s_read-text&quot;), 100)
-	
-	&apos;Get rid of the old files containing a script And/or plain text of selected String
-	resetSpeech
-	sArtLook = config(5)
-	
-	If fbCreatingMediaFile(media_list) Then
-		&apos; Get current track, then increment it by one to a maximum value of 255. 
-		&apos; (hex FF)
-		n = fiMyCurrentAudioTrack(True)
-		If sGetOS = &quot;MacOS&quot; Then
-			&apos; If metadata is required, it is written into a temporary
-			&apos; osascript document.
-			bAddTime = True
-		Else
-			If Bool(config(fiExternalOption())) Or Bool(config(fiFestivalOption())) Then
-				&apos; Temporary Metadata for an external vbs or python script.
-				&apos; External scripts delete these files once they have been
-				&apos; read.  MacOS creates a script at run-time, so these files
-				&apos; are not required.
-				&apos; 
-				&apos; On UNIX and Linux platforms, check the sound title 
-				&apos; before writing the setting.  Windows does this in the
-				&apos; vbs script.
-				Select Case sGetOS
-					Case &quot;WINDOWS&quot;
-					s1 = fsThisSoundTitle()
-					Case Else
-					s1 = fsMyTitleInputBox(_
-					True, _
-					fsThisSoundTitle(), _
-					fsThisDocGenre() &amp; &quot; (&quot; &amp; fsGetActuateExtension(_
-					sArtLook, media_list) &amp; &quot;)&quot; )
-					If s1 = &quot;&quot; Then
-						Exit Sub
-					End If
-				End Select
-				fbWriteTextLocks(s1, n)  &apos; title As String, track as Integer
-			End If
-		End If
-	Else
-		&apos; Set the global variable holding the track counter to zero
-		&apos; if we aren&apos;t creating a media file.
-		&apos; 
-		i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 0
-		CreateFile(fsMyTempLock(&quot;lock.lexicon&quot;), CustomLexiconDir(), &quot;UTF-8&quot;)
-	End If
-	oBar.Value = 70
-	If config(fiFestivalOption()) Then
-		&apos;Write the Festival script and the file to read aloud
-		sProgram = config(fiFestivalPath())
-		sCommand = &quot;&quot;&quot;&quot; &amp; ConvertFromURL(fsFestivalScriptName()) &amp; &quot;&quot;&quot;&quot;
-		&apos; Windows - don&apos;t limit to SAPI languages
-		sScript = config(fiFestivalComboChoice())
-		sScript = replaceLocalTokensWithStr(sScript)
-		sScript = replacePublicTokensWithStr(sScript)
-		If fsComplexAsiaOrWest(sTextToSpeak) = &quot;WEST&quot; Then
-			&apos; Compatible characters are officially supported by Festival using iso-8859-15
-			If fbWestEuropeanLang(fsSelectionLanguageAndRegion(True)) Then
-				scodec = &quot;iso-8895-15&quot;
-			End If
-		End If
-		CreateFile(fsFestivalScriptName(), sScript, scodec)
-		CreateFile(fsTemporaryTextDoc(), sTextToSpeak, scodec)
-	ElseIf config(fiExternalOption()) Then
-		sProgram = config(fiExternalProgramPath())
-		sCommand = config(fiExternalCommand)
-		If InStr(LCase(sProgram), &quot;bin/padsp&quot;) &lt;&gt; 0 Then
-			If InStr(LCase(sCommand), &quot;swift&quot;) &lt;&gt; 0 Then
-				&apos; Cepstral swift Alison (2008) for Linux does not pronounce text around smart quotes correctly,
-				&apos; so we strip the smart quotes. Be sure to tell swift to use UTF-8 encoded text as follows: 
-				&apos; &quot;Read with external program&quot; set to /usr/bin/padsp and 
-				&apos; &quot;Command line options&quot; to swift -e UTF-8 -m text -f &quot;(TMP)&quot;
-				sTextToSpeak = fsStripSmartQuotes(sTextToSpeak)
-			End If
-		End If
-		If ThisComponent.supportsService( _
-			&quot;com.sun.star.presentation.PresentationDocument&quot;) Then
-			&apos; Write a song cover image in the output directory.
-			sArtLook = config(5)
-			If fbCreatingMediaFile(&quot;.aif,.aiff,.m4a,.mp3,.oga,.webm,.mp4&quot;, sArtLook) Then
-				sArtURL = fsExportAlbumCover()
-			End If
-		End If
-		If sGetOS = &quot;UNIX&quot; Or sGetOS = &quot;MacOS&quot; Then
-			If fbUsingPosixTalkProgram(sProgram) Then
-				&apos; When using a posix speech command and not using a script,
-				&apos; the routine writes a lock file to use for toggling speech.
-				&apos; The speech toggle does not work with all speech synthesis
-				&apos; applications on all Posix platforms, because the `killall`
-				&apos; command may not work on some processes when it is invoked 
-				&apos; by a user with limited permissions.
-				If instr(sProgram, &quot;/say&quot;) = 0 Then
-					CreateFile(fsMyTempLock(&quot;lock&quot;), fsAppSignature(), &quot;UTF-8&quot;)
-				End If
-			End If
-		End If
-		
-		&apos; Remove audible markdown code symbols for blockquote, heading, emphasize 
-		&apos; when they occur at the beginning or the end of a line.
-		sTextToSpeak = fsTrimSpecial(sTextToSpeak, Chr(13) &amp; Chr(10) &amp; &quot;`#&gt;_ =-*+&quot;)
-		sTextToSpeak = fsReplaceText(sTextToSpeak, Chr(10) &amp; &quot;&gt;&quot;, Chr(10)) &amp; Chr(10)
-		sTextToSpeak = fsCleanMdCode(sTextToSpeak)
-		If bAddTime Then
-			sTextToSpeak = sTextToSpeak &amp; &quot; [[slnc 400]]&quot;
-		End If
-		&apos; Customizing speech		
-		CreateFile(fsTemporaryTextDoc(), sTextToSpeak, scodec)
-		Select Case sGetOS
-			Case &quot;WINDOWS&quot;
-			&apos; If LibreOffice is running on a Windows system, then replace the graphemes
-			&apos; with user phonemes using python3. Posix systems that already use python3
-			&apos; do this by default.
-			If fbIsLibreOffice() Then
-				If FileExists(fsFullPathOf(fsExtensionSetJson(&quot;lexicons/&quot; &amp; _model, _language))) Then
-					fbWindowsReplacePhonemes(_language, model, _text_file_in)
-				End If
-			End If		
-			Case &quot;MacOS&quot;
-			If InStr(sCommand, &quot;_PY)&quot;&quot;&quot;) &lt;&gt; 0 Then
-				&apos; If you chose a Python script, you need to use python
-				&apos; but you don&apos;t need to write an osascript document.
-				sProgram = PosixPythonPath()
-			ElseIf InStr(sCommand,&quot;&quot;&quot;(SAY_APPLESCRIPT_SLOWLY)&quot;&quot;&quot;) = 1 Then
-				fswriteMacOSSpeechScript(&quot;-r 110 &quot;, _
-				fsSelectionLanguageAndRegion(True), sArtURL)
-			ElseIf InStr(sCommand,&quot;&quot;&quot;(SAY_APPLESCRIPT_QUICKLY)&quot;&quot;&quot;) = 1 Then
-				fswriteMacOSSpeechScript(&quot;-r 240 &quot;, _
-				fsSelectionLanguageAndRegion(True), sArtURL)
-			ElseIf InStr(config(fiExternalCommand),&quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;) &lt;&gt; 0 Then
-				fswriteMacOSSpeechScript(&quot;&quot;, _
-				&quot;&quot;, sArtLook)
-			Else
-				fswriteMacOSSpeechScript(&quot;&quot;, _
-				fsSelectionLanguageAndRegion(True), sArtURL)
-			End If
-		End Select
-		If InStr(sCommand,&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot;) = 1 Then
-			
-			&apos;only consider SAPI voices
-			sCommand = fsReplaceText(sCommand,&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,fsSelectionLanguageAndRegion(False))
-		End If
-		sCommand = replaceLocalTokensWithStr(sCommand)
-		sCommand = replacePublicTokensWithStr(sCommand)
-		sCommand = replaceWebTokensWithStr(sCommand, sTextToSpeak) &apos;for online content with media player
-		fbCreateMissingMediaDirectory(sCommand)
-	Else &apos;if config(fiHtmlOption) then
-		&apos;Translate And read with web tools
-		i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 0
-		sCommand = config(fiHtmlComboURL())
-		sCommand = replacePublicTokensWithStr(sCommand)
-		sCommand = replaceWebTokensWithStr(sCommand, sTextToSpeak)
-		&apos; HTML file
-		If Len(sCommand) &lt;&gt; 0 Then
-			If (InStr(sCommand,&quot;http://&quot;) &lt;&gt; 1 And InStr(sCommand,&quot;https://&quot;) &lt;&gt; 1 And InStr(sCommand,&quot;mailto:&quot;) &lt;&gt; 1) Then
-				sCommand = &quot;http://&quot; &amp; sCommand
-			End If
-			webHelp(sCommand)
-		Else
-			ErrorDisplay()
-		End If
-		oBar.End()
-		Exit Sub
-	End If
-	If FileExists(sProgram) Then
-		&apos; program path
-		&apos; 0 - focus is On the hidden program window,
-		&apos; program parameter strings,
-		&apos; False - tasks do not wait until shell task ends
-		bWait = False
-		If sGetOS = &quot;UNIX&quot; Then
-			If Right(sProgram, Len(&quot;festival&quot;)) = &quot;festival&quot; Then
-				&apos; When festival is the external program, the routine pauses while
-				&apos; the computer is speaking to avoid the possibility of playing 
-				&apos; two voices at once.
-				bWait = True
-			End If
-		End If
-		
-		If sCommand &lt;&gt; &quot;&quot; Then
-			Select Case sGetOS
-				Case &quot;WINDOWS&quot;
-				errorCode = Shell(_
-				sProgram, 0, sCommand, bWait)
-				Case Else
-				&apos; Specify a program path as URL because
-				&apos; a program path to a python application
-				&apos; could include spaces.
-				If sGetOS =&quot;MacOS&quot; And _
-					InStr(sProgram, &quot;/python&quot;) &lt;&gt; 0 And _
-					fbIsLibreOffice() Then
-						sProgram = PosixPythonPath()				
-				End If
-				If True Then
-				errorCode = Shell(_
-				converttourl(_
-				sProgram), 0, sCommand, bWait)
-				Else
-				errorCode = Shell (sProgram, 0, sCommand, bWait)				
-				
-				End If
-				
-			End Select
-		End If
-		On Error Resume Next
-		oBar.Value = 80
-		On Error Goto errorHandler
-	Else
-		MsgBox(fsLookUpTerm(&quot;s_could-not-locate-the-program&quot;) &amp; _
-		&quot; &quot; &amp; _
-		fsLookUpTerm(&quot;s_string-cannot-be-analyzed&quot;), 64 , _
-		fsLookUpTerm(&quot;s_read-text&quot;))
-		If FileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
-			kill fsFullPathOf(fsExtensionSettingsIni)
-		End If
-		If FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
-			kill fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
-		End If
-		resetSpeech
-	End If
-	On Error Resume Next
-	oBar.Value = 90
-	If Len(sArtURL) &gt; 0 Then
-		If (sGetOS = &quot;WINDOWS&quot;) Then
-			&apos; The Windows `tts_wscript.vbs` script must deal with the
-			&apos; custom image because removing it here may cause an error.
-		Else
-			If FileExists(sArtURL) Then
-				For n = 0 To 30
-					Wait 500
-					If Not(FileExists(fsMyTempLock(&quot;lock&quot;))) Then
-						If FileExists(sArtURL) Then
-							Kill sArtURL
-						End If
-						Exit For
-					End If
-				Next
-			End If
-		End If
-	End If
-	oBar.Value = 100
-	oBar.End()
-	Exit Sub
-	ErrorHandler:
-	
-	MsgBox(fsLookUpTerm( &quot;s_string-cannot-be-analyzed&quot;), 48, _
-	fsLookUpTerm( &quot;s_read-text&quot;))
-	If FileExists(fsFullPathOf(fsExtensionSettingsIni)) Then
-		kill fsFullPathOf(fsExtensionSettingsIni)
-	End If
-	If FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
-		kill FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
-	End If
+	fbRemoveFile(fsFullPathOf(fsExtensionSettingsIni))
+	fbRemoveFile(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
 	resetSpeech
 End Sub
 
@@ -3814,59 +3493,59 @@ Function replaceLocalTokensWithStr( _
 	sB = fsGetTextSelection(False, False)
 	&apos;Temporary file name
 	sFind = &quot;(TMP)&quot;
-	sReplace = ConvertFromURL(fsTemporaryTextDoc())
+	sReplace = ConvertFromUrl(fsTemporaryTextDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(TTS_WSCRIPT_VBS)&quot;
-	sReplace = ConvertFromURL(fsTTSScriptVBS())
+	sReplace = ConvertFromUrl(fsTTSScriptVBS())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(SPD_READ_TEXT_PY)&quot;
-	sReplace = ConvertFromURL(fsPythonSpdDoc())
+	sReplace = ConvertFromUrl(fsPythonSpdDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(PICO_READ_TEXT_PY)&quot;
-	sReplace = ConvertFromURL(fsPythonPicoDoc())
+	sReplace = ConvertFromUrl(fsPythonPicoDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(ESPEAK_READ_TEXT_PY)&quot;
-	sReplace = ConvertFromURL(fsPythonEspeakDoc())
+	sReplace = ConvertFromUrl(fsPythonEspeakDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(FESTIVAL_READ_TEXT_PY)&quot;
-	sReplace = ConvertFromURL(fsPythonFestivalDoc())
+	sReplace = ConvertFromUrl(fsPythonFestivalDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(RHVOICE_READ_TEXT_PY)&quot;
-	sReplace = ConvertFromURL(fsRhVoiceTtsDoc())
+	sReplace = ConvertFromUrl(fsRhVoiceTtsDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(NETWORK_READ_TEXT_PY)&quot;
-	sReplace = ConvertFromURL(fsNetworkTtsDoc())
+	sReplace = ConvertFromUrl(fsNetworkTtsDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(OPENJTALK_READ_TEXT_PY)&quot;
-	sReplace = ConvertFromURL(fsPythonOpenJTalkDoc())
+	sReplace = ConvertFromUrl(fsPythonOpenJTalkDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(SAY_APPLESCRIPT)&quot;
-	sReplace = ConvertFromURL(fsTemporaryTtsAppleScript())
+	sReplace = ConvertFromUrl(fsTemporaryTtsAppleScript())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(SAY_APPLESCRIPT_SLOWLY)&quot;
-	sReplace = ConvertFromURL(fsTemporaryTtsAppleScript())
+	sReplace = ConvertFromUrl(fsTemporaryTtsAppleScript())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(SAY_APPLESCRIPT_QUICKLY)&quot;
-	sReplace = ConvertFromURL(fsTemporaryTtsAppleScript())
+	sReplace = ConvertFromUrl(fsTemporaryTtsAppleScript())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;
-	sReplace = ConvertFromURL(fsTemporaryTtsAppleScript())
+	sReplace = ConvertFromUrl(fsTemporaryTtsAppleScript())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(CREATE_QR_LABEL_PY)&quot;
-	sReplace = ConvertFromURL(fsPythonCreateQR())
+	sReplace = ConvertFromUrl(fsPythonCreateQR())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	&apos;Work directory also known As My Documents or home
@@ -3885,12 +3564,12 @@ Function replaceLocalTokensWithStr( _
 	
 	&apos; Sample image for movie clip with embedded speech
 	sFind = &quot;(POSTER_IMG)&quot;
-	sReplace = ConvertFromURL(fsPosterImg())
+	sReplace = ConvertFromUrl(fsPosterImg())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	&apos; Sample image for movie clip with embedded speech
 	sFind = &quot;(POSTER2_IMG)&quot;
-	sReplace = ConvertFromURL(fsPoster2Png)
+	sReplace = ConvertFromUrl(fsPoster2Png)
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	&apos;Choose an image for your movie clip with embedded speech
@@ -5079,7 +4758,7 @@ Sub MsgSpeak( _
 			&apos;
 			&apos; [MS0]:https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/say.1.html
 			&apos;
-			ConfigureReadTextAloud
+			ConfigureReadTextAloud()
 		Else
 			&apos; Read strA aloud
 			If FileExists(sFile) Then
@@ -5094,7 +4773,7 @@ Sub MsgSpeak( _
 		End If
 	Else
 		&apos; Show the settings dialogue
-		ConfigureReadTextAloud
+		ConfigureReadTextAloud()
 	End If
 End Sub
 
@@ -5479,9 +5158,7 @@ Function fbcreateDirectory( _
 			sA = sPath &amp; &quot;/&quot; &amp; &quot;temp-&quot; &amp; Trim(Second(Now)) &amp; &quot;.txt&quot;
 		End If
 		fbcreateDirectory = CreateFile(sA, fsAppSignature(), &quot;UTF-8&quot;)
-		If FileExists(sA) Then
-			kill sA
-		End If
+		fbRemoveFile(sA)
 	End If
 	Exit Function
 	fbcreateDirectoryErr:
@@ -5730,7 +5407,7 @@ Function fswriteMacOSSpeechScript( _
 	fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
 	&quot;)&quot;
 	Dim sF$
-	sF = ConvertFromURL(fsTemporaryTextDoc())
+	sF = ConvertFromUrl(fsTemporaryTextDoc())
 	Dim sFile$
 	sFile = fsTemporaryTtsAppleScript()
 	Dim sGetOS$
@@ -5756,9 +5433,7 @@ Function fswriteMacOSSpeechScript( _
 		bestEncoder = &quot;MP3&quot;
 		confirmMetaData = &quot;.aif,.aiff,.caf,.mp3&quot;
 	End Select
-	If FileExists(sFile) Then
-		kill sFile
-	End If
+	fbRemoveFile(sFile)
 	If FileExists(sFile) Then
 		&apos; if we can&apos;t make a fresh file, then we don&apos;t want to run an
 		&apos; arbitrary script.
@@ -5768,7 +5443,7 @@ Function fswriteMacOSSpeechScript( _
 		CreateFile(sFile, _
 		sA, _
 		&quot;UTF-8&quot;)
-		kill sFile
+		fbRemoveFile(sFile)
 	End If
 	sA = &quot;&quot;
 	&apos; We use the system voice if the selected language is the same as the user
@@ -5802,9 +5477,9 @@ Function fswriteMacOSSpeechScript( _
 		&apos; audio files and playlists.
 		If ArtPath = &quot;&quot; Or _
 			Not(FileExists(ArtPath)) Then
-			ArtPath = Trim(convertfromURL(fsPosterImg()))
+			ArtPath = Trim(ConvertFromUrl(fsPosterImg()))
 		Else
-			ArtPath = Trim(convertfromURL(ArtPath))
+			ArtPath = Trim(ConvertFromUrl(ArtPath))
 		End If
 		&apos; Check generated  title 
 		
@@ -5852,7 +5527,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;    set donemessage to &quot;&quot;&quot;&quot;&quot;, _
 		&quot;    set err1 to &quot;&quot;Apple Script&quot;&quot;&quot;, _
 		&quot;    set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; &quot;&quot;&quot;&quot;, _
-		&quot;    set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; fsMyTempLock(&quot;lock&quot;) &amp; &quot;&quot;&quot;&quot;, _
+		&quot;    set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; ConvertFromUrl(fsMyTempLock(&quot;lock&quot;)) &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set myOption to &quot;&quot;&quot; &amp; sArguments &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set myReader to &quot;&quot;&quot; &amp; fsGetMacOsBaseVoice() &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set mySys to &quot;&quot;&quot; &amp; sGetOS &amp; &quot;&quot;&quot;&quot;, _
@@ -6248,7 +5923,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;    set b to &quot;&quot;&quot;&quot;&quot;, _
 		&quot;    set err1 to &quot;&quot;Apple Script&quot;&quot;&quot;, _
 		&quot;    set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; &quot;&quot;&quot;&quot;, _
-		&quot;    set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; fsMyTempLock(&quot;lock&quot;) &amp; &quot;&quot;&quot;&quot;, _
+		&quot;    set myLock to quoted form of POSIX path of &quot;&quot;&quot; &amp; ConvertFromUrl(fsMyTempLock(&quot;lock&quot;)) &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set myOption to &quot;&quot;&quot; &amp; sArguments &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set myVoice to &quot;&quot;&quot; &amp; fsGetMacOsBaseVoice() &amp; &quot;&quot;&quot;&quot;, _
 		&quot;    set textFile to quoted form of POSIX path of &quot;&quot;&quot; &amp; sF &amp; &quot;&quot;&quot;&quot;, _
@@ -6353,9 +6028,8 @@ End Function
 
 Function fsTemporaryTtsAppleScript() As String
 	Dim sA As String
-	sA = createUnoService(&quot;com.sun.star.util.PathSettings&quot;).temp &amp; _
+	fsTemporaryTtsAppleScript = createUnoService(&quot;com.sun.star.util.PathSettings&quot;).temp &amp; _
 	&quot;/readaloud.applescript&quot;
-	fsTemporaryTtsAppleScript = ConvertFromURL(sA)
 End Function
 
 
@@ -6384,9 +6058,7 @@ Function CreateFile( _
 		End Select
 	End If
 	On Error Goto CreateFileError
-	If FileExists(sFilePath) Then
-		kill sFilePath
-	End If
+	fbRemoveFile(sFilePath)
 	oOutputAccess = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
 	oOutputStream = CreateUnoService(&quot;com.sun.star.io.TextOutputStream&quot;)
 	vOutputData = oOutputAccess.openFileWrite(sFilePath)
@@ -6945,7 +6617,7 @@ Function fsMyFfmpeg() As String
 	If Len(sE) = 0 Then
 		sE = ffmpegPath()
 	End If
-	fsMyFfmpeg = convertfromurl(sE)
+	fsMyFfmpeg = ConvertFromUrl(sE)
 End Function
 
 
@@ -7236,18 +6908,13 @@ Sub resetSpeechDispatcher( _
 	On Error Goto resetSpeechDispatcherErr
     Select Case fsGetOS()
     	Case &quot;WINDOWS&quot;
-		If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
-			kill fsMyTempLock(&quot;lock&quot;)
-		End if
-
+		fbRemoveFile(fsMyTempLock(&quot;lock&quot;))
     	Case &quot;MacOS&quot;
 		If FileExists(&quot;/usr/bin/say&quot;) Then
 			If Not (fbCreatingMacOSMediaFile()) Then
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;say&quot;, True)
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;afplay&quot;, True)
-				If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
-					kill fsMyTempLock(&quot;lock&quot;)
-				End If
+				fbRemoveFile(fsMyTempLock(&quot;lock&quot;))
 			End If
 		End If
 
@@ -7298,17 +6965,10 @@ Sub resetSpeechDispatcher( _
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet vlc&quot;, True)
 			End If
 		End If
-		If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
-			kill fsMyTempLock(&quot;lock&quot;)
-		End If
-		If FileExists(fsTemporaryTextDoc() &amp; &quot;.sable&quot;) Then
-			kill fsTemporaryTextDoc() &amp; &quot;.sable&quot;
-		End If
-
+		fbRemoveFile(fsMyTempLock(&quot;lock&quot;))
+		fbRemoveFile(fsTemporaryTextDoc() &amp; &quot;.sable&quot;)
     End Select
-	If FileExists(fsTemporaryTextDoc()) Then
-		kill fsTemporaryTextDoc()
-	End If
+	fbRemoveFile(fsTemporaryTextDoc())
 	On Error Resume Next
 	oBar.End()
 	Exit Sub
@@ -8061,10 +7721,7 @@ Function fsExportAlbumCover( _
 		&apos; Make sure we have a writable folder
 		CreateFile(sPath &amp; &quot;.txt&quot; , fsAppSignature(), &quot;UTF-8&quot;)
 		If FileExists(sPath &amp; &quot;.txt&quot;) Then
-			kill sPath &amp; &quot;.txt&quot;
-			If FileExists(sPath) Then
-				kill sPath
-			End If
+			fbRemoveFile(sPath &amp; &quot;.txt&quot;)
 		Else
 			fsExportAlbumCover = &quot;&quot;
 			Exit Function
@@ -9487,15 +9144,13 @@ Function fbDoWinBat(_
 			&quot;chcp 65001&gt;nul&quot; &amp; _
 			CR
 	&apos; s5 is a batch prefix to change the default encoding code page to 65001
-	If FileExists(s4) Then
-		kill s4
-	End If
+	fbRemoveFile(s4)
 	&apos; If we can&apos;t make a fresh file, then we don&apos;t want to run an
 	&apos; arbitrary script.
 	If FileExists(s4) Then Exit Function
 	CreateFile(s4, s5 &amp; sA, &quot;utf-8&quot;)
 	If FileLen(s4) = 0 Then Wait 1
-	&apos; On Local Error GoTo fbDoWinBatErr
+	On Local Error GoTo fbDoWinBatErr
 	If Len(fsWinLocaleStr(&quot;sLongDate&quot;)) = 0 Then
 		&apos; You might not have access to `Wscript.Shell` so try to run the program
 		&apos; in a normal shell.
@@ -9562,9 +9217,9 @@ Function fsReleasenotesCMD( _
 	End Select
 	a1 = Split(sA, &quot;,&quot;)
 	For n = LBound(a1) To UBound(a1)
-		s2 = &quot;&quot;&quot;&quot; &amp; convertfromURL(fsMyURL &amp; &quot;/textToSpeech/&quot; &amp; a1(n) &amp; &quot;.xba&quot;) &amp; &quot;&quot;&quot;&quot;
-		s3 = &quot;&quot;&quot;&quot; &amp; convertfromURL(fsGetHomeDir &amp; &quot;&quot; &amp; a1(n) &amp; &quot;.markdown&quot;) &amp; &quot;&quot;&quot;&quot;
-		s4 = &quot;&quot;&quot;&quot; &amp; convertfromURL(fsGetHomeDir &amp; &quot;&quot; &amp; a1(n) &amp; &quot;.markdown-e&quot;) &amp; &quot;&quot;&quot;&quot;
+		s2 = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsMyURL &amp; &quot;/textToSpeech/&quot; &amp; a1(n) &amp; &quot;.xba&quot;) &amp; &quot;&quot;&quot;&quot;
+		s3 = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsGetHomeDir &amp; &quot;&quot; &amp; a1(n) &amp; &quot;.markdown&quot;) &amp; &quot;&quot;&quot;&quot;
+		s4 = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsGetHomeDir &amp; &quot;&quot; &amp; a1(n) &amp; &quot;.markdown-e&quot;) &amp; &quot;&quot;&quot;&quot;
 		s1 = &quot;cat &quot; &amp; s2 &amp; &quot; | grep &quot;&quot;&amp;apos;&amp;apos;&quot;&quot; &gt; &quot; &amp; s3 &amp; &quot; ; &quot; &amp; _
 		&quot;sed -i -e &apos;s/&amp;apos;&amp;apos; //g&apos; &quot; &amp; s3 &amp; &quot; ; &quot; &amp; _
 		&quot;sed -i -e &apos;s/&amp;apos;&amp;apos;//g&apos; &quot; &amp; s3 &amp; &quot; ; &quot; &amp; _
@@ -9633,7 +9288,7 @@ Sub megaDoc()
 	For n = LBound(a1) To UBound(a1)
 		s1 = s1 &amp; _
 		&quot;&quot;&quot;&quot; &amp; _
-		convertfromURL(fsGetHomeDir &amp; _
+		ConvertFromUrl(fsGetHomeDir &amp; _
 		a1(n) &amp; _
 		&quot;.markdown&quot;) &amp; _
 		&quot;&quot;&quot; &quot;
@@ -9641,7 +9296,7 @@ Sub megaDoc()
 	s1 = s1 &amp; _
 	&quot;&gt; &quot; &amp; _
 	&quot;&quot;&quot;&quot; &amp; _
-	convertfromURL(fsGetHomeDir() &amp; _
+	ConvertFromUrl(fsGetHomeDir() &amp; _
 	&quot;TTS_read-text-all&quot; &amp; _
 	&quot;.markdown&quot;) &amp; _
 	&quot;&quot;&quot; &quot;

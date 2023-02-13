@@ -466,7 +466,7 @@ Function fsGitRawJson(_
 			CreateFile(_temp_json, _get, &quot;UTF-8&quot;)
 			fbUpdateLexiconJsonFile(lang_region, json_dir, _temp_json)
 			fsGitRawJson = getTextFromFile(_temp_json, &quot;UTF-8&quot;)
-			kill _temp_json
+			fbRemoveFile(_temp_json)
 			If Len(fsGitRawJson) = 0 Then
 				fsGitRawJson = _get
 			End If
@@ -541,8 +541,8 @@ Function fsDefaultJson(_select_lang As String) As String
 	CR = Chr(13)
 	fsDefaultJson = Join(Array(&quot;{&quot;,_
 	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00001&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read Text Extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;},&quot;,_
-	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00002&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read text extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;}&quot;,_
-	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_99998&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;$[LOCALE]&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot; &amp; _select_lang &amp; &quot;&quot;&quot;}&quot;,_
+	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00002&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read text extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;},&quot;,_
+	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_99998&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;$[LOCALE]&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot; &amp; _select_lang &amp; &quot;&quot;&quot;},&quot;,_
 	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_99999&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;$[REVISION]&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot; &amp; fsTimeStamp() &amp; &quot;&quot;&quot;}&quot;,_
 	&quot;}&quot;), CR)
 End Function
@@ -668,7 +668,7 @@ Function EditJsonPhonemeTable() As String
 		.GetControl(&quot;_grapheme&quot;).model.Text = _grapheme
 		.GetControl(&quot;_grapheme&quot;).model.helpText = &quot;&quot;&quot;g&quot;&quot;:&quot;
 		.GetControl(&quot;_json_text&quot;).model.Text = _json_display
-		.GetControl(&quot;_json_text&quot;).model.helpText = ConvertFromURL(_out_file)
+		.GetControl(&quot;_json_text&quot;).model.helpText = ConvertFromUrl(_out_file)
 		.GetControl(&quot;_edit_frame&quot;).model.Label = fsLookUpTerm2(_
 		&quot;s_speech-synthesis&quot;, _lang)
 		.GetControl(&quot;_test1&quot;).model.Label = fsLookUpTerm2(&quot;s_test&quot;, _lang)
@@ -927,9 +927,7 @@ Sub ConfigureReadTextAloud()
 					End If
 				End If
 				On Error Resume Next
-				If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
-					kill fsMyTempLock()
-				End If
+				fbRemoveFile(fsMyTempLock(&quot;lock&quot;))
 			End If
 		End If
 		If .Execute() &lt;&gt; 0 Then
@@ -937,9 +935,7 @@ Sub ConfigureReadTextAloud()
 			config() = fvCurrentDialogConfig()
 			.Dispose()
 			On Error Resume Next
-			If FileExists(sFile) Then
-				kill sFile
-			End If
+			fbRemoveFile(sFile)
 			tts_config_writeFile(config(), sfile)
 			&apos;Call the shell to execute the program specified with the commands specified
 			ttsActuate(config(), _
@@ -1177,9 +1173,7 @@ Sub AboutAddOn( _
 			&apos; needs a dummy run of function before evaluating
 			&apos; the results.
 			&apos; if it crashes, then we are left with a lock file.
-			If FileExists(s3) Then  &apos; unlock clipboard
-				kill s3
-			End If
+			fbRemoveFile(s3)  &apos; unlock clipboard
 			s4 = fsGetClipBoard(False)
 			.GetControl(&quot;ImageControl4&quot;).model.helpText = Left( _
 			s4, 99)
@@ -1202,7 +1196,7 @@ Sub AboutAddOn( _
 		&apos;Change the text in the information text boxes
 		If config(fiFestivalOption()) Then
 			.GetControl(&quot;TextField3&quot;).model.Text = config(fiFestivalPath()) &amp; &quot; &quot; &amp; _
-			&quot;&quot;&quot;&quot; &amp; ConvertFromURL(fsFestivalScriptName()) &amp; &quot;&quot;&quot;&quot;
+			&quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsFestivalScriptName()) &amp; &quot;&quot;&quot;&quot;
 			sA = replaceLocalTokensWithStr(config(fiFestivalComboChoice()))
 			sA = replacePublicTokensWithStr(sA)
 			.GetControl(&quot;TextField2&quot;).model.Text = sA

@@ -222,7 +222,7 @@ Function _( _
 	End If
 	Dim sMyPoFile
 	sMyPoFile = &quot;&quot;
-	sMyPoFile = convertfromurl( _
+	sMyPoFile = ConvertFromUrl( _
 	fsMyURL() &amp; _
 	&quot;/po/&quot; &amp; _
 	sDirPo &amp; _
@@ -692,8 +692,8 @@ Function fsMyTempLock(ByVal sExt) As String
 	Else
 		sDiv = &quot;&quot;
 	End If
-	fsMyTempLock = ConvertFromURL(converttourl(sTemp) &amp; _
-	sDiv &amp; fsAppSignature &amp; &quot;.&quot; &amp; sUser &amp; &quot;.&quot; &amp; sExt )
+	fsMyTempLock = converttourl(sTemp) &amp; _
+	sDiv &amp; fsAppSignature() &amp; &quot;.&quot; &amp; sUser &amp; &quot;.&quot; &amp; sExt
 End Function
 
 
@@ -713,13 +713,12 @@ Function fbTestDirRW( _
 	End If
 	CreateFile(sA &amp; s1, s1, &quot;UTF-8&quot;)
 	If FileExists(sA &amp; s1) Then
-		kill sA &amp; s1
+		fbRemoveFile(sA &amp; s1)
 		fbTestDirRW = True
 	End If
 	
 	Exit Function
 	fbTestDirRWErr:
-	
 	fbTestDirRW = False
 End Function
 
@@ -733,7 +732,7 @@ Function fsExtensionVersion() As String
 	
 	s1 = fsMyURL() &amp; &quot;/description.xml&quot;
 	s2 = &quot;&quot;
-	aFile = ConvertFromURL(s1)
+	aFile = ConvertFromUrl(s1)
 	iNumber = Freefile
 	open aFile For input As #iNumber
 	While (s2 = &quot;&quot;) And (Not Eof(iNumber))
@@ -1245,7 +1244,7 @@ Function fsFestivalDirectory( _
 	&quot;voices/welsh/cb_cy_cw_diphone&quot;, _
 	&quot;voices/welsh/hl_diphone&quot;)
 	If Not(n &gt; UBound(a1)) Then
-		fsFestivalDirectory = convertfromurl(s2 &amp; a1(n))
+		fsFestivalDirectory = ConvertFromUrl(s2 &amp; a1(n))
 	End If
 End Function
 
@@ -1304,7 +1303,7 @@ Function fsFestivalLanguage( _
 	If Not(n &gt; UBound(a1)) Then
         Select Case o
             Case 0
-		    fsFestivalLanguage = convertfromurl(s2 &amp; a1(n)(0))
+		    fsFestivalLanguage = ConvertFromUrl(s2 &amp; a1(n)(0))
             Case Else
 		    fsFestivalLanguage = a1(n)(1)
         End Select
@@ -1690,11 +1689,11 @@ Function fsGetHomeDir() As String
 	
 	cr = Chr(10)
 	fsGetHomeDir = &quot;&quot;
-	s1 = ConvertFromURL(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;)
+	s1 = ConvertFromUrl(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;)
 	If FileExists(s1) Then
 		fsGetHomeDir = s1
 	Else
-		s1 = ConvertFromURL(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;) &amp; cr
+		s1 = ConvertFromUrl(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;) &amp; cr
 		s1 = s1 &amp; Environ(&quot;pwd&quot;) &amp; &quot;/&quot; &amp; cr
 		s1 = s1 &amp; Environ(&quot;HOMEPATH&quot;) &amp; &quot;\&quot; &amp; cr
 		s1 = s1 &amp; Environ(&quot;HOME&quot;) &amp; &quot;/&quot; &amp; cr
