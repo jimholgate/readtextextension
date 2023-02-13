@@ -646,8 +646,6 @@ Function EditJsonPhonemeTable() As String
 		.model.Title = fsLookUpTerm2(_
 		&quot;s_read-text&quot;, _lang)  &amp; &quot; - &quot; &amp; _po_dir &amp; &quot; - &quot; &amp; fsLookUpTerm2(_
 		&quot;s_speech-properties&quot;, _lang)
-		.GetControl(&quot;_trash&quot;).model.ImageURL = fsRewindLogo()
-		.GetControl(&quot;_trash&quot;).Visible = False
 		.GetControl(&quot;_add&quot;).Model.enabled = True
 		.GetControl(&quot;_cancel&quot;).model.Label = fsLookUpTerm2(&quot;s_cancel&quot;, _lang)
 		.GetControl(&quot;_replace&quot;).model.Label = fsLookUpTerm2(_
