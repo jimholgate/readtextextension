@@ -1,7 +1,8 @@
 {
     "en-US_00001":{"g":"MaryTTS","p":"mary t t s."},
-    "en-US_00002":{"g":"Read Text Extension","p":"['ri:əd] text extension"},
-    "en-US_00003":{"g":"Read text extension","p":"['ri:əd] text extension"},
+    "en-US_00002":{"g":"LibreOffice","p":"leebra-office"},
+    "en-US_00003":{"g":"Read Text Extension","p":"['ri:əd] text extension"},
+    "en-US_00004":{"g":"Read text extension","p":"['ri:əd] text extension"},
     "en-US_99998":{"g":"$[LOCALE]","p":"en-US"},
-    "en-US_99999":{"g":"$[REVISION]","p":"2023-01-28_00:35:50"}
+    "en-US_99999":{"g":"$[REVISION]","p":"2023-02-13_13:32:33"}
 }
