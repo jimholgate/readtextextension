@@ -1720,6 +1720,10 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             _input_type = self.input_types[3]
         elif _speech_rate == 160:
             _input_type = self.input_types[0]
+        elif not REQUESTS_OK:
+            print('''
+NOTE: Setting a MaryTTS speech rate requires the python `request` library.''')
+            _input_type = self.input_types[0]
         else:
             _input_type = self.input_types[6]
             _text = self.marytts_xml(_text, _speech_rate)

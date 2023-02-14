@@ -266,7 +266,12 @@ Function MaryTtsSpeechHostInfo()
 		.json_dir = &quot;mary_tts&quot;
 		.sample = &quot;http://0.0.0.0:59125?AUDIO=WAVE_FILE&amp;OUTPUT_TYPE=AUDIO&amp;INPUT_TYPE=TEXT&amp;LOCALE=de&amp;INPUT_TEXT=Hallo+welt&quot;
 		.docker = &quot;https://hub.docker.com/r/synesthesiam/marytts&quot;
-		.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;)
+		Select Case Len(fsAppImageResourcePath(&quot;python&quot;))
+			Case 0
+			.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;)
+			Case Else
+			.tags = Array(&quot;text&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;web-ui&quot;)
+		End Select
 	End With
 	MaryTtsSpeechHostInfo = _info
 End Function
