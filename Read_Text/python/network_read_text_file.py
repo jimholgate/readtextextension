@@ -159,8 +159,9 @@ import readtexttools
 try:
     import urllib
     import json
+    BASICS_OK = True
 except ImportError:
-    pass
+    BASICS_OK = False
 try:
     import requests
     REQUESTS_OK = True
@@ -205,13 +206,12 @@ def usage():  # -> None
     '''
     Command line help
     '''
-
     print('''
 Network Speech Synthesis
 ========================
 
-Reads a text file using an on-line voice and a media player
-like ffmpeg or avconv.
+Reads a text file using an on-line voice and a media player like ffmpeg or
+avconv.
 
 Usage
 -----
@@ -226,19 +226,15 @@ seconds, or retrieving the online resource might fail.
 Local Server
 ------------
 
-The extension can use a local server that is compatible with the applcation
-programming interface (API) of a `rhasspy/larynx` speech server daemon.
+The extension can use a local server that is compatible with the application
+programming interface (API) of a locally hosted speech server daemon.
 
-The default larnyx address is <http://0.0.0.0:5002>.
+It is normal for a local server to take a moment to start speaking the first
+time that you use it.
 
-You can use a different local address and port in the command options:
-
-    network_read_text_file.py --language=en-US --url="http://localhost:5002" "input.txt"
-
-It is normal for `larynx` to take a moment to start speaking the first time
-that you use it.
-
-[About Larynx...](https://github.com/rhasspy/larynx)
+* [Larynx](https://github.com/rhasspy/larynx)
+* [MaryTTS](http://mary.dfki.de/)
+* [Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest)
 ''')
 
 
@@ -383,7 +379,8 @@ class LocalCommons(object):
                 _verbose = '-q'  # quiet
                 if bool(self.debug):
                     _verbose = '-v'
-                _command = '''wget --no-http-keep-alive %(_verbose)s -O '%(_media_work)s' '%(_url)s?%(_body_data)s"%(_text)s"' ''' % locals()
+                _command = '''wget --no-http-keep-alive %(_verbose)s -O '%(_media_work)s' '%(_url)s?%(_body_data)s"%(_text)s"' ''' % locals(
+                )
             elif readtexttools.have_posix_app('curl', False):
                 _verbose = '-s'  # silent
                 if bool(self.debug):
@@ -1186,10 +1183,7 @@ Try restarting `larynx-server`.''')
                 platform.python_version_tuple()[1]) < 8:
             self.ok = False
             return self.ok
-        if not REQUESTS_OK:
-            if not readtexttools.have_posix_app('curl', False):
-                self.ok = False
-                return False
+        if not REQUESTS_OK and not BASICS_OK:
             if not bool(self.base_curl):
                 self.ok = False
                 return False
@@ -1411,38 +1405,71 @@ Loading larynx voices for `%(_lang2)s`
                                                   'LARYNX_USER_DIRECTORY',
                                                   False)[0]
         if REQUESTS_OK:
-            _strips = '\n .;'
-            _text = '\n'.join(['', _text.strip(_strips), ''])
-            response = requests.post(
-                _url,
-                params={
-                    'voice': _voice,
-                    'vocoder': _vocoder,
-                    'denoiserStrength': _denoiser_strength,
-                    'noiseScale': _noise_scale,
-                    'lengthScale': _length_scale,
-                    'ssml': _ssml
-                },
-                headers={
-                    'Content-Type':
-                    'application/x-www-form-urlencoded',
-                    'User-Agent':
-                    'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
-                },
-                data=_text.encode('utf-8', 'ignore'),
-                timeout=(_ok_wait, _end_wait))
-            with open(_media_work, 'wb') as f:
-                f.write(response.content)
-                _done = True
+            try:
+                _strips = '\n .;'
+                _text = '\n'.join(['', _text.strip(_strips), ''])
+                response = requests.post(
+                    _url,
+                    params={
+                        'voice': _voice,
+                        'vocoder': _vocoder,
+                        'denoiserStrength': _denoiser_strength,
+                        'noiseScale': _noise_scale,
+                        'lengthScale': _length_scale,
+                        'ssml': _ssml
+                    },
+                    headers={
+                        'Content-Type':
+                        'application/x-www-form-urlencoded',
+                        'User-Agent':
+                        'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
+                    },
+                    data=_text.encode('utf-8', 'ignore'),
+                    timeout=(_ok_wait, _end_wait))
+                with open(_media_work, 'wb') as f:
+                    f.write(response.content)
+                if os.path.isfile(_media_work):
+                    _done = os.path.getsize(_media_work) != 0
+            except:
+                _done = False
+        if not _done:
+            my_body = 'voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s' % locals(
+            )
+            my_url = '''%(_url)s?%(my_body)s''' % locals()
+            try:
+                # TODO : timeout=_ok_wait or _end_wait? Currently using the
+                # default timeout. `socket._GLOBAL_DEFAULT_TIMEOUT`
+                # See: <https://docs.python.org/3/library/urllib.request.html>
+                # See also: `/usr/lib/python3.xx/urllib/request.py
+                _strips = '\n .;'
+                _text = '\n'.join(['', _text.strip(_strips), ''])
+                data = _text.encode('utf-8', 'ignore')
+                req = urllib.request.Request(my_url, data)
+                resp = urllib.request.urlopen(req)
+                response_content = resp.read()
+                with open(_media_work, 'wb') as f:
+                    f.write(response_content)
+                if os.path.isfile(_media_work):
+                    _done = os.path.getsize(_media_work) != 0
+            except:
+                _done = False
         if not _done:
             if not bool(self.base_curl):
                 return False
             _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
-            _text = str(_text.translate(self.base_curl))                
+            _text = str(_text.translate(self.base_curl))
             app_list = [
-                ['curl', '''curl --max-time %(_end_wait)s --connect-timeout %(_ok_wait)s -s -d "%(_text)s" "%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s" -o "%(_media_work)s"''' % locals()], 
-                ['wget', '''wget --no-http-keep-alive -q --post-data="%(_text)s" "%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s" -O "%(_media_work)s"''' % locals()],
-                ]
+                [
+                    'curl',
+                    'curl --max-time %(_end_wait)s --connect-timeout %(_ok_wait)s -s -d "%(_text)s" "%(my_url)s" -o "%(_media_work)s"'
+                    % locals()
+                ],
+                [
+                    'wget',
+                    'wget --no-http-keep-alive -q --post-data="%(_text)s" "%(my_url)s" -O "%(_media_work)s"'
+                    % locals()
+                ],
+            ]
             for _app in app_list:
                 if readtexttools.have_posix_app(_app[0], False):
                     if bool(self.debug):
@@ -1551,11 +1578,7 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                 platform.python_version_tuple()[1]) < 8:
             self.ok = False
             return self.ok
-        if not REQUESTS_OK:
-            if not readtexttools.have_posix_app('curl', False):
-                if not readtexttools.have_posix_app('wget', False):
-                    self.ok = False
-                    return False
+        if not REQUESTS_OK and not BASICS_OK:
             if not bool(self.base_curl):
                 self.ok = False
                 return False
@@ -1696,11 +1719,13 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
         if not self.ok:
             return False
         _media_out = ''
-
+        _done = False
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
         _media_work = os.path.join(tempfile.gettempdir(), 'MaryTTS.wav')
+        if os.path.isfile(_media_work):
+            os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
                 return True
@@ -1721,6 +1746,8 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
         elif _speech_rate == 160:
             _input_type = self.input_types[0]
         elif not REQUESTS_OK:
+            # NOTE: Some voices are not intelligible when you modify the
+            # speed.
             print('''
 NOTE: Setting a MaryTTS speech rate requires the python `request` library.''')
             _input_type = self.input_types[0]
@@ -1783,14 +1810,41 @@ Docker MaryTTS
                 timeout=(_ok_wait, _end_wait))
             with open(_media_work, 'wb') as f:
                 f.write(response.content)
-            _done = os.path.isfile(_media_work)
-        else:
+            if os.path.isfile(_media_work):
+                _done = os.path.getsize(_media_work) != 0
+        if not _done:
             vcommand = '&VOICE=%(_mary_vox)s' % locals()
             if len(_mary_vox) == 0:
                 vcommand = ''
             _method = "POST"
             _body_data = "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT=" % locals(
             )
+            q_text = urllib.parse.quote(_text)
+            my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
+            try:
+                # NOTE: Setting a MaryTTS speech rate requires the python
+                # `request` library.
+                #
+                # TODO : timeout=_ok_wait or _end_wait? Currently using the
+                # default timeout. `socket._GLOBAL_DEFAULT_TIMEOUT`
+                # See: <https://docs.python.org/3/library/urllib.request.html>
+                # See also: `/usr/lib/python3.xx/urllib/request.py
+                _strips = '\n .;'
+                _text = '\n'.join(['', _text.strip(_strips), ''])
+                data = {}  # The API uses an `INPUT_TEXT` argument for text
+                req = urllib.request.Request(my_url, data)
+                resp = urllib.request.urlopen(req)
+                response_content = resp.read()
+                with open(_media_work, 'wb') as f:
+                    f.write(response_content)
+                if os.path.isfile(_media_work):
+                    _done = os.path.getsize(_media_work) != 0
+            except:
+                _done = False
+        if not _done:
+            _body_data = "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT=" % locals(
+            )
+            _method = "POST"
             _done = self.common.do_posix_os_download(_url, _media_work,
                                                      _body_data, _text,
                                                      _method, _found_locale,
@@ -1954,6 +2008,7 @@ class RhvoiceLocalHost(object):
                            alt_local_url=''):  # -> bool
         '''Is the language or voice supported in rhvoice rest?
         + `iso_lang` can be in the form `en-US` or `en`.'''
+        _found_name=''
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
         if self.ok:
@@ -1974,6 +2029,8 @@ class RhvoiceLocalHost(object):
                 break
         if len(self.checked_lang) != 0:
             for item in self.checklist:
+                if bool(self.common.debug):
+                    print(item)
                 if item[2] == _iso_lang.lower():
                     self.checked_lang = item[0]
                     self.ok = True
@@ -1989,7 +2046,8 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
 ''' % locals())
             if not REQUESTS_OK:
                 if not readtexttools.have_posix_app('curl', False):
-                    self.ok = False
+                    if not readtexttools.have_posix_app('wget', False):
+                        self.ok = False
                 if not bool(self.base_curl):
                     self.ok = False
         return self.ok
@@ -2079,6 +2137,8 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                 if _symbol in _text:
                     _text = _text.translate(self.add_pause).replace('.;', '.')
                     break
+        if os.path.isfile(_media_work):
+            os.remove(_media_work)
         _view_json = self.debug and 1
         response = readtexttools.local_pronunciation(_iso_lang, _text,
                                                      'rhvoice',
@@ -2114,14 +2174,42 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                                         timeout=(_ok_wait))
                 with open(_media_work, 'wb') as f:
                     f.write(response.content)
-                    _done = True
+                if os.path.isfile(_media_work):
+                    _done = os.path.getsize(_media_work) != 0
             except requests.exceptions.ConnectionError:
                 self.ok = False
-                return self.ok
-        else:
-            _body_data = 'format=%(_audio_format)s&rate=%(_length_scale)s&pitch=50&volume=50&voice=%(_voice)s&text=' % locals()
+                _done = False
+        if not _done:
+            # Not all Rhvoice voices use ascii. i. e.: Portuguese
+            # q_voice=let%C3%ADcia
+            q_voice = urllib.parse.quote(_voice)
+            _body_data = 'format=%(_audio_format)s&rate=%(_length_scale)s&pitch=50&volume=50&voice=%(q_voice)s&text=' % locals(
+            )
             _method = "GET"
-            _done = self.common.do_posix_os_download(_url, _media_work, _body_data, _text, _method, _iso_lang, _ok_wait, _end_wait)
+            q_text = urllib.parse.quote(_text)
+            my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
+            try:
+                # TODO : timeout=_ok_wait or _end_wait? Currently using the
+                # default timeout. `socket._GLOBAL_DEFAULT_TIMEOUT`
+                # See: <https://docs.python.org/3/library/urllib.request.html>
+                # See also: `/usr/lib/python3.xx/urllib/request.py
+                _strips = '\n .;'
+                _text = '\n'.join(['', _text.strip(_strips), ''])
+                # The API uses GET and a `text` argument for text
+                req = urllib.request.Request(my_url)
+                resp = urllib.request.urlopen(req)
+                response_content = resp.read()
+                with open(_media_work, 'wb') as f:
+                    f.write(response_content)
+                if os.path.isfile(_media_work):
+                    _done = os.path.getsize(_media_work) != 0
+            except:
+                _done = False
+        if not _done:
+            _done = self.common.do_posix_os_download(_url, _media_work,
+                                                     _body_data, _text,
+                                                     _method, _iso_lang,
+                                                     _ok_wait, _end_wait)
         if not _done:
             return False
         return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
