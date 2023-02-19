@@ -337,62 +337,6 @@ class LocalCommons(object):
             return True
         return False
 
-    def do_posix_os_download(
-            self,
-            _url='',
-            _media_work='',
-            _body_data='AUDIO=WAVE_FILE&OUTPUT_TYPE=AUDIO&INPUT_TYPE=TEXT&LOCALE=en-US&VOICE=cmu-rms-hsmm&INPUT_TEXT=',
-            _text='Testing 123',
-            _method='POST',
-            _iso_lang='en-US',
-            _ok_wait=4,
-            _end_wait=30):  # -> bool
-        '''Use `curl` or `wget` to download a file.'''
-        for _item in [
-                _url, _media_work, _body_data, _text, _method, _iso_lang
-        ]:
-            if len(_item) == 0:
-                return False
-        for _item in [_ok_wait, _end_wait, self.base_curl]:
-            if bool(_item) == False:
-                return False
-        if os.path.isfile(_media_work):
-            os.remove(_media_work)
-        _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
-        _text = str(_text.translate(self.base_curl))
-        _text = urllib.parse.quote(_text)
-        if _method in ['POST']:
-            if readtexttools.have_posix_app('wget', False):
-                _verbose = '-q'  # quiet
-                if bool(self.debug):
-                    _verbose = ''
-                _command = '''wget --no-http-keep-alive %(_verbose)s --header='Content-Type: application/x-www-form-urlencoded' -O '%(_media_work)s' --method %(_method)s  --body-data '%(_body_data)s"%(_text)s"' %(_url)s''' % locals(
-                )
-            elif readtexttools.have_posix_app('curl', False):
-                _verbose = '-s'  # silent
-                if bool(self.debug):
-                    _verbose = '-v'  # verbose
-                _command = '''curl %(_verbose)s -o "%(_media_work)s" --max-time %(_end_wait)s --connect-timeout %(_ok_wait)s -X %(_method)s -d '%(_body_data)s %(_text)s' %(_url)s''' % locals(
-                )
-        elif _method in ['GET']:
-            if readtexttools.have_posix_app('wget', False):
-                _verbose = '-q'  # quiet
-                if bool(self.debug):
-                    _verbose = '-v'
-                _command = '''wget --no-http-keep-alive %(_verbose)s -O '%(_media_work)s' '%(_url)s?%(_body_data)s"%(_text)s"' ''' % locals(
-                )
-            elif readtexttools.have_posix_app('curl', False):
-                _verbose = '-s'  # silent
-                if bool(self.debug):
-                    _verbose = '-v'
-                _command = '''curl "%(_url)s?%(_body_data)s%(_text)s" %(_verbose)s -o "%(_media_work)s" --max-time %(_end_wait)s --connect-timeout %(_ok_wait)s ''' % locals(
-                )
-        else:  # Only allow GET and POST
-            return False
-        if bool(self.debug):
-            print(_command)
-        return os.system(_command) == 0
-
 
 class AmazonClass(object):
     u''' The following notice should be displayed in a dialog when users click
@@ -1183,10 +1127,6 @@ Try restarting `larynx-server`.''')
                 platform.python_version_tuple()[1]) < 8:
             self.ok = False
             return self.ok
-        if not REQUESTS_OK and not BASICS_OK:
-            if not bool(self.base_curl):
-                self.ok = False
-                return False
         if not self._set_vocoders(self.url):
             self.ok = False
             return False
@@ -1433,6 +1373,7 @@ Loading larynx voices for `%(_lang2)s`
             except:
                 _done = False
         if not _done:
+            _voice = urllib.parse.quote(_voice)
             my_body = 'voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s' % locals(
             )
             my_url = '''%(_url)s?%(my_body)s''' % locals()
@@ -1454,39 +1395,8 @@ Loading larynx voices for `%(_lang2)s`
             except:
                 _done = False
         if not _done:
-            if not bool(self.base_curl):
-                return False
-            _text = readtexttools.strip_mojibake(_iso_lang[:2].lower(), _text)
-            _text = str(_text.translate(self.base_curl))
-            app_list = [
-                [
-                    'curl',
-                    'curl --max-time %(_end_wait)s --connect-timeout %(_ok_wait)s -s -d "%(_text)s" "%(my_url)s" -o "%(_media_work)s"'
-                    % locals()
-                ],
-                [
-                    'wget',
-                    'wget --no-http-keep-alive -q --post-data="%(_text)s" "%(my_url)s" -O "%(_media_work)s"'
-                    % locals()
-                ],
-            ]
-            for _app in app_list:
-                if readtexttools.have_posix_app(_app[0], False):
-                    if bool(self.debug):
-                        print(_app[1])
-                    os.system(_app[1])
-                    if not os.path.isfile(_media_work):
-                        continue
-                    if os.path.getsize(_media_work) == 0:
-                        time.sleep(2)
-                    if os.path.isfile(_media_work):
-                        _done = True
-                        break
-        if not _done:
             print('''The application cannot load a sound file.
-Your computer is missing a required library.
-Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
-                  )
+Your computer is missing a required library.''')
             self.ok = False
             return False
         return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
@@ -1578,10 +1488,6 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                 platform.python_version_tuple()[1]) < 8:
             self.ok = False
             return self.ok
-        if not REQUESTS_OK and not BASICS_OK:
-            if not bool(self.base_curl):
-                self.ok = False
-                return False
         if len(self.voice_locale) != 0:
             self.help_url = self.url
             self.help_icon = '/usr/share/icons/HighContrast/scalable/actions/system-run.svg'
@@ -1745,7 +1651,7 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             _input_type = self.input_types[3]
         elif _speech_rate == 160:
             _input_type = self.input_types[0]
-        elif not REQUESTS_OK:
+        elif REQUESTS_OK:
             # NOTE: Some voices are not intelligible when you modify the
             # speed.
             print('''
@@ -1813,9 +1719,11 @@ Docker MaryTTS
             if os.path.isfile(_media_work):
                 _done = os.path.getsize(_media_work) != 0
         if not _done:
-            vcommand = '&VOICE=%(_mary_vox)s' % locals()
             if len(_mary_vox) == 0:
                 vcommand = ''
+            else:
+                _mary_vox = urllib.parse.quote(_mary_vox)
+                vcommand = '&VOICE=%(_mary_vox)s' % locals()
             _method = "POST"
             _body_data = "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT=" % locals(
             )
@@ -1841,14 +1749,6 @@ Docker MaryTTS
                     _done = os.path.getsize(_media_work) != 0
             except:
                 _done = False
-        if not _done:
-            _body_data = "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT=" % locals(
-            )
-            _method = "POST"
-            _done = self.common.do_posix_os_download(_url, _media_work,
-                                                     _body_data, _text,
-                                                     _method, _found_locale,
-                                                     _ok_wait, _end_wait)
         if not _done:
             print('''The application cannot load a sound file.
 Your computer is missing a required library.
@@ -2008,7 +1908,7 @@ class RhvoiceLocalHost(object):
                            alt_local_url=''):  # -> bool
         '''Is the language or voice supported in rhvoice rest?
         + `iso_lang` can be in the form `en-US` or `en`.'''
-        _found_name=''
+        _found_name = ''
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
         if self.ok:
@@ -2044,12 +1944,6 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
 
 <%(help_url)s>
 ''' % locals())
-            if not REQUESTS_OK:
-                if not readtexttools.have_posix_app('curl', False):
-                    if not readtexttools.have_posix_app('wget', False):
-                        self.ok = False
-                if not bool(self.base_curl):
-                    self.ok = False
         return self.ok
 
     def rhvoice_voice(self,
@@ -2157,29 +2051,7 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
         _url = '%(_url1)s/say' % locals()
         _audio_format = self.audio_format
         _voice = self.rhvoice_voice(_vox, _iso_lang, True)
-        if REQUESTS_OK:
-            try:
-                _strips = '\n .;'
-                _text = '\n'.join(['', _text.strip(_strips), ''])
-                response = requests.get(_url,
-                                        params={
-                                            'format': _audio_format,
-                                            'rate': _length_scale,
-                                            'pitch': '50',
-                                            'volume': '50',
-                                            'voice': _voice,
-                                            'text':
-                                            _text.encode('utf-8', 'ignore')
-                                        },
-                                        timeout=(_ok_wait))
-                with open(_media_work, 'wb') as f:
-                    f.write(response.content)
-                if os.path.isfile(_media_work):
-                    _done = os.path.getsize(_media_work) != 0
-            except requests.exceptions.ConnectionError:
-                self.ok = False
-                _done = False
-        if not _done:
+        if BASICS_OK:
             # Not all Rhvoice voices use ascii. i. e.: Portuguese
             # q_voice=let%C3%ADcia
             q_voice = urllib.parse.quote(_voice)
@@ -2205,11 +2077,6 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                     _done = os.path.getsize(_media_work) != 0
             except:
                 _done = False
-        if not _done:
-            _done = self.common.do_posix_os_download(_url, _media_work,
-                                                     _body_data, _text,
-                                                     _method, _iso_lang,
-                                                     _ok_wait, _end_wait)
         if not _done:
             return False
         return self.common.do_net_sound(_info, _media_work, _icon, _media_out,

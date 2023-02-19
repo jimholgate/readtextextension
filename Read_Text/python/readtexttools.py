@@ -145,7 +145,7 @@ IPA_SUBSET = [
 
 def killall_process(_process=''):  # -> bool
     '''If process is active, then stop it. Posix systems can use the posix
-    `killall` command. Windows requires the `pip3` `psutil` library. Returns
+    `killall` command. Windows uses the `pip3` `psutil` library. Returns
     `True` if a process was stopped.'''
     _success = False
     try:
@@ -159,7 +159,11 @@ def killall_process(_process=''):  # -> bool
             # `killall` might not be available to the script if it is running
             # in a container that does not include the `killall` command.
             return os.system('killall %(_process)s' % locals()) == 0
-        print("WARNING: NameError in `killall_process`. Requires pip3 `psutil`")
+        elif os.name == 'nt':
+            # /f force /im <imagename>
+            return os.system('taskkill /f /im %(_process)s' % locals()) == 0
+        print(
+            "WARNING: NameError in `killall_process`. Requires pip3 `psutil`")
     return False
 
 
@@ -2947,10 +2951,10 @@ file for `%(my_dir)s` was found.""" % locals())
                     _ohs = 5 * '0'
                     _json_text = '{\n'
                     _footnotes = [
-                            '''    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},'''
-                            % locals(),
-                            '''    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}'''
-                            % locals(), '}', ''
+                        '''    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},'''
+                        % locals(),
+                        '''    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}'''
+                        % locals(), '}', ''
                     ]
                     for _item in data:
                         _grapheme = _json_tools.sanitize_json(data[_item]['g'])
@@ -2991,10 +2995,21 @@ file for `%(my_dir)s` was found.""" % locals())
                     text = text.replace(data[_item]['g'],
                                         data[_item]['p']).replace(
                                             grapheme, data[_item]['p'])
+    except KeyError:
+        print('''WARNING: A text string was not edited because a `json` lexicon
+is incorrectly formatted for this application. (`KeyError`)
+
+%(_json_file)s.''' % locals())
+        _json_text = '''{
+    "%(_test)s_99997":{"g":"$[ERROR]","p":"JSONDecodeError"},
+    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},
+    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}
+}'''
     except json.decoder.JSONDecodeError:
         print('''WARNING: A text string was not edited because a `json` lexicon
 file is missing or is incorrectly formatted for this application.
-        %(_json_file)s.''' % locals())
+
+%(_json_file)s.''' % locals())
         _json_text = '''{
     "%(_test)s_99997":{"g":"$[ERROR]","p":"JSONDecodeError"},
     "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},
@@ -3034,9 +3049,7 @@ class PosixAudioPlayers(object):
             ['roarcatplay', 'roarcatplay', '"%(file_path)s"', False],
             ['aplay', 'aplay', ' --nonblock "%(file_path)s"', False],
             [  # pipewire
-                'pw-cat', 'pw-cat',
-                ' --play "%(file_path)s"',
-                True
+                'pw-cat', 'pw-cat', ' --play "%(file_path)s"', True
             ],
             [
                 'ffmpeg', 'ffplay',
@@ -3067,13 +3080,16 @@ class PosixAudioPlayers(object):
             _list.append(_item[self.app])
         return _list
 
-    def player_command(self, file_path='/path/rte-play.ec3'):  # -> str
+    def player_command(self,
+                       file_path='/path/rte-play.ec3',
+                       check_is_file=False):  # -> str
         '''Get an audio player command on your system
         that is compatible with the audio file type.'''
         if not '.' in file_path:
             return ''
-        if not os.path.isfile(file_path):
-            return ''
+        if check_is_file:
+            if not os.path.isfile(file_path):
+                return ''
         uri_path = path2url(file_path)
         for player in self.players:
             if player == 'afplay':
@@ -3095,7 +3111,7 @@ class PosixAudioPlayers(object):
         compatible with the audio file type.'''
         if not '.' in file_path:
             return ''
-        _command = self.player_command(file_path)
+        _command = self.player_command(file_path, False)
         if len(_command) != 0:
             return self.found_player
         return ''
@@ -3139,7 +3155,7 @@ def play_wav_no_ui(file_path=''):  # -> bool
                     return False
     else:
         _audio_play = PosixAudioPlayers()
-        _command = _audio_play.player_command(file_path)
+        _command = _audio_play.player_command(file_path, True)
         if len(_command) == 0:
             try:
                 if bool(Gst):
