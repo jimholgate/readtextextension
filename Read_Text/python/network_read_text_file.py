@@ -180,6 +180,10 @@ except ImportError:
     except:
         pass
 try:
+    import socket
+except ImportError:
+    pass
+try:
     import awsserver
 except ImportError:
     pass
@@ -306,6 +310,16 @@ class LocalCommons(object):
         elif _text.lower().count('<speak') != 0:
             _text = readtexttools.strip_xml(_text)
         return _text.splitlines()
+    
+    def set_urllib_timeout(self, _ok_wait=4):  # -> bool
+        '''Try to set sockets timeout before transfering a file using
+        `urllib`.
+        https://docs.python.org/3/howto/urllib2.html#sockets-and-layers'''
+        try:
+            socket.setdefaulttimeout(_ok_wait)
+        except:
+            return False
+        return True
 
     def do_net_sound(self,
                      _info='',
@@ -1265,8 +1279,8 @@ Loading larynx voices for `%(_lang2)s`
              ssml=False,
              _denoiser_strength=0.005,
              _noise_scale=0.667,
-             _ok_wait=4,
-             _end_wait=30):  # -> bool
+             _ok_wait=20,
+             _end_wait=60):  # -> bool
         '''
         First, check larynx language support using `def language_supported`.
         Speak text aloud using a running instance of the
@@ -1377,11 +1391,8 @@ Loading larynx voices for `%(_lang2)s`
             my_body = 'voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s' % locals(
             )
             my_url = '''%(_url)s?%(my_body)s''' % locals()
+            self.common.set_urllib_timeout(_ok_wait)
             try:
-                # TODO : timeout=_ok_wait or _end_wait? Currently using the
-                # default timeout. `socket._GLOBAL_DEFAULT_TIMEOUT`
-                # See: <https://docs.python.org/3/library/urllib.request.html>
-                # See also: `/usr/lib/python3.xx/urllib/request.py
                 _strips = '\n .;'
                 _text = '\n'.join(['', _text.strip(_strips), ''])
                 data = _text.encode('utf-8', 'ignore')
@@ -1651,9 +1662,9 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             _input_type = self.input_types[3]
         elif _speech_rate == 160:
             _input_type = self.input_types[0]
-        elif REQUESTS_OK:
-            # NOTE: Some voices are not intelligible when you modify the
-            # speed.
+        elif not REQUESTS_OK:
+            # With `urllib` the tested version of MaryTTS can only use TEXT,
+            # not RAWMARYXML
             print('''
 NOTE: Setting a MaryTTS speech rate requires the python `request` library.''')
             _input_type = self.input_types[0]
@@ -1729,14 +1740,11 @@ Docker MaryTTS
             )
             q_text = urllib.parse.quote(_text)
             my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
+            self.common.set_urllib_timeout(_ok_wait)
             try:
                 # NOTE: Setting a MaryTTS speech rate requires the python
                 # `request` library.
                 #
-                # TODO : timeout=_ok_wait or _end_wait? Currently using the
-                # default timeout. `socket._GLOBAL_DEFAULT_TIMEOUT`
-                # See: <https://docs.python.org/3/library/urllib.request.html>
-                # See also: `/usr/lib/python3.xx/urllib/request.py
                 _strips = '\n .;'
                 _text = '\n'.join(['', _text.strip(_strips), ''])
                 data = {}  # The API uses an `INPUT_TEXT` argument for text
@@ -2060,9 +2068,8 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
             _method = "GET"
             q_text = urllib.parse.quote(_text)
             my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
+            self.common.set_urllib_timeout(_ok_wait)
             try:
-                # TODO : timeout=_ok_wait or _end_wait? Currently using the
-                # default timeout. `socket._GLOBAL_DEFAULT_TIMEOUT`
                 # See: <https://docs.python.org/3/library/urllib.request.html>
                 # See also: `/usr/lib/python3.xx/urllib/request.py
                 _strips = '\n .;'
@@ -2238,7 +2245,7 @@ def network_main(_text_file_in='',
             _larynx.read(_text, _iso_lang, _visible, _audible, _media_out,
                          _icon, clip_title, _post_processes[5], _info, _size,
                          _speech_rate, _quality, _ssml, _denoiser_strength,
-                         _noise_scale)
+                         _noise_scale, 20, 60)
         elif _marytts.language_supported(_iso_lang):
             _ssml = '</speak>' in _text and '<speak' in _text
             _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,

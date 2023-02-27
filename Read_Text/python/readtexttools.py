@@ -3048,9 +3048,6 @@ class PosixAudioPlayers(object):
             ['roarcat', 'roarcat', '"%(file_path)s"', False],
             ['roarcatplay', 'roarcatplay', '"%(file_path)s"', False],
             ['aplay', 'aplay', ' --nonblock "%(file_path)s"', False],
-            [  # pipewire
-                'pw-cat', 'pw-cat', ' --play "%(file_path)s"', True
-            ],
             [
                 'ffmpeg', 'ffplay',
                 ' -autoexit -hide_banner -loglevel info -nostats -nodisp "%(file_path)s"',
