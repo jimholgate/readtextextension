@@ -1093,6 +1093,7 @@ Function fvCurrentDialogConfig() As Variant
 	Dim config(fiCountConfigOptions) As Variant
 	Dim file_control_2 As String
 	With f_dlgSpeechSetup
+		On Error Resume Next
 		file_control_2 = .GetControl(&quot;FileControl2&quot;).Model.Text
 		If fsGetOS() = &quot;MacOS&quot; and fbIsLibreOffice() And _
 		Instr(file_control_2, &quot;/usr/python3&quot;) &lt;&gt; 0 Then

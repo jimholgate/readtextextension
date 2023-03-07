@@ -3240,7 +3240,7 @@ Sub ttsActuate( _
 &apos;&apos;   but on default Windows and MacOS systems, you need to use creative spelling
 &apos;&apos;   that works for you.
 &apos;&apos;
-			If fbIsLibreOffice() Then
+			If fbIsLibreOffice() or sGetOS = &quot;UNIX&quot; Then
 				model = WindowsSpeechAppInfo().json_dir
 				If FileExists(fsFullPathOf(fsExtensionSetJson(&quot;lexicons/&quot; &amp; model, language))) Then
 					fbWindowsReplacePhonemes(language, model, _text_file)
@@ -5033,9 +5033,7 @@ Sub windowsSAPIControl(Event As Object)
 			Case 0
 			&apos;pass
 			Case MouseAlt
-			If fbIsLibreOffice() Then
-				EditJsonPhonemeTable()
-			End If
+			EditJsonPhonemeTable()
 			Case Else
 			If Len(fsLocalHostSpeech()) &lt;&gt; 0 Then
 				webHelp(fsLocalHostSpeech())
