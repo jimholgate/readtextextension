@@ -87,7 +87,7 @@ Function SaveAsJsonDialog(_default As String) As String
 	Dim _file_list As Object
 	SaveAsJsonDialog = &quot;&quot;
 	Dim _file_picker_args As Variant : _file_picker_args = Array(_
-	com.sun.star.ui.dialogs.TemplateDescription.FILESAVE_AUTOEXTENSION )	
+	com.sun.star.ui.dialogs.TemplateDescription.FILESAVE_SIMPLE)	
 	Dim oDlg As Object : oDlg = createUnoService(_
 	&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
 	With oDlg

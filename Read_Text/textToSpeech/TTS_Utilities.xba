@@ -874,6 +874,7 @@ Sub AboutButton_MouseUp( _
 	End If
 End Sub
 
+
 Function fsHttpHelpUrl() As String
 	fsHttpHelpUrl = fsLookUpTerm2( &quot;s_http-help-url&quot;, fsDisplayLanguage())
 End Function
@@ -1149,7 +1150,7 @@ End Function
 
 
 Function fbEnhancedRTVersion() As Boolean
-	&apos; Version 9 of the Read Text Extension enables smart text
+	&apos; A variant of the Read Text Extension enables smart text
 	&apos; and includes a help file for Tools - Add-ons - Impress-view.
 	fbEnhancedRTVersion = FileExists(fsMyURL() &amp; _
 	&quot;/help/en/&quot; &amp; _
@@ -3240,12 +3241,13 @@ Sub ttsActuate( _
 &apos;&apos;   but on default Windows and MacOS systems, you need to use creative spelling
 &apos;&apos;   that works for you.
 &apos;&apos;
-			If fbIsLibreOffice() or sGetOS = &quot;UNIX&quot; Then
-				model = WindowsSpeechAppInfo().json_dir
+			&apos; NOTE: Apache OpenOffice 4 for Windows does not support python 3
+			If fbIsLibreOffice() Then
+			model = WindowsSpeechAppInfo().json_dir
 				If FileExists(fsFullPathOf(fsExtensionSetJson(&quot;lexicons/&quot; &amp; model, language))) Then
 					fbWindowsReplacePhonemes(language, model, _text_file)
 				End If
-			End If		
+			End If
 			Case &quot;MacOS&quot;
 			If InStr(sCommand, &quot;_PY)&quot;&quot;&quot;) &lt;&gt; 0 Then
 				&apos; If you chose a Python script, you need to use python
@@ -5019,6 +5021,8 @@ Sub windowsSAPIControl(Event As Object)
 				Case 0
 				&apos;pass
 				Case MouseAlt
+				&apos; NOTE: Apache OpenOffice 4 for Windows does not support `Wscript.Shell`,
+				&apos; `com.sun.star.util.PathSubstitution` or python 3 features.
 				If fbIsLibreOffice() Then
 					EditJsonPhonemeTable()
 				End If
@@ -8976,7 +8980,7 @@ Sub addBubbleToSlide( _
 		shapeGeometry(0).Value = sType
 		oShape.CustomShapeGeometry = shapeGeometry
 	End Select
-	&apos;xxxxx with size - use createSize utility
+	&apos; with size - use createSize utility
 	oShape.setSize(createSize(width, height))
 	
 	If ismissing(xval) Then
@@ -9034,9 +9038,22 @@ Function BundlePyPath()
 	End If
 	On Error GoTo BundlePyPathErr
 	Dim PyPath As String : PyPath = &quot;&quot;
+	Dim TryPath As String : TryPath = &quot;&quot;
+	Dim App As String : App = fsGetSetting(&quot;ooname&quot;)
+	Dim Versions As Variant : Versions = Array(&quot;&quot;, &quot; 4&quot;, &quot; 3&quot;, &quot; 2&quot;, &quot; 5&quot;, &quot; 6&quot;,_
+	&quot; 7&quot;, &quot; 8&quot;, &quot; 9&quot;, &quot; 10&quot;, &quot; 11&quot;, &quot; 12&quot;, &quot; 13&quot;, &quot; 14&quot;, &quot; 15&quot;, &quot; 16&quot;, &quot; 17&quot;)
+	Dim i As Integer : i = 0
 	Select Case fsGetOS()
 		Case &quot;WINDOWS&quot;
-		PyPath = &quot;&quot;
+		&apos; NOTE: Apache OpenOffice might not return a valid path when using
+		&apos; `com.sun.star.util.PathSubstitution` so set a default.
+		For i = Lbound(Versions) To UBound(Versions)
+			TryPath = fsFindAppPath(App &amp; Versions(i) &amp; &quot;/program/python.exe&quot;)
+			If Len(TryPath) &lt;&gt; 0 Then
+				PyPath = TryPath
+				Exit For
+			End If
+		Next
 		Case Else
 		PyPath = ConvertToURL(PosixPythonPath())
 	End Select
@@ -9111,6 +9128,7 @@ Function fbWindowsReplacePhonemes(_
 		_model As String,_
 		_text_file_in As String) As Boolean
     &apos;Replaces mispronounced words with phonemes
+	&apos; NOTE: Apache OpenOffice 4 for Windows does not support python 3
     fbWindowsReplacePhonemes = False
     Dim PyPath$ : PyPath = BundlePyPath()
     If Len(PyPath) = 0 Then
@@ -9120,7 +9138,11 @@ Function fbWindowsReplacePhonemes(_
 	&quot;&quot;&quot;&quot;, ConvertFromUrl(PyPath), &quot;&quot;&quot; &quot;&quot;&quot;, ConvertFromUrl(fsMyURL() &amp;_
 	&quot;/python/find_replace_phonemes.py&quot;), &quot;&quot;&quot; --language &quot;, _language,_
 	&quot; --model &quot;, _model, &quot; &quot;&quot;&quot;, ConvertFromUrl(_text_file_in), &quot;&quot;&quot;&quot;), &quot;&quot;)
-	fbWindowsReplacePhonemes = fbDoWinBat(_command)
+	If fbIsLibreOffice() Then
+		fbWindowsReplacePhonemes = fbDoWinBat(_command)
+	Else
+		fbWindowsReplacePhonemes = False
+	End If
 End Function
 
 
@@ -9130,6 +9152,7 @@ Function fbDoWinBat(_
 	&apos; Batch files should only contain characters supported by iso-8859-15.
 	&apos; This procedure runs the batch command sequence in the background.
 	&apos;
+	&apos; NOTE: Apache OpenOffice 4 cannot use `Wscript.Shell` to run a batch file
 	fbDoWinBat = False
 	If Not(fsGetOS() = &quot;WINDOWS&quot;) Then Exit Function
 	If Len(sA) = 0 Then Exit Function
@@ -9159,7 +9182,6 @@ Function fbDoWinBat(_
 		CreateObject(&quot;Wscript.Shell&quot;).Run s4, 0, True
 		b1 = True
 	Else
-		&apos; Apache OpenOffice cannot use `Wscript.Shell` to run a batch file.  
 		b1 = shell(ConvertToURL(s4), 6, &quot;&quot;, True)
 	End If
 	If FileExists(s4) Then

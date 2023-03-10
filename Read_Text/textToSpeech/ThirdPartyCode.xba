@@ -160,26 +160,30 @@ Function fbUpdateLexiconJsonFile(_
 		_json_file_in As String) As Boolean
     &apos; Update json and remove duplicate items. When you download an untrusted
     &apos; json file, return `True` only if the data structure is compatible.
+    &apos; NOTE: Apache OpenOffice 4 for Windows does not support python 3
     fbUpdateLexiconJsonFile = False
 	Dim _command As String : _command = &quot;&quot;
 	Dim _app As String : _app = BundlePyPath()
 	If Len(_app) = 0 Then
 		Exit Function
 	End If
-	Select Case fsGetOS()
-		Case &quot;WINDOWS&quot;
+	If fsGetOS() = &quot;WINDOWS&quot; Then
 		_command = Join(Array(_
 		&quot;&quot;&quot;&quot;, ConvertFromUrl(_app), &quot;&quot;&quot; &quot;&quot;&quot;, ConvertFromUrl(fsMyURL() &amp;_
 		&quot;/python/find_replace_phonemes.py&quot;), &quot;&quot;&quot; --language &quot;, _language,_
 		&quot; --model &quot;, _model, &quot; &quot;&quot;&quot;, ConvertFromUrl(_json_file_in), &quot;&quot;&quot;&quot;), &quot;&quot;)
-		fbUpdateLexiconJsonFile = fbDoWinBat(_command)
-		Case Else
+		If fbIsLibreOffice() Then
+			fbUpdateLexiconJsonFile = fbDoWinBat(_command)
+		Else
+			fbUpdateLexiconJsonFile = False
+		End If
+	Else
 		_command = Join(Array(_
 		&quot;&quot;&quot;&quot;, ConvertFromUrl(fsMyURL() &amp; &quot;/python/find_replace_phonemes.py&quot;),_
 		&quot;&quot;&quot; --language &quot;, _language, &quot; --model &quot;, _model, &quot; &quot;&quot;&quot;,_
 		ConvertFromUrl(_json_file_in), &quot;&quot;&quot;&quot;), &quot;&quot;)
 		fbUpdateLexiconJsonFile = Shell(_app, 0, _command) = 0
-	End Select
+	End If
 	Exit Function
 	fbUpdateLexiconJsonFileErr:
 	fbUpdateLexiconJsonFile = False

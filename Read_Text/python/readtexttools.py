@@ -1505,7 +1505,7 @@ class JsonTools(object):
             test_text = content.strip('\{\}\n\t')
         except AttributeError:
             try:
-                test_text = str(content).strip('\'\{\}\n\t')
+                test_text = content.strip('\'\{\}\n\t')
                 if test_text == 'None':
                     return ''
             except AttributeError:
@@ -2975,13 +2975,16 @@ file for `%(my_dir)s` was found.""" % locals())
                         ])
                     for _addenda in _footnotes:
                         _json_text = ''.join([_json_text, _addenda, '\n'])
-                    print(_json_text)
+                    try:
+                        print(_json_text)
+                    except UnicodeEncodeError:
+                        pass
             _len_text3 = len(text) * 3
             try:
                 if _len_text3 > sys.maxsize / 2:
                     _len_text3 = sys.maxsize / 2
             except [AttributeError, NameError]:
-                _len_text3 = 279496122328932608
+                _len_text3 = 1073741823
             for _item in data:
                 if len(data[_item]['g']) == 0:
                     continue
@@ -3005,7 +3008,7 @@ is incorrectly formatted for this application. (`KeyError`)
     "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},
     "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}
 }'''
-    except json.decoder.JSONDecodeError:
+    except Exception: # i. e. : python 3 json.decoder.JSONDecodeError: 
         print('''WARNING: A text string was not edited because a `json` lexicon
 file is missing or is incorrectly formatted for this application.
 
@@ -3015,7 +3018,6 @@ file is missing or is incorrectly formatted for this application.
     "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},
     "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}
 }''' % locals()
-
     return [text, _json_text]
 
 
