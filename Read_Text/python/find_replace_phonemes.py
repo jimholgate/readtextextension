@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: UTF-8-*-
 import getopt
 import os
@@ -50,16 +50,19 @@ See:
 New file
 --------
 
-find_replace_phonemes.py --output <path-out> --language en-CA <path-in>
+find_replace_phonemes.py --model <model> --output <path-out> --language en-CA <path-in>
 
 Modify file
 -----------
 
-find_replace_phonemes.py --language en-CA <path-to-file-to-edit>''')
+find_replace_phonemes.py --model <model> --language en-CA <path-to-file-to-edit>'''
+          )
 
 
-def fix_up_text_file(_text_file_in='', _file_out='',
-                     _language='en-CA', _my_dir='default',
+def fix_up_text_file(_text_file_in='',
+                     _file_out='',
+                     _language='en-CA',
+                     _my_dir='default',
                      _user_dir='SPEECH_USER_DIRECTORY'):  # -> bool
     '''Replace incorrect pronunciations in a UTF-8 text file.'''
     _import_meta = readtexttools.ImportedMetaData()
@@ -69,8 +72,8 @@ def fix_up_text_file(_text_file_in='', _file_out='',
     if os.path.splitext(_file_out)[1] in ['.json', '.js']:
         _output_type = [0, 1][1]
     _content2 = readtexttools.local_pronunciation(
-        _language,
-        _import_meta.meta_from_file(_text_file_in, False), _my_dir, _user_dir, True)
+        _language, _import_meta.meta_from_file(_text_file_in, False), _my_dir,
+        _user_dir, True)
     if not bool(_file_out):
         _file_out = _text_file_in
     if os.path.splitext(_file_out)[1] in ['.json', '.js']:
@@ -122,8 +125,8 @@ def main():  # -> NoReturn
         if not os.path.isfile(_text_file_in):
             usage()
             sys.exit(0)
-        if not fix_up_text_file(_text_file_in, _file_out,
-                                _language, _my_dir, _user_dir):
+        if not fix_up_text_file(_text_file_in, _file_out, _language, _my_dir,
+                                _user_dir):
             print('I was unable to find the file you specified!')
     sys.exit(0)
 

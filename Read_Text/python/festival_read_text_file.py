@@ -13,6 +13,9 @@ Install festival using a package manager to install a festivox or festival
 voice.  The package manager should automatically select the festival package
 and the required support files.
 
+Some platforms allow you to use festival with `speech-dispatcher` so that you
+can use different speech platforms for different languages.
+
 Fedora
 ------
 
@@ -30,7 +33,7 @@ Small footprint English
     sudo dnf install flite
 
 
-Debian and derivatives like Mint and Ubuntu 
+Debian and derivatives like Mint and Ubuntu
 -------------------------------------------
 
 High quality scriptable English
@@ -44,6 +47,11 @@ Small footprint English
 Other supported languages and voices
 
     sudo apt install festival <name_of_voice_package>
+    
+If you install rhvoice with apt-get or your normal package manager
+then some voices installed in the festival directory might not be
+compatible with festival. Using the `rhvoice-rest` docker image with
+`network_read_text_file.py` avoids this problem.
 
 Read Selection... Dialog setup:
 -------------------------------
