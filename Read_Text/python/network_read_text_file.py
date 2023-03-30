@@ -202,7 +202,7 @@ except ImportError:
 
 NET_SERVICE_LIST = [
     'AUTO', 'NETWORK', 'AWS', 'AZURE', 'GOOGLECLOUD', 'WATSON', 'GTTS',
-    'LARYNX', 'MARYTTS', 'RHVOICE'
+    'LARYNX', 'MARYTTS', 'MIMIC', 'RHVOICE'
 ]
 
 
@@ -277,6 +277,13 @@ class LocalCommons(object):
             '(', '\n', '\r', u"\u2026", u'\u201C', u"\u2014", u"\u2013",
             u'\u00A0'
         ]
+        self.rhasspy_fm = [
+            'eva_k', 'hokuspokus', 'kerstin', 'rebecca_braunert_plunkett',
+            'blizzard_fls', 'blizzard_lessac', 'cmu_clb', 'cmu_eey', 'cmu_ljm',
+            'cmu_lnh', 'cmu_rms', 'cmu_slp', 'cmu_slt', 'ek', 'harvard',
+            'judy_bieber', 'kathleen', 'ljspeech', 'southern_english_female',
+            'karen_savage', 'siwis', 'lisa', 'nathalie', 'hajdurova'
+        ]
         try:
             self.add_pause = str.maketrans({
                 '\n': ';\n',
@@ -310,7 +317,7 @@ class LocalCommons(object):
         elif _text.lower().count('<speak') != 0:
             _text = readtexttools.strip_xml(_text)
         return _text.splitlines()
-    
+
     def set_urllib_timeout(self, _ok_wait=4):  # -> bool
         '''Try to set sockets timeout before transfering a file using
         `urllib`.
@@ -1021,15 +1028,8 @@ class LarynxClass(object):
                 'southern_english_male'
             ]
         # https://community.rhasspy.org/t/preview-of-new-tts-voices/2556
-
-        self.larynx_fm = [
-            'eva_k', 'hokuspokus', 'kerstin', 'rebecca_braunert_plunkett',
-            'blizzard_fls', 'blizzard_lessac', 'cmu_clb', 'cmu_eey', 'cmu_ljm',
-            'cmu_lnh', 'cmu_rms', 'cmu_slp', 'cmu_slt', 'ek', 'harvard',
-            'judy_bieber', 'kathleen', 'ljspeech', 'southern_english_female',
-            'karen_savage', 'siwis', 'lisa', 'nathalie', 'hajdurova',
-            self.default_voice
-        ]
+        self.larynx_fm = _common.rhasspy_fm
+        self.larynx_fm.append(self.default_voice)
         self.voice_id = ''
         self.voice_name = ''
         self.pause_list = _common.pause_list
@@ -1048,10 +1048,14 @@ class LarynxClass(object):
         if bool(self.vocoders):
             return True
         try:
+            self.common.set_urllib_timeout(1)
             response = urllib.request.urlopen(''.join(
                 [self.url, '/api/vocoders']))
             data_response = response.read()
             data = json.loads(data_response)
+        except TimeoutError:
+            self.ok = False
+            return False
         except urllib.error.URLError:
             self.ok = False
             return False
@@ -1060,7 +1064,16 @@ class LarynxClass(object):
                 response = urllib.urlopen(''.join([self.url, '/api/vocoders']))
                 data_response = response.read()
                 data = json.loads(data_response)
-            except [AttributeError, urllib.error.URLError]:
+            except AttributeError:
+                self.ok = False
+                return False
+            except TimeoutError:
+                self.ok = False
+                return False
+            except urllib.error.URLError:
+                self.ok = False
+                return False
+            except:
                 self.ok = False
                 return False
         except:
@@ -1416,26 +1429,45 @@ Your computer is missing a required library.''')
 
 
 class MaryTtsClass(object):
-    '''You can use `synesthesiam/docker-marytts` text to speech localhost
+    '''MaryTTS
+=======
+
+You can use `synesthesiam/docker-marytts` text to speech localhost
 http server for 8 languages. You can find other docker containers that can
 use the same application program interface with a different selection of
 voices, speech technology, and language options. For example,
 [Larynx MaryTTS Compatible API](https://github.com/rhasspy/larynx#marytts-compatible-api)
 
-    docker run \
-        -it \
-        -p 59125:5002 \
-        -e "HOME=${HOME}" \
-        -v "$HOME:${HOME}" \
-        -v /usr/share/ca-certificates:/usr/share/ca-certificates \
-        -v /etc/ssl/certs:/etc/ssl/certs \
-        -w "${PWD}" \
-        --user "$(id -u):$(id -g)" \
-        rhasspy/larynx
-
 Default MaryTts server: <http://0.0.0.0:59125>
 
-[About MaryTts...](https://github.com/synesthesiam/docker-marytts)'''
+[About MaryTts...](https://github.com/synesthesiam/docker-marytts)
+
+MyCroft AI Mimic TTS
+====================
+
+"A fast local neural text to speech engine for Mycroft"
+
+Check the release status of the API for Mimic before using it. By default the
+application shares the same address and port as MaryTTS so do not run them at
+the same time using the same URL and port.
+
+    mkdir -p "${HOME}/.local/share/mycroft/mimic3"
+    chmod a+rwx "${HOME}/.local/share/mycroft/mimic3"
+    docker run \
+        -it \
+        -p 59125:59125 \
+        -v "${HOME}/.local/share/mycroft/mimic3:/home/mimic3/.local/share/mycroft/mimic3" \
+        'mycroftai/mimic3'
+    
+Set the Docker container restart policy to "always"
+
+* [Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
+* [GitHub](https://github.com/MycroftAI/mimic3)
+'''
+    # Some speech engines do not use a gender tag so in this case the implimentation
+    # enables all voices. For example the gender column is `NA` for
+    # [Mimic-3 v0.2.4](https://github.com/MycroftAI/mimic3-voices/tree/master/voices)
+    # `tts/voices` and there is no json tag for gender in `/api/voices`
 
     def __init__(self):  # -> None
         '''Initialize data. See
@@ -1460,18 +1492,19 @@ Default MaryTts server: <http://0.0.0.0:59125>
             'female4', 'female5', 'female6', 'female7', 'female8', 'female9',
             'child_female1', 'child_male', 'male1', 'male2', 'male3', 'male4',
             'male5', 'male6', 'male7', 'male8', 'male9', 'child_male1',
-            'marytts', 'localhost', 'docker', 'local_server'
+            'marytts', 'mimic', 'localhost', 'docker', 'local_server'
         ]
         self.voice_locale = ''
         self.pause_list = _common.pause_list
         self.add_pause = _common.add_pause
         self.base_curl = _common.base_curl
         self.is_x86_64 = _common.is_x86_64
+        self.is_mimic = False
 
     def marytts_xml(self, _text='', _speech_rate=160):  # -> str
         '''Change the speed that MaryTTS reads plain text aloud using
         `RAWMARYXML`. `maryxml` correctly uses standard XML conventions like
-        `&amp;`, `&gt;` and `&lt;`, so the charactrs that they represent use
+        `&amp;`, `&gt;` and `&lt;`, so the characters that they represent use
         corrected XML.'''
         _xmltransform = readtexttools.XmlTransform()
         _text = _xmltransform.clean_for_xml(_text, False)
@@ -1506,26 +1539,38 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
         _lang1 = iso_lang.replace('-', '_')
         # concise language
         _lang2 = _lang1.split('_')[0]
-        try:
-            response = urllib.request.urlopen(''.join([self.url, '/locales']))
-            _locales = str(response.read(), 'utf-8')
-        except urllib.error.URLError:
-            self.ok = False
-            return False
-        except AttributeError:
+        _locales = ''
+        for dir_search in ['/locales', '/voices']:
             try:
-                # catching classes that do not inherit from BaseExceptions
-                # is not allowed.
-                response = urllib.urlopen(''.join([self.url, '/locales']))
+                self.common.set_urllib_timeout(1)
+                response = urllib.request.urlopen(
+                    ''.join([self.url, dir_search]))
                 _locales = str(response.read(), 'utf-8')
-            except AttributeError:
+            except urllib.error.URLError:
                 self.ok = False
-                return False
+            except AttributeError:
+                try:
+                    # catching classes that do not inherit from BaseExceptions
+                    # is not allowed.
+                    response = urllib.urlopen(''.join([self.url, dir_search]))
+                    _locales = str(response.read(), 'utf-8')
+                except AttributeError:
+                    self.ok = False
         if len(_locales) == 0:
+            self.ok = False
             return False
         # Find the first voice that meets the criteria. If found, then
         # return `True`, otherwise return `False`.
         self.ok = False
+        if '/voices' == dir_search:
+            self.is_mimic = True
+            self.input_types = ['TEXT']
+            for _test in [_lang1, _lang2]:
+                for _row in _locales.splitlines():
+                    if _row.startswith(_test):
+                        self.ok = True
+                        self.voice_locale = _test
+                        return True
         if _lang1 in _locales.split('\n'):
             self.ok = True
             self.voice_locale = _lang1
@@ -1534,9 +1579,13 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             if _lang2 == 'en':
                 if _lang1[-2:].lower() in [
                         'au', 'bd', 'bs', 'gb', 'gh', 'hk', 'ie', 'in', 'jm',
-                        'nz', 'pk', 'sa', 'tt'
+                        'nz', 'pk', 'sa', 'tt', 'uk'
                 ]:
-                    self.voice_locale = 'en_GB'
+                    if self.is_mimic:
+                        # The default Mimic voice uses this locale
+                        self.voice_locale = 'en_UK'
+                    else:
+                        self.voice_locale = 'en_GB'
                 else:
                     self.voice_locale = 'en_US'
             else:
@@ -1544,7 +1593,7 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
         return self.ok
 
     def marytts_voice(self,
-                      _voice='female1',
+                      _voice='',
                       _iso_lang='en-US',
                       _prefer_gendered_fallback=True):  # -> str
         '''If the MaryTTS API includes the voice description, return a
@@ -1576,7 +1625,7 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             # i. e.: en_AU, en_CA ... en_ZA etc.
             # Disregard the region code and use all voices for the language.
             _locale = _locale.split('_')[0]
-        _voice_list = _voices.split('\n')
+        _voice_list = _voices.splitlines()
         for _tester in _voice_list:
             _row = _tester.split(' ')
             if _row[0].count(_voice) != 0:
@@ -1594,7 +1643,15 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             try:
                 if _row[1].startswith(_locale):
                     last_match = _row[0]
-                    for _standard in [_row[2], ''.join(['child_', _row[2]])]:
+                    _row2 = _row[2]
+                    if not _row2 in ['male', 'female']:
+                        # Unknown, so distribute evenly. Mimic voice 0
+                        # is male, MaryTTS voice 0 is female by default.
+                        if bool(len(matches) % 2) == self.is_mimic:
+                            _row2 = 'female'
+                        else:
+                            _row2 = "male"
+                    for _standard in [_row2, ''.join(['child_', _row2]), 'auto']:
                         if _voice.startswith(_standard):
                             _add_name = last_match
                             break
@@ -1668,6 +1725,10 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             print('''
 NOTE: Setting a MaryTTS speech rate requires the python `request` library.''')
             _input_type = self.input_types[0]
+        elif self.is_mimic:
+            # TODO - mimic-3 supports a subset of W3C.org SSML.
+            # For now, this implementation only supports plain text.
+            _input_type = self.input_types[0]
         else:
             _input_type = self.input_types[6]
             _text = self.marytts_xml(_text, _speech_rate)
@@ -1680,9 +1741,19 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.''')
         _audio_format = self.audio_format
         _output_type = 'AUDIO'
         _mary_vox = self.marytts_voice(_vox, _iso_lang)
+        _title = '''Docker MaryTTS
+=============='''
+        if self.is_mimic:
+            _url = ''.join([_url1, '/api/tts'])
+            _ssml = '0'
+            # if ssml:
+            #    _ssml = '1'
+            if len(_mary_vox) == 0:
+                _mary_vox = 'en_UK/apope_low'
+            _title = '''Mycroft AI Mimic-3
+=================='''
         print('''
-Docker MaryTTS
-==============
+%(_title)s
 
 * Audio: `%(_audio_format)s`
 * Input Type: `%(_input_type)s`
@@ -1691,8 +1762,6 @@ Docker MaryTTS
 * Output Type: `%(_output_type)s`
 * Server URL: `%(_url1)s`
 * Voice : `%(_mary_vox)s`
-
-[Docker MaryTTS](https://github.com/synesthesiam/docker-marytts)
 ''' % locals())
         if REQUESTS_OK:
             if len(_mary_vox) == 0:
@@ -1714,49 +1783,87 @@ Docker MaryTTS
                 }
             _strips = ';\n .;'
             _text = _text.strip(_strips)
-            response = requests.post(
-                _url,
-                params=request_params,
-                headers={
-                    'Content-Type':
-                    'application/x-www-form-urlencoded',
-                    'User-Agent':
-                    'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
-                },
-                data=_text.encode('utf-8', 'ignore'),
-                timeout=(_ok_wait, _end_wait))
-            with open(_media_work, 'wb') as f:
-                f.write(response.content)
-            if os.path.isfile(_media_work):
-                _done = os.path.getsize(_media_work) != 0
-        if not _done:
-            if len(_mary_vox) == 0:
-                vcommand = ''
+            if self.is_mimic:
+                request_params = {
+                    'text': _text,
+                    'voice': _mary_vox,
+                    'ssml': _ssml
+                }
+                # Note: 2013-03 switches are similar to Larynx. This app uses a subset.
+                # 'api/tts?text=' + encodeURIComponent(text) +
+                # '&voice=' + encodeURIComponent(voice) +
+                # '&noiseScale=' + encodeURIComponent(noiseScale) +
+                # '&noiseW=' + encodeURIComponent(noiseW) +
+                # '&lengthScale=' + encodeURIComponent(lengthScale) +
+                # '&ssml=' + encodeURIComponent(ssml) +
+                # '&audioTarget=' + encodeURIComponent(audioTarget),
+                # {cache: 'no-cache'})
+                print('''NOTE: This voice engine ignores gender.
+
+[Mimic-3](https://github.com/MycroftAI/mimic3#mimic-3)''')
+
             else:
-                _mary_vox = urllib.parse.quote(_mary_vox)
-                vcommand = '&VOICE=%(_mary_vox)s' % locals()
-            _method = "POST"
-            _body_data = "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT=" % locals(
-            )
-            q_text = urllib.parse.quote(_text)
-            my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
-            self.common.set_urllib_timeout(_ok_wait)
+                print(
+                    '[Docker MaryTTS](https://github.com/synesthesiam/docker-marytts)')
             try:
-                # NOTE: Setting a MaryTTS speech rate requires the python
-                # `request` library.
-                #
-                _strips = '\n .;'
-                _text = '\n'.join(['', _text.strip(_strips), ''])
-                data = {}  # The API uses an `INPUT_TEXT` argument for text
-                req = urllib.request.Request(my_url, data)
-                resp = urllib.request.urlopen(req)
-                response_content = resp.read()
+                response = requests.post(
+                    _url,
+                    params=request_params,
+                    headers={
+                        'Content-Type':
+                        'application/x-www-form-urlencoded',
+                        'User-Agent':
+                        'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
+                    },
+                    data=_text.encode('utf-8', 'ignore'),
+                    timeout=(_ok_wait, _end_wait))
                 with open(_media_work, 'wb') as f:
-                    f.write(response_content)
+                    f.write(response.content)
                 if os.path.isfile(_media_work):
                     _done = os.path.getsize(_media_work) != 0
             except:
-                _done = False
+                pass
+            if not _done:
+                # _method = "POST"
+                self.common.set_urllib_timeout(_ok_wait)
+                q_text = urllib.parse.quote(_text)
+                if self.is_mimic:
+                    if _mary_vox.count('/') == 0:
+                        print('''
+NOTE: Incompatible voice format for Mimic; using the default. Make
+sure to use a Mimic 3 voice key instead of a MaryTTS voice name.''')
+# # i.e.: http://localhost:59125/api/tts?text=<message>&voice=<voice>&ssml=<0|1>
+# See:
+# https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3#marytts-compatibility
+                        _mary_vox = 'en_UK/apope_low'
+                    _mary_vox = urllib.parse.quote(_mary_vox)
+                    my_url = '%(_url)s?text="%(q_text)s"&voice=%(_mary_vox)s&ssml=%(_ssml)s'
+                else:
+                    if len(_mary_vox) == 0:
+                        vcommand = ''
+                    else:
+                        _mary_vox = urllib.parse.quote(_mary_vox)
+                        vcommand = '&VOICE=%(_mary_vox)s' % locals()
+                    _body_data = "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT=" % locals(
+                    )
+                    my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
+                try:
+                    # NOTE: Setting a MaryTTS speech rate requires the python
+                    # `request` library.
+                    #
+                    _strips = '\n .;'
+                    _text = '\n'.join(['', _text.strip(_strips), ''])
+                    data = {}  # The API uses an `INPUT_TEXT` argument for text
+                    req = urllib.request.Request(my_url, data)
+                    resp = urllib.request.urlopen(req)
+                    response_content = resp.read()
+
+                    with open(_media_work, 'wb') as f:
+                        f.write(response_content)
+                    if os.path.isfile(_media_work):
+                        _done = os.path.getsize(_media_work) != 0
+                except:
+                    _done = False
         if not _done:
             print('''The application cannot load a sound file.
 Your computer is missing a required library.
@@ -2065,7 +2172,7 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
             q_voice = urllib.parse.quote(_voice)
             _body_data = 'format=%(_audio_format)s&rate=%(_length_scale)s&pitch=50&volume=50&voice=%(q_voice)s&text=' % locals(
             )
-            _method = "GET"
+            # _method = "GET"
             q_text = urllib.parse.quote(_text)
             my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
             self.common.set_urllib_timeout(_ok_wait)
