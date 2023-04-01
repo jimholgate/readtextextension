@@ -1,0 +1,19 @@
+{
+    "en_00001":{"g":"&","p":" and "},
+    "en_00002":{"g":"XML","p":"x-m-l"},
+    "en_00003":{"g":"DOCX","p":"doc-x"},
+    "en_00004":{"g":"HTML","p":"h-t-m-l"},
+    "en_00005":{"g":"<","p":" less than "},
+    "en_00006":{"g":"MacOS","p":"mak-o-s"},
+    "en_00007":{"g":">","p":" greater than "},
+    "en_00008":{"g":"ChatGPT","p":"chat g-p-t"},
+    "en_00009":{"g":" both live ","p":" both liv "},
+    "en_00010":{"g":" does live ","p":" does liv "},
+    "en_00011":{"g":"LibreOffice","p":"leebra-office"},
+    "en_00012":{"g":" does not live ","p":" does not liv "},
+    "en_00013":{"g":"Read Text Extension","p":"reed text extension"},
+    "en_00014":{"g":"Read text extension","p":"reed text extension"},
+    "en_99998":{"g":"$[LOCALE]","p":"en"},
+    "en_99999":{"g":"$[REVISION]","p":"2023-03-31_07:55:42"}
+}
+
