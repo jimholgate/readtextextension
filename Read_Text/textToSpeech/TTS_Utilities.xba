@@ -664,24 +664,39 @@ Function isFlatPak() As Boolean
 End Function
 
 
-Function fbLocalHostOk(_url As String) As Boolean
+Function fbLocalHostOk(ByVal _url As String, ByVal _key As String) As Boolean
 	&apos; Check if a web api resource that returns text is available.
 	&apos; Note: fsGetWebService could freeze if you &quot;Pause&quot; a docker
 	&apos; image instead of &quot;Stopping&quot; it becaue it will wait for a reply
 	&apos; from the local server.
 	fbLocalHostOk = False
 	On Error Goto fbLocalHostOkErr
+	Dim test_str$ : test_str = &quot;&quot;
+	Dim alt_key$ : alt_key = _key
 	If Len(_url) = 0 Then
 		&apos; rhasspy/larynx speech server
 		_url = &quot;http://0.0.0.0:5002/api/voices&quot;
 	End If
-	Dim test_str$ : test_str = &quot;&quot;
 	test_str = fsGetWebService(_url)
+	If Len(_key) = 0 Then
+		_key = Lcase(fsSelectionLanguageAndRegion(True))
+		test_str = Lcase(test_str)
+		If Len(_key) = 0 Then
+			Exit Function
+		End If
+		alt_key = fsReplaceText(_key, &quot;-&quot;, &quot;_&quot;)
+	End If
 	Select Case Len(test_str)
 		Case 0
 		fbLocalHostOk = False
 		Case Else
-		fbLocalHostOk = True
+		If Instr(test_str, _key) = 0 And _
+		Instr(test_str, alt_key) = 0 Then
+			&apos; 404, timeout or unexpected contents
+			fbLocalHostOk = False
+		Else
+			fbLocalHostOk = True
+		End If
 	End Select
 	Exit Function
 	fbLocalHostOkErr:
@@ -5037,6 +5052,7 @@ Sub windowsSAPIControl(Event As Object)
 			Case 0
 			&apos;pass
 			Case MouseAlt
+			ResetHostSpeechURI
 			EditJsonPhonemeTable()
 			Case Else
 			If Len(fsLocalHostSpeech()) &lt;&gt; 0 Then

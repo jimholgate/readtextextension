@@ -226,6 +226,7 @@ End Function
 
 Type SpeechHostInfo
 	about as String
+	key as String
 	label as String  &apos; &quot;larynx-server&quot;
 	token as String
 	url as String  &apos; &quot;http://0.0.0.0:5002&quot;
@@ -241,6 +242,7 @@ Function LarynxSpeechHostInfo()
 	Dim _info As SpeechHostInfo
 	With _info
 		.about = &quot;End-to-end text to speech system using gruut and onnx.&quot;
+		.key = &quot;en-us&quot;
 		.label = &quot;larynx-server&quot;
 		.token = &quot;&quot;
 		.url = &quot;http://0.0.0.0:5002&quot;
@@ -259,21 +261,45 @@ Function MaryTtsSpeechHostInfo()
 	Dim _info As SpeechHostInfo
 	With _info
 		.about = &quot;MaryTTS 5.2 text to speech server with 19 voices for 8 languages&quot;
+		.key = &quot;Mary TTS server&quot;
 		.label = &quot;marytts-server&quot;
 		.token = &quot;&quot;
 		.url = &quot;http://0.0.0.0:59125&quot;
-		.url_info = &quot;/voices&quot;
+		.url_info = &quot;/version&quot;
 		.json_dir = &quot;mary_tts&quot;
 		.sample = &quot;http://0.0.0.0:59125?AUDIO=WAVE_FILE&amp;OUTPUT_TYPE=AUDIO&amp;INPUT_TYPE=TEXT&amp;LOCALE=de&amp;INPUT_TEXT=Hallo+welt&quot;
 		.docker = &quot;https://hub.docker.com/r/synesthesiam/marytts&quot;
-		Select Case Len(fsAppImageResourcePath(&quot;python&quot;))
-			Case 0
-			.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;)
-			Case Else
+		If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0  or isSnap() or _
+		isFlatPak() Then
 			.tags = Array(&quot;text&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;web-ui&quot;)
-		End Select
+		Else
+			.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;rawmaryxml&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;)
+		End If
 	End With
 	MaryTtsSpeechHostInfo = _info
+End Function
+
+
+Function MimicSpeechHostInfo()
+	Dim _info As SpeechHostInfo
+	With _info
+		.about = &quot;Mimic is a fast local neural text to speech engine for Mycroft&quot;
+		.key = &quot;/&quot;
+		.label = &quot;mimic3-server&quot;
+		.token = &quot;&quot;
+		.url = &quot;http://0.0.0.0:59125&quot;
+		.url_info = &quot;/voices&quot;
+		.json_dir = &quot;mimic&quot;
+		.sample = &quot;http:0.0.0.0:59125/api/tts?text=Hello%20world&amp;voice=apope&amp;ssml=0&quot;
+		.docker = &quot;https://hub.docker.com/r/mycroftai/docker-mycroft/&quot;
+		If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0  or isSnap() or _
+		isFlatPak() Then
+			.tags = Array(&quot;text&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;web-ui&quot;)
+		Else
+			.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;)
+		End If
+	End With
+	MimicSpeechHostInfo = _info
 End Function
 
 
@@ -282,7 +308,9 @@ Function RhvoiceSpeechHostInfo()
 	With _info
 		.about = Join(Array(&quot;A speech synthesizer for Albanian, English, Esperanto, Georgian, Kyrgyz,&quot;,_
 		&quot; Macedonian, Portuguese, Russian, Tatar and Ukrainian&quot;),&quot;&quot;)
+		.key = &quot;rhvoice_wrapper_library_version&quot;
 		.label = &quot;rhvoice-rest&quot;
+		.token = &quot;&quot;
 		.url = &quot;http://0.0.0.0:8080&quot;
 		.url_info = &quot;/info&quot;
 		.json_dir = &quot;rhvoice&quot;
@@ -300,6 +328,7 @@ Function MacOSSpeechAppInfo()
 		Case &quot;MacOS&quot;
 		With _info
 			.about = &quot;&quot;
+			.key = &quot;&quot;
 			.label = &quot;macos-say&quot;
 			.token = &quot;&quot;
 			.url = fsMyURL() &amp; &quot;/po/macos_say&quot;
@@ -323,6 +352,7 @@ Function PosixFestivalSpeechAppInfo()
 	Dim _info As SpeechHostInfo
 	With _info
 		.about = &quot;Festival is a speech synthesiser developed in 1995 at the University of Edinburgh.&quot;
+		.key = &quot;&quot;
 		.label = &quot;festival-tts&quot;
 		.token = &quot;(FESTIVAL_READ_TEXT_PY)&quot;
 		.url = fsMyURL() &amp; &quot;/po/festival&quot;
@@ -343,6 +373,7 @@ Function PosixRhvoiceSpeechAppInfo()
 	Dim _info As SpeechHostInfo
 	With _info
 		.about = &quot;Olga Yakovleva created RHVoice in 2011. It now includes several languages.&quot;
+		.key = &quot;{&quot;
 		.label = &quot;rhvoice&quot;
 		.token = &quot;(RHVOICE_READ_TEXT_PY)&quot;
 		.url = fsMyURL() &amp; &quot;/po/rhvoice&quot;
@@ -360,6 +391,7 @@ Function PosixSvoxPicoSpeechAppInfo()
 	Dim _info As SpeechHostInfo
 	With _info
 		.about = &quot;SVOX Pico is a compact speech synthesiser with low latency.&quot;
+		.key = &quot;&quot;
 		.label = &quot;svox-pico&quot;
 		.token = &quot;(PICO_READ_TEXT_PY)&quot;
 		.url = fsMyURL() &amp; &quot;/po/svox_pico&quot;
@@ -372,12 +404,14 @@ Function PosixSvoxPicoSpeechAppInfo()
 	PosixSvoxPicoSpeechAppInfo = _info
 End Function
 
+
 Function WindowsSpeechAppInfo()
 	Dim _info As SpeechHostInfo
 	Select Case fsGetOS()
 		Case &quot;WINDOWS&quot;
 		With _info
 			.about = &quot;Windows Speech Application Interface (SAPI)&quot;
+			.key = &quot;&quot;
 			.label = &quot;windows-sapi&quot;
 			.url = fsMyURL() &amp; &quot;/po/windows_sapi&quot;
 			.url_info = &quot;/en-US_lexicon.json&quot;
@@ -505,17 +539,50 @@ End Function
 
 
 Function SpeechHostInfoList()
+	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0  or isSnap() or _
+	isFlatPak() Then
+	&apos; Python3 `requests` library is not available so MaryTTS
+	&apos; has limited functionality. See `network_read_textfile.py`
+	&apos; The reordering allows developers to compare Larynx with
+	&apos; Mimic by installing both a native app and an AppImage
+	&apos; version. The native app will prefer Mimic over Larynx
+	&apos; whereas the AppImage will prefer Larynx over Mimic.
+	&apos;
+	&apos; Example: compare es-ES &quot;Es un placer conocerte.&quot; with the
+	&apos; two speech engines. Is `conocerte` correctly spoken?
+	&apos; To record errors, use the json editor on dialog 2.
+	&apos;
+	&apos; Larynx and MaryTTS have limited support for phoneme code.
+	&apos; Currently Mimic, like MacOS `say`, appears not to.
 	SpeechHostInfoList = Array(_
 	LarynxSpeechHostInfo(), _
-	MaryTtsSpeechHostInfo(), _
+	MimicSpeechHostInfo(), _
 	RhvoiceSpeechHostInfo(), _
+	MaryTtsSpeechHostInfo(), _
+	)	
+	Else
+	&apos; Prioritize recent tts frameworks
+	SpeechHostInfoList = Array(_
+	MimicSpeechHostInfo(), _
+	LarynxSpeechHostInfo(), _
+	MaryTtsSpeechHostInfo(), _
+	RhvoiceSpeechHostInfo() _
 	)
+	End If
 End Function
+
+
+Sub ResetHostSpeechURI
+	&apos; On Linux systems using localhost, users might set up their system
+	&apos; to enable or disable speech servers without restarting Office, so
+	&apos; check the status of the localhost uri every time.
+	s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI = &quot;&quot;
+End Sub
 
 
 Function fsLocalHostSpeech() As String
 	&apos; Return the localhost speech address
-	&apos; i.e.: `larynx-server`, `marytts-server`, `rhvoice-rest`
+	&apos; i.e.: `larynx-server`, `marytts-server`, `rhvoice-rest`, &apos;mimic3-server`
 	On Error GoTo fsLocalHostSpeechErr
 	fsLocalHostSpeech = &quot;&quot;
 	Dim _info As Variant
@@ -525,7 +592,7 @@ Function fsLocalHostSpeech() As String
 		_info = SpeechHostInfoList()
 		For x = Lbound(_info) To Ubound(_info)
 			If Instr(_info(x).url, &quot;http&quot;) = 1 Then
-				If fbLocalHostOk(_info(x).url &amp; _info(x).url_info) Then
+				If fbLocalHostOk(_info(x).url &amp; _info(x).url_info, _info(x).key) Then
 					fsLocalHostSpeech = _info(x).url
 					s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI = fsLocalHostSpeech
 					Exit For
@@ -597,7 +664,7 @@ Function EditJsonPhonemeTable() As String
 	End Select
 	_info = SpeechHostInfoList()
 	For x = Lbound(_info) To Ubound(_info)
-		If fbLocalHostOk(_info(x).url &amp; _info(x).url_info) Then
+		If fbLocalHostOk(_info(x).url &amp; _info(x).url_info, _info(x).key) Then
 			_po_dir = _info(x).json_dir
 			Exit For
 		End If
