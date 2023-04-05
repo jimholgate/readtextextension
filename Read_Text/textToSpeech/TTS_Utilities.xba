@@ -6393,11 +6393,14 @@ End Function
 
 Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
 	&apos; On UNIX, if `only_local` is True, then do not check for a library
-	&apos; unless the current user has explicitly installed it with `pip3`
+	&apos; unless the current user has explicitly installed it with a version
+	&apos; of pip that makes user installed pip libraries available to other
+	&apos; user applications, excluding python virtual environments (`venvs`).
 	Dim ret_val$ : ret_val = &quot;&quot;
 	Dim os_div$ : os_div = getPathSeparator
 	Dim sPythonSubDirs$
 	Dim py_dir$
+	Dim home$ : home = Environ(&quot;HOME&quot;)
 	fsGetPipLibPath = &quot;&quot;
 
 	Select Case fsGetOS()
@@ -6406,12 +6409,14 @@ Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
 		py_dir = Environ(&quot;LOCALAPPDATA&quot;) &amp; &quot;\Programs\Python&quot;
 		Case &quot;MacOS&quot;
 		sPythonSubDirs = &quot;/lib/python/site-packages&quot;
-		py_dir = Environ(&quot;HOME&quot;) &amp; &quot;/Library/Python&quot;	
+		py_dir = home &amp; &quot;/Library/Python&quot;	
 		Case &quot;UNIX&quot;
 		&apos; `snap`, `flatpak`, `appimage` and other standalone versions of
 		&apos; of LibreOffice python might not work correctly with the system
 		&apos; python extended libraries or user installed libraries
-		If Not Instr(Environ(&quot;PWD&quot;), Environ(&quot;HOME&quot;)) = 1 Then
+		If Not Instr(Environ(&quot;PWD&quot;), home) = 1 Then
+			Exit Function
+		ElseIf FileExists(home &amp; &quot;/.local/pipx/venvs/&quot; &amp; s_test) Then
 			Exit Function
 		ElseIf Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
 			Exit Function
@@ -6424,22 +6429,25 @@ Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
 				Exit Function
 			End If
 		End If
-		sPythonSubDirs = &quot;/lib/site-packages&quot;
-		py_dir = Environ(&quot;HOME&quot;) &amp; &quot;/.local/lib/python&quot;
+		sPythonSubDirs = &quot;/site-packages&quot;
+		py_dir = home &amp; &quot;/.local/lib&quot;
 	End Select
 	Dim sSubDirectories$ : sSubDirectories = fsSubDirectories(py_dir)
 	Dim version_list As Variant : version_list = Split(sSubDirectories, Chr(13))
+
 	Dim x As Integer : x = 0
 	For x = Lbound(version_list) to Ubound(version_list)
-		ret_val = py_dir &amp; _
-		os_div &amp; _
-		version_list(x) &amp; _
-		sPythonSubDirs &amp; _
-		os_div &amp; _
-		s_test
-		If FileExists(ret_val) Then
-			fsGetPipLibPath = ret_val
-			Exit Function
+		If instr(version_list(x), &quot;python&quot;) = 1 Then
+			ret_val = py_dir &amp; _
+			os_div &amp; _
+			version_list(x) &amp; _
+			sPythonSubDirs &amp; _
+			os_div &amp; _
+			s_test
+			If FileExists(ret_val) Then
+				fsGetPipLibPath = ret_val
+				Exit Function
+			End If
 		End If
 	Next
 	fsGetPipLibPath = &quot;&quot;
@@ -6448,18 +6456,18 @@ End Function
 
 Function fsSubDirectories(sPath As String)
 	&apos; Returns directories
-	Dim sDir As String
-	Dim sValue As String
-	Dim cnt_msg# : cnt_msg = -1
-	Dim a1(0) As Variant
+	Dim sDir As String : sDir = &quot;&quot;
+	Dim sValue As String : sValue = &quot;&quot;
+	Dim path_sep As String : path_sep = getPathSeparator
 	fsSubDirectories = &quot;&quot;
-	sDir = &quot; &quot;
-	If Len(sPath) = 0 Then sPath = CurDir
-	sValue = Dir$(sPath + getPathSeparator + &quot;*&quot;, 16)
+	sDir = &quot;&quot;
+	If Len(sPath) = 0 Then Exit Function
+	sValue = Dir(sPath + path_sep + &quot;*&quot;, 16)
+
 	On Error Resume Next
 	Do
 		If sValue &lt;&gt; &quot;.&quot; And sValue &lt;&gt; &quot;..&quot; Then
-			If (GetAttr(sPath + getPathSeparator + sValue) And 16) &gt; 0 Then
+			If (GetAttr(sPath + path_sep + sValue) And 16) &gt; 0 Then
 				sDir = sDir &amp; Chr(13) &amp; sValue			   
 			End If
 		End If
@@ -6522,6 +6530,16 @@ Function ibmWatsonJson()
 End Function
 
 
+Function gttsResourceCheck()
+	Dim home$ : home = Environ(&quot;HOME&quot;)
+	If FileExists(home &amp; &quot;/.local/pipx/venvs/gtts/bin/gtts-cli&quot;) Then
+		gttsResourceCheck = fsFullPathOf(&quot;gtts/config.json&quot;)
+	Else
+		gttsResourceCheck = home &amp; &quot;/.local/bin/gtts-cli&quot;
+	End If
+End Function
+
+
 Function fbHaveNetworkTTS() As Boolean
 	&apos; See: &lt;https://github.com/pndurette/gTTS&gt;
 	&apos; If you are not running libreoffice from normal home directory, then
@@ -6544,7 +6562,7 @@ Function fbHaveNetworkTTS() As Boolean
 	Dim x# : x = 0
 	Dim home$ : home = Environ(&quot;HOME&quot;)
 	Dim Tokens : Tokens = Array(_
-	home &amp; &quot;/.local/bin/gtts-cli&quot;, _
+	gttsResourceCheck(), _
 	AwsBoto3Json(), _
 	AwsPolyJson(), _
 	GoogleApisJson(), _

@@ -110,6 +110,24 @@ See also:
 
 [Rhasspy community](https://community.rhasspy.org/)
 
+Mimic 3
+-------
+
+"A fast local neural text to speech engine for Mycroft"
+
+If your computer architecture supports rhasspy programs, you
+can use Mimic TTS with speech-dispatcher or as a localhost
+web server with this application. When installed from 
+an apt archive, or a from compiled code, you can start the
+local web server at startup using a command to initiate
+ `mimic3-server`.
+
+If you use a docker image, you can get the computer to
+start the mimic localhost web server on startup by setting
+the Docker container restart policy to "always". 
+
+[Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
+
 It doesn't work?
 ----------------
 
@@ -238,6 +256,7 @@ time that you use it.
 
 * [Larynx](https://github.com/rhasspy/larynx)
 * [MaryTTS](http://mary.dfki.de/)
+* [Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
 * [Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest)
 ''')
 
