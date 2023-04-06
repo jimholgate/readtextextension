@@ -873,6 +873,8 @@ def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
         path1 = os.path.join(profile, 'Library/Python/')
         path2 = '/lib/python/site-packages'
     elif os.name == 'posix':
+        if not os.getenv('HOME') == os.getenv('PWD'):
+            return retval
         py_search = ''.join([
             'python',
             platform.python_version_tuple()[0],
@@ -885,18 +887,18 @@ def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
                 os.getenv('PWD'), '/.local/lib/', py_search, '/site-packages'
             ])
             if not os.path.isdir(_add_path):
-                _add_path = _add_path = ''.join([os.getenv('PWD'),
-                    '/.local/pipx/venvs/', lib_name, '/lib/', py_search,
-                    '/site-packages/'])                   
+                _add_path = _add_path = ''.join([
+                    os.getenv('PWD'), '/.local/pipx/venvs/', lib_name, '/lib/',
+                    py_search, '/site-packages/'
+                ])
         if os.path.isdir(_add_path):
             # Use the most recent local library, not the distribution library.
             site_list.insert(0, _add_path)
         for _site in site_list:
-            if len(os.getenv('HOME')) != 0:
-                if os.path.isdir(os.path.join(_site, lib_name)):
-                    retval = _site
-                    if not latest:
-                        return retval
+            if os.path.isdir(os.path.join(_site, lib_name)):
+                retval = _site
+                if not latest:
+                    return retval
         return retval
     py_path = ''
     with os.scandir(path1) as it:
