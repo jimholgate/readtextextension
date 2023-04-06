@@ -6399,6 +6399,7 @@ Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
 	Dim ret_val$ : ret_val = &quot;&quot;
 	Dim os_div$ : os_div = getPathSeparator
 	Dim sPythonSubDirs$
+	Dim deb12_pipx$ : deb12_pipx = &quot;&quot;
 	Dim py_dir$
 	Dim home$ : home = Environ(&quot;HOME&quot;)
 	fsGetPipLibPath = &quot;&quot;
@@ -6414,9 +6415,14 @@ Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
 		&apos; `snap`, `flatpak`, `appimage` and other standalone versions of
 		&apos; of LibreOffice python might not work correctly with the system
 		&apos; python extended libraries or user installed libraries
+		deb12_pipx = home &amp; &quot;/.local/pipx/venvs/&quot; &amp; s_test
 		If Not Instr(Environ(&quot;PWD&quot;), home) = 1 Then
 			Exit Function
-		ElseIf FileExists(home &amp; &quot;/.local/pipx/venvs/&quot; &amp; s_test) Then
+		ElseIf FileExists(deb12_pipx) Then
+			&apos; NOTE: When path is present, the string points to a resource
+			&apos; directory that contains the actual library. If the version
+			&apos; of python doesn&apos;t match, then the python routine may fail.
+			fsGetPipLibPath = deb12_pipx
 			Exit Function
 		ElseIf Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
 			Exit Function

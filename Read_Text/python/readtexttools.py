@@ -849,7 +849,7 @@ class ExtensionTable(object):
         return ''
 
 
-def find_local_pip(lib_name='qrcode', latest=True):  # -> str
+def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
     '''If you installed a pip tool as a local user, then
     return the library path, otherwise return `''`.
 
@@ -873,9 +873,26 @@ def find_local_pip(lib_name='qrcode', latest=True):  # -> str
         path1 = os.path.join(profile, 'Library/Python/')
         path2 = '/lib/python/site-packages'
     elif os.name == 'posix':
+        py_search = ''.join([
+            'python',
+            platform.python_version_tuple()[0],
+            '.',
+            platform.python_version_tuple()[1],
+        ])
         site_list = site.getsitepackages()
+        if len(_add_path) == 0:
+            _add_path = ''.join([
+                os.getenv('PWD'), '/.local/lib/', py_search, '/site-packages'
+            ])
+            if not os.path.isdir(_add_path):
+                _add_path = _add_path = ''.join([os.getenv('PWD'),
+                    '/.local/pipx/venvs/', lib_name, '/lib/', py_search,
+                    '/site-packages/'])                   
+        if os.path.isdir(_add_path):
+            # Use the most recent local library, not the distribution library.
+            site_list.insert(0, _add_path)
         for _site in site_list:
-            if os.getenv("PWD") in _site and len(os.getenv) != 0:
+            if len(os.getenv('HOME')) != 0:
                 if os.path.isdir(os.path.join(_site, lib_name)):
                     retval = _site
                     if not latest:
@@ -3008,7 +3025,7 @@ is incorrectly formatted for this application. (`KeyError`)
     "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},
     "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}
 }'''
-    except Exception: # i. e. : python 3 json.decoder.JSONDecodeError: 
+    except Exception:  # i. e. : python 3 json.decoder.JSONDecodeError:
         print('''WARNING: A text string was not edited because a `json` lexicon
 file is missing or is incorrectly formatted for this application.
 
