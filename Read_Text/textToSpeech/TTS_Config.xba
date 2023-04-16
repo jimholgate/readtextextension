@@ -322,6 +322,25 @@ Function RhvoiceSpeechHostInfo()
 End Function
 
 
+Function CoquiAISpeechHostInfo()
+	Dim _info As SpeechHostInfo
+	With _info
+		.about = Join(Array(&quot;Coqui AI TTS was designed to achieve the best trade-off&quot;,_
+		&quot; among ease-of-training, speed and quality.&quot;),&quot;&quot;)
+		.key = &quot;Coqui AI TTS&quot;
+		.label = &quot;tts-server&quot;
+		.token = &quot;&quot;
+		.url = &quot;http://[::1]:5002/&quot;
+		.url_info = &quot;/&quot;
+		.json_dir = &quot;coqui&quot;
+		.sample = &quot;http://[::1]:5002/api/tts?text=Hello%20world&amp;speaker_id=&amp;style_wav=&amp;language_id=&quot;
+		.docker = &quot;https://tts.readthedocs.io/en/latest/docker_images.html&quot;
+		.tags = Array(&quot;text&quot;, &quot;wav&quot;)
+	End With
+	CoquiAISpeechHostInfo = _info
+End Function
+
+
 Function MacOSSpeechAppInfo()
 	Dim _info As SpeechHostInfo
 	Select Case fsGetOS()
@@ -559,6 +578,7 @@ Function SpeechHostInfoList()
 	MimicSpeechHostInfo(), _
 	RhvoiceSpeechHostInfo(), _
 	MaryTtsSpeechHostInfo(), _
+	CoquiAISpeechHostInfo() _
 	)	
 	Else
 	&apos; Prioritize recent tts frameworks
@@ -566,7 +586,8 @@ Function SpeechHostInfoList()
 	MimicSpeechHostInfo(), _
 	LarynxSpeechHostInfo(), _
 	MaryTtsSpeechHostInfo(), _
-	RhvoiceSpeechHostInfo() _
+	RhvoiceSpeechHostInfo(), _
+	CoquiAISpeechHostInfo() _
 	)
 	End If
 End Function
@@ -581,8 +602,8 @@ End Sub
 
 
 Function fsLocalHostSpeech() As String
-	&apos; Return the localhost speech address
-	&apos; i.e.: `larynx-server`, `marytts-server`, `rhvoice-rest`, &apos;mimic3-server`
+	&apos; Return the local host speech address
+	&apos; i.e.: `http:&lt;localhost&gt;:&lt;port&gt;`
 	On Error GoTo fsLocalHostSpeechErr
 	fsLocalHostSpeech = &quot;&quot;
 	Dim _info As Variant

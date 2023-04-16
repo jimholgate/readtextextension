@@ -171,7 +171,8 @@ gTTS Library
 
 Powered by Google\u2122
 
-"Google", "Google Cloud" and "Google Translate" are trademarks of Google Inc.
+"Google", "Google Cloud", "Google Translate" and the stylized "G" logo are
+trademarks of Google Inc.
 
 The contents of this resource are not affiliated with, sponsored by, or endorsed
 by Google nor does the documention represent the views or opinions of Google or
@@ -458,15 +459,11 @@ configurations.
                             [95, 66, '--|------', -42],
                             [65, 33, '-|-------', -50],
                             [32, 0, '|--------', -100]]
-        self.all_voices = [
-            'MALE3', 'MALE2', 'MALE1', 'FEMALE3', 'FEMALE2', 'FEMALE1',
-            'CHILD_MALE', 'CHILD_FEMALE', 'AUTO', 'NETWORK', 'AWS', 'AZURE',
-            'GOOGLECLOUD', 'GTTS'
-        ]
         self.spd_voices = [
             'MALE3', 'MALE2', 'MALE1', 'FEMALE3', 'FEMALE2', 'FEMALE1',
             'CHILD_MALE', 'CHILD_FEMALE'
         ]
+        self.all_voices = self.spd_voices + network_read_text_file.NET_SERVICE_LIST
         self.stop_voice = 'TriggerAssertionError'
         # NOTE: speechd might reject a language when length of item > 2
         self.language_list = espeak_read_text_file.espk_languages()

@@ -49,7 +49,6 @@ Copyright (c) 2011 - 2023 James Holgate
 '''
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-import aifc
 import codecs
 import getopt
 import glob
@@ -58,7 +57,6 @@ import math
 import mimetypes
 import os
 import platform
-import sunau
 import sys
 import tempfile
 import threading
@@ -860,37 +858,49 @@ def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
     of the tools. A current good practice for programmers
     is to use `venv`. A good practice for users is to delete
     and rebuild your pip libraries when you do a major version
-    upgrade of your system or of python.'''
+    upgrade of your system or of python. Best practice for MacOS
+    is to set up a virtual environment using LibreOffice's
+    python version. See the `pipx` venvs documentation.'''
     retval = ''
+    py_ver = ''.join([
+        platform.python_version_tuple()[0],
+        '.',
+        platform.python_version_tuple()[1],
+    ])
     if int(platform.python_version_tuple()[0]) < 3:
         return ''
     elif os.name == 'nt':
-        profile = os.getenv("LOCALAPPDATA")
-        path1 = os.path.join(profile, 'Programs\\Python\\')
-        path2 = '\\Lib\\site-packages'
+        profile = os.getenv("LOCALAPPDATA").strip(os.div)
+        path1 = os.path.join(profile, 'Programs', 'Python')
+        path2 = os.path.join('Lib', 'site-packages')
+        path3 = path2
     elif have_posix_app('say', False):
         profile = os.getenv("HOME")
-        path1 = os.path.join(profile, 'Library/Python/')
-        path2 = '/lib/python/site-packages'
+        path1 = os.path.join(profile, 'Library', 'Python')
+        path2 = os.path.join('lib', 'python', 'site-packages')
+        path3 = os.sep + os.path.join(
+            'Library', 'Frameworks', 'Python.framework', 'Versions', py_ver,
+            'lib', 'python' + py_ver, 'site-packages')
     elif os.name == 'posix':
-        if not os.getenv('HOME') == os.getenv('PWD'):
-            return retval
-        py_search = ''.join([
-            'python',
-            platform.python_version_tuple()[0],
-            '.',
-            platform.python_version_tuple()[1],
-        ])
+        profile = os.getenv('HOME')
+        path1 = os.path.join(profile, '.local', 'lib')
+        path2 = os.path.join('lib', 'python', 'site-packages')
+        path3 = path2
+        pwd_dir = os.getenv('PWD')
+        py_search = ''.join(['python', py_ver])
+        if not profile == pwd_dir:
+            if not pwd_dir.startswith(os.path.join(profile, '.config')):
+                # snap & flatpak containment check
+                return retval
         site_list = site.getsitepackages()
         if len(_add_path) == 0:
-            _add_path = ''.join([
-                os.getenv('PWD'), '/.local/lib/', py_search, '/site-packages'
-            ])
-            if not os.path.isdir(_add_path):
-                _add_path = _add_path = ''.join([
-                    os.getenv('PWD'), '/.local/pipx/venvs/', lib_name, '/lib/',
-                    py_search, '/site-packages/'
-                ])
+            _add_path = os.path.join(profile, '.local', 'lib', py_search,
+                                     'site-packages')
+            if not os.path.isdir(os.path.join(_add_path, lib_name.lower())):
+                if not os.path.isdir(os.path.join(_add_path, lib_name)):
+                    _add_path = os.path.join(profile, '.local', 'pipx',
+                                             'venvs', lib_name.lower(), 'lib',
+                                             py_search, 'site-packages/')
         if os.path.isdir(_add_path):
             # Use the most recent local library, not the distribution library.
             site_list.insert(0, _add_path)
@@ -901,14 +911,39 @@ def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
                     return retval
         return retval
     py_path = ''
-    with os.scandir(path1) as it:
+    path_result = ''
+    for _item in [path1, path3]:
+        if os.path.exists(_item):
+            path_result = _item
+            break
+    if len(path_result) == 0:
+        print('FAIL: `%(lib_name)s` search: no directory at `%(path1)s`' %
+              locals())
+        return ''
+    with os.scandir(path_result) as it:
         for entry in it:
-            if not entry.name.startswith('.') and entry.is_dir():
-                py_path = ''.join([path1, entry.name, path2, os.sep, lib_name])
-                if os.path.isdir(py_path):
-                    retval = ''.join([path1, entry.name, path2])
+            # print (925, entry.name)
+            for entry_name in [py_ver, entry.name]:
+                if entry_name.startswith('.'):
+                    continue
+                elif 'dist-info' in entry_name:
+                    continue
+                py_path = os.path.join(path_result, entry_name, path2, lib_name)
+                if not os.path.isdir(py_path):
+                    if os.path.isdir(os.path.join(path_result, lib_name)):
+                        py_path = path_result
+                pipx_path = os.path.join(path_result, 'pipx', 'venvs',
+                                         lib_name.lower(), 'lib', py_ver,
+                                         'site-packages')
+                if os.path.isdir(pipx_path):
+                    retval = pipx_path
+                    break
+                elif os.path.isdir(py_path):
+                    retval = os.path.join(path1, entry_name, path2)
                     if not latest:
                         return retval
+            if len(retval) != 0:
+                break
     return retval
 
 
@@ -1606,23 +1641,6 @@ def sound_length_seconds(_work):  # -> int
             snd_read.close()
         except:
             pass
-    elif _mime == mimetypes.types_map['.au']:
-        try:
-            snd_read = sunau.open(_work, 'r')
-            _return_value = math.ceil(
-                snd_read.getnframes() // snd_read.getframerate()) + 1
-            snd_read.close()
-        except:
-            pass
-    elif _mime == (mimetypes.types_map['.aif']
-                   or _mime == mimetypes.types_map['.aifc']):
-        try:
-            snd_read = aifc.open(_work, 'r')
-            _return_value = math.ceil(
-                snd_read.getnframes() // snd_read.getframerate()) + 1
-            snd_read.close()
-        except:
-            pass
     return _return_value
 
 
@@ -1760,9 +1778,7 @@ class ImportedMetaData(object):
         if not os.path.isfile(file_path):
             self.seconds = 0
             return self.seconds
-        if os.path.splitext(file_path)[1].lower() in [
-                '.aif', '.aifc', '.au', '.wav'
-        ]:
+        if os.path.splitext(file_path)[1].lower() in ['.aif', '.wav']:
             self.seconds = sound_length_seconds(file_path)
             return self.seconds
         elif _extension_table.get_mime(file_path).startswith('audio/'):
@@ -2115,9 +2131,9 @@ class WinMediaPlay(object):
         is the path to the app or a blank string if the app is not
         found. `rest` is the approximate length of the speech in
         seconds.'''
-        self.extensions = [['.aifc', 0], ['.aif', 0], ['.aiff', 0], ['.au', 0],
-                           ['.m4a', 12209], ['.mp2', 12209], ['.mp3', 12209],
-                           ['.snd', 88320], ['.wav', 0], ['.wma', 12209]]
+        self.extensions = [['.aif', 0], ['.aiff', 0], ['.m4a', 12209],
+                           ['.mp2', 12209], ['.mp3', 12209], ['.snd', 88320],
+                           ['.wav', 0], ['.wma', 12209]]
         self.app = get_nt_path('Windows Media Player', 'wmplayer.exe')
         self.rest = 0
 
@@ -2803,8 +2819,8 @@ def get_my_lock(_lock=''):  # -> str
 def media_mac_os_ok(_out=''):  # -> bool
     '''MacOS native apps can play the media type'''
     return os.path.splitext(_out)[1] in [
-        ".aif", ".aifc", ".aiff", ".wav", ".aac", "mp4", ".mp3", ".m4v",
-        ".m4a", ".mov", ".dv", ".mpeg", ".avi"
+        ".aif", ".aiff", ".wav", ".aac", "mp4", ".mp3", ".m4v", ".m4a", ".mov",
+        ".dv", ".mpeg", ".avi"
     ]
 
 
@@ -3046,9 +3062,9 @@ class PosixAudioPlayers(object):
     def __init__(self):
         '''List of known sound file players'''
         self.afplay_exts = [
-            '.3gp', '.3g2', '.aac', '.adts', '.aifc', '.aiff', '.aif', '.amr',
-            '.m4a', '.m4r', '.m4b', '.caf', '.ec3', '.flac', '.mp1', '.mp2',
-            '.mp3', '.mpeg', '.mpa', '.mp4', '.snd', '.au', '.wav', '.w64'
+            '.3gp', '.3g2', '.aac', '.adts', '.aiff', '.aif', '.amr', '.m4a',
+            '.m4r', '.m4b', '.caf', '.ec3', '.flac', '.mp1', '.mp2', '.mp3',
+            '.mpeg', '.mpa', '.mp4', '.snd', '.wav', '.w64'
         ]
         self.apt_get = 0
         self.app = 1
@@ -3235,6 +3251,7 @@ def main():  # -> NoReturn
     Converts the input wav sound to another format.  Ffmpeg
     can include a still frame movie if you include an image.
     '''
+    print(3255, find_local_pip('yapf'))
     if sys.argv[-1] == sys.argv[0]:
         usage()
         sys.exit(0)
