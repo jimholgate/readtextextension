@@ -1793,10 +1793,11 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             if not _neutral_voice_count in [0, 1]:
                 print('''\nNOTICE: The current voice models do not identify
 voices by gender so the gender might be wrong.''')
+        _vox_number = int(''.join(
+            ['0', readtexttools.safechars(_voice, '1234567890')]))
+        # When you just want a list of indices, it is faster to to use len()
         for i in range(0, len(matches)):
-            if int(''.join([
-                    '0', readtexttools.safechars(_voice, '1234567890')
-            ])) % len(matches) == i + 1:
+            if _vox_number % len(matches) == i + 1:
                 return matches[i]
         if _prefer_gendered_fallback:
             if len(gendered_fallback) != 0:
