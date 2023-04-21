@@ -300,6 +300,19 @@ time that you use it.
 ''')
 
 
+def have_gpu(_test='Radeon'):  # -> bool
+    '''If the system can detect the specified GPU string, return `True`,
+    otherwise return `False`'''
+    _test_app = 'lspci'
+    if not readtexttools.have_posix_app(_test_app):
+        return False
+    _search = _test.lower()
+    _imported_meta = readtexttools.ImportedMetaData()
+    _content = _imported_meta.execute_command('%(_test_app)s | grep VGA' %
+                                              locals()).lower()
+    return _search in _content
+
+
 def network_problem(voice='default'):  # -> str
     '''Return suggestions to make an on-line voice work.'''
     return '''Is the network connected?
@@ -721,8 +734,7 @@ class GoogleTranslateClass(object):
         '''Initialize data'''
         self.ok = True
         self.accept_voice = [
-            '', 'all', 'auto', 'child_female', 'female1', 'female2', 'female3',
-            'child_male', 'male1', 'male2', 'male3', 'gtts'
+            '', 'all', 'auto', 'child_female', 'child_male', 'gtts'
         ]
         self.translator = 'Google'
         self.translator_domain = self.translator.lower()
@@ -750,6 +762,11 @@ class GoogleTranslateClass(object):
                 _test_version.split('.')[:2])) >= minimum_version
         except (AttributeError, IndexError, ValueError):
             self.ok = False
+        s_index = '1'
+        for i in range(1, 100, 1):
+            s_index = str(i)
+            self.accept_voice.append('female%(s_index)s' % locals())
+            self.accept_voice.append('male%(s_index)s' % locals())
         return self.ok
 
     def read(self,
@@ -1573,11 +1590,9 @@ Set the Docker container restart policy to "always"
             'RAWMARYXML'
         ]
         self.accept_voice = [
-            '', 'all', 'auto', 'child_female', 'female1', 'female2', 'female3',
-            'female4', 'female5', 'female6', 'female7', 'female8', 'female9',
-            'child_female1', 'child_male', 'male1', 'male2', 'male3', 'male4',
-            'male5', 'male6', 'male7', 'male8', 'male9', 'child_male1',
-            'marytts', 'mimic', 'localhost', 'docker', 'local_server'
+            '', 'all', 'auto', 'child_female', 'child_female1', 'child_male',
+            'child_male1', 'marytts', 'mimic', 'localhost', 'docker',
+            'local_server'
         ]
         self.voice_locale = ''
         self.pause_list = _common.pause_list
@@ -1648,6 +1663,11 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             return False
         # Find the first voice that meets the criteria. If found, then
         # return `True`, otherwise return `False`.
+        s_index = '9'
+        for i in range(1, len(_locales) + 1, 1):
+            s_index = str(i)
+            self.accept_voice.append('female%(s_index)s' % locals())
+            self.accept_voice.append('male%(s_index)s' % locals())
         self.ok = False
         if '/' in _locales:
             # i. e.: `en_UK/apope_low` for mimic vs. `cmu-rms-hsmm` for MaryTTS
@@ -1696,9 +1716,14 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             response = urllib.request.urlopen(''.join([self.url, '/voices']))
             _voices = str(response.read(), 'utf-8')
         except urllib.error.URLError:
-            print(
-                '''Requested [docker-marytts](https://github.com/synesthesiam/docker-marytts)
-            It did not respond correctly.''')
+            if self.is_mimic:
+                print(
+                    '''Requested [Mimic 3](https://github.com/MycroftAI/mimic3#mimic-3)
+                It did not respond correctly.''')
+            else:
+                print(
+                    '''Requested [docker-marytts](https://github.com/synesthesiam/docker-marytts)
+                It did not respond correctly.''')
             return ''
         except AttributeError:
             try:
@@ -1725,9 +1750,11 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
         matches = []
         last_match = ''
         gendered_fallback = ''
-
         if _voice not in self.accept_voice:
             return last_match
+        _neutral_voice_count = 0
+        if self.is_mimic:
+            _neutral_voice_count = 1
         for _tester in _voice_list:
             _row = _tester.split(' ')
             _add_name = ''
@@ -1735,27 +1762,41 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                 if _row[1].startswith(_locale):
                     last_match = _row[0]
                     _row2 = _row[2]
-                    if not _row2 in ['male', 'female']:
-                        # Unknown, so distribute evenly. Mimic voice 0
-                        # is male, MaryTTS voice 0 is female by default.
-                        if bool(len(matches) % 2) == self.is_mimic:
-                            _row2 = 'female'
+                    if _row2 in ['male', 'female']:
+                        for _standard in [
+                                _row2,
+                                ''.join(['child_', _row2]),
+                                'auto',
+                        ]:
+                            if _voice.startswith(_standard):
+                                _add_name = last_match
+
+                        if len(_add_name) != 0:
+                            if _row2 == 'male':
+                                matches.append(_add_name)
+                            else:
+                                matches.insert(0, _add_name)
+                    else:
+                        # Unknown gender, so alternate adding the voice to
+                        # the beginning and the end of the list so MALE[1|2|3]
+                        # and FEMALE[1|2|3] are different voices if available.
+                        _neutral_voice_count += 1
+                        if _neutral_voice_count % 2 == 1:
+                            matches.append(last_match)
                         else:
-                            _row2 = "male"
-                    for _standard in [
-                            _row2, ''.join(['child_', _row2]), 'auto'
-                    ]:
-                        if _voice.startswith(_standard):
-                            _add_name = last_match
-                            break
-                if len(_add_name) != 0:
-                    matches.append(_add_name)
-                    if len(gendered_fallback) == 0:
-                        gendered_fallback = last_match
+                            matches.insert(0, last_match)
+                if len(gendered_fallback) == 0:
+                    gendered_fallback = last_match
             except IndexError:
                 continue
-        for i in reversed(range(0, len(matches))):
-            if _voice.endswith(str(len(matches) - i)):
+        if 'male' in _voice:
+            if not _neutral_voice_count in [0, 1]:
+                print('''\nNOTICE: The current voice models do not identify
+voices by gender so the gender might be wrong.''')
+        for i in range(0, len(matches)):
+            if int(''.join([
+                    '0', readtexttools.safechars(_voice, '1234567890')
+            ])) % len(matches) == i + 1:
                 return matches[i]
         if _prefer_gendered_fallback:
             if len(gendered_fallback) != 0:
@@ -1789,8 +1830,13 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
         _done = False
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
-        # Determine the temporary file name
-        _media_work = os.path.join(tempfile.gettempdir(), 'MaryTTS.wav')
+        # Determine the temporary file name;
+        if self.is_mimic:
+            _media_work = os.path.join(tempfile.gettempdir(), 'Mimic3.wav')
+            _user_env = 'MIMIC_TTS_USER_DIRECTORY'
+        else:
+            _media_work = os.path.join(tempfile.gettempdir(), 'MaryTTS.wav')
+            _user_env = 'MARY_TTS_USER_DIRECTORY'
         if os.path.isfile(_media_work):
             os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
@@ -1803,9 +1849,9 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                     break
         _view_json = self.debug and 1
         _mary_vox = self.marytts_voice(_vox, _iso_lang)
-        response = readtexttools.local_pronunciation(
-            _iso_lang, _text, self.local_dir, 'MARY_TTS_USER_DIRECTORY',
-            _view_json)
+        response = readtexttools.local_pronunciation(_iso_lang, _text,
+                                                     self.local_dir, _user_env,
+                                                     _view_json)
         _text = response[0]
         if _view_json:
             print(response[1])
@@ -2309,7 +2355,8 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
 
 
 class CoquiDemoLocalHost(object):
-    '''The [TTS engine](https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu)
+    '''# CoquiAI TTS
+    The [TTS engine](https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu)
     provides a local http service to convert text that you select to speech.
     
     The TTS server is powered by python. You can use `pip3`, `pipx`, `git`
@@ -2331,7 +2378,7 @@ class CoquiDemoLocalHost(object):
     * English `tts-server --model_name tts_models/en/vctk/vits`
     * French `tts-server --model_name tts_models/fr/css10/vits`
     * Spanish `tts-server --model_name tts_models/es/css10/vits`
-    + Ukrainian `tts-server --model_name tts_models/uk/mai/vits`
+    * Ukrainian `tts-server --model_name tts_models/uk/mai/vits`
 
     This script is a client of the `tts` webserver. The developer github site
     includes a page to report problems and feature requests. It serves to
@@ -2344,16 +2391,16 @@ class CoquiDemoLocalHost(object):
     `--vocoder_checkpoint /path/to/vocoder/model.pth `
     `--vocoder_config /path/to/vocoder/config.json`
 
-    This Client 
-    -----------
+    ReadText Client 
+    ---------------
 
     Some voice models require system files that are not explicitly stated
     in the documentation. If a model does not seem to work, run the
     `tts-server` program in a command window and note any error messages.
 
-    Read text is a `TTS` client. You need a few addtional system packages -
-    `python3-bs4`, `python3-pip` `and `espeak-ng`. On supported Ubuntu
-    distributions you can use:
+    This script is a python `TTS` client. You need a few additional system
+    packages - `python3-bs4`, `python3-pip` and `espeak-ng`. On supported
+    Ubuntu distributions you can use:
 
         `sudo apt-get install python3-bs4 python3-pip espeak-ng`
     
@@ -2361,6 +2408,10 @@ class CoquiDemoLocalHost(object):
     if you run your office program using a terminal window.
 
         `/usr/bin/soffice`
+
+    The client will not work unless the server is configured correctly and
+    is running. You can check the server by navigating to the local server
+    [demo page](http://[::1]:5002/).
     
     Docker
     ------
@@ -2388,21 +2439,21 @@ class CoquiDemoLocalHost(object):
 
     Enter the following in a terminal.
 
-    `tts-server` `<options>`
+    `tts-server [options]`
 
     You may need to wait a few moments for the server application to finish
-    loading. Check it by browsing to the local
-    [CoquiAI web application](http://[::1]:5002/).
+    loading. Check it by opening the local [TTS Engine](http://[::1]:5002/)
+    in your web browser.
 
     Troubleshooting
     ---------------
 
-    To trouble shoot the server, you should run `tts-server` from
+    To troubleshoot the server, you should run `tts-server` from
     a command line. If you can use [TTS engine](http://[::1]:5002/),
     then check this TTS client by running `/usr/bin/soffice` in a
-    terminal window and checking for python errors. Be patient the
-    first time you run the server. It can take a while for the
-    program to download the model data.
+    terminal window and checking for python errors. Be patient; the
+    first time you run the server with a new model it can take a
+    while for the TTS program to download the model data.
 
     + If the tts server stops responding, try quitting `soffice` and
       the tts-server. Use the `tts --list_models` to list available
@@ -2422,7 +2473,10 @@ class CoquiDemoLocalHost(object):
     * Conqui assumes that you have installed `espeak-ng`. Some models
       don't work without it.
     * Some models have specific memory, CPU and GPU requirements.
-    
+    * Some models will only work if you are running soffice as a
+      native application, not as a snap or flatpak. This is because for
+      some TTS models, this client uses the system `bs4` (Beautiful
+      Soup) python library to check for languages or voices.
 '''
 
     def __init__(self):  # -> None
@@ -2515,8 +2569,8 @@ class CoquiDemoLocalHost(object):
             'vocoder_models/uk/mai/multiband-melgan',
             'vocoder_models/tr/common-voice/hifigan'
         ]
-        if readtexttools.have_posix_app('nvcc', False):
-            # NVIDIA GPU support application
+        if have_gpu('nvidia'):
+            # NVIDIA GPU support
             self.base_models = self.more_models + self.base_models
         self.coqui_fm = [
             'ED\n', 'p225', 'p227', 'p237', 'p240', 'p243', 'p244', 'p245',

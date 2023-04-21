@@ -2261,6 +2261,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	Dim CR As String
 	Dim oComboBox As Variant
 	Dim bIsAppImage As Boolean : bIsAppImage = False
+	Dim bEnableLocalHostRate As Boolean : bEnableLocalHostRate = True
 	Dim sGetOS As String : sGetOS = fsGetOS()
 	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then bIsAppImage = True
 	CR = Chr(10)
@@ -2293,18 +2294,29 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	End If
 	If fbHaveNetworkTTS() or isSnap() or isFlatPak() Then
 		If fsGetOS() = &quot;UNIX&quot; Then
+			bEnableLocalHostRate = fbEnableLocalHostRate()
 			&apos; Include settings for [larynx-server](https://github.com/rhasspy/larynx)
-			Redim _opts : _opts = Array(&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
+			If bEnableLocalHostRate Then
+				Redim _opts : _opts = Array(&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
+			Else
+				&apos; NOTE: Some tts models ignore gender; consider using neutral terms like &quot;VOICE1&quot;
+				&apos; The disadvantage is that the labeling system would not match `speech-dispatcher`
+				Redim _opts : _opts = Array(&quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;,_
+				&quot;FEMALE6&quot;, &quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
+			End If
 			For n = Lbound(_opts) To Ubound(_opts)
-				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
-				s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;&quot; &amp;_opts(n) &amp; &quot;&quot;&quot;&quot;
+				If bEnableLocalHostRate Then
+					s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; &quot;&quot;&quot;&quot;
+					s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+				End If
+				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;&quot; &amp; _opts(n) &amp; &quot;&quot;&quot;&quot;
 				s1 = s1 &amp; fspyPlayOption(oDialog, s4)
 			Next
 		End If
-
-		s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot;&quot;
-		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+		If bEnableLocalHostRate Then
+			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot;&quot;
+			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+		End If
         s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
 		If fbInPaths(&quot;larynx-server&quot;) Then

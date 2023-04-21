@@ -601,6 +601,32 @@ Sub ResetHostSpeechURI
 End Sub
 
 
+Function fbEnableLocalHostRate() As Boolean
+	&apos; Some localhost speech servers do not support rate, are
+	&apos; untested, or have other issues when the rate of speech
+	&apos; is not 100%
+	fbEnableLocalHostRate = True
+	Dim _info As Variant : _info = Array(_
+	MimicSpeechHostInfo(), _
+	RhvoiceSpeechHostInfo(), _
+	CoquiAISpeechHostInfo() _
+	)
+	Dim x As Integer : x = 0
+	On Error GoTo fbEnableLocalHostRateErr
+	For x = Lbound(_info) to Ubound(_info)
+		If Instr(_info(x).url, &quot;http&quot;) = 1 Then
+			If fbLocalHostOk(_info(x).url &amp; _info(x).url_info, _info(x).key) Then
+				fbEnableLocalHostRate = False
+				Exit Function
+			End If
+		End If
+	Next
+	Exit Function
+	fbEnableLocalHostRateErr:
+	fbEnableLocalHostRate = False
+End Function
+
+
 Function fsLocalHostSpeech() As String
 	&apos; Return the local host speech address
 	&apos; i.e.: `http:&lt;localhost&gt;:&lt;port&gt;`

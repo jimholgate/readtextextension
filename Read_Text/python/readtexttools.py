@@ -3251,7 +3251,6 @@ def main():  # -> NoReturn
     Converts the input wav sound to another format.  Ffmpeg
     can include a still frame movie if you include an image.
     '''
-    print(3255, find_local_pip('yapf'))
     if sys.argv[-1] == sys.argv[0]:
         usage()
         sys.exit(0)
