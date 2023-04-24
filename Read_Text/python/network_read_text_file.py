@@ -406,7 +406,8 @@ class LocalCommons(object):
                  _xml_lang='en-US'):  # -> str
         '''Change the speed that a reader reads plain text aloud using
         w3.org `SSML`. The reader should use standard XML conventions like
-        `&amp;`, `&gt;` and `&lt;`.
+        `&amp;`, `&gt;` and `&lt;`.  Mimic3 supports a subset of SSML.
+        Not all models support SSML prosody rate.
 
         <https://www.w3.org/TR/speech-synthesis11/ >'''
         _xmltransform = readtexttools.XmlTransform()
@@ -1326,6 +1327,7 @@ can synthesize speech privately using %(_eurl)s.''' % locals())
             _logo = ''.join([u' \u263B  (', self.default_lang, ')'])
         else:
             _logo = ''.join([u' \u263A  (', _lang2, ')'])
+        print_url = self.url
         if len(_verified_name) != 0:
             if len(larynx_names) != 0:
                 display_names = larynx_names.replace(
@@ -1336,6 +1338,8 @@ Loading larynx voices for `%(_lang2)s`
 ==============================
 
 %(display_names)s
+
+[Larynx server](%(print_url)s)
 ''' % locals())
             # Check for a specific matching SPD name
             # Search examples - `FEMALE2`, `MALE1`
@@ -1648,6 +1652,8 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                 response = urllib.request.urlopen(''.join(
                     [self.url, dir_search]))
                 _locales = str(response.read(), 'utf-8')
+            except TimeoutError:
+                continue
             except urllib.error.URLError:
                 self.ok = False
             except AttributeError:
@@ -1945,8 +1951,16 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.''')
                 # '&lengthScale=' + encodeURIComponent(lengthScale) +
                 # '&ssml=' + encodeURIComponent(ssml) +
                 # '&audioTarget=' + encodeURIComponent(audioTarget)
-                print('''
-[Mimic-3](https://github.com/MycroftAI/mimic3#mimic-3)''')
+                _preload = _mary_vox.split('#')[0]
+                print('''Preload voice command
+---------------------
+
+    mimic3-server --preload-voice %(_preload)s
+
+Help
+----
+
+[Mimic-3](https://github.com/MycroftAI/mimic3#mimic-3)''' % locals())
 
             else:
                 print(
@@ -2730,6 +2744,7 @@ system installer application like `apt`.''')
         _vox_number = int(''.join(
             ['0', readtexttools.safechars(_vox, '1234567890')]))
         _my_favs_count = 3  # male1, male2, male3
+        _matches = []
         if _index == 0 and _vox_number > _my_favs_count:
             # You specify an out of range voice using `male4`, `female5` etc.
             # The voices chosen this way are not classified by gender.
@@ -2737,7 +2752,7 @@ system installer application like `apt`.''')
         _matches = [_vox, 'p374', 'female-pt-3']
         for _item in self.tts_equivalents:
             if _vox.lower() == _item[1]:
-                _matches.insert(0, _item[0])
+                _matches.append(_item[0])
         print('\n' + self.help_heading)
         print('=' * (len(self.help_heading)))
         if not self.ok:
@@ -2753,17 +2768,17 @@ system installer application like `apt`.''')
         _index_voice = ''
         try:
             _default_voice = urllib.parse.quote(speakers[0]['value'])
-        except IndexError:
+        except (IndexError, ValueError):
             return ''
         try:
-
-            #if 'female' in _vox:
-            # prioritize female voices
-            #    speakers = self.coqui_fm + speakers
-            if len(speakers) != 0:
-                _index = _index % len(speakers)
+            len_speakers = len(speakers)
+            if len_speakers != 0:
+                _index = _index % len_speakers
+                if 'female' in _vox:
+                    # Use reverse index
+                    _index = len_speakers - _index
                 _index_voice = urllib.parse.quote(speakers[_index]['value'])
-        except IndexError:
+        except (IndexError, ValueError):
             _index_voice = _default_voice
         if len(_default_voice) == 0:
             return ''
@@ -2784,11 +2799,18 @@ system installer application like `apt`.''')
                 for _match in _matches:
                     if _speaker_value == _match:
                         self.voice = urllib.parse.quote(_match)
-                        printed_list = '\n* '.join(_print_values) + '\n'
-                        print(
-                            printed_list.replace(
-                                _match, self.voice + ' ' + self.mascot + ' (' +
-                                _vox + ')'))
+                        if bool(self.debug):
+                            printed_list = '\n* '.join(_print_values) + '\n'
+                            print(
+                                printed_list.replace(
+                                    _match, self.voice + ' ' + self.mascot +
+                                    ' (' + _vox + ')'))
+                        else:
+                            print(''.join([
+                                '\n* ', self.voice, ' ', self.mascot, ' (',
+                                _vox + ')\n\n[', self.help_heading, '](',
+                                self.url, ')\n'
+                            ]))
                         return self.voice
         if len(_index_voice) == 0:
             self.voice = _default_voice
