@@ -607,7 +607,6 @@ Function fbEnableLocalHostRate() As Boolean
 	&apos; is not 100%
 	fbEnableLocalHostRate = True
 	Dim _info As Variant : _info = Array(_
-	MimicSpeechHostInfo(), _
 	RhvoiceSpeechHostInfo(), _
 	CoquiAISpeechHostInfo() _
 	)

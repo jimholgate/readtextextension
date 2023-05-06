@@ -3219,7 +3219,7 @@ Sub ttsActuate( _
 		If bAddTime Then
 			sTextToSpeak = sTextToSpeak &amp; &quot; [[slnc 400]]&quot;
 		End If
-		&apos; Customizing speech		
+		&apos; Customizing speech
 		CreateFile(_text_file, sTextToSpeak, scodec)
 		Select Case sGetOS
 			Case &quot;WINDOWS&quot;
@@ -3350,15 +3350,9 @@ Sub ttsActuate( _
 					fbIsLibreOffice() Then
 						sProgram = PosixPythonPath()				
 				End If
-				If True Then
 				errorCode = Shell(_
 				converttourl(_
 				sProgram), 0, sCommand, bWait)
-				Else
-				errorCode = Shell (sProgram, 0, sCommand, bWait)				
-				
-				End If
-				
 			End Select
 		End If
 		On Error Resume Next

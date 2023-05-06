@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: UTF-8-*-
-"""
+'''
 This text explains how to use a web service and media player to read a text
 file. It outlines the terms and conditions associated with using the on-line
 service, as well as the potential privacy and security risks. It introduces
@@ -163,8 +163,9 @@ web service.
  
 See also:
 [Docker docs](https://docs.docker.com/desktop/install/linux-install/)
-"""
-from __future__ import absolute_import, division, print_function, unicode_literals
+'''
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import getopt
 import math
 import os
@@ -173,13 +174,12 @@ import sys
 import tempfile
 import time
 import readtexttools
-
 try:
     import re
 except (ImportError, ModuleNotFoundError):
     try:
-        if len(readtexttools.find_local_pip("re")) != 0:
-            sys.path.append(readtexttools.find_local_pip("re"))
+        if len(readtexttools.find_local_pip('re')) != 0:
+            sys.path.append(readtexttools.find_local_pip('re'))
             try:
                 import re
             except:
@@ -189,13 +189,11 @@ except (ImportError, ModuleNotFoundError):
 try:
     import urllib
     import json
-
     BASICS_OK = True
 except ImportError:
     BASICS_OK = False
 try:
     import requests
-
     REQUESTS_OK = True
 except:
     REQUESTS_OK = False
@@ -203,36 +201,10 @@ try:
     import gtts
 except (ImportError, ModuleNotFoundError):
     try:
-        if len(readtexttools.find_local_pip("gtts")) != 0:
-            sys.path.append(readtexttools.find_local_pip("gtts"))
+        if len(readtexttools.find_local_pip('gtts')) != 0:
+            sys.path.append(readtexttools.find_local_pip('gtts'))
             try:
                 import gtts
-            except:
-                pass
-    except:
-        pass
-try:
-    from TTS.api import TTS
-except (ImportError, ModuleNotFoundError):
-    try:
-        _local_pip = readtexttools.find_local_pip("TTS")
-        if len(_local_pip) != 0:
-            sys.path.append(_local_pip)
-            try:
-                from TTS.api import TTS
-            except:
-                pass
-    except:
-        pass
-try:
-    from bs4 import BeautifulSoup
-except (ImportError, ModuleNotFoundError):
-    try:
-        _local_pip = readtexttools.find_local_pip("bs4")
-        if len(_local_pip) != 0:
-            sys.path.append(_local_pip)
-            try:
-                from bs4 import BeautifulSoup
             except:
                 pass
     except:
@@ -241,45 +213,18 @@ try:
     import socket
 except ImportError:
     pass
-try:
-    import awsserver
-except ImportError:
-    pass
-try:
-    import azureserver
-except ImportError:
-    pass
-try:
-    import gcloudserver
-except ImportError:
-    pass
-try:
-    import watsonserver
-except ImportError:
-    pass
 
 NET_SERVICE_LIST = [
-    "AUTO",
-    "NETWORK",
-    "AWS",
-    "AZURE",
-    "GOOGLECLOUD",
-    "WATSON",
-    "GTTS",
-    "COQUI",
-    "LARYNX",
-    "MARYTTS",
-    "MIMIC",
-    "RHVOICE",
-    "TTS",
+    'AUTO', 'NETWORK', 'AWS', 'AZURE', 'GOOGLECLOUD', 'WATSON', 'GTTS',
+    'COQUI', 'LARYNX', 'MARYTTS', 'MIMIC', 'RHVOICE', 'TTS'
 ]
 
 
 def usage():  # -> None
-    """
+    '''
     Command line help
-    """
-    print("""
+    '''
+    print('''
 Network Speech Synthesis
 ========================
 
@@ -310,25 +255,25 @@ time that you use it.
 * [Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
 * [Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest)
 * [CoquiAI demo](https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu)
-""")
+''')
 
 
-def have_gpu(_test="Radeon"):  # -> bool
-    """If the system can detect the specified GPU string, return `True`,
-    otherwise return `False`"""
-    _test_app = "lspci"
+def have_gpu(_test='Radeon'):  # -> bool
+    '''If the system can detect the specified GPU string, return `True`,
+    otherwise return `False`'''
+    _test_app = 'lspci'
     if not readtexttools.have_posix_app(_test_app):
         return False
     _search = _test.lower()
     _imported_meta = readtexttools.ImportedMetaData()
-    _content = _imported_meta.execute_command("%(_test_app)s | grep VGA" %
+    _content = _imported_meta.execute_command('%(_test_app)s | grep VGA' %
                                               locals()).lower()
     return _search in _content
 
 
-def network_problem(voice="default"):  # -> str
-    """Return suggestions to make an on-line voice work."""
-    return ("""Is the network connected?
+def network_problem(voice='default'):  # -> str
+    '''Return suggestions to make an on-line voice work.'''
+    return '''Is the network connected?
 =========================
 
 + The `%(voice)s` on-line voice is currently unavailable.
@@ -337,700 +282,369 @@ def network_problem(voice="default"):  # -> str
 + If you are using a `localhost` server, it might help to
   enter the local speech server command in a terminal and
   read what it prints out. (i. e.: `larynx-server`)
-  """ % locals())
+  ''' % locals()
 
 
 class LocalCommons(object):
-    """Shared items for local speech servers"""
+    '''Shared items for local speech servers'''
 
     def __init__(self):  # -> None
         self.debug = [0, 1, 2, 3][0]
 
         self.default_lang = readtexttools.default_lang()
-        self.default_extension = ".wav"
-        self.help_icon = "/usr/share/icons/HighContrast/32x32/apps/web-browser.png"
+        self.default_extension = '.wav'
+        self.help_icon = '/usr/share/icons/HighContrast/32x32/apps/web-browser.png'
+        self.length_scales = [[320, 289, '---------|', 0.50],
+                              [288, 257, '--------|-', 0.55],
+                              [256, 225, '-------|--', 0.62],
+                              [224, 193, '------|---', 0.71],
+                              [192, 161, '-----|----', 0.83],
+                              [128, 97, '---|-----', 1.25],
+                              [96, 66, '--|------', 1.66],
+                              [64, 33, '-|-------', 2.50],
+                              [32, 0, '|--------', 5.00]]
         self.spd_fm = [
-            "female1",
-            "female2",
-            "female3",
-            "female4",
-            "female5",
-            "female6",
-            "female7",
-            "female8",
-            "female9",
-            "child_female",
-            "child_female1",
+            'female1', 'female2', 'female3', 'female4', 'female5', 'female6',
+            'female7', 'female8', 'female9', 'child_female', 'child_female1'
         ]
         self.spd_m = [
-            "male1",
-            "male2",
-            "male3",
-            "male4",
-            "male5",
-            "male6",
-            "male7",
-            "male8",
-            "male9",
-            "child_male",
-            "child_male1",
+            'male1', 'male2', 'male3', 'male4', 'male5', 'male6', 'male7',
+            'male8', 'male9', 'child_male', 'child_male1'
         ]
         self.pause_list = [
-            "(",
-            "\n",
-            "\r",
-            "\u2026",
-            "\u201C",
-            "\u2014",
-            "\u2013",
-            "\u00A0",
+            '(', '\n', '\r', u"\u2026", u'\u201C', u"\u2014", u"\u2013",
+            u'\u00A0'
         ]
         self.rhasspy_fm = [
-            "eva_k",
-            "hokuspokus",
-            "kerstin",
-            "rebecca_braunert_plunkett",
-            "blizzard_fls",
-            "blizzard_lessac",
-            "cmu_clb",
-            "cmu_eey",
-            "cmu_ljm",
-            "cmu_lnh",
-            "cmu_rms",
-            "cmu_slp",
-            "cmu_slt",
-            "ek",
-            "harvard",
-            "judy_bieber",
-            "kathleen",
-            "ljspeech",
-            "southern_english_female",
-            "karen_savage",
-            "siwis",
-            "lisa",
-            "nathalie",
-            "hajdurova",
+            'eva_k', 'hokuspokus', 'kerstin', 'rebecca_braunert_plunkett',
+            'blizzard_fls', 'blizzard_lessac', 'cmu_clb', 'cmu_eey', 'cmu_ljm',
+            'cmu_lnh', 'cmu_rms', 'cmu_slp', 'cmu_slt', 'ek', 'harvard',
+            'judy_bieber', 'kathleen', 'ljspeech', 'southern_english_female',
+            'karen_savage', 'siwis', 'lisa', 'nathalie', 'hajdurova'
         ]
         self.spd_100 = [
-            "female0",
-            "male0",
-            "female1",
-            "male1",
-            "female2",
-            "male2",
-            "female3",
-            "male3",
-            "female4",
-            "male4",
-            "female5",
-            "male5",
-            "female6",
-            "male6",
-            "female7",
-            "male7",
-            "female8",
-            "male8",
-            "female9",
-            "male9",
-            "female10",
-            "male10",
-            "female11",
-            "male11",
-            "female12",
-            "male12",
-            "female13",
-            "male13",
-            "female14",
-            "male14",
-            "female15",
-            "male15",
-            "female16",
-            "male16",
-            "female17",
-            "male17",
-            "female18",
-            "male18",
-            "female19",
-            "male19",
-            "female20",
-            "male20",
-            "female21",
-            "male21",
-            "female22",
-            "male22",
-            "female23",
-            "male23",
-            "female24",
-            "male24",
-            "female25",
-            "male25",
-            "female26",
-            "male26",
-            "female27",
-            "male27",
-            "female28",
-            "male28",
-            "female29",
-            "male29",
-            "female30",
-            "male30",
-            "female31",
-            "male31",
-            "female32",
-            "male32",
-            "female33",
-            "male33",
-            "female34",
-            "male34",
-            "female35",
-            "male35",
-            "female36",
-            "male36",
-            "female37",
-            "male37",
-            "female38",
-            "male38",
-            "female39",
-            "male39",
-            "female40",
-            "male40",
-            "female41",
-            "male41",
-            "female42",
-            "male42",
-            "female43",
-            "male43",
-            "female44",
-            "male44",
-            "female45",
-            "male45",
-            "female46",
-            "male46",
-            "female47",
-            "male47",
-            "female48",
-            "male48",
-            "female49",
-            "male49",
-            "female50",
-            "male50",
-            "female51",
-            "male51",
-            "female52",
-            "male52",
-            "female53",
-            "male53",
-            "female54",
-            "male54",
-            "female55",
-            "male55",
-            "female56",
-            "male56",
-            "female57",
-            "male57",
-            "female58",
-            "male58",
-            "female59",
-            "male59",
-            "female60",
-            "male60",
-            "female61",
-            "male61",
-            "female62",
-            "male62",
-            "female63",
-            "male63",
-            "female64",
-            "male64",
-            "female65",
-            "male65",
-            "female66",
-            "male66",
-            "female67",
-            "male67",
-            "female68",
-            "male68",
-            "female69",
-            "male69",
-            "female70",
-            "male70",
-            "female71",
-            "male71",
-            "female72",
-            "male72",
-            "female73",
-            "male73",
-            "female74",
-            "male74",
-            "female75",
-            "male75",
-            "female76",
-            "male76",
-            "female77",
-            "male77",
-            "female78",
-            "male78",
-            "female79",
-            "male79",
-            "female80",
-            "male80",
-            "female81",
-            "male81",
-            "female82",
-            "male82",
-            "female83",
-            "male83",
-            "female84",
-            "male84",
-            "female85",
-            "male85",
-            "female86",
-            "male86",
-            "female87",
-            "male87",
-            "female88",
-            "male88",
-            "female89",
-            "male89",
-            "female90",
-            "male90",
-            "female91",
-            "male91",
-            "female92",
-            "male92",
-            "female93",
-            "male93",
-            "female94",
-            "male94",
-            "female95",
-            "male95",
-            "female96",
-            "male96",
-            "female97",
-            "male97",
-            "female98",
-            "male98",
-            "female99",
-            "male99",
-            "female100",
-            "male100",
+            'female0',
+            'male0',
+            'female1',
+            'male1',
+            'female2',
+            'male2',
+            'female3',
+            'male3',
+            'female4',
+            'male4',
+            'female5',
+            'male5',
+            'female6',
+            'male6',
+            'female7',
+            'male7',
+            'female8',
+            'male8',
+            'female9',
+            'male9',
+            'female10',
+            'male10',
+            'female11',
+            'male11',
+            'female12',
+            'male12',
+            'female13',
+            'male13',
+            'female14',
+            'male14',
+            'female15',
+            'male15',
+            'female16',
+            'male16',
+            'female17',
+            'male17',
+            'female18',
+            'male18',
+            'female19',
+            'male19',
+            'female20',
+            'male20',
+            'female21',
+            'male21',
+            'female22',
+            'male22',
+            'female23',
+            'male23',
+            'female24',
+            'male24',
+            'female25',
+            'male25',
+            'female26',
+            'male26',
+            'female27',
+            'male27',
+            'female28',
+            'male28',
+            'female29',
+            'male29',
+            'female30',
+            'male30',
+            'female31',
+            'male31',
+            'female32',
+            'male32',
+            'female33',
+            'male33',
+            'female34',
+            'male34',
+            'female35',
+            'male35',
+            'female36',
+            'male36',
+            'female37',
+            'male37',
+            'female38',
+            'male38',
+            'female39',
+            'male39',
+            'female40',
+            'male40',
+            'female41',
+            'male41',
+            'female42',
+            'male42',
+            'female43',
+            'male43',
+            'female44',
+            'male44',
+            'female45',
+            'male45',
+            'female46',
+            'male46',
+            'female47',
+            'male47',
+            'female48',
+            'male48',
+            'female49',
+            'male49',
+            'female50',
+            'male50',
+            'female51',
+            'male51',
+            'female52',
+            'male52',
+            'female53',
+            'male53',
+            'female54',
+            'male54',
+            'female55',
+            'male55',
+            'female56',
+            'male56',
+            'female57',
+            'male57',
+            'female58',
+            'male58',
+            'female59',
+            'male59',
+            'female60',
+            'male60',
+            'female61',
+            'male61',
+            'female62',
+            'male62',
+            'female63',
+            'male63',
+            'female64',
+            'male64',
+            'female65',
+            'male65',
+            'female66',
+            'male66',
+            'female67',
+            'male67',
+            'female68',
+            'male68',
+            'female69',
+            'male69',
+            'female70',
+            'male70',
+            'female71',
+            'male71',
+            'female72',
+            'male72',
+            'female73',
+            'male73',
+            'female74',
+            'male74',
+            'female75',
+            'male75',
+            'female76',
+            'male76',
+            'female77',
+            'male77',
+            'female78',
+            'male78',
+            'female79',
+            'male79',
+            'female80',
+            'male80',
+            'female81',
+            'male81',
+            'female82',
+            'male82',
+            'female83',
+            'male83',
+            'female84',
+            'male84',
+            'female85',
+            'male85',
+            'female86',
+            'male86',
+            'female87',
+            'male87',
+            'female88',
+            'male88',
+            'female89',
+            'male89',
+            'female90',
+            'male90',
+            'female91',
+            'male91',
+            'female92',
+            'male92',
+            'female93',
+            'male93',
+            'female94',
+            'male94',
+            'female95',
+            'male95',
+            'female96',
+            'male96',
+            'female97',
+            'male97',
+            'female98',
+            'male98',
+            'female99',
+            'male99',
+            'female100',
+            'male100',
         ]
         try:
             self.add_pause = str.maketrans({
-                "\n": ";\n",
-                "\r": ";\r",
-                "(": " ( ",
-                "\u201C": "\u201C;",
-                "\u2026": "\u2026;",
-                "\u2014": "\u2014;",
-                "\u2013": "\u2013;",
-                "\u00A0": " ",
+                '\n': ';\n',
+                '\r': ';\r',
+                '(': ' ( ',
+                u'\u201C': u'\u201C;',
+                u'\u2026': u'\u2026;',
+                u'\u2014': u'\u2014;',
+                u'\u2013': u'\u2013;',
+                u'\u00A0': ' '
             })
         except AttributeError:
             self.add_pause = None
         try:
             self.base_curl = str.maketrans({
-                "\\": " ",
+                '\\': ' ',
                 '"': '\\"',
-                """
-""": """\
-""",
-                "\r": " ",
+                '''
+''': '''\
+''',
+                '\r': ' '
             })
         except AttributeError:
             self.base_curl = None
         self.is_x86_64 = sys.maxsize > 2**32
 
-    def big_play_list(self, _text=""):  # -> list[str] | None
-        """Split a long string of plain text into a list"""
+    def big_play_list(self, _text=''):  # -> list[str] | None
+        '''Split a long string of plain text into a list'''
         if len(_text.strip()) == 0:
             return None
-        elif _text.lower().count("<speak") != 0:
+        elif _text.lower().count('<speak') != 0:
             _text = readtexttools.strip_xml(_text)
         return _text.splitlines()
 
     def set_urllib_timeout(self, _ok_wait=4):  # -> bool
-        """Try to set sockets timeout before transfering a file using
+        '''Try to set sockets timeout before transfering a file using
         `urllib`.
-        https://docs.python.org/3/howto/urllib2.html#sockets-and-layers"""
+        https://docs.python.org/3/howto/urllib2.html#sockets-and-layers'''
         try:
             socket.setdefaulttimeout(_ok_wait)
         except:
             return False
         return True
 
+    def rate_to_rhasspy_length_scale(self, _speech_rate=160):  # -> list
+        '''Look up the Larynx or Mimic3 length scale appropriate for requested
+        `_speech rate`. Rates have discreet steps. In English, a common speech
+        rate is about 160 words per minute, but individuals vary widely. Some
+        voices do not sound good with an altered rate.'''
+        _length_scale = 1
+        _length_bar = ''
+        for _item in self.length_scales:
+            if not _speech_rate > _item[0] and not _speech_rate < _item[1]:
+                _length_scale = _item[3]
+                _length_bar = _item[2]
+                break
+        return [_length_scale, _length_bar]
+
     def ssml_xml(self,
-                 _text="",
-                 _voice="en_UK/apope_low",
+                 _text='',
+                 _voice='en_UK/apope_low',
                  _speech_rate=160,
-                 _xml_lang="en-US"):  # -> str
-        """Change the speed that a reader reads plain text aloud using
+                 _xml_lang='en-US'):  # -> str
+        '''Change the speed that a reader reads plain text aloud using
         w3.org `SSML`. The reader should use standard XML conventions like
         `&amp;`, `&gt;` and `&lt;`.  Mimic3 supports a subset of SSML.
         Not all models support SSML prosody rate.
 
-        <https://www.w3.org/TR/speech-synthesis11/ >"""
+        <https://www.w3.org/TR/speech-synthesis11/ >'''
         _xmltransform = readtexttools.XmlTransform()
         _text = _xmltransform.clean_for_xml(_text, False)
-        _xml_lang = _xml_lang.replace("_", "-")
+        _xml_lang = _xml_lang.replace('_', '-')
         try:
             # 160 wpm (Words per minute) yields 100% prosody rate
             if _speech_rate < 40:
                 _speech_rate = 40
-            _rate = "".join([str(int(_speech_rate / 1.6)), "%"])
+            _rate = ''.join([str(int(_speech_rate / 1.6)), '%'])
         except [AttributeError, TypeError]:
-            _rate = "100%"
-        return ("""<?xml version="1.0"?>en
+            _rate = '100%'
+        return '''<?xml version="1.0"?>en
 <speak version="1.1" xmlns="http://www.w3.org/2001/10/synthesis"
 xml:lang="%(_xml_lang)s">
 <p>
 <prosody rate="%(_rate)s"><voice name="%(_voice)s" languages="%(_xml_lang)s" required="languages">
-%(_text)s</voice></prosody></p></speak>""" % locals())
+%(_text)s</voice></prosody></p></speak>''' % locals()
 
-    def do_net_sound(
-        self,
-        _info="",
-        _media_work="",
-        _icon="",
-        _media_out="",
-        _audible="true",
-        _visible="false",
-        _writer="",
-        _size="600x600",
-        _post_process="",
-    ):  # -> bool
-        """Play `_media_work` or export it to `_media_out` format."""
+    def do_net_sound(self,
+                     _info='',
+                     _media_work='',
+                     _icon='',
+                     _media_out='',
+                     _audible='true',
+                     _visible='false',
+                     _writer='',
+                     _size='600x600',
+                     _post_process=''):  # -> bool
+        '''Play `_media_work` or export it to `_media_out` format.'''
         # use `getsize` to ensure that python waits for file to finish download
         if not os.path.isfile(_media_work):
             return False
         if os.path.getsize(_media_work) == 0:
             time.sleep(2)
         if os.path.isfile(_media_work) and _post_process in [
-                "process_audio_media",
-                "process_wav_media",
+                'process_audio_media', 'process_wav_media'
         ]:
             if os.path.getsize(_media_work) == 0:
-                print("Unable to write media work file.")
+                print('Unable to write media work file.')
                 return False
             # NOTE: Calling process must unlock_my_lock()
             readtexttools.unlock_my_lock()
-            readtexttools.process_wav_media(
-                _info,
-                _media_work,
-                _icon,
-                _media_out,
-                _audible,
-                _visible,
-                _writer,
-                _size,
-            )
+            readtexttools.process_wav_media(_info, _media_work, _icon,
+                                            _media_out, _audible, _visible,
+                                            _writer, _size)
             return True
         return False
 
 
-class AmazonClass(object):
-    """The following notice should be displayed in a dialog when users click
-    *About...* or the equivalent in their language when this class is enabled.
-
-    Powered by Amazon\u2122 LLC
-
-    "Amazon" is a trademark of Amazon LLC."""
-
-    # * <https://docs.aws.amazon.com/polly/latest/dg/examples-for-using-polly.html>
-    def __init__(self):  # -> None
-        """Initialize data"""
-        self.ok = True
-        self.accept_voice = [
-            "",
-            "all",
-            "auto",
-            "child_female",
-            "female1",
-            "female2",
-            "female3",
-            "female4",
-            "female5",
-            "female6",
-            "child_male",
-            "male1",
-            "male2",
-            "male3",
-            "male4",
-            "male5",
-            "male6",
-            "aws",
-        ]
-
-    def version(self):  # -> string
-        """Returns the version in the form `nn.nn.nn`."""
-        try:
-            return awsserver.version()
-        except (AttributeError, NameError):
-            self.ok = False
-        return ""
-
-    def language_supported(self, iso_lang="ca-ES"):  # -> bool
-        """Is the language supported?"""
-        try:
-            self.ok = awsserver.language_supported(iso_lang)
-        except (AttributeError, NameError):
-            self.ok = False
-        return self.ok
-
-    def read(
-        self,
-        _text="",
-        _iso_lang="en-US",
-        _visible="false",
-        _audible="true",
-        _out_path="",
-        _icon="",
-        _info="",
-        _post_process=None,
-        _writer="",
-        _size="600x600",
-        _speech_rate=160,
-    ):  # -> bool
-        """stub"""
-        if not self.ok:
-            return False
-        try:
-            return awsserver.read(
-                _text="",
-                _iso_lang="en-US",
-                _visible="false",
-                _audible="true",
-                _out_path="",
-                _icon="",
-                _info="",
-                _post_process=None,
-                _writer="",
-                _size="600x600",
-                _speech_rate=160,
-            )
-        except (AttributeError, NameError):
-            pass
-        return False
-
-
-class AzureClass(object):
-    """The following notice should be displayed in a dialog when users click
-    *About...* or the equivalent in their language when this class is enabled.
-
-    Powered by Microsoft\u2122
-
-    "Microsoft" and "Azure" are trademarks of Microsoft."""
-
-    # * <https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/>
-    def __init__(self):  # -> None
-        """Initialize data"""
-        self.ok = True
-        self.accept_voice = [
-            "",
-            "all",
-            "auto",
-            "child_female",
-            "female1",
-            "female2",
-            "female3",
-            "child_male",
-            "male1",
-            "male2",
-            "male3",
-            "azure",
-        ]
-
-    def language_supported(self, iso_lang="ca-ES"):  # -> bool
-        """Is the language supported?"""
-        try:
-            self.ok = azureserver.language_supported(iso_lang)
-        except (AttributeError, NameError):
-            self.ok = False
-        return self.ok
-
-    def read(
-        self,
-        _text="",
-        _iso_lang="en-US",
-        _visible="false",
-        _audible="true",
-        _out_path="",
-        _icon="",
-        _info="",
-        _post_process=None,
-        _writer="",
-        _size="600x600",
-        _speech_rate=160,
-    ):  # -> bool
-        """stub"""
-        if not self.ok:
-            return False
-        try:
-            return azureserver.read(
-                _text="",
-                _iso_lang="en-US",
-                _visible="false",
-                _audible="true",
-                _out_path="",
-                _icon="",
-                _info="",
-                _post_process=None,
-                _writer="",
-                _size="600x600",
-                _speech_rate=160,
-            )
-        except (AttributeError, NameError):
-            pass
-        return False
-
-
-class GoogleCloudClass(object):
-    """The following notice should be displayed in a dialog when users click
-    *About...* or the equivalent in their language when this class is enabled.
-
-    Powered by Google\u2122
-
-    "Google" and "Google Cloud" are trademarks of Google Inc."""
-
-    # * <https://cloud.google.com/text-to-speech/docs/create-audio-text-command-line>
-    # * <https://cloud.google.com/text-to-speech/>
-    def __init__(self):  # -> None
-        """Initialize data"""
-        self.ok = True
-        self.accept_voice = [
-            "",
-            "all",
-            "auto",
-            "child_female",
-            "female1",
-            "female2",
-            "female3",
-            "child_male",
-            "male1",
-            "male2",
-            "male3",
-            "googlecloud",
-        ]
-
-    def language_supported(self, iso_lang="ca-ES"):  # -> bool
-        """Is the language supported?"""
-        try:
-            self.ok = gcloudserver.language_supported(iso_lang)
-        except (AttributeError, NameError):
-            self.ok = False
-        return self.ok
-
-    def read(
-        self,
-        _text="",
-        _iso_lang="en-US",
-        _visible="false",
-        _audible="true",
-        _out_path="",
-        _icon="",
-        _info="",
-        _post_process=None,
-        _writer="",
-        _size="600x600",
-        _speech_rate=160,
-    ):  # -> bool
-        """stub"""
-        if not self.ok:
-            return False
-        try:
-            return gcloudserver.read(
-                _text="",
-                _iso_lang="en-US",
-                _visible="false",
-                _audible="true",
-                _out_path="",
-                _icon="",
-                _info="",
-                _post_process=None,
-                _writer="",
-                _size="600x600",
-                _speech_rate=160,
-            )
-        except (AttributeError, NameError):
-            pass
-        return False
-
-
-class WatsonClass(object):
-    """The following notice should be displayed in a dialog when users click
-    *About...* or the equivalent in their language when this class is enabled.
-
-    Powered by IBM\u2122
-
-    "IBM" and "Ask Watson" are trademarks of International Business Machines
-    Corporation ("IBM")."""
-
-    # * <https://www.ibm.com/docs/en/watson-explorer/11.0.0?topic=modules-installing-watson-explorer-from-command-line>
-    # * <https://www.ibm.com/docs/en/watson-explorer/11.0.0?topic=components-requirements>
-    def __init__(self):  # -> None
-        """Initialize data"""
-        self.ok = True
-        self.accept_voice = [
-            "",
-            "all",
-            "auto",
-            "child_female",
-            "female1",
-            "female2",
-            "female3",
-            "child_male",
-            "male1",
-            "male2",
-            "male3",
-            "watson",
-        ]
-
-    def language_supported(self, iso_lang="ca-ES"):  # -> bool
-        """Is the language supported?"""
-        try:
-            self.ok = watsonserver.language_supported(iso_lang)
-        except (AttributeError, NameError):
-            self.ok = False
-        return self.ok
-
-    def read(
-        self,
-        _text="",
-        _iso_lang="en-US",
-        _visible="false",
-        _audible="true",
-        _out_path="",
-        _icon="",
-        _info="",
-        _post_process=None,
-        _writer="",
-        _size="600x600",
-        _speech_rate=160,
-    ):  # -> bool
-        """stub"""
-        if not self.ok:
-            return False
-        try:
-            return watsonserver.read(
-                _text="",
-                _iso_lang="en-US",
-                _visible="false",
-                _audible="true",
-                _out_path="",
-                _icon="",
-                _info="",
-                _post_process=None,
-                _writer="",
-                _size="600x600",
-                _speech_rate=160,
-            )
-        except (AttributeError, NameError):
-            pass
-        return False
-
-
 class GoogleTranslateClass(object):
-    """The following notice should be displayed in a dialog when users click
+    u''' The following notice should be displayed in a dialog when users click
     *About...* or the equivalent in their language when this class is enabled.
 
     Powered by Google\u2122
@@ -1060,32 +674,32 @@ class GoogleTranslateClass(object):
 
     * <https://github.com/pndurette/gTTS>
     * <https://gtts.readthedocs.io/en/latest/>
-    """
+    '''
 
     def __init__(self):  # -> None
-        """Initialize data"""
+        '''Initialize data'''
         self.ok = True
         self.accept_voice = [
-            "", "all", "auto", "child_female", "child_male", "gtts"
+            '', 'all', 'auto', 'child_female', 'child_male', 'gtts'
         ]
-        self.translator = "Google"
+        self.translator = 'Google'
         self.translator_domain = self.translator.lower()
-        self.default_extension = ".mp3"
+        self.default_extension = '.mp3'
         self.tested_version = 2.3  # April, 2023
 
     def version(self):  # -> string
-        """Returns the version in the form `nn.nn.nn`."""
+        '''Returns the version in the form `nn.nn.nn`.'''
         try:
             return gtts.version.__version__
         except (AttributeError, NameError):
             self.ok = False
-            return ""
+            return ''
 
     def check_version(self, minimum_version=0):  # -> bool
-        """Check for minimum version."""
+        '''Check for minimum version.'''
         if minimum_version == 0:
             minimum_version = self.tested_version
-        if os.name == "nt":
+        if os.name == 'nt':
             # The library is not available in the LibreOffice
             # and OpenOffice for Windows python environments.
             # winsound.PlaySound does not play mp3 content.
@@ -1093,54 +707,52 @@ class GoogleTranslateClass(object):
             return self.ok
         _test_version = self.version()
         try:
-            self.ok = float(".".join(
-                _test_version.split(".")[:2])) >= minimum_version
+            self.ok = float('.'.join(
+                _test_version.split('.')[:2])) >= minimum_version
         except (AttributeError, IndexError, ValueError):
             self.ok = False
         _commons = LocalCommons()
         self.accept_voice = self.accept_voice + _commons.spd_100
         return self.ok
 
-    def read(
-        self,
-        _text="",
-        _iso_lang="en-US",
-        _visible="false",
-        _audible="true",
-        _out_path="",
-        _icon="",
-        _info="",
-        _post_process=None,
-        _writer="",
-        _size="600x600",
-        _speech_rate=160,
-    ):  # -> bool
-        """
-        Setup
-        -----
+    def read(self,
+             _text="",
+             _iso_lang='en-US',
+             _visible="false",
+             _audible="true",
+             _out_path="",
+             _icon="",
+             _info="",
+             _post_process=None,
+             _writer='',
+             _size='600x600',
+             _speech_rate=160):  # -> bool
+        '''
+Setup
+-----
 
-        + See: <https://gtts.readthedocs.io/en/latest/>
-        + Package Manager: `sudo dnf install python3-pip` or `sudo apt install python3-pip`
-        + Pip Installer: `pip3 install gTTS gTTS-token` (*Not* `sudo`!)
++ See: <https://gtts.readthedocs.io/en/latest/>
++ Package Manager: `sudo dnf install python3-pip` or `sudo apt install python3-pip`
++ Pip Installer: `pip3 install gTTS gTTS-token` (*Not* `sudo`!)
 
-        + `_text` - Text to speak
-        + `_iso_lang` - Supported letter language code - defaults to English
-        + `_visible` - Use a graphic media player, or False for invisible player
-        + `_out_path` - Name of desired output media file
-        + `_audible` - If false, then don't play the sound file
-        + `_icon` - a .png or .jpg file if required.
-        + `_info` - Commentary or title for post processing
-        + `_post_process` - Get information, play file, or convert a file
-        + `_writer` - Artist or Author
-        + `_size` - Dimensions to scale photo '600x600'
-        + `_speech_rate` - Two speeds supported: 100% or above is Normal;
-           Any value less is Slow.
-        """
++ `_text` - Text to speak
++ `_iso_lang` - Supported letter language code - defaults to English
++ `_visible` - Use a graphic media player, or False for invisible player
++ `_out_path` - Name of desired output media file
++ `_audible` - If false, then don't play the sound file
++ `_icon` - a .png or .jpg file if required.
++ `_info` - Commentary or title for post processing
++ `_post_process` - Get information, play file, or convert a file
++ `_writer` - Artist or Author
++ `_size` - Dimensions to scale photo '600x600'
++ `_speech_rate` - Two speeds supported: 100% or above is Normal;
+   Any value less is Slow.
+    '''
         if len(_text) == 0:
             return False
         _tld = "com"
         _region = "US"
-        _lang1 = "en"
+        _lang1 = 'en'
         _lang2 = "es"
         _slow = False
         _lang_check = True
@@ -1150,16 +762,15 @@ class GoogleTranslateClass(object):
         _env_lang = readtexttools.default_lang()
         _domain = self.translator_domain
         _provider = self.translator
-        _provider_logo = (
-            "/usr/share/icons/hicolor/scalable/apps/goa-account-%(_domain)s.svg"
-            % locals())
+        _provider_logo = '/usr/share/icons/hicolor/scalable/apps/goa-account-%(_domain)s.svg' % locals(
+        )
         if not os.path.isfile(_provider_logo):
             # Modified high contrast icon - GNU LESSER GENERAL PUBLIC LICENSE
             # Version 3, 29 June 2007
             # https://raw.githubusercontent.com/shgysk8zer0/adwaita-icons/master/LICENSE
             _provider_logo = readtexttools.app_icon_image(
-                "goa-account-google_hc.svg")
-        for _dash in ["-", "_"]:
+                'goa-account-google_hc.svg')
+        for _dash in ['-', '_']:
             if _dash in _iso_lang:
                 _lang = _iso_lang.split(_dash)[0]
                 _region = _iso_lang.split(_dash)[1]
@@ -1169,142 +780,121 @@ class GoogleTranslateClass(object):
                 _slow = True
         except (NameError, TypeError):
             self.ok = False
-        domain_table = [
-            {
-                "domain": "com.au",
-                "iso_code": "AU",
-                "lang1": "en",
-                "lang2": "zh-CN"
-            },
-            {
-                "domain": "co.uk",
-                "iso_code": "GB",
-                "lang1": "en",
-                "lang2": "pl"
-            },
-            {
-                "domain": "ca",
-                "iso_code": "CA",
-                "lang1": "en",
-                "lang2": "fr"
-            },
-            {
-                "domain": "co.nz",
-                "iso_code": "NZ",
-                "lang1": "en",
-                "lang2": "zh-CN"
-            },
-            {
-                "domain": "com.hk",
-                "iso_code": "CN",
-                "lang1": "zh",
-                "lang2": "en"
-            },
-            {
-                "domain": "com.hk",
-                "iso_code": "HK",
-                "lang1": "zh",
-                "lang2": "en"
-            },
-            {
-                "domain": "com.hk",
-                "iso_code": "MO",
-                "lang1": "zh",
-                "lang2": "pt"
-            },
-            {
-                "domain": "com.tw",
-                "iso_code": "TW",
-                "lang1": "zh-TW",
-                "lang2": "en"
-            },
-            {
-                "domain": "co.in",
-                "iso_code": "IN",
-                "lang1": "hi",
-                "lang2": "en"
-            },
-            {
-                "domain": "ie",
-                "iso_code": "IE",
-                "lang1": "en",
-                "lang2": "pl"
-            },
-            {
-                "domain": "co.za",
-                "iso_code": "ZA",
-                "lang1": "af",
-                "lang2": "en"
-            },
-            {
-                "domain": "fr",
-                "iso_code": "FR",
-                "lang1": "fr",
-                "lang2": "ar"
-            },
-            {
-                "domain": "com.br",
-                "iso_code": "BR",
-                "lang1": "pt",
-                "lang2": "de"
-            },
-            {
-                "domain": "pt",
-                "iso_code": "PT",
-                "lang1": "pt",
-                "lang2": "en"
-            },
-            {
-                "domain": "com.mx",
-                "iso_code": "MX",
-                "lang1": "es",
-                "lang2": "en"
-            },
-            {
-                "domain": "es",
-                "iso_code": "ES",
-                "lang1": "es",
-                "lang2": "ca"
-            },
-            {
-                "domain": "ar",
-                "iso_code": "AR",
-                "lang1": "es",
-                "lang2": "en"
-            },
-            {
-                "domain": "ci",
-                "iso_code": "CI",
-                "lang1": "es",
-                "lang2": "en"
-            },
-            {
-                "domain": "ru",
-                "iso_code": "RU",
-                "lang1": "ru",
-                "lang2": "uk"
-            },
-            {
-                "domain": "com.ua",
-                "iso_code": "UA",
-                "lang1": "uk",
-                "lang2": "ru"
-            },
-        ]
+        domain_table = [{
+            'domain': 'com.au',
+            'iso_code': 'AU',
+            'lang1': 'en',
+            'lang2': 'zh-CN'
+        }, {
+            'domain': 'co.uk',
+            'iso_code': 'GB',
+            'lang1': 'en',
+            'lang2': 'pl'
+        }, {
+            'domain': 'ca',
+            'iso_code': 'CA',
+            'lang1': 'en',
+            'lang2': 'fr'
+        }, {
+            'domain': 'co.nz',
+            'iso_code': 'NZ',
+            'lang1': 'en',
+            'lang2': 'zh-CN'
+        }, {
+            'domain': 'com.hk',
+            'iso_code': 'CN',
+            'lang1': 'zh',
+            'lang2': 'en'
+        }, {
+            'domain': 'com.hk',
+            'iso_code': 'HK',
+            'lang1': 'zh',
+            'lang2': 'en'
+        }, {
+            'domain': 'com.hk',
+            'iso_code': 'MO',
+            'lang1': 'zh',
+            'lang2': 'pt'
+        }, {
+            'domain': 'com.tw',
+            'iso_code': 'TW',
+            'lang1': 'zh-TW',
+            'lang2': 'en'
+        }, {
+            'domain': 'co.in',
+            'iso_code': 'IN',
+            'lang1': 'hi',
+            'lang2': 'en'
+        }, {
+            'domain': 'ie',
+            'iso_code': 'IE',
+            'lang1': 'en',
+            'lang2': 'pl'
+        }, {
+            'domain': 'co.za',
+            'iso_code': 'ZA',
+            'lang1': 'af',
+            'lang2': 'en'
+        }, {
+            'domain': 'fr',
+            'iso_code': 'FR',
+            'lang1': 'fr',
+            'lang2': 'ar'
+        }, {
+            'domain': 'com.br',
+            'iso_code': 'BR',
+            'lang1': 'pt',
+            'lang2': 'de'
+        }, {
+            'domain': 'pt',
+            'iso_code': 'PT',
+            'lang1': 'pt',
+            'lang2': 'en'
+        }, {
+            'domain': 'com.mx',
+            'iso_code': 'MX',
+            'lang1': 'es',
+            'lang2': 'en'
+        }, {
+            'domain': 'es',
+            'iso_code': 'ES',
+            'lang1': 'es',
+            'lang2': 'ca'
+        }, {
+            'domain': 'ar',
+            'iso_code': 'AR',
+            'lang1': 'es',
+            'lang2': 'en'
+        }, {
+            'domain': 'ci',
+            'iso_code': 'CI',
+            'lang1': 'es',
+            'lang2': 'en'
+        }, {
+            'domain': 'ru',
+            'iso_code': 'RU',
+            'lang1': 'ru',
+            'lang2': 'uk'
+        }, {
+            'domain': 'com.ua',
+            'iso_code': 'UA',
+            'lang1': 'uk',
+            'lang2': 'ru'
+        }]
         for i in range(len(domain_table)):
-            if domain_table[i]["iso_code"] == _region.upper():
-                _tld = domain_table[i]["domain"]
-                _lang1 = domain_table[i]["lang1"]
-                _lang2 = domain_table[i]["lang2"]
+            if domain_table[i]['iso_code'] == _region.upper():
+                _tld = domain_table[i]['domain']
+                _lang1 = domain_table[i]['lang1']
+                _lang2 = domain_table[i]['lang2']
                 break
 
-        _media_out = ""
+        _media_out = ''
         # Determine the output file name
-        _media_out = readtexttools.get_work_file_path(_out_path, _icon, "OUT")
+        _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
-        _media_work = "".join([
-            readtexttools.get_work_file_path(_out_path, _icon, "TEMP"),
-            self.default_extension,
+        _media_work = ''.join([
+            readtexttools.get_work_file_path(_out_path, _icon, 'TEMP'),
+            self.default_extension
         ])
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
@@ -1315,31 +905,26 @@ class GoogleTranslateClass(object):
         if os.path.isfile(_media_out):
             os.remove(_media_out)
         _max_words = 20
-        _short_text = "%20".join(
-            _text.replace("+", "%2B").split(" ")[:_max_words])
+        _short_text = '%20'.join(
+            _text.replace('+', '%2B').split(' ')[:_max_words])
 
-        for _punctuation in "\n.?!":
+        for _punctuation in '\n.?!':
             if _punctuation in _short_text:
                 _short_text = _short_text.split(_punctuation)[0]
                 break
         if _lang != _lang1:
             # Translate **to** default language
             _lang2 = _lang1
-        if readtexttools.have_posix_app("osascript", False):
-            _msg = "https://translate.%(_domain)s.%(_tld)s" % locals()
+        if readtexttools.have_posix_app('osascript', False):
+            _msg = 'https://translate.%(_domain)s.%(_tld)s' % locals()
         else:
-            _msg = (
-                "`<https://translate.%(_domain)s.%(_tld)s?&langpair=auto|%(_lang2)s&tbb=1&ie=&hl=%(_env_lang)s&text=%(_short_text)s>"
-                % locals())
+            _msg = '`<https://translate.%(_domain)s.%(_tld)s?&langpair=auto|%(_lang2)s&tbb=1&ie=&hl=%(_env_lang)s&text=%(_short_text)s>' % locals(
+            )
         if not self.language_supported(_iso_lang):
             # Fallback: display a link to translate using Google Translate.
             readtexttools.pop_message(
-                "%(_provider)s Translate\u2122" % locals(),
-                _msg,
-                5000,
-                _provider_logo,
-                0,
-            )
+                u"%(_provider)s Translate\u2122" % locals(), _msg, 5000,
+                _provider_logo, 0)
             return True
         try:
             tts = gtts.gTTS(_text, _tld, _lang, _slow, _lang_check)
@@ -1349,42 +934,26 @@ class GoogleTranslateClass(object):
                                           _msg, 5000, _provider_logo, 0)
         except gtts.tts.gTTSError:
             readtexttools.pop_message(
-                "`gtts-%(_version)s` failed to connect." % locals(),
-                _msg,
-                5000,
-                _error_icon,
-                2,
-            )
+                "`gtts-%(_version)s` failed to connect." % locals(), _msg,
+                5000, _error_icon, 2)
             self.ok = False
             return False
         except (AssertionError, NameError, ValueError, RuntimeError):
             # gtts error. Consider using pip3 to check for an update.
             readtexttools.pop_message(
-                "%(_provider)s Translate\u2122" % locals(),
-                _msg,
-                5000,
-                _provider_logo,
-                0,
-            )
+                u"%(_provider)s Translate\u2122" % locals(), _msg, 5000,
+                _provider_logo, 0)
             self.ok = False
             return False
         if os.path.isfile(_media_work) and _post_process in [
-                "process_mp3_media",
-                "process_audio_media",
+                'process_mp3_media', 'process_audio_media'
         ]:
             if os.path.getsize(_media_work) == 0:
                 return False
             # NOTE: Calling process must unlock_my_lock()
-            readtexttools.process_wav_media(
-                _info,
-                _media_work,
-                _icon,
-                _media_out,
-                _audible,
-                _visible,
-                _writer,
-                _size,
-            )
+            readtexttools.process_wav_media(_info, _media_work, _icon,
+                                            _media_out, _audible, _visible,
+                                            _writer, _size)
             return True
         else:
             _msg = "Could not play a network media file locally. Try `pip3 install gTTS gTTS-token`."
@@ -1395,13 +964,13 @@ class GoogleTranslateClass(object):
         self.ok = False
         return False
 
-    def language_supported(self, iso_lang="ca-ES"):  # -> bool
-        """Check if the library supports the language."""
-        test_lang = ""
+    def language_supported(self, iso_lang='ca-ES'):  # -> bool
+        '''Check if the library supports the language.'''
+        test_lang = ''
         if len(iso_lang) == 0:
             return False
         try:
-            for sep in ["-", "_"]:
+            for sep in ['-', '_']:
                 if sep in iso_lang:
                     test_lang = iso_lang.split(sep)[0]
                     break
@@ -1417,7 +986,7 @@ class GoogleTranslateClass(object):
 
 
 class LarynxClass(object):
-    """Larynx is a text to speech local http voice server that a
+    '''Larynx is a text to speech local http voice server that a
     Raspberry Pi computer can use with automated devices. Larynx
     can support SSML and codes in plain text strings to suggest
     how to say words and phrases. Check the larynx website shown
@@ -1447,47 +1016,31 @@ class LarynxClass(object):
 
     [Default larnyx address](http://0.0.0.0:5002)
 
-    [About Larynx...](https://github.com/rhasspy/larynx)"""
+    [About Larynx...](https://github.com/rhasspy/larynx)'''
 
     def __init__(self):  # -> None
-        """Initialize data. See
-        <https://github.com/rhasspy/larynx#basic-synthesis>"""
+        '''Initialize data. See
+        <https://github.com/rhasspy/larynx#basic-synthesis>'''
         _common = LocalCommons()
         self.common = _common
         self.debug = _common.debug
         self.default_extension = _common.default_extension
         self.ok = True
         # This is the default. You can set up Larynx to use a different port.
-        self.url = "http://0.0.0.0:5002"  # localhost port 5002
+        self.url = 'http://0.0.0.0:5002'  # localhost port 5002
         self.help_icon = _common.help_icon
-        self.help_heading = "Rhasspy Larynx"
-        self.help_url = "https://github.com/rhasspy/larynx#larynx"
-        self.local_dir = os.path.expanduser("~/.local/share/larynx/")
+        self.help_heading = 'Rhasspy Larynx'
+        self.help_url = 'https://github.com/rhasspy/larynx#larynx'
+        self.local_dir = os.path.expanduser('~/.local/share/larynx/')
         self.vocoders = None  # ordered fast+normal to slow+high quality
         self.ssmls = [False, True]  # false = TEXT or true = SSML
         self.rate_denominator = 1
-        self.length_scales = [
-            [320, 289, "---------|", 0.50],
-            [288, 257, "--------|-", 0.55],
-            [256, 225, "-------|--", 0.62],
-            [224, 193, "------|---", 0.71],
-            [192, 161, "-----|----", 0.83],
-            [128, 97, "---|-----", 1.25],
-            [96, 66, "--|------", 1.66],
-            [64, 33, "-|-------", 2.50],
-            [32, 0, "|--------", 5.00],
-        ]  # A lower speed corresponds to a longer duration.
+        self.length_scales = _common.length_scales
+        # A lower speed corresponds to a longer duration.
         # larynx `glow_tts` voices from larynx version 1.1.
         self.accept_voice = [
-            "",
-            "all",
-            "auto",
-            "child_female1",
-            "child_male1",
-            "larynx",
-            "localhost",
-            "docker",
-            "local_server",
+            '', 'all', 'auto', 'child_female1', 'child_male1', 'larynx',
+            'localhost', 'docker', 'local_server'
         ] + _common.spd_100
         self.spd_fm = _common.spd_fm
         self.spd_m = _common.spd_m
@@ -1495,47 +1048,43 @@ class LarynxClass(object):
         # The routine uses the default voice as a fallback. The routine
         # prioritizes a voice that you chose to install.
         self.default_lang = _common.default_lang
-        self.default_voice = "mary_ann"
+        self.default_voice = 'mary_ann'
         self.default_extension = _common.default_extension
         # `mary_ann` is the default voice, and it is always installed. It
         # will not appear in a downloaded voices directory. It will always
         # be included in the server's json request response.
-        self.larynx_v1 = ["mary_ann"]
-        if "_IN" in self.default_lang:
-            self.larynx_v1 = ["cmu_aup", "cmu_ksp", "cmu_slp"]
-        elif self.default_lang == "en_CA":
-            self.larynx_v1 = ["mary_ann", "cmu_jmk"]
-        elif self.default_lang == "es_ES":
-            self.larynx_v1 = ["carlfm", "karen_savage"]
-        elif self.default_lang == "fr_FR":
-            self.larynx_v1 = ["gilles_le_blanc", "siwis"]
-        elif self.default_lang == "it_IT":
-            self.larynx_v1 = ["lisa", "riccardo_fasol"]
-        elif self.default_lang not in ["en_PH", "en_US", "es_MX"]:
+        self.larynx_v1 = ['mary_ann']
+        if '_IN' in self.default_lang:
+            self.larynx_v1 = ['cmu_aup', 'cmu_ksp', 'cmu_slp']
+        elif self.default_lang == 'en_CA':
+            self.larynx_v1 = ['mary_ann', 'cmu_jmk']
+        elif self.default_lang == 'es_ES':
+            self.larynx_v1 = ['carlfm', 'karen_savage']
+        elif self.default_lang == 'fr_FR':
+            self.larynx_v1 = ['gilles_le_blanc', 'siwis']
+        elif self.default_lang == 'it_IT':
+            self.larynx_v1 = ['lisa', 'riccardo_fasol']
+        elif self.default_lang not in ['en_PH', 'en_US', 'es_MX']:
             self.larnx_v1 = [
-                "blizzard_fls",
-                "ek",
-                "harvard",
-                "northern_english_male",
-                "scottish_english_male",
-                "southern_english_female",
-                "southern_english_male",
+                'blizzard_fls', 'ek', 'harvard', 'northern_english_male',
+                'scottish_english_male', 'southern_english_female',
+                'southern_english_male'
             ]
         # https://community.rhasspy.org/t/preview-of-new-tts-voices/2556
         self.larynx_fm = _common.rhasspy_fm
         self.larynx_fm.append(self.default_voice)
-        self.voice_id = ""
-        self.voice_name = ""
+        self.voice_id = ''
+        self.voice_name = ''
         self.pause_list = _common.pause_list
         self.add_pause = _common.add_pause
         self.base_curl = _common.base_curl
         self.is_x86_64 = _common.is_x86_64
 
-    def _set_vocoders(self, alt_local_url=""):  # -> bool
-        """If the server is running, then get the list of voice coders.
+    def _set_vocoders(self, alt_local_url=''):  # -> bool
+        '''If the server is running, then get the list of voice coders.
         + `alt_local_url` If you are connecting to a local network's
            larynx server using a different computer, you might need to use
-           a different url."""
+           a different url.'''
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
         data = {}
@@ -1543,8 +1092,8 @@ class LarynxClass(object):
             return True
         try:
             self.common.set_urllib_timeout(1)
-            response = urllib.request.urlopen("".join(
-                [self.url, "/api/vocoders"]))
+            response = urllib.request.urlopen(''.join(
+                [self.url, '/api/vocoders']))
             data_response = response.read()
             data = json.loads(data_response)
         except TimeoutError:
@@ -1555,7 +1104,7 @@ class LarynxClass(object):
             return False
         except AttributeError:
             try:
-                response = urllib.urlopen("".join([self.url, "/api/vocoders"]))
+                response = urllib.urlopen(''.join([self.url, '/api/vocoders']))
                 data_response = response.read()
                 data = json.loads(data_response)
             except AttributeError:
@@ -1571,49 +1120,49 @@ class LarynxClass(object):
                 self.ok = False
                 return False
         except:
-            print("""Unknown error while looking up larynx voice encoders.
-Try restarting `larynx-server`.""")
+            print('''Unknown error while looking up larynx voice encoders.
+Try restarting `larynx-server`.''')
             return False
         if len(data) == 0:
             return False
-        _nsv = ""
+        _nsv = ''
         for _jint in range(0, len(data)):
-            _nsv = "".join([_nsv, data[_jint]["id"], "\n"])
-        self.vocoders = _nsv[:-1].split("\n")
+            _nsv = ''.join([_nsv, data[_jint]['id'], '\n'])
+        self.vocoders = _nsv[:-1].split('\n')
         return True
 
     def _spd_voice_to_larynx_voice(self,
-                                   _search="female1",
-                                   larynx_names="mary_ann"):  # -> str
-        """Assign a larynx name like `scottish_english_male` to a spd_voice
-        like `male1`"""
+                                   _search='female1',
+                                   larynx_names='mary_ann'):  # -> str
+        '''Assign a larynx name like `scottish_english_male` to a spd_voice
+        like `male1` '''
         if self.debug and 1:
             print([
-                "`LarynxClass` > `_spd_voice_to_larynx_voice`", _search,
+                '`LarynxClass` > `_spd_voice_to_larynx_voice`', _search,
                 larynx_names
             ])
-        _search = _search.lower().strip("'\" \n")
+        _search = _search.lower().strip('\'" \n')
         if len(_search) == 0:
-            return ""
+            return ''
         elif len(larynx_names.strip()) == 0:
-            return ""
+            return ''
         # data_list has a minimum of four items.
         # Not using Modulo Operator (`%`)
-        _data = 5 * """%(larynx_names)s\n""" % locals()
-        _data_list = _data.strip().split("\n")
-        _resultat = ""
+        _data = 5 * '''%(larynx_names)s\n''' % locals()
+        _data_list = _data.strip().split('\n')
+        _resultat = ''
         count_f = 0
         for count, _item in enumerate(self.spd_m):
             if _item == _search:
                 count_f = count
                 break
-        _voices = ""
-        if "female" not in _search:
+        _voices = ''
+        if 'female' not in _search:
             for _voice in _data_list:
                 if _voice not in self.larynx_fm:
-                    _voices = "".join([_voices, _voice, "\n"])
+                    _voices = ''.join([_voices, _voice, '\n'])
             try:
-                _resultat = _voices.strip().split("\n")[count_f]
+                _resultat = _voices.strip().split('\n')[count_f]
             except IndexError:
                 _resultat = self.voice_name
         if len(_resultat) != 0:
@@ -1623,29 +1172,29 @@ Try restarting `larynx-server`.""")
             if _item == _search:
                 count_f = count
                 break
-        _voices = ""
+        _voices = ''
         for _voice in _data_list:
             if _voice in self.larynx_fm:
-                _voices = "".join([_voices, _voice, "\n"])
+                _voices = ''.join([_voices, _voice, '\n'])
         try:
-            _resultat = _voices.strip().split("\n")[count_f]
+            _resultat = _voices.strip().split('\n')[count_f]
         except IndexError:
             _resultat = self.voice_name
         return _resultat
 
     def language_supported(self,
-                           iso_lang="en-US",
-                           alt_local_url="",
-                           vox="auto"):  # -> bool
-        """Is the language or voice supported?
+                           iso_lang='en-US',
+                           alt_local_url='',
+                           vox='auto'):  # -> bool
+        '''Is the language or voice supported?
         + `iso_lang` can be in the form `en-US` or a voice like `eva_k`
         + `alt_local_url` If you are connecting to a local network's
            speech server using a different computer, you might need to use
-           a different url."""
+           a different url.'''
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
-        if (int(platform.python_version_tuple()[0]) < 3
-                or int(platform.python_version_tuple()[1]) < 8):
+        if int(platform.python_version_tuple()[0]) < 3 or int(
+                platform.python_version_tuple()[1]) < 8:
             self.ok = False
             return self.ok
         if not self._set_vocoders(self.url):
@@ -1653,39 +1202,37 @@ Try restarting `larynx-server`.""")
             return False
         if len(self.voice_id) != 0:
             self.help_url = self.url
-            self.help_icon = (
-                "/usr/share/icons/HighContrast/scalable/actions/system-run.svg"
-            )
+            self.help_icon = '/usr/share/icons/HighContrast/scalable/actions/system-run.svg'
             return True
         # format of json dictionary item: 'de-de/eva_k-glow_tts'
         # "voice" or "language and region"
         _lang1 = iso_lang.lower()
         # concise language
-        _lang2 = iso_lang.lower().split("-")[0].split("_")[0]
+        _lang2 = iso_lang.lower().split('-')[0].split('_')[0]
         data = {}
         try:
-            response = urllib.request.urlopen("".join(
-                [self.url, "/api/voices"]))
+            response = urllib.request.urlopen(''.join(
+                [self.url, '/api/voices']))
             data_response = response.read()
             data = json.loads(data_response)
         except urllib.error.URLError:
             _eurl = self.url
             if self.is_x86_64:
-                print("""
+                print('''
 [larynx-server](https://github.com/rhasspy/larynx)
-can synthesize speech privately using %(_eurl)s.""" % locals())
+can synthesize speech privately using %(_eurl)s.''' % locals())
             self.ok = False
             return False
         except AttributeError:
             try:
                 # catching classes that do not inherit from BaseExceptions
                 # is not allowed.
-                response = urllib.urlopen("".join([self.url, "/api/voices"]))
+                response = urllib.urlopen(''.join([self.url, '/api/voices']))
                 data_response = response.read()
                 data = json.loads(data_response)
             except Exception:
                 try:
-                    os.system("larynx-server")
+                    os.system('larynx-server')
                 except OSError:
                     pass
                 self.ok = False
@@ -1694,136 +1241,128 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
             return False
         # Find the first voice that meets the criteria. If found, then
         # return `True`, otherwise return `False`.
-        _voice_id = ""
-        larynx_names = ""
+        _voice_id = ''
+        larynx_names = ''
         for _item in data:
-            if data[_item]["downloaded"]:
-                self.accept_voice.append(data[_item]["name"])
-                if _lang1 in data[_item]["language"]:
-                    larynx_names = "".join(
-                        [larynx_names, "\n", data[_item]["name"]])
-                elif _lang2 == data[_item]["language"].split("-")[0].split(
-                        "_")[0]:
-                    larynx_names = "".join(
-                        [larynx_names, "\n", data[_item]["name"]])
+            if data[_item]['downloaded']:
+                self.accept_voice.append(data[_item]['name'])
+                if _lang1 in data[_item]['language']:
+                    larynx_names = ''.join(
+                        [larynx_names, '\n', data[_item]['name']])
+                elif _lang2 == data[_item]['language'].split('-')[0].split(
+                        '_')[0]:
+                    larynx_names = ''.join(
+                        [larynx_names, '\n', data[_item]['name']])
         larynx_names = larynx_names.strip()
         _vox = vox.lower()
-        if _vox in larynx_names.split("\n"):
+        if _vox in larynx_names.split('\n'):
             _verified_name = _vox
         else:
             _verified_name = self._spd_voice_to_larynx_voice(
                 _vox, larynx_names)
         if _verified_name in self.larynx_v1:
-            _logo = "".join([" \u263B  (", self.default_lang, ")"])
+            _logo = ''.join([u' \u263B  (', self.default_lang, ')'])
         else:
-            _logo = "".join([" \u263A  (", _lang2, ")"])
+            _logo = ''.join([u' \u263A  (', _lang2, ')'])
         print_url = self.url
         if len(_verified_name) != 0:
             if len(larynx_names) != 0:
                 display_names = larynx_names.replace(
                     _verified_name,
-                    "%(_verified_name)s %(_logo)s  %(_vox)s" % locals())
-                print("""
+                    u'%(_verified_name)s %(_logo)s  %(_vox)s' % locals())
+                print('''
 Loading larynx voices for `%(_lang2)s`
 ==============================
 
 %(display_names)s
 
 [Larynx server](%(print_url)s)
-""" % locals())
+''' % locals())
             # Check for a specific matching SPD name
             # Search examples - `FEMALE2`, `MALE1`
             for _item in data:
-                if data[_item]["name"] == _verified_name:
+                if data[_item]['name'] == _verified_name:
                     if self.debug and 1:
                         print([
-                            "`LarynxClass` > `language_supported` found: ",
-                            data[_item]["name"],
-                            "Setting `id` to: ",
-                            data[_item]["id"],
+                            '`LarynxClass` > `language_supported` found: ',
+                            data[_item]['name'], 'Setting `id` to: ',
+                            data[_item]['id']
                         ])
-                    self.voice_id = data[_item]["id"]
-                    self.voice_name = data[_item]["name"]
+                    self.voice_id = data[_item]['id']
+                    self.voice_name = data[_item]['name']
                     self.ok = True
                     return self.ok
         self.ok = False
-        iso_lower = iso_lang.replace("_", "-").lower()
+        iso_lower = iso_lang.replace('_', '-').lower()
         # Find a voice id that matches Larynx name, id or language
         # Search examples: ``, `AUTO`, `LARYNX`
         for _item in data:
-            if data[_item]["downloaded"]:
+            if data[_item]['downloaded']:
                 for try_lang in [
-                        data[_item]["language"],
-                        data[_item]["language"].split("-")[0],
+                        data[_item]['language'],
+                        data[_item]['language'].split('-')[0]
                 ]:
                     for argument in [_vox, iso_lower, _lang1]:
                         if argument in [
-                                try_lang,
-                                data[_item]["name"],
-                                data[_item]["id"],
+                                try_lang, data[_item]['name'],
+                                data[_item]['id']
                         ]:
-                            self.voice_id = data[_item]["id"]
-                            self.voice_name = data[_item]["name"]
+                            self.voice_id = data[_item]['id']
+                            self.voice_name = data[_item]['name']
                             self.ok = True
                             return self.ok
         return self.ok
 
-    def get_voc_type(self, _type="small"):  # -> str
-        """Try to get the appropriate voc type for the platform."""
-        if not _type in ["small", "medium", "large"]:
-            return ""
+    def get_voc_type(self, _type='small'):  # -> str
+        '''Try to get the appropriate voc type for the platform.'''
+        if not _type in ['small', 'medium', 'large']:
+            return ''
         for coder in self.vocoders:
             if coder.endswith(_type):
                 return coder
-        return ""
+        return ''
 
-    def read(
-        self,
-        _text="",
-        _iso_lang="en-US",
-        _visible="false",
-        _audible="true",
-        _out_path="",
-        _icon="",
-        _info="",
-        _post_process=None,
-        _writer="",
-        _size="600x600",
-        _speech_rate=160,
-        quality=1,
-        ssml=False,
-        _denoiser_strength=0.005,
-        _noise_scale=0.667,
-        _ok_wait=20,
-        _end_wait=60,
-    ):  # -> bool
-        """
+    def read(self,
+             _text="",
+             _iso_lang='en-US',
+             _visible="false",
+             _audible="true",
+             _out_path="",
+             _icon="",
+             _info="",
+             _post_process=None,
+             _writer='',
+             _size='600x600',
+             _speech_rate=160,
+             quality=1,
+             ssml=False,
+             _denoiser_strength=0.005,
+             _noise_scale=0.667,
+             _ok_wait=20,
+             _end_wait=60):  # -> bool
+        '''
         First, check larynx language support using `def language_supported`.
         Speak text aloud using a running instance of the
         [larynx-server](https://github.com/rhasspy/larynx)
         For most personal computers "highest" quality is too slow for
         real time speech synthesis. Use "standard" or "higher".
-        """
+        '''
         if not self.ok:
             return False
         if len(self.voice_id) == 0:
-            self.voice_id = "en-us/mary_ann-glow_tts"
-            self.voice_name = "mary_ann"
+            self.voice_id = 'en-us/mary_ann-glow_tts'
+            self.voice_name = 'mary_ann'
         _done = False
         if not os.path.isdir(self.local_dir):
             if not readtexttools.is_container_instance():
-                readtexttools.pop_message(
-                    self.help_heading,
-                    "".join(["<", self.help_url, ">"]),
-                    8000,
-                    self.help_icon,
-                    1,
-                )
-        _media_out = ""
+                readtexttools.pop_message(self.help_heading,
+                                          ''.join(['<', self.help_url, '>']),
+                                          8000, self.help_icon, 1)
+        _media_out = ''
         # Determine the output file name
-        _media_out = readtexttools.get_work_file_path(_out_path, _icon, "OUT")
+        _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
-        _media_work = os.path.join(tempfile.gettempdir(), "larynx.wav")
+        _media_work = os.path.join(tempfile.gettempdir(), 'larynx.wav')
         if os.path.isfile(_media_work):
             os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
@@ -1831,17 +1370,17 @@ Loading larynx voices for `%(_lang2)s`
                 return True
         _voice = self.voice_name
         if self.debug and 1:
-            print(["`LarynxClass` > ` `read`", "Request `_voice`: ", _voice])
+            print(['`LarynxClass` > ` `read`', 'Request `_voice`: ', _voice])
         _length_scale = 0.85
         if bool(self.add_pause) and not ssml:
             for _symbol in self.pause_list:
                 if _symbol in _text:
-                    _text = _text.translate(self.add_pause).replace(".;", ".")
+                    _text = _text.translate(self.add_pause).replace('.;', '.')
                     break
         try:
             if not self.is_x86_64:
                 # Unknown platform - try the fastest setting.
-                _vocoder = self.get_voc_type("small")
+                _vocoder = self.get_voc_type('small')
             elif quality in range(0, len(self.vocoders) - 1):
                 # Set manually - I don't know which order the
                 # voices are on your platform, so if it does
@@ -1850,9 +1389,9 @@ Loading larynx voices for `%(_lang2)s`
             elif len(_text.split()) < 3:
                 # A single word
                 self.rate_denominator = 0.85  # speak slower
-                _vocoder = self.get_voc_type("large")
+                _vocoder = self.get_voc_type('large')
             else:
-                _vocoder = self.get_voc_type("medium")
+                _vocoder = self.get_voc_type('medium')
             if len(_vocoder) == 0:
                 _vocoder = self.vocoders[len(self.vocoders) - 1]
         except IndexError:
@@ -1860,57 +1399,46 @@ Loading larynx voices for `%(_lang2)s`
                 _vocoder = self.vocoders[len(self.vocoders) - 1]
             else:
                 return False
-        _ssml = "false"
+        _ssml = 'false'
         if ssml:
-            _ssml = "true"
-        _url = "".join([self.url, "/api/tts"])
-        for _item in self.length_scales:
-            if not _speech_rate > _item[0] and not _speech_rate < _item[1]:
-                print(
-                    "\nLarynx\n======\n+ tts rate: ",
-                    _speech_rate,
-                    "".join([
-                        "wpm   20%[",
-                        _item[2],
-                        "]200%\n+ url: ",
-                        self.url,
-                        "\n+ voice encoder: ",
-                        _vocoder,
-                        "\n+ voice id: ",
-                        _voice,
-                        "\n",
-                    ]),
-                )
-                _length_scale = _item[3]
-                break
+            _ssml = 'true'
+        _url = ''.join([self.url, '/api/tts'])
+        _rate_length_scale = self.common.rate_to_rhasspy_length_scale(
+            _speech_rate)
+        if len(_rate_length_scale[1]) != 0:
+            print(''.join([
+                '\nLarynx\n======\n+ tts rate: ', _speech_rate, '\nwpm   20%[',
+                _rate_length_scale[1], ']200%\n+ url: ', self.url,
+                '\n+ voice encoder: ', _vocoder, '\n+ voice id: ', _voice, '\n'
+            ]))
+        _length_scale = _rate_length_scale[0]
         _length_scale = str(_length_scale / self.rate_denominator)
-        _text = readtexttools.local_pronunciation(_iso_lang, _text, "larynx",
-                                                  "LARYNX_USER_DIRECTORY",
+        _text = readtexttools.local_pronunciation(_iso_lang, _text, 'larynx',
+                                                  'LARYNX_USER_DIRECTORY',
                                                   False)[0]
         if REQUESTS_OK:
             try:
-                _strips = "\n .;"
-                _text = "\n".join(["", _text.strip(_strips), ""])
+                _strips = '\n .;'
+                _text = '\n'.join(['', _text.strip(_strips), ''])
                 response = requests.post(
                     _url,
                     params={
-                        "voice": _voice,
-                        "vocoder": _vocoder,
-                        "denoiserStrength": _denoiser_strength,
-                        "noiseScale": _noise_scale,
-                        "lengthScale": _length_scale,
-                        "ssml": _ssml,
+                        'voice': _voice,
+                        'vocoder': _vocoder,
+                        'denoiserStrength': _denoiser_strength,
+                        'noiseScale': _noise_scale,
+                        'lengthScale': _length_scale,
+                        'ssml': _ssml
                     },
                     headers={
-                        "Content-Type":
-                        "application/x-www-form-urlencoded",
-                        "User-Agent":
-                        "Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0",
+                        'Content-Type':
+                        'application/x-www-form-urlencoded',
+                        'User-Agent':
+                        'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
                     },
-                    data=_text.encode("utf-8", "ignore"),
-                    timeout=(_ok_wait, _end_wait),
-                )
-                with open(_media_work, "wb") as f:
+                    data=_text.encode('utf-8', 'ignore'),
+                    timeout=(_ok_wait, _end_wait))
+                with open(_media_work, 'wb') as f:
                     f.write(response.content)
                 if os.path.isfile(_media_work):
                     _done = os.path.getsize(_media_work) != 0
@@ -1918,44 +1446,35 @@ Loading larynx voices for `%(_lang2)s`
                 _done = False
         if not _done:
             _voice = urllib.parse.quote(_voice)
-            my_body = (
-                "voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s"
-                % locals())
-            my_url = """%(_url)s?%(my_body)s""" % locals()
+            my_body = 'voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s' % locals(
+            )
+            my_url = '''%(_url)s?%(my_body)s''' % locals()
             self.common.set_urllib_timeout(_ok_wait)
             try:
-                _strips = "\n .;"
-                _text = "\n".join(["", _text.strip(_strips), ""])
-                data = _text.encode("utf-8", "ignore")
+                _strips = '\n .;'
+                _text = '\n'.join(['', _text.strip(_strips), ''])
+                data = _text.encode('utf-8', 'ignore')
                 req = urllib.request.Request(my_url, data)
                 resp = urllib.request.urlopen(req)
                 response_content = resp.read()
-                with open(_media_work, "wb") as f:
+                with open(_media_work, 'wb') as f:
                     f.write(response_content)
                 if os.path.isfile(_media_work):
                     _done = os.path.getsize(_media_work) != 0
             except:
                 _done = False
         if not _done:
-            print("""The application cannot load a sound file.
-Your computer is missing a required library.""")
+            print('''The application cannot load a sound file.
+Your computer is missing a required library.''')
             self.ok = False
             return False
-        return self.common.do_net_sound(
-            _info,
-            _media_work,
-            _icon,
-            _media_out,
-            _audible,
-            _visible,
-            _writer,
-            _size,
-            _post_process,
-        )
+        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
+                                        _audible, _visible, _writer, _size,
+                                        _post_process)
 
 
 class MaryTtsClass(object):
-    """MaryTTS
+    '''MaryTTS
 =======
 
 You can use `synesthesiam/docker-marytts` text to speech localhost
@@ -1989,103 +1508,87 @@ Set the Docker container restart policy to "always"
 
 * [Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
 * [GitHub](https://github.com/MycroftAI/mimic3)
-"""
+'''
 
     def __init__(self):  # -> None
-        """Initialize data. See
-        <https://github.com/synesthesiam/docker-marytts>"""
+        '''Initialize data. See
+        <https://github.com/synesthesiam/docker-marytts>'''
         _common = LocalCommons()
         self.common = _common
         self.debug = _common.debug
-        self.local_dir = "mary_tts"
+        self.local_dir = 'mary_tts'
         self.ok = True
-        self.response = ""
+        self.response = ''
         # This is the default. You can set up MaryTts to use a different port.
-        self.url = "http://0.0.0.0:59125"  # localhost port 59125
+        self.url = 'http://0.0.0.0:59125'  # localhost port 59125
         self.help_icon = _common.help_icon
-        self.help_heading = "Rhasspy MaryTTS"
-        self.help_url = "https://github.com/synesthesiam/docker-marytts"
-        self.audio_format = "WAVE_FILE"
+        self.help_heading = 'Rhasspy MaryTTS'
+        self.help_url = 'https://github.com/synesthesiam/docker-marytts'
+        self.audio_format = 'WAVE_FILE'
         self.input_types = [
-            "TEXT",
-            "SIMPLEPHONEMES",
-            "SABLE",
-            "SSML",
-            "APML",
-            "EMOTIONML",
-            "RAWMARYXML",
+            'TEXT', 'SIMPLEPHONEMES', 'SABLE', 'SSML', 'APML', 'EMOTIONML',
+            'RAWMARYXML'
         ]
         self.accept_voice = [
-            "",
-            "all",
-            "auto",
-            "child_female",
-            "child_female1",
-            "child_male",
-            "child_male1",
-            "marytts",
-            "mimic",
-            "localhost",
-            "docker",
-            "local_server",
+            '', 'all', 'auto', 'child_female', 'child_female1', 'child_male',
+            'child_male1', 'marytts', 'mimic', 'localhost', 'docker',
+            'local_server'
         ]
         self.spd_100 = _common.spd_100
-        self.voice_locale = ""
+        self.voice_locale = ''
         self.pause_list = _common.pause_list
         self.add_pause = _common.add_pause
         self.base_curl = _common.base_curl
         self.is_x86_64 = _common.is_x86_64
         self.is_mimic = False
 
-    def marytts_xml(self, _text="", _speech_rate=160):  # -> str
-        """Change the speed that MaryTTS reads plain text aloud using
+    def marytts_xml(self, _text='', _speech_rate=160):  # -> str
+        '''Change the speed that MaryTTS reads plain text aloud using
         `RAWMARYXML`. `maryxml` correctly uses standard XML conventions like
         `&amp;`, `&gt;` and `&lt;`, so the characters that they represent use
-        corrected XML."""
+        corrected XML.'''
         _xmltransform = readtexttools.XmlTransform()
         _text = _xmltransform.clean_for_xml(_text, False)
         try:
             # 160 wpm (Words per minute) yields 100% prosody rate
             if _speech_rate < 40:
                 _speech_rate = 40
-            _rate = "".join([str(int(_speech_rate / 1.6)), "%"])
+            _rate = ''.join([str(int(_speech_rate / 1.6)), '%'])
         except [AttributeError, TypeError]:
-            _rate = "100%"
-        return ("""<?xml version="1.0" encoding="UTF-8"?>
+            _rate = '100%'
+        return '''<?xml version="1.0" encoding="UTF-8"?>
 <maryxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
-<prosody rate="%(_rate)s">%(_text)s</prosody></p></maryxml>""" % locals())
+<prosody rate="%(_rate)s">%(_text)s</prosody></p></maryxml>''' % locals()
 
     def language_supported(self,
-                           iso_lang="en-US",
-                           alt_local_url=""):  # -> bool
-        """Is the language or voice supported?
+                           iso_lang='en-US',
+                           alt_local_url=''):  # -> bool
+        '''Is the language or voice supported?
         + `iso_lang` can be in the form `en-US` or `en`.
         + `alt_local_url` If you are connecting to a local network's
            speech server using a different computer, you might need to use
-           a different url."""
+           a different url.'''
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
-        if (int(platform.python_version_tuple()[0]) < 3
-                or int(platform.python_version_tuple()[1]) < 8):
+        if int(platform.python_version_tuple()[0]) < 3 or int(
+                platform.python_version_tuple()[1]) < 8:
             self.ok = False
             return self.ok
         if len(self.voice_locale) != 0:
             self.help_url = self.url
-            self.help_icon = (
-                "/usr/share/icons/HighContrast/scalable/actions/system-run.svg"
-            )
+            self.help_icon = '/usr/share/icons/HighContrast/scalable/actions/system-run.svg'
             return True
-        _lang1 = iso_lang.replace("-", "_")
+        _lang1 = iso_lang.replace('-', '_')
         # concise language
-        _lang2 = _lang1.split("_")[0]
-        _locales = ""
+        _lang2 = _lang1.split('_')[0]
+        _locales = ''
         self.common.set_urllib_timeout(1)
-        for dir_search in ["/locales", "/voices"]:
+        for dir_search in ['/locales', '/voices']:
             try:
-                response = urllib.request.urlopen("".join(
+                response = urllib.request.urlopen(''.join(
                     [self.url, dir_search]))
-                _locales = str(response.read(), "utf-8")
+                _locales = str(response.read(), 'utf-8')
             except TimeoutError:
                 continue
             except urllib.error.URLError:
@@ -2094,8 +1597,8 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                 try:
                     # catching classes that do not inherit from BaseExceptions
                     # is not allowed.
-                    response = urllib.urlopen("".join([self.url, dir_search]))
-                    _locales = str(response.read(), "utf-8")
+                    response = urllib.urlopen(''.join([self.url, dir_search]))
+                    _locales = str(response.read(), 'utf-8')
                 except AttributeError:
                     self.ok = False
         if len(_locales) == 0:
@@ -2105,11 +1608,11 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
         # return `True`, otherwise return `False`.
         self.accept_voice = self.accept_voice + self.spd_100
         self.ok = False
-        if "/" in _locales:
+        if '/' in _locales:
             # i. e.: `en_UK/apope_low` for mimic vs. `cmu-rms-hsmm` for MaryTTS
             self.is_mimic = True
-            self.local_dir = "mimic"
-            self.input_types = ["TEXT", "SSML"]
+            self.local_dir = 'mimic'
+            self.input_types = ['TEXT', 'SSML']
             for _test in [_lang1, _lang2]:
                 for _row in _locales.splitlines():
                     if _row.startswith(_test):
@@ -2118,109 +1621,97 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                         break
                 if self.ok:
                     break
-        if _lang1 in _locales.split("\n"):
+        if _lang1 in _locales.split('\n'):
             self.ok = True
             self.voice_locale = _lang1
-        elif _lang2 in _locales.split() or _lang2 == "en":
+        elif _lang2 in _locales.split() or _lang2 == 'en':
             self.ok = True
-            if _lang2 == "en":
+            if _lang2 == 'en':
                 if _lang1[-2:].lower() in [
-                        "au",
-                        "bd",
-                        "bs",
-                        "gb",
-                        "gh",
-                        "hk",
-                        "ie",
-                        "in",
-                        "jm",
-                        "nz",
-                        "pk",
-                        "sa",
-                        "tt",
-                        "uk",
+                        'au', 'bd', 'bs', 'gb', 'gh', 'hk', 'ie', 'in', 'jm',
+                        'nz', 'pk', 'sa', 'tt', 'uk'
                 ]:
                     if self.is_mimic:
                         # The default Mimic voice uses this locale
-                        self.voice_locale = "en_UK"
+                        self.voice_locale = 'en_UK'
                     else:
-                        self.voice_locale = "en_GB"
+                        self.voice_locale = 'en_GB'
                 else:
-                    self.voice_locale = "en_US"
+                    self.voice_locale = 'en_US'
             else:
                 self.voice_locale = _lang2.lower()
         return self.ok
 
     def marytts_voice(self,
-                      _voice="",
-                      _iso_lang="en-US",
+                      _voice='',
+                      _iso_lang='en-US',
                       _prefer_gendered_fallback=True):  # -> str
-        """If the MaryTTS API includes the voice description, return a
+        '''If the MaryTTS API includes the voice description, return a
         marytts voice description like `cmu-bdl-hsmm`, otherwise return
-        `''`."""
+        `''`.'''
         if len(_voice) == 0:
-            return ""
+            return ''
         try:
-            response = urllib.request.urlopen("".join([self.url, "/voices"]))
-            _voices = str(response.read(), "utf-8")
+            response = urllib.request.urlopen(''.join([self.url, '/voices']))
+            _voices = str(response.read(), 'utf-8')
         except urllib.error.URLError:
             if self.is_mimic:
                 print(
-                    """Requested [Mimic 3](https://github.com/MycroftAI/mimic3#mimic-3)
-                It did not respond correctly.""")
+                    '''Requested [Mimic 3](https://github.com/MycroftAI/mimic3#mimic-3)
+                It did not respond correctly.''')
             else:
                 print(
-                    """Requested [docker-marytts](https://github.com/synesthesiam/docker-marytts)
-                It did not respond correctly.""")
-            return ""
+                    '''Requested [docker-marytts](https://github.com/synesthesiam/docker-marytts)
+                It did not respond correctly.''')
+            return ''
         except AttributeError:
             try:
                 # catching classes that do not inherit from BaseExceptions
                 # is not allowed.
-                response = urllib.urlopen("".join([self.url, "/voices"]))
-                _voices = str(response.read(), "utf-8")
+                response = urllib.urlopen(''.join([self.url, '/voices']))
+                _voices = str(response.read(), 'utf-8')
             except AttributeError:
-                return ""
+                return ''
         if len(_voices) == 0:
-            return ""
-        _locale = _iso_lang.replace("-", "_")
+            return ''
+        _locale = _iso_lang.replace('-', '_')
         _voice = _voice.lower()
         if _voices.count(_locale) == 0:
             # i. e.: en_AU, en_CA ... en_ZA etc.
             # Disregard the region code and use all voices for the language.
-            _locale = _locale.split("_")[0]
+            _locale = _locale.split('_')[0]
         _voice_list = _voices.splitlines()
         for _tester in _voice_list:
-            _row = _tester.split(" ")
+            _row = _tester.split(' ')
             if _row[0].count(_voice) != 0:
                 self.voice_locale = _row[1]
                 return _row[0]
         matches = []
-        last_match = ""
-        gendered_fallback = ""
+        last_match = ''
+        gendered_fallback = ''
         if _voice not in self.accept_voice:
             return last_match
         _neutral_voice_count = 0
         if self.is_mimic:
             _neutral_voice_count = 1
         for _tester in _voice_list:
-            _row = _tester.split(" ")
-            _add_name = ""
+            _row = _tester.split(' ')
+            _add_name = ''
             try:
                 if _row[1].startswith(_locale):
                     last_match = _row[0]
                     _row2 = _row[2]
-                    if _row2 in ["male", "female"]:
+                    if _row2 in ['male', 'female']:
                         for _standard in [
                                 _row2,
-                                "".join(["child_", _row2]),
-                                "auto",
+                                ''.join(['child_', _row2]),
+                                'auto',
                         ]:
                             if _voice.startswith(_standard):
                                 _add_name = last_match
 
                         if len(_add_name) != 0:
-                            if _row2 == "male":
+                            if _row2 == 'male':
                                 matches.append(_add_name)
                             else:
                                 matches.insert(0, _add_name)
@@ -2237,12 +1728,12 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                     gendered_fallback = last_match
             except IndexError:
                 continue
-        if "male" in _voice:
+        if 'male' in _voice:
             if not _neutral_voice_count in [0, 1]:
-                print("""\nNOTICE: The current voice models do not identify
-voices by gender so the gender might be wrong.""")
-        _vox_number = int("".join(
-            ["0", readtexttools.safechars(_voice, "1234567890")]))
+                print('''\nNOTICE: The current voice models do not identify
+voices by gender so the gender might be wrong.''')
+        _vox_number = int(''.join(
+            ['0', readtexttools.safechars(_voice, '1234567890')]))
         # When you just want a list of indices, it is faster to to use len()
         for i in range(0, len(matches)):
             if _vox_number % len(matches) == i + 1:
@@ -2252,42 +1743,41 @@ voices by gender so the gender might be wrong.""")
                 return gendered_fallback
         return last_match
 
-    def read(
-        self,
-        _text="",
-        _iso_lang="en-US",
-        _visible="false",
-        _audible="true",
-        _out_path="",
-        _icon="",
-        _info="",
-        _post_process=None,
-        _writer="",
-        _size="600x600",
-        _speech_rate=160,
-        ssml=False,
-        _vox="male1",
-        _ok_wait=4,
-        _end_wait=30,
-    ):  # -> bool
-        """
+    def read(self,
+             _text="",
+             _iso_lang='en-US',
+             _visible="false",
+             _audible="true",
+             _out_path="",
+             _icon="",
+             _info="",
+             _post_process=None,
+             _writer='',
+             _size='600x600',
+             _speech_rate=160,
+             ssml=False,
+             _vox='male1',
+             _ok_wait=4,
+             _end_wait=30):  # -> bool
+        '''
         The read tool supports a subset of MaryTTS functions because not
         all voices, languages and synthesisers support all of the features
         of the server.
-        """
+        '''
         if not self.ok:
             return False
-        _media_out = ""
+        _media_out = ''
         _done = False
+        _length_scale = 1
         # Determine the output file name
-        _media_out = readtexttools.get_work_file_path(_out_path, _icon, "OUT")
+        _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name;
         if self.is_mimic:
-            _media_work = os.path.join(tempfile.gettempdir(), "Mimic3.wav")
-            _user_env = "MIMIC_TTS_USER_DIRECTORY"
+            _media_work = os.path.join(tempfile.gettempdir(), 'Mimic3.wav')
+            _user_env = 'MIMIC_TTS_USER_DIRECTORY'
         else:
-            _media_work = os.path.join(tempfile.gettempdir(), "MaryTTS.wav")
-            _user_env = "MARY_TTS_USER_DIRECTORY"
+            _media_work = os.path.join(tempfile.gettempdir(), 'MaryTTS.wav')
+            _user_env = 'MARY_TTS_USER_DIRECTORY'
         if os.path.isfile(_media_work):
             os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
@@ -2296,7 +1786,7 @@ voices by gender so the gender might be wrong.""")
         if bool(self.add_pause) and not ssml:
             for _symbol in self.pause_list:
                 if _symbol in _text:
-                    _text = _text.translate(self.add_pause).replace(".;", ".")
+                    _text = _text.translate(self.add_pause).replace('.;', '.')
                     break
         _view_json = self.debug and 1
         _mary_vox = self.marytts_voice(_vox, _iso_lang)
@@ -2313,76 +1803,80 @@ voices by gender so the gender might be wrong.""")
         elif not REQUESTS_OK:
             # With `urllib` the tested version of MaryTTS can only use TEXT,
             # not RAWMARYXML
-            print("""
-NOTE: Setting a MaryTTS speech rate requires the python `request` library.""")
+            print('''
+NOTE: Setting a MaryTTS speech rate requires the python `request` library.''')
             _input_type = self.input_types[0]
         elif self.is_mimic:
             if ssml:
                 _input_type = self.input_types[3]
-                if "</speak>" not in _text:
+                if '</speak>' not in _text:
                     _text = self.common.ssml_xml(_text, _mary_vox,
                                                  _speech_rate, _iso_lang)
             else:
                 _input_type = self.input_types[0]
+            _length_scale = self.common.rate_to_rhasspy_length_scale(
+                _speech_rate)[0]
         else:
             _input_type = self.input_types[6]
-            if "</maryxml>" not in _text:
+            if '</maryxml>' not in _text:
                 _text = self.marytts_xml(_text, _speech_rate)
         _url1 = self.url
-        _url = "".join([_url1, "/process"])
-        _locale = _iso_lang.replace("-", "_")
-        _found_locale = "en_US"
+        _url = ''.join([_url1, '/process'])
+        _locale = _iso_lang.replace('-', '_')
+        _found_locale = 'en_US'
         if len(self.voice_locale) != 0:
             _found_locale = self.voice_locale
         _audio_format = self.audio_format
-        _output_type = "AUDIO"
-        _title = """Docker MaryTTS
-=============="""
+        _output_type = 'AUDIO'
+        _title = '''Docker MaryTTS
+=============='''
         if self.is_mimic:
-            _url = "".join([_url1, "/api/tts"])
-            _ssml = "0"
+            _url = ''.join([_url1, '/api/tts'])
+            _ssml = '0'
             if ssml:
-                _ssml = "1"
+                _ssml = '1'
             if len(_mary_vox) == 0:
-                _mary_vox = "en_UK/apope_low"
-            _title = """Mycroft AI Mimic-3
-=================="""
-        print("""
+                _mary_vox = 'en_UK/apope_low'
+            _title = '''Mycroft AI Mimic-3
+=================='''
+        print('''
 %(_title)s
 
 * Audio: `%(_audio_format)s`
 * Input Type: `%(_input_type)s`
+* Speech Rate: `%(_speech_rate)s`
 * Locale: `%(_found_locale)s`
 * Mapped Voice : `%(_vox)s`
 * Output Type: `%(_output_type)s`
 * Server URL: `%(_url1)s`
 * Voice : `%(_mary_vox)s`
-""" % locals())
+''' % locals())
         if REQUESTS_OK:
             if len(_mary_vox) == 0:
                 request_params = {
-                    "AUDIO": _audio_format,
-                    "OUTPUT_TYPE": _output_type,
-                    "INPUT_TYPE": _input_type,
-                    "LOCALE": _found_locale,
-                    "INPUT_TEXT": _text,
+                    'AUDIO': _audio_format,
+                    'OUTPUT_TYPE': _output_type,
+                    'INPUT_TYPE': _input_type,
+                    'LOCALE': _found_locale,
+                    'INPUT_TEXT': _text,
                 }
             else:
                 request_params = {
-                    "AUDIO": _audio_format,
-                    "OUTPUT_TYPE": _output_type,
-                    "INPUT_TYPE": _input_type,
-                    "LOCALE": _found_locale,
-                    "VOICE": _mary_vox,
-                    "INPUT_TEXT": _text,
+                    'AUDIO': _audio_format,
+                    'OUTPUT_TYPE': _output_type,
+                    'INPUT_TYPE': _input_type,
+                    'LOCALE': _found_locale,
+                    'VOICE': _mary_vox,
+                    'INPUT_TEXT': _text,
                 }
-            _strips = ";\n .;"
+            _strips = ';\n .;'
             _text = _text.strip(_strips)
             if self.is_mimic:
                 request_params = {
-                    "text": _text,
-                    "voice": _mary_vox,
-                    "ssml": _ssml
+                    'text': _text,
+                    'voice': _mary_vox,
+                    'ssml': _ssml,
+                    'lengthScale': _length_scale
                 }
                 # Note: 2013-03 Mimic switches are similar to Larynx.
                 # This app uses a subset to maximize MaryTTS compatibility.
@@ -2394,8 +1888,8 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.""")
                 # '&lengthScale=' + encodeURIComponent(lengthScale) +
                 # '&ssml=' + encodeURIComponent(ssml) +
                 # '&audioTarget=' + encodeURIComponent(audioTarget)
-                _preload = _mary_vox.split("#")[0]
-                print("""Preload voice command
+                _preload = _mary_vox.split('#')[0]
+                print('''Preload voice command
 ---------------------
 
     mimic3-server --preload-voice %(_preload)s
@@ -2403,26 +1897,25 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.""")
 Help
 ----
 
-[Mimic-3](https://github.com/MycroftAI/mimic3#mimic-3)""" % locals())
+[Mimic-3](https://github.com/MycroftAI/mimic3#mimic-3)''' % locals())
 
             else:
                 print(
-                    "[Docker MaryTTS](https://github.com/synesthesiam/docker-marytts)"
+                    '[Docker MaryTTS](https://github.com/synesthesiam/docker-marytts)'
                 )
             try:
                 response = requests.post(
                     _url,
                     params=request_params,
                     headers={
-                        "Content-Type":
-                        "application/x-www-form-urlencoded",
-                        "User-Agent":
-                        "Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0",
+                        'Content-Type':
+                        'application/x-www-form-urlencoded',
+                        'User-Agent':
+                        'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
                     },
-                    data=_text.encode("utf-8", "ignore"),
-                    timeout=(_ok_wait, _end_wait),
-                )
-                with open(_media_work, "wb") as f:
+                    data=_text.encode('utf-8', 'ignore'),
+                    timeout=(_ok_wait, _end_wait))
+                with open(_media_work, 'wb') as f:
                     f.write(response.content)
                 if os.path.isfile(_media_work):
                     _done = os.path.getsize(_media_work) != 0
@@ -2430,26 +1923,29 @@ Help
                 _done = False
         if not _done:
             self.common.set_urllib_timeout(_ok_wait)
-            q_text = urllib.parse.quote(_text.strip(";\n"))
+            q_text = urllib.parse.quote(_text.strip(';\n'))
             if self.is_mimic:
-                if _mary_vox.count("/") == 0:
-                    print("""
+                if _mary_vox.count('/') == 0:
+                    print('''
 NOTE: Incompatible voice format for Mimic; using the default. Make
-sure to use a Mimic 3 voice key instead of a MaryTTS voice name.""")
+sure to use a Mimic 3 voice key instead of a MaryTTS voice name.''')
                     # # i.e.: http://localhost:59125/api/tts?text=<message>&voice=<voice>&ssml=<0|1>
                     # See:
                     # https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3#marytts-compatibility
-                    _mary_vox = "en_UK/apope_low"
+                    _mary_vox = 'en_UK/apope_low'
                 _mary_vox = urllib.parse.quote(_mary_vox)
                 _ssml = urllib.parse.quote(_ssml)
-                my_url = (
-                    "%(_url)s?text=%(q_text)s&voice=%(_mary_vox)s&ssml=%(_ssml)s"
-                    % locals())
+                if self.is_mimic:
+                    my_url = '%(_url)s?text=%(q_text)s&voice=%(_mary_vox)s&ssml=%(_ssml)s&lengthScale=%(_length_scale)s' % locals(
+                    )
+                else:
+                    my_url = '%(_url)s?text=%(q_text)s&voice=%(_mary_vox)s&ssml=%(_ssml)s' % locals(
+                    )
                 try:
                     # GET
                     response = urllib.request.urlopen(my_url,
                                                       timeout=(_end_wait))
-                    with open(_media_work, "wb") as f:
+                    with open(_media_work, 'wb') as f:
                         f.write(response.read())
                     if os.path.isfile(_media_work):
                         _done = os.path.getsize(_media_work) != 0
@@ -2457,57 +1953,48 @@ sure to use a Mimic 3 voice key instead of a MaryTTS voice name.""")
                     pass
             else:
                 if len(_mary_vox) == 0:
-                    vcommand = ""
+                    vcommand = ''
                 else:
                     _mary_vox = urllib.parse.quote(_mary_vox)
-                    vcommand = "&VOICE=%(_mary_vox)s" % locals()
-                _body_data = (
-                    "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT="
-                    % locals())
+                    vcommand = '&VOICE=%(_mary_vox)s' % locals()
+                _body_data = "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT=" % locals(
+                )
                 my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
                 try:
                     # POST
                     # NOTE: Setting a MaryTTS speech rate requires the python
                     # `request` library.
-                    _strips = "\n .;"
-                    _text = "\n".join(["", _text.strip(_strips), ""])
+                    _strips = '\n .;'
+                    _text = '\n'.join(['', _text.strip(_strips), ''])
                     data = {}  # The API uses an `INPUT_TEXT` argument for text
                     req = urllib.request.Request(my_url, data)
                     resp = urllib.request.urlopen(req)
                     response_content = resp.read()
-                    with open(_media_work, "wb") as f:
+                    with open(_media_work, 'wb') as f:
                         f.write(response_content)
                     if os.path.isfile(_media_work):
                         _done = os.path.getsize(_media_work) != 0
                 except:
                     _done = False
         if not _done:
-            print("""The application cannot load a sound file.
+            print('''The application cannot load a sound file.
 Your computer is missing a required library.
-Use `pip3 install requests` or `apt-get install python3-requests` to fix it."""
+Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
                   )
             self.ok = False
             return False
-        return self.common.do_net_sound(
-            _info,
-            _media_work,
-            _icon,
-            _media_out,
-            _audible,
-            _visible,
-            _writer,
-            _size,
-            _post_process,
-        )
+        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
+                                        _audible, _visible, _writer, _size,
+                                        _post_process)
 
 
 class RhvoiceLocalHost(object):
-    """[Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest) is
+    '''[Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest) is
     a docker image that allows Linux users to use speech synthesis (text
     to speech) while running Read Text Extension in a protected container like
     a snap or a flatpak. It provides a `localhost` http server to convert text
     that you select to speech. Docker images come with all the necessary files
-    and settings packaged in a tamper-resistant container.
+    and settings packaged in a tamper-resistant container. 
 
     This Rhvoice docker container can read English, Esperanto, Georgian, Kyrgyz,
     Macedonian, Portuguese, Russian, Tatar and Ukrainian.
@@ -2546,68 +2033,59 @@ class RhvoiceLocalHost(object):
 
     * <https://github.com/RHVoice/RHVoice>
     * <https://github.com/RHVoice/RHVoice/issues>
-    * <https://rhvoice.org/>"""
+    * <https://rhvoice.org/>'''
 
     def __init__(self):  # -> None
-        """The docker image doesn't expose details of the directory structure
+        '''The docker image doesn't expose details of the directory structure
         to the localhost API, so functions in the parent that rely on a specific
-        file path do not work."""
+        file path do not work.'''
         _common = LocalCommons()
         self.common = _common
         self.add_pause = _common.add_pause
         self.pause_list = _common.pause_list
         self.base_curl = _common.base_curl
         self.debug = _common.debug
-        self.url = "http://0.0.0.0:8080"  # localhost port 8080
+        self.url = 'http://0.0.0.0:8080'  # localhost port 8080
         self.help_icon = _common.help_icon
-        self.help_heading = "Rhvoice Rest"
-        self.help_url = "https://github.com/Aculeasis/rhvoice-rest/"
-        self.audio_format = ["wav", "mp3", "opus", "flac"][0]
-        self.input_types = ["TEXT"]
+        self.help_heading = 'Rhvoice Rest'
+        self.help_url = 'https://github.com/Aculeasis/rhvoice-rest/'
+        self.audio_format = ['wav', 'mp3', 'opus', 'flac'][0]
+        self.input_types = ['TEXT']
         self.accept_voice = [
-            "",
-            "all",
-            "auto",
-            "child_female`",
-            "child_male1",
-            "rhvoice",
-            "localhost",
-            "docker",
-            "local_server",
+            '', 'all', 'auto', 'child_female`', 'child_male1', 'rhvoice',
+            'localhost', 'docker', 'local_server'
         ] + _common.spd_100
         self.ok = False
-        self.voice = ""
+        self.voice = ''
         self.female = 2
         self.male = 1
-        self.checked_lang = ""
+        self.checked_lang = ''
         # This is a list for testing if the API fails. Normally, using
         # the json data at <http://0.0.0.0:8080/info> enables updates
         # and forks of the original docker image to use current data.
         # As of 2023.01,18 the API `country` field might not reflect
         # the accent of the named speaker.
         # [lang | lang-region], ['male' | 'female'], name
-        self.checklist = [["zzy", "male", "_no_name"]]
+        self.checklist = [['zzy', 'male', '_no_name']]
 
         self.verified_voices = []
-        self.length_scales = [
-            [320, 289, "---------|", 100],
-            [288, 257, "--------|-", 95],
-            [256, 225, "-------|--", 85],
-            [224, 193, "------|---", 75],
-            [192, 161, "-----|----", 65],
-            [160, 127, "----|----", 50],
-            [128, 97, "---|-----", 35],
-            [96, 66, "--|------", 20],
-            [64, 33, "-|-------", 10],
-            [32, 0, "|--------", 0],
-        ]
+        self.length_scales = [[320, 289, '---------|', 100],
+                              [288, 257, '--------|-', 95],
+                              [256, 225, '-------|--', 85],
+                              [224, 193, '------|---', 75],
+                              [192, 161, '-----|----', 65],
+                              [160, 127, '----|----', 50],
+                              [128, 97, '---|-----', 35],
+                              [96, 66, '--|------', 20],
+                              [64, 33, '-|-------', 10],
+                              [32, 0, '|--------', 0]]
 
     def update_rhvoice_checklist(self):  # -> list
-        """Create a list table in the same format as `self.checklist`
+        '''Create a list table in the same format as `self.checklist`
         using a json data adapted from the rhvoice-rest API.
 
-        See: <https://www.iso.org/obp/ui/#iso:code:3166:UA>"""
-        _url = "".join([self.url, "/info"])
+        See: <https://www.iso.org/obp/ui/#iso:code:3166:UA>'''
+        _url = ''.join([self.url, '/info'])
         _default_list = self.checklist
         try:
             response = urllib.request.urlopen(_url)
@@ -2626,7 +2104,7 @@ class RhvoiceLocalHost(object):
                 return _default_list
         except:
             return _default_list
-        voice_lib = data["rhvoice_wrapper_voices_info"]
+        voice_lib = data['rhvoice_wrapper_voices_info']
         key_list = []
         return_list = []
         for _item in voice_lib:
@@ -2635,13 +2113,13 @@ class RhvoiceLocalHost(object):
             self.verified_voices = key_list
         try:
             for _key in key_list:
-                _iso = "".join(
-                    [voice_lib[_key]["lang"], "-", voice_lib[_key]["country"]])
-                for iso_c in [["-NaN", ""], ["-UK", "-UA"]]:
+                _iso = ''.join(
+                    [voice_lib[_key]['lang'], '-', voice_lib[_key]['country']])
+                for iso_c in [['-NaN', ''], ['-UK', '-UA']]:
                     _iso = _iso.replace(iso_c[0], iso_c[1])
                 return_list.append([
-                    _iso, voice_lib[_key]["gender"],
-                    voice_lib[_key]["name"].lower()
+                    _iso, voice_lib[_key]['gender'],
+                    voice_lib[_key]['name'].lower()
                 ])
         except KeyError:
             return _default_list
@@ -2650,11 +2128,11 @@ class RhvoiceLocalHost(object):
         return self.checklist
 
     def language_supported(self,
-                           _iso_lang="en-US",
-                           alt_local_url=""):  # -> bool
-        """Is the language or voice supported in rhvoice rest?
-        + `iso_lang` can be in the form `en-US` or `en`."""
-        _found_name = ""
+                           _iso_lang='en-US',
+                           alt_local_url=''):  # -> bool
+        '''Is the language or voice supported in rhvoice rest?
+        + `iso_lang` can be in the form `en-US` or `en`.'''
+        _found_name = ''
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
         if self.ok:
@@ -2665,7 +2143,7 @@ class RhvoiceLocalHost(object):
                 self.ok = False
                 return False
         self.ok = False
-        for _search in [_iso_lang.lower(), _iso_lang.split("-")[0].lower()]:
+        for _search in [_iso_lang.lower(), _iso_lang.split('-')[0].lower()]:
             for item in self.checklist:
                 if item[0].lower().startswith(_search):
                     self.checked_lang = item[0]
@@ -2684,39 +2162,39 @@ class RhvoiceLocalHost(object):
         if self.ok:
             help_heading = self.help_heading
             help_url = self.help_url
-            print("""
+            print('''
 Checking %(help_heading)s voices for `%(_iso_lang)s`
 ========================================
 
 <%(help_url)s>
-""" % locals())
+''' % locals())
         return self.ok
 
     def rhvoice_voice(self,
-                      _voice="female1",
-                      _iso_lang="en-US",
+                      _voice='female1',
+                      _iso_lang='en-US',
                       _prefer_gendered_fallback=True):  # -> str
-        """If the Rhvoice API includes the voice description, return a
+        '''If the Rhvoice API includes the voice description, return a
         rhvoice voice description like `cmu-bdl-hsmm`, otherwise return
-        `''`."""
+        `''`.'''
         if len(_voice) == 0:
-            return ""
+            return ''
         if not bool(self.verified_voices):
             self.update_rhvoice_checklist()
             if not bool(self.verified_voices):
                 self.ok = False
-                return ""
+                return ''
         _voice = _voice.lower()
         if _voice in self.verified_voices:
             return _voice
         _found_locale = self.checked_lang
         if len(_found_locale) == 0:
-            _found_locale = readtexttools.default_lang().replace("_", "-")
-        _found_locale = _found_locale.split("-")[0].split("_")[0]
+            _found_locale = readtexttools.default_lang().replace('_', '-')
+        _found_locale = _found_locale.split('-')[0].split('_')[0]
         matches = []
-        _add_name = ""
-        gendered_fallback = ""
-        last_match = ""
+        _add_name = ''
+        gendered_fallback = ''
+        last_match = ''
         i_lang = 0
         i_gender = 1
         i_name = 2
@@ -2725,10 +2203,9 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                 if _row[i_lang].startswith(_found_locale):
                     last_match = _row[i_name]
                     for _standard in [
-                            _row[i_gender],
-                            "".join(["child_", _row[i_gender]]),
+                            _row[i_gender], ''.join(['child_', _row[i_gender]])
                     ]:
-                        _add_name = ""
+                        _add_name = ''
                         if _voice.startswith(_standard):
                             _add_name = last_match
                             break
@@ -2746,46 +2223,44 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                 return gendered_fallback
         return last_match
 
-    def read(
-        self,
-        _text="",
-        _iso_lang="en-US",
-        _visible="false",
-        _audible="true",
-        _out_path="",
-        _icon="",
-        _info="",
-        _post_process=None,
-        _writer="",
-        _size="600x600",
-        _speech_rate=160,
-        _vox="female1",
-        _ok_wait=4,
-        _end_wait=30,
-    ):  # -> bool
-        """Read text using <https://hub.docker.com/r/aculeasis/rhvoice-rest>"""
+    def read(self,
+             _text="",
+             _iso_lang='en-US',
+             _visible="false",
+             _audible="true",
+             _out_path="",
+             _icon="",
+             _info="",
+             _post_process=None,
+             _writer='',
+             _size='600x600',
+             _speech_rate=160,
+             _vox='female1',
+             _ok_wait=4,
+             _end_wait=30):  # -> bool
+        '''Read text using <https://hub.docker.com/r/aculeasis/rhvoice-rest>'''
         if not self.ok:
             return False
-        _media_out = ""
+        _media_out = ''
         _done = False
         # Determine the output file name
-        _media_out = readtexttools.get_work_file_path(_out_path, _icon, "OUT")
+        _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
-        _media_work = os.path.join(tempfile.gettempdir(), "Rhvoice-rest.wav")
+        _media_work = os.path.join(tempfile.gettempdir(), 'Rhvoice-rest.wav')
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
                 return True
         if bool(self.add_pause):
             for _symbol in self.pause_list:
                 if _symbol in _text:
-                    _text = _text.translate(self.add_pause).replace(".;", ".")
+                    _text = _text.translate(self.add_pause).replace('.;', '.')
                     break
         if os.path.isfile(_media_work):
             os.remove(_media_work)
         _view_json = self.debug and 1
         response = readtexttools.local_pronunciation(_iso_lang, _text,
-                                                     "rhvoice",
-                                                     "RHVOICE_USER_DIRECTORY",
+                                                     'rhvoice',
+                                                     'RHVOICE_USER_DIRECTORY',
                                                      _view_json)
         _text = response[0]
         if _view_json:
@@ -2797,19 +2272,18 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                 break
         _length_scale = str(_length_scale)
         _url1 = self.url
-        _url = "%(_url1)s/say" % locals()
+        _url = '%(_url1)s/say' % locals()
         _audio_format = self.audio_format
         _voice = self.rhvoice_voice(_vox, _iso_lang, True)
         if BASICS_OK:
             # Not all Rhvoice voices use ascii. i. e.: Portuguese
             # q_voice=let%C3%ADcia
             q_voice = urllib.parse.quote(_voice)
-            _body_data = (
-                "format=%(_audio_format)s&rate=%(_length_scale)s&pitch=50&volume=50&voice=%(q_voice)s&text="
-                % locals())
+            _body_data = 'format=%(_audio_format)s&rate=%(_length_scale)s&pitch=50&volume=50&voice=%(q_voice)s&text=' % locals(
+            )
             # _method = "GET"
-            _strips = "\n .;"
-            _text = "\n".join(["", _text.strip(_strips), ""])
+            _strips = '\n .;'
+            _text = '\n'.join(['', _text.strip(_strips), ''])
             # The API uses GET and a `text` argument for text
             q_text = urllib.parse.quote(_text)
             my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
@@ -2820,7 +2294,7 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                 req = urllib.request.Request(my_url)
                 resp = urllib.request.urlopen(req)
                 response_content = resp.read()
-                with open(_media_work, "wb") as f:
+                with open(_media_work, 'wb') as f:
                     f.write(response_content)
                 if os.path.isfile(_media_work):
                     _done = os.path.getsize(_media_work) != 0
@@ -2828,24 +2302,16 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                 _done = False
         if not _done:
             return False
-        return self.common.do_net_sound(
-            _info,
-            _media_work,
-            _icon,
-            _media_out,
-            _audible,
-            _visible,
-            _writer,
-            _size,
-            _post_process,
-        )
+        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
+                                        _audible, _visible, _writer, _size,
+                                        _post_process)
 
 
 class CoquiDemoLocalHost(object):
-    """# CoquiAI TTS
+    '''# CoquiAI TTS
     The [TTS engine](https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu)
     provides a local http service to convert text that you select to speech.
-
+    
     The TTS server is powered by python. You can use `pip3`, `pipx`, `git`
     or a docker image to download it.
 
@@ -2861,7 +2327,7 @@ class CoquiDemoLocalHost(object):
 
     Example server commands:
 
-    * Default `tts-server`
+    * Default `tts-server` 
     * English `tts-server --model_name tts_models/en/vctk/vits`
     * French `tts-server --model_name tts_models/fr/css10/vits`
     * Spanish `tts-server --model_name tts_models/es/css10/vits`
@@ -2878,7 +2344,7 @@ class CoquiDemoLocalHost(object):
     `--vocoder_checkpoint /path/to/vocoder/model.pth `
     `--vocoder_config /path/to/vocoder/config.json`
 
-    ReadText Client
+    ReadText Client 
     ---------------
 
     Some voice models require system files that are not explicitly stated
@@ -2890,7 +2356,7 @@ class CoquiDemoLocalHost(object):
     Ubuntu distributions you can use:
 
         `sudo apt-get install python3-bs4 python3-pip espeak-ng`
-
+    
     To troubleshoot the client, you can see information and error messages
     if you run your office program using a terminal window.
 
@@ -2899,7 +2365,7 @@ class CoquiDemoLocalHost(object):
     The client will not work unless the server is configured correctly and
     is running. You can check the server by navigating to the local server
     [demo page](http://[::1]:5002/).
-
+    
     Docker
     ------
 
@@ -2963,12 +2429,13 @@ class CoquiDemoLocalHost(object):
     * Some models will only work if you are running soffice as a
       native application, not as a snap or flatpak. This is because for
       some TTS models, this client uses the system `bs4` (Beautiful
-      Soup) python library to check for languages or voices."""
+      Soup) python library to check for languages or voices.
+'''
 
     def __init__(self):  # -> None
-        """A docker image doesn't expose details of the directory structure
+        '''A docker image doesn't expose details of the directory structure
         to the tts host's API, so functions in the parent that rely on a
-        specific file path do not work."""
+        specific file path do not work.'''
         _common = LocalCommons()
         self.end = 0
         self.common = _common
@@ -2976,212 +2443,126 @@ class CoquiDemoLocalHost(object):
         self.pause_list = _common.pause_list
         self.base_curl = _common.base_curl
         self.debug = _common.debug
-        self.url = "http://[::1]:5002/"  # locally hosted URL port 5002
+        self.url = 'http://[::1]:5002/'  # locally hosted URL port 5002
         self.help_icon = _common.help_icon
         self.help_heading = "Coqui AI TTS demo server"
-        self.first_option = ""
-        self.help_url = "https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu"
-        self.help_icon = "/usr/share/icons/HighContrast/scalable/actions/system-run.svg"
-        self.mascot = "🐸"  # U+1F438  <https://www.compart.com/en/unicode/block/U+1F300>
-        self.data_response = ""
-        self.audio_format = "wav"
-        self.input_types = ["TEXT"]
+        self.first_option = ''
+        self.help_url = 'https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu'
+        self.help_icon = '/usr/share/icons/HighContrast/scalable/actions/system-run.svg'
+        self.mascot = '🐸'  # U+1F438  <https://www.compart.com/en/unicode/block/U+1F300>
+        self.data_response = ''
+        self.audio_format = 'wav'
+        self.input_types = ['TEXT']
         self.accept_voice = [
-            "",
-            "all",
-            "auto",
-            "coqui",
-            "localhost",
-            "docker",
-            "tts",
-            "local_server",
+            '', 'all', 'auto', 'coqui', 'localhost', 'docker', 'tts',
+            'local_server'
         ]
         self.ok = False
-        self.voice = ""
+        self.voice = ''
         self.soup = None
-        self.checked_lang = ""
-        self.styled_wav = ""
+        self.checked_lang = ''
+        self.styled_wav = ''
         self.base_models = [
-            "tts_models/multilingual/multi-dataset/your_tts",
-            "tts_models/bg/cv/vits",
-            "tts_models/cs/cv/vits",
-            "tts_models/da/cv/vits",
-            "tts_models/et/cv/vits",
-            "tts_models/ga/cv/vits",
-            "tts_models/en/ek1/tacotron2",
-            "tts_models/en/ljspeech/tacotron2-DDC",
-            "tts_models/en/ljspeech/tacotron2-DDC_ph",
-            "tts_models/en/ljspeech/glow-tts",
-            "tts_models/en/ljspeech/speedy-speech",
-            "tts_models/en/ljspeech/tacotron2-DCA",
-            "tts_models/en/ljspeech/vits",
-            "tts_models/en/ljspeech/vits--neon",
-            "tts_models/en/ljspeech/fast_pitch",
-            "tts_models/en/ljspeech/overflow",
-            "tts_models/en/ljspeech/neural_hmm",
-            "tts_models/en/vctk/vits",
-            "tts_models/en/vctk/fast_pitch",
-            "tts_models/en/sam/tacotron-DDC",
-            "tts_models/en/blizzard2013/capacitron-t2-c50",
-            "tts_models/en/blizzard2013/capacitron-t2-c150_v2",
-            "tts_models/es/mai/tacotron2-DDC",
-            "tts_models/es/css10/vits",
-            "tts_models/fr/mai/tacotron2-DDC",
-            "tts_models/fr/css10/vits",
-            "tts_models/uk/mai/glow-tts",
-            "tts_models/uk/mai/vits",
-            "tts_models/zh-CN/baker/tacotron2-DDC-GST",
-            "tts_models/nl/mai/tacotron2-DDC",
-            "tts_models/nl/css10/vits",
-            "tts_models/de/thorsten/tacotron2-DCA",
-            "tts_models/de/thorsten/vits",
-            "tts_models/de/thorsten/tacotron2-DDC",
-            "tts_models/de/css10/vits-neon",
-            "tts_models/ja/kokoro/tacotron2-DDC",
-            "tts_models/tr/common-voice/glow-tts",
-            "tts_models/it/mai_female/glow-tts",
-            "tts_models/it/mai_female/vits",
-            "tts_models/it/mai_male/glow-tts",
-            "tts_models/it/mai_male/vits",
-            "tts_models/ewe/openbible/vits",
-            "tts_models/hau/openbible/vits",
-            "tts_models/lin/openbible/vits",
-            "tts_models/tw_akuapem/openbible/vits",
-            "tts_models/tw_asante/openbible/vits",
-            "tts_models/yor/openbible/vits",
-            "tts_models/hu/css10/vits",
-            "tts_models/el/cv/vits",
-            "tts_models/fi/css10/vits",
-            "tts_models/hr/cv/vits",
-            "tts_models/lt/cv/vits",
-            "tts_models/lv/cv/vits",
-            "tts_models/mt/cv/vits",
-            "tts_models/pl/mai_female/vits",
-            "tts_models/pt/cv/vits",
-            "tts_models/ro/cv/vits",
-            "tts_models/sk/cv/vits",
-            "tts_models/sl/cv/vits",
-            "tts_models/sv/cv/vits",
-            "tts_models/ca/custom/vits",
-            "tts_models/fa/custom/glow-tts",
+            'tts_models/multilingual/multi-dataset/your_tts',
+            'tts_models/bg/cv/vits', 'tts_models/cs/cv/vits',
+            'tts_models/da/cv/vits', 'tts_models/et/cv/vits',
+            'tts_models/ga/cv/vits', 'tts_models/en/ek1/tacotron2',
+            'tts_models/en/ljspeech/tacotron2-DDC',
+            'tts_models/en/ljspeech/tacotron2-DDC_ph',
+            'tts_models/en/ljspeech/glow-tts',
+            'tts_models/en/ljspeech/speedy-speech',
+            'tts_models/en/ljspeech/tacotron2-DCA',
+            'tts_models/en/ljspeech/vits', 'tts_models/en/ljspeech/vits--neon',
+            'tts_models/en/ljspeech/fast_pitch',
+            'tts_models/en/ljspeech/overflow',
+            'tts_models/en/ljspeech/neural_hmm', 'tts_models/en/vctk/vits',
+            'tts_models/en/vctk/fast_pitch', 'tts_models/en/sam/tacotron-DDC',
+            'tts_models/en/blizzard2013/capacitron-t2-c50',
+            'tts_models/en/blizzard2013/capacitron-t2-c150_v2',
+            'tts_models/es/mai/tacotron2-DDC', 'tts_models/es/css10/vits',
+            'tts_models/fr/mai/tacotron2-DDC', 'tts_models/fr/css10/vits',
+            'tts_models/uk/mai/glow-tts', 'tts_models/uk/mai/vits',
+            'tts_models/zh-CN/baker/tacotron2-DDC-GST',
+            'tts_models/nl/mai/tacotron2-DDC', 'tts_models/nl/css10/vits',
+            'tts_models/de/thorsten/tacotron2-DCA',
+            'tts_models/de/thorsten/vits',
+            'tts_models/de/thorsten/tacotron2-DDC',
+            'tts_models/de/css10/vits-neon',
+            'tts_models/ja/kokoro/tacotron2-DDC',
+            'tts_models/tr/common-voice/glow-tts',
+            'tts_models/it/mai_female/glow-tts',
+            'tts_models/it/mai_female/vits', 'tts_models/it/mai_male/glow-tts',
+            'tts_models/it/mai_male/vits', 'tts_models/ewe/openbible/vits',
+            'tts_models/hau/openbible/vits', 'tts_models/lin/openbible/vits',
+            'tts_models/tw_akuapem/openbible/vits',
+            'tts_models/tw_asante/openbible/vits',
+            'tts_models/yor/openbible/vits', 'tts_models/hu/css10/vits',
+            'tts_models/el/cv/vits', 'tts_models/fi/css10/vits',
+            'tts_models/hr/cv/vits', 'tts_models/lt/cv/vits',
+            'tts_models/lv/cv/vits', 'tts_models/mt/cv/vits',
+            'tts_models/pl/mai_female/vits', 'tts_models/pt/cv/vits',
+            'tts_models/ro/cv/vits', 'tts_models/sk/cv/vits',
+            'tts_models/sl/cv/vits', 'tts_models/sv/cv/vits',
+            'tts_models/ca/custom/vits', 'tts_models/fa/custom/glow-tts'
         ]
         self.more_models = [
-            "vocoder_models/universal/libri-tts/wavegrad",
-            "vocoder_models/universal/libri-tts/fullband-melgan",
-            "vocoder_models/en/ljspeech/multiband-melgan",
-            "vocoder_models/en/ljspeech/hifigan_v2",
-            "vocoder_models/en/ljspeech/univnet",
-            "vocoder_models/en/blizzard2013/hifigan_v2",
-            "vocoder_models/en/vctk/hifigan_v2",
-            "vocoder_models/en/sam/hifigan_v2",
-            "vocoder_models/nl/mai/parallel-wavegan",
-            "vocoder_models/de/thorsten/wavegrad",
-            "vocoder_models/de/thorsten/fullband-melgan",
-            "vocoder_models/de/thorsten/hifigan_v1",
-            "vocoder_models/ja/kokoro/hifigan_v1",
-            "vocoder_models/uk/mai/multiband-melgan",
-            "vocoder_models/tr/common-voice/hifigan",
+            'vocoder_models/universal/libri-tts/wavegrad',
+            'vocoder_models/universal/libri-tts/fullband-melgan',
+            'vocoder_models/en/ljspeech/multiband-melgan',
+            'vocoder_models/en/ljspeech/hifigan_v2',
+            'vocoder_models/en/ljspeech/univnet',
+            'vocoder_models/en/blizzard2013/hifigan_v2',
+            'vocoder_models/en/vctk/hifigan_v2',
+            'vocoder_models/en/sam/hifigan_v2',
+            'vocoder_models/nl/mai/parallel-wavegan',
+            'vocoder_models/de/thorsten/wavegrad',
+            'vocoder_models/de/thorsten/fullband-melgan',
+            'vocoder_models/de/thorsten/hifigan_v1',
+            'vocoder_models/ja/kokoro/hifigan_v1',
+            'vocoder_models/uk/mai/multiband-melgan',
+            'vocoder_models/tr/common-voice/hifigan'
         ]
-        if have_gpu("nvidia"):
-            # NVIDIA GPU support
-            self.base_models = self.more_models + self.base_models
+        self.base_models = self.more_models + self.base_models
         self.coqui_fm = [
-            "ED\n",
-            "p225",
-            "p227",
-            "p237",
-            "p240",
-            "p243",
-            "p244",
-            "p245",
-            "p246",
-            "p247",
-            "p248",
-            "p249",
-            "p250",
-            "p257",
-            "p259",
-            "p260",
-            "p261",
-            "p263",
-            "p268",
-            "p270",
-            "p271",
-            "p273",
-            "p274",
-            "p275",
-            "p276",
-            "p277",
-            "p278",
-            "p280",
-            "p282",
-            "p283",
-            "p284",
-            "p288",
-            "p293",
-            "p294",
-            "p295",
-            "p297",
-            "p300",
-            "p303",
-            "p304",
-            "p305",
-            "p306",
-            "p308",
-            "p310",
-            "p311",
-            "p314",
-            "p316",
-            "p323",
-            "p239",
-            "p333",
-            "p334",
-            "p335",
-            "p336",
-            "p339",
-            "p341",
-            "p343",
-            "p345",
-            "p347",
-            "p360",
-            "p361",
-            "p362",
-            "p363",
-            "p364",
-            "p374",
-            "female-en-5",
-            "female-pt-4",
-            "female-en5\n",
+            'ED\n', 'p225', 'p227', 'p237', 'p240', 'p243', 'p244', 'p245',
+            'p246', 'p247', 'p248', 'p249', 'p250', 'p257', 'p259', 'p260',
+            'p261', 'p263', 'p268', 'p270', 'p271', 'p273', 'p274', 'p275',
+            'p276', 'p277', 'p278', 'p280', 'p282', 'p283', 'p284', 'p288',
+            'p293', 'p294', 'p295', 'p297', 'p300', 'p303', 'p304', 'p305',
+            'p306', 'p308', 'p310', 'p311', 'p314', 'p316', 'p323', 'p239',
+            'p333', 'p334', 'p335', 'p336', 'p339', 'p341', 'p343', 'p345',
+            'p347', 'p360', 'p361', 'p362', 'p363', 'p364', 'p374',
+            'female-en-5', 'female-pt-4', 'female-en5\n', 'olena'
         ]
         self.tts_equivalents = [
-            ["p374", "all"],
-            ["male-pt-3", "all"],
-            ["p374", "coqui"],
-            ["male-pt-3", "coqui"],
-            ["p305", "female_child1"],
-            ["p374", "male_child1"],
-            ["ED\n", "female1"],
-            ["p336", "female2"],
-            ["p308", "female3"],
-            ["p230", "male1"],
-            ["p252", "male2"],
-            ["p313", "male3"],
-            ["female-en-5", "female_child1"],
-            ["male-pt-3\n", "male_child1"],
-            ["female-pt-3", "female1"],
-            ["female-en-5", "female2"],
-            ["female-en-5\n", "female3"],
-            ["male-pt-3\n", "male1"],
-            ["male-en-2", "male2"],
-            ["male-en-2", "male3"],
+            ['p374', 'all'],
+            ['male-pt-3', 'all'],
+            ['p374', 'coqui'],
+            ['male-pt-3', 'coqui'],
+            ['p305', 'female_child1'],
+            ['p374', 'male_child1'],
+            ['ED\n', 'female1'],
+            ['p336', 'female2'],
+            ['p308', 'female3'],
+            ['p230', 'male1'],
+            ['p252', 'male2'],
+            ['p313', 'male3'],
+            ['female-en-5', 'female_child1'],
+            ['male-pt-3\n', 'male_child1'],
+            ['female-pt-3', 'female1'],
+            ['female-en-5', 'female2'],
+            ['female-en-5\n', 'female3'],
+            ['male-pt-3\n', 'male1'],
+            ['male-en-2', 'male2'],
+            ['male-en-2', 'male3'],
         ]
 
-    def _re_search_first_key(self, _key="title"):  # -> str
-        """Get the first text string that matches a key, or `''`if the key is
-        not found"""
+    def _re_search_first_key(self, _key='title'):  # -> str
+        '''Get the first text string that matches a key, or `''`if the key is
+        not found '''
         html = self.data_response
         if not _key in html:
-            return ""
+            return ''
         try:
             pattern = "<%(_key)s.*?>*?</%(_key)s.*?>" % locals()
             search_result = re.search(pattern, html, re.IGNORECASE)
@@ -3189,11 +2570,11 @@ class CoquiDemoLocalHost(object):
             return re.sub("<.*?>", "", search_group)
         except (AttributeError, NameError):
             pass
-        return ""
+        return ''
 
     def _check_tts_ids(self):
-        """Return `True` if the `tts` home page has interesting `id` contents,
-        otherwise return `False`, so don't continue with `ds4`"""
+        '''Return `True` if the `tts` home page has interesting `id` contents,
+        otherwise return `False`, so don't continue with `ds4`'''
         _continue = False
         if len(self.data_response) == 0:
             return _continue
@@ -3206,60 +2587,73 @@ class CoquiDemoLocalHost(object):
         return _continue
 
     def language_supported(self,
-                           _iso_lang="en-US",
-                           alt_local_url=""):  # -> bool
-        """Is the language or voice supported in the demonstration?
-        + `iso_lang` can be in the form `en-US` or `en`."""
+                           _iso_lang='en-US',
+                           alt_local_url=''):  # -> bool
+        '''Is the language or voice supported in the demonstration?
+        + `iso_lang` can be in the form `en-US` or `en`.'''
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
         if self.ok:
             return self.ok
         _lower_lang = _iso_lang.lower()
-        _lang = _lower_lang.split("_")[0].split("-")[0]
+        _lang = _lower_lang.split('_')[0].split('-')[0]
         _found = False
         for _model in self.base_models:
-            if "/" in _model:
-                if _lang == _model.split("/")[1]:
+            if '/' in _model:
+                if _lang == _model.split('/')[1]:
                     _found = True
                     break
         if _found:
             try:
+                from bs4 import BeautifulSoup
+            except (ImportError, ModuleNotFoundError):
+                try:
+                    _local_pip = readtexttools.find_local_pip('bs4')
+                    if len(_local_pip) != 0:
+                        sys.path.append(_local_pip)
+                        try:
+                            from bs4 import BeautifulSoup
+                        except:
+                            pass
+                except:
+                    pass
+            try:
                 response = urllib.request.urlopen(self.url)
-                self.data_response = response.read().decode("utf-8")
+                self.data_response = response.read().decode('utf-8')
             except urllib.error.URLError:
-                self.data_response = ""
+                self.data_response = ''
             except TimeoutError:
-                self.data_response = ""
+                self.data_response = ''
             if len(self.data_response) == 0:
                 self.ok = False
                 return False
-            help_heading = self._re_search_first_key("title")  # System display
+            help_heading = self._re_search_first_key('title')  # System display
             if len(help_heading) == 0:
                 return False
             else:
                 self.help_heading = help_heading
                 self.first_option = urllib.parse.quote(
-                    self._re_search_first_key("option"))  # url argument
+                    self._re_search_first_key('option'))  # url argument
             try:
                 if not self._check_tts_ids():
-                    self.checked_lang = ""
+                    self.checked_lang = ''
                     self.ok = True
                     return self.ok
                 try:
                     self.soup = BeautifulSoup(self.data_response,
                                               features="lxml")
                 except NameError:
-                    print("""NameError: This speech synthesis model requires
+                    print('''NameError: This speech synthesis model requires
 [Beautiful Soup 4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) to
 parse values from a webpage. Install it using `pipx`, `pip3` or a distribution
-system installer application like `apt`.""")
+system installer application like `apt`.''')
                     self.ok = False
                     return self.ok
-                _language_ids = self.soup.find(attrs={"id": "language_id"})
-                _idioms = _language_ids.find_all("option")
+                _language_ids = self.soup.find(attrs={'id': 'language_id'})
+                _idioms = _language_ids.find_all('option')
                 for _query in [_iso_lang, _lower_lang, _lang]:
                     for option in _idioms:
-                        _idiom_value = option["value"]
+                        _idiom_value = option['value']
                         if _idiom_value.startswith(_query):
                             self.checked_lang = _idiom_value
                             self.ok = True
@@ -3267,124 +2661,105 @@ system installer application like `apt`.""")
                 # 'NoneType' object has no attribute 'find_all'; so the page
                 # is missing this section because the model does not feature
                 # the options.
-                self.checked_lang = ""
+                self.checked_lang = ''
                 self.ok = True
             except NameError:
-                print("""NameError: This speech synthesis application requires
-[Beautiful Soup 4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)""")
+                print('''NameError: This speech synthesis application requires
+[Beautiful Soup 4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)''')
                 self.ok = False
         return self.ok
 
-    def get_bs4_style_wav(self, _content=""):  # -> string
-        """If the model supports it, use `style_wav` (dict or path to wav)
-        to help generate speech."""
+    def get_bs4_style_wav(self, _content=''):  # -> string
+        '''If the model supports it, use `style_wav` (dict or path to wav)
+        to help generate speech.'''
         if not self.ok:
-            return ""
+            return ''
         if not 'id="style_wav"' in self.data_response:
-            return ""
+            return ''
         try:
             return urllib.parse.quote(_content)
         except:
             pass
-        return ""
+        return ''
 
-    def get_bs4_speaker(self, _vox="female1", _index=0):  # -> string
-        """Get the matching voice on thes CoquiAI server web page"""
+    def get_bs4_speaker(self, _vox='female1', _index=0):  # -> string
+        '''Get the matching voice on thes CoquiAI server web page'''
         if not self._check_tts_ids():
-            return ""
+            return ''
         if _vox == self.first_option:
             self.ok = True
             self.voice = _vox
             return self.voice
-        _vox_number = int("".join(
-            ["0", readtexttools.safechars(_vox, "1234567890")]))
+        _vox_number = int(''.join(
+            ['0', readtexttools.safechars(_vox, '1234567890')]))
         _my_favs_count = 3  # male1, male2, male3
         _matches = []
         if _index == 0 and _vox_number > _my_favs_count:
             # You specify an out of range voice using `male4`, `female5` etc.
             # The voices chosen this way are not classified by gender.
             _index = _vox_number
-        _matches = [_vox, "p374", "female-pt-3"]
+        _matches = [_vox, 'p374', 'female-pt-3']
         for _item in self.tts_equivalents:
             if _vox.lower() == _item[1]:
                 _matches.append(_item[0])
-        print("\n" + self.help_heading)
-        print("=" * (len(self.help_heading)))
+        print('\n' + self.help_heading)
+        print('=' * (len(self.help_heading)))
         if not self.ok:
-            return ""
+            return ''
         elif len(self.data_response) == 0:
-            return ""
+            return ''
         try:
-            speaker_ids = self.soup.find(attrs={"id": "speaker_id"})
-            speakers = speaker_ids.find_all("option")
+            speaker_ids = self.soup.find(attrs={'id': 'speaker_id'})
+            speakers = speaker_ids.find_all('option')
         except AttributeError:
-            return ""
-        _default_voice = ""
-        _index_voice = ""
+            return ''
+        _default_voice = ''
+        _index_voice = ''
         try:
-            _default_voice = urllib.parse.quote(speakers[0]["value"])
+            _default_voice = urllib.parse.quote(speakers[0]['value'])
         except (IndexError, ValueError):
-            return ""
+            return ''
         try:
             len_speakers = len(speakers)
             if len_speakers != 0:
                 _index = _index % len_speakers
-                if "female" in _vox:
+                if 'female' in _vox:
                     # Use reverse index
                     _index = len_speakers - _index
-                _index_voice = urllib.parse.quote(speakers[_index]["value"])
+                _index_voice = urllib.parse.quote(speakers[_index]['value'])
         except (IndexError, ValueError):
             _index_voice = _default_voice
         if len(_default_voice) == 0:
-            return ""
-        _print_values = [""]
+            return ''
+        _print_values = ['']
         for option in speakers:
-            _speaker_value = option["value"]
+            _speaker_value = option['value']
             if _speaker_value == _index_voice:
                 if _index > _my_favs_count:
                     self.voice = urllib.parse.quote(_index_voice)
-                    self.mascot = "\u263A "
-                    print("".join([
-                        "\n* ",
-                        self.voice,
-                        " ",
-                        self.mascot,
-                        " (",
-                        _vox,
-                        ")\n\n[",
-                        self.help_heading,
-                        "](",
-                        self.url,
-                        ")\n",
+                    self.mascot = u'\u263A '
+                    print(''.join([
+                        '\n* ', self.voice, ' ', self.mascot, ' (', _vox,
+                        ')\n\n[', self.help_heading, '](', self.url, ')\n'
                     ]))
                     return self.voice
             self.accept_voice.append(_speaker_value)
-            _print_values.append(_speaker_value.strip("\n"))
+            _print_values.append(_speaker_value.strip('\n'))
             if bool(_matches):
                 for _match in _matches:
                     if _speaker_value == _match:
                         self.voice = urllib.parse.quote(_match)
                         if bool(self.debug):
-                            printed_list = "\n* ".join(_print_values) + "\n"
+                            printed_list = '\n* '.join(_print_values) + '\n'
                             print(
                                 printed_list.replace(
-                                    _match,
-                                    self.voice + " " + self.mascot + " (" +
-                                    _vox + ")",
-                                ))
+                                    _match, self.voice + ' ' + self.mascot +
+                                    ' (' + _vox + ')'))
                         else:
-                            print("".join([
-                                "\n* ",
-                                self.voice,
-                                " ",
-                                self.mascot,
-                                " (",
-                                _vox,
-                                ")\n\n[",
-                                self.help_heading,
-                                "](",
-                                self.url,
-                                ")\n",
+                            print(''.join([
+                                '\n* ', self.voice, ' ', self.mascot, ' (',
+                                _vox, ')\n\n[', self.help_heading, '](',
+                                self.url, ')\n'
                             ]))
                         return self.voice
         if len(_index_voice) == 0:
@@ -3393,82 +2768,78 @@ system installer application like `apt`.""")
             self.voice = _index_voice
         return self.voice
 
-    def read(
-        self,
-        _text="",
-        _iso_lang="en-US",
-        _visible="false",
-        _audible="true",
-        _out_path="",
-        _icon="",
-        _info="",
-        _post_process=None,
-        _writer="",
-        _size="600x600",
-        _speech_rate=160,
-        _vox="female1",
-        _ok_wait=4,
-        _end_wait=30,
-        _style_wav="",
-    ):  # -> bool
-        """Read text using the Coqui-demo local server."""
+    def read(self,
+             _text="",
+             _iso_lang='en-US',
+             _visible="false",
+             _audible="true",
+             _out_path="",
+             _icon="",
+             _info="",
+             _post_process=None,
+             _writer='',
+             _size='600x600',
+             _speech_rate=160,
+             _vox='female1',
+             _ok_wait=4,
+             _end_wait=30,
+             _style_wav=''):  # -> bool
+        '''Read text using the Coqui-demo local server.'''
         if not self.ok:
             return False
-        _media_out = ""
+        _media_out = ''
         _done = False
         # Determine the output file name
-        _media_out = readtexttools.get_work_file_path(_out_path, _icon, "OUT")
+        _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name
-        _media_work = os.path.join(
-            tempfile.gettempdir(),
-            self.help_heading.replace(" ", "-") + "-demo.wav")
+        _end = '-demo.wav'
+        if have_gpu('nvidia'):
+            # NVIDIA GPU support
+            _end = '-cuda.wav'
+        _media_work = os.path.join(tempfile.gettempdir(),
+                                   self.help_heading.replace(' ', '-') + _end)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
                 return True
         if bool(self.add_pause):
             for _symbol in self.pause_list:
                 if _symbol in _text:
-                    _text = _text.translate(self.add_pause).replace(".;", ".")
+                    _text = _text.translate(self.add_pause).replace('.;', '.')
                     break
         if os.path.isfile(_media_work):
             os.remove(_media_work)
         _view_json = self.debug and 1
-        response = readtexttools.local_pronunciation(_iso_lang, _text, "coqui",
-                                                     "COQUI_USER_DIRECTORY",
+        response = readtexttools.local_pronunciation(_iso_lang, _text, 'coqui',
+                                                     'COQUI_USER_DIRECTORY',
                                                      _view_json)
         _text = response[0]
         if _view_json:
             print(response[1])
         _url1 = self.url
-        _url = "%(_url1)s/api/tts" % locals()
+        _url = '%(_url1)s/api/tts' % locals()
         _speaker_id = self.get_bs4_speaker(_vox)
         if BASICS_OK:
-            _text = _text.strip("\n .;")
+            _text = _text.strip('\n .;')
             q_text = urllib.parse.quote(_text)
             _language_id = self.checked_lang
             _style_wav = self.get_bs4_style_wav(_style_wav)
-            my_url = (
-                """%(_url)s?text=%(q_text)s&speaker_id=%(_speaker_id)s&style_wav=%(_style_wav)s&language_id=%(_language_id)s"""
-                % locals())
-            # _method = "GET"
-            _logo = " " + self.mascot + " "
-            if len(_text) > 500 or "\n" in _text:
-                _end_wait = int(_end_wait * len(_text) / 500)
-                _logo = " ⌛ "
-            readtexttools.pop_message(
-                "".join([self.help_heading, _logo, self.voice]),
-                self.url,
-                0,
-                self.help_icon,
-                0,
+            my_url = '''%(_url)s?text=%(q_text)s&speaker_id=%(_speaker_id)s&style_wav=%(_style_wav)s&language_id=%(_language_id)s''' % locals(
             )
+            # _method = "GET"
+            _logo = ' ' + self.mascot + ' '
+            if len(_text) > 500 or '\n' in _text:
+                _end_wait = int(_end_wait * len(_text) / 500)
+                _logo = ' ⌛ '
+            readtexttools.pop_message(
+                ''.join([self.help_heading, _logo, self.voice]), self.url, 0,
+                self.help_icon, 0)
             self.common.set_urllib_timeout(_end_wait)
             try:
                 # The API uses GET and a `text` argument for text
                 req = urllib.request.Request(my_url)
                 resp = urllib.request.urlopen(req)
                 response_content = resp.read()
-                with open(_media_work, "wb") as f:
+                with open(_media_work, 'wb') as f:
                     f.write(response_content)
                 if os.path.isfile(_media_work):
                     _done = os.path.getsize(_media_work) != 0
@@ -3476,41 +2847,33 @@ system installer application like `apt`.""")
                 _done = False
         if not _done:
             return False
-        return self.common.do_net_sound(
-            _info,
-            _media_work,
-            _icon,
-            _media_out,
-            _audible,
-            _visible,
-            _writer,
-            _size,
-            _post_process,
-        )
+        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
+                                        _audible, _visible, _writer, _size,
+                                        _post_process)
 
 
-def speech_wpm(_percent="100%"):  # -> int
-    """
+def speech_wpm(_percent='100%'):  # -> int
+    '''
     _percent - rate expressed as a percentage.
     Use '100%' for default rate of 160 words per minute (wpm).
     Returns rate between 20 and 640.
-    """
+    '''
     _calc_product = 0
     _result = 0
     _minimum = 20
     _maximum = 640
     _normal = 160
-    _p_cent = ""
+    _p_cent = ''
 
     try:
-        if "%" in _percent:
-            _p_cent = _percent.replace("%", "")
-            _calc_product = float(
-                _p_cent) if "." in _p_cent else int(_p_cent) / 100
+        if '%' in _percent:
+            _p_cent = _percent.replace('%', '')
+            _calc_product = (float(_p_cent)
+                             if '.' in _p_cent else int(_p_cent) / 100)
             _result = math.ceil(_calc_product * _normal)
         else:
-            _calc_product = float(_percent) if "." in _percent else int(
-                _percent)
+            _calc_product = (float(_percent)
+                             if '.' in _percent else int(_percent))
             _result = math.ceil(_calc_product)
     except TypeError:
         return _normal
@@ -3523,8 +2886,8 @@ def speech_wpm(_percent="100%"):  # -> int
     return _result
 
 
-def network_ok(_iso_lang="en-US", _local_url=""):  # -> bool
-    """Do at least one of the classes support an on-line speech library?"""
+def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
+    '''Do at least one of the classes support an on-line speech library?'''
     _gtts_class = GoogleTranslateClass()
     _continue = False
     if not _continue:
@@ -3532,7 +2895,7 @@ def network_ok(_iso_lang="en-US", _local_url=""):  # -> bool
         _continue = _mary_tts.language_supported(_iso_lang, _local_url)
     if not _continue:
         _larynx = LarynxClass()
-        _continue = _larynx.language_supported(_iso_lang, _local_url, "AUTO")
+        _continue = _larynx.language_supported(_iso_lang, _local_url, 'AUTO')
     if not _continue:
         _rhvoice_rest = RhvoiceLocalHost()
         _continue = _rhvoice_rest.language_supported(_iso_lang, _local_url)
@@ -3542,299 +2905,136 @@ def network_ok(_iso_lang="en-US", _local_url=""):  # -> bool
     if not _continue:
         _coqui_demo = CoquiDemoLocalHost()
         _continue = _coqui_demo.language_supported(_iso_lang, _local_url)
-    if not _continue:
-        _amazon_class = AmazonClass()
-        _continue = bool(_amazon_class.language_supported(_iso_lang))
-    if not _continue:
-        _azure_class = AzureClass()
-        _continue = bool(_azure_class.language_supported(_iso_lang))
-    if not _continue:
-        _google_cloud_class = GoogleCloudClass()
-        _continue = bool(_google_cloud_class.language_supported(_iso_lang))
-    if not _continue:
-        _watson_class = WatsonClass()
-        _continue = bool(_watson_class.language_supported(_iso_lang))
     return _continue
 
 
-def network_main(
-    _text_file_in="",
-    _iso_lang="ca-ES",
-    _visible="false",
-    _audible="true",
-    _media_out="",
-    _writer="",
-    _title="",
-    _icon="",
-    _size="600x600",
-    _speech_rate=160,
-    _vox="",
-    _local_url="",
-    _denoiser_strength=0.005,
-    _noise_scale=0.667,
-):  # -> boolean
-    """Read a text file aloud using a network resource."""
+def network_main(_text_file_in='',
+                 _iso_lang='ca-ES',
+                 _visible='false',
+                 _audible='true',
+                 _media_out='',
+                 _writer='',
+                 _title='',
+                 _icon='',
+                 _size='600x600',
+                 _speech_rate=160,
+                 _vox='',
+                 _local_url='',
+                 _denoiser_strength=0.005,
+                 _noise_scale=0.667):  # -> boolean
+    '''Read a text file aloud using a network resource.'''
     _imported_meta = readtexttools.ImportedMetaData()
     _larynx = LarynxClass()
     _marytts = MaryTtsClass()
-    _amazon_class = AmazonClass()
-    _azure_class = AzureClass()
-    _google_cloud_class = GoogleCloudClass()
-    _watson_class = WatsonClass()
     _gtts_class = GoogleTranslateClass()
     _rhvoice_rest = RhvoiceLocalHost()
     _coqui_demo = CoquiDemoLocalHost()
     _continue = False
-    _vox = _vox.strip("'\" \t\n").lower()
+    _vox = _vox.strip('\'" \t\n').lower()
     if not _continue:
         _continue = _marytts.language_supported(_iso_lang, _local_url)
     if not _continue:
-        _continue = (_larynx.language_supported(
+        _continue = _larynx.language_supported(
             _iso_lang,
             _local_url,
             _vox,
-        ) and _vox in _larynx.accept_voice)
+        ) and _vox in _larynx.accept_voice
     if not _continue:
         _continue = _rhvoice_rest.language_supported(_iso_lang, _local_url)
     if not _continue:
         _continue = _coqui_demo.language_supported(_iso_lang, _local_url)
     if not _continue:
-        _continue = (_gtts_class.check_version(_gtts_class.tested_version)
-                     and _vox in _gtts_class.accept_voice)
-    if not _continue:
-        _continue = (bool(_amazon_class.language_supported(_iso_lang))
-                     and _vox in _amazon_class.accept_voice)
-    if not _continue:
-        _continue = (bool(_azure_class.language_supported(_iso_lang))
-                     and _vox in _azure_class.accept_voice)
-    if not _continue:
-        _continue = (bool(_google_cloud_class.language_supported(_iso_lang))
-                     and _vox in _google_cloud_class.accept_voice)
-    if not _continue:
-        _continue = (bool(_watson_class.language_supported(_iso_lang))
-                     and _vox in _watson_class.accept_voice)
+        _continue = _gtts_class.check_version(
+            _gtts_class.tested_version) and _vox in _gtts_class.accept_voice
 
     if not _continue:
         print(
-            "No working network server was found, or the requested voice is unavailable.\n"
+            'No working network server was found, or the requested voice is unavailable.\n'
         )
         usage()
         return False
     _text = _imported_meta.meta_from_file(_text_file_in)
     if len(_text) != 0:
         _info = readtexttools.check_artist(_writer)
-        clip_title = readtexttools.check_title(_title, "espeak")
+        clip_title = readtexttools.check_title(_title, 'espeak')
         # If the library does not require a postprocess, use `0`,
         # otherwise use the item corresponding to the next action.
         _post_processes = [
-            None,
-            "process_mp3_media",
-            "process_playlist",
-            "process_riff_media",
-            "process_vorbis_media",
-            "process_wav_media",
-            "process_audio_media",
+            None, 'process_mp3_media', 'process_playlist',
+            'process_riff_media', 'process_vorbis_media', 'process_wav_media',
+            'process_audio_media'
         ]
-        if _amazon_class.language_supported(_iso_lang):
-            _amazon_class.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[1],
-                _info,
-                _size,
-                _speech_rate,
-            )
-        elif _azure_class.language_supported(_iso_lang):
-            _azure_class.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[1],
-                _info,
-                _size,
-                _speech_rate,
-            )
-        elif _google_cloud_class.language_supported(_iso_lang):
-            _google_cloud_class.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[1],
-                _info,
-                _size,
-                _speech_rate,
-            )
-        elif REQUESTS_OK and _marytts.language_supported(_iso_lang):
-            _ssml = "</speak>" in _text and "<speak" in _text
-            _marytts.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _ssml,
-                _vox,
-                4,
-                15,
-            )
+        if REQUESTS_OK and _marytts.language_supported(_iso_lang):
+            _ssml = '</speak>' in _text and '<speak' in _text
+            _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
+                          _icon, clip_title, _post_processes[5], _info, _size,
+                          _speech_rate, _ssml, _vox, 4, 15)
+        elif not REQUESTS_OK and _marytts.language_supported(_iso_lang):
+            _ssml = False
+            if '</speak' in _text:
+                _text = readtexttools.strip_xml(_text)
+            _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
+                          _icon, clip_title, _post_processes[5], _info, _size,
+                          _speech_rate, _ssml, _vox, 4, 15)
         elif _larynx.language_supported(_iso_lang):
             _quality = -1  # Auto; Manual is 0 (lowest) to 2 (highest)
-            _ssml = "</speak>" in _text and "<speak" in _text
+            _ssml = '</speak>' in _text and '<speak' in _text
             if _ssml:
                 # Check if `_text` is valid XML
                 if readtexttools.strip_xml(_text) == _text:
                     _ssml = False
-            _larynx.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _quality,
-                _ssml,
-                _denoiser_strength,
-                _noise_scale,
-                20,
-                60,
-            )
+            _larynx.read(_text, _iso_lang, _visible, _audible, _media_out,
+                         _icon, clip_title, _post_processes[5], _info, _size,
+                         _speech_rate, _quality, _ssml, _denoiser_strength,
+                         _noise_scale, 20, 60)
         elif _rhvoice_rest.language_supported(_iso_lang, _local_url):
-            _rhvoice_rest.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _vox,
-                4,
-                30,
-            )
-        elif not REQUESTS_OK and _marytts.language_supported(_iso_lang):
-            _ssml = False
-            if "</speak" in _text:
-                _text = readtexttools.strip_xml(_text)
-            _marytts.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _ssml,
-                _vox,
-                4,
-                15,
-            )
+            _rhvoice_rest.read(_text, _iso_lang, _visible, _audible,
+                               _media_out, _icon, clip_title,
+                               _post_processes[5], _info, _size, _speech_rate,
+                               _vox, 4, 30)
+
         elif _coqui_demo.language_supported(_iso_lang, _local_url):
-            _coqui_demo.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _vox,
-                20,
-                60,
-            )
+            _coqui_demo.read(_text, _iso_lang, _visible, _audible, _media_out,
+                             _icon, clip_title, _post_processes[5], _info,
+                             _size, _speech_rate, _vox, 20, 60)
         elif _gtts_class.language_supported(_iso_lang):
-            _gtts_class.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[1],
-                _info,
-                _size,
-                _speech_rate,
-            )
+            _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,
+                             _icon, clip_title, _post_processes[1], _info,
+                             _size, _speech_rate)
         else:
             # Just display a translation link.
-            _gtts_class.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[0],
-                _info,
-                _size,
-                _speech_rate,
-            )
+            _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,
+                             _icon, clip_title, _post_processes[0], _info,
+                             _size, _speech_rate)
     return True
 
 
 def main():  # -> NoReturn
-    """Use network speech synthesis for supported languages while on-line"""
-    if not sys.version_info >= (3, 6) or not os.name in ["posix", "nt"]:
-        print("Your system does not support the network python tool.")
+    '''Use network speech synthesis for supported languages while on-line'''
+    if not sys.version_info >= (3, 6) or not os.name in ['posix', 'nt']:
+        print('Your system does not support the network python tool.')
         usage()
         sys.exit(0)
     _speech_rate = 160
-    _iso_lang = "ca-ES"
+    _iso_lang = 'ca-ES'
     try:
-        _iso_lang = readtexttools.default_lang().replace("_", "-")
+        _iso_lang = readtexttools.default_lang().replace('_', '-')
     except AttributeError:
         pass
-    _media_out = ""
-    _visible = ""
-    _audible = ""
-    _text = ""
-    _percent_rate = "100%"
+    _media_out = ''
+    _visible = ''
+    _audible = ''
+    _text = ''
+    _percent_rate = '100%'
     _speech_rate = speech_wpm(_percent_rate)
     _denoiser_strength = 0.005
     _noise_scale = 0.667
-    _icon = ""
-    _title = ""
-    _writer = ""
-    _size = "600x600"
-    _speaker = "AUTO"
-    _local_url = ""
+    _icon = ''
+    _title = ''
+    _writer = ''
+    _size = '600x600'
+    _speaker = 'AUTO'
+    _local_url = ''
     _text_file_in = sys.argv[-1]
 
     if os.path.isfile(_text_file_in):
@@ -3842,70 +3042,55 @@ def main():  # -> NoReturn
             usage()
             sys.exit(0)
         try:
-            opts, args = getopt.getopt(
-                sys.argv[1:],
-                "hovalritndsxuec",
-                [
-                    "help",
-                    "output=",
-                    "visible=",
-                    "audible=",
-                    "language=",
-                    "rate=",
-                    "image=",
-                    "title=",
-                    "artist=",
-                    "dimensions=",
-                    "speaker=",
-                    "voice=",
-                    "url=",
-                    "denoiser_strength=",
-                    "noise_scale=",
-                ],
-            )
+            opts, args = getopt.getopt(sys.argv[1:], 'hovalritndsxuec', [
+                'help', 'output=', 'visible=', 'audible=', 'language=',
+                'rate=', 'image=', 'title=', 'artist=', 'dimensions=',
+                'speaker=', 'voice=', 'url=', 'denoiser_strength=',
+                'noise_scale='
+            ])
         except getopt.GetoptError:
-            print("option -a not recognized")
+            print('option -a not recognized')
             usage()
             sys.exit(2)
         for o, a in opts:
-            if o in ("-h", "--help"):
+            if o in ('-h', '--help'):
                 usage()
                 sys.exit(0)
-            elif o in ("-o", "--output"):
+            elif o in ('-o', '--output'):
                 _media_out = a
-            elif o in ("-v", "--visible"):
+            elif o in ('-v', '--visible'):
                 _visible = a
-            elif o in ("-a", "--audible"):
+            elif o in ('-a', '--audible'):
                 _audible = a
-            elif o in ("-l", "--language"):
+            elif o in ('-l', '--language'):
                 _iso_lang = a
-            elif o in ("-r", "--rate"):
+            elif o in ('-r', '--rate'):
                 _percent_rate = a
                 if len(_percent_rate) != 0:
                     _speech_rate = speech_wpm(_percent_rate)
-            elif o in ("-i", "--image"):
+            elif o in ('-i', '--image'):
                 _icon = a
-            elif o in ("-t", "--title"):
+            elif o in ('-t', '--title'):
                 _title = a
-            elif o in ("-n", "--artist"):
+            elif o in ('-n', '--artist'):
                 _writer = a
-            elif o in ("-d", "--dimensions"):
+            elif o in ('-d', '--dimensions'):
                 _size = a
-            elif o in ("-s", "--speaker"):
+            elif o in ('-s', '--speaker'):
                 # depreciated
                 _speaker = a
-            elif o in ("-x", "--voice"):
+            elif o in ('-x', '--voice'):
                 _speaker = a
-            elif o in ("-u", "--url"):
+            elif o in ('-u', '--url'):
                 _local_url = a
-            elif o in ("-e", "--denoiser_strength"):
+            elif o in ('-e', '--denoiser_strength'):
                 try:
                     _denoiser_strength = float(o)
                 except (AttributeError, TypeError, ValueError):
                     pass
                 if not bool(_denoiser_strength):
                     _denoiser_strength = 0.005
-            elif o in ("-c", "--noise_scale"):
+            elif o in ('-c', '--noise_scale'):
                 try:
                     _noise_scale = float(o)
                 except (AttributeError, TypeError, ValueError):
@@ -3913,25 +3098,12 @@ def main():  # -> NoReturn
                 if not bool(_noise_scale):
                     _noise_scale = 0.667
             else:
-                assert False, "unhandled option"
-        network_main(
-            _text_file_in,
-            _iso_lang,
-            _visible,
-            _audible,
-            _media_out,
-            _writer,
-            _title,
-            _icon,
-            _size,
-            _speech_rate,
-            _speaker,
-            _local_url,
-            _denoiser_strength,
-            _noise_scale,
-        )
+                assert False, 'unhandled option'
+        network_main(_text_file_in, _iso_lang, _visible, _audible, _media_out,
+                     _writer, _title, _icon, _size, _speech_rate, _speaker,
+                     _local_url, _denoiser_strength, _noise_scale)
     sys.exit(0)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
