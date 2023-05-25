@@ -2928,6 +2928,13 @@ for an unusually large length. Python is breaking now to protect
 your system. Some words might not be pronounced correctly.'''
 
 
+def prefix_ohs(_int=1, _str_len=10, _symbol='0'):  # -> str
+    '''Given an integer `_int`, returns a string of length `_str_len`
+    prefixed by `_symbol` character (zeros by default).'''
+    _ohs = _str_len * _symbol
+    return (_ohs + str(_int))[0 - _str_len :]
+
+
 def local_pronunciation(iso_lang='en-CA',
                         text='',
                         my_dir='macos_say',
@@ -2983,7 +2990,6 @@ file for `%(my_dir)s` was found.""" % locals())
                     # return json with standard formatting and
                     # removing duplicate graphemes in list item 1
                     _count_j = 0
-                    _ohs = 5 * '0'
                     _json_text = '{\n'
                     _footnotes = [
                         '''    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},'''
@@ -3002,11 +3008,12 @@ file for `%(my_dir)s` was found.""" % locals())
                             '":{"g":"', _grapheme, '","p":"', _phoneme, '"},'
                         ]))
                     _good_list = sorted(sorted(_good_list), key=len)
+
                     for _item in _good_list:
                         _count_j += 1
                         _json_text = ''.join([
                             _json_text, '    "', _test, '_',
-                            (_ohs + str(_count_j))[-5:], _item, '\n'
+                            prefix_ohs(_count_j, 5, '0'), _item, '\n'
                         ])
                     for _addenda in _footnotes:
                         _json_text = ''.join([_json_text, _addenda, '\n'])

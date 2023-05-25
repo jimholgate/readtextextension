@@ -4,10 +4,10 @@
 This text explains how to use a web service and media player to read a text
 file. It outlines the terms and conditions associated with using the on-line
 service, as well as the potential privacy and security risks. It introduces
-text-to-speech tools, Larynx, Rhvoice and MaryTTS, and how to use them. It
-mentions the need to check if the network is available and to set permissions
-when using these tools. Lastly, it provides advice on how to update local
-libraries and packages when using these tools.
+text-to-speech tools, Mimic3, Larynx, Rhvoice, MaryTTS and TTS, and how to
+use them. It mentions the need to check if the network is available and to
+set permissions when using these tools. Lastly, it provides advice on how to
+update local libraries and packages when using these tools.
 
 -----
 
@@ -31,8 +31,75 @@ There may be acceptable use policies, limits or costs.
   or snap, some functions might not work because the application
   does not have permission to execute them.
 * On some systems, you might need to install additional software
-  like `curl` and `ffmpeg` to ensure that libraries are available to
-  download and process files.
+  libraries like `bs4`, `spacy`, `docker.io` `python3-requests`
+  and `ffmpeg` to ensure that libraries are available to download
+  and process files.
+
+Docker
+------
+
+You can install some text to speech local host tools using docker.io.
+
+If Read Text Extension documentation does not specifically state that it
+supports a docker image, check if the docker image has a `maryTTS`
+compatibility mode. The compatibility mode allows the speech synthesis
+image to use the maryTTS address and port and the maryTTS Application
+Program Interface (API) to list installed voices and to produce spoken
+audio files over a local web service.
+ 
+See also:
+[Docker docs](https://docs.docker.com/desktop/install/linux-install/)
+  
+Mimic 3
+-------
+
+"A fast local neural text to speech engine for Mycroft"
+
+Mycroft Mimic3 is a fast text to speech tool that includes very high quality
+voice assets. As of May 2023, it is still in the development stage. The
+author of Rhasspy Larynx is a major contributor to the project, so anyone
+familiar with Larynx will find it easy to add voice models and manage the
+service using the Mimic 3 locally hosted web page.
+
+Mimic 3 covers a lot of languages. The locally hosted web page has a Feedback
+ button that encourages users to comment on how the pronunciation could be
+ improved. 
+
+If your computer architecture supports Mimic 3, you can use Mimic TTS with
+speech-dispatcher or as a localhost web server with this application. When
+installed from an apt archive, or a from compiled code, you can start the
+local web server at startup using a command to initiate `mimic3-server`.
+
+If you use a docker image, you can get the computer to start the mimic 
+localhost web server on startup by setting the Docker container restart policy
+to "always". 
+
+[Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
+
+### It doesn't work?
+
+The first step is to check if the network is available. The
+network service might offer an account status report page or
+a help document to assist you.
+
+The tool relies on external libraries or packages, and python
+might not have access to the current required packages.
+
+Some ways of installing your office application restrict the
+application's ability to run third party extensions. You or
+your system administrator might need to set permissions for
+this extension to run or for the extension to access a
+network resource.
+
+Some of the network tools require specific versions of python
+or a specific system platform like `amd64`, `arm64` or `v7`.
+This script might not work with those tools because it can't use
+the required libraries on an unsupported version of python.
+
+If you use python pip to install local libraries, you might have to
+manually update them from time to time. Packages that are managed
+by update utilities like `apt-get`, `yum` and `dnf` are upgraded
+by the distribution.
 
 Larynx
 ------
@@ -56,6 +123,8 @@ Posix computers like MacOS and desktop Linux distributions.
 Website](https://github.com/rhasspy/larynx)
 
 <https://hub.docker.com/r/rhasspy/larynx>
+
+### It doesn't work?
 
 + Is the larynx server running? Consider setting up `larynx-server`
   to automatically start up when you log in.
@@ -110,59 +179,27 @@ See also:
 
 [Rhasspy community](https://community.rhasspy.org/)
 
-Mimic 3
--------
+TTS
+---
 
-"A fast local neural text to speech engine for Mycroft"
+TTS is a text to speech authoring tool that includes support for converting
+text to speech. The Read Text Extension accesses TTS as a client of a locally
+hosted Coqui AI TTS web service. To interpret the capabilities of each tts
+model, the Read Text Extension web client requires the `bs4` (beautiful soup)
+pythonlibrary. To correctly parse the text the Read Text python client
+requires the `spacy` python library.
 
-If your computer architecture supports rhasspy programs, you
-can use Mimic TTS with speech-dispatcher or as a localhost
-web server with this application. When installed from 
-an apt archive, or a from compiled code, you can start the
-local web server at startup using a command to initiate
- `mimic3-server`.
+TTS is a development platform. You, like other users and online community
+contributors can create voice models. The speed, reliability and accuracy
+of TTS's artificial intelligence generated speech can vary by model, language
+and your computer's hardware. The Read Text Extension's local host web client
+might not be able to access all the features of all TTS language models on all
+computers.
 
-If you use a docker image, you can get the computer to
-start the mimic localhost web server on startup by setting
-the Docker container restart policy to "always". 
+There's more information on how to set up and use TTS in thenotes for in the
+`CoquiDemoLocalHost` comments section below.
 
-[Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
-
-It doesn't work?
-----------------
-
-The first step is to check if the network is available. The
-network service might offer an account status report page or
-a help document to assist you.
-
-The tool relies on external libraries or packages, and python
-might not have access to the current required packages.
-
-Some ways of installing your office application restrict the
-application's ability to run third party extensions. You or
-your system administrator might need to set permissions for
-this extension to run or for the extension to access a
-network resource.
-
-Some of the network tools require specific versions of python
-or a specific system platform like `amd64`, `arm64` or `v7`.
-This script might not work with those tools because it can't use
-the required libraries on an unsupported version of python.
-
-If you use python pip to install local libraries, you might have to
-manually update them from time to time. Packages that are managed
-by update utilities like `apt-get`, `yum` and `dnf` are upgraded
-by the distribution.
-
-If your docker image is not specifically supported here, check if
-it has a `maryTTS` compatibility mode. The compatibility mode
-allows the speech synthesis image to use the maryTTS address and 
-port and the maryTTS Application Program Interface (API) to list
-installed voices and to produce spoken audio files over a local
-web service.
- 
-See also:
-[Docker docs](https://docs.docker.com/desktop/install/linux-install/)
+[Coqui.ai News](https://tts.readthedocs.io/en/latest/index.html)
 '''
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
@@ -322,6 +359,14 @@ class LocalCommons(object):
             'judy_bieber', 'kathleen', 'ljspeech', 'southern_english_female',
             'karen_savage', 'siwis', 'lisa', 'nathalie', 'hajdurova'
         ]
+        self.spacy_dat = [[['en'], '_core_web_sm'],
+                          [[
+                              'ca', 'da', 'el', 'es', 'fi', 'fr', 'de', 'hr',
+                              'it', 'ja', 'ko', 'lt', 'mk', 'nb', 'nl', 'pl',
+                              'pt', 'ro', 'ru', 'sv', 'uk'
+                          ], '_core_news_sm'], [['xx'], '_ent_wiki_sm']]
+        self.checked_spacy = False
+        self.ai_developer_platforms = ['ubuntu', 'darwin', 'alpine']
         self.spd_100 = [
             'female0',
             'male0',
@@ -551,14 +596,91 @@ class LocalCommons(object):
         except AttributeError:
             self.base_curl = None
         self.is_x86_64 = sys.maxsize > 2**32
+        self.generic_problem = '''The application cannot load a sound file.
+Your computer might be missing a required library, or an operation might have
+taken too long. If the problem persists, try installing `pip3 install requests`
+or `apt-get install python3-requests` to fix it.'''
 
-    def big_play_list(self, _text=''):  # -> list[str] | None
-        '''Split a long string of plain text into a list'''
-        if len(_text.strip()) == 0:
-            return None
-        elif _text.lower().count('<speak') != 0:
-            _text = readtexttools.strip_xml(_text)
-        return _text.splitlines()
+    def big_play_list(self, _text='', _lang_str='en', _verbose=True):  # -> list
+        '''Split a long string of sentences or paragraphs into a list.
+        Best practice is to install [spacy](https://spacy.io/)
+        in a virtual environment and download the parsing components. '''
+        retval = _text.splitlines()
+        try:
+            import spacy
+        except (ImportError, ModuleNotFoundError):
+            try:
+                _local_pip = readtexttools.find_local_pip('spacy')
+                if len(_local_pip) != 0:
+                    sys.path.append(_local_pip)
+                    try:
+                        import spacy
+                    except:
+                        return retval
+            except:
+                return retval
+        spaceval = []
+        trained_pipeline = 'xx_ent_wiki_sm'
+        for _item in self.spacy_dat:
+            if _lang_str in _item[0]:
+                trained_pipeline = ''.join([_lang_str, _item[1]])
+                break
+        try:
+            nlp = spacy.load(trained_pipeline)
+            doc = nlp(_text)
+            for item in doc.sents:
+                spaceval.append(item.text)
+            self.checked_spacy = True
+        except:
+            self.checked_spacy = False
+        if len(spaceval) == 0 and _verbose:
+            print(
+                '''The python `spacy` library or a `%(_lang_str)s` language model is unavailable.
+Falling back to `.splitlines()`
+
+    sudo apt-get install pipx
+    pipx install spacy
+    spacy download %(trained_pipeline)s
+
+* See: <https://spacy.io/api/cli#download>
+* Package list: <https://spacy.io/models>''' % locals())
+            for _item in '.?!`':
+                _text = _text.replace(_item, _item + '\n')
+            retval = _text.splitlines()
+            return retval
+        return spaceval
+    
+    def is_ai_developer_platform(self):  # -> bool
+        '''Does the posix platform include options for system
+        contributor or non-free components for some ai models?'''
+        # i. e.: MacOS, Docker container or Ubuntu compatible?
+        if os.name == 'posix':
+            try:
+                _uname_ver = platform.uname().version
+            except:
+                try:
+                    _importmeta = readtexttools.ImportedMetaData()
+                    _uname_ver = _importmeta.execute_command('uname -a')
+                except:
+                    return False
+            for _item in self.ai_developer_platforms:
+                if _item.lower() in _uname_ver.lower():
+                    return True
+        return False
+
+    def verify_spacy(self, _lang='en'):  # -> bool
+        '''spaCy is a free open-source library for Natural Language
+        Processing in Python.
+
+        Do a test run of the python `spacy` library, and check whether it
+        completes the task with no errors with the specified language
+        (`_lang`).'''
+        if self.checked_spacy:
+            return True
+        _verbose = self.is_ai_developer_platform()
+        if len(self.big_play_list('123.\n456', _lang, _verbose)) == 0:
+            return False
+        return self.checked_spacy
 
     def set_urllib_timeout(self, _ok_wait=4):  # -> bool
         '''Try to set sockets timeout before transfering a file using
@@ -621,7 +743,8 @@ xml:lang="%(_xml_lang)s">
                      _visible='false',
                      _writer='',
                      _size='600x600',
-                     _post_process=''):  # -> bool
+                     _post_process='',
+                     handle_unlock=False):  # -> bool
         '''Play `_media_work` or export it to `_media_out` format.'''
         # use `getsize` to ensure that python waits for file to finish download
         if not os.path.isfile(_media_work):
@@ -634,8 +757,10 @@ xml:lang="%(_xml_lang)s">
             if os.path.getsize(_media_work) == 0:
                 print('Unable to write media work file.')
                 return False
-            # NOTE: Calling process must unlock_my_lock()
-            readtexttools.unlock_my_lock()
+            # NOTE: Calling process should unlock_my_lock()
+            # In a loop, this would cause the voice to continue..
+            if handle_unlock:
+                readtexttools.unlock_my_lock()
             readtexttools.process_wav_media(_info, _media_work, _icon,
                                             _media_out, _audible, _visible,
                                             _writer, _size)
@@ -1079,6 +1204,7 @@ class LarynxClass(object):
         self.add_pause = _common.add_pause
         self.base_curl = _common.base_curl
         self.is_x86_64 = _common.is_x86_64
+        self.max_chars = 360
 
     def _set_vocoders(self, alt_local_url=''):  # -> bool
         '''If the server is running, then get the list of voice coders.
@@ -1322,6 +1448,86 @@ Loading larynx voices for `%(_lang2)s`
                 return coder
         return ''
 
+    def _try_requests(self,
+                      _voice='',
+                      _text='',
+                      _url='',
+                      _vocoder='',
+                      _denoiser_strength='',
+                      _noise_scale='',
+                      _length_scale='',
+                      _ssml='',
+                      _ok_wait=4,
+                      _end_wait=30,
+                      _media_work=''):  # -> bool
+        '''Try getting a sound file using requests.'''
+        _done = False
+        if not REQUESTS_OK:
+            return False
+        try:
+            _strips = '\n .;'
+            _text = '\n'.join(['', _text.strip(_strips), ''])
+            response = requests.post(
+                _url,
+                params={
+                    'voice': _voice,
+                    'vocoder': _vocoder,
+                    'denoiserStrength': _denoiser_strength,
+                    'noiseScale': _noise_scale,
+                    'lengthScale': _length_scale,
+                    'ssml': _ssml
+                },
+                headers={
+                    'Content-Type':
+                    'application/x-www-form-urlencoded',
+                    'User-Agent':
+                    'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
+                },
+                data=_text.encode('utf-8', 'ignore'),
+                timeout=(_ok_wait, _end_wait))
+            with open(_media_work, 'wb') as f:
+                f.write(response.content)
+            if os.path.isfile(_media_work):
+                _done = os.path.getsize(_media_work) != 0
+        except:
+            _done = False
+        return _done
+
+    def _try_url_lib(self,
+                     _voice='',
+                     _text='',
+                     _url='',
+                     _vocoder='',
+                     _denoiser_strength='',
+                     _noise_scale='',
+                     _length_scale='',
+                     _ssml='',
+                     _ok_wait=4,
+                     _media_work=''):  # -> bool
+        '''Try getting a sound file using url_lib.'''
+        _done = False
+        if not BASICS_OK:
+            return False
+        self.common.set_urllib_timeout(_ok_wait)
+        _vocoder = urllib.parse.quote(_vocoder)
+        _voice = urllib.parse.quote(_voice)
+        my_url = '''%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s''' % locals(
+        )
+        try:
+            _strips = '\n .;'
+            _text = '\n'.join(['', _text.strip(_strips), ''])
+            data = _text.encode('utf-8', 'ignore')
+            req = urllib.request.Request(my_url, data)
+            resp = urllib.request.urlopen(req)
+            response_content = resp.read()
+            with open(_media_work, 'wb') as f:
+                f.write(response_content)
+            if os.path.isfile(_media_work):
+                _done = os.path.getsize(_media_work) != 0
+        except:
+            _done = False
+        return _done
+
     def read(self,
              _text="",
              _iso_lang='en-US',
@@ -1367,6 +1573,10 @@ Loading larynx voices for `%(_lang2)s`
             os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
+                readtexttools.unlock_my_lock('larynx')
+                return True
+            elif os.path.isfile(readtexttools.get_my_lock('larynx')):
+                readtexttools.unlock_my_lock('larynx')
                 return True
         _voice = self.voice_name
         if self.debug and 1:
@@ -1416,61 +1626,55 @@ Loading larynx voices for `%(_lang2)s`
         _text = readtexttools.local_pronunciation(_iso_lang, _text, 'larynx',
                                                   'LARYNX_USER_DIRECTORY',
                                                   False)[0]
-        if REQUESTS_OK:
-            try:
-                _strips = '\n .;'
-                _text = '\n'.join(['', _text.strip(_strips), ''])
-                response = requests.post(
-                    _url,
-                    params={
-                        'voice': _voice,
-                        'vocoder': _vocoder,
-                        'denoiserStrength': _denoiser_strength,
-                        'noiseScale': _noise_scale,
-                        'lengthScale': _length_scale,
-                        'ssml': _ssml
-                    },
-                    headers={
-                        'Content-Type':
-                        'application/x-www-form-urlencoded',
-                        'User-Agent':
-                        'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
-                    },
-                    data=_text.encode('utf-8', 'ignore'),
-                    timeout=(_ok_wait, _end_wait))
-                with open(_media_work, 'wb') as f:
-                    f.write(response.content)
-                if os.path.isfile(_media_work):
-                    _done = os.path.getsize(_media_work) != 0
-            except:
-                _done = False
+
+        readtexttools.lock_my_lock('larynx')
+        _tries = 0
+        _no = '0' * 10
+        if ssml:
+            _items = [_text]
+        elif self.common.is_ai_developer_platform():
+            _items = self.common.big_play_list(_text, _iso_lang.split('-')[0])
+        elif len(_text.splitlines()) == 1 or len(_text) < self.max_chars:
+            _items = [_text]
+        elif self.common.verify_spacy(_iso_lang.split('-')[0]):
+            _items = self.common.big_play_list(_text, _iso_lang.split('-')[0])
+        else:
+            _items = [_text]
+        for _item in _items:
+            if not os.path.isfile(readtexttools.get_my_lock('larynx')):
+                print('[>] Stop!')
+                return True
+            elif len(_item.strip(' ;.!?\n')) == 0:
+                continue
+            elif '.' in _media_out and _tries != 0:
+                _ext = os.path.splittext(_media_out)[1]
+                _no = readtexttools.prefix_ohs(_tries, 10, '0')
+                _media_out = _media_out.replace('.%(_ext)s' % locals(),
+                                                '_%(_no)s.%(_ext)s' % locals())
+            _tries += 1
+            _done = self._try_requests(_voice, _item, _url, _vocoder,
+                                       _denoiser_strength, _noise_scale,
+                                       _length_scale, _ssml, _ok_wait,
+                                       _end_wait, _media_work)
+            if not _done:
+                _done = self._try_url_lib(_voice, _item, _url, _vocoder,
+                                          _denoiser_strength, _noise_scale,
+                                          _length_scale, _ssml, _ok_wait,
+                                          _media_work)
+            if not os.path.isfile(readtexttools.get_my_lock('larynx')):
+                print('[>] Stop')
+                return True
+            if _done:
+                self.common.do_net_sound(_info, _media_work, _icon, _media_out,
+                                         _audible, _visible, _writer, _size,
+                                         _post_process, False)
+            else:
+                break
+        self.ok = _done
         if not _done:
-            _voice = urllib.parse.quote(_voice)
-            my_body = 'voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s' % locals(
-            )
-            my_url = '''%(_url)s?%(my_body)s''' % locals()
-            self.common.set_urllib_timeout(_ok_wait)
-            try:
-                _strips = '\n .;'
-                _text = '\n'.join(['', _text.strip(_strips), ''])
-                data = _text.encode('utf-8', 'ignore')
-                req = urllib.request.Request(my_url, data)
-                resp = urllib.request.urlopen(req)
-                response_content = resp.read()
-                with open(_media_work, 'wb') as f:
-                    f.write(response_content)
-                if os.path.isfile(_media_work):
-                    _done = os.path.getsize(_media_work) != 0
-            except:
-                _done = False
-        if not _done:
-            print('''The application cannot load a sound file.
-Your computer is missing a required library.''')
-            self.ok = False
-            return False
-        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
-                                        _audible, _visible, _writer, _size,
-                                        _post_process)
+            print(self.common.generic_problem)
+        readtexttools.unlock_my_lock('larynx')
+        return _done
 
 
 class MaryTtsClass(object):
@@ -1541,6 +1745,7 @@ Set the Docker container restart policy to "always"
         self.base_curl = _common.base_curl
         self.is_x86_64 = _common.is_x86_64
         self.is_mimic = False
+        self.max_chars = 360
 
     def marytts_xml(self, _text='', _speech_rate=160):  # -> str
         '''Change the speed that MaryTTS reads plain text aloud using
@@ -1743,6 +1948,145 @@ voices by gender so the gender might be wrong.''')
                 return gendered_fallback
         return last_match
 
+    def _try_requests(self,
+                      _mary_vox='',
+                      _audio_format='',
+                      _output_type='',
+                      _input_type='',
+                      _found_locale='',
+                      _text='',
+                      _ssml='',
+                      _length_scale=1,
+                      _url='',
+                      _ok_wait=4,
+                      _end_wait=30,
+                      _media_work=''):  # -> bool
+        '''Try getting a sound file using requests.'''
+        _done = False
+        if not REQUESTS_OK:
+            return False
+        if len(_mary_vox) == 0:
+            request_params = {
+                'AUDIO': _audio_format,
+                'OUTPUT_TYPE': _output_type,
+                'INPUT_TYPE': _input_type,
+                'LOCALE': _found_locale,
+                'INPUT_TEXT': _text,
+            }
+        else:
+            request_params = {
+                'AUDIO': _audio_format,
+                'OUTPUT_TYPE': _output_type,
+                'INPUT_TYPE': _input_type,
+                'LOCALE': _found_locale,
+                'VOICE': _mary_vox,
+                'INPUT_TEXT': _text,
+            }
+        _strips = ';\n .;'
+        _text = _text.strip(_strips)
+        if self.is_mimic:
+            request_params = {
+                'text': _text,
+                'voice': _mary_vox,
+                'ssml': _ssml,
+                'lengthScale': _length_scale
+            }
+            # Note: 2013-03 Mimic switches are similar to Larynx.
+            # This app uses a subset to maximize MaryTTS compatibility.
+            # The Mimic defaults work well as-is.
+            # 'api/tts?text=' + encodeURIComponent(text) +
+            # '&voice=' + encodeURIComponent(voice) +
+            # '&noiseScale=' + encodeURIComponent(noiseScale) +
+            # '&noiseW=' + encodeURIComponent(noiseW) +
+            # '&lengthScale=' + encodeURIComponent(lengthScale) +
+            # '&ssml=' + encodeURIComponent(ssml) +
+            # '&audioTarget=' + encodeURIComponent(audioTarget)
+        try:
+            response = requests.post(
+                _url,
+                params=request_params,
+                headers={
+                    'Content-Type':
+                    'application/x-www-form-urlencoded',
+                    'User-Agent':
+                    'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
+                },
+                data=_text.encode('utf-8', 'ignore'),
+                timeout=(_ok_wait, _end_wait))
+            with open(_media_work, 'wb') as f:
+                f.write(response.content)
+            if os.path.isfile(_media_work):
+                _done = os.path.getsize(_media_work) != 0
+        except:
+            _done = False
+        return _done
+
+    def _try_url_lib(self,
+                     _mary_vox='',
+                     _audio_format='',
+                     _output_type='',
+                     _input_type='',
+                     _found_locale='',
+                     _text='',
+                     _ssml='',
+                     _length_scale=1,
+                     _url='',
+                     _ok_wait=4,
+                     _end_wait=30,
+                     _media_work=''):  # -> bool
+        '''Try getting a sound file using url_lib.'''
+        _done = False
+        if not BASICS_OK:
+            return False
+        self.common.set_urllib_timeout(_ok_wait)
+        q_text = urllib.parse.quote(_text.strip(';\n'))
+        if self.is_mimic:
+            if _mary_vox.count('/') == 0:
+                _mary_vox = 'en_UK/apope_low'
+            _mary_vox = urllib.parse.quote(_mary_vox)
+            _ssml = urllib.parse.quote(_ssml)
+            my_url = '%(_url)s?text=%(q_text)s&voice=%(_mary_vox)s&ssml=%(_ssml)s&lengthScale=%(_length_scale)s' % locals(
+            )
+            try:
+                # GET
+                response = urllib.request.urlopen(my_url, timeout=(_end_wait))
+                with open(_media_work, 'wb') as f:
+                    f.write(response.read())
+                if os.path.isfile(_media_work):
+                    _done = os.path.getsize(_media_work) != 0
+            except:
+                pass
+        else:
+            if len(_mary_vox) == 0:
+                vcommand = ''
+            else:
+                _mary_vox = urllib.parse.quote(_mary_vox)
+                vcommand = '&VOICE=%(_mary_vox)s' % locals()
+            _body_data = "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT=" % locals(
+            )
+            my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
+            try:
+                # POST
+                # NOTE: Setting a MaryTTS speech rate requires the python
+                # `requests` library.
+                _strips = '\n .;'
+                _text = '\n'.join(['', _text.strip(_strips), ''])
+                data = {}  # The API uses an `INPUT_TEXT` argument for text
+                req = urllib.request.Request(my_url, data)
+                resp = urllib.request.urlopen(req)
+                response_content = resp.read()
+                with open(_media_work, 'wb') as f:
+                    f.write(response_content)
+                if os.path.isfile(_media_work):
+                    _done = os.path.getsize(_media_work) != 0
+            except:
+                _done = False
+        if _done:
+            self.ok = True
+        else:
+            self.ok = False
+        return self.ok
+
     def read(self,
              _text="",
              _iso_lang='en-US',
@@ -1769,6 +2113,7 @@ voices by gender so the gender might be wrong.''')
         _media_out = ''
         _done = False
         _length_scale = 1
+        _ssml = '0'
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
         # Determine the temporary file name;
@@ -1782,6 +2127,10 @@ voices by gender so the gender might be wrong.''')
             os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
+                readtexttools.unlock_my_lock('mary')
+                return True
+            elif os.path.isfile(readtexttools.get_my_lock('mary')):
+                readtexttools.unlock_my_lock('mary')
                 return True
         if bool(self.add_pause) and not ssml:
             for _symbol in self.pause_list:
@@ -1830,6 +2179,7 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.''')
         _output_type = 'AUDIO'
         _title = '''Docker MaryTTS
 =============='''
+        _added_info = '[Docker MaryTTS](https://github.com/synesthesiam/docker-marytts)'
         if self.is_mimic:
             _url = ''.join([_url1, '/api/tts'])
             _ssml = '0'
@@ -1837,11 +2187,21 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.''')
                 _ssml = '1'
             if len(_mary_vox) == 0:
                 _mary_vox = 'en_UK/apope_low'
-            _title = '''Mycroft AI Mimic-3
+            _title = '''Mycroft AI Mimic-3            
 =================='''
+            _preload = _mary_vox.split('#')[0]
+            _added_info = '''Preload voice command
+---------------------
+
+    mimic3-server --preload-voice %(_preload)s
+
+Help
+----
+
+[Mimic-3](https://github.com/MycroftAI/mimic3#mimic-3)''' % locals()
+
         print('''
 %(_title)s
-
 * Audio: `%(_audio_format)s`
 * Input Type: `%(_input_type)s`
 * Speech Rate: `%(_speech_rate)s`
@@ -1850,142 +2210,60 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.''')
 * Output Type: `%(_output_type)s`
 * Server URL: `%(_url1)s`
 * Voice : `%(_mary_vox)s`
+
+%(_added_info)s
 ''' % locals())
-        if REQUESTS_OK:
-            if len(_mary_vox) == 0:
-                request_params = {
-                    'AUDIO': _audio_format,
-                    'OUTPUT_TYPE': _output_type,
-                    'INPUT_TYPE': _input_type,
-                    'LOCALE': _found_locale,
-                    'INPUT_TEXT': _text,
-                }
+        if _input_type != self.input_types[0]:
+            # Don't split XML code
+            _items = [_text]
+        elif self.common.is_ai_developer_platform():
+            _items = self.common.big_play_list(_text, _iso_lang.split('-')[0])
+        elif len(_text.splitlines()) == 1 or len(_text) < self.max_chars:
+            _items = [_text]
+        elif self.common.verify_spacy(_locale.split('_')[0]):
+            # Split by sentence (`spacy`) or paragraph (`splitline()`)
+            _items = self.common.big_play_list(_text, _locale.split('_')[0])
+        else:
+            _items = [_text]
+        _tries = 0
+        readtexttools.lock_my_lock('mary')
+        _no = '0' * 10
+        for _item in _items:
+            if not os.path.isfile(readtexttools.get_my_lock('mary')):
+                print('[>] Stop!')
+                return True
+            elif len(_item.strip(' ;.!?\n')) == 0:
+                continue
+            elif '.' in _media_out and _tries != 0:
+                _ext = os.path.splittext(_media_out)[1]
+                _no = readtexttools.prefix_ohs(_tries, 10, '0')
+                _media_out = _media_out.replace('.%(_ext)s' % locals(),
+                                                '_%(_no)s.%(_ext)s' % locals())
+            _tries += 1
+            _done = self._try_requests(_mary_vox, _audio_format, _output_type,
+                                       _input_type, _found_locale, _item,
+                                       _ssml, _length_scale, _url, _ok_wait,
+                                       _end_wait, _media_work)
+            if not _done:
+                _done = self._try_url_lib(_mary_vox, _audio_format,
+                                          _output_type, _input_type,
+                                          _found_locale, _item, _ssml,
+                                          _length_scale, _url, _ok_wait,
+                                          _end_wait, _media_work)
+            if not os.path.isfile(readtexttools.get_my_lock('mary')):
+                print('[>] Stop')
+                return True
+            if _done:
+                self.common.do_net_sound(_info, _media_work, _icon, _media_out,
+                                         _audible, _visible, _writer, _size,
+                                         _post_process, False)
             else:
-                request_params = {
-                    'AUDIO': _audio_format,
-                    'OUTPUT_TYPE': _output_type,
-                    'INPUT_TYPE': _input_type,
-                    'LOCALE': _found_locale,
-                    'VOICE': _mary_vox,
-                    'INPUT_TEXT': _text,
-                }
-            _strips = ';\n .;'
-            _text = _text.strip(_strips)
-            if self.is_mimic:
-                request_params = {
-                    'text': _text,
-                    'voice': _mary_vox,
-                    'ssml': _ssml,
-                    'lengthScale': _length_scale
-                }
-                # Note: 2013-03 Mimic switches are similar to Larynx.
-                # This app uses a subset to maximize MaryTTS compatibility.
-                # The Mimic defaults work well as-is.
-                # 'api/tts?text=' + encodeURIComponent(text) +
-                # '&voice=' + encodeURIComponent(voice) +
-                # '&noiseScale=' + encodeURIComponent(noiseScale) +
-                # '&noiseW=' + encodeURIComponent(noiseW) +
-                # '&lengthScale=' + encodeURIComponent(lengthScale) +
-                # '&ssml=' + encodeURIComponent(ssml) +
-                # '&audioTarget=' + encodeURIComponent(audioTarget)
-                _preload = _mary_vox.split('#')[0]
-                print('''Preload voice command
----------------------
-
-    mimic3-server --preload-voice %(_preload)s
-
-Help
-----
-
-[Mimic-3](https://github.com/MycroftAI/mimic3#mimic-3)''' % locals())
-
-            else:
-                print(
-                    '[Docker MaryTTS](https://github.com/synesthesiam/docker-marytts)'
-                )
-            try:
-                response = requests.post(
-                    _url,
-                    params=request_params,
-                    headers={
-                        'Content-Type':
-                        'application/x-www-form-urlencoded',
-                        'User-Agent':
-                        'Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0'
-                    },
-                    data=_text.encode('utf-8', 'ignore'),
-                    timeout=(_ok_wait, _end_wait))
-                with open(_media_work, 'wb') as f:
-                    f.write(response.content)
-                if os.path.isfile(_media_work):
-                    _done = os.path.getsize(_media_work) != 0
-            except:
-                _done = False
+                break
+        self.ok = _done
         if not _done:
-            self.common.set_urllib_timeout(_ok_wait)
-            q_text = urllib.parse.quote(_text.strip(';\n'))
-            if self.is_mimic:
-                if _mary_vox.count('/') == 0:
-                    print('''
-NOTE: Incompatible voice format for Mimic; using the default. Make
-sure to use a Mimic 3 voice key instead of a MaryTTS voice name.''')
-                    # # i.e.: http://localhost:59125/api/tts?text=<message>&voice=<voice>&ssml=<0|1>
-                    # See:
-                    # https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3#marytts-compatibility
-                    _mary_vox = 'en_UK/apope_low'
-                _mary_vox = urllib.parse.quote(_mary_vox)
-                _ssml = urllib.parse.quote(_ssml)
-                if self.is_mimic:
-                    my_url = '%(_url)s?text=%(q_text)s&voice=%(_mary_vox)s&ssml=%(_ssml)s&lengthScale=%(_length_scale)s' % locals(
-                    )
-                else:
-                    my_url = '%(_url)s?text=%(q_text)s&voice=%(_mary_vox)s&ssml=%(_ssml)s' % locals(
-                    )
-                try:
-                    # GET
-                    response = urllib.request.urlopen(my_url,
-                                                      timeout=(_end_wait))
-                    with open(_media_work, 'wb') as f:
-                        f.write(response.read())
-                    if os.path.isfile(_media_work):
-                        _done = os.path.getsize(_media_work) != 0
-                except:
-                    pass
-            else:
-                if len(_mary_vox) == 0:
-                    vcommand = ''
-                else:
-                    _mary_vox = urllib.parse.quote(_mary_vox)
-                    vcommand = '&VOICE=%(_mary_vox)s' % locals()
-                _body_data = "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT=" % locals(
-                )
-                my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
-                try:
-                    # POST
-                    # NOTE: Setting a MaryTTS speech rate requires the python
-                    # `request` library.
-                    _strips = '\n .;'
-                    _text = '\n'.join(['', _text.strip(_strips), ''])
-                    data = {}  # The API uses an `INPUT_TEXT` argument for text
-                    req = urllib.request.Request(my_url, data)
-                    resp = urllib.request.urlopen(req)
-                    response_content = resp.read()
-                    with open(_media_work, 'wb') as f:
-                        f.write(response_content)
-                    if os.path.isfile(_media_work):
-                        _done = os.path.getsize(_media_work) != 0
-                except:
-                    _done = False
-        if not _done:
-            print('''The application cannot load a sound file.
-Your computer is missing a required library.
-Use `pip3 install requests` or `apt-get install python3-requests` to fix it.'''
-                  )
-            self.ok = False
-            return False
-        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
-                                        _audible, _visible, _writer, _size,
-                                        _post_process)
+            print(self.common.generic_problem)
+        readtexttools.unlock_my_lock('mary')
+        return _done
 
 
 class RhvoiceLocalHost(object):
@@ -2249,7 +2527,11 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
         _media_work = os.path.join(tempfile.gettempdir(), 'Rhvoice-rest.wav')
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
+                readtexttools.unlock_my_lock('rhvoice')
                 return True
+            elif os.path.isfile(readtexttools.get_my_lock('rhvoice')):
+                readtexttools.unlock_my_lock('rhvoice')
+                return True 
         if bool(self.add_pause):
             for _symbol in self.pause_list:
                 if _symbol in _text:
@@ -2283,37 +2565,69 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
             )
             # _method = "GET"
             _strips = '\n .;'
-            _text = '\n'.join(['', _text.strip(_strips), ''])
-            # The API uses GET and a `text` argument for text
-            q_text = urllib.parse.quote(_text)
-            my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
             self.common.set_urllib_timeout(_ok_wait)
-            try:
-                # See: <https://docs.python.org/3/library/urllib.request.html>
-                # See also: `/usr/lib/python3.xx/urllib/request.py
-                req = urllib.request.Request(my_url)
-                resp = urllib.request.urlopen(req)
-                response_content = resp.read()
-                with open(_media_work, 'wb') as f:
-                    f.write(response_content)
-                if os.path.isfile(_media_work):
-                    _done = os.path.getsize(_media_work) != 0
-            except:
-                _done = False
-        if not _done:
-            return False
-        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
-                                        _audible, _visible, _writer, _size,
-                                        _post_process)
+            _tries = 0
+            readtexttools.lock_my_lock('rhvoice')
+            _no = '0' * 10
+            # Rhvoice has low latency, so using `spacy` to divide text into sentences
+            # might degrade performance. Use `splitlines()`
+            if self.common.ai_developer_platforms:
+                _items = _text.splitlines()
+            else:
+                _items = [_text]
+            for _item in _items:
+                if not os.path.isfile(readtexttools.get_my_lock('rhvoice')):
+                    print('[>] Stop!')
+                    return True
+                if len(_item.strip(_strips)) == 0:
+                    continue
+                elif '.' in _media_out and _tries != 0:
+                    _ext = os.path.splittext(_media_out)[1]
+                    _no = readtexttools.prefix_ohs(_tries, 10, '0')
+                    _media_out = _media_out.replace('.%(_ext)s' % locals(),
+                                                    '_%(_no)s.%(_ext)s' % locals())
+                _item = '\n'.join(['', _item.strip(_strips), ''])
+                # The API uses GET and a `text` argument for text
+
+                q_text = urllib.parse.quote(_item)
+                my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
+                try:
+                    # See: <https://docs.python.org/3/library/urllib.request.html>
+                    # See also: `/usr/lib/python3.xx/urllib/request.py
+                    req = urllib.request.Request(my_url)
+                    resp = urllib.request.urlopen(req)
+                    response_content = resp.read()
+                    with open(_media_work, 'wb') as f:
+                        f.write(response_content)
+                    if os.path.isfile(_media_work):
+                        _done = os.path.getsize(_media_work) != 0
+                except:
+                    _done = False
+                    break
+                if not _done:
+                    readtexttools.unlock_my_lock('rhvoice')
+                    return False
+                
+                if not os.path.isfile(readtexttools.get_my_lock('rhvoice')):
+                    print('[>] Stop')
+                    return True
+                retval = self.common.do_net_sound(_info, _media_work, _icon, _media_out,
+                                                _audible, _visible, _writer, _size,
+                                                _post_process, False)
+        readtexttools.unlock_my_lock('rhvoice')
+        return retval
+
 
 
 class CoquiDemoLocalHost(object):
     '''# CoquiAI TTS
+
     The [TTS engine](https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu)
     provides a local http service to convert text that you select to speech.
     
     The TTS server is powered by python. You can use `pip3`, `pipx`, `git`
-    or a docker image to download it.
+    or a docker image to download it. For testing, I used Ubuntu 22.04 LTS
+    and installed the TTS library using `pipx`.
 
     The server only serves one model at a time, but you can specify the
     language by selecting a model that includes the iso language code for
@@ -2333,9 +2647,15 @@ class CoquiDemoLocalHost(object):
     * Spanish `tts-server --model_name tts_models/es/css10/vits`
     * Ukrainian `tts-server --model_name tts_models/uk/mai/vits`
 
-    This script is a client of the `tts` webserver. The developer github site
+    This script is a client of the `tts` webserver. The TTS github site
     includes a page to report problems and feature requests. It serves to
     identify limits, errors, pronunciation problems, and other issues.
+
+    IMPORTANT: If some of the models are unusable, it is *not* this client's
+    software issue -- report it to the author of the voice model, not the Read
+    Text Extension's github bug tracker. Try the text using the locally hosted
+    [web page](http://[::1]:5002/) and try to reproduce the problem using
+    the same voice and settings.
 
     The TTS server supports custom models. Check the server documentation.
 
@@ -2357,6 +2677,13 @@ class CoquiDemoLocalHost(object):
 
         `sudo apt-get install python3-bs4 python3-pip espeak-ng`
     
+    Optionally, install `spacy` and the associated `spacy` text parsing
+    packages for your language using `pipx`. Using the current long term
+    support Ubuntu distribution, this allows the Read Text Extension to
+    break long text into manageable chunks.'
+
+        `pipx install spacy`
+
     To troubleshoot the client, you can see information and error messages
     if you run your office program using a terminal window.
 
@@ -2374,14 +2701,15 @@ class CoquiDemoLocalHost(object):
 
     `docker run --rm -it -p 5002:5002 --entrypoint /bin/bash ghcr.io/coqui-ai/tts-cpu`
 
-    The official documentation lists equivalent docker commands that are
-    optimized for specific computer hardware configurations - like the GPU or
-    CPU architecture.
+    The official TTS server documentation lists equivalent docker commands
+    for specific computer hardware configurations - like the GPU or CPU 
+    architecture.
 
-    Pip3
+    Pipx
     ----
 
-    `pip3 install tts`
+    * `pipx install tts`
+    * `pipx install spacy`
 
     Your Linux `temp` and `home` directories must have at least 5 GB of
     available storage. Installing via `pip3` or `pipx` might not work on
@@ -2419,7 +2747,9 @@ class CoquiDemoLocalHost(object):
       to a cloud service might allow you to use more voices and
       languages.
     * If you select a long text to say aloud, then the Coqui TTS web
-      server can time out. Select a shorter text.
+      server can time out. Select a shorter text or use `pipx` to install
+      the `spacy` text handling tool so that Read Text Extension can
+      accurately split long text into manageable chunks.
     * Different models used in your `tts-server` command vary in the
       pronunciation, naturalness, intelligibilty, speed and reliability.
       If you can, try out a different model if one does not work well.
@@ -2800,14 +3130,17 @@ system installer application like `apt`.''')
                                    self.help_heading.replace(' ', '-') + _end)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
+                readtexttools.unlock_my_lock('tts')
+                return True
+            elif os.path.isfile(readtexttools.get_my_lock('tts')):
+                readtexttools.unlock_my_lock('tts')
                 return True
         if bool(self.add_pause):
             for _symbol in self.pause_list:
                 if _symbol in _text:
                     _text = _text.translate(self.add_pause).replace('.;', '.')
                     break
-        if os.path.isfile(_media_work):
-            os.remove(_media_work)
+
         _view_json = self.debug and 1
         response = readtexttools.local_pronunciation(_iso_lang, _text, 'coqui',
                                                      'COQUI_USER_DIRECTORY',
@@ -2818,38 +3151,88 @@ system installer application like `apt`.''')
         _url1 = self.url
         _url = '%(_url1)s/api/tts' % locals()
         _speaker_id = self.get_bs4_speaker(_vox)
+        retval = False
         if BASICS_OK:
-            _text = _text.strip('\n .;')
-            q_text = urllib.parse.quote(_text)
+            _text = _text.strip('\n;')
             _language_id = self.checked_lang
             _style_wav = self.get_bs4_style_wav(_style_wav)
-            my_url = '''%(_url)s?text=%(q_text)s&speaker_id=%(_speaker_id)s&style_wav=%(_style_wav)s&language_id=%(_language_id)s''' % locals(
-            )
-            # _method = "GET"
             _logo = ' ' + self.mascot + ' '
-            if len(_text) > 500 or '\n' in _text:
-                _end_wait = int(_end_wait * len(_text) / 500)
-                _logo = ' ⌛ '
-            readtexttools.pop_message(
-                ''.join([self.help_heading, _logo, self.voice]), self.url, 0,
-                self.help_icon, 0)
-            self.common.set_urllib_timeout(_end_wait)
-            try:
-                # The API uses GET and a `text` argument for text
-                req = urllib.request.Request(my_url)
-                resp = urllib.request.urlopen(req)
-                response_content = resp.read()
-                with open(_media_work, 'wb') as f:
-                    f.write(response_content)
+            # Coqui TTS is not currently available as a built in
+            # in system package, so the behaviour and requirements
+            # doe not change consistently across platforms.
+            play_list = self.common.big_play_list(_text,
+                                                  _iso_lang.split('-')[0])
+            last_item = ''
+            _tries = 0
+            readtexttools.lock_my_lock('tts')
+            _no = 10 * '0'
+            for _item in play_list:
+                if not os.path.isfile(readtexttools.get_my_lock('tts')):
+                    print('[>] Stop!')
+                    return True
+                _item = _item.strip(' \n;')
+                _ilen = len(_item)
+                if _ilen == 0:
+                    continue
+                elif _ilen < 3:
+                    # Using the default Coqui Web page, enter just "No"
+                    # into the text entry field and click "Speak". Wait
+                    # and wait until the web server times out. Good luck!
+                    # Let's add some punctuation so it reads a short word
+                    # aloud.
+                    _item = _item + '!'
+                elif _ilen > len(last_item):
+                    # Could make unusual noises. Your mileage may vary.
+                    #
+                    # Let's make sure that the previous utterance is done.
+                    time.sleep(2)
+                last_item = _item
+                _no = readtexttools.prefix_ohs(_tries, 10, '0')
+                if '.' in _media_out and _tries != 0:
+                    _ext = os.path.splittext(_media_out)[1]
+                    _media_out = _media_out.replace(
+                        '.%(_ext)s' % locals(), '_%(_no)s.%(_ext)s' % locals())
+                _tries += 1
                 if os.path.isfile(_media_work):
-                    _done = os.path.getsize(_media_work) != 0
-            except:
-                _done = False
-        if not _done:
-            return False
-        return self.common.do_net_sound(_info, _media_work, _icon, _media_out,
-                                        _audible, _visible, _writer, _size,
-                                        _post_process)
+                    os.remove(_media_work)
+                q_text = urllib.parse.quote(_item)
+                my_url = '''%(_url)s?text=%(q_text)s&speaker_id=%(_speaker_id)s&style_wav=%(_style_wav)s&language_id=%(_language_id)s''' % locals(
+                )
+                # _method = "GET"
+                if self.debug:
+                    if len(play_list) != 1:
+                        print('\n'.join(['', _no, _item, 10 * '-']))
+                if len(_item) > 200:
+                    _end_wait = int(_end_wait * len(_item) / 500)
+                    _logo = ' ⌛ '  # U+231B <https://www.compart.com/en/unicode/U+231B>
+                if not retval:
+                    readtexttools.pop_message(
+                        ''.join([self.help_heading, _logo, self.voice]),
+                        self.url, 0, self.help_icon, 0)
+                self.common.set_urllib_timeout(_end_wait)
+                try:
+                    # The API uses GET and a `text` argument for text
+                    req = urllib.request.Request(my_url)
+                    resp = urllib.request.urlopen(req)
+                    response_content = resp.read()
+                    with open(_media_work, 'wb') as f:
+                        f.write(response_content)
+                    if os.path.isfile(_media_work):
+                        _done = os.path.getsize(_media_work) != 0
+                except TimeoutError:
+                    readtexttools.unlock_my_lock('tts')
+                    done = False
+                if not _done:
+                    return False
+                if not os.path.isfile(readtexttools.get_my_lock('tts')):
+                    print('[>] Stop')
+                    return True
+                retval = self.common.do_net_sound(_info, _media_work, _icon,
+                                                  _media_out, _audible,
+                                                  _visible, _writer, _size,
+                                                  _post_process, False)
+            readtexttools.unlock_my_lock('tts')
+            return retval
 
 
 def speech_wpm(_percent='100%'):  # -> int
