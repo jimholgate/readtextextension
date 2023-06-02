@@ -130,17 +130,9 @@ def espeak_path():  # -> str
 
 def espk_languages():  # -> list[str]
     '''If using `espeak-ng`, return a language_list of voices that `espeak-ng`
-    supports, otherwise return a list of supported`espeak` voices.
+    supported in 2023.07, otherwise return a list of supported`espeak` voices.
     '''
     _app_name = espeak_path()
-    _imported_meta = readtexttools.ImportedMetaData()
-    _reported_langs = []
-    _espk_lang = _imported_meta.execute_command('%(_app_name)s --voices' %
-                                                locals()).replace('  ', '\t')
-    if 'Ukrainian' in _espk_lang:  # espeak-ng Debian 12 (bookworm) or newer
-        for _line in _espk_lang.splitlines():
-            if _line.count('\t') != 0:
-                _reported_langs.append(_line.split('\t')[1])
     if _app_name.count('-ng') != 0:
         return [
             'af', 'am', 'an', 'ar', 'az', 'ba', 'bg', 'bn', 'bpy', 'bs', 'ca',
@@ -152,13 +144,13 @@ def espk_languages():  # -> list[str]
             'nb', 'nci', 'ne', 'nl', 'om', 'or', 'pap', 'pt', 'py', 'quc',
             'ro', 'ru', 'sd', 'shn', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta',
             'te', 'tn', 'tn', 'tn', 'tr', 'tt', 'ur', 'uz', 'vi', 'yue'
-        ] + _reported_langs
+        ]
     else:
         return [
             'af', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'eo', 'fi', 'fr',
             'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ku', 'la', 'lv', 'mk',
             'nl', 'pl', 'ro', 'ru', 'sk', 'sq', 'sr', 'sv', 'sw', 'ta', 'tr',
-            'vi' + _reported_langs
+            'vi'
         ]
 
 

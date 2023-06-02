@@ -867,9 +867,9 @@ def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
         '.',
         platform.python_version_tuple()[1],
     ])
-    if int(platform.python_version_tuple()[0]) < 3:
+    if int(platform.python_version_tuple()[0].strip()) < 3:
         return ''
-    elif os.name == 'nt':
+    if os.name == 'nt':
         profile = os.getenv("LOCALAPPDATA").strip(os.div)
         path1 = os.path.join(profile, 'Programs', 'Python')
         path2 = os.path.join('Lib', 'site-packages')

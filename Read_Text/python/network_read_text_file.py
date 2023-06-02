@@ -3206,9 +3206,10 @@ system installer application like `apt`.''')
                     _end_wait = int(_end_wait * len(_item) / 500)
                     _logo = ' ⌛ '  # U+231B <https://www.compart.com/en/unicode/U+231B>
                 if not retval:
-                    readtexttools.pop_message(
-                        ''.join([self.help_heading, _logo, self.voice]),
-                        self.url, 0, self.help_icon, 0)
+                    if "TTS engine" in self.data_response:
+                        readtexttools.pop_message(
+                            ''.join([self.help_heading, _logo, self.voice]),
+                            self.url, 0, self.help_icon, 0)
                 self.common.set_urllib_timeout(_end_wait)
                 try:
                     # The API uses GET and a `text` argument for text
@@ -3219,6 +3220,11 @@ system installer application like `apt`.''')
                         f.write(response_content)
                     if os.path.isfile(_media_work):
                         _done = os.path.getsize(_media_work) != 0
+                except urllib.error.HTTPError:
+                    _logo = u' \u26a0\ufe0f '
+                    print('%(_logo)s Tried using `%(_iso_lang)s` with Coqui TTS but failed with an HTTP Error.' % locals())
+                    readtexttools.unlock_my_lock('tts')
+                    done = False
                 except TimeoutError:
                     readtexttools.unlock_my_lock('tts')
                     done = False
