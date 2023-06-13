@@ -359,14 +359,18 @@ class LocalCommons(object):
             'judy_bieber', 'kathleen', 'ljspeech', 'southern_english_female',
             'karen_savage', 'siwis', 'lisa', 'nathalie', 'hajdurova'
         ]
+        # Updated for spacy 3.5
         self.spacy_dat = [[['en'], '_core_web_sm'],
                           [[
-                              'ca', 'da', 'el', 'es', 'fi', 'fr', 'de', 'hr',
+                              'ca', 'da', 'de', 'el', 'es', 'fi', 'fr', 'hr',
                               'it', 'ja', 'ko', 'lt', 'mk', 'nb', 'nl', 'pl',
-                              'pt', 'ro', 'ru', 'sv', 'uk'
+                              'pt', 'ro', 'ru', 'sv', 'uk', 'zh'
                           ], '_core_news_sm'], [['xx'], '_ent_wiki_sm']]
         self.checked_spacy = False
-        self.ai_developer_platforms = ['ubuntu', 'darwin', 'alpine']
+        self.ai_developer_platforms = [
+            'centos', 'darwin', 'debian', 'fedora', 'raspbian', 'rhel', 'sles',
+            'ubuntu', 'preempt_dynamic'
+            ]
         self.spd_100 = [
             'female0',
             'male0',
@@ -627,9 +631,18 @@ or `apt-get install python3-requests` to fix it.'''
                 break
         try:
             nlp = spacy.load(trained_pipeline)
+            try:
+                # The `senter` component is ~10× faster than `parser` and
+                # more accurate than the rule-based sentencizer. Not all
+                # models include the `senter` component.
+                nlp.disable_pipe("parser")
+                nlp.enable_pipe("senter")
+            except AttributeError:
+                pass
             doc = nlp(_text)
             for item in doc.sents:
-                spaceval.append(item.text)
+                if len(item.text) != 0:
+                    spaceval.append(item.text)
             self.checked_spacy = True
         except:
             self.checked_spacy = False
@@ -642,8 +655,8 @@ Falling back to `.splitlines()`
     pipx install spacy
     spacy download %(trained_pipeline)s
 
-* See: <https://spacy.io/api/cli#download>
-* Package list: <https://spacy.io/models>''' % locals())
+* See: <https://pypi.org/project/spacy/>
+* Package list: <https://spacy.io/models/ca>''' % locals())
             for _item in '.?!`':
                 _text = _text.replace(_item, _item + '\n')
             retval = _text.splitlines()
@@ -651,8 +664,9 @@ Falling back to `.splitlines()`
         return spaceval
     
     def is_ai_developer_platform(self):  # -> bool
-        '''Does the posix platform include options for system
-        contributor or non-free components for some ai models?'''
+        '''Does the posix platform include options for docker, system
+        contributor or non-free components for some ai models?
+        '''
         # i. e.: MacOS, Docker container or Ubuntu compatible?
         if os.name == 'posix':
             try:
