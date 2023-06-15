@@ -236,7 +236,7 @@ except:
     REQUESTS_OK = False
 try:
     import gtts
-except (ImportError, ModuleNotFoundError):
+except (AttributeError, ImportError, ModuleNotFoundError):
     try:
         if len(readtexttools.find_local_pip('gtts')) != 0:
             sys.path.append(readtexttools.find_local_pip('gtts'))
