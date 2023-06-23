@@ -303,6 +303,24 @@ Function MimicSpeechHostInfo()
 End Function
 
 
+Function OpenttsSpeechHostInfo()
+	Dim _info As SpeechHostInfo
+	With _info
+		.about = &quot;OpenTTS server supports multiple text to speech systems and voices.&quot;
+		.key = &quot;OpenTTS&quot;
+		.label = &quot;opentts-server&quot;
+		.token = &quot;&quot;
+		.url = &quot;http://0.0.0.0:5500&quot;
+		.url_info = &quot;/&quot;
+		.json_dir = &quot;default&quot;
+		.sample = &quot;http://0.0.0.0:5500/api/tts?voice=nanotts%3Aes&amp;text=Hola%20el%20mundo&amp;vocoder=medium&amp;denoiserStrength=0.03&amp;cache=false&quot;
+		.docker = &quot;https://hub.docker.com/r/synesthesiam/opentts&quot;
+		.tags = Array(&quot;text&quot;, &quot;wav&quot;, &quot;web-ui&quot;)
+	End With
+	OpenttsSpeechHostInfo = _info
+End Function
+
+
 Function RhvoiceSpeechHostInfo()
 	Dim _info As SpeechHostInfo
 	With _info
@@ -573,18 +591,21 @@ Function SpeechHostInfoList()
 	&apos;
 	&apos; Larynx and MaryTTS have limited support for phoneme code.
 	&apos; Currently Mimic, like MacOS `say`, appears not to.
+	&apos; Coqui TTS client relies on `python3-bs` (beautiful soup)
+	&apos; so it is not available in immutable office packages.
 	SpeechHostInfoList = Array(_
 	LarynxSpeechHostInfo(), _
 	MimicSpeechHostInfo(), _
+	OpenttsSpeechHostInfo(), _
 	RhvoiceSpeechHostInfo(), _
 	MaryTtsSpeechHostInfo(), _
-	CoquiAISpeechHostInfo() _
 	)	
 	Else
 	&apos; Prioritize recent tts frameworks
 	SpeechHostInfoList = Array(_
 	MimicSpeechHostInfo(), _
 	LarynxSpeechHostInfo(), _
+	OpenttsSpeechHostInfo(), _
 	MaryTtsSpeechHostInfo(), _
 	RhvoiceSpeechHostInfo(), _
 	CoquiAISpeechHostInfo() _

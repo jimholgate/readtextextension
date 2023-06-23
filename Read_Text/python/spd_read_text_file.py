@@ -198,6 +198,7 @@ import platform
 import sys
 import time
 import espeak_read_text_file
+import netcommon
 import network_read_text_file
 import openjtalk_read_text_file
 import readtexttools
@@ -221,7 +222,7 @@ computer's ability to run system python libraries.
     except ImportError:
         USE_SPEECHD = False
 
-NET_SERVICE_LIST = network_read_text_file.NET_SERVICE_LIST
+NET_SERVICE_LIST = netcommon.NET_SERVICE_LIST
 
 
 def about_script(player='speech-dispatcher'):  # -> str
@@ -463,7 +464,7 @@ configurations.
             'MALE3', 'MALE2', 'MALE1', 'FEMALE3', 'FEMALE2', 'FEMALE1',
             'CHILD_MALE', 'CHILD_FEMALE'
         ]
-        self.all_voices = self.spd_voices + network_read_text_file.NET_SERVICE_LIST
+        self.all_voices = self.spd_voices + NET_SERVICE_LIST
         self.stop_voice = 'TriggerAssertionError'
         # NOTE: speechd might reject a language when length of item > 2
         self.language_list = espeak_read_text_file.espk_languages()

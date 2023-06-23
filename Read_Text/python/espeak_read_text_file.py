@@ -133,6 +133,8 @@ def espk_languages():  # -> list[str]
     supports, otherwise return a list of supported`espeak` voices.
     '''
     _app_name = espeak_path()
+    if len(_app_name) == 0:
+        return []
     _imported_meta = readtexttools.ImportedMetaData()
     _reported_langs = []
     _espk_lang = _imported_meta.execute_command('%(_app_name)s --voices' %

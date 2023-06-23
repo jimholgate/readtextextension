@@ -140,7 +140,6 @@ IPA_SUBSET = [
     'ɜ', 'ɛ', 'i', 'ɪ', 'ɨ', 'o', 'ɒ', 'ɔ', 'ɵ', 'ʌ', 'u', 'ɯ', 'ʊ', 'ʉ', 'y'
 ]
 
-
 def killall_process(_process=''):  # -> bool
     '''If process is active, then stop it. Posix systems can use the posix
     `killall` command. Windows uses the `pip3` `psutil` library. Returns
@@ -922,7 +921,6 @@ def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
         return ''
     with os.scandir(path_result) as it:
         for entry in it:
-            # print (925, entry.name)
             for entry_name in [py_ver, entry.name]:
                 if entry_name.startswith('.'):
                     continue
