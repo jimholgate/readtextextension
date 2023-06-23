@@ -1,7 +1,7 @@
-import netcommon
+#!/usr/bin/env python
+# -*- coding: UTF-8-*-
 import os
 import re
-import readtexttools
 import sys
 import time
 import tempfile
@@ -10,6 +10,8 @@ try:
     BASICS_OK = True
 except ImportError:
     BASICS_OK = False
+import netcommon
+import readtexttools
 
 
 class CoquiDemoLocalHost(object):
@@ -615,7 +617,9 @@ system installer application like `apt`.''')
                         _done = os.path.getsize(_media_work) != 0
                 except urllib.error.HTTPError:
                     _logo = u' \u26a0\ufe0f '
-                    print('%(_logo)s Tried using `%(_iso_lang)s` with Coqui TTS but failed with an HTTP Error.' % locals())
+                    print(
+                        '%(_logo)s Tried using `%(_iso_lang)s` with Coqui TTS but failed with an HTTP Error.'
+                        % locals())
                     readtexttools.unlock_my_lock('tts')
                     done = False
                 except TimeoutError:

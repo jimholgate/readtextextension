@@ -1,17 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8-*-
 import os
 import platform
+import time
 try:
     import socket
 except ImportError:
     pass
 import sys
 import readtexttools
-import time
 
 NET_SERVICE_LIST = [
     'AUTO', 'NETWORK', 'AWS', 'AZURE', 'GOOGLECLOUD', 'WATSON', 'GTTS',
     'COQUI', 'LARYNX', 'MARYTTS', 'MIMIC', 'RHVOICE', 'TTS'
 ]
+
 
 def have_gpu(_test='Radeon'):  # -> bool
     '''If the system can detect the specified GPU string, return `True`,
@@ -26,13 +29,14 @@ def have_gpu(_test='Radeon'):  # -> bool
     return _search in _content
 
 
-def spd_voice_list(_min=0, _max=100, _roots= ['female', 'male']):
+def spd_voice_list(_min=0, _max=100, _roots=['female', 'male']):
     '''Return a list in the form `['female0', 'male0', 'female1' ...]`'''
     retval = []
     for _digit in range(_min, _max + 1):
         for _root in _roots:
             retval.append(''.join([_root, str(_digit)]))
     return retval
+
 
 def index_number_to_list_item(_vox_number=0, _list=None):  # -> str
     """Return a specific voice_id using vox_number as an index in the list.
@@ -41,9 +45,9 @@ def index_number_to_list_item(_vox_number=0, _list=None):  # -> str
         return _list[(_vox_number % abs(len(_list) - 1))]
     except ZeroDivisionError:
         return _list[0]
-    except:
-        return ""
-    
+    return ""
+
+
 class LocalCommons(object):
     '''Shared items for local speech servers'''
 
@@ -92,7 +96,7 @@ class LocalCommons(object):
         self.ai_developer_platforms = [
             'centos', 'darwin', 'debian', 'fedora', 'raspbian', 'rhel', 'sles',
             'ubuntu', 'preempt_dynamic'
-            ]
+        ]
         try:
             self.add_pause = str.maketrans({
                 '\n': ';\n',
@@ -123,7 +127,10 @@ Your computer might be missing a required library, or an operation might have
 taken too long. If the problem persists, try installing `pip3 install requests`
 or `apt-get install python3-requests` to fix it.'''
 
-    def big_play_list(self, _text='', _lang_str='en', _verbose=True):  # -> list
+    def big_play_list(self,
+                      _text='',
+                      _lang_str='en',
+                      _verbose=True):  # -> list
         '''Split a long string of sentences or paragraphs into a list.
         Best practice is to install [spacy](https://spacy.io/)
         in a virtual environment and download the parsing components. '''
@@ -180,7 +187,7 @@ Falling back to `.splitlines()`
             retval = _text.splitlines()
             return retval
         return spaceval
-    
+
     def is_ai_developer_platform(self):  # -> bool
         '''Does the posix platform include options for docker, system
         contributor or non-free components for some ai models?

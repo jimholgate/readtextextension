@@ -1,23 +1,15 @@
-import netcommon
+#!/usr/bin/env python
+# -*- coding: UTF-8-*-
 import os
-import platform
-import readtexttools
-
-try:
-    import requests
-
-    REQUESTS_OK = True
-except ImportError:
-    REQUESTS_OK = False
 import tempfile
-
 try:
     import urllib
     import json
-
     BASICS_OK = True
 except ImportError:
     BASICS_OK = False
+import netcommon
+import readtexttools
 
 
 class RhvoiceLocalHost(object):
@@ -148,7 +140,8 @@ class RhvoiceLocalHost(object):
         voice_lib = data["rhvoice_wrapper_voices_info"]
         key_list = []
         return_list = []
-        self.accept_voice.extend(netcommon.spd_voice_list(0, 100, ["female", "male"]))
+        self.accept_voice.extend(
+            netcommon.spd_voice_list(0, 100, ["female", "male"]))
         for _item in voice_lib:
             key_list.append(_item)
             self.accept_voice.append(_item)
@@ -156,20 +149,22 @@ class RhvoiceLocalHost(object):
         try:
             for _key in key_list:
                 _iso = "".join(
-                    [voice_lib[_key]["lang"], "-", voice_lib[_key]["country"]]
-                )
+                    [voice_lib[_key]["lang"], "-", voice_lib[_key]["country"]])
                 for iso_c in [["-NaN", ""], ["-UK", "-UA"]]:
                     _iso = _iso.replace(iso_c[0], iso_c[1])
-                return_list.append(
-                    [_iso, voice_lib[_key]["gender"], voice_lib[_key]["name"].lower()]
-                )
+                return_list.append([
+                    _iso, voice_lib[_key]["gender"],
+                    voice_lib[_key]["name"].lower()
+                ])
         except KeyError:
             return _default_list
         self.checklist = return_list
         self.ok = True
         return self.checklist
 
-    def language_supported(self, _iso_lang="en-US", alt_local_url=""):  # -> bool
+    def language_supported(self,
+                           _iso_lang="en-US",
+                           alt_local_url=""):  # -> bool
         """Is the language or voice supported in rhvoice rest?
         + `iso_lang` can be in the form `en-US` or `en`."""
         _found_name = ""
@@ -202,20 +197,18 @@ class RhvoiceLocalHost(object):
         if self.ok:
             help_heading = self.help_heading
             help_url = self.help_url
-            print(
-                """
+            print("""
 Checking %(help_heading)s voices for `%(_iso_lang)s`
 ========================================
 
 <%(help_url)s>
-"""
-                % locals()
-            )
+""" % locals())
         return self.ok
 
-    def rhvoice_voice(
-        self, _voice="female1", _iso_lang="en-US", _prefer_gendered_fallback=True
-    ):  # -> str
+    def rhvoice_voice(self,
+                      _voice="female1",
+                      _iso_lang="en-US",
+                      _prefer_gendered_fallback=True):  # -> str
         """If the Rhvoice API includes the voice description, return a
         rhvoice voice description like `cmu-bdl-hsmm`, otherwise return
         `''`."""
@@ -245,8 +238,8 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                 if _row[i_lang].startswith(_found_locale):
                     last_match = _row[i_name]
                     for _standard in [
-                        _row[i_gender],
-                        "".join(["child_", _row[i_gender]]),
+                            _row[i_gender],
+                            "".join(["child_", _row[i_gender]]),
                     ]:
                         _add_name = ""
                         if _voice.startswith(_standard):
@@ -307,9 +300,10 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
         if os.path.isfile(_media_work):
             os.remove(_media_work)
         _view_json = self.debug and 1
-        response = readtexttools.local_pronunciation(
-            _iso_lang, _text, "rhvoice", "RHVOICE_USER_DIRECTORY", _view_json
-        )
+        response = readtexttools.local_pronunciation(_iso_lang, _text,
+                                                     "rhvoice",
+                                                     "RHVOICE_USER_DIRECTORY",
+                                                     _view_json)
         _text = response[0]
         if _view_json:
             print(response[1])
@@ -329,8 +323,7 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
             q_voice = urllib.parse.quote(_voice)
             _body_data = (
                 "format=%(_audio_format)s&rate=%(_length_scale)s&pitch=50&volume=50&voice=%(q_voice)s&text="
-                % locals()
-            )
+                % locals())
             # _method = "GET"
             _strips = "\n .;"
             self.common.set_urllib_timeout(_ok_wait)
@@ -353,8 +346,7 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                     _ext = os.path.splittext(_media_out)[1]
                     _no = readtexttools.prefix_ohs(_tries, 10, "0")
                     _media_out = _media_out.replace(
-                        ".%(_ext)s" % locals(), "_%(_no)s.%(_ext)s" % locals()
-                    )
+                        ".%(_ext)s" % locals(), "_%(_no)s.%(_ext)s" % locals())
                 _item = "\n".join(["", _item.strip(_strips), ""])
                 # The API uses GET and a `text` argument for text
 

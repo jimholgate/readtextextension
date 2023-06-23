@@ -1,6 +1,8 @@
-import netcommon
+#!/usr/bin/env python
+# -*- coding: UTF-8-*-
 import os
 import platform
+import netcommon
 import readtexttools
 
 try:
@@ -116,15 +118,14 @@ Set the Docker container restart policy to "always"
             _rate = "".join([str(int(_speech_rate / 1.6)), "%"])
         except [AttributeError, TypeError]:
             _rate = "100%"
-        return (
-            """<?xml version="1.0" encoding="UTF-8"?>
+        return ("""<?xml version="1.0" encoding="UTF-8"?>
 <maryxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
-<prosody rate="%(_rate)s">%(_text)s</prosody></p></maryxml>"""
-            % locals()
-        )
+<prosody rate="%(_rate)s">%(_text)s</prosody></p></maryxml>""" % locals())
 
-    def language_supported(self, iso_lang="en-US", alt_local_url=""):  # -> bool
+    def language_supported(self,
+                           iso_lang="en-US",
+                           alt_local_url=""):  # -> bool
         """Is the language or voice supported?
         + `iso_lang` can be in the form `en-US` or `en`.
         + `alt_local_url` If you are connecting to a local network's
@@ -132,10 +133,8 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
            a different url."""
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
-        if (
-            int(platform.python_version_tuple()[0]) < 3
-            or int(platform.python_version_tuple()[1]) < 8
-        ):
+        if (int(platform.python_version_tuple()[0]) < 3
+                or int(platform.python_version_tuple()[1]) < 8):
             self.ok = False
             return self.ok
         if len(self.voice_locale) != 0:
@@ -151,7 +150,8 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
         self.common.set_urllib_timeout(1)
         for dir_search in ["/locales", "/voices"]:
             try:
-                response = urllib.request.urlopen("".join([self.url, dir_search]))
+                response = urllib.request.urlopen("".join(
+                    [self.url, dir_search]))
                 _locales = str(response.read(), "utf-8")
             except TimeoutError:
                 continue
@@ -170,9 +170,8 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             return False
         # Find the first voice that meets the criteria. If found, then
         # return `True`, otherwise return `False`.
-        self.accept_voice.extend(netcommon.spd_voice_list(
-            0, 100, ["female", "male"])
-        )
+        self.accept_voice.extend(
+            netcommon.spd_voice_list(0, 100, ["female", "male"]))
         self.ok = False
         if "/" in _locales:
             # i. e.: `en_UK/apope_low` for mimic vs. `cmu-rms-hsmm` for MaryTTS
@@ -194,20 +193,20 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             self.ok = True
             if _lang2 == "en":
                 if _lang1[-2:].lower() in [
-                    "au",
-                    "bd",
-                    "bs",
-                    "gb",
-                    "gh",
-                    "hk",
-                    "ie",
-                    "in",
-                    "jm",
-                    "nz",
-                    "pk",
-                    "sa",
-                    "tt",
-                    "uk",
+                        "au",
+                        "bd",
+                        "bs",
+                        "gb",
+                        "gh",
+                        "hk",
+                        "ie",
+                        "in",
+                        "jm",
+                        "nz",
+                        "pk",
+                        "sa",
+                        "tt",
+                        "uk",
                 ]:
                     if self.is_mimic:
                         # The default Mimic voice uses this locale
@@ -220,9 +219,10 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                 self.voice_locale = _lang2.lower()
         return self.ok
 
-    def marytts_voice(
-        self, _voice="", _iso_lang="en-US", _prefer_gendered_fallback=True
-    ):  # -> str
+    def marytts_voice(self,
+                      _voice="",
+                      _iso_lang="en-US",
+                      _prefer_gendered_fallback=True):  # -> str
         """If the MaryTTS API includes the voice description, return a
         marytts voice description like `cmu-bdl-hsmm`, otherwise return
         `''`."""
@@ -235,13 +235,11 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             if self.is_mimic:
                 print(
                     """Requested [Mimic 3](https://github.com/MycroftAI/mimic3#mimic-3)
-                It did not respond correctly."""
-                )
+                It did not respond correctly.""")
             else:
                 print(
                     """Requested [docker-marytts](https://github.com/synesthesiam/docker-marytts)
-                It did not respond correctly."""
-                )
+                It did not respond correctly.""")
             return ""
         except AttributeError:
             try:
@@ -282,9 +280,9 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                     _row2 = _row[2]
                     if _row2 in ["male", "female"]:
                         for _standard in [
-                            _row2,
-                            "".join(["child_", _row2]),
-                            "auto",
+                                _row2,
+                                "".join(["child_", _row2]),
+                                "auto",
                         ]:
                             if _voice.startswith(_standard):
                                 _add_name = last_match
@@ -309,11 +307,10 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                 continue
         if "male" in _voice:
             if not _neutral_voice_count in [0, 1]:
-                print(
-                    """\nNOTICE: The current voice models do not identify
-voices by gender so the gender might be wrong."""
-                )
-        _vox_number = int("".join(["0", readtexttools.safechars(_voice, "1234567890")]))
+                print("""\nNOTICE: The current voice models do not identify
+voices by gender so the gender might be wrong.""")
+        _vox_number = int("".join(
+            ["0", readtexttools.safechars(_voice, "1234567890")]))
         # When you just want a list of indices, it is faster to to use len()
         for i in range(0, len(matches)):
             if _vox_number % len(matches) == i + 1:
@@ -383,8 +380,10 @@ voices by gender so the gender might be wrong."""
                 _url,
                 params=request_params,
                 headers={
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "User-Agent": "Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0",
+                    "Content-Type":
+                    "application/x-www-form-urlencoded",
+                    "User-Agent":
+                    "Mozilla/5.0 (X11; Debian; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0",
                 },
                 data=_text.encode("utf-8", "ignore"),
                 timeout=(_ok_wait, _end_wait),
@@ -425,8 +424,7 @@ voices by gender so the gender might be wrong."""
             _ssml = urllib.parse.quote(_ssml)
             my_url = (
                 "%(_url)s?text=%(q_text)s&voice=%(_mary_vox)s&ssml=%(_ssml)s&lengthScale=%(_length_scale)s"
-                % locals()
-            )
+                % locals())
             try:
                 # GET
                 response = urllib.request.urlopen(my_url, timeout=(_end_wait))
@@ -444,8 +442,7 @@ voices by gender so the gender might be wrong."""
                 vcommand = "&VOICE=%(_mary_vox)s" % locals()
             _body_data = (
                 "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT="
-                % locals()
-            )
+                % locals())
             my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
             try:
                 # POST
@@ -523,9 +520,9 @@ voices by gender so the gender might be wrong."""
                     break
         _view_json = self.debug and 1
         _mary_vox = self.marytts_voice(_vox, _iso_lang)
-        response = readtexttools.local_pronunciation(
-            _iso_lang, _text, self.local_dir, _user_env, _view_json
-        )
+        response = readtexttools.local_pronunciation(_iso_lang, _text,
+                                                     self.local_dir, _user_env,
+                                                     _view_json)
         _text = response[0]
         if _view_json:
             print(response[1])
@@ -536,21 +533,19 @@ voices by gender so the gender might be wrong."""
         elif not REQUESTS_OK:
             # With `urllib` the tested version of MaryTTS can only use TEXT,
             # not RAWMARYXML
-            print(
-                """
-NOTE: Setting a MaryTTS speech rate requires the python `request` library."""
-            )
+            print("""
+NOTE: Setting a MaryTTS speech rate requires the python `request` library.""")
             _input_type = self.input_types[0]
         elif self.is_mimic:
             if ssml:
                 _input_type = self.input_types[3]
                 if "</speak>" not in _text:
-                    _text = self.common.ssml_xml(
-                        _text, _mary_vox, _speech_rate, _iso_lang
-                    )
+                    _text = self.common.ssml_xml(_text, _mary_vox,
+                                                 _speech_rate, _iso_lang)
             else:
                 _input_type = self.input_types[0]
-            _length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)[0]
+            _length_scale = self.common.rate_to_rhasspy_length_scale(
+                _speech_rate)[0]
         else:
             _input_type = self.input_types[6]
             if "</maryxml>" not in _text:
@@ -576,8 +571,7 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library."""
             _title = """Mycroft AI Mimic-3            
 =================="""
             _preload = _mary_vox.split("#")[0]
-            _added_info = (
-                """Preload voice command
+            _added_info = ("""Preload voice command
 ---------------------
 
     mimic3-server --preload-voice %(_preload)s
@@ -585,12 +579,9 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library."""
 Help
 ----
 
-[Mimic-3](https://github.com/MycroftAI/mimic3#mimic-3)"""
-                % locals()
-            )
+[Mimic-3](https://github.com/MycroftAI/mimic3#mimic-3)""" % locals())
 
-        print(
-            """
+        print("""
 %(_title)s
 * Audio: `%(_audio_format)s`
 * Input Type: `%(_input_type)s`
@@ -602,9 +593,7 @@ Help
 * Voice : `%(_mary_vox)s`
 
 %(_added_info)s
-"""
-            % locals()
-        )
+""" % locals())
         if _input_type != self.input_types[0]:
             # Don't split XML code
             _items = [_text]
@@ -629,9 +618,8 @@ Help
             elif "." in _media_out and _tries != 0:
                 _ext = os.path.splittext(_media_out)[1]
                 _no = readtexttools.prefix_ohs(_tries, 10, "0")
-                _media_out = _media_out.replace(
-                    ".%(_ext)s" % locals(), "_%(_no)s.%(_ext)s" % locals()
-                )
+                _media_out = _media_out.replace(".%(_ext)s" % locals(),
+                                                "_%(_no)s.%(_ext)s" % locals())
             _tries += 1
             _done = self._try_requests(
                 _mary_vox,

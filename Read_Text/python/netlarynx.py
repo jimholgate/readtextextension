@@ -1,6 +1,8 @@
-import netcommon
+#!/usr/bin/env python
+# -*- coding: UTF-8-*-
 import os
 import platform
+import netcommon
 import readtexttools
 
 try:
