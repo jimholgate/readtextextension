@@ -42,9 +42,15 @@ def index_number_to_list_item(_vox_number=0, _list=None):  # -> str
     """Return a specific voice_id using vox_number as an index in the list.
     Handle out of range numbers using a modulus (`int % len(_list)`) value."""
     try:
+        if not bool(_list):
+            return ""
+        if len(_list) == 1:
+            return _list[0]
         return _list[(_vox_number % abs(len(_list) - 1))]
     except ZeroDivisionError:
         return _list[0]
+    except [IndexError, TypeError]:
+        pass
     return ""
 
 

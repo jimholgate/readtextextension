@@ -3,6 +3,7 @@
 import os
 import platform
 import netcommon
+import netmimic3
 import readtexttools
 
 try:
@@ -97,6 +98,7 @@ Set the Docker container restart policy to "always"
             "local_server",
         ]
         self.voice_locale = ""
+        self.voice_mimic_locale = ""
         self.pause_list = _common.pause_list
         self.add_pause = _common.add_pause
         self.base_curl = _common.base_curl
@@ -217,6 +219,7 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                     self.voice_locale = "en_US"
             else:
                 self.voice_locale = _lang2.lower()
+                self.voice_mimic_locale = _lang2
         return self.ok
 
     def marytts_voice(self,
@@ -228,6 +231,8 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
         `''`."""
         if len(_voice) == 0:
             return ""
+        if self.is_mimic:
+            _mimic3 = netmimic3.Mimic3Class()
         try:
             response = urllib.request.urlopen("".join([self.url, "/voices"]))
             _voices = str(response.read(), "utf-8")
@@ -270,6 +275,12 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             return last_match
         _neutral_voice_count = 0
         if self.is_mimic:
+            if _mimic3.language_supported(_locale):
+                _locale = self.voice_mimic_locale
+                if len(_locale) == 0:
+                    _locale = _iso_lang
+                return _mimic3._spd_voice_to_mimic3_voice(
+                    _voice, self.voice_mimic_locale, self.url)
             _neutral_voice_count = 1
         for _tester in _voice_list:
             _row = _tester.split(" ")

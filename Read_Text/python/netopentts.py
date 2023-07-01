@@ -44,8 +44,7 @@ class OpenTTSClass(object):
     """
 
     def __init__(self):  # -> None
-        """Initialize data. See
-        <https://github.com/rhasspy/larynx#basic-synthesis>"""
+        """Initialize data."""
         _common = netcommon.LocalCommons()
         self.common = _common
         self.debug = _common.debug
@@ -97,15 +96,6 @@ class OpenTTSClass(object):
         self.pause_list = _common.pause_list
         self.add_pause = _common.add_pause
 
-    def _index_number_to_list_item(self, _vox_number=0, _list=None):  # -> str
-        """Return a specific voice_id using vox_number as an index in the list.
-        Handle out of range numbers using a modulus (`int % len(_list)`) value."""
-        try:
-            return _list[(_vox_number % abs(len(_list) - 1))]
-        except ZeroDivisionError:
-            return _list[0]
-        except:
-            return ""
 
     def _spd_voice_to_opentts_voice(self,
                                     _search="female1",
@@ -190,7 +180,7 @@ OpenTTS
 can synthesize speech privately using %(_eurl)s.""" % locals())
             self.ok = False
             return False
-        except AttributeError:
+        except [AttributeError, TimeoutError]:
             self.ok = False
             return False
         if len(self.data) == 0:
@@ -298,7 +288,12 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
                 f.write(response.read())
             if os.path.isfile(_media_work):
                 _done = os.path.getsize(_media_work) != 0
-        except TimeoutError:
+        except (TimeoutError, urllib.error.HTTPError):
+            print('''
+OpenTTS cannot provide speech for `%(_voice)s`.  Check using
+
+    tts-server --list_models | grep 'already downloaded'
+    ''' % locals())
             _done = False
         return _done
 
