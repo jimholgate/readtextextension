@@ -3,25 +3,40 @@
 import os
 import platform
 import tempfile
-import netcommon
-import readtexttools
-
 try:
     import urllib
     import json
-
     BASICS_OK = True
 except ImportError:
     BASICS_OK = False
+import netcommon
+import readtexttools
 
 
 class Mimic3Class(object):
-    """MyCroft Mimic is a text to speech local host voice server.
+    """MyCroft AI Mimic TTS
+====================
 
-    [Mimic3 local host](http://0.0.0.0:59125)
+"A fast local neural text to speech engine for Mycroft"
 
-    [More...](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
-    """
+Check the release status of the API for Mimic before using it. By default the
+application shares the same address and port as MaryTTS so do not run them at
+the same time using the same URL and port.
+
+    mkdir -p "${HOME}/.local/share/mycroft/mimic3"
+    chmod a+rwx "${HOME}/.local/share/mycroft/mimic3"
+    docker run \
+        -it \
+        -p 59125:59125 \
+        -v "${HOME}/.local/share/mycroft/mimic3:/home/mimic3/.local/share/mycroft/mimic3" \
+        'mycroftai/mimic3'
+
+To automatically start the daemon, set the Docker container restart policy to
+"always"
+
+* [Local host](http://0.0.0.0:59125)
+* [Mimic3 TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
+* [GitHub](https://github.com/MycroftAI/mimic3)"""
 
     def __init__(self):  # -> None
         """Initialize data."""
@@ -38,6 +53,7 @@ class Mimic3Class(object):
             "https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3"
         )
         self.local_dir = "mimic"
+        self.max_chars = 360
         self.voice = ""
         self.voice_id = ""
 
@@ -411,11 +427,12 @@ class Mimic3Class(object):
         self.is_x86_64 = _common.is_x86_64
         self.pause_list = _common.pause_list
         self.add_pause = _common.add_pause
+        self.voice_name = ''
 
-    def _spd_voice_to_mimic3_voice(self,
-                                   _search="female1",
-                                   _iso_lang="en-US",
-                                   _alt_local_url=""):  # -> str
+    def spd_voice_to_mimic3_voice(self,
+                                  _search="female1",
+                                  _iso_lang="en-US",
+                                  _alt_local_url=""):  # -> str
         """Assign a name like `en_UK/apope_low"` to a
         spd_voice like `male0`"""
         _search = _search.strip("'\" \n")
@@ -527,7 +544,12 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
                         ])
                         if full_name not in self.full_names:
                             self.accept_voice.append(full_name)
-                            if _item["language"].startswith(_lang1):
+                            if vox == full_name:
+                                self.male_names = [vox]
+                                self.female_names = [vox]
+                                self.ok = True
+                                return self.ok
+                            elif _item["language"].startswith(_lang1):
                                 self.full_names.insert(0, full_name)
                                 if full_name in self.male_list:
                                     self.male_names.insert(0, full_name)
@@ -554,7 +576,7 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
         return self.ok
 
     def try_url_lib(
-        _self,
+        self,
         _voice="",
         _text="",
         _url="",
@@ -669,7 +691,7 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
             elif len(_item.strip(" ;.!?\n")) == 0:
                 continue
             elif "." in _media_out and _tries != 0:
-                _ext = os.path.splittext(_media_out)[1]
+                _ext = os.path.splitext(_media_out)[1]
                 _no = readtexttools.prefix_ohs(_tries, 10, "0")
                 _media_out = _media_out.replace(".%(_ext)s" % locals(),
                                                 "_%(_no)s.%(_ext)s" % locals())

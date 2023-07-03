@@ -2,17 +2,17 @@
 # -*- coding: UTF-8-*-
 import os
 import platform
+import tempfile
+try:
+    import requests
+    REQUESTS_OK = True
+except ImportError:
+    REQUESTS_OK = False
+
 import netcommon
 import netmimic3
 import readtexttools
 
-try:
-    import requests
-
-    REQUESTS_OK = True
-except ImportError:
-    REQUESTS_OK = False
-import tempfile
 
 try:
     import urllib
@@ -105,6 +105,9 @@ Set the Docker container restart policy to "always"
         self.is_x86_64 = _common.is_x86_64
         self.is_mimic = False
         self.max_chars = 360
+        self.nogender = 'NA'
+        self.male = 'male'
+        self.female = 'female'
 
     def marytts_xml(self, _text="", _speech_rate=160):  # -> str
         """Change the speed that MaryTTS reads plain text aloud using
@@ -222,6 +225,17 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                 self.voice_mimic_locale = _lang2
         return self.ok
 
+    def _what_gender(self, _voice='male1'):  # -> str
+        '''Check the voice for a specific gender'''
+        test_voice = _voice.lower()
+        for gender in ['female', 'male']:
+            for _standard in [gender, "".join(["child_", gender])]:
+                if test_voice.startswith(_standard):
+                    if gender == 'female':
+                        return self.female
+                    return self.male
+        return self.nogender
+
     def marytts_voice(self,
                       _voice="",
                       _iso_lang="en-US",
@@ -238,13 +252,11 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             _voices = str(response.read(), "utf-8")
         except urllib.error.URLError:
             if self.is_mimic:
-                print(
-                    """Requested [Mimic 3](https://github.com/MycroftAI/mimic3#mimic-3)
-                It did not respond correctly.""")
+                _help_site = '[Mimic 3](https://github.com/MycroftAI/mimic3#mimic-3)'
             else:
-                print(
-                    """Requested [docker-marytts](https://github.com/synesthesiam/docker-marytts)
-                It did not respond correctly.""")
+                _help_site = '[docker-marytts](https://github.com/synesthesiam/docker-marytts)'
+            print("""Requested %(_help_site)s
+It did not respond correctly.""" % locals())
             return ""
         except AttributeError:
             try:
@@ -268,67 +280,51 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             if _row[0].count(_voice) != 0:
                 self.voice_locale = _row[1]
                 return _row[0]
-        matches = []
         last_match = ""
-        gendered_fallback = ""
         if _voice not in self.accept_voice:
             return last_match
-        _neutral_voice_count = 0
         if self.is_mimic:
-            if _mimic3.language_supported(_locale):
+            if _mimic3.language_supported(_locale, self.url, "auto"):
                 _locale = self.voice_mimic_locale
                 if len(_locale) == 0:
                     _locale = _iso_lang
-                return _mimic3._spd_voice_to_mimic3_voice(
+                return _mimic3.spd_voice_to_mimic3_voice(
                     _voice, self.voice_mimic_locale, self.url)
-            _neutral_voice_count = 1
+            return ''
+        good_rows = []
+        match_found = []
+        unmatch_found = []
         for _tester in _voice_list:
             _row = _tester.split(" ")
-            _add_name = ""
+            is_exact_voice = False
             try:
-                if _row[1].startswith(_locale):
+                is_exact_voice = _row[0].lower() == _voice.lower()
+                if _row[1].startswith(_locale) or is_exact_voice:
                     last_match = _row[0]
-                    _row2 = _row[2]
-                    if _row2 in ["male", "female"]:
-                        for _standard in [
-                                _row2,
-                                "".join(["child_", _row2]),
-                                "auto",
-                        ]:
-                            if _voice.startswith(_standard):
-                                _add_name = last_match
-
-                        if len(_add_name) != 0:
-                            if _row2 == "male":
-                                matches.append(_add_name)
-                            else:
-                                matches.insert(0, _add_name)
-                    else:
-                        # Unknown gender, so alternate adding the voice to
-                        # the beginning and the end of the list so MALE[1|2|3]
-                        # and FEMALE[1|2|3] are different voices if available.
-                        _neutral_voice_count += 1
-                        if _neutral_voice_count % 2 == 1:
-                            matches.append(last_match)
-                        else:
-                            matches.insert(0, last_match)
-                if len(gendered_fallback) == 0:
-                    gendered_fallback = last_match
+                    good_rows.append(_row)
             except IndexError:
                 continue
-        if "male" in _voice:
-            if not _neutral_voice_count in [0, 1]:
-                print("""\nNOTICE: The current voice models do not identify
-voices by gender so the gender might be wrong.""")
+        if len(good_rows) == 0:
+            return ''
+        mary_gender = self._what_gender(_voice)
+        for good_row in good_rows:
+            gender = good_row[2]
+            if gender == mary_gender or is_exact_voice:
+                match_found.append(good_row[0])
+            else:
+                unmatch_found.append(good_row[0])
+        if len(match_found) == 0:
+            match_found = unmatch_found
+        elif not _prefer_gendered_fallback:
+            # Allow male1 or no gender as alternate for female2
+            # Allow female1 or no gender as alternate for male2
+            match_found = match_found.extend(unmatch_found)
         _vox_number = int("".join(
             ["0", readtexttools.safechars(_voice, "1234567890")]))
-        # When you just want a list of indices, it is faster to to use len()
-        for i in range(0, len(matches)):
-            if _vox_number % len(matches) == i + 1:
-                return matches[i]
-        if _prefer_gendered_fallback:
-            if len(gendered_fallback) != 0:
-                return gendered_fallback
+        best_match = netcommon.index_number_to_list_item(
+            _vox_number, match_found)
+        if len(best_match) != 0:
+            return best_match
         return last_match
 
     def _try_requests(
@@ -579,7 +575,7 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.""")
                 _ssml = "1"
             if len(_mary_vox) == 0:
                 _mary_vox = "en_UK/apope_low"
-            _title = """Mycroft AI Mimic-3            
+            _title = """Mycroft AI Mimic-3
 =================="""
             _preload = _mary_vox.split("#")[0]
             _added_info = ("""Preload voice command
@@ -627,7 +623,7 @@ Help
             elif len(_item.strip(" ;.!?\n")) == 0:
                 continue
             elif "." in _media_out and _tries != 0:
-                _ext = os.path.splittext(_media_out)[1]
+                _ext = os.path.splitext(_media_out)[1]
                 _no = readtexttools.prefix_ohs(_tries, 10, "0")
                 _media_out = _media_out.replace(".%(_ext)s" % locals(),
                                                 "_%(_no)s.%(_ext)s" % locals())
