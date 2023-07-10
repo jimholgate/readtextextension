@@ -95,6 +95,7 @@ class OpenTTSClass(object):
         self.is_x86_64 = _common.is_x86_64
         self.pause_list = _common.pause_list
         self.add_pause = _common.add_pause
+        self.max_chars = 360
 
 
     def _spd_voice_to_opentts_voice(self,
@@ -180,7 +181,8 @@ OpenTTS
 can synthesize speech privately using %(_eurl)s.""" % locals())
             self.ok = False
             return False
-        except [AttributeError, TimeoutError]:
+        except:
+            # catching classes that do not inherit from BaseException is not allowed
             self.ok = False
             return False
         if len(self.data) == 0:

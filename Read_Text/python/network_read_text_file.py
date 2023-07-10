@@ -205,17 +205,40 @@ import math
 import os
 import sys
 import netgtts
-import netlarynx
-import netmary
-import netopentts
-import netrhvoice
-import nettts
-import readtexttools
 try:
     import requests
     REQUESTS_OK = True
-except:
+except (AttributeError, ImportError):
     REQUESTS_OK = False
+try:
+    import netmimic3
+except (AttributeError, ImportError):
+    pass
+try:
+    import netlarynx
+except (AttributeError, ImportError):
+    pass
+try:
+    import netmary
+except (AttributeError, ImportError):
+    pass
+try:
+    import netopentts
+except (AttributeError, ImportError):
+    pass
+try:
+    import netrhvoice
+except (AttributeError, ImportError):
+    pass
+try:
+    import nettts
+except (AttributeError, ImportError):
+    pass
+try:
+    import readtexttools
+except (AttributeError, ImportError):
+    pass
+
 
 def usage():  # -> None
     '''
@@ -308,26 +331,61 @@ def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
     '''Do at least one of the classes support an on-line speech library?'''
     _continue = False
     if not _continue:
-        _mary_tts = netmary.MaryTtsClass()
-        _continue = _mary_tts.language_supported(_iso_lang, _local_url)
+        try:
+            _mimic3 = netmimic3.Mimic3Class()
+            _continue = _mimic3.language_supported(_iso_lang, _local_url)
+        except NameError:
+            pass
     if not _continue:
-        _larynx = netlarynx.LarynxClass()
-        _continue = _larynx.language_supported(_iso_lang, _local_url, 'AUTO')
+        try:
+            _larynx = netlarynx.LarynxClass()
+            _continue = _larynx.language_supported(_iso_lang, _local_url, 'AUTO')
+        except NameError:
+            pass
     if not _continue:
-        _rhvoice_rest = netrhvoice.RhvoiceLocalHost()
-        _continue = _rhvoice_rest.language_supported(_iso_lang, _local_url)
+        try:
+            _rhvoice_rest = netrhvoice.RhvoiceLocalHost()
+            _continue = _rhvoice_rest.language_supported(_iso_lang, _local_url)
+        except NameError:
+            pass
     if not _continue:
-        _opentts = netopentts.OpenTTSClass()
-        if _opentts.language_supported(_iso_lang, _local_url):
-            _continue = True
+        try:
+            _opentts = netopentts.OpenTTSClass()
+            if _opentts.language_supported(_iso_lang, _local_url):
+                _continue = True
+        except NameError:
+            pass
     if not _continue:
-        _gtts_class = netgtts.GoogleTranslateClass()
-        if _gtts_class.check_version(_gtts_class.tested_version):
-            _continue = True
+        try:
+            _mary_tts = netmary.MaryTtsClass()
+            _continue = _mary_tts.language_supported(_iso_lang, _local_url)
+        except NameError:
+            pass
     if not _continue:
-        _coqui_demo = nettts.CoquiDemoLocalHost()
-        _continue = _coqui_demo.language_supported(_iso_lang, _local_url)
+        try:
+            _gtts_class = netgtts.GoogleTranslateClass()
+            if _gtts_class.check_version(_gtts_class.tested_version):
+                _continue = True
+        except NameError:
+            pass
+    if not _continue:
+        try:
+            _coqui_demo = nettts.CoquiDemoLocalHost()
+            _continue = _coqui_demo.language_supported(_iso_lang, _local_url)
+        except NameError:
+            pass
     return _continue
+
+
+def is_ssml(_text=''):
+    '''Return `True` if text includes standard ssml tags and the string
+    is valid XML,'''
+    _ssml = '</speak>' in _text and '<speak' in _text
+    if _ssml:
+        # Check if `_text` is valid XML
+        if readtexttools.strip_xml(_text) == _text:
+            _ssml = False
+    return _ssml
 
 
 def network_main(_text_file_in='',
@@ -359,71 +417,98 @@ def network_main(_text_file_in='',
         'process_audio_media'
     ]
     _vox = _vox.strip('\'" \t\n').lower()
-    _marytts = netmary.MaryTtsClass()        
-    if _marytts.language_supported(_iso_lang, _local_url):
-        if REQUESTS_OK:
-            _ssml = '</speak>' in _text and '<speak' in _text
-            _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
+    # Prioritize speech engines that use json to communicate data
+    # because text tables can use ambiguous labels (i. e.: `NA`)
+    # Prioritize engines where everything can be achieved using `urllib`
+    # because some immutable office packages do not include `requests`
+    # support.
+    try:
+        _mimic3 = netmimic3.Mimic3Class()
+        if _mimic3.language_supported(_iso_lang, _local_url, _vox):
+            _mimic3.spd_voice_to_mimic3_voice(_vox, _iso_lang, _local_url)
+            _ssml = is_ssml(_text)
+            _mimic3.read(_text, _iso_lang, _visible, _audible, _media_out,
                         _icon, clip_title, _post_processes[5], _info, _size,
-                        _speech_rate, _ssml, _vox, 4, 15)
-        else:
-            _ssml = False
-            if '</speak' in _text:
-                _text = readtexttools.strip_xml(_text)
-            _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
-                        _icon, clip_title, _post_processes[5], _info, _size,
-                        _speech_rate, _ssml, _vox, 4, 15)
-        return True
-    _larynx = netlarynx.LarynxClass()        
-    if _larynx.language_supported(
-            _iso_lang,
-            _local_url,
-            _vox,
-            ) and _vox in _larynx.accept_voice:
+                        _ssml, 20, 60)
+            return True
+    except NameError:
+        pass
+    try:
+        _larynx = netlarynx.LarynxClass()        
+        if _larynx.language_supported(
+                _iso_lang,
+                _local_url,
+                _vox,
+                ) and _vox in _larynx.accept_voice:
 
-        _quality = -1  # Auto; Manual is 0 (lowest) to 2 (highest)
-        _ssml = '</speak>' in _text and '<speak' in _text
-        if _ssml:
-            # Check if `_text` is valid XML
-            if readtexttools.strip_xml(_text) == _text:
-                _ssml = False
-        _larynx.read(_text, _iso_lang, _visible, _audible, _media_out,
-                     _icon, clip_title, _post_processes[5], _info, _size,
-                     _speech_rate, _quality, _ssml, _denoiser_strength,
-                     _noise_scale, 20, 60)
-        return True
-    _rhvoice_rest = netrhvoice.RhvoiceLocalHost()
-    if _rhvoice_rest.language_supported(_iso_lang, _local_url):
-        _rhvoice_rest.read(_text, _iso_lang, _visible, _audible,
-                           _media_out, _icon, clip_title,
-                           _post_processes[5], _info, _size, _speech_rate,
-                           _vox, 4, 30)
-        return True
-    _opentts = netopentts.OpenTTSClass()
-    if _opentts.language_supported(_iso_lang, _local_url):
-        _ssml = '</speak>' in _text and '<speak' in _text
-        if _ssml:
-            # Check if `_text` is valid XML
-            if readtexttools.strip_xml(_text) == _text:
-                _ssml = False
-        _opentts._spd_voice_to_opentts_voice(_vox, _iso_lang)
-        _opentts.read(_text, _iso_lang, _visible, _audible, _media_out,
-                      _icon, clip_title, _post_processes[5], _info,
-                      _size, _ssml, .03, 20, 60)
-        return True
-    _coqui_demo = nettts.CoquiDemoLocalHost()
-    if _coqui_demo.language_supported(_iso_lang, _local_url):
-        _coqui_demo.read(_text, _iso_lang, _visible, _audible, _media_out,
-                         _icon, clip_title, _post_processes[5], _info,
-                         _size, _speech_rate, _vox, 20, 60)
-        return True
-    _gtts_class = netgtts.GoogleTranslateClass() 
-    if _gtts_class.check_version(
-            _gtts_class.tested_version) and _vox in _gtts_class.accept_voice:
-        _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,
-                         _icon, clip_title, _post_processes[1], _info,
-                         _size, _speech_rate)        
-        return True
+            _quality = -1  # Auto; Manual is 0 (lowest) to 2 (highest)
+            _ssml = is_ssml(_text)
+            _larynx.read(_text, _iso_lang, _visible, _audible, _media_out,
+                        _icon, clip_title, _post_processes[5], _info, _size,
+                        _speech_rate, _quality, _ssml, _denoiser_strength,
+                        _noise_scale, 20, 60)
+            return True
+    except NameError:
+        pass
+    try:
+        _rhvoice_rest = netrhvoice.RhvoiceLocalHost()
+        if _rhvoice_rest.language_supported(_iso_lang, _local_url):
+            _rhvoice_rest.read(_text, _iso_lang, _visible, _audible,
+                            _media_out, _icon, clip_title,
+                            _post_processes[5], _info, _size, _speech_rate,
+                            _vox, 4, 30)
+            return True
+    except NameError:
+        pass
+    try:
+        _opentts = netopentts.OpenTTSClass()
+        if _opentts.language_supported(_iso_lang, _local_url):
+            _ssml = is_ssml(_text)
+            _opentts._spd_voice_to_opentts_voice(_vox, _iso_lang)
+            _opentts.read(_text, _iso_lang, _visible, _audible, _media_out,
+                        _icon, clip_title, _post_processes[5], _info,
+                        _size, _ssml, .03, 20, 60)
+            return True
+    except NameError:
+        pass
+    try:
+        _marytts = netmary.MaryTtsClass()
+        if _marytts.language_supported(_iso_lang, _local_url):
+            _ssml = is_ssml(_text)
+            if REQUESTS_OK:
+                if int(requests.__version__[0] == 1):
+                    if _ssml:
+                        _text = readtexttools.strip_xml(_text)
+                        _ssml = False
+            else:
+                if _ssml:
+                    _text = readtexttools.strip_xml(_text)
+                    _ssml = False
+            _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
+                        _icon, clip_title, _post_processes[5], _info, _size,
+                        _speech_rate, _ssml, _vox, 4, 15)
+            return True
+    except NameError:
+        pass
+    try:
+        _coqui_demo = nettts.CoquiDemoLocalHost()
+        if _coqui_demo.language_supported(_iso_lang, _local_url):
+            _coqui_demo.read(_text, _iso_lang, _visible, _audible, _media_out,
+                            _icon, clip_title, _post_processes[5], _info,
+                            _size, _speech_rate, _vox, 20, 60)
+            return True
+    except (NameError, TypeError):
+        pass
+    try:
+        _gtts_class = netgtts.GoogleTranslateClass() 
+        if _gtts_class.check_version(
+                _gtts_class.tested_version) and _vox in _gtts_class.accept_voice:
+            _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,
+                            _icon, clip_title, _post_processes[1], _info,
+                            _size, _speech_rate)        
+            return True
+    except NameError:
+        pass
     # Just display a translation link.
     _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,
                      _icon, clip_title, _post_processes[0], _info,
@@ -446,7 +531,7 @@ def main():  # -> NoReturn
     _iso_lang = 'ca-ES'
     try:
         _iso_lang = readtexttools.default_lang().replace('_', '-')
-    except AttributeError:
+    except (AttributeError, ImportError):
         pass
     _media_out = ''
     _visible = ''

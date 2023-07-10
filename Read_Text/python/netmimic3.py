@@ -68,7 +68,7 @@ To automatically start the daemon, set the Docker container restart policy to
             "docker",
             "local_server",
         ]
-
+        self.checked_spacy = False
         self.default_lang = _common.default_lang
         self.default_voice = "en_UK/apope_low"
         self.default_extension = _common.default_extension
@@ -629,7 +629,6 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
         _writer="",
         _size="600x600",
         ssml=False,
-        _denoiser_strength=0.03,
         _ok_wait=20,
         _end_wait=60,
     ):  # -> bool
@@ -656,20 +655,21 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
                 readtexttools.unlock_my_lock("mimic3")
                 return True
         _voice = self.voice_id
+        self.checked_spacy = self.common.verify_spacy(_iso_lang.split("-")[0])
         if self.debug and 1:
             print(["`Mimic3Class` > ` `read`", "Request `_voice`: ", _voice])
-        if bool(self.add_pause) and not ssml:
-            for _symbol in self.pause_list:
-                if _symbol in _text:
-                    _text = _text.translate(self.add_pause).replace(".;", ".")
-                    break
+            if bool(self.add_pause) and not ssml:
+                for _symbol in self.pause_list:
+                    if _symbol in _text:
+                        _text = _text.translate(self.add_pause).replace(".\n;", ".").strip(';')
+                        break
         if ssml:
             _ssml = "true"
         _url = "".join([self.url, "/api/tts"])
         _text = readtexttools.local_pronunciation(_iso_lang, _text,
                                                   self.local_dir,
                                                   "MIMIC3_USER_DIRECTORY",
-                                                  False)[0]
+                                                  False)[0].strip()
 
         readtexttools.lock_my_lock("mimic3")
         _tries = 0
@@ -680,7 +680,7 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
             _items = self.common.big_play_list(_text, _iso_lang.split("-")[0])
         elif len(_text.splitlines()) == 1 or len(_text) < self.max_chars:
             _items = [_text]
-        elif self.common.verify_spacy(_iso_lang.split("-")[0]):
+        elif self.checked_spacy:
             _items = self.common.big_play_list(_text, _iso_lang.split("-")[0])
         else:
             _items = [_text]

@@ -9,7 +9,7 @@ try:
     import requests
 
     REQUESTS_OK = True
-except ImportError:
+except (AttributeError, ImportError):
     REQUESTS_OK = False
 import tempfile
 

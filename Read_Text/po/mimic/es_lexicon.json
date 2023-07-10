@@ -27,9 +27,17 @@
     "es_00026":{"g":"°C","p":"grados celsius"},
     "es_00027":{"g":"C.P.","p":"casilla postal"},
     "es_00028":{"g":"°F","p":"grados fahrenheit"},
-    "es_00029":{"g":"Read Text Extension","p":"reed text extension"},
-    "es_00030":{"g":"Read text extension","p":"reed text extension"},
+    "es_00029":{"g":"conocerla","p":"conocer-lap"},
+    "es_00030":{"g":"conocerlo","p":"conocer-lop"},
+    "es_00031":{"g":"conocerme","p":"conocer-mép"},
+    "es_00032":{"g":"conocerse","p":"conocer-sép"},
+    "es_00033":{"g":"conocerte","p":"conocer-tép"},
+    "es_00034":{"g":"conocerlas","p":"conocer-lasp"},
+    "es_00035":{"g":"conocerlos","p":"conocer-losp"},
+    "es_00036":{"g":"conocernos","p":"conocer-nosp"},
+    "es_00037":{"g":"Read Text Extension","p":"reed text extension"},
+    "es_00038":{"g":"Read text extension","p":"reed text extension"},
     "es_99998":{"g":"$[LOCALE]","p":"es"},
-    "es_99999":{"g":"$[REVISION]","p":"2023-02-25_15:57:27"}
+    "es_99999":{"g":"$[REVISION]","p":"2023-07-08_23:10:10"}
 }
 
