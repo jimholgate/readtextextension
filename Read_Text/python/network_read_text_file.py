@@ -281,6 +281,8 @@ time that you use it.
 
 def network_problem(voice='default'):  # -> str
     '''Return suggestions to make an on-line voice work.'''
+    if len(voice) == 0:
+        voice = 'requested'
     return '''Is the network connected?
 =========================
 

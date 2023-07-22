@@ -926,7 +926,8 @@ def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
                     continue
                 elif 'dist-info' in entry_name:
                     continue
-                py_path = os.path.join(path_result, entry_name, path2, lib_name)
+                py_path = os.path.join(
+                    path_result, entry_name, path2, lib_name)
                 if not os.path.isdir(py_path):
                     if os.path.isdir(os.path.join(path_result, lib_name)):
                         py_path = path_result
@@ -2930,7 +2931,7 @@ def prefix_ohs(_int=1, _str_len=10, _symbol='0'):  # -> str
     '''Given an integer `_int`, returns a string of length `_str_len`
     prefixed by `_symbol` character (zeros by default).'''
     _ohs = _str_len * _symbol
-    return (_ohs + str(_int))[0 - _str_len :]
+    return (_ohs + str(_int))[0 - _str_len:]
 
 
 def local_pronunciation(iso_lang='en-CA',
@@ -3061,6 +3062,30 @@ file is missing or is incorrectly formatted for this application.
     return [text, _json_text]
 
 
+def pipewire_supported():  # -> bool
+    '''Check if the system has pipewire audio playback.'''
+    # Check that the distribution works with .mp3 before adding to the list.
+    # Debian 12 bookworm? Yes.
+    # Fedora 33? Yes.
+    # Ubuntu 22.04 LTS? No.
+
+    if os.name != 'posix':
+        return False
+    _distributions = [
+        ['debian', 6],
+        ['#1 smp preempt_dynamic', 6],
+    ]
+    try:
+        for _dist in _distributions:
+            if _dist[0] in os.uname().version.lower():
+                if int(os.uname()[2].split('.')[0]) < _dist[1]:
+                    return False
+                return have_posix_app('pw-cat')
+    except (TypeError, ValueError):
+        pass
+    return False
+
+
 class PosixAudioPlayers(object):
     '''Check for an available player on platforms like Linux and MacOS'''
 
@@ -3076,16 +3101,24 @@ class PosixAudioPlayers(object):
         self.command_get = 2
         self.universal_play = 3  # verified to play compressed formats
         self.found_player = 'Unknown player'
-        self.players = [
-            [
-                'afplay',
-                'afplay',  # Darwin
-                '"%(file_path)s"',
+        first_player = [
+            'afplay',
+            'afplay',  # Darwin
+            '"%(file_path)s"',
+            True
+        ]
+        if pipewire_supported():
+            first_player = [
+                'pipewire-bin',
+                'pw-cat',
+                '-p "%(file_path)s"',
                 True
-            ],
+            ]
+        self.players = [
+            first_player,
+            ['paplay', 'paplay', '"%(file_path)s"', False],
             ['esdplay', 'esdplay', '"%(file_path)s"', False],
             ['ossplay', 'ossplay', '"%(file_path)s"', False],
-            ['paplay', 'paplay', '"%(file_path)s"', False],
             ['artsplay', 'artsplay', '"%(file_path)s"', False],
             ['roarcat', 'roarcat', '"%(file_path)s"', False],
             ['roarcatplay', 'roarcatplay', '"%(file_path)s"', False],

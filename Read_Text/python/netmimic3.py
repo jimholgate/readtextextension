@@ -462,10 +462,9 @@ To automatically start the daemon, set the Docker container restart policy to
         _help_url = self.help_url
         s_voice_count = str(_voice_count)
         _mimic_lang = voice_id.split('/')[0]
-
         print("""
-Mimic 3 Mapping
-===============
+Mimic 3
+=======
 
 * Mapped Voice: `%(_search)s`
 * Available Locale: `%(_mimic_lang)s`

@@ -292,9 +292,8 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
                 _done = os.path.getsize(_media_work) != 0
         except (TimeoutError, urllib.error.HTTPError):
             print('''
-OpenTTS cannot provide speech for `%(_voice)s`.  Check using
-
-    tts-server --list_models | grep 'already downloaded'
+OpenTTS cannot provide speech for `%(_voice)s`.
+Check the server settings.
     ''' % locals())
             _done = False
         return _done

@@ -44,7 +44,7 @@ class GoogleTranslateClass(object):
 
     or
 
-        pip3 install gTTS gTTS-token
+        pipx install gTTS
 
     See:
 

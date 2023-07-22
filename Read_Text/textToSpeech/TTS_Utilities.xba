@@ -1981,7 +1981,7 @@ Sub dialog1Combo2ShowAppleScriptChoices( _
 			&apos; 2021-12 MacOS 12.01 (Monterey)
 			&apos; .m4a opens in third party apps like VideoLan VLC, but not
 			&apos; the native MacOS 11 Music or Quicktime player programs.
-			If Len(vlcPath()) = 0 Then
+			If Not fbHaveVLC() Then
 				s2 = &quot;.aif,.mp3&quot;
 			Else
 				
@@ -1990,7 +1990,7 @@ Sub dialog1Combo2ShowAppleScriptChoices( _
 			Case &quot;iTunes&quot;
 			&apos; MacOS 10.13.6 and iTunes 12.8.3.1
 			&apos; .mp3 -- no metadata
-			If Len(vlcPath()) = 0 Then
+			If fbHaveVLC() Then
 				s2 = &quot;.aif,.m4a&quot;
 			Else
 				s2 = &quot;.opus,.ogg,.aif,.mp3,.m4a&quot;
@@ -2635,7 +2635,7 @@ Function fspyOutOptions( _
 				&apos; we cannot count on it working properly.
 			ElseIf Len(_
 			fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 And Not(_
-			fbHaveFfmpeg()) And Len(_vlc) = 0 Then
+			fbHaveFfmpeg()) And Not(fbHaveVLC()) Then
 				&apos; The Python gstreamer library might not be available, so 
 				&apos; propose saving audio formats that your apps support.
 
@@ -4935,6 +4935,7 @@ Function fbIsAMediaPlayer( _
 	&quot;/usr/bin/noatun&quot;, _
 	&quot;/usr/bin/parole&quot;, _
 	&quot;/usr/bin/play&quot;, _
+	&quot;/usr/bin/pw-cat&quot;, _
 	&quot;/usr/bin/sensible-browser&quot;, _
 	&quot;/usr/bin/totem&quot;, _
 	&quot;/usr/bin/xdg-open&quot;, _
@@ -6286,6 +6287,11 @@ Function fbHaveFfmpeg() As Boolean
 End Function
 
 
+Function fbHavePipeWire() As Boolean
+	fbHavePipeWire = Not (Len(fsMyPipeWire()) = 0)
+End Function
+
+
 Function fbHaveGst() As Boolean
 	fbHaveGst = Not (Len(GstLaunchPath()) = 0)
 End Function
@@ -6633,39 +6639,78 @@ End Function
 
 
 Function fsMyFfmpeg() As String
-&apos; FFmpeg
-	Dim sProgramPaths, sWebURL, cR, sA, sB, sC, sD, sE As String
-	Dim aC, aD
-	Dim i As Integer
+&apos; FFmpeg is a command line utility for playing, manipulating
+&apos; and converting sound files.
+	Dim sTest, sExt As String
+	Dim aC, aD As Variant
+	Dim i, j As Integer
 	
-	aC = Array(&quot;ffmpeg&quot;,&quot;avconv&quot;)
-	cR = Chr$(10)
-	sA = fsProgramDirectory()
-	sB = fsProgramDirectoryx86()
-	sProgramPaths = &quot;&quot;
+	aC = Array(&quot;ffmpeg&quot;, &quot;avconv&quot;)
+	sTest = &quot;&quot;
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+		sExt = &quot;.exe&quot;
+		aD = Array(_
+			converttourl(fsProgramDirectory() &amp; &quot;/Shotcut/&quot;), _
+			converttourl(fsProgramDirectoryx86() &amp; &quot;/Shotcut/&quot;), _	
+			converttourl(Environ(&quot;HOMEDRIVE&quot;) &amp; &quot;/opt/&quot;), _
+			converttourl(Environ(&quot;USERPROFILE&quot;) &amp; &quot;/opt/&quot;))
+		Case Else
+		sExt = &quot;&quot;
+		aD = Array(_
+			&quot;file:///usr/bin/&quot;, _
+			&quot;file:///Applications/Shotcut.app/Contents/MacOS/&quot;, _
+			&quot;file:///usr/local/bin/&quot;, _
+			&quot;file:///opt/&quot;, _
+			&quot;file:///opt/local/&quot;, _
+			&quot;file:///opt/Shotcut/Shotcut.app/bin/&quot;)
+	End Select
 	For i = LBound(aC) To UBound(aC)
-		sProgramPaths = sProgramPaths &amp; &quot;file:///usr/bin/&quot; &amp; aC(i) &amp; cR &amp; _
-		&quot;file:///Applications/Shotcut.app/Contents/MacOS/&quot; &amp; aC(i) &amp; cR &amp; _
-		converttourl(Environ(&quot;HOMEDRIVE&quot;)) &amp; &quot;/opt/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
-		converttourl(Environ(&quot;USERPROFILE&quot;)) &amp; &quot;/opt/&quot; &amp; aC(i) &amp; &quot;.exe&quot; &amp; cR &amp; _
-		&quot;file:///usr/local/bin/&quot; &amp; aC(i) &amp; cR &amp; _
-		&quot;file:///opt/&quot; &amp; aC(i) &amp; cR &amp; _
-		&quot;file:///opt/local/&quot; &amp; aC(i) &amp; cR &amp; _
-		&quot;file:///opt/Shotcut/Shotcut.app/bin/&quot; &amp; aC(i) &amp; cR
-		&apos; &quot;---END OF CR SEPARATED LIST---&quot;
+		For j = LBound(aD) to Ubound(aD)
+			sTest = aD(j) &amp; aC(i) &amp; sExt
+			If FileExists(sTest) Then
+				fsMyFfmpeg = ConvertFromUrl(sTest)
+				Exit Function
+			End If
+		Next
 	Next
-	aD = Split(fsSuperTrim(sProgramPaths, &quot;&quot;), cR)
-	sE = &quot;&quot;
-	For i = LBound(aD) To UBound(aD)
-		If FileExists(aD(i)) Then
-			sE = (aD(i))
-			Exit For
-		End If
+	fsMyFfmpeg = &quot;&quot;
+End Function
+
+
+Function fsMyPipeWire() As String
+&apos; pw-cat is a command line utility for playing, manipulating
+&apos; and converting sound files.
+	Dim sTest, sExt As String
+	Dim aC, aD As Variant
+	Dim i, j As Integer
+	
+	aC = Array(&quot;pw-cat&quot;, &quot;pw-play&quot;)
+	sTest = &quot;&quot;
+	Select Case fsGetOS()
+	Case &quot;WINDOWS&quot;
+	sExt = &quot;.exe&quot;
+	aD = Array(_
+		converttourl(Environ(&quot;HOMEDRIVE&quot;) &amp; &quot;/opt/&quot;), _
+		converttourl(Environ(&quot;USERPROFILE&quot;) &amp; &quot;/opt/&quot;))
+	Case Else
+	sExt = &quot;&quot;
+	aD = Array(_
+		&quot;file:///usr/bin/&quot;, _
+		&quot;file:///usr/local/bin/&quot;, _
+		&quot;file:///opt/&quot;, _
+		&quot;file:///opt/local/&quot;)
+	End Select
+	For i = LBound(aC) To UBound(aC)
+		For j = LBound(aD) to Ubound(aD)
+			sTest = aD(j) &amp; aC(i) &amp; sExt
+			If FileExists(sTest) Then
+				fsMyPipeWire = ConvertFromUrl(sTest)
+				Exit Function
+			End If
+		Next
 	Next
-	If Len(sE) = 0 Then
-		sE = ffmpegPath()
-	End If
-	fsMyFfmpeg = ConvertFromUrl(sE)
+	fsMyPipeWire = &quot;&quot;
 End Function
 
 
@@ -6985,6 +7030,7 @@ Sub resetSpeechDispatcher( _
 			&apos; Check players before synthesizers.
 			a1 = Array( _
 			&quot;gst-launch-1.0&quot;, _
+			&quot;pw-cat&quot;, _
 			&quot;afplay&quot;, _
 			&quot;aplay&quot;, _
 			&quot;artsplay&quot;, _
