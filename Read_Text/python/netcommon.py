@@ -131,9 +131,11 @@ class LocalCommons(object):
         self.locker = 'net_speech'
         self.generic_problem = '''The application cannot load a sound file.
 Your computer might be missing a required library, or an operation might have
-taken too long. If the problem persists, try installing `pip3 install requests`
-or `apt-get install python3-requests` to fix it.'''
-
+taken too long.'''
+        if readtexttools.using_container(False):
+            self.generic_problem = '''The container application cannot load
+a sound file. It might be missing a required library or an operation might
+have taken too long.'''
     def big_play_list(self,
                       _text='',
                       _lang_str='en',
@@ -170,7 +172,10 @@ or `apt-get install python3-requests` to fix it.'''
                 nlp.disable_pipe("parser")
                 nlp.enable_pipe("senter")
             except AttributeError:
-                pass
+                try:
+                    nlp.enable_pipe("parser")
+                except AttributeError:
+                    pass
             doc = nlp(_text)
             for item in doc.sents:
                 if len(item.text) != 0:
@@ -179,7 +184,7 @@ or `apt-get install python3-requests` to fix it.'''
         except:
             self.checked_spacy = False
         if len(spaceval) == 0 and _verbose:
-            if not readtexttools.using_container():
+            if not readtexttools.using_container(True):
                 print(
                 '''The python `spacy` library or a `%(_lang_str)s` language model is unavailable.
 Falling back to `.splitlines()`

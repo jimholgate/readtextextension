@@ -195,14 +195,16 @@ def get_temp_prefix():  # -> str
     return tempfile.gettempdir()
 
 
-def using_container():  # ->bool
+def using_container(check_exec=False):  # ->bool
     '''Check whether the extension is in a known container resource
-    directory or the application is temporary.'''
+    directory (snap, flatpack) or optionally if the application is
+    mounted in a temporary directory (appimage).'''
     for test_path in ['/snap/libreoffice', '/var/', '/.var/']:
         if test_path in os.path.realpath(__file__):
             return True
-    if sys.executable.startswith('/tmp/.mount_'):
-        return True
+    if check_exec:
+        if sys.executable.startswith('/tmp/.mount_'):
+            return True
     return False
 
 

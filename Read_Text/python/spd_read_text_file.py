@@ -208,7 +208,7 @@ USE_SPEECHD = True
 try:
     import speechd
 except ImportError:
-    if readtexttools.using_container():
+    if readtexttools.using_container(False):
         print('''
 Using a *container* version of an office application could restrict your
 computer's ability to run system python libraries.
