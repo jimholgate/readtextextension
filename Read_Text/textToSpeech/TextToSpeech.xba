@@ -155,6 +155,13 @@ Sub ReadTextAloud()
 	Dim msgs()As Variant
 	Dim errorCode As Integer : errorCode = 0
 	Dim config(fiCountConfigOptions)As Variant
+	Dim locklist As Variant
+	Dim x As Integer
+	Dim bDone As Boolean : bDone = False
+	locklist = Array(&quot;lock&quot;)
+	If fsGetOS() = &quot;UNIX&quot; Then
+		locklist = Array(&quot;lock&quot;, &quot;net_speech&quot;)
+	End If
 	
 	sFile = fsFullPathOf(fsExtensionSettingsIni)
 	If FileExists(sFile) Then
@@ -163,9 +170,14 @@ Sub ReadTextAloud()
 			ConfigureReadTextAloud()
 		Else
 			On Error Resume Next
-			ClearWorkingCountryLanguage
-			If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
-				fbRemoveFile(fsMyTempLock(&quot;lock&quot;))
+			ClearWorkingCountryLanguage()
+			For x = LBound(locklist) To Ubound(locklist)
+				If FileExists(fsMyTempLock(locklist(x))) Then
+					fbRemoveFile(fsMyTempLock(locklist(x)))
+					bDone = True
+				End If
+			Next
+			If bDone Then
 				resetSpeechDispatcher(True)
 			Else
 				ttsActuate(config(), _

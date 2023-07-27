@@ -59,6 +59,7 @@ class LarynxClass(object):
         """Initialize data. See
         <https://github.com/rhasspy/larynx#basic-synthesis>"""
         _common = netcommon.LocalCommons()
+        self.locker = _common.locker
         self.common = _common
         self.debug = _common.debug
         self.default_extension = _common.default_extension
@@ -515,10 +516,10 @@ Loading larynx voices for `%(_lang2)s`
             os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
-                readtexttools.unlock_my_lock("larynx")
+                readtexttools.unlock_my_lock(self.locker)
                 return True
-            elif os.path.isfile(readtexttools.get_my_lock("larynx")):
-                readtexttools.unlock_my_lock("larynx")
+            elif os.path.isfile(readtexttools.get_my_lock(self.locker)):
+                readtexttools.unlock_my_lock(self.locker)
                 return True
         _voice = self.voice_name
         if self.debug and 1:
@@ -580,7 +581,7 @@ Loading larynx voices for `%(_lang2)s`
             _iso_lang, _text, "larynx", "LARYNX_USER_DIRECTORY", False
         )[0]
 
-        readtexttools.lock_my_lock("larynx")
+        readtexttools.lock_my_lock(self.locker)
         _tries = 0
         _no = "0" * 10
         if ssml:
@@ -594,7 +595,7 @@ Loading larynx voices for `%(_lang2)s`
         else:
             _items = [_text]
         for _item in _items:
-            if not os.path.isfile(readtexttools.get_my_lock("larynx")):
+            if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop!")
                 return True
             elif len(_item.strip(" ;.!?\n")) == 0:
@@ -632,7 +633,7 @@ Loading larynx voices for `%(_lang2)s`
                     _ok_wait,
                     _media_work,
                 )
-            if not os.path.isfile(readtexttools.get_my_lock("larynx")):
+            if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop")
                 return True
             if _done:
@@ -653,5 +654,5 @@ Loading larynx voices for `%(_lang2)s`
         self.ok = _done
         if not _done:
             print(self.common.generic_problem)
-        readtexttools.unlock_my_lock("larynx")
+        readtexttools.unlock_my_lock(self.locker)
         return _done

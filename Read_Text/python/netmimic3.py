@@ -41,6 +41,7 @@ To automatically start the daemon, set the Docker container restart policy to
     def __init__(self):  # -> None
         """Initialize data."""
         _common = netcommon.LocalCommons()
+        self.locker = _common.locker
         self.common = _common
         self.debug = _common.debug
         self.default_extension = _common.default_extension
@@ -56,6 +57,7 @@ To automatically start the daemon, set the Docker container restart policy to
         self.max_chars = 360
         self.voice = ""
         self.voice_id = ""
+        self.app_locker = readtexttools.get_my_lock("lock")
 
         self.accept_voice = [
             "",
@@ -648,10 +650,10 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
             os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
-                readtexttools.unlock_my_lock("mimic3")
+                readtexttools.unlock_my_lock(self.locker)
                 return True
-            elif os.path.isfile(readtexttools.get_my_lock("mimic3")):
-                readtexttools.unlock_my_lock("mimic3")
+            elif os.path.isfile(readtexttools.get_my_lock(self.locker)):
+                readtexttools.unlock_my_lock(self.locker)
                 return True
         _voice = self.voice_id
         self.checked_spacy = self.common.verify_spacy(_iso_lang.split("-")[0])
@@ -670,7 +672,7 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
                                                   "MIMIC3_USER_DIRECTORY",
                                                   False)[0].strip()
 
-        readtexttools.lock_my_lock("mimic3")
+        readtexttools.lock_my_lock(self.locker)
         _tries = 0
         _no = "0" * 10
         if ssml:
@@ -684,7 +686,7 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
         else:
             _items = [_text]
         for _item in _items:
-            if not os.path.isfile(readtexttools.get_my_lock("mimic3")):
+            if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop!")
                 return True
             elif len(_item.strip(" ;.!?\n")) == 0:
@@ -700,11 +702,10 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
                 _ssml = 'true'
             _done = self.try_url_lib(_voice, _item, _url, _length_scale, _ssml,
                                      _ok_wait, _end_wait, _media_work)
-            if not os.path.isfile(readtexttools.get_my_lock("mimic3")):
+            if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop")
                 return True
             if _done:
-
                 self.common.do_net_sound(
                     _info,
                     _media_work,
@@ -722,5 +723,5 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
         self.ok = _done
         if not _done:
             print(self.common.generic_problem)
-        readtexttools.unlock_my_lock("mimic3")
+        readtexttools.unlock_my_lock(self.locker)
         return _done

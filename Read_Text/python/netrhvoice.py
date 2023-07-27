@@ -64,6 +64,7 @@ class RhvoiceLocalHost(object):
         to the localhost API, so functions in the parent that rely on a specific
         file path do not work."""
         _common = netcommon.LocalCommons()
+        self.locker = _common.locker
         self.common = _common
         self.add_pause = _common.add_pause
         self.pause_list = _common.pause_list
@@ -287,10 +288,10 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
         _media_work = os.path.join(tempfile.gettempdir(), "Rhvoice-rest.wav")
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
-                readtexttools.unlock_my_lock("rhvoice")
+                readtexttools.unlock_my_lock(self.locker)
                 return True
-            elif os.path.isfile(readtexttools.get_my_lock("rhvoice")):
-                readtexttools.unlock_my_lock("rhvoice")
+            elif os.path.isfile(readtexttools.get_my_lock(self.locker)):
+                readtexttools.unlock_my_lock(self.locker)
                 return True
         if bool(self.add_pause):
             for _symbol in self.pause_list:
@@ -328,7 +329,7 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
             _strips = "\n .;"
             self.common.set_urllib_timeout(_ok_wait)
             _tries = 0
-            readtexttools.lock_my_lock("rhvoice")
+            readtexttools.lock_my_lock(self.locker)
             _no = "0" * 10
             # Rhvoice has low latency, so using `spacy` to divide text into sentences
             # might degrade performance. Use `splitlines()`
@@ -337,7 +338,7 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
             else:
                 _items = [_text]
             for _item in _items:
-                if not os.path.isfile(readtexttools.get_my_lock("rhvoice")):
+                if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                     print("[>] Stop!")
                     return True
                 if len(_item.strip(_strips)) == 0:
@@ -366,10 +367,10 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                     _done = False
                     break
                 if not _done:
-                    readtexttools.unlock_my_lock("rhvoice")
+                    readtexttools.unlock_my_lock(self.locker)
                     return False
 
-                if not os.path.isfile(readtexttools.get_my_lock("rhvoice")):
+                if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                     print("[>] Stop")
                     return True
                 retval = self.common.do_net_sound(
@@ -384,5 +385,5 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                     _post_process,
                     False,
                 )
-        readtexttools.unlock_my_lock("rhvoice")
+        readtexttools.unlock_my_lock(self.locker)
         return retval

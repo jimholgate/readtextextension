@@ -442,7 +442,6 @@ def network_main(_text_file_in='',
                 _local_url,
                 _vox,
                 ) and _vox in _larynx.accept_voice:
-
             _quality = -1  # Auto; Manual is 0 (lowest) to 2 (highest)
             _ssml = is_ssml(_text)
             _larynx.read(_text, _iso_lang, _visible, _audible, _media_out,

@@ -162,6 +162,7 @@ class CoquiDemoLocalHost(object):
         to the tts host's API, so functions in the parent that rely on a
         specific file path do not work.'''
         _common = netcommon.LocalCommons()
+        self.locker = _common.locker
         self.end = 0
         self.common = _common
         self.add_pause = _common.add_pause
@@ -525,10 +526,10 @@ system installer application like `apt`.''')
                                    self.help_heading.replace(' ', '-') + _end)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
-                readtexttools.unlock_my_lock('tts')
+                readtexttools.unlock_my_lock(self.locker)
                 return True
-            elif os.path.isfile(readtexttools.get_my_lock('tts')):
-                readtexttools.unlock_my_lock('tts')
+            elif os.path.isfile(readtexttools.get_my_lock(self.locker)):
+                readtexttools.unlock_my_lock(self.locker)
                 return True
         if bool(self.add_pause):
             for _symbol in self.pause_list:
@@ -559,10 +560,10 @@ system installer application like `apt`.''')
                                                   _iso_lang.split('-')[0])
             last_item = ''
             _tries = 0
-            readtexttools.lock_my_lock('tts')
+            readtexttools.lock_my_lock(self.locker)
             _no = 10 * '0'
             for _item in play_list:
-                if not os.path.isfile(readtexttools.get_my_lock('tts')):
+                if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                     print('[>] Stop!')
                     return True
                 _item = _item.strip(' \n;')
@@ -620,19 +621,19 @@ system installer application like `apt`.''')
                     print(
                         '%(_logo)s Tried using `%(_iso_lang)s` with Coqui TTS but failed with an HTTP Error.'
                         % locals())
-                    readtexttools.unlock_my_lock('tts')
+                    readtexttools.unlock_my_lock(self.locker)
                     done = False
                 except TimeoutError:
-                    readtexttools.unlock_my_lock('tts')
+                    readtexttools.unlock_my_lock(self.locker)
                     done = False
                 if not _done:
                     return False
-                if not os.path.isfile(readtexttools.get_my_lock('tts')):
+                if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                     print('[>] Stop')
                     return True
                 retval = self.common.do_net_sound(_info, _media_work, _icon,
                                                   _media_out, _audible,
                                                   _visible, _writer, _size,
                                                   _post_process, False)
-            readtexttools.unlock_my_lock('tts')
+            readtexttools.unlock_my_lock(self.locker)
             return retval

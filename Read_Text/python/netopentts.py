@@ -47,6 +47,7 @@ class OpenTTSClass(object):
         """Initialize data."""
         _common = netcommon.LocalCommons()
         self.common = _common
+        self.locker = _common.locker
         self.debug = _common.debug
         self.default_extension = _common.default_extension
         self.ok = False
@@ -59,17 +60,17 @@ class OpenTTSClass(object):
         )
         self.voice = ""
         self.voice_id = ""  # larynx, glow-speak and coqui-tts use AI.
-        # This subset of models omits espeak and coqui. In June, 2023, the
-        # OpenTTS speech engines that support languages other than English
-        # include nanotts and marytts.
+        # This subset of models omits espeak, festival and coqui.
+        # In June, 2023, the OpenTTS speech engines that support languages
+        # other than English include nanotts and marytts.
         self.vmodels = [
-            "coqui-tts",
-            "festival",
             "flite",
             "glow-speak",
             "larynx",
             "marytts",
-            "nanotts",
+            "nanotts",  # aka svox pico
+            # "coqui-tts",  # Timeout
+            # "festival",  # Timeout errors; depreciated legacy code
         ]
 
         self.accept_voice = [
@@ -181,7 +182,7 @@ OpenTTS
 can synthesize speech privately using %(_eurl)s.""" % locals())
             self.ok = False
             return False
-        except:
+        except:  # [AttributeError, TimeoutError]:
             # catching classes that do not inherit from BaseException is not allowed
             self.ok = False
             return False
@@ -293,7 +294,7 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
         except (TimeoutError, urllib.error.HTTPError):
             print('''
 OpenTTS cannot provide speech for `%(_voice)s`.
-Check the server settings.
+Check the server settings or use a different voice.
     ''' % locals())
             _done = False
         return _done
@@ -331,10 +332,10 @@ Check the server settings.
             os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
-                readtexttools.unlock_my_lock("opentts")
+                readtexttools.unlock_my_lock(self.locker)
                 return True
-            elif os.path.isfile(readtexttools.get_my_lock("opentts")):
-                readtexttools.unlock_my_lock("opentts")
+            elif os.path.isfile(readtexttools.get_my_lock(self.locker)):
+                readtexttools.unlock_my_lock(self.locker)
                 return True
         _voice = self.voice_id
         if self.debug and 1:
@@ -355,7 +356,7 @@ Check the server settings.
                                                   "OPENTTS_USER_DIRECTORY",
                                                   False)[0]
 
-        readtexttools.lock_my_lock("opentts")
+        readtexttools.lock_my_lock(self.locker)
         _tries = 0
         _no = "0" * 10
         if ssml:
@@ -369,7 +370,7 @@ Check the server settings.
         else:
             _items = [_text]
         for _item in _items:
-            if not os.path.isfile(readtexttools.get_my_lock("opentts")):
+            if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop!")
                 return True
             elif len(_item.strip(" ;.!?\n")) == 0:
@@ -391,7 +392,7 @@ Check the server settings.
                 _end_wait,
                 _media_work,
             )
-            if not os.path.isfile(readtexttools.get_my_lock("opentts")):
+            if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop")
                 return True
             if _done:
@@ -412,5 +413,5 @@ Check the server settings.
         self.ok = _done
         if not _done:
             print(self.common.generic_problem)
-        readtexttools.unlock_my_lock("opentts")
+        readtexttools.unlock_my_lock(self.locker)
         return _done

@@ -7067,7 +7067,6 @@ Sub resetSpeechDispatcher( _
 	oBar.End()
 	Exit Sub
 	resetSpeechDispatcherErr:
-	
 End Sub
 
 

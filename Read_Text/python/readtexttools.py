@@ -124,11 +124,9 @@ try:
 except ImportError:
     pass
 
-from xml.etree.ElementTree import TreeBuilder
-
 try:
     import webbrowser
-except:
+except ImportError:
     pass
 
 LOOK_UPS = 0
@@ -195,6 +193,17 @@ def get_temp_prefix():  # -> str
      -image.png for image
     '''
     return tempfile.gettempdir()
+
+
+def using_container():  # ->bool
+    '''Check whether the extension is in a known container resource
+    directory or the application is temporary.'''
+    for test_path in ['/snap/libreoffice', '/var/', '/.var/']:
+        if test_path in os.path.realpath(__file__):
+            return True
+    if sys.executable.startswith('/tmp/.mount_'):
+        return True
+    return False
 
 
 def have_posix_app(posix_app='vlc', do_test=True):  # -> bool
@@ -575,6 +584,8 @@ def gst_plugin_path(plug_in_name='libgstvorbis'):  # -> str
         '/usr/lib/mipsel-linux-gnu/',
         '/usr/local/lib/ppc64el-linux-gnu/',
         '/usr/lib/ppc64el-linux-gnu/',
+        '/usr/local/lib/riscv64-linux-gnu/',
+        '/usr/lib/riscv64-linux-gnu/',
         '/usr/local/lib/s390x-linux-gnu/',
         '/usr/lib/s390x-linux-gnu/',
     ]
@@ -869,7 +880,7 @@ def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
     if int(platform.python_version_tuple()[0].strip()) < 3:
         return ''
     if os.name == 'nt':
-        profile = os.getenv("LOCALAPPDATA").strip(os.div)
+        profile = os.getenv("LOCALAPPDATA").strip(os.sep)
         path1 = os.path.join(profile, 'Programs', 'Python')
         path2 = os.path.join('Lib', 'site-packages')
         path3 = path2
@@ -926,8 +937,7 @@ def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
                     continue
                 elif 'dist-info' in entry_name:
                     continue
-                py_path = os.path.join(
-                    path_result, entry_name, path2, lib_name)
+                py_path = os.path.join(path_result, entry_name, path2, lib_name)
                 if not os.path.isdir(py_path):
                     if os.path.isdir(os.path.join(path_result, lib_name)):
                         py_path = path_result
@@ -2931,7 +2941,7 @@ def prefix_ohs(_int=1, _str_len=10, _symbol='0'):  # -> str
     '''Given an integer `_int`, returns a string of length `_str_len`
     prefixed by `_symbol` character (zeros by default).'''
     _ohs = _str_len * _symbol
-    return (_ohs + str(_int))[0 - _str_len:]
+    return (_ohs + str(_int))[0 - _str_len :]
 
 
 def local_pronunciation(iso_lang='en-CA',
@@ -3063,18 +3073,15 @@ file is missing or is incorrectly formatted for this application.
 
 
 def pipewire_supported():  # -> bool
-    '''Check if the system has pipewire audio playback.'''
+    '''Check if the system has pipewire audio.'''
     # Check that the distribution works with .mp3 before adding to the list.
-    # Debian 12 bookworm? Yes.
-    # Fedora 33? Yes.
-    # Ubuntu 22.04 LTS? No.
-
+    # Ubuntu 22.04? No.
+    # Ubuntu 23.04? smp preempt_dynamic? Yes.
+    # Debian 12.1 bookworm? Yes.
+    # Fedora 38 smp preempt_dynamic? Yes.
     if os.name != 'posix':
         return False
-    _distributions = [
-        ['debian', 6],
-        ['#1 smp preempt_dynamic', 6],
-    ]
+    _distributions = [['debian', 6], ['smp preempt_dynamic', 6]]
     try:
         for _dist in _distributions:
             if _dist[0] in os.uname().version.lower():
@@ -3102,18 +3109,18 @@ class PosixAudioPlayers(object):
         self.universal_play = 3  # verified to play compressed formats
         self.found_player = 'Unknown player'
         first_player = [
-            'afplay',
-            'afplay',  # Darwin
-            '"%(file_path)s"',
-            True
-        ]
+                'afplay',
+                'afplay',  # Darwin
+                '"%(file_path)s"',
+                True
+            ]
         if pipewire_supported():
             first_player = [
                 'pipewire-bin',
                 'pw-cat',
                 '-p "%(file_path)s"',
                 True
-            ]
+                ]
         self.players = [
             first_player,
             ['paplay', 'paplay', '"%(file_path)s"', False],

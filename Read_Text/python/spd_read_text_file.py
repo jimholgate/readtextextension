@@ -208,14 +208,13 @@ USE_SPEECHD = True
 try:
     import speechd
 except ImportError:
-    for test_path in ['/snap/libreoffice', '/var/', '/.var/']:
-        if test_path in os.path.realpath(__file__):
-            print('''
+    if readtexttools.using_container():
+        print('''
 Using a *container* version of an office application could restrict your
 computer's ability to run system python libraries.
 ''')
-            # Run `main()` to show usage alternatives.
-            USE_SPEECHD = False
+        # Run `main()` to show usage alternatives.
+        USE_SPEECHD = False
     try:
         if USE_SPEECHD:
             import speechd_py as speechd

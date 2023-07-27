@@ -128,6 +128,7 @@ class LocalCommons(object):
         except AttributeError:
             self.base_curl = None
         self.is_x86_64 = sys.maxsize > 2**32
+        self.locker = 'net_speech'
         self.generic_problem = '''The application cannot load a sound file.
 Your computer might be missing a required library, or an operation might have
 taken too long. If the problem persists, try installing `pip3 install requests`
@@ -178,7 +179,8 @@ or `apt-get install python3-requests` to fix it.'''
         except:
             self.checked_spacy = False
         if len(spaceval) == 0 and _verbose:
-            print(
+            if not readtexttools.using_container():
+                print(
                 '''The python `spacy` library or a `%(_lang_str)s` language model is unavailable.
 Falling back to `.splitlines()`
 

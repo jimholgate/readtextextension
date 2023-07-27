@@ -36,6 +36,7 @@ Default MaryTts server: <http://0.0.0.0:59125>
         """Initialize data. See
         <https://github.com/synesthesiam/docker-marytts>"""
         _common = netcommon.LocalCommons()
+        self.locker = _common.locker
         self.common = _common
         self.debug = _common.debug
         self.local_dir = "mary_tts"
@@ -419,10 +420,10 @@ It did not respond correctly.""" % locals())
             os.remove(_media_work)
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
-                readtexttools.unlock_my_lock("mary")
+                readtexttools.unlock_my_lock(self.locker)
                 return True
-            elif os.path.isfile(readtexttools.get_my_lock("mary")):
-                readtexttools.unlock_my_lock("mary")
+            elif os.path.isfile(readtexttools.get_my_lock(self.locker)):
+                readtexttools.unlock_my_lock(self.locker)
                 return True
         if bool(self.add_pause) and not ssml:
             for _symbol in self.pause_list:
@@ -483,10 +484,10 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.""")
         else:
             _items = self.common.big_play_list(_text, _iso_lang.split("-")[0])
         _tries = 0
-        readtexttools.lock_my_lock("mary")
+        readtexttools.lock_my_lock(self.locker)
         _no = "0" * 10
         for _item in _items:
-            if not os.path.isfile(readtexttools.get_my_lock("mary")):
+            if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop!")
                 return True
             elif len(_item.strip(" ;.!?\n")) == 0:
@@ -526,7 +527,7 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.""")
                     _end_wait,
                     _media_work,
                 )
-            if not os.path.isfile(readtexttools.get_my_lock("mary")):
+            if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop")
                 return True
             if _done:
@@ -547,5 +548,5 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.""")
         self.ok = _done
         if not _done:
             print(self.common.generic_problem)
-        readtexttools.unlock_my_lock("mary")
+        readtexttools.unlock_my_lock(self.locker)
         return _done
