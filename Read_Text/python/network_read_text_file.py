@@ -341,7 +341,8 @@ def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
     if not _continue:
         try:
             _larynx = netlarynx.LarynxClass()
-            _continue = _larynx.language_supported(_iso_lang, _local_url, 'AUTO')
+            _continue = _larynx.language_supported(
+                _iso_lang, _local_url, 'AUTO')
         except NameError:
             pass
     if not _continue:
@@ -429,25 +430,25 @@ def network_main(_text_file_in='',
         if _mimic3.language_supported(_iso_lang, _local_url, _vox):
             _mimic3.spd_voice_to_mimic3_voice(_vox, _iso_lang, _local_url)
             _ssml = is_ssml(_text)
-            _mimic3.read(_text, _iso_lang, _visible, _audible, _media_out,
-                        _icon, clip_title, _post_processes[5], _info, _size,
-                        _ssml, 20, 60)
+            _mimic3.read(_text, _iso_lang, _visible, _audible, _media_out, _icon,
+                         clip_title, _post_processes[5], _info, _size, _speech_rate,
+                         _ssml, 20, 60)
             return True
     except NameError:
         pass
     try:
-        _larynx = netlarynx.LarynxClass()        
+        _larynx = netlarynx.LarynxClass()
         if _larynx.language_supported(
                 _iso_lang,
                 _local_url,
                 _vox,
-                ) and _vox in _larynx.accept_voice:
+        ) and _vox in _larynx.accept_voice:
             _quality = -1  # Auto; Manual is 0 (lowest) to 2 (highest)
             _ssml = is_ssml(_text)
             _larynx.read(_text, _iso_lang, _visible, _audible, _media_out,
-                        _icon, clip_title, _post_processes[5], _info, _size,
-                        _speech_rate, _quality, _ssml, _denoiser_strength,
-                        _noise_scale, 20, 60)
+                         _icon, clip_title, _post_processes[5], _info, _size,
+                         _speech_rate, _quality, _ssml, _denoiser_strength,
+                         _noise_scale, 20, 60)
             return True
     except NameError:
         pass
@@ -455,9 +456,9 @@ def network_main(_text_file_in='',
         _rhvoice_rest = netrhvoice.RhvoiceLocalHost()
         if _rhvoice_rest.language_supported(_iso_lang, _local_url):
             _rhvoice_rest.read(_text, _iso_lang, _visible, _audible,
-                            _media_out, _icon, clip_title,
-                            _post_processes[5], _info, _size, _speech_rate,
-                            _vox, 4, 30)
+                               _media_out, _icon, clip_title,
+                               _post_processes[5], _info, _size, _speech_rate,
+                               _vox, 4, 30)
             return True
     except NameError:
         pass
@@ -467,8 +468,8 @@ def network_main(_text_file_in='',
             _ssml = is_ssml(_text)
             _opentts._spd_voice_to_opentts_voice(_vox, _iso_lang)
             _opentts.read(_text, _iso_lang, _visible, _audible, _media_out,
-                        _icon, clip_title, _post_processes[5], _info,
-                        _size, _ssml, .03, 20, 60)
+                          _icon, clip_title, _post_processes[5], _info,
+                          _size, _ssml, .03, 20, 60)
             return True
     except NameError:
         pass
@@ -486,8 +487,8 @@ def network_main(_text_file_in='',
                     _text = readtexttools.strip_xml(_text)
                     _ssml = False
             _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
-                        _icon, clip_title, _post_processes[5], _info, _size,
-                        _speech_rate, _ssml, _vox, 4, 15)
+                          _icon, clip_title, _post_processes[5], _info, _size,
+                          _speech_rate, _ssml, _vox, 4, 15)
             return True
     except NameError:
         pass
@@ -495,18 +496,18 @@ def network_main(_text_file_in='',
         _coqui_demo = nettts.CoquiDemoLocalHost()
         if _coqui_demo.language_supported(_iso_lang, _local_url):
             _coqui_demo.read(_text, _iso_lang, _visible, _audible, _media_out,
-                            _icon, clip_title, _post_processes[5], _info,
-                            _size, _speech_rate, _vox, 20, 60)
+                             _icon, clip_title, _post_processes[5], _info,
+                             _size, _speech_rate, _vox, 20, 60)
             return True
     except (NameError, TypeError):
         pass
     try:
-        _gtts_class = netgtts.GoogleTranslateClass() 
+        _gtts_class = netgtts.GoogleTranslateClass()
         if _gtts_class.check_version(
                 _gtts_class.tested_version) and _vox in _gtts_class.accept_voice:
             _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,
-                            _icon, clip_title, _post_processes[1], _info,
-                            _size, _speech_rate)        
+                             _icon, clip_title, _post_processes[1], _info,
+                             _size, _speech_rate)
             return True
     except NameError:
         pass
@@ -514,7 +515,7 @@ def network_main(_text_file_in='',
     _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,
                      _icon, clip_title, _post_processes[0], _info,
                      _size, _speech_rate)
-    
+
     print(
         'No working network server was found, or the requested voice is unavailable.\n'
     )
@@ -535,8 +536,8 @@ def main():  # -> NoReturn
     except (AttributeError, ImportError):
         pass
     _media_out = ''
-    _visible = ''
-    _audible = ''
+    _visible = 'false'
+    _audible = 'true'
     _text = ''
     _percent_rate = '100%'
     _speech_rate = speech_wpm(_percent_rate)

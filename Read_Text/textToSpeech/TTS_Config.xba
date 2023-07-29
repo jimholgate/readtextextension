@@ -284,7 +284,7 @@ Function MimicSpeechHostInfo()
 	Dim _info As SpeechHostInfo
 	With _info
 		.about = &quot;Mimic is a fast local neural text to speech engine for Mycroft&quot;
-		.key = &quot;/&quot;
+		.key = &quot;en_UK/apope_low en_UK NA vits&quot;
 		.label = &quot;mimic3-server&quot;
 		.token = &quot;&quot;
 		.url = &quot;http://0.0.0.0:59125&quot;
@@ -292,12 +292,7 @@ Function MimicSpeechHostInfo()
 		.json_dir = &quot;mimic&quot;
 		.sample = &quot;http:0.0.0.0:59125/api/tts?text=Hello%20world&amp;voice=apope&amp;ssml=0&quot;
 		.docker = &quot;https://hub.docker.com/r/mycroftai/docker-mycroft/&quot;
-		If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0  or isSnap() or _
-		isFlatPak() Then
-			.tags = Array(&quot;text&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;web-ui&quot;)
-		Else
-			.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;)
-		End If
+		.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;)
 	End With
 	MimicSpeechHostInfo = _info
 End Function
@@ -623,20 +618,19 @@ End Sub
 
 
 Function fbEnableLocalHostRate() As Boolean
-	&apos; Some localhost speech servers do not support rate, are
-	&apos; untested, or have other issues when the rate of speech
-	&apos; is not 100%
-	fbEnableLocalHostRate = True
+	&apos; Some localhost speech servers support rate for all voices,
+	&apos; so display rate options like `--rate 75%`.
+	fbEnableLocalHostRate = False
 	Dim _info As Variant : _info = Array(_
-	RhvoiceSpeechHostInfo(), _
-	CoquiAISpeechHostInfo() _
-	)
+	MimicSpeechHostInfo(), _
+	LarynxSpeechHostInfo() _
+	)	
 	Dim x As Integer : x = 0
 	On Error GoTo fbEnableLocalHostRateErr
 	For x = Lbound(_info) to Ubound(_info)
 		If Instr(_info(x).url, &quot;http&quot;) = 1 Then
 			If fbLocalHostOk(_info(x).url &amp; _info(x).url_info, _info(x).key) Then
-				fbEnableLocalHostRate = False
+				fbEnableLocalHostRate = True
 				Exit Function
 			End If
 		End If

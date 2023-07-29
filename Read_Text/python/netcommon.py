@@ -136,6 +136,7 @@ taken too long.'''
             self.generic_problem = '''The container application cannot load
 a sound file. It might be missing a required library or an operation might
 have taken too long.'''
+
     def big_play_list(self,
                       _text='',
                       _lang_str='en',
@@ -186,7 +187,7 @@ have taken too long.'''
         if len(spaceval) == 0 and _verbose:
             if not readtexttools.using_container(True):
                 print(
-                '''The python `spacy` library or a `%(_lang_str)s` language model is unavailable.
+                    '''The python `spacy` library or a `%(_lang_str)s` language model is unavailable.
 Falling back to `.splitlines()`
 
     sudo apt-get install pipx

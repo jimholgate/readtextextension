@@ -138,6 +138,7 @@ IPA_SUBSET = [
     'ɜ', 'ɛ', 'i', 'ɪ', 'ɨ', 'o', 'ɒ', 'ɔ', 'ɵ', 'ʌ', 'u', 'ɯ', 'ʊ', 'ʉ', 'y'
 ]
 
+
 def killall_process(_process=''):  # -> bool
     '''If process is active, then stop it. Posix systems can use the posix
     `killall` command. Windows uses the `pip3` `psutil` library. Returns
@@ -939,7 +940,8 @@ def find_local_pip(lib_name='qrcode', latest=True, _add_path=''):  # -> str
                     continue
                 elif 'dist-info' in entry_name:
                     continue
-                py_path = os.path.join(path_result, entry_name, path2, lib_name)
+                py_path = os.path.join(
+                    path_result, entry_name, path2, lib_name)
                 if not os.path.isdir(py_path):
                     if os.path.isdir(os.path.join(path_result, lib_name)):
                         py_path = path_result
@@ -2943,7 +2945,7 @@ def prefix_ohs(_int=1, _str_len=10, _symbol='0'):  # -> str
     '''Given an integer `_int`, returns a string of length `_str_len`
     prefixed by `_symbol` character (zeros by default).'''
     _ohs = _str_len * _symbol
-    return (_ohs + str(_int))[0 - _str_len :]
+    return (_ohs + str(_int))[0 - _str_len:]
 
 
 def local_pronunciation(iso_lang='en-CA',
@@ -3111,18 +3113,18 @@ class PosixAudioPlayers(object):
         self.universal_play = 3  # verified to play compressed formats
         self.found_player = 'Unknown player'
         first_player = [
-                'afplay',
-                'afplay',  # Darwin
-                '"%(file_path)s"',
-                True
-            ]
+            'afplay',
+            'afplay',  # Darwin
+            '"%(file_path)s"',
+            True
+        ]
         if pipewire_supported():
             first_player = [
                 'pipewire-bin',
                 'pw-cat',
                 '-p "%(file_path)s"',
                 True
-                ]
+            ]
         self.players = [
             first_player,
             ['paplay', 'paplay', '"%(file_path)s"', False],

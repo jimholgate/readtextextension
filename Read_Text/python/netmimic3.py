@@ -597,7 +597,7 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
             _url,
             "?voice=",
             urllib.parse.quote(_voice),
-            "&length_scale=",
+            "&lengthScale=",
             str(_length_scale),
             "&ssml=",
             urllib.parse.quote(_ssml),
@@ -629,12 +629,16 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
         _post_process=None,
         _writer="",
         _size="600x600",
+        _speech_rate=160,
         ssml=False,
         _ok_wait=20,
         _end_wait=60,
     ):  # -> bool
         """Read Mimic3 speech aloud"""
         _length_scale = 1
+        if not _speech_rate == 160:
+            _length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)[
+                0]
         if not self.ok:
             return False
         if len(self.voice_id) == 0:
@@ -662,7 +666,8 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
             if bool(self.add_pause) and not ssml:
                 for _symbol in self.pause_list:
                     if _symbol in _text:
-                        _text = _text.translate(self.add_pause).replace(".\n;", ".").strip(';')
+                        _text = _text.translate(self.add_pause).replace(
+                            ".\n;", ".").strip(';')
                         break
         if ssml:
             _ssml = "true"

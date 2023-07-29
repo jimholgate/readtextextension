@@ -142,7 +142,8 @@ class LarynxClass(object):
             return True
         try:
             self.common.set_urllib_timeout(1)
-            response = urllib.request.urlopen("".join([self.url, "/api/vocoders"]))
+            response = urllib.request.urlopen(
+                "".join([self.url, "/api/vocoders"]))
             data_response = response.read()
             data = json.loads(data_response)
         except TimeoutError:
@@ -264,7 +265,8 @@ Try restarting `larynx-server`."""
         _lang2 = iso_lang.lower().split("-")[0].split("_")[0]
         data = {}
         try:
-            response = urllib.request.urlopen("".join([self.url, "/api/voices"]))
+            response = urllib.request.urlopen(
+                "".join([self.url, "/api/voices"]))
             data_response = response.read()
             data = json.loads(data_response)
         except urllib.error.URLError:
@@ -302,15 +304,18 @@ can synthesize speech privately using %(_eurl)s."""
             if data[_item]["downloaded"]:
                 self.accept_voice.append(data[_item]["name"])
                 if _lang1 in data[_item]["language"]:
-                    larynx_names = "".join([larynx_names, "\n", data[_item]["name"]])
+                    larynx_names = "".join(
+                        [larynx_names, "\n", data[_item]["name"]])
                 elif _lang2 == data[_item]["language"].split("-")[0].split("_")[0]:
-                    larynx_names = "".join([larynx_names, "\n", data[_item]["name"]])
+                    larynx_names = "".join(
+                        [larynx_names, "\n", data[_item]["name"]])
         larynx_names = larynx_names.strip()
         _vox = vox.lower()
         if _vox in larynx_names.split("\n"):
             _verified_name = _vox
         else:
-            _verified_name = self._spd_voice_to_larynx_voice(_vox, larynx_names)
+            _verified_name = self._spd_voice_to_larynx_voice(
+                _vox, larynx_names)
         if _verified_name in self.larynx_v1:
             _logo = "".join([" \u263B  (", self.default_lang, ")"])
         else:
@@ -319,7 +324,8 @@ can synthesize speech privately using %(_eurl)s."""
         if len(_verified_name) != 0:
             if len(larynx_names) != 0:
                 display_names = larynx_names.replace(
-                    _verified_name, "%(_verified_name)s %(_logo)s  %(_vox)s" % locals()
+                    _verified_name, "%(_verified_name)s %(_logo)s  %(_vox)s" % locals(
+                    )
                 )
                 print(
                     """
@@ -556,7 +562,8 @@ Loading larynx voices for `%(_lang2)s`
         if ssml:
             _ssml = "true"
         _url = "".join([self.url, "/api/tts"])
-        _rate_length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)
+        _rate_length_scale = self.common.rate_to_rhasspy_length_scale(
+            _speech_rate)
         if len(_rate_length_scale[1]) != 0:
             print(
                 "".join(
