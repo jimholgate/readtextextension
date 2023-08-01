@@ -213,10 +213,10 @@ def have_posix_app(posix_app='vlc', do_test=True):  # -> bool
     '''if the app exists and understands a `--version` or `--help` switch,
     then returns `True`, otherwise returns `False`.
 
-    If `do_test` is `False`, then only look for the app installed in the
-    standard system-wide location, otherwise test for a manual or help
-    response. A container version of an app might test `True`, but the
-    python program might not be able to run the posix app.
+    If `do_test` is `False`, then only look for the app installed in an
+    specific `os.environ['PATH']` location, otherwise test for a manual
+    or help response. A container version of an app might test `True`,
+    but the python program might not be able to run the posix app.
     '''
     os_sep = os.sep
     mute_response = '&> %(os_sep)sdev%(os_sep)snull &' % locals()
@@ -224,8 +224,9 @@ def have_posix_app(posix_app='vlc', do_test=True):  # -> bool
         return False
     if not bool(posix_app):
         return False
-    if os.path.isfile('/usr/bin/%(posix_app)s' % locals()):
-        return True
+    for _base_path in os.environ['PATH'].split(':'):
+        if os.path.isfile(os.path.join(_base_path, posix_app)):
+            return True
     if os_sep in posix_app:
         posix_app = os.path.basename(posix_app)
     if bool(do_test) and my_os_system(
@@ -549,18 +550,10 @@ def default_lang():  # -> str
     return ''
 
 
-def gst_plugin_path(plug_in_name='libgstvorbis'):  # -> str
-    '''
-    Check directories for a named GST plugin (i. e.: `libgstvorbis`)
-    '''
-    # This does not check for plugin by pad name, mime type or extension
-    if not plug_in_name:
-        return ''
-    rt1 = ''
-    version = ''
-
-    g_versions = ['1.2', '1.1', '1.0', '1', '0.10']
-    _paths = [
+def sys_machine_paths():  # list(str)
+    '''Return a list of posix `usr` architecture specific paths to resources
+    like gstreamer plugins or espeak-ng-data.'''
+    return [
         '/usr/local/lib/x86_64-linux-gnu/',
         '/usr/local/lib/',
         '/usr/lib/x86_64-linux-gnu/',
@@ -592,6 +585,30 @@ def gst_plugin_path(plug_in_name='libgstvorbis'):  # -> str
         '/usr/local/lib/s390x-linux-gnu/',
         '/usr/lib/s390x-linux-gnu/',
     ]
+
+
+def linux_machine_dir_path(search='espeak-ng-data'):  # -> str
+    '''If the architecture specific resource directory exists, return the full
+    path, otherwise return `''` '''
+    for _path in sys_machine_paths():
+        try_path = ''.join([_path, search])
+        if os.path.isdir(try_path):
+            return try_path
+    return ''
+
+
+def gst_plugin_path(plug_in_name='libgstvorbis'):  # -> str
+    '''
+    Check directories for a named GST plugin (i. e.: `libgstvorbis`)
+    '''
+    # This does not check for plugin by pad name, mime type or extension
+    if not plug_in_name:
+        return ''
+    rt1 = ''
+    version = ''
+
+    g_versions = ['1.2', '1.1', '1.0', '1', '0.10']
+    _paths = sys_machine_paths()
     _ext = '.so'
     if have_posix_app('say', False):
         _paths = [

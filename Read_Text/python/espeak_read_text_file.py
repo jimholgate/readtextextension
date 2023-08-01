@@ -128,6 +128,20 @@ def espeak_path():  # -> str
     return ''
 
 
+def espeak_ng_list():  # -> list(str)
+    '''Return list of `espeak-ng` dictionary language codes like `en` and
+    `de`.'''
+    _ng_list = []
+    _dir = readtexttools.linux_machine_dir_path('espeak-ng-data')
+    if not len(_dir):
+        return _ng_list
+    _dir = os.listdir(_dir)
+    for _item in _dir:
+        if _item.endswith('_dict'):
+            _ng_list.append(_item[:-5])
+    return sorted(_ng_list)
+
+
 def espk_languages():  # -> list[str]
     '''If using `espeak-ng`, return a language_list of voices that `espeak-ng`
     supports, otherwise return a list of supported`espeak` voices.
@@ -144,24 +158,26 @@ def espk_languages():  # -> list[str]
             if _line.count('\t') != 0:
                 _reported_langs.append(_line.split('\t')[1])
     if _app_name.count('-ng') != 0:
-        return [
-            'af', 'am', 'an', 'ar', 'az', 'ba', 'bg', 'bn', 'bpy', 'bs', 'ca',
-            'cmn', 'cs', 'cy', 'da', 'de', 'el', 'en', 'en-GB', 'en-US', 'eo',
-            'es', 'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gd', 'gn', 'grc', 'gu',
-            'hak', 'hi', 'hr', 'ht', 'hu', 'hy', 'hyw', 'ia', 'id', 'is', 'it',
-            'ja', 'jbo', 'ka', 'kk', 'kl', 'kn', 'ko', 'kok', 'ku', 'ky', 'la',
-            'lfn', 'lt', 'lv', 'mi', 'mk', 'ml', 'mr', 'ms', 'mt', 'mt', 'my',
-            'nb', 'nci', 'ne', 'nl', 'om', 'or', 'pap', 'pt', 'py', 'quc',
-            'ro', 'ru', 'sd', 'shn', 'sk', 'sl', 'sq', 'sr', 'sv', 'sw', 'ta',
-            'te', 'tn', 'tn', 'tn', 'tr', 'tt', 'ur', 'uz', 'vi', 'yue'
-        ] + _reported_langs
-    else:
-        return [
-            'af', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'eo', 'fi', 'fr',
-            'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ku', 'la', 'lv', 'mk',
-            'nl', 'pl', 'ro', 'ru', 'sk', 'sq', 'sr', 'sv', 'sw', 'ta', 'tr',
-            'vi' + _reported_langs
-        ]
+        _ng_list = espeak_ng_list()
+        if len(_ng_list) !=0:
+            return _ng_list
+        return ['af', 'am', 'an', 'ar', 'as', 'az', 'ba', 'be', 'bg', 'bn',
+                'bpy', 'bs', 'ca', 'chr', 'cmn', 'cs', 'cv', 'cy', 'da', 'de',
+                'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'ga',
+                'gd', 'gn', 'grc', 'gu', 'hak', 'haw', 'he', 'hi', 'hr', 'ht',
+                'hu', 'hy', 'ia', 'id', 'io', 'is', 'it', 'ja', 'jbo', 'ka',
+                'kk', 'kl', 'kn', 'ko', 'kok', 'ku', 'ky', 'la', 'lb', 'lfn',
+                'lt', 'lv', 'mi', 'mk', 'ml', 'mr', 'ms', 'mt', 'my', 'nci',
+                'ne', 'nl', 'no', 'nog', 'om', 'or', 'pa', 'pap', 'piqd',
+                'pl', 'pt', 'py', 'qdb', 'qu', 'quc', 'qya', 'ro', 'ru', 'sd',
+                'shn', 'si', 'sjn', 'sk', 'sl', 'smj', 'sq', 'sr', 'sv', 'sw',
+                'ta', 'te', 'th', 'tk', 'tn', 'tr', 'tt', 'ug', 'uk', 'ur',
+                'uz', 'vi', 'yue'] + _reported_langs
+    return [
+        'af', 'bs', 'ca', 'cs', 'cy', 'da', 'de', 'el', 'eo', 'fi', 'fr',
+        'hi', 'hr', 'hu', 'hy', 'id', 'is', 'it', 'ku', 'la', 'lv', 'mk',
+        'nl', 'pl', 'ro', 'ru', 'sk', 'sq', 'sr', 'sv', 'sw', 'ta', 'tr',
+        'vi'] + _reported_langs
 
 
 def espkread(_text_path, _lang, _visible, _audible, _tmp0, _image, _title,
@@ -527,7 +543,6 @@ def main():  # -> NoReturn
     _author = ''
     _dimensions = '600x600'
     _text_path = sys.argv[-1]
-
     if not os.path.isfile(_text_path):
         sys.exit(0)
     if sys.argv[-1] == sys.argv[0]:
