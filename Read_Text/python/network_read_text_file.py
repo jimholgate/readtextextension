@@ -201,7 +201,6 @@ computers
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import getopt
-import math
 import os
 import sys
 import netgtts
@@ -236,6 +235,10 @@ except (AttributeError, ImportError):
     pass
 try:
     import readtexttools
+except (AttributeError, ImportError):
+    pass
+try:
+    import netcommon
 except (AttributeError, ImportError):
     pass
 
@@ -293,40 +296,6 @@ def network_problem(voice='default'):  # -> str
   enter the local speech server command in a terminal and
   read what it prints out. (i. e.: `larynx-server`)
   ''' % locals()
-
-
-def speech_wpm(_percent='100%'):  # -> int
-    '''
-    _percent - rate expressed as a percentage.
-    Use '100%' for default rate of 160 words per minute (wpm).
-    Returns rate between 20 and 640.
-    '''
-    _calc_product = 0
-    _result = 0
-    _minimum = 20
-    _maximum = 640
-    _normal = 160
-    _p_cent = ''
-
-    try:
-        if '%' in _percent:
-            _p_cent = _percent.replace('%', '')
-            _calc_product = (float(_p_cent)
-                             if '.' in _p_cent else int(_p_cent) / 100)
-            _result = math.ceil(_calc_product * _normal)
-        else:
-            _calc_product = (float(_percent)
-                             if '.' in _percent else int(_percent))
-            _result = math.ceil(_calc_product)
-    except TypeError:
-        return _normal
-    if _result == 0:
-        return _normal
-    elif _result <= _minimum:
-        return _minimum
-    elif _result >= _maximum:
-        return _maximum
-    return _result
 
 
 def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
@@ -540,7 +509,7 @@ def main():  # -> NoReturn
     _audible = 'true'
     _text = ''
     _percent_rate = '100%'
-    _speech_rate = speech_wpm(_percent_rate)
+    _speech_rate = netcommon.speech_wpm(_percent_rate)
     _denoiser_strength = 0.005
     _noise_scale = 0.667
     _icon = ''
@@ -581,7 +550,7 @@ def main():  # -> NoReturn
             elif o in ('-r', '--rate'):
                 _percent_rate = a
                 if len(_percent_rate) != 0:
-                    _speech_rate = speech_wpm(_percent_rate)
+                    _speech_rate = netcommon.speech_wpm(_percent_rate)
             elif o in ('-i', '--image'):
                 _icon = a
             elif o in ('-t', '--title'):

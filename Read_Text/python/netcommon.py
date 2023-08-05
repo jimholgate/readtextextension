@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
+import math
 import os
 import platform
 import time
@@ -53,6 +54,39 @@ def index_number_to_list_item(_vox_number=0, _list=None):  # -> str
         pass
     return ""
 
+
+def speech_wpm(_percent='100%'):  # -> int
+    '''
+    _percent - rate expressed as a percentage.
+    Use '100%' for default rate of 160 words per minute (wpm).
+    Returns rate between 20 and 640.
+    '''
+    _calc_product = 0
+    _result = 0
+    _minimum = 20
+    _maximum = 640
+    _normal = 160
+    _p_cent = ''
+
+    try:
+        if '%' in _percent:
+            _p_cent = _percent.replace('%', '')
+            _calc_product = (float(_p_cent)
+                             if '.' in _p_cent else int(_p_cent) / 100)
+            _result = math.ceil(_calc_product * _normal)
+        else:
+            _calc_product = (float(_percent)
+                             if '.' in _percent else int(_percent))
+            _result = math.ceil(_calc_product)
+    except TypeError:
+        return _normal
+    if _result == 0:
+        return _normal
+    elif _result <= _minimum:
+        return _minimum
+    elif _result >= _maximum:
+        return _maximum
+    return _result
 
 class LocalCommons(object):
     '''Shared items for local speech servers'''
