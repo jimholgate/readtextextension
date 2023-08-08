@@ -133,7 +133,7 @@ def espeak_ng_list():  # -> list(str)
     `de`.'''
     _ng_list = []
     _dir = readtexttools.linux_machine_dir_path('espeak-ng-data')
-    if not len(_dir):
+    if len(_dir) == 0:
         return _ng_list
     _dir = os.listdir(_dir)
     for _item in _dir:
@@ -207,6 +207,7 @@ reads the file aloud.
     _concise_lang = _lang.split('-')[0].split('_')[0].lower()
     _app_name = espeak_path()
     _voice = ''
+    _command = ''
     if _concise_lang in ['de']:
         s = 'de'
     elif _concise_lang in ['en']:
@@ -240,9 +241,6 @@ reads the file aloud.
         else:
             s = 'zh'
     elif _concise_lang in espk_languages():
-        s = _concise_lang
-    elif os.path.isfile('/usr/share/espeak-ng-data/%(_concise_lang)s_dict' %
-                        locals()):
         s = _concise_lang
     else:
         print('''`espeak_read_text_file.py` says:
@@ -416,7 +414,7 @@ reads the file aloud.
                 ' -w "', _work_file, '" -f "', _text_path, '"'
             ])
         elif bool(readtexttools.gst_plugin_path('libgstespeak')):
-            if not readtexttools.have_posix_app('gst-launch-1.0'):
+            if not readtexttools.have_posix_app('gst-launch-1.0', False):
                 return 0
             elif os.path.isfile(readtexttools.get_my_lock('lock')):
                 # User requested play, but action is locked

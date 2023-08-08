@@ -251,8 +251,8 @@ def usage():  # -> None
 Network Speech Synthesis
 ========================
 
-Reads a text file using an on-line voice and a media player like ffmpeg or
-avconv.
+Reads a text file using an on-line voice and a media player like `pw-cat`,
+`ffmpeg` or `avconv`.
 
 Usage
 -----
@@ -286,16 +286,16 @@ def network_problem(voice='default'):  # -> str
     '''Return suggestions to make an on-line voice work.'''
     if len(voice) == 0:
         voice = 'requested'
-    return '''Is the network connected?
+    return f'''Is the network connected?
 =========================
 
-+ The `%(voice)s` on-line voice is currently unavailable.
++ The `{voice}` on-line voice is currently unavailable.
 + It might help to restart your device, refresh the network
   or check your on-line account status.
 + If you are using a `localhost` server, it might help to
   enter the local speech server command in a terminal and
   read what it prints out. (i. e.: `larynx-server`)
-  ''' % locals()
+  '''
 
 
 def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
@@ -435,7 +435,7 @@ def network_main(_text_file_in='',
         _opentts = netopentts.OpenTTSClass()
         if _opentts.language_supported(_iso_lang, _local_url):
             _ssml = is_ssml(_text)
-            _opentts._spd_voice_to_opentts_voice(_vox, _iso_lang)
+            _opentts.spd_voice_to_opentts_voice(_vox, _iso_lang)
             _opentts.read(_text, _iso_lang, _visible, _audible, _media_out,
                           _icon, clip_title, _post_processes[5], _info,
                           _size, _ssml, .03, 20, 60)

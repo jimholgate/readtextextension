@@ -96,10 +96,10 @@ Default MaryTts server: <http://0.0.0.0:59125>
             _rate = "".join([str(int(_speech_rate / 1.6)), "%"])
         except [AttributeError, TypeError]:
             _rate = "100%"
-        return ("""<?xml version="1.0" encoding="UTF-8"?>
+        return (f"""<?xml version="1.0" encoding="UTF-8"?>
 <maryxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
-<prosody rate="%(_rate)s">%(_text)s</prosody></p></maryxml>""" % locals())
+<prosody rate="{_rate}">{_text}</prosody></p></maryxml>""")
 
     def language_supported(self,
                            iso_lang="en-US",
@@ -207,8 +207,8 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
             _voices = str(response.read(), "utf-8")
         except urllib.error.URLError:
             help_site = '[docker-marytts](https://github.com/synesthesiam/docker-marytts)'
-            print("""Requested %(_help_site)s
-It did not respond correctly.""" % locals())
+            print(f"""Requested {help_site}
+It did not respond correctly.""")
             return ""
         except AttributeError:
             try:
@@ -355,11 +355,11 @@ It did not respond correctly.""" % locals())
             vcommand = ""
         else:
             _mary_vox = urllib.parse.quote(_mary_vox)
-            vcommand = "&VOICE=%(_mary_vox)s" % locals()
+            vcommand = f"&VOICE={_mary_vox}"
         _body_data = (
-            "AUDIO=%(_audio_format)s&OUTPUT_TYPE=%(_output_type)s&INPUT_TYPE=%(_input_type)s&LOCALE=%(_found_locale)s%(vcommand)s&INPUT_TEXT="
-            % locals())
-        my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
+            f"AUDIO={_audio_format}&OUTPUT_TYPE={_output_type}&INPUT_TYPE={_input_type}&LOCALE={_found_locale}{vcommand}&INPUT_TEXT="
+            )
+        my_url = f'{_url}?{_body_data}"{q_text}"'
         try:
             # POST
             # NOTE: Setting a MaryTTS speech rate requires the python
@@ -463,19 +463,19 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.""")
         _title = """Docker MaryTTS
 =============="""
         _added_info = "[Docker MaryTTS](https://github.com/synesthesiam/docker-marytts)"
-        print("""
-%(_title)s
-* Audio: `%(_audio_format)s`
-* Input Type: `%(_input_type)s`
-* Speech Rate: `%(_speech_rate)s`
-* Locale: `%(_found_locale)s`
-* Mapped Voice : `%(_vox)s`
-* Output Type: `%(_output_type)s`
-* Server URL: `%(_url1)s`
-* Voice : `%(_mary_vox)s`
+        print(f"""
+{_title}
+* Audio: `{_audio_format}`
+* Input Type: `{_input_type}`
+* Speech Rate: `{_speech_rate}`
+* Locale: `{_found_locale}`
+* Mapped Voice : `{_vox}`
+* Output Type: `{_output_type}`
+* Server URL: `{_url1}`
+* Voice : `{_mary_vox}`
 
-%(_added_info)s
-""" % locals())
+{_added_info}
+""")
         if _input_type != self.input_types[0]:
             # Don't split XML code
             _items = [_text]
@@ -495,8 +495,8 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library.""")
             elif "." in _media_out and _tries != 0:
                 _ext = os.path.splitext(_media_out)[1]
                 _no = readtexttools.prefix_ohs(_tries, 10, "0")
-                _media_out = _media_out.replace(".%(_ext)s" % locals(),
-                                                "_%(_no)s.%(_ext)s" % locals())
+                _media_out = _media_out.replace(f".{_ext}",
+                                                f"_{_no}.{_ext}")
             _tries += 1
             _done = self._try_requests(
                 _mary_vox,

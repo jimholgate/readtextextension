@@ -290,7 +290,7 @@ class CoquiDemoLocalHost(object):
         if not _key in html:
             return ''
         try:
-            pattern = "<%(_key)s.*?>*?</%(_key)s.*?>" % locals()
+            pattern = f"<{_key}.*?>*?</{_key}.*?>"
             search_result = re.search(pattern, html, re.IGNORECASE)
             search_group = search_result.group()
             return re.sub("<.*?>", "", search_group)
@@ -545,7 +545,7 @@ system installer application like `apt`.''')
         if _view_json:
             print(response[1])
         _url1 = self.url
-        _url = '%(_url1)s/api/tts' % locals()
+        _url = f'{_url1}/api/tts'
         _speaker_id = self.get_bs4_speaker(_vox)
         retval = False
         if BASICS_OK:
@@ -587,13 +587,12 @@ system installer application like `apt`.''')
                 if '.' in _media_out and _tries != 0:
                     _ext = os.path.splittext(_media_out)[1]
                     _media_out = _media_out.replace(
-                        '.%(_ext)s' % locals(), '_%(_no)s.%(_ext)s' % locals())
+                        f'.{_ext}', f'_{_no}.{_ext}')
                 _tries += 1
                 if os.path.isfile(_media_work):
                     os.remove(_media_work)
                 q_text = urllib.parse.quote(_item)
-                my_url = '''%(_url)s?text=%(q_text)s&speaker_id=%(_speaker_id)s&style_wav=%(_style_wav)s&language_id=%(_language_id)s''' % locals(
-                )
+                my_url = f'''{_url}?text={q_text}&speaker_id={_speaker_id}&style_wav={_style_wav}&language_id={_language_id}'''
                 # _method = "GET"
                 if self.debug:
                     if len(play_list) != 1:
@@ -619,8 +618,7 @@ system installer application like `apt`.''')
                 except urllib.error.HTTPError:
                     _logo = u' \u26a0\ufe0f '
                     print(
-                        '%(_logo)s Tried using `%(_iso_lang)s` with Coqui TTS but failed with an HTTP Error.'
-                        % locals())
+                        f'{_logo} Tried using `{_iso_lang}` with Coqui TTS but failed with an HTTP Error.')
                     readtexttools.unlock_my_lock(self.locker)
                     done = False
                 except TimeoutError:

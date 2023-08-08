@@ -133,6 +133,7 @@ class GoogleTranslateClass(object):
         _region = "US"
         _lang1 = "en"
         _lang2 = "es"
+        _short_text = ""
         _slow = False
         _lang_check = True
         _lang = _iso_lang
@@ -141,9 +142,7 @@ class GoogleTranslateClass(object):
         _env_lang = readtexttools.default_lang()
         _domain = self.translator_domain
         _provider = self.translator
-        _provider_logo = (
-            "/usr/share/icons/hicolor/scalable/apps/goa-account-%(_domain)s.svg"
-            % locals())
+        _provider_logo = f"/usr/share/icons/hicolor/scalable/apps/goa-account-{_domain}.svg)"
         if not os.path.isfile(_provider_logo):
             # Modified high contrast icon - GNU LESSER GENERAL PUBLIC LICENSE
             # Version 3, 29 June 2007
@@ -317,15 +316,15 @@ class GoogleTranslateClass(object):
             # Translate **to** default language
             _lang2 = _lang1
         if readtexttools.have_posix_app("osascript", False):
-            _msg = "https://translate.%(_domain)s.%(_tld)s" % locals()
+            _msg = f"https://translate.{_domain}.{_tld}"
         else:
             _msg = (
-                "`<https://translate.%(_domain)s.%(_tld)s?&langpair=auto|%(_lang2)s&tbb=1&ie=&hl=%(_env_lang)s&text=%(_short_text)s>"
-                % locals())
+                f"`<https://translate.{_domain}.{_tld}?&langpair=auto|{_lang2}&tbb=1&ie=&hl={_env_lang}&text={_short_text}>"
+                )
         if not self.language_supported(_iso_lang):
             # Fallback: display a link to translate using Google Translate.
             readtexttools.pop_message(
-                "%(_provider)s Translate\u2122" % locals(),
+                f"{_provider} Translate\u2122",
                 _msg,
                 5000,
                 _provider_logo,
@@ -336,11 +335,11 @@ class GoogleTranslateClass(object):
             tts = gtts.gTTS(_text, _tld, _lang, _slow, _lang_check)
             tts.save(_media_work)
             if os.path.isfile(_media_work):
-                readtexttools.pop_message("`gtts-%(_version)s`" % locals(),
+                readtexttools.pop_message(f"`gtts-{_version}`",
                                           _msg, 5000, _provider_logo, 0)
         except gtts.tts.gTTSError:
             readtexttools.pop_message(
-                "`gtts-%(_version)s` failed to connect." % locals(),
+                f"`gtts-{_version}` failed to connect.",
                 _msg,
                 5000,
                 _error_icon,
@@ -351,7 +350,7 @@ class GoogleTranslateClass(object):
         except (AssertionError, NameError, ValueError, RuntimeError):
             # gtts error. Consider using pip3 to check for an update.
             readtexttools.pop_message(
-                "%(_provider)s Translate\u2122" % locals(),
+                f"{_provider} Translate\u2122",
                 _msg,
                 5000,
                 _provider_logo,
@@ -381,7 +380,7 @@ class GoogleTranslateClass(object):
             _msg = "Could not play a network media file locally. Try `pip3 install gTTS gTTS-token`."
             if bool(_media_out):
                 _msg = "Could not save a network media file locally. Try `pip3 install gTTS gTTS-token`."
-            readtexttools.pop_message("Python `gtts-%(_version)s`" % locals(),
+            readtexttools.pop_message(f"Python `gtts-{_version}`",
                                       _msg, 5000, _error_icon, 1)
         self.ok = False
         return False

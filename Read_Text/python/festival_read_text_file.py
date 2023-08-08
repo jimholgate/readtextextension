@@ -152,7 +152,7 @@ class ReadFestivalClass(object):
         self.player = ''
         if os.name == 'nt':
             self.player = readtexttools.get_nt_path('festival/festival.exe')
-        elif readtexttools.have_posix_app('festival'):
+        elif readtexttools.have_posix_app('festival', False):
             self.player = 'festival'
         self.replacements = u'''?!\uFF1F\uFF01.,¡()[]¿…‥،;:—。，、：\n'''
         self._divider = u'\u2424'

@@ -464,18 +464,18 @@ To automatically start the daemon, set the Docker container restart policy to
         _help_url = self.help_url
         s_voice_count = str(_voice_count)
         _mimic_lang = voice_id.split('/')[0]
-        print("""
+        print(f"""
 Mimic 3
 =======
 
-* Mapped Voice: `%(_search)s`
-* Available Locale: `%(_mimic_lang)s`
-* Mimic3 Voice: `%(voice_id)s`
-* Number of Voices: `%(s_voice_count)s`
-* Mimic3 Server: `%(_url)s`
+* Mapped Voice: `{_search}`
+* Available Locale: `{_mimic_lang}`
+* Mimic3 Voice: `{voice_id}`
+* Number of Voices: `{s_voice_count}`
+* Mimic3 Server: `{_url}`
 
-[Mimic3](%(_help_url)s)
-""" % locals())
+[Mimic3]({_help_url})
+""")
         return self.voice_id
 
     def language_supported(self,
@@ -516,7 +516,7 @@ Mimic 3
             if self.is_x86_64:
                 print("""
 [Mimic 3](https://github.com/MycroftAI/mimic3)
-can synthesize speech privately using %(_eurl)s.""" % locals())
+can synthesize speech privately using {_eurl}.""")
             self.ok = False
             return False
         except AttributeError:
@@ -699,8 +699,8 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
             elif "." in _media_out and _tries != 0:
                 _ext = os.path.splitext(_media_out)[1]
                 _no = readtexttools.prefix_ohs(_tries, 10, "0")
-                _media_out = _media_out.replace(".%(_ext)s" % locals(),
-                                                "_%(_no)s.%(_ext)s" % locals())
+                _media_out = _media_out.replace(f".{_ext}",
+                                                f"_{_no}.{_ext}")
             _tries += 1
             _ssml = 'false'
             if readtexttools.lax_bool(ssml):

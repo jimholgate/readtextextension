@@ -199,7 +199,7 @@ Try restarting `larynx-server`."""
             return ""
         # data_list has a minimum of four items.
         # Not using Modulo Operator (`%`)
-        _data = 5 * """%(larynx_names)s\n""" % locals()
+        _data = 5 * f"""{larynx_names}\n"""
         _data_list = _data.strip().split("\n")
         _resultat = ""
         count_f = 0
@@ -273,10 +273,9 @@ Try restarting `larynx-server`."""
             _eurl = self.url
             if self.is_x86_64:
                 print(
-                    """
+                    f"""
 [larynx-server](https://github.com/rhasspy/larynx)
-can synthesize speech privately using %(_eurl)s."""
-                    % locals()
+can synthesize speech privately using {_eurl}."""
                 )
             self.ok = False
             return False
@@ -324,19 +323,17 @@ can synthesize speech privately using %(_eurl)s."""
         if len(_verified_name) != 0:
             if len(larynx_names) != 0:
                 display_names = larynx_names.replace(
-                    _verified_name, "%(_verified_name)s %(_logo)s  %(_vox)s" % locals(
-                    )
+                    _verified_name, f"{_verified_name} {_logo}  {_vox}"
                 )
                 print(
-                    """
-Loading larynx voices for `%(_lang2)s`
+                    f"""
+Loading larynx voices for `{_lang2}`
 ==============================
 
-%(display_names)s
+{display_names}
 
-[Larynx server](%(print_url)s)
+[Larynx server]({print_url})
 """
-                    % locals()
                 )
             # Check for a specific matching SPD name
             # Search examples - `FEMALE2`, `MALE1`
@@ -453,8 +450,7 @@ Loading larynx voices for `%(_lang2)s`
         _vocoder = urllib.parse.quote(_vocoder)
         _voice = urllib.parse.quote(_voice)
         my_url = (
-            """%(_url)s?voice=%(_voice)s&vocoder=%(_vocoder)s&denoiserStrength=%(_denoiser_strength)s&noiseScale=%(_noise_scale)s&lengthScale=%(_length_scale)s&ssml=%(_ssml)s"""
-            % locals()
+            f"""{_url}?voice={_voice}&vocoder={_vocoder}&denoiserStrength={_denoiser_strength}&noiseScale={_noise_scale}&lengthScale={_length_scale}&ssml={_ssml}"""
         )
         try:
             _strips = "\n .;"
@@ -608,10 +604,10 @@ Loading larynx voices for `%(_lang2)s`
             elif len(_item.strip(" ;.!?\n")) == 0:
                 continue
             elif "." in _media_out and _tries != 0:
-                _ext = os.path.splittext(_media_out)[1]
+                _ext = os.path.splitext(_media_out)[1]
                 _no = readtexttools.prefix_ohs(_tries, 10, "0")
                 _media_out = _media_out.replace(
-                    ".%(_ext)s" % locals(), "_%(_no)s.%(_ext)s" % locals()
+                    f".{_ext}", f"_{_no}.{_ext}"
                 )
             _tries += 1
             _done = self._try_requests(

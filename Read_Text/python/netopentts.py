@@ -99,7 +99,7 @@ class OpenTTSClass(object):
         self.max_chars = 360
 
 
-    def _spd_voice_to_opentts_voice(self,
+    def spd_voice_to_opentts_voice(self,
                                     _search="female1",
                                     _iso_lang="en-US",
                                     _alt_local_url=""):  # -> str
@@ -126,17 +126,17 @@ class OpenTTSClass(object):
         _url = self.url
         voice_id = self.voice_id
         _help_url = self.help_url
-        print("""
+        print(f"""
 OpenTTS
 =======
 
-* Requested Voice:  %(_search)s
-* Language:  %(_iso_lang)s
-* OpenTTS Voice:  %(voice_id)s
-* OpenTTS Server:  %(_url)s
+* Requested Voice:  {_search}
+* Language:  {_iso_lang}
+* OpenTTS Voice:  {voice_id}
+* OpenTTS Server:  {_url}
 
-[OpenTTS](%(_help_url)s)
-""" % locals())
+[OpenTTS]({_help_url})
+""")
         return self.voice_id
 
     def language_supported(self,
@@ -177,9 +177,9 @@ OpenTTS
         except urllib.error.URLError:
             _eurl = self.url
             if self.is_x86_64:
-                print("""
+                print(f"""
 [OpenTTS](https://github.com/synesthesiam/opentts#)
-can synthesize speech privately using %(_eurl)s.""" % locals())
+can synthesize speech privately using {_eurl}.""")
             self.ok = False
             return False
         except:  # [AttributeError, TimeoutError]:
@@ -292,10 +292,10 @@ can synthesize speech privately using %(_eurl)s.""" % locals())
             if os.path.isfile(_media_work):
                 _done = os.path.getsize(_media_work) != 0
         except (TimeoutError, urllib.error.HTTPError):
-            print('''
-OpenTTS cannot provide speech for `%(_voice)s`.
+            print(f'''
+OpenTTS cannot provide speech for `{_voice}`.
 Check the server settings or use a different voice.
-    ''' % locals())
+    ''')
             _done = False
         return _done
 
@@ -378,8 +378,8 @@ Check the server settings or use a different voice.
             elif "." in _media_out and _tries != 0:
                 _ext = os.path.splittext(_media_out)[1]
                 _no = readtexttools.prefix_ohs(_tries, 10, "0")
-                _media_out = _media_out.replace(".%(_ext)s" % locals(),
-                                                "_%(_no)s.%(_ext)s" % locals())
+                _media_out = _media_out.replace(f".{_ext}",
+                                                f"_{_no}.{_ext}")
             _tries += 1
             _done = self.try_url_lib(
                 _voice,

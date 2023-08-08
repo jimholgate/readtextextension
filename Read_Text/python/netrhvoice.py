@@ -198,12 +198,12 @@ class RhvoiceLocalHost(object):
         if self.ok:
             help_heading = self.help_heading
             help_url = self.help_url
-            print("""
-Checking %(help_heading)s voices for `%(_iso_lang)s`
+            print(f"""
+Checking {help_heading} voices for `{_iso_lang}`
 ========================================
 
-<%(help_url)s>
-""" % locals())
+<{help_url}>
+""")
         return self.ok
 
     def rhvoice_voice(self,
@@ -315,7 +315,7 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                 break
         _length_scale = str(_length_scale)
         _url1 = self.url
-        _url = "%(_url1)s/say" % locals()
+        _url = f"{_url1}/say"
         _audio_format = self.audio_format
         _voice = self.rhvoice_voice(_vox, _iso_lang, True)
         if BASICS_OK:
@@ -323,8 +323,8 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
             # q_voice=let%C3%ADcia
             q_voice = urllib.parse.quote(_voice)
             _body_data = (
-                "format=%(_audio_format)s&rate=%(_length_scale)s&pitch=50&volume=50&voice=%(q_voice)s&text="
-                % locals())
+                f"format={_audio_format}&rate={_length_scale}&pitch=50&volume=50&voice={q_voice}&text="
+            )
             # _method = "GET"
             _strips = "\n .;"
             self.common.set_urllib_timeout(_ok_wait)
@@ -347,12 +347,12 @@ Checking %(help_heading)s voices for `%(_iso_lang)s`
                     _ext = os.path.splittext(_media_out)[1]
                     _no = readtexttools.prefix_ohs(_tries, 10, "0")
                     _media_out = _media_out.replace(
-                        ".%(_ext)s" % locals(), "_%(_no)s.%(_ext)s" % locals())
+                        f".{_ext}", f"_{_no}.{_ext}")
                 _item = "\n".join(["", _item.strip(_strips), ""])
                 # The API uses GET and a `text` argument for text
 
                 q_text = urllib.parse.quote(_item)
-                my_url = '%(_url)s?%(_body_data)s"%(q_text)s"' % locals()
+                my_url = f'{_url}?{_body_data}"{q_text}"'
                 try:
                     # See: <https://docs.python.org/3/library/urllib.request.html>
                     # See also: `/usr/lib/python3.xx/urllib/request.py
