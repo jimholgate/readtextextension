@@ -200,6 +200,7 @@ class PiperTTSClass(object):
         self.j_quality = ""
         self.j_path = ""
         self.j_speaker_list = []
+        self.j_data_set = ''
         self.sample_rate = 22050
         self.noise_scale = 0.667
         self.length_scale = 1
@@ -388,6 +389,8 @@ Missing or incompatible `{self.lang}` language `.json` and `.onnx` files for `{s
                     self.noise_scale = data["inference"]["noise_scale"]
                     self.length_scale = data["inference"]["length_scale"]
                     self.noise_w = data["inference"]["noise_w"]
+                    self.j_data_set = data["dataset"]
+
                     for _key in data["speaker_id_map"].keys():
                         self.j_speaker_list.append(_key)
                 except KeyError:
@@ -476,7 +479,11 @@ Missing or incompatible `{self.lang}` language `.json` and `.onnx` files for `{s
             _name_key = "None"
             if self.debug == 0:
                 _variant = str(voice_no)
-                _name_key = self.j_speaker_list[voice_no]
+                _name_key = self.j_data_set
+                try:
+                    _name_key = self.j_speaker_list[voice_no]
+                except IndexError:
+                    pass
                 print(
                     f"""
 Piper TTS
