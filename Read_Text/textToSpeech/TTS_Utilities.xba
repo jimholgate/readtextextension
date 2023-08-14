@@ -2246,6 +2246,33 @@ Sub CheckComboBox4UrlList(oDialog)
 End Sub
 
 
+Function LocalLinuxPaths()
+	Dim all_paths As String
+	all_paths = (Environ(&quot;PATH&quot;) &amp; &quot;:&quot; &amp; Environ(&quot;HOME&quot;) &amp; &quot;/.local/bin&quot;)
+	LocalLinuxPaths = Split(all_paths, &quot;:&quot;)
+End Function
+
+
+Function fsPiperPath()
+	fsPiperPath = &quot;&quot;
+	Dim x As Integer
+	Dim paths As Variant
+	Dim _path As String
+	Dim sf as Object
+	sf = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	paths = LocalLinuxPaths()
+	For x = Lbound(paths) to Ubound(paths)
+		_path = paths(x) &amp; &quot;/piper&quot;
+		If sf.exists(_path) Then
+			fsPiperPath = _path
+			Exit Function
+		End If
+	Next
+Exit Function
+LocalLinuxPathsErr:
+
+End Function
+
 Function fiDialog1Combo2ShowMyPythonChoices( _
 	oDialog) As Integer
 	&apos; Python
@@ -2500,6 +2527,17 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
+	End If
+	If fbPiperTtsOk(&quot;&quot;) Then
+		s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				&quot; --rate 125% --voice AUTO1#4 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+		s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				&quot; --rate 100% --voice AUTO1#0 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+		s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				&quot; --rate 75% --voice AUTO1#64 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
 	End If
 	If Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 Then
 		s4 = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; --language ja-JP&quot;
@@ -2862,6 +2900,11 @@ End Function
 
 Function fsPicoTextString() As String
 	fsPicoTextString = getTextFromFile(fsPythonPicoDoc(), &quot;UTF-8&quot;)
+End Function
+
+
+Function fsPiperTextString() As String
+	fsPiperTextString = getTextFromFile(fsPythonPiperDoc(), &quot;UTF-8&quot;)
 End Function
 
 
@@ -3529,6 +3572,10 @@ Function replaceLocalTokensWithStr( _
 	
 	sFind = &quot;(PICO_READ_TEXT_PY)&quot;
 	sReplace = ConvertFromUrl(fsPythonPicoDoc())
+	sA = fsReplaceText(sA,sFind,sReplace)
+	
+	sFind = &quot;(PIPER_READ_TEXT_PY)&quot;
+	sReplace = ConvertFromUrl(fsPythonPiperDoc())
 	sA = fsReplaceText(sA,sFind,sReplace)
 	
 	sFind = &quot;(ESPEAK_READ_TEXT_PY)&quot;
@@ -6986,8 +7033,11 @@ End Function
 Sub resetSpeechDispatcher( _
 	bAll As Boolean)
 &apos;Stopping Speech
-	Dim a1
+	Dim a1 As Variant
+	Dim a2 As Variant
 	Dim i# : i = 0
+	Dim j# : j = 0
+	Dim _path$ : _path = &quot;&quot; 
 	Dim errorCode
 	Dim oBar
 	Dim oFrame
@@ -7047,13 +7097,18 @@ Sub resetSpeechDispatcher( _
 			&quot;festvox&quot;, _
 			&quot;padsp&quot;, _
 			&quot;pico2wave&quot;, _
+			&quot;piper&quot;, _
 			&quot;speak_ng&quot;, _
 			&quot;text2wave&quot;)
+			a2 = LocalLinuxPaths()
 			For i = LBound(a1) To UBound(a1)
-				If FileExists(&quot;/usr/bin/&quot; &amp; a1(i)) Or _
-					FileExists(&quot;/usr/local/bin/&quot; &amp; a1(i)) Then
-					errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet &quot; &amp; a1(i), True)
-				End If
+				For j = Lbound(a2) to Ubound(a2)
+					_path = a2(j) &amp; &quot;/&quot; &amp; a1(i)
+					If FileExists(a2(j) &amp; &quot;/&quot; &amp; a1(i)) Then
+						errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet &quot; &amp; a1(i), True)
+						Exit For
+					End If
+				Next
 			Next
 			If fbHaveNetworkTTS() And FileExists(&quot;/usr/bin/vlc&quot;) Then
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet vlc&quot;, True)

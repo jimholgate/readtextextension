@@ -398,6 +398,29 @@ Function PosixFestivalSpeechAppInfo()
 End Function
 
 
+Function PosixPiperTtsSpeechAppInfo()
+	&apos; This implimentation of Piper TTS uses a binary download for Linux.
+	&apos; It only supports a basic subset of Piper TTS tools.
+	&apos;
+	&apos; Some voices do not work on all computers or do not include copyright
+	&apos; information.
+	Dim _info As SpeechHostInfo
+	With _info
+		.about = &quot;Piper TTS is a fast, private local neural text to speech engine.&quot;
+		.key = &quot;&quot;
+		.label = &quot;piper-tts&quot;
+		.token = &quot;(PIPER_READ_TEXT_PY)&quot;
+		.url = fsMyURL() &amp; &quot;/po/default&quot;
+		.url_info = &quot;/en-US_lexicon.json&quot;
+		.json_dir = &quot;default&quot;
+		.sample = &quot;&quot;
+		.docker = &quot;&quot;
+		.tags = Array(&quot;text&quot;, &quot;wav&quot;, &quot;rate&quot;)
+	End With
+	PosixPiperTtsSpeechAppInfo = _info
+End Function
+
+
 Function PosixRhvoiceSpeechAppInfo()
 	&apos; This relies on a depreciated &quot;developer&quot; interface. If you are an end user
 	&apos; you can run this application with additional options on a Docker localhost
@@ -719,6 +742,8 @@ Function EditJsonPhonemeTable() As String
 			_po_dir = PosixFestivalSpeechAppInfo().json_dir
 		ElseIf InStr(posix_py, PosixRhvoiceSpeechAppInfo().token) &lt;&gt; 0 Then
 			_po_dir = PosixRhvoiceSpeechAppInfo().json_dir
+		ElseIf InStr(posix_py, PosixPiperTtsSpeechAppInfo().token) &lt;&gt; 0 Then
+			_po_dir = PosixPiperTtsSpeechAppInfo().json_dir
 		Else
 			_po_dir = &quot;default&quot;
 		End If
@@ -1350,6 +1375,8 @@ Sub AboutAddOn( _
 				.GetControl(&quot;TextField2&quot;).model.Text = fsOpenJtalkTextString()
 			ElseIf InStr(config(fiExternalCommand()),&quot;(PICO_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsPicoTextString()
+			ElseIf InStr(config(fiExternalCommand()),&quot;(PIPER_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
+				.GetControl(&quot;TextField2&quot;).model.Text = fsPiperTextString()
 			ElseIf InStr(config(fiExternalCommand()), &quot;(RHVOICE_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				.GetControl(&quot;TextField2&quot;).model.Text = fsRhVoiceTextString()
 			ElseIf InStr(config(fiExternalCommand()),&quot;(CREATE_QR_LABEL_PY)&quot;) &lt;&gt; 0 Then

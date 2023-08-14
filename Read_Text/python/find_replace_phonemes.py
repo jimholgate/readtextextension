@@ -80,7 +80,6 @@ def fix_up_text_file(_text_file_in='',
         _output_type = [0, 1][1]
     readtexttools.write_plain_text_file(_file_out, _content2[_output_type],
                                         'utf-8')
-    print('')
     return True
 
 

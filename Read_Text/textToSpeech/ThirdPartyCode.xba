@@ -154,6 +154,24 @@ Function fbOsaScriptOk(_command) As Boolean
 End Function
 
 
+Function fbPiperTtsOk(_command) As Boolean
+	&apos; Return `True` if Linux `piper` is executable
+	On Error Goto fbPiperTtsOkErr
+	If Len(_command) = 0 Then
+		_command = &quot; --version&quot;
+	End If
+	fbPiperTtsOk = False
+	Dim sPiperPath As String : sPiperPath = fsPiperPath()
+	If Len(sPiperPath) = 0 Then
+		Exit Function
+	End If
+	fbPiperTtsOk = Shell(sPiperPath, 0, _command) = 0
+	Exit Function
+	fbPiperTtsOkErr:
+	fbPiperTtsOk = False
+End Function
+
+
 Function fbUpdateLexiconJsonFile(_
 		_language As String,_
 		_model As String,_
@@ -254,6 +272,9 @@ Function fvTts_config_createDefaultConfig( _
 				&apos; Japanese
 				config(fiExternalCommand()) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
+			ElseIf fbPiperTtsOk(&quot;&quot;) Then
+				config(fiExternalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				&quot; --rate 100% --voice AUTO1#27 --language (SELECTION_LANGUAGE_COUNTRY_CODE&quot;
 			ElseIf FileExists(Environ(&quot;HOME&quot;) &amp; _
 				&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or FileExists( _
 				Environ(&quot;HOME&quot;) &amp; _

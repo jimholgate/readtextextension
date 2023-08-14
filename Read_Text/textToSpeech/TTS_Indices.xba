@@ -883,6 +883,11 @@ Function fsPythonPicoDoc() As String
 End Function
 
 
+Function fsPythonPiperDoc() As String
+	fsPythonPiperDoc = fsMyURL() &amp; &quot;/python/piper_read_text.py&quot;
+End Function
+
+
 Function fsPythonEspeakDoc() As String
 	fsPythonEspeakDoc = fsMyURL() &amp; &quot;/python/espeak_read_text_file.py&quot;
 End Function

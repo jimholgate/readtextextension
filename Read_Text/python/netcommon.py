@@ -54,9 +54,9 @@ def index_number_to_list_item(_vox_number=0, _list=None):  # -> str
     try:
         if not bool(_list):
             return ""
-        if len(_list) == 1:
-            return _list[0]
-        return _list[(_vox_number % abs(len(_list) - 1))]
+        if not _vox_number > len(_list) - 1:
+            return _list[_vox_number]
+        return _list[(_vox_number % abs(len(_list)))]
     except ZeroDivisionError:
         return _list[0]
     except [IndexError, TypeError]:
@@ -79,13 +79,13 @@ def speech_wpm(_percent="100%"):  # -> int
 
     try:
         if "%" in _percent:
-            _p_cent = _percent.replace("%", "")
+            _p_cent = readtexttools.safechars(_percent, "1234567890.")
             _calc_product = float(_p_cent) if "." in _p_cent else int(_p_cent) / 100
             _result = math.ceil(_calc_product * _normal)
         else:
             _calc_product = float(_percent) if "." in _percent else int(_percent)
             _result = math.ceil(_calc_product)
-    except TypeError:
+    except (TypeError, ValueError):
         return _normal
     if _result == 0:
         return _normal
@@ -111,7 +111,10 @@ class LocalCommons(object):
             [256, 225, "-------|--", 0.62],
             [224, 193, "------|---", 0.71],
             [192, 161, "-----|----", 0.83],
-            [128, 97, "---|-----", 1.25],
+            [160, 159, "-----|----", 1.00],
+            [158, 128, "---|-----", 1.15],
+            [127, 110, "---|-----", 1.25],
+            [109, 97, "---|-----", 1.50],
             [96, 66, "--|------", 1.66],
             [64, 33, "-|-------", 2.50],
             [32, 0, "|--------", 5.00],
