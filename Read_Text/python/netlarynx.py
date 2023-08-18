@@ -275,7 +275,7 @@ Try restarting `larynx-server`."""
                 print(
                     f"""
 [larynx-server](https://github.com/rhasspy/larynx)
-can synthesize speech privately using {_eurl}."""
+can synthesize speech privately using <{_eurl}>."""
                 )
             self.ok = False
             return False

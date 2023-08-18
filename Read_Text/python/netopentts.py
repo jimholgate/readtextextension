@@ -179,7 +179,7 @@ OpenTTS
             if self.is_x86_64:
                 print(f"""
 [OpenTTS](https://github.com/synesthesiam/opentts#)
-can synthesize speech privately using {_eurl}.""")
+can synthesize speech privately using <{_eurl}>.""")
             self.ok = False
             return False
         except:  # [AttributeError, TimeoutError]:

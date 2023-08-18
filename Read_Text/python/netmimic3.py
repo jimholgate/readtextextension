@@ -514,9 +514,9 @@ Mimic 3
         except urllib.error.URLError:
             _eurl = self.url
             if self.is_x86_64:
-                print("""
+                print(f"""
 [Mimic 3](https://github.com/MycroftAI/mimic3)
-can synthesize speech privately using {_eurl}.""")
+can synthesize speech privately using <{_eurl}>.""")
             self.ok = False
             return False
         except AttributeError:

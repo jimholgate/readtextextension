@@ -15,6 +15,7 @@ import readtexttools
 def usage():
     """Usage"""
     cmd = "python3 piper_read_text.py"
+    cmd_break = "\\"
     print(
         f"""Piper TTS
 =========
@@ -26,6 +27,19 @@ Piper TTS is a fast, private local neural text to speech engine.
 Use a particular model (`auto5`) and speaker (`45`):
 
     {cmd} --language en-GB --voice auto5#45 --rate 75% '<text_path.txt>'
+
+If you specify a voice name for one language model, other language
+models will use the first voice in the model's index. For example,
+my preferred voice from the `de_DE-thorsten_emotional-medium` model
+is `amused`,so I would use:
+
+    {cmd} --language de-DE {cmd_break}
+        --voice de_DE-thorsten_emotional-medium#amused '<text_path.txt>'
+
+When reading French with piper I use the `fr_FR-upmc-medium` model. When
+speaking French with this tool, it now uses the first voice in the list
+(i.e.: `fr_FR-upmc-medium#jessica`) because it did not find `amused`
+in this French language model.
 
 Use a piper `onnx` and `json` model package in a local user directory:
 
@@ -61,6 +75,11 @@ class PiperTTSClass(object):
     that supports your computer architecture. (i. e.
     `sudo apt-get install piper-tts`)
 
+    This tool uses `piper-tts` in a configuration that streams raw audio
+    data to a player in real time. This enables the player to start playing
+    long texts quickly because it breaks them up into smaller pieces that
+    it deals with one at a time.
+
     Local installation
     ------------------
 
@@ -88,12 +107,43 @@ class PiperTTSClass(object):
                 "size_bytes": 5950,
                 "md5_digest": "54392cc51bd08e8aa6270302e9d0180b"
             }, ...
+
     Using the example, create this directory:
 
         ${HOME}/.local/share/piper-tts/piper-voices/fr/fr_FR/siwis/low/
 
     Place the fr_FR-siwis-low.onnx and fr_FR-siwis-low.json in this
     new directory.
+
+    Samples and json configurations download
+    ----------------------------------------
+
+    This is optional. You can set up the standard release directory
+    structure for all sample voice mp3 files, json configuration
+    files, notes, utility scripts, and placeholders for onnx file
+    data using git.
+
+        cd "${HOME}/.local/share/piper-tts/piper-voices"
+        git clone https://huggingface.co/rhasspy/piper-voices
+
+    This method of replicating the developer configuraton setup includes plain
+    text placeholders for the onnx binary files that work with piper-tts. You
+    can activate a voice model by replacing the text placeholder with the
+    the actual onnx file from the web site...
+
+    ### Placeholder
+
+    The placeholder is a text file that contains the version, verification
+    checksum and size of the onnx file.
+
+    https://huggingface.co/rhasspy/piper-voices/raw/main/en/en_GB/jenny_dioco/medium/en_GB-jenny_dioco-medium.onnx
+
+    ### Actual file:
+
+    The linked file is a binary file that piper-tts can use to generate
+    speech.
+
+    https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_GB/jenny_dioco/medium/en_GB-jenny_dioco-medium.onnx
 
     Espeak-ng
     ----------
@@ -124,23 +174,33 @@ class PiperTTSClass(object):
 
     ### Optimize voice assets
 
-    If you add or erase directories with voice assets, you can regenerate the
-    local `voices.json` file with a python script included on the huggingface
-    website.:
+    If you add or erase directories with voice assets, or modify configuration
+    parameters, you can regenerate the local `voices.json` file with a python
+    script included on the huggingface website.
 
         python3 '($HOME)/.local/share/piper-tts/piper-voices/_script/voicefest.py'
 
-    AI voices have a trade-off between latency and quality on low spec machines.
+    Piper voices have a trade-off between latency and quality on low spec machines.
     Medium quality is great for most desktop computers. For small home automation
     computers, Low quality might work better. If you have a computer with a
     compatible high performance graphics card, you might want to choose High quality.
 
     * [Piper TTS](https://github.com/rhasspy/piper)
-    * [Piper TTS voices](https://huggingface.co/rhasspy/piper-voices)"""
+    * [Piper TTS voices](https://huggingface.co/rhasspy/piper-voices)
+    * [Thorsten Müller - Piper Voice Training](https://www.youtube.com/watch?v=b_we_jma220)
+    """
 
     def __init__(self):  # -> None
         """Initialize data."""
         _common = netcommon.LocalCommons()
+        self.app = "piper"
+        # Use a complete path for a local installation because the local user
+        # might not have added `~/.local/bin/` to their `PATH` environment.
+        for _app in ["piper-cli", "piper"]:
+            _app_path = os.path.expanduser(f"~/.local/bin/{_app}")
+            if os.path.isfile(_app_path):
+                self.app = _app_path
+                break
         self.locker = _common.locker
         self.common = _common
         self.debug = _common.debug
@@ -157,50 +217,53 @@ class PiperTTSClass(object):
         self.default_speaker = 0  # All models have at least one voice.
         self.voice = self.default_speaker
         self.app_locker = readtexttools.get_my_lock("lock")
-
-        self.accept_voice = [
-            "",
-            "all",
-            "auto",
-            "child_female1",
-            "child_male1",
-            "piper",
-        ]
         self.default_lang = _common.default_lang
         self.default_model = "en_GB-vctk-medium.onnx"
         self.default_extension = _common.default_extension
-        self.add_pause = _common.add_pause
         self.voice_name = ""
         self.lang = ""
         self.concise_lang = ""
         self.model = ""
-        self.piper_voice_dir = os.path.expanduser(
-            "~/.local/share/piper-tts/piper-voices"
-        )
-        if not os.path.isdir(self.piper_voice_dir):
-            self.piper_voice_dir = os.path.expanduser("~/piper-voices")
-        if not os.path.isdir(self.piper_voice_dir):
-            self.piper_voice_dir = readtexttools.linux_machine_dir_path("piper-voices")
-        if not os.path.isdir(self.piper_voice_dir):
-            self.piper_voice_dir = os.path.expanduser("~/Downloads/piper-voices")
-        if not os.path.isdir(self.piper_voice_dir):
-            self.piper_voice_dir = os.path.expanduser("~/")
-        self.espeak_ng_dir = os.path.expanduser(
-            "~/.local/share/piper-tts/piper/espeak-ng-data"
-        )
-        if not os.path.isdir(self.espeak_ng_dir):
-            self.espeak_ng_dir = os.path.expanduser("~/espeak-ng-data")
-        if not os.path.isdir(self.espeak_ng_dir):
-            self.espeak_ng_dir = readtexttools.linux_machine_dir_path("espeak-ng-data")
+        self.piper_voice_dir = ""
+        for _piper_dir in [
+            os.path.expanduser(
+                "~/.local/share/piper-tts/piper-voices"),
+            os.path.expanduser(
+                "~/.local/share/piper/piper-voices"),
+            os.path.expanduser(
+                "~/piper-voices"),
+            os.path.expanduser(
+                "~/Downloads/piper-voices"),
+            readtexttools.linux_machine_dir_path(
+                "piper-voices"),
+                ]:
+            if os.path.isdir(_piper_dir):
+                self.piper_voice_dir = _piper_dir
+                break
+        self.espeak_ng_dir = ""
+        for espeak_ng_dir in [
+            os.path.expanduser(
+                "~/.local/share/piper-tts/piper/espeak-ng-data"),
+            os.path.expanduser(
+                "~/.local/share/piper/espeak-ng-data"),
+            os.path.expanduser(
+                "~/espeak-ng-data"),
+            os.path.expanduser(
+                "~/Downloads/espeak-ng-data"),
+            readtexttools.linux_machine_dir_path(
+                "espeak-ng-data"),
+                ]:
+            if os.path.isdir(espeak_ng_dir):
+                self.espeak_ng_dir = espeak_ng_dir
+                break
         self.j_key = ""
-        self.j_key_list = []
         self.j_lang = ""
         self.j_concise_lang = ""
         self.j_model = ""
         self.j_quality = ""
         self.j_path = ""
-        self.j_speaker_list = []
-        self.j_data_set = ''
+        self.speaker_id_map_keys = []
+        self.dataset = ""
         self.sample_rate = 22050
         self.noise_scale = 0.667
         self.length_scale = 1
@@ -242,14 +305,15 @@ class PiperTTSClass(object):
         if len(self.piper_voice_dir) == 0:
             return False
         self.voice = int(
-            "".join(["0", readtexttools.safechars(vox.split("#")[0], "1234567890")])
+            "".join(["0", readtexttools.safechars(
+                vox.split("#")[0], "1234567890")])
         )
         self.voice_name = vox
         self.concise_lang = iso_lang.split("_")[0].split("-")[0]
         self.lang = iso_lang.replace("-", "_")
         if self.concise_lang in os.listdir(self.piper_voice_dir):
-            for block_list in ["_script", "~"]:
-                if self.concise_lang.startswith(block_list):
+            for _ignore in ["_script", "~"]:
+                if self.concise_lang.startswith(_ignore):
                     self.ok = False
                     return self.ok
             self.ok = True
@@ -309,12 +373,13 @@ voice models, then the generic json configuration will not recognize them.
         ]:
             try:
                 for _item in data:
-                    self.j_key = _json_tools.sanitize_json(data[_item]["key"])
-                    self.j_key_list = self.j_key.split("-")
-                    self.j_lang = self.j_key_list[0]
-                    self.j_concise_lang = self.j_lang.split("_")[0]
-                    self.j_model = self.j_key_list[1]
-                    self.j_quality = self.j_key_list[2]
+                    # de_DE-thorsten_emotional-medium
+                    self.j_key = data[_item]["key"]
+                    self.j_lang = data[_item]["language"]["code"]  # de_DE
+                    # de
+                    self.j_concise_lang = data[_item]["language"]["family"]
+                    self.j_model = data[_item]["name"]  # thorsten_emotional
+                    self.j_quality = data[_item]["quality"]  # medium
                     for self.j_path in [
                         os.path.join(
                             self.piper_voice_dir,
@@ -324,7 +389,8 @@ voice models, then the generic json configuration will not recognize them.
                             self.j_quality,
                             f"{self.j_key}.{extension}",
                         ),
-                        os.path.join(self.piper_voice_dir, f"{self.j_key}.{extension}"),
+                        os.path.join(self.piper_voice_dir,
+                                     f"{self.j_key}.{extension}"),
                     ]:
                         if _vox in [self.j_key, self.j_model]:
                             return [self.j_path]
@@ -350,6 +416,7 @@ voice models, then the generic json configuration will not recognize them.
             return self.use_specific_onnx_path
         if not os.path.isdir(self.piper_voice_dir):
             return ""
+        _model = ""
         _model_list = self._model_path_list(self.lang, self.model, _extension)
         _uri = f"{self.voice_url}/{self.concise_lang}"
         if len(_model_list) == 0:
@@ -364,10 +431,17 @@ Missing or incompatible `{self.lang}` language `.json` and `.onnx` files for `{s
 [Get piper-voices]({_uri})."""
             )
             readtexttools.pop_message(
-                self.help_heading, _uri, 8000, readtexttools.net_error_icon()
+                self.help_heading, _uri, 8000, self.help_icon
             )
-        _model = netcommon.index_number_to_list_item(self.voice, _model_list)
-
+        _voice_name_base = self.voice_name.split("#")[0]
+        os_sep = os.sep
+        for _path in _model_list:
+            if _path.endswith(f"{os_sep}{_voice_name_base}.{_extension}"):
+                _model = _path
+                break
+        if len(_model) == 0:
+            _model = netcommon.index_number_to_list_item(
+                self.voice, _model_list)
         if os.path.isfile(_model):
             self.ok = True
             return _model
@@ -389,10 +463,10 @@ Missing or incompatible `{self.lang}` language `.json` and `.onnx` files for `{s
                     self.noise_scale = data["inference"]["noise_scale"]
                     self.length_scale = data["inference"]["length_scale"]
                     self.noise_w = data["inference"]["noise_w"]
-                    self.j_data_set = data["dataset"]
+                    self.dataset = data["dataset"]
 
                     for _key in data["speaker_id_map"].keys():
-                        self.j_speaker_list.append(_key)
+                        self.speaker_id_map_keys.append(_key)
                 except KeyError:
                     pass
                 self.voice_count = data["num_speakers"]
@@ -420,7 +494,8 @@ Missing or incompatible `{self.lang}` language `.json` and `.onnx` files for `{s
         """Read speech aloud"""
         _length_scale = self.length_scale  # Fallback rate
         if _speech_rate != 160:
-            _length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)[0]
+            _length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)[
+                0]
         if not self.ok:
             return False
         _espeak_data = self.espeak_ng_dir
@@ -438,10 +513,20 @@ Missing or incompatible `{self.lang}` language `.json` and `.onnx` files for `{s
         if "#" not in _vox:
             _vox = f"{_vox}#0"
         try:
-            voice_no = int(_vox.split("#")[1])
+            _vox_split = _vox.split("#")[1]
+            self._check_voice_request(0, self._model_voice_info(_model))
+            if _vox_split in self.speaker_id_map_keys:
+                voice_no = 0
+                for _index in range(len(self.speaker_id_map_keys)):
+                    if _vox_split.lower() == self.speaker_id_map_keys[_index].lower():
+                        voice_no = _index
+                        break
+            else:
+                voice_no = int(_vox_split)
         except (ValueError, IndexError):
             voice_no = 0
-        voice_no = self._check_voice_request(voice_no, self._model_voice_info(_model))
+        voice_no = self._check_voice_request(
+            voice_no, self._model_voice_info(_model))
 
         _outer = f" --output-raw | aplay -r {self.sample_rate} -f S16_LE -t raw -"
         # NOTE: change `_outer` if saving mp3 output; post-process wav file.
@@ -459,7 +544,7 @@ Missing or incompatible `{self.lang}` language `.json` and `.onnx` files for `{s
                 [
                     "cat '",
                     _text_file,
-                    "' | piper --espeak_data '",
+                    f"' | {self.app} --espeak_data '",
                     _espeak_data,
                     "' --noise_scale ",
                     str(self.noise_scale),
@@ -479,9 +564,10 @@ Missing or incompatible `{self.lang}` language `.json` and `.onnx` files for `{s
             _name_key = "None"
             if self.debug == 0:
                 _variant = str(voice_no)
-                _name_key = self.j_data_set
+                _name_key = self.dataset
                 try:
-                    _name_key = self.j_speaker_list[voice_no]
+                    if len(self.speaker_id_map_keys) != 0:
+                        _name_key = self.speaker_id_map_keys[voice_no]
                 except IndexError:
                     pass
                 print(
@@ -489,7 +575,7 @@ Missing or incompatible `{self.lang}` language `.json` and `.onnx` files for `{s
 Piper TTS
 =========
 
-+ Language:  `{self.concise_lang}`
+* Language:  `{self.concise_lang}`
 * Model:  `{_onnx}`
 * Requested Language:  `{_iso_lang}`
 * Requested Model:  `{_vox}`
@@ -535,7 +621,8 @@ def main():  # -> NoReturn
         sys.exit(0)
     try:
         opts, args = getopt.getopt(
-            sys.argv[1:], "hclrv", ["help", "config", "language=", "rate=", "voice="]
+            sys.argv[1:], "hclrv", ["help", "config",
+                                    "language=", "rate=", "voice="]
         )
     except getopt.GetoptError:
         # print help information and exit
@@ -577,7 +664,7 @@ if __name__ == "__main__":
 # NOTE: This python code is a client of Piper. There are thousands
 # of Piper voices, and the quality of voice samples on which they
 # are based can vary.
-# 
+#
 # With an untested model check if neural voice quality degrades or
 # the voice starts "babbling" random sounds with long srings. Check
 # short code-like strings like '`eye`, `bye`, `no`, `No`, `null`, `nil`,
