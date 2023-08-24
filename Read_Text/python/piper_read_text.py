@@ -271,6 +271,12 @@ and 'male'.
 
     def get_quickstart_info(self):  # -> str
         """Set `self.quick_start` and return concise setup information."""
+        _use_phrase = self.sample_phrase
+        if len(self.tested_phrase) != 0:
+            _use_phrase = self.tested_phrase
+        _use_model = self.sample_model
+        if len(self.tested_model) != 0:
+            _use_model = self.tested_model
         self.quick_start = f"""
 Quickstart
 ==========
@@ -288,8 +294,8 @@ files that contain between 60 - 100 GB of data depending on the model.
 
     sudo apt-get install espeak-ng-data
     cd ~/.local/share/piper-tts/piper-voices
-    echo '{self.tested_phrase}' | \\
-        ~/.local/bin/piper --model {self.tested_model} \\
+    echo '{_use_phrase}' | \\
+        ~/.local/bin/piper --model {_use_model} \\
         --output-raw | \\
         aplay -r 22050 -f S16_LE -t raw -
 
