@@ -158,7 +158,7 @@ Function fbPiperTtsOk(_command) As Boolean
 	&apos; Return `True` if Linux `piper` is executable
 	On Error Goto fbPiperTtsOkErr
 	If Len(_command) = 0 Then
-		_command = &quot; --version&quot;
+		_command = &quot; -h&quot;
 	End If
 	fbPiperTtsOk = False
 	Dim sPiperPath As String : sPiperPath = fsPiperPath()

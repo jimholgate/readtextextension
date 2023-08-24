@@ -708,6 +708,7 @@ def sys_machine_paths():  # list(str)
         "/usr/i386/",
         "/usr/local/share/",
         "/usr/share/",
+        "/opt/"
     ]
     try:
         machine_type = platform.uname().machine

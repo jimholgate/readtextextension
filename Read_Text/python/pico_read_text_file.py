@@ -36,17 +36,17 @@ External program:
 
 Command line options (default):
 
-        "(PICO_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) "(TMP)"
+        "(PICO_READ_TEXT_PY)" --language (SELECTION_LANGUAGE_CODE) "(TMP)"
 
 or (save as a .wav file in the home directory):
 
-         "(PICO_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
+         "(PICO_READ_TEXT_PY)" --language (SELECTION_LANGUAGE_CODE) \
            --output "(HOME)(NOW).wav" "(TMP)"
 
 or (speak more slowly with a lowered pitch):
 
-        "(PICO_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_CODE) \
-          --rate=80% --pitch=80% "(TMP)"
+        "(PICO_READ_TEXT_PY)" --language (SELECTION_LANGUAGE_CODE) \
+          --rate 80% --pitch 80% "(TMP)"
 
 See the manual page for `pico2wave` for more detailed information
 

@@ -2248,7 +2248,9 @@ End Sub
 
 Function LocalLinuxPaths()
 	Dim all_paths As String
-	all_paths = (Environ(&quot;PATH&quot;) &amp; &quot;:&quot; &amp; Environ(&quot;HOME&quot;) &amp; &quot;/.local/bin&quot;)
+	Dim _home As String : _home = Environ(&quot;HOME&quot;)
+	all_paths = (Environ(&quot;PATH&quot;) &amp; &quot;:&quot; &amp; _home &amp; &quot;/.local/bin&quot; &amp;_
+	 &quot;:&quot; &amp; _home &amp; &quot;/.local/share/piper-tts/piper&quot;)
 	LocalLinuxPaths = Split(all_paths, &quot;:&quot;)
 End Function
 
@@ -2259,6 +2261,7 @@ Function fsPiperPath()
 	Dim paths As Variant
 	Dim _path As String
 	Dim sf as Object
+	On Local Error GoTo fsPiperPathErr
 	sf = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
 	paths = LocalLinuxPaths()
 	For x = Lbound(paths) to Ubound(paths)
@@ -2269,7 +2272,7 @@ Function fsPiperPath()
 		End If
 	Next
 Exit Function
-LocalLinuxPathsErr:
+fsPiperPathErr:
 
 End Function
 
