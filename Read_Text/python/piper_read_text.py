@@ -26,11 +26,11 @@ External program:
 
 Use the first available voice.
 
-    "(PIPER_READ_TEXT_PY)"  --rate 100% --language (SELECTION_LANGUAGE_CODE)"(TMP)"
+    "(PIPER_READ_TEXT_PY)"  --rate 100% --language (SELECTION_LANGUAGE_CODE) "(TMP)"
 
 Use a particular model (`auto5`) and speaker (`45`):
 
-    "(PIPER_READ_TEXT_PY)" --voice auto5#45 --rate 75% --language (SELECTION_LANGUAGE_CODE)"(TMP)"
+    "(PIPER_READ_TEXT_PY)" --voice auto5#45 --rate 75% --language (SELECTION_LANGUAGE_CODE) "(TMP)"
 
 Quick start
 -----------
@@ -220,6 +220,10 @@ class PiperTTSClass(object):
     def usage(self, _help=""):  # -> None
         """Usage"""
         cmd = "python3 piper_read_text.py"
+        _file = "'<text_path.txt>'"
+        if len(_help) != 0:
+            cmd = "\"(PIPER_READ_TEXT_PY)\""
+            _file = "\"(TMP)\""
         cmd_break = "\\"
         print(
             f"""
@@ -235,11 +239,11 @@ Use
 
 Use the first available voice.
 
-    {cmd} --language en-GB --rate 100% '<text_path.txt>'
+    {cmd} --language en-GB --rate 100% {_file}
 
 Use a particular model (`auto5`) and speaker (`45`):
 
-    {cmd} --language en-GB --voice auto5#45 --rate 75% '<text_path.txt>'
+    {cmd} --language en-GB --voice auto5#45 --rate 75% {_file}
 
 If you specify a voice name for one language model, other language
 models will use the first voice in the model's index. For example,
@@ -247,7 +251,7 @@ if your preferred voice from the `de_DE-thorsten_emotional-medium`
 model is `amused`, you would use:
 
     {cmd} --language de-DE {cmd_break}
-        --voice de_DE-thorsten_emotional-medium#amused '<text_path.txt>'
+        --voice de_DE-thorsten_emotional-medium#amused {_file}
 
 You can still use French with a model like `fr_FR-upmc-medium`. When
 speaking French with this model, it now uses the first voice in the list
@@ -257,7 +261,7 @@ in the French language model.
 You can use a piper `onnx` and `json` model package in a local 
 user directory that you specify:
 
-    {cmd} --voice='</path/to/myvoice.onnx>#4' '<text_path.txt>'
+    {cmd} --voice='</path/to/myvoice.onnx>#4' {_file}
 
 The `voices.json` file for piper contains no gender information, so
 the application will use the same voice index for 'auto', 'child', female'
@@ -311,7 +315,7 @@ download links and store them in your voices directory at
 The features of the python version of `piper` can vary depending on the
 version of python and the libraries that are supplied by your distribution.
 Therefore, some models that work with the binary version of `piper` might
-not work `python3-pipx piper-tts` command line interface.
+not work with the python version.
 """
         return self.quick_start
 
