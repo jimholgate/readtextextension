@@ -222,8 +222,8 @@ class PiperTTSClass(object):
         cmd = "python3 piper_read_text.py"
         _file = "'<text_path.txt>'"
         if len(_help) != 0:
-            cmd = "\"(PIPER_READ_TEXT_PY)\""
-            _file = "\"(TMP)\""
+            cmd = '"(PIPER_READ_TEXT_PY)"'
+            _file = '"(TMP)"'
         cmd_break = "\\"
         print(
             f"""
