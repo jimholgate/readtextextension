@@ -712,11 +712,11 @@ def sys_machine_paths():  # list(str)
     ]
     try:
         machine_type = platform.uname().machine
-    except (AttributeError, NameError):
+    except:
         _meta = ImportedMetaData()
         machine_type = _meta.execute_command("uname -m")
     if len(machine_type) == 0:
-        return no_gnus
+        machine_type = "x86_64"
     return [
         "/usr/local/lib/%(machine_type)s-linux-gnu/" % locals(),
         "/usr/lib/%(machine_type)s-linux-gnu/" % locals(),
