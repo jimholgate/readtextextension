@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
-"""
+APP_DESCRIPTION = r"""
 Piper TTS
 =========
 
@@ -32,16 +32,54 @@ Use a particular model (`auto5`) and speaker (`45`):
 
     "(PIPER_READ_TEXT_PY)" --voice auto5#45 --rate 75% --language (SELECTION_LANGUAGE_CODE) "(TMP)"
 
-Quick start
------------
+Install piper-tts
+=================
 
 If you are not online, then you cannot download voice models or configuration
 files. Once they are installed, piper handles speech locally.
+
+Binary release
+--------------
+
+The binary release is fast.
+
+The most recent binary `piper` executable program included in a 
+[piper archive](https://github.com/rhasspy/piper#installation) for your
+computer's specific processor type. For example, `piper_amd64.tar.gz`
+works with `x86_64` processors. 
+
+For example, for the `piper_amd64` 1.2.0 release, use the following:
+
+    python3 -c "import os;os.makedirs(os.expanduser('~/.local/share/piper-tts/'))"
+    wget -O ~/piper_amd64.tar.gz https://github.com/rhasspy/piper/releases/download/v1.2.0/piper_amd64.tar.gz
+    tar -xf ~/piper_amd64.tar.gz -C ~/.local/share/piper-tts/
+    ln -s -T ~/.local/share/piper-tts/piper/piper ~/.local/bin/piper-cli
+    ~/.local/bin/piper-cli --version
+
+Python release
+--------------
+
+The python pipx package has higher latency, but the `piper` script simplifies
+automating downloading the required `onnx` data and `json` configuration
+files. Some Linux platforms use python versions that are incompatible or only
+partially compatible with the pipx stable release of `piper-tts`.
 
 Install the following packages:
 
     python3-pipx
     espeak-ng-data
+
+Then use pipx to install `piper-tts`
+
+    pipx update-all
+    pipx install piper-tts
+    pipx ensurepath
+    piper -h
+
+Audition and download a voice model
+-----------------------------------
+
+You can check the voice models online.
 
 Review the [voice model samples](https://rhasspy.github.io/piper-samples/).
 
@@ -50,19 +88,12 @@ piper voice models (`onnx`) and configuration files (`json`).
 
 `~/.local/share/piper-tts/piper-voices`
 
-Read the `README` file in the directory for the next steps to complete
-the installation using voice models for your language and region.
+You can download the voice and configuration files for various languages
+and regions following the link on the piper-samples web page. Move the
+`onnx` and `json` files to the local `piper-voices` directory.
 
-Final steps
------------
-
-To enhance the functionality, speed and stability of `piper-tts`
-you can create a symbolic link at `~/.local/bin/piper-cli` targeting
-the most recent binary `piper` executable program included in the 
-[piper archive](https://github.com/rhasspy/piper#installation) for your
-computer's specific processor type. For example, `piper_amd64.tar.gz`. 
-
-    ln -s -T ~/.local/share/piper-tts/piper/piper ~/.local/bin/piper-cli
+Read the `README` file in the directory for more information
+about using voice models for other languages and regions.
 
 System-wide installation
 ------------------------
@@ -183,7 +214,7 @@ class PiperTTSClass(object):
             "~/.local/share/piper/piper-voices",
             "~/.local/share/piper-voices",
             "~/piper-voices",
-            "~/Downloads/piper-voices",
+            "/opt/piper-voices",
             readtexttools.linux_machine_dir_path("piper-voices"),
         ]:
             if os.path.isdir(os.path.expanduser(_piper_dir)):
@@ -281,11 +312,13 @@ and 'male'.
 * [Piper samples](https://rhasspy.github.io/piper-samples/)
 * [Instructions](https://github.com/rhasspy/piper)
 * [Download voices](https://huggingface.co/rhasspy/piper-voices/tree/main/)
+
+{APP_DESCRIPTION}
 """
         )
 
-    def get_quickstart_info(self):  # -> str
-        """Set `self.quick_start` and return concise setup information."""
+    def get_pip_test_text(self):  # -> str
+        """Set `self.quick_start` and return the string."""
         _use_phrase = self.sample_phrase
         if len(self.tested_phrase) != 0:
             _use_phrase = self.tested_phrase
@@ -293,19 +326,8 @@ and 'male'.
         if len(self.tested_model) != 0:
             _use_model = self.tested_model
         self.quick_start = f"""
-Quickstart
-==========
-
-    pipx upgrade-all
-    pipx install piper-tts
-    pipx ensurepath
-
-Before using this piper client, verify that the piper program works by
-testing it with a command from the piper-tts
-[website](https://github.com/rhasspy/piper) using the same models that you
-want to use with this client. If you are using the `python-pipx` version of
-`piper`, using these commands trigger a download of configuration and data
-files that contain between 60 - 100 GB of data depending on the model.
+If you have installed the `piper-tts` library, you can use the
+following commands to install specific voice models.
 
     sudo apt-get install espeak-ng-data
     cd ~/.local/share/piper-tts/piper-voices
@@ -313,15 +335,6 @@ files that contain between 60 - 100 GB of data depending on the model.
         ~/.local/bin/piper --model {_use_model} \\
         --output-raw | \\
         aplay -r 22050 -f S16_LE -t raw -
-
-You can audition this and other piper speech models at the
-[Piper Voice Samples](https://rhasspy.github.io/piper-samples/)
-webpage. Once you have chosen a model, the page displays a download
-[link](https://huggingface.co/rhasspy/piper-voices/tree/main/)
-for the `MODEL_CARD`, `.onnx` model and `.json` configuration files. Click the
-download links and store them in your voices directory at
-`~/.local/share/piper-tts/piper-voices`. The binary version of piper from
-[github](https://github.com/rhasspy/piper) is current.
 
 The features of the python version of `piper` can vary depending on the
 version of python and the libraries that are supplied by your distribution.
@@ -810,7 +823,7 @@ Piper TTS
                     pass
                 if len(self.tested_phrase) == 0:
                     self.tested_phrase = self.sample_phrase
-            _quick_start = self.get_quickstart_info()
+            _quick_start = self.get_pip_test_text()
         self.instructions = f"""
 Summary
 =======
@@ -820,17 +833,21 @@ Summary
 * Download voice `onnx` and `json` files for the model or models
   that you need and place them in the appropriate directory.
 
-Installation
-============
-{_quick_start}
-### python-pipx
+{APP_DESCRIPTION}
 
-To [install](https://github.com/rhasspy/piper#running-in-python)
-using `pipx`, you need the `python3-pipx` python package.
+Details
+=======
+
+python-pipx
+-----------
+
+To [install](https://github.com/rhasspy/piper#running-in-python) `piper-tts`
+using `pipx`, you need the `python3-pipx` and the `espeak-ng-data` packages.
 
     pipx upgrade-all
     pipx install piper-tts
     pipx ensurepath
+    piper -h
 
 Some platforms might show an error when attempting to use the library because
 they use an incompatible version of one or more of python's support libraries
@@ -838,13 +855,10 @@ or the system architecture is incompatible with `piper-tts`. In this case, a
 binary package compatible with your computer's architecture might work.
 
 Currently, the python library version of the piper command line interface
-displays no information about the audio stream. 
-
-### Binary package
-
-The piper-tts pip library distribution helps you to install voices easily.
-However, this client works faster and more predictably with the newest
-piper-tts binary from [github](https://github.com/rhasspy/piper#installation).
+displays no information about the audio stream.
+{_quick_start}
+Binary package
+--------------
 
 The python binary supports Debian stable (x86-64), Fedora Workstation
 (x86-64) and Ubuntu LTS (x86-64). If you use the binary package, you
@@ -866,39 +880,13 @@ link does not overwrite a link to a python script of the same name.
 The binary version of piper displays information about the audio stream
 in the terminal window.
 
-Download models and configuration files
----------------------------------------
+Create a settings directory manually
+------------------------------------
 
-### Samples and json configurations download
+If you are using a version of the office suite with restricted permissions or
+a different version of python than the system python, automated installation
+of voice model and configuration files might fail.
 
-This is optional. You can set up the standard release directory structure
-for all sample voice mp3 files, json configuration files, notes, utility
-scripts, and placeholders for onnx file data using git.  This lets you
-automate updating the local `voices.json` file so that you can use
-this piper client with third party voice models and configuration files
-like ones that you create.
-
-    cd "~/.local/share/piper-tts/piper-voices"
-    git clone https://huggingface.co/rhasspy/piper-voices
-
-This method of replicating the developer configuraton setup includes plain
-text placeholders for the onnx binary files that work with piper-tts. You
-can activate a voice model by replacing the text placeholder with the
-the actual onnx file from the web site.
-
-#### Placeholder
-
-The placeholder is a text file that contains the version, verification
-checksum and size of the onnx file.
-https://huggingface.co/rhasspy/piper-voices/raw/main/en/en_GB/jenny_dioco/medium/en_GB-jenny_dioco-medium.onnx
-
-#### Actual file:
-
-The linked file is a binary file that piper-tts can use to generate speech.
-https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_GB/jenny_dioco/medium/en_GB-jenny_dioco-medium.onnx
-
-Local voices
-------------
 This client looks for voices in several directories. To create a directory in
 the recommended location, enter:
 
@@ -960,8 +948,8 @@ Some voices might require voice data from the `espeak-ng` package.
 ### Optimize voice assets
 
 If you add or erase directories with voice assets, or modify configuration
-parameters, you can regenerate the local `voices.json` file with a [python
-script](https://huggingface.co/rhasspy/piper-voices/tree/main/_script)
+parameters, you can regenerate the local `voices.json` file with a python
+[script](https://huggingface.co/rhasspy/piper-voices/tree/main/_script)
 included on the huggingface website.
 
     python3 '($HOME)/.local/share/piper-tts/piper-voices/_script/voicefest.py'
@@ -977,8 +965,52 @@ four quality levels:
 Some models contain multiple speakers. The quality of one of the speakers
 could be less than it would be using a single speaker model. Contributors
 and researchers record samples under different conditions, so some voices
-might have issues irrespective of these quality levels like background
-noise and distortion.
+might have issues ike background noise and distortion irrespective of the
+stated quality level.
+
+Git clone
+---------
+
+Git is a developer tool to manage computer projects.
+
+### Advantages
+
+* Using Git as an alternative method to set up a developer release directory
+  structure will include all sample voice `mp3` files, `json` configuration
+  files, notes, utility scripts, and placeholders for `onnx` file data.
+* Using this developer version facilitates updating the local `voices.json`
+  file so that you can use this piper client with third party.
+  voice models and configuration files like ones that you create yourself.
+* The git program can help you track changes and undo mistakes in text files.
+
+### Disadvantages
+
+* It will not work as-is because the placeholders are not actual `onnx`
+  data files.
+* Modifying the git clone might cause problems if you try to push it or
+  synchronize it to a public repository.
+
+### Method
+
+    cd "~/.local/share/piper-tts/piper-voices"
+    git clone https://huggingface.co/rhasspy/piper-voices
+
+This method of replicating the developer configuraton setup includes plain
+text placeholders for the `onnx` binary files that work with piper-tts. You
+can activate a voice model by replacing the text placeholder with local 
+symbolic links to local binary onnx files downloaded from the huggingface.co
+web site.
+
+#### Placeholder
+
+The placeholder is a text file that contains the version, verification
+checksum and size of the `onnx` file.
+https://huggingface.co/rhasspy/piper-voices/raw/main/en/en_GB/vctk/medium/en_GB-vctk-medium.onnx
+
+#### Actual file:
+
+The linked file is a binary file that piper-tts can use to generate speech.
+https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_GB/vctk/medium/en_GB-vctk-medium.onnx
 
 Piper TTS status
 ----------------
@@ -999,7 +1031,7 @@ Links
 -----
 
 * [About Piper TTS](https://github.com/rhasspy/piper)
-* [Piper samples](https://rhasspy.github.io/piper-samples/)
+* [Piper Samples](https://rhasspy.github.io/piper-samples/)
 * [Piper Voices](https://huggingface.co/rhasspy/piper-voices/tree/main)
 * [Thorsten Müller - Piper Voice Training](https://www.youtube.com/watch?v=b_we_jma220)
     """
@@ -1010,6 +1042,7 @@ def main():  # -> NoReturn
     """Use Piper TTS speech synthesis for supported languages."""
     _piper_tts = PiperTTSClass()
     _dir = os.path.expanduser("~/.local/share/piper-tts/piper-voices/")
+    _dir_list = [_dir, _piper_tts.piper_voice_dir]
     if not sys.version_info >= (3, 6) or not os.name in ["posix"]:
         print("Your system does not support the piper python tool.")
         _piper_tts.usage()
@@ -1049,6 +1082,7 @@ def main():  # -> NoReturn
                     response = urllib.request.urlopen(_piper_tts.json_url)
                     if os.path.isfile(f"{_dir}voices.json"):
                         os.remove(f"{_dir}voices.json")
+                        _dir_list = [_dir]
                     _piper_tts.update_request = True
                 except (TimeoutError, ValueError):
                     pass
@@ -1065,8 +1099,12 @@ def main():  # -> NoReturn
             _voice = a
         else:
             assert False, "unhandled option"
-
-    if not os.path.isfile(os.path.join(_dir, "voices.json")):
+    use_dir = ""
+    for _a_dir in _dir_list:
+        if os.path.isfile(os.path.join(_a_dir, "voices.json")):
+            use_dir = _a_dir
+            break
+    if len(use_dir) == 0:
         _piper_tts.update_local_model_dir(_dir, True)
     if not _piper_tts.language_supported(_iso_lang, _voice):
         sys.exit(0)
