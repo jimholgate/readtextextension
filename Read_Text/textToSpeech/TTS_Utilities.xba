@@ -2258,18 +2258,23 @@ End Function
 Function fsPiperPath()
 	fsPiperPath = &quot;&quot;
 	Dim x As Integer
+	Dim y As Integer
 	Dim paths As Variant
+	Dim _apps As Variant
 	Dim _path As String
 	Dim sf as Object
+	_apps = Array(&quot;/piper-cli&quot;, &quot;/piper&quot;)
 	On Local Error GoTo fsPiperPathErr
 	sf = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
 	paths = LocalLinuxPaths()
-	For x = Lbound(paths) to Ubound(paths)
-		_path = paths(x) &amp; &quot;/piper&quot;
-		If sf.exists(_path) Then
-			fsPiperPath = _path
-			Exit Function
-		End If
+	For y = Lbound(_apps) to Ubound(_apps)
+		For x = Lbound(paths) to Ubound(paths)
+			_path = paths(x) &amp; _apps(y)
+			If sf.exists(_path) Then
+				fsPiperPath = _path
+				Exit Function
+			End If
+		Next
 	Next
 Exit Function
 fsPiperPathErr:
