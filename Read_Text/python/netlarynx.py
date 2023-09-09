@@ -55,7 +55,7 @@ class LarynxClass(object):
 
     [About Larynx...](https://github.com/rhasspy/larynx)"""
 
-    def __init__(self):  # -> None
+    def __init__(self) -> None:
         """Initialize data. See
         <https://github.com/rhasspy/larynx#basic-synthesis>"""
         _common = netcommon.LocalCommons()
@@ -130,7 +130,7 @@ class LarynxClass(object):
         self.is_x86_64 = _common.is_x86_64
         self.max_chars = 360
 
-    def _set_vocoders(self, alt_local_url=""):  # -> bool
+    def _set_vocoders(self, alt_local_url="") -> bool:
         """If the server is running, then get the list of voice coders.
         + `alt_local_url` If you are connecting to a local network's
            larynx server using a different computer, you might need to use
@@ -185,7 +185,7 @@ Try restarting `larynx-server`."""
 
     def _spd_voice_to_larynx_voice(
         self, _search="female1", larynx_names="mary_ann"
-    ):  # -> str
+    ) -> str:
         """Assign a larynx name like `scottish_english_male` to a spd_voice
         like `male1`"""
         if self.debug and 1:
@@ -235,7 +235,7 @@ Try restarting `larynx-server`."""
 
     def language_supported(
         self, iso_lang="en-US", alt_local_url="", vox="auto"
-    ):  # -> bool
+    ) -> bool:
         """Is the language or voice supported?
         + `iso_lang` can be in the form `en-US` or a voice like `eva_k`
         + `alt_local_url` If you are connecting to a local network's
@@ -374,7 +374,7 @@ Loading larynx voices for `{_lang2}`
                             return self.ok
         return self.ok
 
-    def get_voc_type(self, _type="small"):  # -> str
+    def get_voc_type(self, _type="small") -> str:
         """Try to get the appropriate voc type for the platform."""
         if not _type in ["small", "medium", "large"]:
             return ""
@@ -396,7 +396,7 @@ Loading larynx voices for `{_lang2}`
         _ok_wait=4,
         _end_wait=30,
         _media_work="",
-    ):  # -> bool
+    ) -> bool:
         """Try getting a sound file using requests."""
         _done = False
         if not REQUESTS_OK:
@@ -441,7 +441,7 @@ Loading larynx voices for `{_lang2}`
         _ssml="",
         _ok_wait=4,
         _media_work="",
-    ):  # -> bool
+    ) -> bool:
         """Try getting a sound file using url_lib."""
         _done = False
         if not BASICS_OK:
@@ -486,7 +486,7 @@ Loading larynx voices for `{_lang2}`
         _noise_scale=0.667,
         _ok_wait=20,
         _end_wait=60,
-    ):  # -> bool
+    ) -> bool:
         """
         First, check larynx language support using `def language_supported`.
         Speak text aloud using a running instance of the

@@ -38,7 +38,7 @@ To automatically start the daemon, set the Docker container restart policy to
 * [Mimic3 TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
 * [GitHub](https://github.com/MycroftAI/mimic3)"""
 
-    def __init__(self):  # -> None
+    def __init__(self) -> None:
         """Initialize data."""
         _common = netcommon.LocalCommons()
         self.locker = _common.locker
@@ -434,7 +434,7 @@ To automatically start the daemon, set the Docker container restart policy to
     def spd_voice_to_mimic3_voice(self,
                                   _search="female1",
                                   _iso_lang="en-US",
-                                  _alt_local_url=""):  # -> str
+                                  _alt_local_url="") -> str:
         """Assign a name like `en_UK/apope_low"` to a
         spd_voice like `male0`"""
         _search = _search.strip("'\" \n")
@@ -481,7 +481,7 @@ Mimic 3
     def language_supported(self,
                            iso_lang="en-US",
                            alt_local_url="",
-                           vox="auto"):  # -> bool
+                           vox="auto") -> bool:
         """Is the language or voice supported?
         + `iso_lang` can be in the form `en-US` or a voice like
           `de_DE/thorsten_low`
@@ -586,7 +586,7 @@ can synthesize speech privately using <{_eurl}>.""")
         _ok_wait=4,
         _end_wait=10,
         _media_work="",
-    ):  # -> bool
+    ) -> bool:
         """Try getting a sound file using url_lib."""
         _done = False
         if not BASICS_OK:
@@ -633,7 +633,7 @@ can synthesize speech privately using <{_eurl}>.""")
         ssml=False,
         _ok_wait=20,
         _end_wait=60,
-    ):  # -> bool
+    ) -> bool:
         """Read Mimic3 speech aloud"""
         _length_scale = 1
         if not _speech_rate == 160:

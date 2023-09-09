@@ -13,7 +13,7 @@ a voice.
 This client uses the piper engine to read text aloud using Read
 Text Extension with your office program.
 
-* [Piper samples](https://rhasspy.github.io/piper-samples/)
+* [Piper samples](https://rhasspy.github.io/piper-samples)
 * [Instructions](https://github.com/rhasspy/piper)
 * [Download voices](https://huggingface.co/rhasspy/piper-voices/tree/main/)
 
@@ -81,7 +81,7 @@ Audition and download a voice model
 
 You can check the voice models online.
 
-Review the [voice model samples](https://rhasspy.github.io/piper-samples/).
+Review the [voice model samples](https://rhasspy.github.io/piper-samples).
 
 The first time you use this client, it will set up a directory to store
 piper voice models (`onnx`) and configuration files (`json`). 
@@ -141,7 +141,7 @@ import readtexttools
 class PiperTTSClass(object):
     """Piper TTS class"""
 
-    def __init__(self):  # -> None
+    def __init__(self) -> None:
         """Initialize data."""
         _common = netcommon.LocalCommons()
         self.default_lang = _common.default_lang
@@ -215,7 +215,9 @@ class PiperTTSClass(object):
             "~/.local/share/piper-voices",
             "~/piper-voices",
             "/opt/piper-voices",
+            "/opt/piper-tts/piper-voices",
             readtexttools.linux_machine_dir_path("piper-voices"),
+            readtexttools.linux_machine_dir_path("piper-tts/piper-voices"),
         ]:
             if os.path.isdir(os.path.expanduser(_piper_dir)):
                 self.piper_voice_dir = os.path.expanduser(_piper_dir)
@@ -227,6 +229,8 @@ class PiperTTSClass(object):
             "~/.local/share/piper/espeak-ng-data",
             "~/espeak-ng-data",
             "~/Downloads/espeak-ng-data",
+            "/opt/piper-tts/piper-tts/piper/espeak-ng-data",
+            readtexttools.linux_machine_dir_path("piper-tts/piper/espeak-ng-data"),
             readtexttools.linux_machine_dir_path("espeak-ng-data"),
         ]:
             if os.path.isdir(os.path.expanduser(espeak_ng_dir)):
@@ -239,6 +243,7 @@ class PiperTTSClass(object):
         self.j_model = ""
         self.j_quality = ""
         self.j_path = ""
+        self.sample_webpage = "https://rhasspy.github.io/piper-samples"
         self.speaker_id_map_keys = []
         self.dataset = ""
         self.phoneme_type = ""
@@ -251,7 +256,7 @@ class PiperTTSClass(object):
         self.use_specific_onnx_voice_no = 0
         self.meta = readtexttools.ImportedMetaData()
 
-    def usage(self, _help=""):  # -> None
+    def usage(self, _help="") -> None:
         """Usage"""
         cmd = "python3 piper_read_text.py"
         _file = "'<text_path.txt>'"
@@ -309,7 +314,7 @@ The `voices.json` file for piper contains no gender information, so
 the application will use the same voice index for 'auto', 'child', female'
 and 'male'.
 
-* [Piper samples](https://rhasspy.github.io/piper-samples/)
+* [Piper samples]({self.sample_webpage})
 * [Instructions](https://github.com/rhasspy/piper)
 * [Download voices](https://huggingface.co/rhasspy/piper-voices/tree/main/)
 
@@ -317,7 +322,7 @@ and 'male'.
 """
         )
 
-    def get_pip_test_text(self):  # -> str
+    def get_pip_test_text(self) -> str:
         """Set `self.quick_start` and return the string."""
         _use_phrase = self.sample_phrase
         if len(self.tested_phrase) != 0:
@@ -343,7 +348,7 @@ not work with the python version.
 """
         return self.quick_start
 
-    def language_supported(self, iso_lang="en-GB", vox="auto"):  # -> bool
+    def language_supported(self, iso_lang="en-GB", vox="auto") -> bool:
         """Check to see if the language is available"""
         model_test = vox.split("#")[0]
         if model_test.startswith("~"):
@@ -394,7 +399,7 @@ not work with the python version.
                     return self.ok
         return False
 
-    def _model_path_list(self, iso_lang="en-GB", _vox="", extension="onnx"):  # -> list
+    def _model_path_list(self, iso_lang="en-GB", _vox="", extension="onnx") -> list:
         """Check the directories for language models, and if found return
         the results in a list.
         """
@@ -475,7 +480,7 @@ voice models, then the generic json configuration will not recognize them.
                                     self.untested_model = self.j_key
                                     self.sample_uri = "/".join(
                                         [
-                                            "https://rhasspy.github.io/piper-samples/samples",
+                                            self.sample_webpage,
                                             self.j_concise_lang,
                                             self.j_lang,
                                             self.j_model,
@@ -493,7 +498,7 @@ voice models, then the generic json configuration will not recognize them.
                 pass
         return _found_models
 
-    def model_path(self, _extension="onnx"):  # -> str
+    def model_path(self, _extension="onnx") -> str:
         """piper-tts models usually have two essential files with `.json` and
         `.onnx` extensions. If `model.[json | .onyx]` is in an expected
         directory, return the path, otherwise return `''`"""
@@ -528,7 +533,7 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         self.ok = False
         return ""
 
-    def _model_voice_info(self, _model=""):  # -> int
+    def _model_voice_info(self, _model="") -> int:
         """Get current info from  the `_model.json` file such as the
         number of speakers and the sample rate.  Edit the named
         json elements for individual voices if needed"""
@@ -555,7 +560,7 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
             self.sample_rate = 22050
         return self.voice_count
 
-    def _check_voice_request(self, _vox_number=0, _list_size=0):  # -> str
+    def _check_voice_request(self, _vox_number=0, _list_size=0) -> str:
         """Handle out of range numbers using a modulus (`int % _list_size`)
         value."""
         try:
@@ -568,7 +573,7 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
             pass
         return 0
 
-    def _use_espeak_data_dir(self):  # -> bool
+    def _use_espeak_data_dir(self) -> bool:
         """If the application publishes a major version greater than `0`
         or is an ELF binary return `True` otherwise return `False`"""
         if len(self.espeak_ng_dir) == 0:
@@ -592,7 +597,7 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
 
     def read(
         self, _text_file="", _iso_lang="en-GB", _config="", _speech_rate=160
-    ):  # -> bool
+    ) -> bool:
         """Read speech aloud"""
         _length_scale = self.length_scale  # Fallback rate
         if _speech_rate != 160:
@@ -720,7 +725,7 @@ Piper TTS
             return _response == 0
         return False
 
-    def update_local_model_dir(self, _dir, _sub_dirs=True):  # -> bool
+    def update_local_model_dir(self, _dir="", _sub_dirs=True, do_pop_message=True) -> bool:
         """Download the most recent `voices.json` file, and if `_sub_dirs` is
         `True` then add new model subdirectories to the local model
         directory."""
@@ -770,9 +775,11 @@ Piper TTS
                             # of the office suite might not be able to display
                             # system pop ups or download resources from the
                             # Internet.
-                            readtexttools.pop_message(
-                                self.help_heading, _uri, 8000, self.help_icon
-                            )
+                            if do_pop_message:
+                                readtexttools.pop_message(
+                                    self.help_heading, _uri, 8000, self.help_icon
+                                )
+                            readtexttools.show_with_app(_dir)
                             self.update_request = False
             except IndexError:
                 pass
@@ -798,7 +805,7 @@ Piper TTS
                         pass
         return os.path.isfile(f"{_dir}voices.json")
 
-    def load_instructions(self, verbose=True):  # -> str
+    def load_instructions(self, verbose=True) -> str:
         """Return installation instructions"""
         _quick_start = ""
         if verbose:
@@ -1031,14 +1038,14 @@ Links
 -----
 
 * [About Piper TTS](https://github.com/rhasspy/piper)
-* [Piper Samples](https://rhasspy.github.io/piper-samples/)
+* [Piper Samples]({self.sample_webpage})
 * [Piper Voices](https://huggingface.co/rhasspy/piper-voices/tree/main)
 * [Thorsten Müller - Piper Voice Training](https://www.youtube.com/watch?v=b_we_jma220)
     """
         return self.instructions
 
 
-def main():  # -> NoReturn
+def main() -> None:
     """Use Piper TTS speech synthesis for supported languages."""
     _piper_tts = PiperTTSClass()
     _dir = os.path.expanduser("~/.local/share/piper-tts/piper-voices/")
@@ -1076,6 +1083,12 @@ def main():  # -> NoReturn
             sys.exit(0)
         elif o in ("-u, --update"):
             if readtexttools.lax_bool(a):
+                readtexttools.pop_message(
+                    _piper_tts.help_heading,
+                    _piper_tts.sample_webpage,
+                    8000,
+                    _piper_tts.help_icon,
+                )
                 # `True`, `Yes`, `1`, `-1`
                 try:
                     _piper_tts.common.set_urllib_timeout(4)
@@ -1086,6 +1099,8 @@ def main():  # -> NoReturn
                     _piper_tts.update_request = True
                 except (TimeoutError, ValueError):
                     pass
+                except Exception:
+                    print(f"Error resolving `{_piper_tts.json_url}`")
         elif o in ("-l", "--language"):
             _iso_lang = a
         elif o in ("-c", "--config"):

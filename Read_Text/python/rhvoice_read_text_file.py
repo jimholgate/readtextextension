@@ -45,11 +45,12 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import getopt
 import os
+import platform
 import sys
 import readtexttools
 
 
-def usage():  # -> None
+def usage() -> None:
     '''
     Command line help
     '''
@@ -127,7 +128,7 @@ class RhVoiceClass(object):
 
     '''
 
-    def __init__(self):  # -> None
+    def __init__(self) -> None:
         '''Initialize data'''
         self.ok = True
         self.app = 'RHVoice-test'
@@ -294,7 +295,7 @@ class RhVoiceClass(object):
              _post_process='process_wav_media',
              _writer='',
              _size='600x600',
-             _speech_rate='100'):  # -> bool
+             _speech_rate='100') -> bool:
         '''
 
 + `_text` - Text to speak
@@ -319,6 +320,10 @@ class RhVoiceClass(object):
         _env_lang = readtexttools.default_lang().split('_')[0].split('-')[0]
         _voice = self.language_to_voice(_iso_lang)
         if not bool(_voice):
+            self.ok = False
+            return False
+        if (int(platform.python_version_tuple()[0]) < 3
+                or int(platform.python_version_tuple()[1]) < 8):
             self.ok = False
             return False
         _media_out = ''
@@ -364,7 +369,7 @@ class RhVoiceClass(object):
         self.ok = False
         return False
 
-    def voice_available(self, iso_lang='en-US', _check_list=None):  # -> bool
+    def voice_available(self, iso_lang='en-US', _check_list=None) -> bool:
         '''Check if you have installed a language resource for
         a language or a voice.'''
         _voice = self.language_to_voice(iso_lang)
@@ -380,7 +385,7 @@ class RhVoiceClass(object):
         self.ok = False
         return False
 
-    def first_good_voice(self, _voices=None, _check_list=None):  # -> string
+    def first_good_voice(self, _voices=None, _check_list=None) -> str:
         '''Check the default Linux installation for the first
         voice available from the `_voices` list. The preferred
         voice in English depends on the region. If English is not
@@ -401,7 +406,7 @@ class RhVoiceClass(object):
                 pass
         return ''
 
-    def language_to_voice(self, iso_lang='en-US', _check_list=None):  # -> str
+    def language_to_voice(self, iso_lang='en-US', _check_list=None) -> str:
         '''Check if the library supports the language or voice.
         If so, return a voice in the language, otherwise return
         `''`.'''
@@ -453,7 +458,7 @@ class RhVoiceClass(object):
         return ''
 
 
-def main():  # -> NoReturn
+def main()-> None:
     '''Use rhvoice speech synthesis for supported languages while on-line'''
     if not sys.version_info >= (3, 6) or not os.name in ['posix']:
         print('Your system does not support the rhvoice python tool.')

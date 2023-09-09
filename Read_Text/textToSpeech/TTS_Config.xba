@@ -36,7 +36,7 @@ global s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage As Str
 global b_CaBcVancouverHolgateJamesReadtextextensionHideExports As Boolean
 global i_CaBcVancouverHolgateJamesReadtextextensionWinItunesVersion As Integer
 global s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI As String
-
+global i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult As Integer
 
 Sub ClearWorkingCountryLanguage()
 	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot;

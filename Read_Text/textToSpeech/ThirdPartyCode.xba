@@ -161,13 +161,30 @@ Function fbPiperTtsOk(_command) As Boolean
 		_command = &quot; -h&quot;
 	End If
 	fbPiperTtsOk = False
+	Select Case i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult
+		&apos; Only test once per session.
+		&apos; Did test complete?
+		&apos; Did the test pass?
+		Case 2
+		Exit Function
+		Case 3
+		fbPiperTtsOk = True
+		Exit Function
+	End Select
 	Dim sPiperPath As String : sPiperPath = fsPiperPath()
 	If Len(sPiperPath) = 0 Then
+		i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 2
 		Exit Function
 	End If
-	fbPiperTtsOk = Shell(sPiperPath, 0, _command) = 0
+	If Shell(sPiperPath, 0, _command) = 0 Then
+		i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 3
+		fbPiperTtsOk = True
+	Else
+		i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 2
+	End If
 	Exit Function
 	fbPiperTtsOkErr:
+	i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 0
 	fbPiperTtsOk = False
 End Function
 

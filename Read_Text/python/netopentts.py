@@ -43,7 +43,7 @@ class OpenTTSClass(object):
     [More...](https://github.com/synesthesiam/opentts#open-text-to-speech-server)
     """
 
-    def __init__(self):  # -> None
+    def __init__(self) -> None:
         """Initialize data."""
         _common = netcommon.LocalCommons()
         self.common = _common
@@ -102,7 +102,7 @@ class OpenTTSClass(object):
     def spd_voice_to_opentts_voice(self,
                                     _search="female1",
                                     _iso_lang="en-US",
-                                    _alt_local_url=""):  # -> str
+                                    _alt_local_url="") -> str:
         """Assign an OpenTTS name like `festival:cmu_us_slt_arctic_hts` to a
         spd_voice like `male1`"""
         _search = _search.strip("'\" \n")
@@ -142,7 +142,7 @@ OpenTTS
     def language_supported(self,
                            iso_lang="en-US",
                            alt_local_url="",
-                           vox="auto"):  # -> bool
+                           vox="auto") -> bool:
         """Is the language or voice supported?
         + `iso_lang` can be in the form `en-US` or a voice like `nanotts:es-ES`
         + `alt_local_url` If you are connecting to a local network's
@@ -169,6 +169,9 @@ OpenTTS
         if not _lang2 in ["de", "en", "es", "fr", "it"]:
             # nanotts is unsupported
             self.vmodels.append("espeak")
+        if vox in self.vmodels and len(vox) != 0:
+            # Test a specific model
+            self.vmodels = [vox]
         try:
             response = urllib.request.urlopen("".join(
                 [self.url, "/api/voices?language=", _lang2]))
@@ -264,7 +267,7 @@ can synthesize speech privately using <{_eurl}>.""")
         _ok_wait=4,
         _end_wait=10,
         _media_work="",
-    ):  # -> bool
+    ) -> bool:
         """Try getting a sound file using url_lib."""
         _done = False
         if not BASICS_OK:
@@ -315,7 +318,7 @@ Check the server settings or use a different voice.
         _denoiser_strength=0.03,
         _ok_wait=20,
         _end_wait=60,
-    ):  # -> bool
+    ) -> bool:
         """Read OpenTTS speech aloud"""
         if not self.ok:
             return False

@@ -32,7 +32,7 @@ Default MaryTts server: <http://0.0.0.0:59125>
 [About MaryTts...](https://github.com/synesthesiam/docker-marytts)
 """
 
-    def __init__(self):  # -> None
+    def __init__(self) -> None:
         """Initialize data. See
         <https://github.com/synesthesiam/docker-marytts>"""
         _common = netcommon.LocalCommons()
@@ -82,7 +82,7 @@ Default MaryTts server: <http://0.0.0.0:59125>
         self.male = 'male'
         self.female = 'female'
 
-    def marytts_xml(self, _text="", _speech_rate=160):  # -> str
+    def marytts_xml(self, _text="", _speech_rate=160) -> str:
         """Change the speed that MaryTTS reads plain text aloud using
         `RAWMARYXML`. `maryxml` correctly uses standard XML conventions like
         `&amp;`, `&gt;` and `&lt;`, so the characters that they represent use
@@ -103,7 +103,7 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
 
     def language_supported(self,
                            iso_lang="en-US",
-                           alt_local_url=""):  # -> bool
+                           alt_local_url="") -> bool:
         """Is the language or voice supported?
         + `iso_lang` can be in the form `en-US` or `en`.
         + `alt_local_url` If you are connecting to a local network's
@@ -182,7 +182,7 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
                 self.voice_mimic_locale = _lang2
         return self.ok
 
-    def _what_gender(self, _voice='male1'):  # -> str
+    def _what_gender(self, _voice='male1') -> str:
         '''Check the voice for a specific gender'''
         test_voice = _voice.lower()
         for gender in ['female', 'male']:
@@ -196,7 +196,7 @@ xmlns="http://mary.dfki.de/2002/MaryXML" version="0.4" xml:lang="en-US"><p>
     def marytts_voice(self,
                       _voice="",
                       _iso_lang="en-US",
-                      _prefer_gendered_fallback=True):  # -> str
+                      _prefer_gendered_fallback=True) -> str:
         """If the MaryTTS API includes the voice description, return a
         marytts voice description like `cmu-bdl-hsmm`, otherwise return
         `''`."""
@@ -285,7 +285,7 @@ It did not respond correctly.""")
         _ok_wait=4,
         _end_wait=30,
         _media_work="",
-    ):  # -> bool
+    ) -> bool:
         """Try getting a sound file using requests."""
         _done = False
         if not REQUESTS_OK:
@@ -344,7 +344,7 @@ It did not respond correctly.""")
         _ok_wait=4,
         _end_wait=30,
         _media_work="",
-    ):  # -> bool
+    ) -> bool:
         """Try getting a sound file using url_lib."""
         _done = False
         if not BASICS_OK:
@@ -399,7 +399,7 @@ It did not respond correctly.""")
         _vox="male1",
         _ok_wait=4,
         _end_wait=30,
-    ):  # -> bool
+    ) -> bool:
         """
         The read tool supports a subset of MaryTTS functions because not
         all voices, languages and synthesisers support all of the features

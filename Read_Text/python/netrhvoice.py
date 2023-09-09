@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
 import os
+import platform
 import tempfile
 try:
     import urllib
@@ -59,7 +60,7 @@ class RhvoiceLocalHost(object):
     * <https://github.com/RHVoice/RHVoice/issues>
     * <https://rhvoice.org/>"""
 
-    def __init__(self):  # -> None
+    def __init__(self) -> None:
         """The docker image doesn't expose details of the directory structure
         to the localhost API, so functions in the parent that rely on a specific
         file path do not work."""
@@ -114,7 +115,7 @@ class RhvoiceLocalHost(object):
             [32, 0, "|--------", 0],
         ]
 
-    def update_rhvoice_checklist(self):  # -> list
+    def update_rhvoice_checklist(self) -> list:
         """Create a list table in the same format as `self.checklist`
         using a json data adapted from the rhvoice-rest API.
 
@@ -165,13 +166,17 @@ class RhvoiceLocalHost(object):
 
     def language_supported(self,
                            _iso_lang="en-US",
-                           alt_local_url=""):  # -> bool
+                           alt_local_url="") -> bool:
         """Is the language or voice supported in rhvoice rest?
         + `iso_lang` can be in the form `en-US` or `en`."""
         _found_name = ""
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
         if self.ok:
+            return self.ok
+        if (int(platform.python_version_tuple()[0]) < 3
+                or int(platform.python_version_tuple()[1]) < 8):
+            self.ok = False
             return self.ok
         if not bool(self.verified_voices):
             self.update_rhvoice_checklist()
@@ -209,7 +214,7 @@ Checking {help_heading} voices for `{_iso_lang}`
     def rhvoice_voice(self,
                       _voice="female1",
                       _iso_lang="en-US",
-                      _prefer_gendered_fallback=True):  # -> str
+                      _prefer_gendered_fallback=True) -> str:
         """If the Rhvoice API includes the voice description, return a
         rhvoice voice description like `cmu-bdl-hsmm`, otherwise return
         `''`."""
@@ -276,7 +281,7 @@ Checking {help_heading} voices for `{_iso_lang}`
         _vox="female1",
         _ok_wait=4,
         _end_wait=30,
-    ):  # -> bool
+    ) -> bool:
         """Read text using <https://hub.docker.com/r/aculeasis/rhvoice-rest>"""
         if not self.ok:
             return False
