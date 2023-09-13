@@ -223,7 +223,7 @@ Function PiperLocalSuggestion(_lang)
 	&quot;sv_SE-nst-medium&quot;, _
 	&quot;sw_CD-lanfrica-medium&quot;, _
 	&quot;tr_TR-dfki-medium&quot;, _
-	&quot;uk_UA-lada-x_low&quot;, _
+	&quot;uk_UA-ukrainian_tts-medium&quot;, _
 	&quot;vi_VN-vais1000-medium&quot;, _
 	&quot;zh_CN-huayan-medium&quot;)
 	Dim langs As Variant : langs = Array(_
