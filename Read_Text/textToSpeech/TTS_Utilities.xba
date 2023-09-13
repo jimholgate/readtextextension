@@ -2548,6 +2548,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		&quot; --voice en_US-lessac-high#0&quot;,_
 		&quot; --voice en_US-arctic-medium#jmk&quot;,_
 		&quot; --voice en_GB-vctk-medium#p278&quot;,_
+		&quot; --voice &quot; &amp; PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0&quot;, _
 		&quot; --update True&quot;,_
 		&quot;&quot;)
 		For n = Lbound(_opts) to Ubound(_opts)

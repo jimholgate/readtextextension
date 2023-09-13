@@ -189,6 +189,60 @@ Function fbPiperTtsOk(_command) As Boolean
 End Function
 
 
+Function PiperLocalSuggestion(_lang)
+	If Len(_lang) = 0 Then
+		_lang = fsSelectionLanguageAndRegion(False)
+	End If
+	PiperLocalSuggestion = &quot;en_GB-jenny_dioco-medium&quot;
+	Dim models As Variant : models = Array(_
+	&quot;ca_ES-upc_ona-medium&quot;, _
+	&quot;cs_CZ-jirka-medium&quot;, _
+	&quot;da_DK-talesyntese-medium&quot;, _
+	&quot;de_DE-thorsten-medium&quot;, _
+	&quot;en_GB-jenny_dioco-medium&quot;, _
+	&quot;en_US-lessac-medium&quot;, _
+	&quot;es_ES-sharvard-medium&quot;, _
+	&quot;fi_FI-harri-medium&quot;, _
+	&quot;fr_FR-upmc-medium&quot;, _
+	&quot;hu_HU-anna-medium&quot;, _
+	&quot;is_IS-bui-medium&quot;, _
+	&quot;it_IT-riccardo-x_low&quot;, _
+	&quot;ka_GE-natia-medium&quot;, _
+	&quot;kk_KZ-iseke-x_low&quot;, _
+	&quot;lb_LU-marylux-medium&quot;, _
+	&quot;ne_NP-google-medium&quot;, _
+	&quot;nl_BE-nathalie-medium&quot;, _
+	&quot;no_NO-talesyntese-medium&quot;, _
+	&quot;pl_PL-darkman-medium&quot;, _
+	&quot;pt_BR-faber-medium&quot;, _
+	&quot;pt_PT-tugão-medium&quot;, _
+	&quot;ro_RO-mihai-medium&quot;, _
+	&quot;ru_RU-denis-medium&quot;, _
+	&quot;sk_SK-lili-medium&quot;, _
+	&quot;sr_RS-serbski_institut-medium&quot;, _
+	&quot;sv_SE-nst-medium&quot;, _
+	&quot;sw_CD-lanfrica-medium&quot;, _
+	&quot;tr_TR-dfki-medium&quot;, _
+	&quot;uk_UA-lada-x_low&quot;, _
+	&quot;vi_VN-vais1000-medium&quot;, _
+	&quot;zh_CN-huayan-medium&quot;)
+	Dim langs As Variant : langs = Array(_
+	fsReplaceText(_lang, &quot;-&quot;, &quot;_&quot;,), _
+	Split(_lang, &quot;-&quot;)(0), _
+	Split(_lang, &quot;_&quot;)(0))
+	Dim x As Integer : x = 0
+	Dim y As Integer : y = 0
+	For x = Lbound(langs) To Ubound(langs)
+		For y = Lbound(models) to Ubound(models)
+			If instr(models(y), langs(x)) = 1 Then
+				PiperLocalSuggestion = models(y)
+				Exit Function
+			End If
+		Next
+	Next
+End Function
+
+
 Function fbUpdateLexiconJsonFile(_
 		_language As String,_
 		_model As String,_
