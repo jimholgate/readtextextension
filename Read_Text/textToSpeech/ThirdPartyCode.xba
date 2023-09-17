@@ -243,14 +243,14 @@ Function PiperLocalSuggestion(_lang)
 End Function
 
 
-Function fbUpdateLexiconJsonFile(_
+Function fbUpdateLexiconFile(_
 		_language As String,_
 		_model As String,_
 		_json_file_in As String) As Boolean
     &apos; Update json and remove duplicate items. When you download an untrusted
     &apos; json file, return `True` only if the data structure is compatible.
     &apos; NOTE: Apache OpenOffice 4 for Windows does not support python 3
-    fbUpdateLexiconJsonFile = False
+    fbUpdateLexiconFile = False
 	Dim _command As String : _command = &quot;&quot;
 	Dim _app As String : _app = BundlePyPath()
 	If Len(_app) = 0 Then
@@ -262,20 +262,20 @@ Function fbUpdateLexiconJsonFile(_
 		&quot;/python/find_replace_phonemes.py&quot;), &quot;&quot;&quot; --language &quot;, _language,_
 		&quot; --model &quot;, _model, &quot; &quot;&quot;&quot;, ConvertFromUrl(_json_file_in), &quot;&quot;&quot;&quot;), &quot;&quot;)
 		If fbIsLibreOffice() Then
-			fbUpdateLexiconJsonFile = fbDoWinBat(_command)
+			fbUpdateLexiconFile = fbDoWinBat(_command)
 		Else
-			fbUpdateLexiconJsonFile = False
+			fbUpdateLexiconFile = False
 		End If
 	Else
 		_command = Join(Array(_
 		&quot;&quot;&quot;&quot;, ConvertFromUrl(fsMyURL() &amp; &quot;/python/find_replace_phonemes.py&quot;),_
 		&quot;&quot;&quot; --language &quot;, _language, &quot; --model &quot;, _model, &quot; &quot;&quot;&quot;,_
 		ConvertFromUrl(_json_file_in), &quot;&quot;&quot;&quot;), &quot;&quot;)
-		fbUpdateLexiconJsonFile = Shell(_app, 0, _command) = 0
+		fbUpdateLexiconFile = Shell(_app, 0, _command) = 0
 	End If
 	Exit Function
-	fbUpdateLexiconJsonFileErr:
-	fbUpdateLexiconJsonFile = False
+	fbUpdateLexiconFileErr:
+	fbUpdateLexiconFile = False
 End Function
 
 

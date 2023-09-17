@@ -7,8 +7,9 @@ import readtexttools
 
 
 def usage():  # -> None
-    '''Show usage'''
-    print('''
+    """Show usage"""
+    print(
+        """
 Replace mispronounced words with phonemes
 =========================================
 
@@ -55,43 +56,54 @@ find_replace_phonemes.py --model <model> --output <path-out> --language en-CA <p
 Modify file
 -----------
 
-find_replace_phonemes.py --model <model> --language en-CA <path-to-file-to-edit>'''
-          )
+find_replace_phonemes.py --model <model> --language en-CA <path-to-file-to-edit>"""
+    )
 
 
-def fix_up_text_file(_text_file_in='',
-                     _file_out='',
-                     _language='en-CA',
-                     _my_dir='default',
-                     _user_dir='SPEECH_USER_DIRECTORY'):  # -> bool
-    '''Replace incorrect pronunciations in a UTF-8 text file.'''
+def fix_up_text_file(
+    _text_file_in="",
+    _file_out="",
+    _language="en-CA",
+    _my_dir="default",
+    _user_dir="SPEECH_USER_DIRECTORY",
+    _verbose=False,
+):  # -> bool
+    """Replace incorrect pronunciations in a UTF-8 text file."""
     _import_meta = readtexttools.ImportedMetaData()
-    _output_type = [0, 1][0]
+    _output_type = [0, 1, 2][0]
     if not os.path.isfile(_text_file_in):
         return False
-    if os.path.splitext(_file_out)[1] in ['.json', '.js']:
-        _output_type = [0, 1][1]
-    _content2 = readtexttools.local_pronunciation(
-        _language, _import_meta.meta_from_file(_text_file_in, False), _my_dir,
-        _user_dir, True)
+    _ext = ""
     if not bool(_file_out):
         _file_out = _text_file_in
-    if os.path.splitext(_file_out)[1] in ['.json', '.js']:
-        _output_type = [0, 1][1]
-    readtexttools.write_plain_text_file(_file_out, _content2[_output_type],
-                                        'utf-8')
+    if "." in _file_out:
+        _ext = os.path.splitext(_file_out)[1]
+    if _ext in [".json", ".js"]:
+        _output_type = [0, 1, 2][1]
+    elif _ext in [".xml", ".lmxl", "xpls"]:
+        _output_type = [0, 1, 2][2]
+    _content2 = readtexttools.local_pronunciation(
+        _language,
+        _import_meta.meta_from_file(_text_file_in, False),
+        _my_dir,
+        _user_dir,
+        True,
+        _verbose,
+    )
+    readtexttools.write_plain_text_file(_file_out, _content2[_output_type], "utf-8")
     return True
 
 
 def main():  # -> NoReturn
-    '''Replaces mispronounced words with phonemes'''
-    _file_out = ''
+    """Replaces mispronounced words with phonemes"""
+    _file_out = ""
+    _verbose = False
     # _output_type = [0, 1][0]  # Selector [text, confirmed json]
-    _language = 'en-CA'
-    _my_dir = 'macos_say'
-    if os.name == 'nt':
-        _my_dir = 'windows_sapi'
-    _user_dir = 'READ_JSON_USER_DIRECTORY'
+    _language = "en-CA"
+    _my_dir = "macos_say"
+    if os.name == "nt":
+        _my_dir = "windows_sapi"
+    _user_dir = "READ_JSON_USER_DIRECTORY"
     # _import_meta = readtexttools.ImportedMetaData()
     _text_file_in = sys.argv[-1]
     if os.path.isfile(_text_file_in):
@@ -99,9 +111,18 @@ def main():  # -> NoReturn
             usage()
             sys.exit(0)
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "holmu", [
-                "help", "output=", "language=", "model=", "user_environ_dir="
-            ])
+            opts, args = getopt.getopt(
+                sys.argv[1:],
+                "holmuv",
+                [
+                    "help",
+                    "output=",
+                    "language=",
+                    "model=",
+                    "user_environ_dir=",
+                    "verbose=",
+                ],
+            )
         except getopt.GetoptError:
             # print help information and exit:
             print("option was not recognized")
@@ -119,14 +140,17 @@ def main():  # -> NoReturn
                 _my_dir = a
             elif o in ("-u", "--user_environ_dir"):
                 _user_dir = a
+            elif o in ("-v", "--verbose"):
+                _verbose = readtexttools.lax_bool(a)
             else:
                 assert False, "unhandled option"
         if not os.path.isfile(_text_file_in):
             usage()
             sys.exit(0)
-        if not fix_up_text_file(_text_file_in, _file_out, _language, _my_dir,
-                                _user_dir):
-            print('I was unable to find the file you specified!')
+        if not fix_up_text_file(
+            _text_file_in, _file_out, _language, _my_dir, _user_dir, _verbose
+        ):
+            print("I was unable to find the file you specified!")
     sys.exit(0)
 
 

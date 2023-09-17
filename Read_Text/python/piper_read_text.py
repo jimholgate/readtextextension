@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: UTF-8-*-
+#!/usr/bin/env python3
 APP_DESCRIPTION = r"""
 Piper TTS
 =========
@@ -160,8 +159,8 @@ class PiperTTSClass(object):
                 "de_DE-thorsten-medium",
                 "Der Regenbogen ist ein atmosphärisch-optisches Phänomen.",
             ],
-            ["en_US-arctic-medium", self.sample_phrase],
-            ["es_ES-davefx-medium", "Un arco iris es un fenómeno óptico."],
+            ["en_US-lessac-medium", self.sample_phrase],
+            ["es_ES-sharvard-medium", "Un arco iris es un fenómeno óptico."],
             ["fr_FR-upmc-medium", "Un arc-en-ciel est un phénomène optique."],
             [
                 "uk_UA-ukrainian_tts-medium",
@@ -725,7 +724,9 @@ Piper TTS
             return _response == 0
         return False
 
-    def update_local_model_dir(self, _dir="", _sub_dirs=True, do_pop_message=True) -> bool:
+    def update_local_model_dir(
+        self, _dir="", _sub_dirs=True, do_pop_message=True
+    ) -> bool:
         """Download the most recent `voices.json` file, and if `_sub_dirs` is
         `True` then add new model subdirectories to the local model
         directory."""
@@ -1125,7 +1126,12 @@ def main() -> None:
         sys.exit(0)
     # WPM = Approximate Words per minute if in English or a similar idiom'
     find_replace_phonemes.fix_up_text_file(
-        _text_file_in, "", _iso_lang, _piper_tts.local_dir, "PIPER_USER_DIRECTORY"
+        _text_file_in,
+        "",
+        _iso_lang,
+        _piper_tts.local_dir,
+        "PIPER_USER_DIRECTORY",
+        False,
     )
     _piper_tts.read(
         _text_file_in, _iso_lang, _config, netcommon.speech_wpm(_percent_rate)

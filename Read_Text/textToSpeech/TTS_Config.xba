@@ -94,8 +94,11 @@ Function SaveAsJsonDialog(_default As String) As String
 		.initialize(_file_picker_args())
 		.setMultiSelectionMode(False)
 		.SetDefaultName(_default)
+		.setValue(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_AUTOEXTENSION,0, true)
 		.appendFilter(&quot;JavaScript Object Notation (.json)&quot;, &quot;*.json&quot;)
 		.appendFilter(&quot;JavaScript (.js)&quot;, &quot;*.js&quot;)
+		.appendFilter(&quot;Pronunication Lexicon Specification (.lmxl)&quot;, &quot;*.lmxl&quot;) &apos; via IBM
+		.appendFilter(&quot;Pronunication Lexicon Specification (.xml)&quot;, &quot;*.xml&quot;)  &apos; generic
 		.CurrentFilter = &quot;JavaScript Object Notation (.json)&quot;
 		.setTitle(fsLookUpTerm2(_
 			&quot;s_speech-properties&quot;, fsDisplayLanguage()))
@@ -185,6 +188,7 @@ Sub SaveJsonPhonemeTable(Event)
 	Dim _json_display As String : _json_display = &quot;&quot;
 	Dim _language As String : _language = &quot;&quot;
 	Dim _model As String : _model = &quot;&quot;
+	Dim _ext As String : _ext = &quot;.json&quot;
 	Dim _control As Variant : _control = Split(converttourl(_
 	f_dlgJsonEdit.GetControl(&quot;_json_text&quot;).model.helpText), &quot;/&quot;)
 	Dim _default As String : _default =_control(Ubound(_
@@ -193,23 +197,33 @@ Sub SaveJsonPhonemeTable(Event)
 		Case MouseAlt
 			_default = _control(Ubound(_control))
 	End Select
+	_default = Split(_default, &quot;.&quot;)(0)
 	_out_file = SaveAsJsonDialog(_default)
 	If Len(_out_file) = 0 Then
 		Exit Sub
+	End If
+	If Instr(_out_file, &quot;.&quot;) &lt;&gt; 0 Then
+		_ext = Split(_out_file, &quot;.&quot;)(1)
 	End If
 	With f_dlgJsonEdit
 		_language = .GetControl(&quot;_test1&quot;).model.helpText
 		_model = .GetControl(&quot;_test2&quot;).model.helpText
 		_json_display = .GetControl(&quot;_json_text&quot;).model.Text
-		CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
-		Select Case _mouse_event
-			Case MouseAlt
-			&apos; Update json and remove duplicate items.
-			fbUpdateLexiconJsonFile(_language, _model, _out_file)
-			.GetControl(&quot;_json_text&quot;).visible = False
-			.GetControl(&quot;_json_text&quot;).model.Text = getTextFromFile(_out_file, &quot;UTF-8&quot;)
-			.GetControl(&quot;_json_text&quot;).visible = True	
-		End Select
+		Select Case Lcase(_ext)
+			Case &quot;js&quot;, &quot;json&quot;, &quot;txt&quot;
+			CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
+			Select Case _mouse_event
+				Case MouseAlt
+				&apos; Update json and remove duplicate items.
+				fbUpdateLexiconFile(_language, _model, _out_file)
+				.GetControl(&quot;_json_text&quot;).visible = False
+				.GetControl(&quot;_json_text&quot;).model.Text = getTextFromFile(_out_file, &quot;UTF-8&quot;)
+				.GetControl(&quot;_json_text&quot;).visible = True	
+			End Select
+			Case &quot;xml&quot;, &quot;lmxl&quot;
+				CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
+				fbUpdateLexiconFile(_language, _model, _out_file)
+		End Select 
 	End With
 End Sub
 
@@ -558,7 +572,7 @@ Function fsGitRawJson(_
 		If Len(_get) &lt;&gt; 0 Then
 			&apos; Update json and remove duplicate items
 			CreateFile(_temp_json, _get, &quot;UTF-8&quot;)
-			fbUpdateLexiconJsonFile(lang_region, json_dir, _temp_json)
+			fbUpdateLexiconFile(lang_region, json_dir, _temp_json)
 			fsGitRawJson = getTextFromFile(_temp_json, &quot;UTF-8&quot;)
 			fbRemoveFile(_temp_json)
 			If Len(fsGitRawJson) = 0 Then
