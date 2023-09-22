@@ -80,7 +80,7 @@ def fix_up_text_file(
         _ext = os.path.splitext(_file_out)[1]
     if _ext in [".json", ".js"]:
         _output_type = [0, 1, 2][1]
-    elif _ext in [".xml", ".lmxl", "xpls"]:
+    elif _ext in [".xml", ".lmxl", ".xpls", ".pls"]:
         _output_type = [0, 1, 2][2]
     _content2 = readtexttools.local_pronunciation(
         _language,

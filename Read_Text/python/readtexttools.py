@@ -135,83 +135,6 @@ except ImportError:
     pass
 
 LOOK_UPS = 0
-IPA_SUBSET = [
-    "+",
-    "-",
-    "=",
-    "(",
-    ")",
-    "ʕ",
-    "ʔ",
-    "b",
-    "β",
-    "c",
-    "ɕ",
-    "d",
-    "ð",
-    "f",
-    "ɸ",
-    "g",
-    "ɡ",
-    "ɣ",
-    "h",
-    "ɦ",
-    "j",
-    "ɟ",
-    "ʝ",
-    "k",
-    "l",
-    "ɭ",
-    "ʟ",
-    "m",
-    "ɱ",
-    "n",
-    "ɲ",
-    "ɳ",
-    "ŋ",
-    "ɴ",
-    "p",
-    "r",
-    "ɹ",
-    "ɻ",
-    "ʁ",
-    "s",
-    "ʂ",
-    "ʃ",
-    "t",
-    "θ",
-    "v",
-    "ʋ",
-    "w",
-    "ɰ",
-    "x",
-    "ɥ",
-    "z",
-    "ʑ",
-    "ʐ",
-    "ʒ",
-    "a",
-    "ɐ",
-    "ᴂ",
-    "ɑ",
-    "e",
-    "ə",
-    "ɜ",
-    "ɛ",
-    "i",
-    "ɪ",
-    "ɨ",
-    "o",
-    "ɒ",
-    "ɔ",
-    "ɵ",
-    "ʌ",
-    "u",
-    "ɯ",
-    "ʊ",
-    "ʉ",
-    "y",
-]
 
 
 def killall_process(_process=""):  # -> bool
@@ -3255,6 +3178,40 @@ def prefix_ohs(_int=1, _str_len=10, _symbol="0"):  # -> str
     _ohs = _str_len * _symbol
     return (_ohs + str(_int))[0 - _str_len :]
 
+# NOTE:
+# -----
+#
+# A particular model uses a subset of the International Phonetic Alphabet
+# (IPA). To check which symbols are supported in a specific language
+# model, consult the `phonemes` field in the `test_xx-xx.jsonl` at the
+# `rhasspy/piper` GitHub site.
+# [link](https://github.com/rhasspy/piper/tree/master/etc/test_sentences)
+#
+# Some language models allow you to embed phonetuc code inline with the text
+# using delimiters to signal that it is a code.
+#
+#     He [sed] that he was fine.
+#     He /sed/ that he was fine.
+#
+# Code example:
+#
+# <https://raw.githubusercontent.com/rhasspy/piper/master/etc/test_sentences/test_en-us.jsonl>
+
+def uses_international_phonetic_alphabet(_str_test=""):  # -> bool
+    '''Return True if `_str_test` uses the International Phonetic
+    Alphabet. IPA Extensions is a block (U+0250 to U+02AF) of the
+    Unicode standard.'''
+    if len(_str_test) == 0:
+        return False
+    _min = 592  # int("0250", 16)
+    _max = 687  # int("02AF", 16)
+    if len(_str_test) == 1:
+        _test = ord(_str_test)
+        return False if _test < _min else False if _test > _max else True
+    for _test in range(_min, _max):
+        if chr(_test) in _str_test:
+            return True
+    return False
 
 def local_pronunciation(
     iso_lang="en-CA",
@@ -3263,6 +3220,7 @@ def local_pronunciation(
     my_env="MACOS_SAY_USER_DIRECTORY",
     is_dev=False,
     _verbose=False,
+    _phonemic_alphabet="",
 ):  # -> list [str]
     """Given a language and region, compatible audible lexical code for
     localized words and phrases. If `is_dev` is `True`, then the last
@@ -3277,7 +3235,6 @@ def local_pronunciation(
     _imported_meta = ImportedMetaData()
     _used_graphemes = [""]
     _good_list = []
-    _ipa_test = "[/]ʔŋɾʃʒθðzɔəɝː"
     _user_dir = os.path.join(office_user_dir(), "config", "lexicons", my_dir)
     if my_env in os.environ:
         _user_dir = os.getenv(my_env)
@@ -3309,6 +3266,11 @@ file for `%(my_dir)s` was found."""
         return [text, _json_text]
     _date = time.strftime("%Y-%m-%d_%H:%M:%S")
     try:
+        _content = ""
+        with codecs.open(
+            _json_file, mode="r", encoding="utf-8", errors="replace"
+        ) as file_obj:
+            _content = file_obj.read()
         with codecs.open(
             _json_file, mode="r", encoding="utf-8", errors="replace"
         ) as file_obj:
@@ -3321,16 +3283,6 @@ file for `%(my_dir)s` was found."""
                     _xml_transform = XmlTransform()
                     _count_j = 0
                     _json_text = "{\n"
-                    _pls_text = (
-                        """<?xml version="1.0" encoding="UTF-8"?>
-<lexicon version="1.0"
-\txmlns="http://www.w3.org/2005/01/pronunciation-lexicon"
-\txmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-\txsi:schemaLocation="http://www.w3.org/2005/01/pronunciation-lexicon http://www.w3.org/TR/2007/CR-pronunciation-lexicon-20071212/pls.xsd"
-\talphabet="ipa" xml:lang="%(iso_lang)s">
-<!-- REVISION: %(_date)s -->"""
-                        % locals()
-                    )
                     _footnotes = [
                         """    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},"""
                         % locals(),
@@ -3339,6 +3291,26 @@ file for `%(my_dir)s` was found."""
                         "}",
                         "",
                     ]
+                    do_ipa_test = uses_international_phonetic_alphabet(_content)
+                    _comment = "Phonemic alphabet: %(_phonemic_alphabet)s"
+                    if len(_phonemic_alphabet) == 0:
+                        if do_ipa_test:
+                            _comment = "https://en.wikipedia.org/wiki/International_Phonetic_Alphabet"
+                            _phonemic_alphabet = "ipa"
+                        else:
+                            _comment = "https://en.wikipedia.org/wiki/X-SAMPA"
+                            _phonemic_alphabet = "x-sampa"
+                    _pls_text = (
+                        """<?xml version="1.0" encoding="UTF-8"?>
+<lexicon version="1.0"
+\txmlns="http://www.w3.org/2005/01/pronunciation-lexicon"
+\txmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+\txsi:schemaLocation="http://www.w3.org/2005/01/pronunciation-lexicon http://www.w3.org/TR/2007/CR-pronunciation-lexicon-20071212/pls.xsd"
+\talphabet="%(_phonemic_alphabet)s" xml:lang="%(iso_lang)s">
+<!-- REVISION: %(_date)s
+%(_comment)s -->"""
+                        % locals()
+                    )
                     for _item in data:
                         _grapheme = _json_tools.sanitize_json(data[_item]["g"])
                         _phoneme = _json_tools.sanitize_json(data[_item]["p"])
@@ -3354,15 +3326,26 @@ file for `%(my_dir)s` was found."""
                         )
                         _grapheme = _xml_transform.clean_for_xml(data[_item]["g"])
                         _alias = _xml_transform.clean_for_xml(data[_item]["p"])
-                        # W3C / World Wide Web Consortium
+                        # W3C -> World Wide Web Consortium
                         _apre = "</grapheme>\n\t\t<alias>"
                         _apost = "</alias>\n\t</lexeme>"
-                        for _letter in _ipa_test:
-                            if _letter in _alias:
-                                # W3C / wɝːld waɪd web kənˈsɔːr.ʃəm
+                        if do_ipa_test:
+                            if (_alias.startswith("[") and _alias.endswith("]")) or (
+                                _alias.startswith("/") and _alias.endswith("/")
+                            ):
+                                # IPA or X-SAMPA
+                                # said -> [sed] or said -> /sed/
+                                _alias = _alias[:-1][1:]
                                 _apre = "</grapheme>\n\t\t<phoneme>"
                                 _apost = "</phoneme>\n\t</lexeme>"
-                                break
+                                do_ipa_test = False
+                        if do_ipa_test:
+                            for _letter in _alias:
+                                if uses_international_phonetic_alphabet(_letter):
+                                    # W3C -> wɝːld waɪd web kənˈsɔːr.ʃəm
+                                    _apre = "</grapheme>\n\t\t<phoneme>"
+                                    _apost = "</phoneme>\n\t</lexeme>"
+                                    break
                         _pls_text = "".join(
                             [
                                 _pls_text,

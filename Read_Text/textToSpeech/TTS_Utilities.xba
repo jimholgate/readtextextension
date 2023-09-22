@@ -5093,7 +5093,10 @@ Sub windowsSAPIControl(Event As Object)
 				Case 0
 				&apos;pass
 				Case MouseAlt
-				If fbIsLibreOffice() Then
+				&apos; LibreOffice for MacOS only supports phonemic substitution with json if
+				&apos; python is enabled.
+				If fbIsLibreOffice() and Instr(_
+				fsProgramCommand, AppleScriptPath()) = 0 Then
 					EditJsonPhonemeTable()
 				End If
 				Case Else

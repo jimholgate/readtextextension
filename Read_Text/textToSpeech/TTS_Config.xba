@@ -87,24 +87,30 @@ Function SaveAsJsonDialog(_default As String) As String
 	Dim _file_list As Object
 	SaveAsJsonDialog = &quot;&quot;
 	Dim _file_picker_args As Variant : _file_picker_args = Array(_
-	com.sun.star.ui.dialogs.TemplateDescription.FILESAVE_SIMPLE)	
+	com.sun.star.ui.dialogs.TemplateDescription.FILESAVE_AUTOEXTENSION)	
 	Dim oDlg As Object : oDlg = createUnoService(_
 	&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
 	With oDlg
 		.initialize(_file_picker_args())
 		.setMultiSelectionMode(False)
 		.SetDefaultName(_default)
-		.setValue(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_AUTOEXTENSION,0, true)
 		.appendFilter(&quot;JavaScript Object Notation (.json)&quot;, &quot;*.json&quot;)
 		.appendFilter(&quot;JavaScript (.js)&quot;, &quot;*.js&quot;)
 		.appendFilter(&quot;Pronunication Lexicon Specification (.lmxl)&quot;, &quot;*.lmxl&quot;) &apos; via IBM
+		.appendFilter(&quot;Pronunication Lexicon Specification (.pls)&quot;, &quot;*.pls&quot;) &apos; Accessible ePub 3 book
 		.appendFilter(&quot;Pronunication Lexicon Specification (.xml)&quot;, &quot;*.xml&quot;)  &apos; generic
 		.CurrentFilter = &quot;JavaScript Object Notation (.json)&quot;
+		.SetValue(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_AUTOEXTENSION, 0, True)
+		.SetValue(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_PASSWORD, 0, False)
+		.EnableControl(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_PASSWORD, False)
 		.setTitle(fsLookUpTerm2(_
 			&quot;s_speech-properties&quot;, fsDisplayLanguage()))
 		If .execute() then
 			_file_list = .getFiles()
 			SaveAsJsonDialog = _file_list(0)
+			If Instr(SaveAsJsonDialog, &quot;.&quot;) = 0 Then
+				SaveAsJsonDialog = SaveAsJsonDialog &amp; &quot;.json&quot;
+			End If
 		End If
 	End With
 End Function
@@ -188,7 +194,7 @@ Sub SaveJsonPhonemeTable(Event)
 	Dim _json_display As String : _json_display = &quot;&quot;
 	Dim _language As String : _language = &quot;&quot;
 	Dim _model As String : _model = &quot;&quot;
-	Dim _ext As String : _ext = &quot;.json&quot;
+	Dim _ext As String : _ext = &quot;json&quot;
 	Dim _control As Variant : _control = Split(converttourl(_
 	f_dlgJsonEdit.GetControl(&quot;_json_text&quot;).model.helpText), &quot;/&quot;)
 	Dim _default As String : _default =_control(Ubound(_
@@ -197,12 +203,14 @@ Sub SaveJsonPhonemeTable(Event)
 		Case MouseAlt
 			_default = _control(Ubound(_control))
 	End Select
-	_default = Split(_default, &quot;.&quot;)(0)
-	_out_file = SaveAsJsonDialog(_default)
+	_out_file = SaveAsJsonDialog(Split(_default, &quot;.&quot;)(0))
 	If Len(_out_file) = 0 Then
 		Exit Sub
 	End If
-	If Instr(_out_file, &quot;.&quot;) &lt;&gt; 0 Then
+	If Instr(_out_file, &quot;.&quot;) = 0 Then
+		_ext = &quot;json&quot;
+		_out_file = _out_file &amp; &quot;.&quot; &amp; _ext
+	Else
 		_ext = Split(_out_file, &quot;.&quot;)(1)
 	End If
 	With f_dlgJsonEdit
@@ -210,7 +218,7 @@ Sub SaveJsonPhonemeTable(Event)
 		_model = .GetControl(&quot;_test2&quot;).model.helpText
 		_json_display = .GetControl(&quot;_json_text&quot;).model.Text
 		Select Case Lcase(_ext)
-			Case &quot;js&quot;, &quot;json&quot;, &quot;txt&quot;
+			Case &quot;js&quot;, &quot;json&quot;, &quot;&quot;
 			CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
 			Select Case _mouse_event
 				Case MouseAlt
@@ -220,7 +228,7 @@ Sub SaveJsonPhonemeTable(Event)
 				.GetControl(&quot;_json_text&quot;).model.Text = getTextFromFile(_out_file, &quot;UTF-8&quot;)
 				.GetControl(&quot;_json_text&quot;).visible = True	
 			End Select
-			Case &quot;xml&quot;, &quot;lmxl&quot;
+			Case &quot;xml&quot;, &quot;pls&quot;, &quot;lmxl&quot;
 				CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
 				fbUpdateLexiconFile(_language, _model, _out_file)
 		End Select 
