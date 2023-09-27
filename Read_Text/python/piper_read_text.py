@@ -973,7 +973,7 @@ four quality levels:
 Some models contain multiple speakers. The quality of one of the speakers
 could be less than it would be using a single speaker model. Contributors
 and researchers record samples under different conditions, so some voices
-might have issues ike background noise and distortion irrespective of the
+might have issues like background noise and distortion irrespective of the
 stated quality level.
 
 Git clone

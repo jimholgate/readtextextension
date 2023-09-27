@@ -2298,11 +2298,13 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	Dim bIsAppImage As Boolean : bIsAppImage = False
 	Dim bEnableLocalHostRate As Boolean : bEnableLocalHostRate = True
 	Dim sGetOS As String : sGetOS = fsGetOS()
+	Dim local_suggestion As String
 	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then bIsAppImage = True
 	CR = Chr(10)
 	s1 = CR
 	s3 = &quot;&quot;
 	s4 = &quot;&quot;
+	local_suggestion = &quot;&quot;
 	Dim bEnableRate As Boolean
 	bEnableRate = True
 	sLanguage = LCase(fsGetLanguage())
@@ -2541,6 +2543,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 	End If
 	If fbPiperTtsOk(&quot;&quot;) Then
+		local_suggestion = PiperLocalSuggestion(&quot;&quot;)
 		Redim _opts : _opts = Array(_
 		&quot; --rate 125% --voice AUTO1#4&quot;,_
 		&quot; --rate 100% --voice AUTO1#0&quot;,_
@@ -2548,7 +2551,9 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		&quot; --voice en_US-lessac-high#0&quot;,_
 		&quot; --voice en_US-arctic-medium#jmk&quot;,_
 		&quot; --voice en_GB-vctk-medium#p278&quot;,_
-		&quot; --voice &quot; &amp; PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0&quot;, _
+		&quot; --rate 125% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
+		&quot; --rate 100% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
+		&quot; --rate 75% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
 		&quot; --update True&quot;,_
 		&quot;&quot;)
 		For n = Lbound(_opts) to Ubound(_opts)
