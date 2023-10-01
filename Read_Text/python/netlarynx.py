@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
+"""Support Larynx Text to Speech using a localhost server."""
 import os
 import platform
 import netcommon
@@ -142,8 +143,7 @@ class LarynxClass(object):
             return True
         try:
             self.common.set_urllib_timeout(1)
-            response = urllib.request.urlopen(
-                "".join([self.url, "/api/vocoders"]))
+            response = urllib.request.urlopen("".join([self.url, "/api/vocoders"]))
             data_response = response.read()
             data = json.loads(data_response)
         except TimeoutError:
@@ -265,8 +265,7 @@ Try restarting `larynx-server`."""
         _lang2 = iso_lang.lower().split("-")[0].split("_")[0]
         data = {}
         try:
-            response = urllib.request.urlopen(
-                "".join([self.url, "/api/voices"]))
+            response = urllib.request.urlopen("".join([self.url, "/api/voices"]))
             data_response = response.read()
             data = json.loads(data_response)
         except urllib.error.URLError:
@@ -303,18 +302,15 @@ can synthesize speech privately using <{_eurl}>."""
             if data[_item]["downloaded"]:
                 self.accept_voice.append(data[_item]["name"])
                 if _lang1 in data[_item]["language"]:
-                    larynx_names = "".join(
-                        [larynx_names, "\n", data[_item]["name"]])
+                    larynx_names = "".join([larynx_names, "\n", data[_item]["name"]])
                 elif _lang2 == data[_item]["language"].split("-")[0].split("_")[0]:
-                    larynx_names = "".join(
-                        [larynx_names, "\n", data[_item]["name"]])
+                    larynx_names = "".join([larynx_names, "\n", data[_item]["name"]])
         larynx_names = larynx_names.strip()
         _vox = vox.lower()
         if _vox in larynx_names.split("\n"):
             _verified_name = _vox
         else:
-            _verified_name = self._spd_voice_to_larynx_voice(
-                _vox, larynx_names)
+            _verified_name = self._spd_voice_to_larynx_voice(_vox, larynx_names)
         if _verified_name in self.larynx_v1:
             _logo = "".join([" \u263B  (", self.default_lang, ")"])
         else:
@@ -449,9 +445,7 @@ Loading larynx voices for `{_lang2}`
         self.common.set_urllib_timeout(_ok_wait)
         _vocoder = urllib.parse.quote(_vocoder)
         _voice = urllib.parse.quote(_voice)
-        my_url = (
-            f"""{_url}?voice={_voice}&vocoder={_vocoder}&denoiserStrength={_denoiser_strength}&noiseScale={_noise_scale}&lengthScale={_length_scale}&ssml={_ssml}"""
-        )
+        my_url = f"""{_url}?voice={_voice}&vocoder={_vocoder}&denoiserStrength={_denoiser_strength}&noiseScale={_noise_scale}&lengthScale={_length_scale}&ssml={_ssml}"""
         try:
             _strips = "\n .;"
             _text = "\n".join(["", _text.strip(_strips), ""])
@@ -558,8 +552,7 @@ Loading larynx voices for `{_lang2}`
         if ssml:
             _ssml = "true"
         _url = "".join([self.url, "/api/tts"])
-        _rate_length_scale = self.common.rate_to_rhasspy_length_scale(
-            _speech_rate)
+        _rate_length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)
         if len(_rate_length_scale[1]) != 0:
             print(
                 "".join(
@@ -606,9 +599,7 @@ Loading larynx voices for `{_lang2}`
             elif "." in _media_out and _tries != 0:
                 _ext = os.path.splitext(_media_out)[1]
                 _no = readtexttools.prefix_ohs(_tries, 10, "0")
-                _media_out = _media_out.replace(
-                    f".{_ext}", f"_{_no}.{_ext}"
-                )
+                _media_out = _media_out.replace(f".{_ext}", f"_{_no}.{_ext}")
             _tries += 1
             _done = self._try_requests(
                 _voice,

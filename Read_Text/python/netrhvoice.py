@@ -1,11 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: UTF-8-*-
+"""Module supporting Docker rhvoice-rest speech synthesis."""
 import os
 import platform
 import tempfile
+
 try:
     import urllib
     import json
+
     BASICS_OK = True
 except ImportError:
     BASICS_OK = False
@@ -142,8 +145,7 @@ class RhvoiceLocalHost(object):
         voice_lib = data["rhvoice_wrapper_voices_info"]
         key_list = []
         return_list = []
-        self.accept_voice.extend(
-            netcommon.spd_voice_list(0, 100, ["female", "male"]))
+        self.accept_voice.extend(netcommon.spd_voice_list(0, 100, ["female", "male"]))
         for _item in voice_lib:
             key_list.append(_item)
             self.accept_voice.append(_item)
@@ -151,22 +153,20 @@ class RhvoiceLocalHost(object):
         try:
             for _key in key_list:
                 _iso = "".join(
-                    [voice_lib[_key]["lang"], "-", voice_lib[_key]["country"]])
+                    [voice_lib[_key]["lang"], "-", voice_lib[_key]["country"]]
+                )
                 for iso_c in [["-NaN", ""], ["-UK", "-UA"]]:
                     _iso = _iso.replace(iso_c[0], iso_c[1])
-                return_list.append([
-                    _iso, voice_lib[_key]["gender"],
-                    voice_lib[_key]["name"].lower()
-                ])
+                return_list.append(
+                    [_iso, voice_lib[_key]["gender"], voice_lib[_key]["name"].lower()]
+                )
         except KeyError:
             return _default_list
         self.checklist = return_list
         self.ok = True
         return self.checklist
 
-    def language_supported(self,
-                           _iso_lang="en-US",
-                           alt_local_url="") -> bool:
+    def language_supported(self, _iso_lang="en-US", alt_local_url="") -> bool:
         """Is the language or voice supported in rhvoice rest?
         + `iso_lang` can be in the form `en-US` or `en`."""
         _found_name = ""
@@ -174,8 +174,10 @@ class RhvoiceLocalHost(object):
             self.url = alt_local_url
         if self.ok:
             return self.ok
-        if (int(platform.python_version_tuple()[0]) < 3
-                or int(platform.python_version_tuple()[1]) < 8):
+        if (
+            int(platform.python_version_tuple()[0]) < 3
+            or int(platform.python_version_tuple()[1]) < 8
+        ):
             self.ok = False
             return self.ok
         if not bool(self.verified_voices):
@@ -203,18 +205,19 @@ class RhvoiceLocalHost(object):
         if self.ok:
             help_heading = self.help_heading
             help_url = self.help_url
-            print(f"""
+            print(
+                f"""
 Checking {help_heading} voices for `{_iso_lang}`
 ========================================
 
 <{help_url}>
-""")
+"""
+            )
         return self.ok
 
-    def rhvoice_voice(self,
-                      _voice="female1",
-                      _iso_lang="en-US",
-                      _prefer_gendered_fallback=True) -> str:
+    def rhvoice_voice(
+        self, _voice="female1", _iso_lang="en-US", _prefer_gendered_fallback=True
+    ) -> str:
         """If the Rhvoice API includes the voice description, return a
         rhvoice voice description like `cmu-bdl-hsmm`, otherwise return
         `''`."""
@@ -244,8 +247,8 @@ Checking {help_heading} voices for `{_iso_lang}`
                 if _row[i_lang].startswith(_found_locale):
                     last_match = _row[i_name]
                     for _standard in [
-                            _row[i_gender],
-                            "".join(["child_", _row[i_gender]]),
+                        _row[i_gender],
+                        "".join(["child_", _row[i_gender]]),
                     ]:
                         _add_name = ""
                         if _voice.startswith(_standard):
@@ -306,10 +309,9 @@ Checking {help_heading} voices for `{_iso_lang}`
         if os.path.isfile(_media_work):
             os.remove(_media_work)
         _view_json = self.debug and 1
-        response = readtexttools.local_pronunciation(_iso_lang, _text,
-                                                     "rhvoice",
-                                                     "RHVOICE_USER_DIRECTORY",
-                                                     _view_json)
+        response = readtexttools.local_pronunciation(
+            _iso_lang, _text, "rhvoice", "RHVOICE_USER_DIRECTORY", _view_json
+        )
         _text = response[0]
         if _view_json:
             print(response[1])
@@ -327,9 +329,7 @@ Checking {help_heading} voices for `{_iso_lang}`
             # Not all Rhvoice voices use ascii. i. e.: Portuguese
             # q_voice=let%C3%ADcia
             q_voice = urllib.parse.quote(_voice)
-            _body_data = (
-                f"format={_audio_format}&rate={_length_scale}&pitch=50&volume=50&voice={q_voice}&text="
-            )
+            _body_data = f"format={_audio_format}&rate={_length_scale}&pitch=50&volume=50&voice={q_voice}&text="
             # _method = "GET"
             _strips = "\n .;"
             self.common.set_urllib_timeout(_ok_wait)
@@ -348,11 +348,10 @@ Checking {help_heading} voices for `{_iso_lang}`
                     return True
                 if len(_item.strip(_strips)) == 0:
                     continue
-                elif "." in _media_out and _tries != 0:
-                    _ext = os.path.splittext(_media_out)[1]
+                if "." in _media_out and _tries != 0:
+                    _ext = os.path.splitext(_media_out)[1]
                     _no = readtexttools.prefix_ohs(_tries, 10, "0")
-                    _media_out = _media_out.replace(
-                        f".{_ext}", f"_{_no}.{_ext}")
+                    _media_out = _media_out.replace(f".{_ext}", f"_{_no}.{_ext}")
                 _item = "\n".join(["", _item.strip(_strips), ""])
                 # The API uses GET and a `text` argument for text
 
@@ -364,8 +363,8 @@ Checking {help_heading} voices for `{_iso_lang}`
                     req = urllib.request.Request(my_url)
                     resp = urllib.request.urlopen(req)
                     response_content = resp.read()
-                    with open(_media_work, "wb") as f:
-                        f.write(response_content)
+                    with open(_media_work, "wb") as _handle:
+                        _handle.write(response_content)
                     if os.path.isfile(_media_work):
                         _done = os.path.getsize(_media_work) != 0
                 except:

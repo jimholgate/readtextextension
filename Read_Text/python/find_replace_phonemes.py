@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
+"""Modify strings of text using JSON coded graphemes and phonemes"""
 import getopt
 import os
 import sys

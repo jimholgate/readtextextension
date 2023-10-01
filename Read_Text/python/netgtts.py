@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
+"""A client of the gtts python library
+
+Powered by Google\u2122
+
+"Google", "Google Cloud", "Google Translate" and the stylized "G" logo are
+trademarks of Google Inc.
+
+The contents of this resource are not affiliated with, sponsored by, or endorsed
+by Google nor does the documention represent the views or opinions of Google or
+Google personnel.
+"""
 import os
 import sys
 import netcommon
@@ -55,9 +66,7 @@ class GoogleTranslateClass(object):
     def __init__(self):  # -> None
         """Initialize data"""
         self.ok = True
-        self.accept_voice = [
-            "", "all", "auto", "child_female", "child_male", "gtts"
-        ]
+        self.accept_voice = ["", "all", "auto", "child_female", "child_male", "gtts"]
         self.translator = "Google"
         self.translator_domain = self.translator.lower()
         self.default_extension = ".mp3"
@@ -83,13 +92,11 @@ class GoogleTranslateClass(object):
             return self.ok
         _test_version = self.version()
         try:
-            self.ok = float(".".join(
-                _test_version.split(".")[:2])) >= minimum_version
+            self.ok = float(".".join(_test_version.split(".")[:2])) >= minimum_version
         except (AttributeError, IndexError, ValueError):
             self.ok = False
         _commons = netcommon.LocalCommons()
-        self.accept_voice.extend(
-            netcommon.spd_voice_list(0, 100, ["female", "male"]))
+        self.accept_voice.extend(netcommon.spd_voice_list(0, 100, ["female", "male"]))
         return self.ok
 
     def read(
@@ -142,13 +149,14 @@ class GoogleTranslateClass(object):
         _env_lang = readtexttools.default_lang()
         _domain = self.translator_domain
         _provider = self.translator
-        _provider_logo = f"/usr/share/icons/hicolor/scalable/apps/goa-account-{_domain}.svg)"
+        _provider_logo = (
+            f"/usr/share/icons/hicolor/scalable/apps/goa-account-{_domain}.svg)"
+        )
         if not os.path.isfile(_provider_logo):
             # Modified high contrast icon - GNU LESSER GENERAL PUBLIC LICENSE
             # Version 3, 29 June 2007
             # https://raw.githubusercontent.com/shgysk8zer0/adwaita-icons/master/LICENSE
-            _provider_logo = readtexttools.app_icon_image(
-                "goa-account-google_hc.svg")
+            _provider_logo = readtexttools.app_icon_image("goa-account-google_hc.svg")
         for _dash in ["-", "_"]:
             if _dash in _iso_lang:
                 _lang = _iso_lang.split(_dash)[0]
@@ -160,126 +168,26 @@ class GoogleTranslateClass(object):
         except (NameError, TypeError):
             self.ok = False
         domain_table = [
-            {
-                "domain": "com.au",
-                "iso_code": "AU",
-                "lang1": "en",
-                "lang2": "zh-CN"
-            },
-            {
-                "domain": "co.uk",
-                "iso_code": "GB",
-                "lang1": "en",
-                "lang2": "pl"
-            },
-            {
-                "domain": "ca",
-                "iso_code": "CA",
-                "lang1": "en",
-                "lang2": "fr"
-            },
-            {
-                "domain": "co.nz",
-                "iso_code": "NZ",
-                "lang1": "en",
-                "lang2": "zh-CN"
-            },
-            {
-                "domain": "com.hk",
-                "iso_code": "CN",
-                "lang1": "zh",
-                "lang2": "en"
-            },
-            {
-                "domain": "com.hk",
-                "iso_code": "HK",
-                "lang1": "zh",
-                "lang2": "en"
-            },
-            {
-                "domain": "com.hk",
-                "iso_code": "MO",
-                "lang1": "zh",
-                "lang2": "pt"
-            },
-            {
-                "domain": "com.tw",
-                "iso_code": "TW",
-                "lang1": "zh-TW",
-                "lang2": "en"
-            },
-            {
-                "domain": "co.in",
-                "iso_code": "IN",
-                "lang1": "hi",
-                "lang2": "en"
-            },
-            {
-                "domain": "ie",
-                "iso_code": "IE",
-                "lang1": "en",
-                "lang2": "pl"
-            },
-            {
-                "domain": "co.za",
-                "iso_code": "ZA",
-                "lang1": "af",
-                "lang2": "en"
-            },
-            {
-                "domain": "fr",
-                "iso_code": "FR",
-                "lang1": "fr",
-                "lang2": "ar"
-            },
-            {
-                "domain": "com.br",
-                "iso_code": "BR",
-                "lang1": "pt",
-                "lang2": "de"
-            },
-            {
-                "domain": "pt",
-                "iso_code": "PT",
-                "lang1": "pt",
-                "lang2": "en"
-            },
-            {
-                "domain": "com.mx",
-                "iso_code": "MX",
-                "lang1": "es",
-                "lang2": "en"
-            },
-            {
-                "domain": "es",
-                "iso_code": "ES",
-                "lang1": "es",
-                "lang2": "ca"
-            },
-            {
-                "domain": "ar",
-                "iso_code": "AR",
-                "lang1": "es",
-                "lang2": "en"
-            },
-            {
-                "domain": "ci",
-                "iso_code": "CI",
-                "lang1": "es",
-                "lang2": "en"
-            },
-            {
-                "domain": "ru",
-                "iso_code": "RU",
-                "lang1": "ru",
-                "lang2": "uk"
-            },
-            {
-                "domain": "com.ua",
-                "iso_code": "UA",
-                "lang1": "uk",
-                "lang2": "ru"
-            },
+            {"domain": "com.au", "iso_code": "AU", "lang1": "en", "lang2": "zh-CN"},
+            {"domain": "co.uk", "iso_code": "GB", "lang1": "en", "lang2": "pl"},
+            {"domain": "ca", "iso_code": "CA", "lang1": "en", "lang2": "fr"},
+            {"domain": "co.nz", "iso_code": "NZ", "lang1": "en", "lang2": "zh-CN"},
+            {"domain": "com.hk", "iso_code": "CN", "lang1": "zh", "lang2": "en"},
+            {"domain": "com.hk", "iso_code": "HK", "lang1": "zh", "lang2": "en"},
+            {"domain": "com.hk", "iso_code": "MO", "lang1": "zh", "lang2": "pt"},
+            {"domain": "com.tw", "iso_code": "TW", "lang1": "zh-TW", "lang2": "en"},
+            {"domain": "co.in", "iso_code": "IN", "lang1": "hi", "lang2": "en"},
+            {"domain": "ie", "iso_code": "IE", "lang1": "en", "lang2": "pl"},
+            {"domain": "co.za", "iso_code": "ZA", "lang1": "af", "lang2": "en"},
+            {"domain": "fr", "iso_code": "FR", "lang1": "fr", "lang2": "ar"},
+            {"domain": "com.br", "iso_code": "BR", "lang1": "pt", "lang2": "de"},
+            {"domain": "pt", "iso_code": "PT", "lang1": "pt", "lang2": "en"},
+            {"domain": "com.mx", "iso_code": "MX", "lang1": "es", "lang2": "en"},
+            {"domain": "es", "iso_code": "ES", "lang1": "es", "lang2": "ca"},
+            {"domain": "ar", "iso_code": "AR", "lang1": "es", "lang2": "en"},
+            {"domain": "ci", "iso_code": "CI", "lang1": "es", "lang2": "en"},
+            {"domain": "ru", "iso_code": "RU", "lang1": "ru", "lang2": "uk"},
+            {"domain": "com.ua", "iso_code": "UA", "lang1": "uk", "lang2": "ru"},
         ]
         for i in range(len(domain_table)):
             if domain_table[i]["iso_code"] == _region.upper():
@@ -292,10 +200,12 @@ class GoogleTranslateClass(object):
         # Determine the output file name
         _media_out = readtexttools.get_work_file_path(_out_path, _icon, "OUT")
         # Determine the temporary file name
-        _media_work = "".join([
-            readtexttools.get_work_file_path(_out_path, _icon, "TEMP"),
-            self.default_extension,
-        ])
+        _media_work = "".join(
+            [
+                readtexttools.get_work_file_path(_out_path, _icon, "TEMP"),
+                self.default_extension,
+            ]
+        )
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
                 return True
@@ -305,8 +215,7 @@ class GoogleTranslateClass(object):
         if os.path.isfile(_media_out):
             os.remove(_media_out)
         _max_words = 20
-        _short_text = "%20".join(
-            _text.replace("+", "%2B").split(" ")[:_max_words])
+        _short_text = "%20".join(_text.replace("+", "%2B").split(" ")[:_max_words])
 
         for _punctuation in "\n.?!":
             if _punctuation in _short_text:
@@ -318,9 +227,7 @@ class GoogleTranslateClass(object):
         if readtexttools.have_posix_app("osascript", False):
             _msg = f"https://translate.{_domain}.{_tld}"
         else:
-            _msg = (
-                f"`<https://translate.{_domain}.{_tld}?&langpair=auto|{_lang2}&tbb=1&ie=&hl={_env_lang}&text={_short_text}>"
-                )
+            _msg = f"`<https://translate.{_domain}.{_tld}?&langpair=auto|{_lang2}&tbb=1&ie=&hl={_env_lang}&text={_short_text}>"
         if not self.language_supported(_iso_lang):
             # Fallback: display a link to translate using Google Translate.
             readtexttools.pop_message(
@@ -335,8 +242,9 @@ class GoogleTranslateClass(object):
             tts = gtts.gTTS(_text, _tld, _lang, _slow, _lang_check)
             tts.save(_media_work)
             if os.path.isfile(_media_work):
-                readtexttools.pop_message(f"`gtts-{_version}`",
-                                          _msg, 5000, _provider_logo, 0)
+                readtexttools.pop_message(
+                    f"`gtts-{_version}`", _msg, 5000, _provider_logo, 0
+                )
         except gtts.tts.gTTSError:
             readtexttools.pop_message(
                 f"`gtts-{_version}` failed to connect.",
@@ -359,8 +267,8 @@ class GoogleTranslateClass(object):
             self.ok = False
             return False
         if os.path.isfile(_media_work) and _post_process in [
-                "process_mp3_media",
-                "process_audio_media",
+            "process_mp3_media",
+            "process_audio_media",
         ]:
             if os.path.getsize(_media_work) == 0:
                 return False
@@ -380,8 +288,9 @@ class GoogleTranslateClass(object):
             _msg = "Could not play a network media file locally. Try `pip3 install gTTS gTTS-token`."
             if bool(_media_out):
                 _msg = "Could not save a network media file locally. Try `pip3 install gTTS gTTS-token`."
-            readtexttools.pop_message(f"Python `gtts-{_version}`",
-                                      _msg, 5000, _error_icon, 1)
+            readtexttools.pop_message(
+                f"Python `gtts-{_version}`", _msg, 5000, _error_icon, 1
+            )
         self.ok = False
         return False
 

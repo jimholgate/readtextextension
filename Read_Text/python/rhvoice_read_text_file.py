@@ -423,38 +423,38 @@ class RhVoiceClass(object):
                 pass
         return ""
 
+
     def language_to_voice(self, iso_lang="en-US", _check_list=None) -> str:
         """Check if the library supports the language or voice.
         If so, return a voice in the language, otherwise return
         `''`."""
         test_lang = ""
-        test_region = ""
         try:
             for sep in ["-", "_"]:
                 if sep in iso_lang:
                     test_lang = iso_lang.split(sep)[0]
-                    test_region = iso_lang.split(sep)[1]
                     break
         except (AttributeError, NameError):
             return ""
         try:
-            domain_table = self.domain_table
+            _domain = self.domain_table
+            _len = len(_domain)
             _tld = ""
             _lang1 = ""
             _region = ""
             _voices = [""]
-            for i in range(len(domain_table)):
+            for i in range(_len):
                 _region = "-".join(
-                    [domain_table[i]["lang1"], domain_table[i]["iso_code"]]
+                    [_domain[i]["lang1"], _domain[i]["iso_code"]]
                 )
                 if _region.strip() == iso_lang.strip():
-                    return self.first_good_voice(domain_table[i]["voices"])
-            for i in range(len(domain_table)):
-                if domain_table[i]["lang1"] == test_lang.lower():
-                    _tld = domain_table[i]["package"]
-                    _lang1 = domain_table[i]["lang1"]
-                    _region = "-".join([_lang1, domain_table[i]["iso_code"]])
-                    _voices = domain_table[i]["voices"]
+                    return self.first_good_voice(_domain[i]["voices"])
+            for i in range(_len):
+                if _domain[i]["lang1"] == test_lang.lower():
+                    _tld = _domain[i]["package"]
+                    _lang1 = _domain[i]["lang1"]
+                    _region = "-".join([_lang1, _domain[i]["iso_code"]])
+                    _voices = _domain[i]["voices"]
                     break
             for _test in [iso_lang, test_lang]:
                 if len(_voices[0]) == 0:

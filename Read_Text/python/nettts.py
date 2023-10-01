@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
+"""Use Coqui AI speech synthesis on supported python platforms."""
 import os
 import re
 import sys
 import time
 import tempfile
+
 try:
     import urllib
+
     BASICS_OK = True
 except ImportError:
     BASICS_OK = False
@@ -15,11 +18,11 @@ import readtexttools
 
 
 class CoquiDemoLocalHost(object):
-    '''# CoquiAI TTS
+    """# CoquiAI TTS
 
     The [TTS engine](https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu)
     provides a local http service to convert text that you select to speech.
-    
+
     The TTS server is powered by python. You can use `pip3`, `pipx`, `git`
     or a docker image to download it. For testing, I used Ubuntu 22.04 LTS
     and installed the TTS library using `pipx`.
@@ -36,7 +39,7 @@ class CoquiDemoLocalHost(object):
 
     Example server commands:
 
-    * Default `tts-server` 
+    * Default `tts-server`
     * English `tts-server --model_name tts_models/en/vctk/vits`
     * French `tts-server --model_name tts_models/fr/css10/vits`
     * Spanish `tts-server --model_name tts_models/es/css10/vits`
@@ -59,7 +62,7 @@ class CoquiDemoLocalHost(object):
     `--vocoder_checkpoint /path/to/vocoder/model.pth `
     `--vocoder_config /path/to/vocoder/config.json`
 
-    ReadText Client 
+    ReadText Client
     ---------------
 
     Some voice models require system files that are not explicitly stated
@@ -71,7 +74,7 @@ class CoquiDemoLocalHost(object):
     Ubuntu distributions you can use:
 
         `sudo apt-get install python3-bs4 python3-pip espeak-ng`
-    
+
     Optionally, install `spacy` and the associated `spacy` text parsing
     packages for your language using `pipx`. Using the current long term
     support Ubuntu distribution, this allows the Read Text Extension to
@@ -87,7 +90,7 @@ class CoquiDemoLocalHost(object):
     The client will not work unless the server is configured correctly and
     is running. You can check the server by navigating to the local server
     [demo page](http://[::1]:5002/).
-    
+
     Docker
     ------
 
@@ -97,7 +100,7 @@ class CoquiDemoLocalHost(object):
     `docker run --rm -it -p 5002:5002 --entrypoint /bin/bash ghcr.io/coqui-ai/tts-cpu`
 
     The official TTS server documentation lists equivalent docker commands
-    for specific computer hardware configurations - like the GPU or CPU 
+    for specific computer hardware configurations - like the GPU or CPU
     architecture.
 
     Pipx
@@ -154,13 +157,12 @@ class CoquiDemoLocalHost(object):
     * Some models will only work if you are running soffice as a
       native application, not as a snap or flatpak. This is because for
       some TTS models, this client uses the system `bs4` (Beautiful
-      Soup) python library to check for languages or voices.
-'''
+      Soup) python library to check for languages or voices."""
 
     def __init__(self):  # -> None
-        '''A docker image doesn't expose details of the directory structure
+        """A docker image doesn't expose details of the directory structure
         to the tts host's API, so functions in the parent that rely on a
-        specific file path do not work.'''
+        specific file path do not work."""
         _common = netcommon.LocalCommons()
         self.locker = _common.locker
         self.end = 0
@@ -169,126 +171,211 @@ class CoquiDemoLocalHost(object):
         self.pause_list = _common.pause_list
         self.base_curl = _common.base_curl
         self.debug = _common.debug
-        self.url = 'http://[::1]:5002/'  # locally hosted URL port 5002
+        self.url = "http://[::1]:5002/"  # locally hosted URL port 5002
         self.help_icon = _common.help_icon
         self.help_heading = "Coqui AI TTS demo server"
-        self.first_option = ''
-        self.help_url = 'https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu'
-        self.help_icon = '/usr/share/icons/HighContrast/scalable/actions/system-run.svg'
-        self.mascot = '🐸'  # U+1F438  <https://www.compart.com/en/unicode/block/U+1F300>
-        self.data_response = ''
-        self.audio_format = 'wav'
-        self.input_types = ['TEXT']
+        self.first_option = ""
+        self.help_url = "https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu"
+        self.help_icon = "/usr/share/icons/HighContrast/scalable/actions/system-run.svg"
+        self.mascot = "🐸"  # U+1F438  <https://www.compart.com/en/unicode/block/U+1F300>
+        self.data_response = ""
+        self.audio_format = "wav"
+        self.input_types = ["TEXT"]
         self.accept_voice = [
-            '', 'all', 'auto', 'coqui', 'localhost', 'docker', 'tts',
-            'local_server'
+            "",
+            "all",
+            "auto",
+            "coqui",
+            "localhost",
+            "docker",
+            "tts",
+            "local_server",
         ]
         self.ok = False
-        self.voice = ''
+        self.voice = ""
         self.soup = None
-        self.checked_lang = ''
-        self.styled_wav = ''
+        self.checked_lang = ""
+        self.styled_wav = ""
         self.base_models = [
-            'tts_models/multilingual/multi-dataset/your_tts',
-            'tts_models/bg/cv/vits', 'tts_models/cs/cv/vits',
-            'tts_models/da/cv/vits', 'tts_models/et/cv/vits',
-            'tts_models/ga/cv/vits', 'tts_models/en/ek1/tacotron2',
-            'tts_models/en/ljspeech/tacotron2-DDC',
-            'tts_models/en/ljspeech/tacotron2-DDC_ph',
-            'tts_models/en/ljspeech/glow-tts',
-            'tts_models/en/ljspeech/speedy-speech',
-            'tts_models/en/ljspeech/tacotron2-DCA',
-            'tts_models/en/ljspeech/vits', 'tts_models/en/ljspeech/vits--neon',
-            'tts_models/en/ljspeech/fast_pitch',
-            'tts_models/en/ljspeech/overflow',
-            'tts_models/en/ljspeech/neural_hmm', 'tts_models/en/vctk/vits',
-            'tts_models/en/vctk/fast_pitch', 'tts_models/en/sam/tacotron-DDC',
-            'tts_models/en/blizzard2013/capacitron-t2-c50',
-            'tts_models/en/blizzard2013/capacitron-t2-c150_v2',
-            'tts_models/es/mai/tacotron2-DDC', 'tts_models/es/css10/vits',
-            'tts_models/fr/mai/tacotron2-DDC', 'tts_models/fr/css10/vits',
-            'tts_models/uk/mai/glow-tts', 'tts_models/uk/mai/vits',
-            'tts_models/zh-CN/baker/tacotron2-DDC-GST',
-            'tts_models/nl/mai/tacotron2-DDC', 'tts_models/nl/css10/vits',
-            'tts_models/de/thorsten/tacotron2-DCA',
-            'tts_models/de/thorsten/vits',
-            'tts_models/de/thorsten/tacotron2-DDC',
-            'tts_models/de/css10/vits-neon',
-            'tts_models/ja/kokoro/tacotron2-DDC',
-            'tts_models/tr/common-voice/glow-tts',
-            'tts_models/it/mai_female/glow-tts',
-            'tts_models/it/mai_female/vits', 'tts_models/it/mai_male/glow-tts',
-            'tts_models/it/mai_male/vits', 'tts_models/ewe/openbible/vits',
-            'tts_models/hau/openbible/vits', 'tts_models/lin/openbible/vits',
-            'tts_models/tw_akuapem/openbible/vits',
-            'tts_models/tw_asante/openbible/vits',
-            'tts_models/yor/openbible/vits', 'tts_models/hu/css10/vits',
-            'tts_models/el/cv/vits', 'tts_models/fi/css10/vits',
-            'tts_models/hr/cv/vits', 'tts_models/lt/cv/vits',
-            'tts_models/lv/cv/vits', 'tts_models/mt/cv/vits',
-            'tts_models/pl/mai_female/vits', 'tts_models/pt/cv/vits',
-            'tts_models/ro/cv/vits', 'tts_models/sk/cv/vits',
-            'tts_models/sl/cv/vits', 'tts_models/sv/cv/vits',
-            'tts_models/ca/custom/vits', 'tts_models/fa/custom/glow-tts'
+            "tts_models/multilingual/multi-dataset/your_tts",
+            "tts_models/bg/cv/vits",
+            "tts_models/cs/cv/vits",
+            "tts_models/da/cv/vits",
+            "tts_models/et/cv/vits",
+            "tts_models/ga/cv/vits",
+            "tts_models/en/ek1/tacotron2",
+            "tts_models/en/ljspeech/tacotron2-DDC",
+            "tts_models/en/ljspeech/tacotron2-DDC_ph",
+            "tts_models/en/ljspeech/glow-tts",
+            "tts_models/en/ljspeech/speedy-speech",
+            "tts_models/en/ljspeech/tacotron2-DCA",
+            "tts_models/en/ljspeech/vits",
+            "tts_models/en/ljspeech/vits--neon",
+            "tts_models/en/ljspeech/fast_pitch",
+            "tts_models/en/ljspeech/overflow",
+            "tts_models/en/ljspeech/neural_hmm",
+            "tts_models/en/vctk/vits",
+            "tts_models/en/vctk/fast_pitch",
+            "tts_models/en/sam/tacotron-DDC",
+            "tts_models/en/blizzard2013/capacitron-t2-c50",
+            "tts_models/en/blizzard2013/capacitron-t2-c150_v2",
+            "tts_models/es/mai/tacotron2-DDC",
+            "tts_models/es/css10/vits",
+            "tts_models/fr/mai/tacotron2-DDC",
+            "tts_models/fr/css10/vits",
+            "tts_models/uk/mai/glow-tts",
+            "tts_models/uk/mai/vits",
+            "tts_models/zh-CN/baker/tacotron2-DDC-GST",
+            "tts_models/nl/mai/tacotron2-DDC",
+            "tts_models/nl/css10/vits",
+            "tts_models/de/thorsten/tacotron2-DCA",
+            "tts_models/de/thorsten/vits",
+            "tts_models/de/thorsten/tacotron2-DDC",
+            "tts_models/de/css10/vits-neon",
+            "tts_models/ja/kokoro/tacotron2-DDC",
+            "tts_models/tr/common-voice/glow-tts",
+            "tts_models/it/mai_female/glow-tts",
+            "tts_models/it/mai_female/vits",
+            "tts_models/it/mai_male/glow-tts",
+            "tts_models/it/mai_male/vits",
+            "tts_models/ewe/openbible/vits",
+            "tts_models/hau/openbible/vits",
+            "tts_models/lin/openbible/vits",
+            "tts_models/tw_akuapem/openbible/vits",
+            "tts_models/tw_asante/openbible/vits",
+            "tts_models/yor/openbible/vits",
+            "tts_models/hu/css10/vits",
+            "tts_models/el/cv/vits",
+            "tts_models/fi/css10/vits",
+            "tts_models/hr/cv/vits",
+            "tts_models/lt/cv/vits",
+            "tts_models/lv/cv/vits",
+            "tts_models/mt/cv/vits",
+            "tts_models/pl/mai_female/vits",
+            "tts_models/pt/cv/vits",
+            "tts_models/ro/cv/vits",
+            "tts_models/sk/cv/vits",
+            "tts_models/sl/cv/vits",
+            "tts_models/sv/cv/vits",
+            "tts_models/ca/custom/vits",
+            "tts_models/fa/custom/glow-tts",
         ]
         self.more_models = [
-            'vocoder_models/universal/libri-tts/wavegrad',
-            'vocoder_models/universal/libri-tts/fullband-melgan',
-            'vocoder_models/en/ljspeech/multiband-melgan',
-            'vocoder_models/en/ljspeech/hifigan_v2',
-            'vocoder_models/en/ljspeech/univnet',
-            'vocoder_models/en/blizzard2013/hifigan_v2',
-            'vocoder_models/en/vctk/hifigan_v2',
-            'vocoder_models/en/sam/hifigan_v2',
-            'vocoder_models/nl/mai/parallel-wavegan',
-            'vocoder_models/de/thorsten/wavegrad',
-            'vocoder_models/de/thorsten/fullband-melgan',
-            'vocoder_models/de/thorsten/hifigan_v1',
-            'vocoder_models/ja/kokoro/hifigan_v1',
-            'vocoder_models/uk/mai/multiband-melgan',
-            'vocoder_models/tr/common-voice/hifigan'
+            "vocoder_models/universal/libri-tts/wavegrad",
+            "vocoder_models/universal/libri-tts/fullband-melgan",
+            "vocoder_models/en/ljspeech/multiband-melgan",
+            "vocoder_models/en/ljspeech/hifigan_v2",
+            "vocoder_models/en/ljspeech/univnet",
+            "vocoder_models/en/blizzard2013/hifigan_v2",
+            "vocoder_models/en/vctk/hifigan_v2",
+            "vocoder_models/en/sam/hifigan_v2",
+            "vocoder_models/nl/mai/parallel-wavegan",
+            "vocoder_models/de/thorsten/wavegrad",
+            "vocoder_models/de/thorsten/fullband-melgan",
+            "vocoder_models/de/thorsten/hifigan_v1",
+            "vocoder_models/ja/kokoro/hifigan_v1",
+            "vocoder_models/uk/mai/multiband-melgan",
+            "vocoder_models/tr/common-voice/hifigan",
         ]
         self.base_models = self.more_models + self.base_models
         self.coqui_fm = [
-            'ED\n', 'p225', 'p227', 'p237', 'p240', 'p243', 'p244', 'p245',
-            'p246', 'p247', 'p248', 'p249', 'p250', 'p257', 'p259', 'p260',
-            'p261', 'p263', 'p268', 'p270', 'p271', 'p273', 'p274', 'p275',
-            'p276', 'p277', 'p278', 'p280', 'p282', 'p283', 'p284', 'p288',
-            'p293', 'p294', 'p295', 'p297', 'p300', 'p303', 'p304', 'p305',
-            'p306', 'p308', 'p310', 'p311', 'p314', 'p316', 'p323', 'p239',
-            'p333', 'p334', 'p335', 'p336', 'p339', 'p341', 'p343', 'p345',
-            'p347', 'p360', 'p361', 'p362', 'p363', 'p364', 'p374',
-            'female-en-5', 'female-pt-4', 'female-en5\n', 'olena'
+            "ED\n",
+            "p225",
+            "p227",
+            "p237",
+            "p240",
+            "p243",
+            "p244",
+            "p245",
+            "p246",
+            "p247",
+            "p248",
+            "p249",
+            "p250",
+            "p257",
+            "p259",
+            "p260",
+            "p261",
+            "p263",
+            "p268",
+            "p270",
+            "p271",
+            "p273",
+            "p274",
+            "p275",
+            "p276",
+            "p277",
+            "p278",
+            "p280",
+            "p282",
+            "p283",
+            "p284",
+            "p288",
+            "p293",
+            "p294",
+            "p295",
+            "p297",
+            "p300",
+            "p303",
+            "p304",
+            "p305",
+            "p306",
+            "p308",
+            "p310",
+            "p311",
+            "p314",
+            "p316",
+            "p323",
+            "p239",
+            "p333",
+            "p334",
+            "p335",
+            "p336",
+            "p339",
+            "p341",
+            "p343",
+            "p345",
+            "p347",
+            "p360",
+            "p361",
+            "p362",
+            "p363",
+            "p364",
+            "p374",
+            "female-en-5",
+            "female-pt-4",
+            "female-en5\n",
+            "olena",
         ]
         self.tts_equivalents = [
-            ['p374', 'all'],
-            ['male-pt-3', 'all'],
-            ['p374', 'coqui'],
-            ['male-pt-3', 'coqui'],
-            ['p305', 'female_child1'],
-            ['p374', 'male_child1'],
-            ['ED\n', 'female1'],
-            ['p336', 'female2'],
-            ['p308', 'female3'],
-            ['p230', 'male1'],
-            ['p252', 'male2'],
-            ['p313', 'male3'],
-            ['female-en-5', 'female_child1'],
-            ['male-pt-3\n', 'male_child1'],
-            ['female-pt-3', 'female1'],
-            ['female-en-5', 'female2'],
-            ['female-en-5\n', 'female3'],
-            ['male-pt-3\n', 'male1'],
-            ['male-en-2', 'male2'],
-            ['male-en-2', 'male3'],
+            ["p374", "all"],
+            ["male-pt-3", "all"],
+            ["p374", "coqui"],
+            ["male-pt-3", "coqui"],
+            ["p305", "female_child1"],
+            ["p374", "male_child1"],
+            ["ED\n", "female1"],
+            ["p336", "female2"],
+            ["p308", "female3"],
+            ["p230", "male1"],
+            ["p252", "male2"],
+            ["p313", "male3"],
+            ["female-en-5", "female_child1"],
+            ["male-pt-3\n", "male_child1"],
+            ["female-pt-3", "female1"],
+            ["female-en-5", "female2"],
+            ["female-en-5\n", "female3"],
+            ["male-pt-3\n", "male1"],
+            ["male-en-2", "male2"],
+            ["male-en-2", "male3"],
         ]
 
-    def _re_search_first_key(self, _key='title'):  # -> str
-        '''Get the first text string that matches a key, or `''`if the key is
-        not found '''
+    def _re_search_first_key(self, _key="title"):  # -> str
+        """Get the first text string that matches a key, or `''`if the key is
+        not found"""
         html = self.data_response
         if not _key in html:
-            return ''
+            return ""
         try:
             pattern = f"<{_key}.*?>*?</{_key}.*?>"
             search_result = re.search(pattern, html, re.IGNORECASE)
@@ -296,37 +383,33 @@ class CoquiDemoLocalHost(object):
             return re.sub("<.*?>", "", search_group)
         except (AttributeError, NameError):
             pass
-        return ''
+        return ""
 
     def _check_tts_ids(self):
-        '''Return `True` if the `tts` home page has interesting `id` contents,
-        otherwise return `False`, so don't continue with `ds4`'''
+        """Return `True` if the `tts` home page has interesting `id` contents,
+        otherwise return `False`, so don't continue with `ds4`"""
         _continue = False
         if len(self.data_response) == 0:
             return _continue
-        for fast_check in [
-                'id="speaker_id"', 'id="language_id"', 'id="style_wav"'
-        ]:
+        for fast_check in ['id="speaker_id"', 'id="language_id"', 'id="style_wav"']:
             if fast_check in self.data_response:
                 _continue = True
                 break
         return _continue
 
-    def language_supported(self,
-                           _iso_lang='en-US',
-                           alt_local_url=''):  # -> bool
-        '''Is the language or voice supported in the demonstration?
-        + `iso_lang` can be in the form `en-US` or `en`.'''
+    def language_supported(self, _iso_lang="en-US", alt_local_url=""):  # -> bool
+        """Is the language or voice supported in the demonstration?
+        + `iso_lang` can be in the form `en-US` or `en`."""
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
         if self.ok:
             return self.ok
         _lower_lang = _iso_lang.lower()
-        _lang = _lower_lang.split('_')[0].split('-')[0]
+        _lang = _lower_lang.split("_")[0].split("-")[0]
         _found = False
         for _model in self.base_models:
-            if '/' in _model:
-                if _lang == _model.split('/')[1]:
+            if "/" in _model:
+                if _lang == _model.split("/")[1]:
                     _found = True
                     break
         if _found:
@@ -334,7 +417,7 @@ class CoquiDemoLocalHost(object):
                 from bs4 import BeautifulSoup
             except (ImportError, ModuleNotFoundError):
                 try:
-                    _local_pip = readtexttools.find_local_pip('bs4')
+                    _local_pip = readtexttools.find_local_pip("bs4")
                     if len(_local_pip) != 0:
                         sys.path.append(_local_pip)
                         try:
@@ -345,41 +428,43 @@ class CoquiDemoLocalHost(object):
                     pass
             try:
                 response = urllib.request.urlopen(self.url)
-                self.data_response = response.read().decode('utf-8')
+                self.data_response = response.read().decode("utf-8")
             except urllib.error.URLError:
-                self.data_response = ''
+                self.data_response = ""
             except TimeoutError:
-                self.data_response = ''
+                self.data_response = ""
             if len(self.data_response) == 0:
                 self.ok = False
                 return False
-            help_heading = self._re_search_first_key('title')  # System display
+            help_heading = self._re_search_first_key("title")  # System display
             if len(help_heading) == 0:
                 return False
             else:
                 self.help_heading = help_heading
                 self.first_option = urllib.parse.quote(
-                    self._re_search_first_key('option'))  # url argument
+                    self._re_search_first_key("option")
+                )  # url argument
             try:
                 if not self._check_tts_ids():
-                    self.checked_lang = ''
+                    self.checked_lang = ""
                     self.ok = True
                     return self.ok
                 try:
-                    self.soup = BeautifulSoup(self.data_response,
-                                              features="lxml")
+                    self.soup = BeautifulSoup(self.data_response, features="lxml")
                 except NameError:
-                    print('''NameError: This speech synthesis model requires
+                    print(
+                        """NameError: This speech synthesis model requires
 [Beautiful Soup 4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) to
 parse values from a webpage. Install it using `pipx`, `pip3` or a distribution
-system installer application like `apt`.''')
+system installer application like `apt`."""
+                    )
                     self.ok = False
                     return self.ok
-                _language_ids = self.soup.find(attrs={'id': 'language_id'})
-                _idioms = _language_ids.find_all('option')
+                _language_ids = self.soup.find(attrs={"id": "language_id"})
+                _idioms = _language_ids.find_all("option")
                 for _query in [_iso_lang, _lower_lang, _lang]:
                     for option in _idioms:
-                        _idiom_value = option['value']
+                        _idiom_value = option["value"]
                         if _idiom_value.startswith(_query):
                             self.checked_lang = _idiom_value
                             self.ok = True
@@ -387,106 +472,134 @@ system installer application like `apt`.''')
                 # 'NoneType' object has no attribute 'find_all'; so the page
                 # is missing this section because the model does not feature
                 # the options.
-                self.checked_lang = ''
+                self.checked_lang = ""
                 self.ok = True
             except NameError:
-                print('''NameError: This speech synthesis application requires
-[Beautiful Soup 4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)''')
+                print(
+                    """NameError: This speech synthesis application requires
+[Beautiful Soup 4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)"""
+                )
                 self.ok = False
         return self.ok
 
-    def get_bs4_style_wav(self, _content=''):  # -> string
-        '''If the model supports it, use `style_wav` (dict or path to wav)
-        to help generate speech.'''
+    def get_bs4_style_wav(self, _content=""):  # -> string
+        """If the model supports it, use `style_wav` (dict or path to wav)
+        to help generate speech."""
         if not self.ok:
-            return ''
+            return ""
         if not 'id="style_wav"' in self.data_response:
-            return ''
+            return ""
         try:
             return urllib.parse.quote(_content)
         except:
             pass
-        return ''
+        return ""
 
-    def get_bs4_speaker(self, _vox='female1', _index=0):  # -> string
-        '''Get the matching voice on thes CoquiAI server web page'''
+    def get_bs4_speaker(self, _vox="female1", _index=0):  # -> string
+        """Get the matching voice on thes CoquiAI server web page"""
         if not self._check_tts_ids():
-            return ''
+            return ""
         if _vox == self.first_option:
             self.ok = True
             self.voice = _vox
             return self.voice
-        _vox_number = int(''.join(
-            ['0', readtexttools.safechars(_vox, '1234567890')]))
+        _vox_number = int("".join(["0", readtexttools.safechars(_vox, "1234567890")]))
         _my_favs_count = 3  # male1, male2, male3
         _matches = []
         if _index == 0 and _vox_number > _my_favs_count:
             # You specify an out of range voice using `male4`, `female5` etc.
             # The voices chosen this way are not classified by gender.
             _index = _vox_number
-        _matches = [_vox, 'p374', 'female-pt-3']
+        _matches = [_vox, "p374", "female-pt-3"]
         for _item in self.tts_equivalents:
             if _vox.lower() == _item[1]:
                 _matches.append(_item[0])
-        print('\n' + self.help_heading)
-        print('=' * (len(self.help_heading)))
+        print("\n" + self.help_heading)
+        print("=" * (len(self.help_heading)))
         if not self.ok:
-            return ''
+            return ""
         elif len(self.data_response) == 0:
-            return ''
+            return ""
         try:
-            speaker_ids = self.soup.find(attrs={'id': 'speaker_id'})
-            speakers = speaker_ids.find_all('option')
+            speaker_ids = self.soup.find(attrs={"id": "speaker_id"})
+            speakers = speaker_ids.find_all("option")
         except AttributeError:
-            return ''
-        _default_voice = ''
-        _index_voice = ''
+            return ""
+        _default_voice = ""
+        _index_voice = ""
         try:
-            _default_voice = urllib.parse.quote(speakers[0]['value'])
+            _default_voice = urllib.parse.quote(speakers[0]["value"])
         except (IndexError, ValueError):
-            return ''
+            return ""
         try:
             len_speakers = len(speakers)
             if len_speakers != 0:
                 _index = _index % len_speakers
-                if 'female' in _vox:
+                if "female" in _vox:
                     # Use reverse index
                     _index = len_speakers - _index
-                _index_voice = urllib.parse.quote(speakers[_index]['value'])
+                _index_voice = urllib.parse.quote(speakers[_index]["value"])
         except (IndexError, ValueError):
             _index_voice = _default_voice
         if len(_default_voice) == 0:
-            return ''
-        _print_values = ['']
+            return ""
+        _print_values = [""]
         for option in speakers:
-            _speaker_value = option['value']
+            _speaker_value = option["value"]
             if _speaker_value == _index_voice:
                 if _index > _my_favs_count:
                     self.voice = urllib.parse.quote(_index_voice)
-                    self.mascot = u'\u263A '
-                    print(''.join([
-                        '\n* ', self.voice, ' ', self.mascot, ' (', _vox,
-                        ')\n\n[', self.help_heading, '](', self.url, ')\n'
-                    ]))
+                    self.mascot = "\u263A "
+                    print(
+                        "".join(
+                            [
+                                "\n* ",
+                                self.voice,
+                                " ",
+                                self.mascot,
+                                " (",
+                                _vox,
+                                ")\n\n[",
+                                self.help_heading,
+                                "](",
+                                self.url,
+                                ")\n",
+                            ]
+                        )
+                    )
                     return self.voice
             self.accept_voice.append(_speaker_value)
-            _print_values.append(_speaker_value.strip('\n'))
+            _print_values.append(_speaker_value.strip("\n"))
             if bool(_matches):
                 for _match in _matches:
                     if _speaker_value == _match:
                         self.voice = urllib.parse.quote(_match)
                         if bool(self.debug):
-                            printed_list = '\n* '.join(_print_values) + '\n'
+                            printed_list = "\n* ".join(_print_values) + "\n"
                             print(
                                 printed_list.replace(
-                                    _match, self.voice + ' ' + self.mascot +
-                                    ' (' + _vox + ')'))
+                                    _match,
+                                    self.voice + " " + self.mascot + " (" + _vox + ")",
+                                )
+                            )
                         else:
-                            print(''.join([
-                                '\n* ', self.voice, ' ', self.mascot, ' (',
-                                _vox, ')\n\n[', self.help_heading, '](',
-                                self.url, ')\n'
-                            ]))
+                            print(
+                                "".join(
+                                    [
+                                        "\n* ",
+                                        self.voice,
+                                        " ",
+                                        self.mascot,
+                                        " (",
+                                        _vox,
+                                        ")\n\n[",
+                                        self.help_heading,
+                                        "](",
+                                        self.url,
+                                        ")\n",
+                                    ]
+                                )
+                            )
                         return self.voice
         if len(_index_voice) == 0:
             self.voice = _default_voice
@@ -494,36 +607,39 @@ system installer application like `apt`.''')
             self.voice = _index_voice
         return self.voice
 
-    def read(self,
-             _text="",
-             _iso_lang='en-US',
-             _visible="false",
-             _audible="true",
-             _out_path="",
-             _icon="",
-             _info="",
-             _post_process=None,
-             _writer='',
-             _size='600x600',
-             _speech_rate=160,
-             _vox='female1',
-             _ok_wait=4,
-             _end_wait=30,
-             _style_wav=''):  # -> bool
-        '''Read text using the Coqui-demo local server.'''
+    def read(
+        self,
+        _text="",
+        _iso_lang="en-US",
+        _visible="false",
+        _audible="true",
+        _out_path="",
+        _icon="",
+        _info="",
+        _post_process=None,
+        _writer="",
+        _size="600x600",
+        _speech_rate=160,
+        _vox="female1",
+        _ok_wait=4,
+        _end_wait=30,
+        _style_wav="",
+    ):  # -> bool
+        """Read text using the Coqui-demo local server."""
         if not self.ok:
             return False
-        _media_out = ''
+        _media_out = ""
         _done = False
         # Determine the output file name
-        _media_out = readtexttools.get_work_file_path(_out_path, _icon, 'OUT')
+        _media_out = readtexttools.get_work_file_path(_out_path, _icon, "OUT")
         # Determine the temporary file name
-        _end = '-demo.wav'
-        if netcommon.have_gpu('nvidia'):
+        _end = "-demo.wav"
+        if netcommon.have_gpu("nvidia"):
             # NVIDIA GPU support
-            _end = '-cuda.wav'
-        _media_work = os.path.join(tempfile.gettempdir(),
-                                   self.help_heading.replace(' ', '-') + _end)
+            _end = "-cuda.wav"
+        _media_work = os.path.join(
+            tempfile.gettempdir(), self.help_heading.replace(" ", "-") + _end
+        )
         if len(_out_path) == 0 and bool(_post_process):
             if readtexttools.handle_sound_playing(_media_work):
                 readtexttools.unlock_my_lock(self.locker)
@@ -534,39 +650,38 @@ system installer application like `apt`.''')
         if bool(self.add_pause):
             for _symbol in self.pause_list:
                 if _symbol in _text:
-                    _text = _text.translate(self.add_pause).replace('.;', '.')
+                    _text = _text.translate(self.add_pause).replace(".;", ".")
                     break
 
         _view_json = self.debug and 1
-        response = readtexttools.local_pronunciation(_iso_lang, _text, 'coqui',
-                                                     'COQUI_USER_DIRECTORY',
-                                                     _view_json)
+        response = readtexttools.local_pronunciation(
+            _iso_lang, _text, "coqui", "COQUI_USER_DIRECTORY", _view_json
+        )
         _text = response[0]
         if _view_json:
             print(response[1])
         _url1 = self.url
-        _url = f'{_url1}/api/tts'
+        _url = f"{_url1}/api/tts"
         _speaker_id = self.get_bs4_speaker(_vox)
         retval = False
         if BASICS_OK:
-            _text = _text.strip('\n;')
+            _text = _text.strip("\n;")
             _language_id = self.checked_lang
             _style_wav = self.get_bs4_style_wav(_style_wav)
-            _logo = ' ' + self.mascot + ' '
+            _logo = " " + self.mascot + " "
             # Coqui TTS is not currently available as a built in
             # in system package, so the behaviour and requirements
             # doe not change consistently across platforms.
-            play_list = self.common.big_play_list(_text,
-                                                  _iso_lang.split('-')[0])
-            last_item = ''
+            play_list = self.common.big_play_list(_text, _iso_lang.split("-")[0])
+            last_item = ""
             _tries = 0
             readtexttools.lock_my_lock(self.locker)
-            _no = 10 * '0'
+            _no = 10 * "0"
             for _item in play_list:
                 if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
-                    print('[>] Stop!')
+                    print("[>] Stop!")
                     return True
-                _item = _item.strip(' \n;')
+                _item = _item.strip(" \n;")
                 _ilen = len(_item)
                 if _ilen == 0:
                     continue
@@ -576,49 +691,53 @@ system installer application like `apt`.''')
                     # and wait until the web server times out. Good luck!
                     # Let's add some punctuation so it reads a short word
                     # aloud.
-                    _item = _item + '!'
+                    _item = _item + "!"
                 elif _ilen > len(last_item):
                     # Could make unusual noises. Your mileage may vary.
                     #
                     # Let's make sure that the previous utterance is done.
                     time.sleep(2)
                 last_item = _item
-                _no = readtexttools.prefix_ohs(_tries, 10, '0')
-                if '.' in _media_out and _tries != 0:
-                    _ext = os.path.splittext(_media_out)[1]
-                    _media_out = _media_out.replace(
-                        f'.{_ext}', f'_{_no}.{_ext}')
+                _no = readtexttools.prefix_ohs(_tries, 10, "0")
+                if "." in _media_out and _tries != 0:
+                    _ext = os.path.splitext(_media_out)[1]
+                    _media_out = _media_out.replace(f".{_ext}", f"_{_no}.{_ext}")
                 _tries += 1
                 if os.path.isfile(_media_work):
                     os.remove(_media_work)
                 q_text = urllib.parse.quote(_item)
-                my_url = f'''{_url}?text={q_text}&speaker_id={_speaker_id}&style_wav={_style_wav}&language_id={_language_id}'''
+                my_url = f"""{_url}?text={q_text}&speaker_id={_speaker_id}&style_wav={_style_wav}&language_id={_language_id}"""
                 # _method = "GET"
                 if self.debug:
                     if len(play_list) != 1:
-                        print('\n'.join(['', _no, _item, 10 * '-']))
+                        print("\n".join(["", _no, _item, 10 * "-"]))
                 if len(_item) > 200:
                     _end_wait = int(_end_wait * len(_item) / 500)
-                    _logo = ' ⌛ '  # U+231B <https://www.compart.com/en/unicode/U+231B>
+                    _logo = " ⌛ "  # U+231B <https://www.compart.com/en/unicode/U+231B>
                 if not retval:
                     if "TTS engine" in self.data_response:
                         readtexttools.pop_message(
-                            ''.join([self.help_heading, _logo, self.voice]),
-                            self.url, 0, self.help_icon, 0)
+                            "".join([self.help_heading, _logo, self.voice]),
+                            self.url,
+                            0,
+                            self.help_icon,
+                            0,
+                        )
                 self.common.set_urllib_timeout(_end_wait)
                 try:
                     # The API uses GET and a `text` argument for text
                     req = urllib.request.Request(my_url)
                     resp = urllib.request.urlopen(req)
                     response_content = resp.read()
-                    with open(_media_work, 'wb') as f:
+                    with open(_media_work, "wb") as f:
                         f.write(response_content)
                     if os.path.isfile(_media_work):
                         _done = os.path.getsize(_media_work) != 0
                 except urllib.error.HTTPError:
-                    _logo = u' \u26a0\ufe0f '
+                    _logo = " \u26a0\ufe0f "
                     print(
-                        f'{_logo} Tried using `{_iso_lang}` with Coqui TTS but failed with an HTTP Error.')
+                        f"{_logo} Tried using `{_iso_lang}` with Coqui TTS but failed with an HTTP Error."
+                    )
                     readtexttools.unlock_my_lock(self.locker)
                     done = False
                 except TimeoutError:
@@ -627,11 +746,19 @@ system installer application like `apt`.''')
                 if not _done:
                     return False
                 if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
-                    print('[>] Stop')
+                    print("[>] Stop")
                     return True
-                retval = self.common.do_net_sound(_info, _media_work, _icon,
-                                                  _media_out, _audible,
-                                                  _visible, _writer, _size,
-                                                  _post_process, False)
+                retval = self.common.do_net_sound(
+                    _info,
+                    _media_work,
+                    _icon,
+                    _media_out,
+                    _audible,
+                    _visible,
+                    _writer,
+                    _size,
+                    _post_process,
+                    False,
+                )
             readtexttools.unlock_my_lock(self.locker)
             return retval

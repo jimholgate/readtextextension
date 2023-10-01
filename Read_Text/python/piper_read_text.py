@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Piper TTS is a fast neural text to speech tool."""
 APP_DESCRIPTION = r"""
 Piper TTS
 =========
@@ -384,19 +385,15 @@ not work with the python version.
         self.voice_name = vox
         self.concise_lang = iso_lang.split("_")[0].split("-")[0]
         self.lang = iso_lang.replace("-", "_")
-        if self.concise_lang in os.listdir(self.piper_voice_dir):
-            for _ignore in ["_script", "~"]:
-                if self.concise_lang.startswith(_ignore):
-                    self.ok = False
-                    return self.ok
-            self.ok = True
-            return True
-        else:
-            for _file in os.listdir(self.piper_voice_dir):
-                if _file.startswith(self.concise_lang):
-                    self.ok = True
-                    return self.ok
-        return False
+        _dir_list = os.listdir(self.piper_voice_dir)
+        self.ok = False
+        if self.concise_lang in _dir_list:
+            if any(
+                self.concise_lang.startswith(_ignore) for _ignore in ["_script", "~"]
+            ):
+                return self.ok
+        self.ok = any(_file.startswith(self.concise_lang) for _file in _dir_list)
+        return self.ok
 
     def _model_path_list(self, iso_lang="en-GB", _vox="", extension="onnx") -> list:
         """Check the directories for language models, and if found return

@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
+"""Supports the Docker MyCroft AI Mimic TTS package"""
 import os
 import platform
 import tempfile
+
 try:
     import urllib
     import json
+
     BASICS_OK = True
 except ImportError:
     BASICS_OK = False
@@ -429,12 +432,11 @@ To automatically start the daemon, set the Docker container restart policy to
         self.is_x86_64 = _common.is_x86_64
         self.pause_list = _common.pause_list
         self.add_pause = _common.add_pause
-        self.voice_name = ''
+        self.voice_name = ""
 
-    def spd_voice_to_mimic3_voice(self,
-                                  _search="female1",
-                                  _iso_lang="en-US",
-                                  _alt_local_url="") -> str:
+    def spd_voice_to_mimic3_voice(
+        self, _search="female1", _iso_lang="en-US", _alt_local_url=""
+    ) -> str:
         """Assign a name like `en_UK/apope_low"` to a
         spd_voice like `male0`"""
         _search = _search.strip("'\" \n")
@@ -442,29 +444,34 @@ To automatically start the daemon, set the Docker container restart policy to
             if not self.language_supported(_iso_lang, _alt_local_url, _search):
                 self.voice_id = ""
                 return self.voice_id
-        _vox_number = int("".join(
-            ["0", readtexttools.safechars(_search, "1234567890")]))
+        _vox_number = int(
+            "".join(["0", readtexttools.safechars(_search, "1234567890")])
+        )
         _voice_count = 1
         if _search in self.full_names:
             self.voice_id = _search
         elif _search.lower().startswith("female"):
             self.voice_id = netcommon.index_number_to_list_item(
-                _vox_number, self.female_names)
+                _vox_number, self.female_names
+            )
             _voice_count = len(self.female_names) + 1
         elif _search.lower().startswith("male"):
             self.voice_id = netcommon.index_number_to_list_item(
-                _vox_number, self.male_names)
+                _vox_number, self.male_names
+            )
             _voice_count = len(self.male_names) + 1
         else:
             self.voice_id = netcommon.index_number_to_list_item(
-                _vox_number, self.full_names)
+                _vox_number, self.full_names
+            )
             _voice_count = len(self.full_names) + 1
         _url = self.url
         voice_id = self.voice_id
         _help_url = self.help_url
         s_voice_count = str(_voice_count)
-        _mimic_lang = voice_id.split('/')[0]
-        print(f"""
+        _mimic_lang = voice_id.split("/")[0]
+        print(
+            f"""
 Mimic 3
 =======
 
@@ -475,13 +482,13 @@ Mimic 3
 * Mimic3 Server: `{_url}`
 
 [Mimic3]({_help_url})
-""")
+"""
+        )
         return self.voice_id
 
-    def language_supported(self,
-                           iso_lang="en-US",
-                           alt_local_url="",
-                           vox="auto") -> bool:
+    def language_supported(
+        self, iso_lang="en-US", alt_local_url="", vox="auto"
+    ) -> bool:
         """Is the language or voice supported?
         + `iso_lang` can be in the form `en-US` or a voice like
           `de_DE/thorsten_low`
@@ -490,8 +497,10 @@ Mimic 3
            a different url."""
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
-        if (int(platform.python_version_tuple()[0]) < 3
-                or int(platform.python_version_tuple()[1]) < 8):
+        if (
+            int(platform.python_version_tuple()[0]) < 3
+            or int(platform.python_version_tuple()[1]) < 8
+        ):
             self.ok = False
             return self.ok
         if len(self.voice_id) != 0:
@@ -502,21 +511,25 @@ Mimic 3
             return True
         # format of json dictionary item: ''
         # "voice" or "language and region"
-        _lang1 = iso_lang.replace('-', '_').replace('en_GB', 'en_UK').replace(
-            'uk_UA', 'uk_UK')
+        _lang1 = (
+            iso_lang.replace("-", "_")
+            .replace("en_GB", "en_UK")
+            .replace("uk_UA", "uk_UK")
+        )
         # concise language
         _lang2 = iso_lang.lower().split("-")[0].split("_")[0]
         try:
-            response = urllib.request.urlopen("".join(
-                [self.url, "/api/voices"]))
+            response = urllib.request.urlopen("".join([self.url, "/api/voices"]))
             data_response = response.read()
             self.data = json.loads(data_response)
         except urllib.error.URLError:
             _eurl = self.url
             if self.is_x86_64:
-                print(f"""
+                print(
+                    f"""
 [Mimic 3](https://github.com/MycroftAI/mimic3)
-can synthesize speech privately using <{_eurl}>.""")
+can synthesize speech privately using <{_eurl}>."""
+                )
             self.ok = False
             return False
         except AttributeError:
@@ -524,8 +537,7 @@ can synthesize speech privately using <{_eurl}>.""")
             return False
         if len(self.data) == 0:
             return False
-        self.accept_voice.extend(
-            netcommon.spd_voice_list(0, 200, ["female", "male"]))
+        self.accept_voice.extend(netcommon.spd_voice_list(0, 200, ["female", "male"]))
         for _idiom in [_lang1, _lang2]:
             for _item in self.data:
                 if bool(_item["speakers"]):
@@ -536,13 +548,15 @@ can synthesize speech privately using <{_eurl}>.""")
                     _speaker_prefix = ""
                 for _speaker in _voice_ids:
                     if _item["language"].startswith(_idiom):
-                        full_name = "".join([
-                            _item["language"],
-                            "/",
-                            _item["name"],
-                            _speaker_prefix,
-                            _speaker,
-                        ])
+                        full_name = "".join(
+                            [
+                                _item["language"],
+                                "/",
+                                _item["name"],
+                                _speaker_prefix,
+                                _speaker,
+                            ]
+                        )
                         if full_name not in self.full_names:
                             self.accept_voice.append(full_name)
                             if vox == full_name:
@@ -593,17 +607,19 @@ can synthesize speech privately using <{_eurl}>.""")
             return False
         _common = netcommon.LocalCommons()
         _common.set_urllib_timeout(_ok_wait)
-        my_url = "".join([
-            _url,
-            "?voice=",
-            urllib.parse.quote(_voice),
-            "&lengthScale=",
-            str(_length_scale),
-            "&ssml=",
-            urllib.parse.quote(_ssml),
-            "&text=",
-            urllib.parse.quote(_text),
-        ])
+        my_url = "".join(
+            [
+                _url,
+                "?voice=",
+                urllib.parse.quote(_voice),
+                "&lengthScale=",
+                str(_length_scale),
+                "&ssml=",
+                urllib.parse.quote(_ssml),
+                "&text=",
+                urllib.parse.quote(_text),
+            ]
+        )
         if _common.debug:
             print(my_url)
         try:
@@ -637,8 +653,7 @@ can synthesize speech privately using <{_eurl}>.""")
         """Read Mimic3 speech aloud"""
         _length_scale = 1
         if not _speech_rate == 160:
-            _length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)[
-                0]
+            _length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)[0]
         if not self.ok:
             return False
         if len(self.voice_id) == 0:
@@ -666,16 +681,18 @@ can synthesize speech privately using <{_eurl}>.""")
             if bool(self.add_pause) and not ssml:
                 for _symbol in self.pause_list:
                     if _symbol in _text:
-                        _text = _text.translate(self.add_pause).replace(
-                            ".\n;", ".").strip(';')
+                        _text = (
+                            _text.translate(self.add_pause)
+                            .replace(".\n;", ".")
+                            .strip(";")
+                        )
                         break
         if ssml:
             _ssml = "true"
         _url = "".join([self.url, "/api/tts"])
-        _text = readtexttools.local_pronunciation(_iso_lang, _text,
-                                                  self.local_dir,
-                                                  "MIMIC3_USER_DIRECTORY",
-                                                  False)[0].strip()
+        _text = readtexttools.local_pronunciation(
+            _iso_lang, _text, self.local_dir, "MIMIC3_USER_DIRECTORY", False
+        )[0].strip()
 
         readtexttools.lock_my_lock(self.locker)
         _tries = 0
@@ -699,14 +716,21 @@ can synthesize speech privately using <{_eurl}>.""")
             elif "." in _media_out and _tries != 0:
                 _ext = os.path.splitext(_media_out)[1]
                 _no = readtexttools.prefix_ohs(_tries, 10, "0")
-                _media_out = _media_out.replace(f".{_ext}",
-                                                f"_{_no}.{_ext}")
+                _media_out = _media_out.replace(f".{_ext}", f"_{_no}.{_ext}")
             _tries += 1
-            _ssml = 'false'
+            _ssml = "false"
             if readtexttools.lax_bool(ssml):
-                _ssml = 'true'
-            _done = self.try_url_lib(_voice, _item, _url, _length_scale, _ssml,
-                                     _ok_wait, _end_wait, _media_work)
+                _ssml = "true"
+            _done = self.try_url_lib(
+                _voice,
+                _item,
+                _url,
+                _length_scale,
+                _ssml,
+                _ok_wait,
+                _end_wait,
+                _media_work,
+            )
             if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop")
                 return True

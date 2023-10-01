@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
+"""Module supporting Docker OpenTTS speech synthesis"""
 import os
 import platform
 import tempfile
@@ -51,6 +52,7 @@ class OpenTTSClass(object):
         self.debug = _common.debug
         self.default_extension = _common.default_extension
         self.ok = False
+        self.voice_name = ""
         # This is the default. You can set up OpenTTS to use a different port.
         self.url = "http://0.0.0.0:5500"  # localhost port 5500
         self.help_icon = _common.help_icon
@@ -98,11 +100,9 @@ class OpenTTSClass(object):
         self.add_pause = _common.add_pause
         self.max_chars = 360
 
-
-    def spd_voice_to_opentts_voice(self,
-                                    _search="female1",
-                                    _iso_lang="en-US",
-                                    _alt_local_url="") -> str:
+    def spd_voice_to_opentts_voice(
+        self, _search="female1", _iso_lang="en-US", _alt_local_url=""
+    ) -> str:
         """Assign an OpenTTS name like `festival:cmu_us_slt_arctic_hts` to a
         spd_voice like `male1`"""
         _search = _search.strip("'\" \n")
@@ -110,23 +110,28 @@ class OpenTTSClass(object):
             if not self.language_supported(_iso_lang, _alt_local_url, _search):
                 self.voice_id = ""
                 return self.voice_id
-        _vox_number = int("".join(
-            ["0", readtexttools.safechars(_search, "1234567890")]))
+        _vox_number = int(
+            "".join(["0", readtexttools.safechars(_search, "1234567890")])
+        )
         if _search in self.full_names:
             self.voice_id = _search
         elif _search.lower().startswith("female"):
             self.voice_id = netcommon.index_number_to_list_item(
-                _vox_number, self.female_names)
+                _vox_number, self.female_names
+            )
         elif _search.lower().startswith("male"):
             self.voice_id = netcommon.index_number_to_list_item(
-                _vox_number, self.male_names)
+                _vox_number, self.male_names
+            )
         else:
             self.voice_id = netcommon.index_number_to_list_item(
-                _vox_number, self.full_names)
+                _vox_number, self.full_names
+            )
         _url = self.url
         voice_id = self.voice_id
         _help_url = self.help_url
-        print(f"""
+        print(
+            f"""
 OpenTTS
 =======
 
@@ -136,13 +141,13 @@ OpenTTS
 * OpenTTS Server:  {_url}
 
 [OpenTTS]({_help_url})
-""")
+"""
+        )
         return self.voice_id
 
-    def language_supported(self,
-                           iso_lang="en-US",
-                           alt_local_url="",
-                           vox="auto") -> bool:
+    def language_supported(
+        self, iso_lang="en-US", alt_local_url="", vox="auto"
+    ) -> bool:
         """Is the language or voice supported?
         + `iso_lang` can be in the form `en-US` or a voice like `nanotts:es-ES`
         + `alt_local_url` If you are connecting to a local network's
@@ -150,8 +155,10 @@ OpenTTS
            a different url."""
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
-        if (int(platform.python_version_tuple()[0]) < 3
-                or int(platform.python_version_tuple()[1]) < 8):
+        if (
+            int(platform.python_version_tuple()[0]) < 3
+            or int(platform.python_version_tuple()[1]) < 8
+        ):
             self.ok = False
             return self.ok
 
@@ -173,16 +180,19 @@ OpenTTS
             # Test a specific model
             self.vmodels = [vox]
         try:
-            response = urllib.request.urlopen("".join(
-                [self.url, "/api/voices?language=", _lang2]))
+            response = urllib.request.urlopen(
+                "".join([self.url, "/api/voices?language=", _lang2])
+            )
             data_response = response.read()
             self.data = json.loads(data_response)
         except urllib.error.URLError:
             _eurl = self.url
             if self.is_x86_64:
-                print(f"""
+                print(
+                    f"""
 [OpenTTS](https://github.com/synesthesiam/opentts#)
-can synthesize speech privately using <{_eurl}>.""")
+can synthesize speech privately using <{_eurl}>."""
+                )
             self.ok = False
             return False
         except:  # [AttributeError, TimeoutError]:
@@ -193,12 +203,10 @@ can synthesize speech privately using <{_eurl}>.""")
             return False
         # Find the first voice that meets the criteria. See the
         # swagger API documentation at <http://0.0.0.0:5500/openapi/>.
-        self.accept_voice.extend(
-            netcommon.spd_voice_list(0, 200, ["female", "male"]))
+        self.accept_voice.extend(netcommon.spd_voice_list(0, 200, ["female", "male"]))
         for _locale_lang in ["locale", "language"]:
             for _item in self.data:
-                if bool(self.data[_item]
-                        ["multispeaker"]) and iso_lang.startswith("en"):
+                if bool(self.data[_item]["multispeaker"]) and iso_lang.startswith("en"):
                     _voice_ids = self.data[_item]["speakers"]
                     _speaker_prefix = "#"
                 else:
@@ -206,46 +214,48 @@ can synthesize speech privately using <{_eurl}>.""")
                     _speaker_prefix = ""
                 for _speaker in _voice_ids:
                     if self.data[_item]["tts_name"] in self.vmodels:
-                        full_name = "".join([
-                            self.data[_item]["tts_name"],
-                            ":",
-                            self.data[_item]["name"],
-                            _speaker_prefix,
-                            _speaker,
-                        ])
+                        full_name = "".join(
+                            [
+                                self.data[_item]["tts_name"],
+                                ":",
+                                self.data[_item]["name"],
+                                _speaker_prefix,
+                                _speaker,
+                            ]
+                        )
                         if full_name not in self.full_names:
                             self.accept_voice.append(full_name)
                             if _lang1 in self.data[_item][_locale_lang]:
                                 self.full_names.insert(0, full_name)
                                 if self.data[_item]["gender"] in [
-                                        "M",
-                                        None,
-                                        "MF",
-                                        "FM",
+                                    "M",
+                                    None,
+                                    "MF",
+                                    "FM",
                                 ]:
                                     self.male_names.insert(0, full_name)
                                 if self.data[_item]["gender"] in [
-                                        "F",
-                                        None,
-                                        "MF",
-                                        "FM",
+                                    "F",
+                                    None,
+                                    "MF",
+                                    "FM",
                                 ]:
                                     self.female_names.insert(0, full_name)
                                 self.ok = True
                             if _lang2 == self.data[_item][_locale_lang]:
                                 self.full_names.insert(0, full_name)
                                 if self.data[_item]["gender"] in [
-                                        "M",
-                                        None,
-                                        "MF",
-                                        "FM",
+                                    "M",
+                                    None,
+                                    "MF",
+                                    "FM",
                                 ]:
                                     self.male_names.insert(0, full_name)
                                 if self.data[_item]["gender"] in [
-                                        "F",
-                                        None,
-                                        "MF",
-                                        "FM",
+                                    "F",
+                                    None,
+                                    "MF",
+                                    "FM",
                                 ]:
                                     self.female_names.insert(0, full_name)
 
@@ -257,7 +267,7 @@ can synthesize speech privately using <{_eurl}>.""")
         return self.ok
 
     def try_url_lib(
-        _self,
+        self,
         _voice="",
         _text="",
         _url="",
@@ -274,31 +284,35 @@ can synthesize speech privately using <{_eurl}>.""")
             return False
         _common = netcommon.LocalCommons()
         _common.set_urllib_timeout(_ok_wait)
-        my_url = "".join([
-            _url,
-            "?voice=",
-            urllib.parse.quote(_voice),
-            "&vocoder=",
-            urllib.parse.quote(_vocoder),
-            "&denoiserStrength=",
-            str(_denoiser_strength),
-            "&ssml=",
-            urllib.parse.quote(_ssml),
-            "&cache=false&text=",
-            urllib.parse.quote(_text),
-        ])
+        my_url = "".join(
+            [
+                _url,
+                "?voice=",
+                urllib.parse.quote(_voice),
+                "&vocoder=",
+                urllib.parse.quote(_vocoder),
+                "&denoiserStrength=",
+                str(_denoiser_strength),
+                "&ssml=",
+                urllib.parse.quote(_ssml),
+                "&cache=false&text=",
+                urllib.parse.quote(_text),
+            ]
+        )
         try:
             # GET
-            response = urllib.request.urlopen(my_url, timeout=(_end_wait))
-            with open(_media_work, "wb") as f:
-                f.write(response.read())
+            response = urllib.request.urlopen(my_url, timeout=_end_wait)
+            with open(_media_work, "wb") as _handle:
+                _handle.write(response.read())
             if os.path.isfile(_media_work):
                 _done = os.path.getsize(_media_work) != 0
         except (TimeoutError, urllib.error.HTTPError):
-            print(f'''
+            print(
+                f"""
 OpenTTS cannot provide speech for `{_voice}`.
 Check the server settings or use a different voice.
-    ''')
+    """
+            )
             _done = False
         return _done
 
@@ -355,9 +369,9 @@ Check the server settings or use a different voice.
         if ssml:
             _ssml = "true"
         _url = "".join([self.url, "/api/tts"])
-        _text = readtexttools.local_pronunciation(_iso_lang, _text, "default",
-                                                  "OPENTTS_USER_DIRECTORY",
-                                                  False)[0]
+        _text = readtexttools.local_pronunciation(
+            _iso_lang, _text, "default", "OPENTTS_USER_DIRECTORY", False
+        )[0]
 
         readtexttools.lock_my_lock(self.locker)
         _tries = 0
@@ -379,10 +393,9 @@ Check the server settings or use a different voice.
             elif len(_item.strip(" ;.!?\n")) == 0:
                 continue
             elif "." in _media_out and _tries != 0:
-                _ext = os.path.splittext(_media_out)[1]
+                _ext = os.path.splitext(_media_out)[1]
                 _no = readtexttools.prefix_ohs(_tries, 10, "0")
-                _media_out = _media_out.replace(f".{_ext}",
-                                                f"_{_no}.{_ext}")
+                _media_out = _media_out.replace(f".{_ext}", f"_{_no}.{_ext}")
             _tries += 1
             _done = self.try_url_lib(
                 _voice,
