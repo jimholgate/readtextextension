@@ -6104,8 +6104,8 @@ Function fswriteMacOSSpeechScript( _
 	&quot;    On Error&quot;, _
 	&quot;        set retval to &quot;&quot;&quot; &amp; fsGetMacOsBaseVoice() &amp; &quot;&quot;&quot;&quot;, _
 	&quot;    end try&quot;, _
-	&quot;    -- On MacOS 13.0, Lee is an optional en_AU voice&quot;, _
-	&quot;    if retval is &quot;&quot;Agnes&quot;&quot; or retval is &quot;&quot;Albert&quot;&quot; or retval is &quot;&quot;Lee&quot;&quot; or retval is &quot;&quot;&quot;&quot; then&quot;, _
+	&quot;    -- On MacOS 13.0 +, Lee is an optional en_AU voice&quot;, _
+	&quot;    if isInString(retval, &quot;&quot;Personal&quot;&quot;) or retval is &quot;&quot;Agnes&quot;&quot; or retval is &quot;&quot;Albert&quot;&quot; or retval is &quot;&quot;Lee&quot;&quot; or retval is &quot;&quot;&quot;&quot; then&quot;, _
 	&quot;        set retval to &quot;&quot;Alex&quot;&quot;&quot;, _
 	&quot;    end if&quot;, _
 	&quot;    return retval&quot;, _
@@ -6394,20 +6394,29 @@ End Function
 Function fbHaveNeroTag() As Boolean
 	fbHaveNeroTag = Not (Len(neroTagPath()) = 0)
 End Function
+Option Explicit
 
 
 Function fbHavePyQrCode() As Boolean
 	&apos; Install `qrcode` with `apt install python3-qrcode`
-	&apos; or `pip3 install qrcode` 
+	&apos; or `pip3 install qrcode`
 	fbHavePyQrCode = Len(fsGetPipLibPath(&quot;qrcode&quot;, False)) &lt;&gt; 0
 	If fbHavePyQrCode Then
 		Exit Function
 	End If
 	Dim x# : x = 0
-	Dim Tokens : Tokens = Array(_
-	&quot;/usr/lib/python3/dist-packages/qrcode/release.py&quot;, _
-	Environ(&quot;HOME&quot;) &amp; &quot;/.local/bin/qr&quot;)
-	
+	Dim Tokens As Variant
+	Dim _home as String
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+		_home = fsSuperTrim(Environ(&quot;HOMEPATH&quot;), &quot;\/ &quot;)
+		Tokens = Array()
+		Case Else
+		_home = Environ(&quot;HOME&quot;)
+		Tokens = Array(_
+		&quot;/usr/lib/python3/dist-packages/qrcode/release.py&quot;, _
+		_home &amp; &quot;/.local/bin/qr&quot;)	
+	End Select
 	If FileExists(fsNetworkTtsDoc()) And _
 	Len(fsContainerResourcePath(&quot;python&quot;)) = 0 And _
 	Len(fsContainerResourcePath(&quot;python3&quot;)) = 0 Then
@@ -6480,7 +6489,7 @@ Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
 	Dim ret_val$ : ret_val = &quot;&quot;
 	Dim os_div$ : os_div = getPathSeparator
 	Dim sPythonSubDirs$
-	Dim deb12_pipx$ : deb12_pipx = &quot;&quot;
+	Dim _pipx$ : _pipx = &quot;&quot;
 	Dim py_dir$
 	Dim home$ : home = Environ(&quot;HOME&quot;)
 	fsGetPipLibPath = &quot;&quot;
@@ -6491,19 +6500,27 @@ Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
 		py_dir = Environ(&quot;LOCALAPPDATA&quot;) &amp; &quot;\Programs\Python&quot;
 		Case &quot;MacOS&quot;
 		sPythonSubDirs = &quot;/lib/python/site-packages&quot;
-		py_dir = home &amp; &quot;/Library/Python&quot;	
+		py_dir = home &amp; &quot;/Library/Python&quot;
+		_pipx = home &amp; &quot;/.local/pipx/venvs/&quot; &amp; s_test
+		If FileExists(_pipx) Then
+			&apos; NOTE: When path is present, the string points to a resource
+			&apos; directory that contains the actual library. If the version
+			&apos; of python doesn&apos;t match, then the python routine may fail.
+			fsGetPipLibPath = _pipx
+			Exit Function
+		End If
 		Case &quot;UNIX&quot;
 		&apos; `snap`, `flatpak`, `appimage` and other standalone versions of
 		&apos; of LibreOffice python might not work correctly with the system
 		&apos; python extended libraries or user installed libraries
-		deb12_pipx = home &amp; &quot;/.local/pipx/venvs/&quot; &amp; s_test
+		_pipx = home &amp; &quot;/.local/pipx/venvs/&quot; &amp; s_test
 		If Not Instr(Environ(&quot;PWD&quot;), home) = 1 Then
 			Exit Function
-		ElseIf FileExists(deb12_pipx) Then
+		ElseIf FileExists(_pipx) Then
 			&apos; NOTE: When path is present, the string points to a resource
 			&apos; directory that contains the actual library. If the version
 			&apos; of python doesn&apos;t match, then the python routine may fail.
-			fsGetPipLibPath = deb12_pipx
+			fsGetPipLibPath = _pipx
 			Exit Function
 		ElseIf Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
 			Exit Function
@@ -6873,16 +6890,24 @@ End Function
 
 
 Function vlcPath() As String
+	&apos; Ignore VLC video player if the system has python 2
+	&apos; available because VLC might not work with this extension.
+	vlcPath = &quot;&quot;
 	Select Case fsGetOS()
 		Case &quot;WINDOWS&quot;
 		vlcPath = fsFindAppPath(&quot;VideoLAN/VLC/vlc.exe&quot;)
 		Case &quot;MacOS&quot;
-		vlcPath = fsFindAppPath(&quot;VLC.app/Contents/MacOS/VLC&quot;)
+		Select Case Len(fsFindAppPath(&quot;python&quot;))
+			Case 0
+			vlcPath = fsFindAppPath(&quot;VLC.app/Contents/MacOS/VLC&quot;)
+			Case Else
+			vlcPath = &quot;&quot;
+		End Select
 		Case Else
 		Select Case Len(fsAppImageResourcePath(&quot;python&quot;))
-		Case 0
+			Case 0
 			vlcPath = fsFindAppPath(&quot;vlc&quot;)
-		Case Else
+			Case Else
 			vlcPath = &quot;&quot;
 		End Select
 	End Select

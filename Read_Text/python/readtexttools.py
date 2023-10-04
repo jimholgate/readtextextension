@@ -705,7 +705,11 @@ class ExtensionTable(object):
         elif os.name == "nt":
             self.vlc = self.win_search("vlc", "vlc")
         elif os.path.exists("/Applications/VLC.app/Contents/MacOS/VLC"):
-            self.vlc = "/Applications/VLC.app/Contents/MacOS/VLC"
+            if os.path.isfile("/usr/bin/python"):
+                # VLC is not fully supported for legacy MacOS 
+                self.vlc = ""
+            else:
+                self.vlc = "/Applications/VLC.app/Contents/MacOS/VLC"
         w_flac = self.win_search("flac", "flac")
         w_twolame = self.win_search("twolame", "twolame")
         w_lame = self.win_search("lame", "lame")
@@ -944,6 +948,26 @@ class ExtensionTable(object):
                                     )
         return ""
 
+def local_pip_search(profile="", lib_name="", py_search="", include_pipx=True):  # -> str
+    """Search local posix pip and optionally the posix pipx directories."""
+    _add_path = os.path.join(
+        profile, ".local", "lib", py_search, "site-packages"
+    )
+    if not os.path.isdir(os.path.join(_add_path, lib_name.lower())):
+        if include_pipx and not os.path.isdir(os.path.join(_add_path, lib_name)):
+            _add_path = os.path.join(
+                profile,
+                ".local",
+                "pipx",
+                "venvs",
+                lib_name.lower(),
+                "lib",
+                py_search,
+                "site-packages",
+            )
+    if os.path.isdir(_add_path):
+        return _add_path
+    return ""
 
 def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
     """If you installed a pip tool as a local user, then
@@ -960,6 +984,9 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
     is to set up a virtual environment using LibreOffice's
     python version. See the `pipx` venvs documentation."""
     retval = ""
+    path1 = ""
+    path2 = ""
+    path3 = ""
     py_ver = "".join(
         [
             platform.python_version_tuple()[0],
@@ -977,6 +1004,15 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
     elif have_posix_app("say", False):
         profile = os.getenv("HOME")
         path1 = os.path.join(profile, "Library", "Python")
+        py_search = "".join(["python", py_ver])
+        local_pip = local_pip_search(profile, lib_name, py_search)
+        if len(local_pip) != 0:
+            return local_pip
+        if not os.path.isdir(path1):
+            for _test in os.getenv("PATH").split(":"):
+                if os.path.isdir(_test) and profile in _test:
+                    path1 = _test
+                    break        
         path2 = os.path.join("lib", "python", "site-packages")
         path3 = os.sep + os.path.join(
             "Library",
@@ -1001,21 +1037,7 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
                 return retval
         site_list = site.getsitepackages()
         if len(_add_path) == 0:
-            _add_path = os.path.join(
-                profile, ".local", "lib", py_search, "site-packages"
-            )
-            if not os.path.isdir(os.path.join(_add_path, lib_name.lower())):
-                if not os.path.isdir(os.path.join(_add_path, lib_name)):
-                    _add_path = os.path.join(
-                        profile,
-                        ".local",
-                        "pipx",
-                        "venvs",
-                        lib_name.lower(),
-                        "lib",
-                        py_search,
-                        "site-packages/",
-                    )
+            _add_path = local_pip_search(profile, lib_name, py_search)
         if os.path.isdir(_add_path):
             # Use the most recent local library, not the distribution library.
             site_list.insert(0, _add_path)

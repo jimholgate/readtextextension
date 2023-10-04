@@ -72,7 +72,7 @@ except ImportError:
         sys.path.append(readtexttools.find_local_pip('qrcode'))
         try:
             import qrcode
-        except:
+        except (ModuleNotFoundError, TypeError):
             IMAGE_OK = False
 if not IMAGE_OK:
     print('''
