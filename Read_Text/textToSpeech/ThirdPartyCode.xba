@@ -195,6 +195,7 @@ Function PiperLocalSuggestion(_lang)
 	End If
 	PiperLocalSuggestion = &quot;en_GB-jenny_dioco-medium&quot;
 	Dim models As Variant : models = Array(_
+	&quot;ar_JO-kareem-medium&quot;, _
 	&quot;ca_ES-upc_ona-medium&quot;, _
 	&quot;cs_CZ-jirka-medium&quot;, _
 	&quot;da_DK-talesyntese-medium&quot;, _
@@ -208,7 +209,7 @@ Function PiperLocalSuggestion(_lang)
 	&quot;is_IS-bui-medium&quot;, _
 	&quot;it_IT-riccardo-x_low&quot;, _
 	&quot;ka_GE-natia-medium&quot;, _
-	&quot;kk_KZ-iseke-x_low&quot;, _
+	&quot;kk_KZ-issai-high&quot;, _
 	&quot;lb_LU-marylux-medium&quot;, _
 	&quot;ne_NP-google-medium&quot;, _
 	&quot;nl_BE-nathalie-medium&quot;, _
@@ -217,7 +218,7 @@ Function PiperLocalSuggestion(_lang)
 	&quot;pt_BR-faber-medium&quot;, _
 	&quot;pt_PT-tugão-medium&quot;, _
 	&quot;ro_RO-mihai-medium&quot;, _
-	&quot;ru_RU-denis-medium&quot;, _
+	&quot;ru_RU-irina-medium&quot;, _
 	&quot;sk_SK-lili-medium&quot;, _
 	&quot;sr_RS-serbski_institut-medium&quot;, _
 	&quot;sv_SE-nst-medium&quot;, _
