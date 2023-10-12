@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
-r'''
+r"""
 Pyttsx
 ======
 
@@ -51,22 +51,23 @@ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-'''
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+"""
+from __future__ import absolute_import, division, print_function, unicode_literals
 import codecs
 import getopt
 import os
 import sys
+
 try:
     import pyttsx
-except (ImportError):
+except ImportError:
     pass
 
 
 def usage():
-    sA = '    `' + os.path.split(sys.argv[0])[1]
-    print('''
+    sA = "    `" + os.path.split(sys.argv[0])[1]
+    print(
+        """
 Pyttsx Read Text
 ================
 
@@ -82,14 +83,16 @@ Usage
 * To say the text slower  
   %(sA)s --rate "-20" "TextFile.txt"`
 * To say the text faster  
-  %(sA)s --rate "20" "TextFile.txt"`)''' % locals())
+  %(sA)s --rate "20" "TextFile.txt"`)"""
+        % locals()
+    )
 
 
-def read_string_aloud(_name='', _rate=0, speechString=''):
-    '''
+def read_string_aloud(_name="", _rate=0, speechString=""):
+    """
     Says speechString, using the default voice or _name voice
     Positive _rate is faster; Negative _rate is slower
-    '''
+    """
     try:
         dummy = bool(pyttsx)
     except NameError:
@@ -98,15 +101,15 @@ def read_string_aloud(_name='', _rate=0, speechString=''):
         sys.exit(2)
     try:
         engine = pyttsx.init()
-        engine.setProperty('rate', engine.getProperty('rate') + int(_rate))
+        engine.setProperty("rate", engine.getProperty("rate") + int(_rate))
     except Exception:
-        print('I did not understand the rate!')
+        print("I did not understand the rate!")
         usage()
         sys.exit(2)
-    voices = engine.getProperty('voices')
+    voices = engine.getProperty("voices")
     for voice in voices:
         if voice.name == _name:
-            engine.setProperty('voice', voice.id)
+            engine.setProperty("voice", voice.id)
             break
     engine.say(speechString)
     engine.runAndWait()
@@ -114,11 +117,10 @@ def read_string_aloud(_name='', _rate=0, speechString=''):
 
 def main():  # -> NoReturn
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hvr",
-                                   ["help", "voice=", "rate="])
-    except (getopt.GetoptError):
+        opts, args = getopt.getopt(sys.argv[1:], "hvr", ["help", "voice=", "rate="])
+    except getopt.GetoptError:
         # print help information and exit:
-        print('option -a not recognized')
+        print("option -a not recognized")
         usage()
         sys.exit(2)
     _name = ""
@@ -134,11 +136,9 @@ def main():  # -> NoReturn
         else:
             assert False, "unhandled option"
     try:
-        f = codecs.open(sys.argv[-1],
-                        mode='r',
-                        encoding=sys.getfilesystemencoding())
+        f = codecs.open(sys.argv[-1], mode="r", encoding=sys.getfilesystemencoding())
     except IOError:
-        print('I was unable to open the file you specified!')
+        print("I was unable to open the file you specified!")
         usage()
     else:
         s = f.read()

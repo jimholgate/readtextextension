@@ -410,12 +410,10 @@ class ReadFestivalClass(object):
         Update `self.voice_eval` to a known available voice in the
         form `(voice_cmu_us_slt_arctic_hts)` if your system supports it."""
         test_lang = ""
-        test_region = ""
         try:
             for sep in ["-", "_"]:
                 if sep in iso_lang:
                     test_lang = iso_lang.split(sep)[0]
-                    test_region = iso_lang.split(sep)[1]
                     break
         except (AttributeError, NameError):
             return ""
@@ -474,27 +472,16 @@ class ReadFestivalClass(object):
         """Third party voices installed in the festival directory might
         not be compatible with the `text2wave` program, and cause a crash."""
         if _lang[:2] in ["uk", "tt", "sq", "ru", "pt", "pl", "mk", "kg", "eo"]:
-            for third_party in [
-                "/usr/share/doc/rhvoice",
-                "/usr/local/share/doc/rhvoice",
-                "/opt/rhvoice",
-            ]:
-                if os.path.isdir(third_party):
-                    return False
+            if any(
+                os.path.isdir(third_party)
+                for third_party in [
+                    "/usr/share/doc/rhvoice",
+                    "/usr/local/share/doc/rhvoice",
+                    "/opt/rhvoice",
+                ]
+            ):
+                return False
         return True
-
-    def list_sentences(self, _test_string="") -> [list[str] | None]:
-        """Generate a list of sentences from a string."""
-        _iter = ""
-        _divider = self._divider
-        if not bool(_test_string):
-            return None
-        if self.punctuation:
-            return str(_test_string.translate(self.punctuation)).split(_divider)
-        for _item in self.replacements:
-            _iter = _item
-            _test_string = _test_string.replace(_iter, f"{_iter}{_divider}")
-        return _test_string.split(_divider)
 
     def festival_read(
         self,

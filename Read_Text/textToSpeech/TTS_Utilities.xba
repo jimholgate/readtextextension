@@ -230,14 +230,14 @@
 &apos;&apos; [ffmpeg](https://ffmpeg.org) are capable of adding a poster image to an
 &apos;&apos; mp3 file as well as normal metadata.
 &apos;&apos; 
-&apos;&apos; #### Larynx
+&apos;&apos; #### Mimic
 &apos;&apos; 
 &apos;&apos; If you have downloaded a container version of LibreOffice from a
-&apos;&apos; `flatpak` or `snap` repository, you can use `larynx-server` to read text
-&apos;&apos; aloud with high quality voices. The `larynx-server` works like the
+&apos;&apos; `flatpak` or `snap` repository, you can use `mimic-server` to read text
+&apos;&apos; aloud with high quality voices. The `mimic-server` works like the
 &apos;&apos; `cups` print server. When the server is running you can access a
-&apos;&apos; `localhost` speech tool at &lt;http://0.0.0.0:5002&gt;. The read text
-&apos;&apos; extension uses the larynx python application program interface to read
+&apos;&apos; `localhost` speech tool at &lt;http://0.0.0.0:591252&gt;. The read text
+&apos;&apos; extension uses the mimic application program interface to read
 &apos;&apos; text aloud.
 &apos;&apos; 
 &apos;&apos; ##### Fedora, Red Hat, CentOS…
@@ -250,20 +250,18 @@
 &apos;&apos; 
 &apos;&apos; ##### All
 &apos;&apos; 
-&apos;&apos;     docker run \
-&apos;&apos;         -it \
-&apos;&apos;         -p 5002:5002 \
-&apos;&apos;         -e &quot;HOME=${HOME}&quot; \
-&apos;&apos;         -v &quot;$HOME:${HOME}&quot; \
-&apos;&apos;         -v /usr/share/ca-certificates:/usr/share/ca-certificates \
-&apos;&apos;         -v /etc/ssl/certs:/etc/ssl/certs \
-&apos;&apos;         -w &quot;${PWD}&quot; \
-&apos;&apos;         --user &quot;$(id -u):$(id -g)&quot; \
-&apos;&apos;         rhasspy/larynx
+&apos;&apos;    mkdir -p &quot;${HOME}/.local/share/mycroft/mimic3&quot;
+&apos;&apos;    chmod a+rwx &quot;${HOME}/.local/share/mycroft/mimic3&quot;
+&apos;&apos;    docker run \
+&apos;&apos;        -it \
+&apos;&apos;        -p 59125:59125 \
+&apos;&apos;        --restart=always \
+&apos;&apos;        -v &quot;${HOME}/.local/share/mycroft/mimic3:/home/mimic3/.local/share/mycroft/mimic3&quot; \
+&apos;&apos;        &apos;mycroftai/mimic3&apos;
 &apos;&apos; 
-&apos;&apos; You can find out more about Larynx at the `rhsspy larynx` website.
+&apos;&apos; You can find out more about Mimic3 TTS at the `mimic3` website.
 &apos;&apos; 
-&apos;&apos; &lt;https://github.com/rhasspy/larynx&gt;
+&apos;&apos; &lt;https://github.com/MycroftAI/mimic3&gt;
 &apos;&apos; 
 &apos;&apos; #### More
 &apos;&apos; 
@@ -674,8 +672,8 @@ Function fbLocalHostOk(ByVal _url As String, ByVal _key As String) As Boolean
 	Dim test_str$ : test_str = &quot;&quot;
 	Dim alt_key$ : alt_key = _key
 	If Len(_url) = 0 Then
-		&apos; rhasspy/larynx speech server
-		_url = &quot;http://0.0.0.0:5002/api/voices&quot;
+		&apos; rhasspy/mimic3 speech server
+		_url = &quot;http://0.0.0.0:59125/api/voices&quot;
 	End If
 	test_str = fsGetWebService(_url)
 	If Len(_key) = 0 Then
@@ -2332,7 +2330,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	If fbHaveNetworkTTS() or isSnap() or isFlatPak() Then
 		If fsGetOS() = &quot;UNIX&quot; Then
 			bEnableLocalHostRate = fbEnableLocalHostRate()
-			&apos; Include settings for [larynx-server](https://github.com/rhasspy/larynx)
+			&apos; Include settings for [mimic3](https://github.com/rhasspy/mimic3)
 			If bEnableLocalHostRate Then
 				Redim _opts : _opts = Array(&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
 			Else
@@ -2356,11 +2354,6 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		End If
         s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-		If fbInPaths(&quot;larynx-server&quot;) Then
-			s1 = s1 &amp; CR &amp; _
-			&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --visible True --language (SELECTION_LANGUAGE_CODE) &quot;&quot;(TMP)&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --voice &quot;&quot;mary_ann&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		End If
 		s1 = s1 &amp; CR &amp; _
 		&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		CheckComboBox4UrlList(oDialog)
@@ -6304,9 +6297,9 @@ Sub CheckUnixSpeech()
 			If isSnap() or isFlatPak() Then
 				&apos; Translate this message for your language
 				If (MsgBox(_(_
-				&quot;Get on-line help for snap? Read Text uses a http speech daemon like [larynx-server](https://github.com/rhasspy/larynx).&quot;,_
+				&quot;Get on-line help for snap? Read Text uses a http speech daemon like [mimic3-server](https://github.com/rhasspy/mimic3).&quot;,_
 				&quot;tools&quot;, fsDisplayLanguage(), -1), 68, fsLookUpTerm(&quot;s_read-text&quot;)) = 6) Then
-					webHelp(&quot;https://github.com/rhasspy/larynx#samples&quot;)
+					webHelp(&quot;https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3&quot;)
 				End If
 			Else
 				If Not fbCheckPosixSpeech() Then
@@ -6659,7 +6652,7 @@ Function fbHaveNetworkTTS() As Boolean
 	If fbHaveNetworkTTS Then
 		Exit Function
 	End If
-	If fbInPaths(&quot;larynx-server&quot;) Then
+	If fbInPaths(&quot;mimic3-server&quot;) Then
 		fbHaveNetworkTTS = True
 		Exit Function
 	End If

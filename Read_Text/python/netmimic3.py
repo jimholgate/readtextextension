@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
-"""Supports the Docker MyCroft AI Mimic TTS package"""
+"""Supports the Docker MyCroft AI Mimic TTS package. This
+tool uses the same web address as MaryTTS by default, so you can't
+run the two localhost servers together using the defaults."""
 import os
 import platform
 import tempfile
@@ -31,11 +33,12 @@ the same time using the same URL and port.
     docker run \
         -it \
         -p 59125:59125 \
+        --restart=always \
         -v "${HOME}/.local/share/mycroft/mimic3:/home/mimic3/.local/share/mycroft/mimic3" \
         'mycroftai/mimic3'
 
 To automatically start the daemon, set the Docker container restart policy to
-"always"
+"always", otherwise omit the option.
 
 * [Local host](http://0.0.0.0:59125)
 * [Mimic3 TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)

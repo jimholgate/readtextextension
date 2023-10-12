@@ -249,34 +249,15 @@ End Function
 Type SpeechHostInfo
 	about as String
 	key as String
-	label as String  &apos; &quot;larynx-server&quot;
+	label as String
 	token as String
-	url as String  &apos; &quot;http://0.0.0.0:5002&quot;
-	url_info as String  &apos; &quot;/api/voices&quot;
-	json_dir as String  &apos; &quot;larynx&quot;
+	url as String
+	url_info as String
+	json_dir as String
 	sample as String
 	docker as String
 	tags as Variant
 End Type
-
-
-Function LarynxSpeechHostInfo()
-	Dim _info As SpeechHostInfo
-	With _info
-		.about = &quot;End-to-end text to speech system using gruut and onnx.&quot;
-		.key = &quot;en-us&quot;
-		.label = &quot;larynx-server&quot;
-		.token = &quot;&quot;
-		.url = &quot;http://0.0.0.0:5002&quot;
-		.url_info = &quot;/api/voices&quot;
-		.json_dir = &quot;larynx&quot;
-		.sample = &quot;http://0.0.0.0:5002/api/tts?voice=en&amp;text=Hello+world&quot;
-		.docker = &quot;https://hub.docker.com/r/rhasspy/larynx&quot;
-		.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;,_
-		&quot;extensible&quot;, &quot;optional-voices&quot;)
-	End With
-	LarynxSpeechHostInfo = _info
-End Function
 
 
 Function MaryTtsSpeechHostInfo()
@@ -620,21 +601,13 @@ Function SpeechHostInfoList()
 	isFlatPak() Then
 	&apos; Python3 `requests` library is not available so MaryTTS
 	&apos; has limited functionality. See `network_read_textfile.py`
-	&apos; The reordering allows developers to compare Larynx with
-	&apos; Mimic by installing both a native app and an AppImage
-	&apos; version. The native app will prefer Mimic over Larynx
-	&apos; whereas the AppImage will prefer Larynx over Mimic.
 	&apos;
-	&apos; Example: compare es-ES &quot;Es un placer conocerte.&quot; with the
-	&apos; two speech engines. Is `conocerte` correctly spoken?
-	&apos; To record errors, use the json editor on dialog 2.
-	&apos;
-	&apos; Larynx and MaryTTS have limited support for phoneme code.
+	&apos; Several speech engines have limited or no support for
+	&apos; phoneme code or can only speak using certain sounds.
 	&apos; Currently Mimic, like MacOS `say`, appears not to.
 	&apos; Coqui TTS client relies on `python3-bs` (beautiful soup)
 	&apos; so it is not available in immutable office packages.
 	SpeechHostInfoList = Array(_
-	LarynxSpeechHostInfo(), _
 	MimicSpeechHostInfo(), _
 	OpenttsSpeechHostInfo(), _
 	RhvoiceSpeechHostInfo(), _
@@ -644,7 +617,6 @@ Function SpeechHostInfoList()
 	&apos; Prioritize recent tts frameworks
 	SpeechHostInfoList = Array(_
 	MimicSpeechHostInfo(), _
-	LarynxSpeechHostInfo(), _
 	OpenttsSpeechHostInfo(), _
 	MaryTtsSpeechHostInfo(), _
 	RhvoiceSpeechHostInfo(), _
@@ -668,7 +640,6 @@ Function fbEnableLocalHostRate() As Boolean
 	fbEnableLocalHostRate = False
 	Dim _info As Variant : _info = Array(_
 	MimicSpeechHostInfo(), _
-	LarynxSpeechHostInfo() _
 	)	
 	Dim x As Integer : x = 0
 	On Error GoTo fbEnableLocalHostRateErr

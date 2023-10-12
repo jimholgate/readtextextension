@@ -325,10 +325,8 @@ class XmlTransform(object):
         """
         _caution = False
         if not strict:
-            for _test in self.caution:
-                if _test in test_text:
-                    _caution = True
-                    break
+            if any(_test in test_text for _test in self.caution):
+                _caution = True
         if bool(self.safe_xml):
             if strict:
                 return str(test_text.translate(self.safe_xml))
@@ -1009,10 +1007,8 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
         if len(local_pip) != 0:
             return local_pip
         if not os.path.isdir(path1):
-            for _test in os.getenv("PATH").split(":"):
-                if os.path.isdir(_test) and profile in _test:
-                    path1 = _test
-                    break        
+            if any(os.path.isdir(_test) and profile in _test for _test in os.getenv("PATH").split(":")):
+                path1 = _test      
         path2 = os.path.join("lib", "python", "site-packages")
         path3 = os.sep + os.path.join(
             "Library",
@@ -1049,10 +1045,8 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
         return retval
     py_path = ""
     path_result = ""
-    for _item in [path1, path3]:
-        if os.path.exists(_item):
-            path_result = _item
-            break
+    if any(os.path.exists(_item) for _item in [path1, path3]):
+        path_result = _item
     if len(path_result) == 0:
         print("FAIL: `%(lib_name)s` search: no directory at `%(path1)s`" % locals())
         return ""
@@ -2355,18 +2349,13 @@ class WinMediaPlay(object):
             return False
         _continue = False
         _ext = os.path.splitext(file_path)[1]
-        for _test in self.extensions:
-            if _test[0] == _ext:
-                _continue = True
-                break
+        if any(_test[0] == _ext for _test in self.extensions):
+            _continue = True
         if not _continue:
             return False
         _denominator = 12209
-        for _test in self.extensions:
-            _ext = os.path.splitext(file_path)[1]
-            if _ext.lower() == _test[0]:
-                _denominator = _test[1]
-                break
+        if any(os.path.splitext(file_path.lower())[1] == _test[0] for _test in self.extensions):
+            _denominator = _test[1]
         if _denominator == 0:
             self.rest = sound_length_seconds(file_path)
         else:
@@ -3219,6 +3208,7 @@ def prefix_ohs(_int=1, _str_len=10, _symbol="0"):  # -> str
 #
 # <https://raw.githubusercontent.com/rhasspy/piper/master/etc/test_sentences/test_en-us.jsonl>
 
+
 def uses_international_phonetic_alphabet(_str_test=""):  # -> bool
     '''Return True if `_str_test` uses the International Phonetic
     Alphabet. IPA Extensions is a block (U+0250 to U+02AF) of the
@@ -3230,10 +3220,10 @@ def uses_international_phonetic_alphabet(_str_test=""):  # -> bool
     if len(_str_test) == 1:
         _test = ord(_str_test)
         return False if _test < _min else False if _test > _max else True
-    for _test in range(_min, _max):
-        if chr(_test) in _str_test:
-            return True
+    if any(chr(_test) in _str_test for _test in range(_min, _max)):
+        return True
     return False
+
 
 def local_pronunciation(
     iso_lang="en-CA",
@@ -3273,10 +3263,9 @@ def local_pronunciation(
             "%(_test)s_lexicon.json" % locals(),
         )
         for _json_search in [_json_search3, _json_search2, _json_search1]:
-            if len(_json_search) != 0:
-                if os.path.isfile(_json_search):
-                    _json_file = _json_search
-                    break
+            if len(_json_search) != 0 and os.path.isfile(_json_search):
+                _json_file = _json_search
+                break
         if len(_json_file) != 0:
             break
     if len(_json_file) == 0:
@@ -3362,12 +3351,10 @@ file for `%(my_dir)s` was found."""
                                 _apost = "</phoneme>\n\t</lexeme>"
                                 do_ipa_test = False
                         if do_ipa_test:
-                            for _letter in _alias:
-                                if uses_international_phonetic_alphabet(_letter):
+                            if any(uses_international_phonetic_alphabet(_letter) for _letter in _alias):
                                     # W3C -> wɝːld waɪd web kənˈsɔːr.ʃəm
                                     _apre = "</grapheme>\n\t\t<phoneme>"
                                     _apost = "</phoneme>\n\t</lexeme>"
-                                    break
                         _pls_text = "".join(
                             [
                                 _pls_text,

@@ -1,6 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
-"""Use Coqui AI speech synthesis on supported python platforms."""
+"""Coqui AI speech synthesis engine is a developer library for advanced
+Text-to-Speech generation. A pipx installation totals over 6.1 GB. Read
+the online documents for details about how to optimize and use specific
+TTS tools.
+
+    sudo apt-get install python3-bs4 python3-pip espeak-ng
+    pip install pipx
+    pipx install spacy
+    pipx install tts
+    pipx ensurepath
+    spacy download en_core_web_sm
+    tts-server --list_models
+    tts-server --model_name tts_models/en/vctk/vits
+    xdg-open http://[::1]:5002/
+
+<https://tts.readthedocs.io/en/latest/>
+"""
 import os
 import re
 import sys
@@ -9,7 +25,6 @@ import tempfile
 
 try:
     import urllib
-
     BASICS_OK = True
 except ImportError:
     BASICS_OK = False
@@ -24,8 +39,8 @@ class CoquiDemoLocalHost(object):
     provides a local http service to convert text that you select to speech.
 
     The TTS server is powered by python. You can use `pip3`, `pipx`, `git`
-    or a docker image to download it. For testing, I used Ubuntu 22.04 LTS
-    and installed the TTS library using `pipx`.
+    or a docker image to download it. For testing, use Ubuntu 22.04 LTS
+    and install the TTS library using `pipx`.
 
     The server only serves one model at a time, but you can specify the
     language by selecting a model that includes the iso language code for
@@ -171,7 +186,7 @@ class CoquiDemoLocalHost(object):
         self.pause_list = _common.pause_list
         self.base_curl = _common.base_curl
         self.debug = _common.debug
-        self.url = "http://[::1]:5002/"  # locally hosted URL port 5002
+        self.url = "http://[::1]:5002"  # locally hosted URL port 5002
         self.help_icon = _common.help_icon
         self.help_heading = "Coqui AI TTS demo server"
         self.first_option = ""
@@ -197,7 +212,9 @@ class CoquiDemoLocalHost(object):
         self.checked_lang = ""
         self.styled_wav = ""
         self.base_models = [
+            "tts_models/multilingual/multi-dataset/xtts_v1",
             "tts_models/multilingual/multi-dataset/your_tts",
+            "tts_models/multilingual/multi-dataset/bark",
             "tts_models/bg/cv/vits",
             "tts_models/cs/cv/vits",
             "tts_models/da/cv/vits",
@@ -219,6 +236,8 @@ class CoquiDemoLocalHost(object):
             "tts_models/en/sam/tacotron-DDC",
             "tts_models/en/blizzard2013/capacitron-t2-c50",
             "tts_models/en/blizzard2013/capacitron-t2-c150_v2",
+            "tts_models/en/multi-dataset/tortoise-v2",
+            "tts_models/en/jenny/jenny",
             "tts_models/es/mai/tacotron2-DDC",
             "tts_models/es/css10/vits",
             "tts_models/fr/mai/tacotron2-DDC",
@@ -259,10 +278,14 @@ class CoquiDemoLocalHost(object):
             "tts_models/sv/cv/vits",
             "tts_models/ca/custom/vits",
             "tts_models/fa/custom/glow-tts",
+            "tts_models/bn/custom/vits-male",
+            "tts_models/bn/custom/vits-female",
+            "tts_models/be/common-voice/glow-tts",
         ]
         self.more_models = [
             "vocoder_models/universal/libri-tts/wavegrad",
             "vocoder_models/universal/libri-tts/fullband-melgan",
+            "vocoder_models/en/ek1/wavegrad",
             "vocoder_models/en/ljspeech/multiband-melgan",
             "vocoder_models/en/ljspeech/hifigan_v2",
             "vocoder_models/en/ljspeech/univnet",
@@ -276,6 +299,7 @@ class CoquiDemoLocalHost(object):
             "vocoder_models/ja/kokoro/hifigan_v1",
             "vocoder_models/uk/mai/multiband-melgan",
             "vocoder_models/tr/common-voice/hifigan",
+            "vocoder_models/be/common-voice/hifigan",
         ]
         self.base_models = self.more_models + self.base_models
         self.coqui_fm = [
@@ -388,14 +412,13 @@ class CoquiDemoLocalHost(object):
     def _check_tts_ids(self):
         """Return `True` if the `tts` home page has interesting `id` contents,
         otherwise return `False`, so don't continue with `ds4`"""
-        _continue = False
         if len(self.data_response) == 0:
-            return _continue
-        for fast_check in ['id="speaker_id"', 'id="language_id"', 'id="style_wav"']:
-            if fast_check in self.data_response:
-                _continue = True
-                break
-        return _continue
+            return False
+        if any(fast_check in self.data_response for
+            fast_check in ['id="speaker_id"', 'id="language_id"', 'id="style_wav"']
+        ):
+            return True
+        return False
 
     def language_supported(self, _iso_lang="en-US", alt_local_url=""):  # -> bool
         """Is the language or voice supported in the demonstration?
@@ -456,7 +479,7 @@ class CoquiDemoLocalHost(object):
                         """NameError: This speech synthesis model requires
 [Beautiful Soup 4](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) to
 parse values from a webpage. Install it using `pipx`, `pip3` or a distribution
-system installer application like `apt`."""
+system installer application like `apt-get`."""
                     )
                     self.ok = False
                     return self.ok
@@ -468,6 +491,9 @@ system installer application like `apt`."""
                         if _idiom_value.startswith(_query):
                             self.checked_lang = _idiom_value
                             self.ok = True
+                            break
+                    if self.ok:
+                        break
             except AttributeError:
                 # 'NoneType' object has no attribute 'find_all'; so the page
                 # is missing this section because the model does not feature
@@ -494,6 +520,20 @@ system installer application like `apt`."""
         except:
             pass
         return ""
+    
+    def print_speaker(self, _vox="female1"):
+        """Print the speaker message"""
+        lang_description = ""
+        if len(self.checked_lang) != 0:
+            lang_description = f"""
+* Language: `{self.checked_lang}`"""
+        print(f"""{lang_description}
+* Requested Voice: `{_vox}`
+* {self.mascot} TTS Voice: `{self.voice}`
+
+[{self.help_heading}]({self.url})
+[Coqui AI on GitHub](https://github.com/coqui-ai/TTS/)
+""")
 
     def get_bs4_speaker(self, _vox="female1", _index=0):  # -> string
         """Get the matching voice on thes CoquiAI server web page"""
@@ -514,7 +554,7 @@ system installer application like `apt`."""
         for _item in self.tts_equivalents:
             if _vox.lower() == _item[1]:
                 _matches.append(_item[0])
-        print("\n" + self.help_heading)
+        print(f"\n{self.help_heading}")
         print("=" * (len(self.help_heading)))
         if not self.ok:
             return ""
@@ -550,23 +590,7 @@ system installer application like `apt`."""
                 if _index > _my_favs_count:
                     self.voice = urllib.parse.quote(_index_voice)
                     self.mascot = "\u263A "
-                    print(
-                        "".join(
-                            [
-                                "\n* ",
-                                self.voice,
-                                " ",
-                                self.mascot,
-                                " (",
-                                _vox,
-                                ")\n\n[",
-                                self.help_heading,
-                                "](",
-                                self.url,
-                                ")\n",
-                            ]
-                        )
-                    )
+                    self.print_speaker(_vox)
                     return self.voice
             self.accept_voice.append(_speaker_value)
             _print_values.append(_speaker_value.strip("\n"))
@@ -583,23 +607,7 @@ system installer application like `apt`."""
                                 )
                             )
                         else:
-                            print(
-                                "".join(
-                                    [
-                                        "\n* ",
-                                        self.voice,
-                                        " ",
-                                        self.mascot,
-                                        " (",
-                                        _vox,
-                                        ")\n\n[",
-                                        self.help_heading,
-                                        "](",
-                                        self.url,
-                                        ")\n",
-                                    ]
-                                )
-                            )
+                            self.print_speaker(_vox)
                         return self.voice
         if len(_index_voice) == 0:
             self.voice = _default_voice
@@ -648,11 +656,8 @@ system installer application like `apt`."""
                 readtexttools.unlock_my_lock(self.locker)
                 return True
         if bool(self.add_pause):
-            for _symbol in self.pause_list:
-                if _symbol in _text:
-                    _text = _text.translate(self.add_pause).replace(".;", ".")
-                    break
-
+            if any(_symbol in _text for _symbol in self.pause_list):
+                _text = _text.translate(self.add_pause).replace(".;", ".")
         _view_json = self.debug and 1
         response = readtexttools.local_pronunciation(
             _iso_lang, _text, "coqui", "COQUI_USER_DIRECTORY", _view_json
@@ -671,7 +676,7 @@ system installer application like `apt`."""
             _logo = " " + self.mascot + " "
             # Coqui TTS is not currently available as a built in
             # in system package, so the behaviour and requirements
-            # doe not change consistently across platforms.
+            # do not change consistently across platforms.
             play_list = self.common.big_play_list(_text, _iso_lang.split("-")[0])
             last_item = ""
             _tries = 0
@@ -736,7 +741,7 @@ system installer application like `apt`."""
                 except urllib.error.HTTPError:
                     _logo = " \u26a0\ufe0f "
                     print(
-                        f"{_logo} Tried using `{_iso_lang}` with Coqui TTS but failed with an HTTP Error."
+                        f"""{_logo} Tried using `{_iso_lang}` with Coqui TTS but failed with an HTTP Error.\n<{my_url}>"""
                     )
                     readtexttools.unlock_my_lock(self.locker)
                     done = False

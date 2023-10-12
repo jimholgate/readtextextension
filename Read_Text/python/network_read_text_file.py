@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: UTF-8-*-
-'''
+"""
 This text explains how to use a web service and media player to read a text
 file. It outlines the terms and conditions associated with using the on-line
 service, as well as the potential privacy and security risks. It introduces
@@ -197,24 +197,21 @@ might not be able to access all the features of all TTS language models on all
 computers
 
 [Coqui.ai News](https://tts.readthedocs.io/en/latest/index.html)
-'''
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+"""
+from __future__ import absolute_import, division, print_function, unicode_literals
 import getopt
 import os
 import sys
 import netgtts
+
 try:
     import requests
+
     REQUESTS_OK = True
 except (AttributeError, ImportError):
     REQUESTS_OK = False
 try:
     import netmimic3
-except (AttributeError, ImportError):
-    pass
-try:
-    import netlarynx
 except (AttributeError, ImportError):
     pass
 try:
@@ -244,10 +241,11 @@ except (AttributeError, ImportError):
 
 
 def usage():  # -> None
-    '''
+    """
     Command line help
-    '''
-    print('''
+    """
+    print(
+        """
 Network Speech Synthesis
 ========================
 
@@ -279,14 +277,15 @@ time that you use it.
 * [Open TTS](https://github.com/synesthesiam/opentts#open-text-to-speech-server)
 * [Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest)
 * [CoquiAI demo](https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu)
-''')
+"""
+    )
 
 
-def network_problem(voice='default'):  # -> str
-    '''Return suggestions to make an on-line voice work.'''
+def network_problem(voice="default"):  # -> str
+    """Return suggestions to make an on-line voice work."""
     if len(voice) == 0:
-        voice = 'requested'
-    return f'''Is the network connected?
+        voice = "requested"
+    return f"""Is the network connected?
 =========================
 
 + The `{voice}` on-line voice is currently unavailable.
@@ -295,23 +294,16 @@ def network_problem(voice='default'):  # -> str
 + If you are using a `localhost` server, it might help to
   enter the local speech server command in a terminal and
   read what it prints out. (i. e.: `larynx-server`)
-  '''
+  """
 
 
-def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
-    '''Do at least one of the classes support an on-line speech library?'''
+def network_ok(_iso_lang="en-US", _local_url=""):  # -> bool
+    """Do at least one of the classes support an on-line speech library?"""
     _continue = False
     if not _continue:
         try:
             _mimic3 = netmimic3.Mimic3Class()
             _continue = _mimic3.language_supported(_iso_lang, _local_url)
-        except NameError:
-            pass
-    if not _continue:
-        try:
-            _larynx = netlarynx.LarynxClass()
-            _continue = _larynx.language_supported(
-                _iso_lang, _local_url, 'AUTO')
         except NameError:
             pass
     if not _continue:
@@ -349,10 +341,10 @@ def network_ok(_iso_lang='en-US', _local_url=''):  # -> bool
     return _continue
 
 
-def is_ssml(_text=''):
-    '''Return `True` if text includes standard ssml tags and the string
-    is valid XML,'''
-    _ssml = '</speak>' in _text and '<speak' in _text
+def is_ssml(_text=""):
+    """Return `True` if text includes standard ssml tags and the string
+    is valid XML,"""
+    _ssml = "</speak>" in _text and "<speak" in _text
     if _ssml:
         # Check if `_text` is valid XML
         if readtexttools.strip_xml(_text) == _text:
@@ -360,35 +352,41 @@ def is_ssml(_text=''):
     return _ssml
 
 
-def network_main(_text_file_in='',
-                 _iso_lang='ca-ES',
-                 _visible='false',
-                 _audible='true',
-                 _media_out='',
-                 _writer='',
-                 _title='',
-                 _icon='',
-                 _size='600x600',
-                 _speech_rate=160,
-                 _vox='',
-                 _local_url='',
-                 _denoiser_strength=0.005,
-                 _noise_scale=0.667):  # -> boolean
-    '''Read a text file aloud using a network resource.'''
+def network_main(
+    _text_file_in="",
+    _iso_lang="ca-ES",
+    _visible="false",
+    _audible="true",
+    _media_out="",
+    _writer="",
+    _title="",
+    _icon="",
+    _size="600x600",
+    _speech_rate=160,
+    _vox="",
+    _local_url="",
+    _denoiser_strength=0.005,
+    _noise_scale=0.667,
+):  # -> boolean
+    """Read a text file aloud using a network resource."""
     _imported_meta = readtexttools.ImportedMetaData()
     _text = _imported_meta.meta_from_file(_text_file_in)
     if len(_text.strip()) == 0:
         return False
     _info = readtexttools.check_artist(_writer)
-    clip_title = readtexttools.check_title(_title, 'espeak')
+    clip_title = readtexttools.check_title(_title, "espeak")
     # If the library does not require a postprocess, use `0`,
     # otherwise use the item corresponding to the next action.
     _post_processes = [
-        None, 'process_mp3_media', 'process_playlist',
-        'process_riff_media', 'process_vorbis_media', 'process_wav_media',
-        'process_audio_media'
+        None,
+        "process_mp3_media",
+        "process_playlist",
+        "process_riff_media",
+        "process_vorbis_media",
+        "process_wav_media",
+        "process_audio_media",
     ]
-    _vox = _vox.strip('\'" \t\n').lower()
+    _vox = _vox.strip("'\" \t\n").lower()
     # Prioritize speech engines that use json to communicate data
     # because text tables can use ambiguous labels (i. e.: `NA`)
     # Prioritize engines where everything can be achieved using `urllib`
@@ -399,35 +397,78 @@ def network_main(_text_file_in='',
         if _mimic3.language_supported(_iso_lang, _local_url, _vox):
             _mimic3.spd_voice_to_mimic3_voice(_vox, _iso_lang, _local_url)
             _ssml = is_ssml(_text)
-            _mimic3.read(_text, _iso_lang, _visible, _audible, _media_out, _icon,
-                         clip_title, _post_processes[5], _info, _size, _speech_rate,
-                         _ssml, 20, 60)
+            _mimic3.read(
+                _text,
+                _iso_lang,
+                _visible,
+                _audible,
+                _media_out,
+                _icon,
+                clip_title,
+                _post_processes[5],
+                _info,
+                _size,
+                _speech_rate,
+                _ssml,
+                20,
+                60,
+            )
             return True
     except NameError:
         pass
     try:
         _larynx = netlarynx.LarynxClass()
-        if _larynx.language_supported(
+        if (
+            _larynx.language_supported(
                 _iso_lang,
                 _local_url,
                 _vox,
-        ) and _vox in _larynx.accept_voice:
+            )
+            and _vox in _larynx.accept_voice
+        ):
             _quality = -1  # Auto; Manual is 0 (lowest) to 2 (highest)
             _ssml = is_ssml(_text)
-            _larynx.read(_text, _iso_lang, _visible, _audible, _media_out,
-                         _icon, clip_title, _post_processes[5], _info, _size,
-                         _speech_rate, _quality, _ssml, _denoiser_strength,
-                         _noise_scale, 20, 60)
+            _larynx.read(
+                _text,
+                _iso_lang,
+                _visible,
+                _audible,
+                _media_out,
+                _icon,
+                clip_title,
+                _post_processes[5],
+                _info,
+                _size,
+                _speech_rate,
+                _quality,
+                _ssml,
+                _denoiser_strength,
+                _noise_scale,
+                20,
+                60,
+            )
             return True
     except NameError:
         pass
     try:
         _rhvoice_rest = netrhvoice.RhvoiceLocalHost()
         if _rhvoice_rest.language_supported(_iso_lang, _local_url):
-            _rhvoice_rest.read(_text, _iso_lang, _visible, _audible,
-                               _media_out, _icon, clip_title,
-                               _post_processes[5], _info, _size, _speech_rate,
-                               _vox, 4, 30)
+            _rhvoice_rest.read(
+                _text,
+                _iso_lang,
+                _visible,
+                _audible,
+                _media_out,
+                _icon,
+                clip_title,
+                _post_processes[5],
+                _info,
+                _size,
+                _speech_rate,
+                _vox,
+                4,
+                30,
+            )
             return True
     except NameError:
         pass
@@ -436,9 +477,22 @@ def network_main(_text_file_in='',
         if _opentts.language_supported(_iso_lang, _local_url):
             _ssml = is_ssml(_text)
             _opentts.spd_voice_to_opentts_voice(_vox, _iso_lang)
-            _opentts.read(_text, _iso_lang, _visible, _audible, _media_out,
-                          _icon, clip_title, _post_processes[5], _info,
-                          _size, _ssml, .03, 20, 60)
+            _opentts.read(
+                _text,
+                _iso_lang,
+                _visible,
+                _audible,
+                _media_out,
+                _icon,
+                clip_title,
+                _post_processes[5],
+                _info,
+                _size,
+                _ssml,
+                0.03,
+                20,
+                60,
+            )
             return True
     except NameError:
         pass
@@ -455,69 +509,118 @@ def network_main(_text_file_in='',
                 if _ssml:
                     _text = readtexttools.strip_xml(_text)
                     _ssml = False
-            _marytts.read(_text, _iso_lang, _visible, _audible, _media_out,
-                          _icon, clip_title, _post_processes[5], _info, _size,
-                          _speech_rate, _ssml, _vox, 4, 15)
+            _marytts.read(
+                _text,
+                _iso_lang,
+                _visible,
+                _audible,
+                _media_out,
+                _icon,
+                clip_title,
+                _post_processes[5],
+                _info,
+                _size,
+                _speech_rate,
+                _ssml,
+                _vox,
+                4,
+                15,
+            )
             return True
     except NameError:
         pass
     try:
         _coqui_demo = nettts.CoquiDemoLocalHost()
         if _coqui_demo.language_supported(_iso_lang, _local_url):
-            _coqui_demo.read(_text, _iso_lang, _visible, _audible, _media_out,
-                             _icon, clip_title, _post_processes[5], _info,
-                             _size, _speech_rate, _vox, 20, 60)
+            _coqui_demo.read(
+                _text,
+                _iso_lang,
+                _visible,
+                _audible,
+                _media_out,
+                _icon,
+                clip_title,
+                _post_processes[5],
+                _info,
+                _size,
+                _speech_rate,
+                _vox,
+                20,
+                60,
+            )
             return True
     except (NameError, TypeError):
         pass
     try:
         _gtts_class = netgtts.GoogleTranslateClass()
-        if _gtts_class.check_version(
-                _gtts_class.tested_version) and _vox in _gtts_class.accept_voice:
-            _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,
-                             _icon, clip_title, _post_processes[1], _info,
-                             _size, _speech_rate)
+        if (
+            _gtts_class.check_version(_gtts_class.tested_version)
+            and _vox in _gtts_class.accept_voice
+        ):
+            _gtts_class.read(
+                _text,
+                _iso_lang,
+                _visible,
+                _audible,
+                _media_out,
+                _icon,
+                clip_title,
+                _post_processes[1],
+                _info,
+                _size,
+                _speech_rate,
+            )
             return True
     except NameError:
         pass
     # Just display a translation link.
-    _gtts_class.read(_text, _iso_lang, _visible, _audible, _media_out,
-                     _icon, clip_title, _post_processes[0], _info,
-                     _size, _speech_rate)
+    _gtts_class.read(
+        _text,
+        _iso_lang,
+        _visible,
+        _audible,
+        _media_out,
+        _icon,
+        clip_title,
+        _post_processes[0],
+        _info,
+        _size,
+        _speech_rate,
+    )
 
     print(
-        'No working network server was found, or the requested voice is unavailable.\n'
+        "No working network server was found, or the requested voice is unavailable.\n"
     )
     usage()
     return False
 
 
 def main():  # -> NoReturn
-    '''Use network speech synthesis for supported languages while on-line'''
-    if not sys.version_info >= (3, 6) or not os.name in ['posix', 'nt']:
-        print('Your system does not support the network python tool.')
+    """Use network speech synthesis for supported languages while on-line"""
+    if not sys.version_info >= (3, 6) or not os.name in ["posix", "nt"]:
+        print("Your system does not support the network python tool.")
         usage()
         sys.exit(0)
     _speech_rate = 160
-    _iso_lang = 'ca-ES'
+    _iso_lang = "ca-ES"
     try:
-        _iso_lang = readtexttools.default_lang().replace('_', '-')
+        _iso_lang = readtexttools.default_lang().replace("_", "-")
     except (AttributeError, ImportError):
         pass
-    _media_out = ''
-    _visible = 'false'
-    _audible = 'true'
-    _text = ''
-    _percent_rate = '100%'
+    _media_out = ""
+    _visible = "false"
+    _audible = "true"
+    _text = ""
+    _percent_rate = "100%"
     _speech_rate = netcommon.speech_wpm(_percent_rate)
     _denoiser_strength = 0.005
     _noise_scale = 0.667
-    _icon = ''
-    _title = ''
-    _writer = ''
-    _size = '600x600'
-    _speaker = 'AUTO'
-    _local_url = ''
+    _icon = ""
+    _title = ""
+    _writer = ""
+    _size = "600x600"
+    _speaker = "AUTO"
+    _local_url = ""
     _text_file_in = sys.argv[-1]
 
     if os.path.isfile(_text_file_in):
@@ -525,55 +628,70 @@ def main():  # -> NoReturn
             usage()
             sys.exit(0)
         try:
-            opts, args = getopt.getopt(sys.argv[1:], 'hovalritndsxuec', [
-                'help', 'output=', 'visible=', 'audible=', 'language=',
-                'rate=', 'image=', 'title=', 'artist=', 'dimensions=',
-                'speaker=', 'voice=', 'url=', 'denoiser_strength=',
-                'noise_scale='
-            ])
+            opts, args = getopt.getopt(
+                sys.argv[1:],
+                "hovalritndsxuec",
+                [
+                    "help",
+                    "output=",
+                    "visible=",
+                    "audible=",
+                    "language=",
+                    "rate=",
+                    "image=",
+                    "title=",
+                    "artist=",
+                    "dimensions=",
+                    "speaker=",
+                    "voice=",
+                    "url=",
+                    "denoiser_strength=",
+                    "noise_scale=",
+                ],
+            )
         except getopt.GetoptError:
-            print('option -a not recognized')
+            print("option -a not recognized")
             usage()
             sys.exit(2)
         for o, a in opts:
-            if o in ('-h', '--help'):
+            if o in ("-h", "--help"):
                 usage()
                 sys.exit(0)
-            elif o in ('-o', '--output'):
+            elif o in ("-o", "--output"):
                 _media_out = a
-            elif o in ('-v', '--visible'):
+            elif o in ("-v", "--visible"):
                 _visible = a
-            elif o in ('-a', '--audible'):
+            elif o in ("-a", "--audible"):
                 _audible = a
-            elif o in ('-l', '--language'):
+            elif o in ("-l", "--language"):
                 _iso_lang = a
-            elif o in ('-r', '--rate'):
+            elif o in ("-r", "--rate"):
                 _percent_rate = a
                 if len(_percent_rate) != 0:
                     _speech_rate = netcommon.speech_wpm(_percent_rate)
-            elif o in ('-i', '--image'):
+            elif o in ("-i", "--image"):
                 _icon = a
-            elif o in ('-t', '--title'):
+            elif o in ("-t", "--title"):
                 _title = a
-            elif o in ('-n', '--artist'):
+            elif o in ("-n", "--artist"):
                 _writer = a
-            elif o in ('-d', '--dimensions'):
+            elif o in ("-d", "--dimensions"):
                 _size = a
-            elif o in ('-s', '--speaker'):
+            elif o in ("-s", "--speaker"):
                 # depreciated
                 _speaker = a
-            elif o in ('-x', '--voice'):
+            elif o in ("-x", "--voice"):
                 _speaker = a
-            elif o in ('-u', '--url'):
+            elif o in ("-u", "--url"):
                 _local_url = a
-            elif o in ('-e', '--denoiser_strength'):
+            elif o in ("-e", "--denoiser_strength"):
                 try:
                     _denoiser_strength = float(o)
                 except (AttributeError, TypeError, ValueError):
                     pass
                 if not bool(_denoiser_strength):
                     _denoiser_strength = 0.005
-            elif o in ('-c', '--noise_scale'):
+            elif o in ("-c", "--noise_scale"):
                 try:
                     _noise_scale = float(o)
                 except (AttributeError, TypeError, ValueError):
@@ -581,12 +699,25 @@ def main():  # -> NoReturn
                 if not bool(_noise_scale):
                     _noise_scale = 0.667
             else:
-                assert False, 'unhandled option'
-        network_main(_text_file_in, _iso_lang, _visible, _audible, _media_out,
-                     _writer, _title, _icon, _size, _speech_rate, _speaker,
-                     _local_url, _denoiser_strength, _noise_scale)
+                assert False, "unhandled option"
+        network_main(
+            _text_file_in,
+            _iso_lang,
+            _visible,
+            _audible,
+            _media_out,
+            _writer,
+            _title,
+            _icon,
+            _size,
+            _speech_rate,
+            _speaker,
+            _local_url,
+            _denoiser_strength,
+            _noise_scale,
+        )
     sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

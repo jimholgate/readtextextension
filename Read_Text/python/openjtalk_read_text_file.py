@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python
 # -*- coding: UTF-8-*-
-'''
+"""
 The Japanese TTS system "Open JTalk"
 ===================================
 
@@ -47,9 +47,8 @@ The Japanese source text might be coded as `shift_jis`:
 
 Copyright (c) 2023 James Holgate
 
-'''
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+"""
+from __future__ import absolute_import, division, print_function, unicode_literals
 import getopt
 import os
 import sys
@@ -57,10 +56,11 @@ import readtexttools
 
 
 def usage():
-    '''
+    """
     Command line help
-    '''
-    print('''Open Jtalk Read Text
+    """
+    print(
+        """Open Jtalk Read Text
 ==============
 
 Reads a utf-8 text file in Japanese using open-jtalk and a media player.
@@ -77,34 +77,39 @@ Usage
      openjtalk_read_text_file.py --output "output.[avi|webm]"
        --image "input.[png|jpg] "input.txt"
      openjtalk_read_text_file.py --audible "false" --output "output.wav"
-       "input.txt" ''')
+       "input.txt" """
+    )
 
 
 class OpenJTalkClass(object):
-    '''Japanese language text to speech'''
+    """Japanese language text to speech"""
 
     def __init__(self):
-        '''Defaults'''
-        self.app = 'open_jtalk'
-        self.application = '/usr/bin/open_jtalk'
-        self.dictionary = '/var/lib/mecab/dic/open-jtalk/naist-jdic'
-        self.hts_voice = '/usr/share/hts-voice/nitech-jp-atr503-m001/nitech_jp_atr503_m001.htsvoice'
-        self.all_pass = '0.55'
-        self.rate = '1.0'  # 0 - 1
-        self.sample_period = '240'
-        self.sample = '48000'
+        """Defaults"""
+        self.app = "open_jtalk"
+        self.application = "/usr/bin/open_jtalk"
+        self.dictionary = "/var/lib/mecab/dic/open-jtalk/naist-jdic"
+        self.hts_voice = (
+            "/usr/share/hts-voice/nitech-jp-atr503-m001/nitech_jp_atr503_m001.htsvoice"
+        )
+        self.all_pass = "0.55"
+        self.rate = "1.0"  # 0 - 1
+        self.sample_period = "240"
+        self.sample = "48000"
 
-    def openjtalk_read(self,
-                       _in_text='',
-                       _language='ja-JP',
-                       _visible='false',
-                       _audible='true',
-                       _media_file='',
-                       _image='',
-                       _title='',
-                       _artist='',
-                       _dimensions='600x600'):
-        '''
+    def openjtalk_read(
+        self,
+        _in_text="",
+        _language="ja-JP",
+        _visible="false",
+        _audible="true",
+        _media_file="",
+        _image="",
+        _title="",
+        _artist="",
+        _dimensions="600x600",
+    ):
+        """
         _in_text file path containing the text to speak. The file must be written as utf-8.
         _language - Supported two or four letter language code
         _visible- Use a graphic media player, or False for invisible player
@@ -114,11 +119,11 @@ class OpenJTalkClass(object):
         _title - Commentary or title for post processing
         _artist - Artist or Author
         _dimensions - Dimensions to scale photo '600x600'
-        '''
-        _out_file = ''
+        """
+        _out_file = ""
         if len(_language) == 0:
-            _language = 'ja'
-        elif _language[:2].lower() != 'ja':
+            _language = "ja"
+        elif _language[:2].lower() != "ja":
             return False
         _app = self.app
         all_pass = self.all_pass
@@ -132,96 +137,121 @@ class OpenJTalkClass(object):
             if not (os.path.isfile(resource) or os.path.isdir(resource)):
                 return False
         # Determine the output file name
-        _out_file = readtexttools.get_work_file_path(_media_file, _image,
-                                                     'OUT')
+        _out_file = readtexttools.get_work_file_path(_media_file, _image, "OUT")
         # Determine the temporary file name
-        _work_file = readtexttools.get_work_file_path(_media_file, _image,
-                                                      'TEMP')
+        _work_file = readtexttools.get_work_file_path(_media_file, _image, "TEMP")
         # Delete old versions
         if os.path.isfile(_work_file):
             os.remove(_work_file)
         if os.path.isfile(_out_file):
             os.remove(_out_file)
         try:
-            _os_command = '"%(application)s" -s %(sample)s -p %(sample_period)s -a %(all_pass)s -m "%(hts_voice)s" -r %(rate)s -ow "%(_work_file)s" -x "%(dictionary)s" "%(_in_text)s"' % locals(
+            _os_command = (
+                '"%(application)s" -s %(sample)s -p %(sample_period)s -a %(all_pass)s -m "%(hts_voice)s" -r %(rate)s -ow "%(_work_file)s" -x "%(dictionary)s" "%(_in_text)s"'
+                % locals()
             )
             if readtexttools.my_os_system(_os_command):
                 if len(_out_file) != 0:
                     readtexttools.unlock_my_lock()
                 if os.path.getsize(_work_file) == 0:
                     return False
-                if readtexttools.process_wav_media(_title, _work_file, _image,
-                                                   _out_file, _audible,
-                                                   _visible, _artist,
-                                                   _dimensions):
+                if readtexttools.process_wav_media(
+                    _title,
+                    _work_file,
+                    _image,
+                    _out_file,
+                    _audible,
+                    _visible,
+                    _artist,
+                    _dimensions,
+                ):
                     return True
         except IOError:
-            print('`openjtalk_read_text_file.py` was unable to read!')
+            print("`openjtalk_read_text_file.py` was unable to read!")
             usage()
         return False
 
 
 def main():  # -> NoReturn
-    '''OpenJtalk read text tools'''
+    """OpenJtalk read text tools"""
     _open_jtalk = OpenJTalkClass()
-    _language = 'ja-JP'
-    _output = ''
-    _visible = 'False'
-    _audible = 'True'
-    _image = ''
-    _title = ''
-    _artist = ''
-    _dimensions = '600x600'
+    _language = "ja-JP"
+    _output = ""
+    _visible = "False"
+    _audible = "True"
+    _image = ""
+    _title = ""
+    _artist = ""
+    _dimensions = "600x600"
     _xml_transform = readtexttools.XmlTransform()
     _file_path = sys.argv[-1]
     if os.path.isfile(_file_path):
         if sys.argv[-1] == sys.argv[0]:
             usage()
             sys.exit(0)
-        elif not os.path.isfile('/usr/bin/open_jtalk'):
-            print('Please install open-jtalk.')
+        elif not os.path.isfile("/usr/bin/open_jtalk"):
+            print("Please install open-jtalk.")
             usage()
             sys.exit(0)
         try:
-            opts, args = getopt.getopt(sys.argv[1:], 'hovalitnd', [
-                'help', 'output=', 'visible=', 'audible=', 'language=',
-                'image=', 'title=', 'artist=', 'dimensions='
-            ])
+            opts, args = getopt.getopt(
+                sys.argv[1:],
+                "hovalitnd",
+                [
+                    "help",
+                    "output=",
+                    "visible=",
+                    "audible=",
+                    "language=",
+                    "image=",
+                    "title=",
+                    "artist=",
+                    "dimensions=",
+                ],
+            )
         except getopt.GetoptError:
             # print help information and exit
-            print('option -a not recognized')
+            print("option -a not recognized")
             usage()
             sys.exit(2)
         for o, a in opts:
-            if o in ('-h', '--help'):
+            if o in ("-h", "--help"):
                 usage()
                 sys.exit(0)
-            elif o in ('-o', '--output'):
+            elif o in ("-o", "--output"):
                 _output = a
-            elif o in ('-v', '--visible'):
+            elif o in ("-v", "--visible"):
                 _visible = a
-            elif o in ('-a', '--audible'):
+            elif o in ("-a", "--audible"):
                 _audible = a
-            elif o in ('-l', '--language'):
+            elif o in ("-l", "--language"):
                 _language = a
-            elif o in ('-i', '--image'):
+            elif o in ("-i", "--image"):
                 _image = a
-            elif o in ('-t', '--title'):
+            elif o in ("-t", "--title"):
                 _title = a
-            elif o in ('-n', '--artist'):
+            elif o in ("-n", "--artist"):
                 _artist = a
-            elif o in ('-d', '--dimensions'):
+            elif o in ("-d", "--dimensions"):
                 _dimensions = a
             else:
-                assert False, 'unhandled option'
+                assert False, "unhandled option"
 
         _artist_ok = readtexttools.check_artist(_artist)
         _title_ok = readtexttools.check_title(_title, "open_jtalk")
-        _open_jtalk.openjtalk_read(_file_path, _language, _visible, _audible,
-                                   _output, _image, _title_ok, _artist_ok,
-                                   _dimensions)
+        _open_jtalk.openjtalk_read(
+            _file_path,
+            _language,
+            _visible,
+            _audible,
+            _output,
+            _image,
+            _title_ok,
+            _artist_ok,
+            _dimensions,
+        )
     else:
-        print('I was unable to find the file you specified!')
+        print("I was unable to find the file you specified!")
     sys.exit(0)
 
 

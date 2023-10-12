@@ -326,7 +326,6 @@ def filterinputs(s0):
     """
     Escape input for a bash shell.
     """
-    bsafe = False
     s1 = s0
     if os.name == "nt":
         if '"' in s1:
@@ -343,17 +342,11 @@ def filterinputs(s0):
             s1 = s1.replace("'", "\\'")
 
         # Check for shellshock
-        a1 = ["{", "}", "(", ")", ";", ":"]
-        for i, item in enumerate(a1):
-            if (a1[i] in s1) is False:
-                bsafe = True
-                break
-
-        if bsafe is False:
+        if any(_item in s1 for _item in ["{", "}", "(", ")", ";", ":"]):
             a2 = ["{", "}", "(", ")"]
             # Escape the problem characters with `\`
-            for i, item in enumerate(a2):
-                s1 = s1.replace(a2[i], "".join(["\\", a2[i]]))
+            for item in ["{", "}", "(", ")"]:
+                s1 = s1.replace(item, "".join(["\\", item]))
     return s1
 
 

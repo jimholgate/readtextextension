@@ -1,6 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
-"""Support MaryTTS speech synthesis using a Docker image."""
+"""Support MaryTTS speech synthesis using a Docker image. This image
+features a collection of hidden semi-Markov model (HSMM) voices for
+various languages. Latency is low and the models are compact. This
+tool uses the same web address as Mimic3 by default, so you can't
+run the two localhost servers together using the defaults.
+
+    docker run -it -p 59125:59125 synesthesiam/marytts:latest \
+        --voice cmu-bdl-hsmm --voice upmc-pierre-hsmm
+    xdg-open http://0.0.0.0:59125
+
+[MaryTSS](https://github.com/synesthesiam/docker-marytts)
+"""
 import os
 import platform
 import tempfile
@@ -424,10 +435,8 @@ It did not respond correctly."""
                 readtexttools.unlock_my_lock(self.locker)
                 return True
         if bool(self.add_pause) and not ssml:
-            for _symbol in self.pause_list:
-                if _symbol in _text:
-                    _text = _text.translate(self.add_pause).replace(".;", ".")
-                    break
+            if any(_symbol in _text for _symbol in self.pause_list):
+                _text = _text.translate(self.add_pause).replace(".;", ".")
         _view_json = self.debug and 1
         _mary_vox = self.marytts_voice(_vox, _iso_lang)
         response = readtexttools.local_pronunciation(

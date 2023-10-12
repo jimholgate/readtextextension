@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8-*-
-"""Module supporting Docker rhvoice-rest speech synthesis."""
+r"""Module supporting Docker rhvoice-rest speech synthesis.
+
+    docker pull aculeasis/rhvoice-rest:latest
+    docker run -d \
+      --name=rhvoice-rest \
+      -p 8080:8080 \
+      --restart unless-stopped \
+      aculeasis/rhvoice-rest:latest
+"""
 import os
 import platform
 import tempfile
@@ -302,10 +310,8 @@ Checking {help_heading} voices for `{_iso_lang}`
                 readtexttools.unlock_my_lock(self.locker)
                 return True
         if bool(self.add_pause):
-            for _symbol in self.pause_list:
-                if _symbol in _text:
-                    _text = _text.translate(self.add_pause).replace(".;", ".")
-                    break
+            if any(_symbol in _text for _symbol in self.pause_list):
+                _text = _text.translate(self.add_pause).replace(".;", ".")
         if os.path.isfile(_media_work):
             os.remove(_media_work)
         _view_json = self.debug and 1

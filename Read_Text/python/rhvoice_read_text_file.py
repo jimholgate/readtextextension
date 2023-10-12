@@ -354,7 +354,9 @@ class RhVoiceClass(object):
         readtexttools.write_plain_text_file(_text_work, _text, "utf-8")
         _app = self.app
         _speech_rate = readtexttools.safechars(_speech_rate, "1234567890")
-        _command = f"{_app} -i '{_text_work}' -r {_speech_rate} -p {_voice} -o '{_media_work}'"
+        _command = (
+            f"{_app} -i '{_text_work}' -r {_speech_rate} -p {_voice} -o '{_media_work}'"
+        )
         try:
             readtexttools.my_os_system(_command)
         except Exception:
@@ -381,9 +383,7 @@ class RhVoiceClass(object):
             _msg = "Could not play a rhvoice media file locally."
             if bool(_media_out):
                 _msg = "Could not save a rhvoice media file locally."
-            readtexttools.pop_message(
-                "Python `rhvoice`", _msg, 5000, _error_icon, 1
-            )
+            readtexttools.pop_message("Python `rhvoice`", _msg, 5000, _error_icon, 1)
         self.ok = False
         return False
 
@@ -415,14 +415,11 @@ class RhVoiceClass(object):
                         if _voice in _check_list:
                             return _voice
                     else:
-                        if os.path.isdir(
-                            f"/usr/share/RHVoice/voices/{_voice}"
-                        ):
+                        if os.path.isdir(f"/usr/share/RHVoice/voices/{_voice}"):
                             return _voice
             except (AttributeError, SyntaxError):
                 pass
         return ""
-
 
     def language_to_voice(self, iso_lang="en-US", _check_list=None) -> str:
         """Check if the library supports the language or voice.
@@ -444,9 +441,7 @@ class RhVoiceClass(object):
             _region = ""
             _voices = [""]
             for i in range(_len):
-                _region = "-".join(
-                    [_domain[i]["lang1"], _domain[i]["iso_code"]]
-                )
+                _region = "-".join([_domain[i]["lang1"], _domain[i]["iso_code"]])
                 if _region.strip() == iso_lang.strip():
                     return self.first_good_voice(_domain[i]["voices"])
             for i in range(_len):
