@@ -1418,7 +1418,6 @@ Function fbGoToMark(MarkType) As Boolean
 	fbGoToMark = False
 End Function
 
-
 Function fbClipBoardAvailable() As Boolean
 	&apos; if program has crashed or is a version known to 
 	&apos; crash when reading the clipboard, provide
@@ -1578,7 +1577,7 @@ Function fbWindowsHasAnInternationalVoice( _
 	cr = Chr(10)
 	On Error Goto fbWindowsHasAnInternationalVoiceErr
 	b1 = True
-	If fsGetOS = &quot;WINDOWS&quot; Then
+	If fsGetOS() = &quot;WINDOWS&quot; Then
 		Dim sapi As Object
 		Set Sapi = CreateObject(&quot;Sapi.SpVoice&quot;)
 		b1 = False
@@ -3889,7 +3888,7 @@ Function fbWindowsHasVoiceInThisLanguage( _
 	&apos; https://www.w3.org/TR/speech-synthesis
 	&apos; Determine which SAPI voices are installed, then
 	&apos; if we have a modern voice from Windows Vista, Windows 7 or above
-	&apos; then return true, else if no voices found, then return False
+	&apos; then return True, else if no voices found, then return False
 	Dim Sapi As Object
 	Dim n,n1 As Integer
 	Dim s1, s2 As String
@@ -3904,7 +3903,7 @@ Function fbWindowsHasVoiceInThisLanguage( _
 	&apos;let&apos;s see if we recognize the language s1
 	For n = 0 To Sapi.GetVoices.Count - 1
 		s2 = LCase(Sapi.GetVoices.Item(n).GetDescription)
-		If InStr(s2,s1) &lt;&gt; 0 Then
+		If InStr(s2, s1) &lt;&gt; 0 Then
 			fbWindowsHasVoiceInThisLanguage = True
 			Exit For
 		End If
@@ -3918,491 +3917,629 @@ Function fbWindowsHasVoiceInThisLanguage( _
 End Function
 
 
-Function isoToEnglish( _
-	ByVal s1) As String
-	&apos; Returns name of language, if known
-	Dim S2 As String
-	
-	If Right(s1,1) = &quot;-&quot; Then
-		s1 = Left(s1,Len(s1 - 1))
+Function fsWindowsCloseMatchLanguage(s1)
+		Dim s2
+		s2 = fsWindowsCloseMatchVoice(s1)
+		Dim s3
+		s3 = &quot; &quot;
+		Dim s4
+		s4 = &quot;en-US&quot;
+		If Len(s2) &gt; 1 Then
+			If InStr(s2, &quot;-&quot;) &gt; 4  Then
+				&apos; Microsoft voice listing format lists the language
+				&apos; in English following a dash
+				s3 = &quot;-&quot;
+			End If
+			Dim a1 : a1 = Split(s2, s3)
+			s4 = Trim(a1(UBound(a1)))
+			fsWindowsCloseMatchLanguage = fsIsoToHumanReadable(s4, 0)
+		Else
+			fsWindowsCloseMatchLanguage = s4
+		End If
+End Function
+
+
+Function fsWindowsCloseMatchVoice(s1)
+	&apos; s1 - iso language string in the form `es-ES` or `en-CA`
+	&apos; Returns a human readable string of a language that
+	&apos; is installed and that closely matches the requested language
+	&apos; in the form `Spanish (Mexico)` or `English (USA)`
+	fsWindowsCloseMatchVoice = &quot;&quot;
+	Dim i
+	i = 0
+	Dim s2
+	s2 = fsIsoToConciseHumanReadable(s1, 1)
+	Dim s3
+	s3 = &quot;&quot;
+	Dim s4
+	s4 = fsIsoToHumanReadable(s1, 1)
+	Dim Sapi
+	Set Sapi = CreateObject(&quot;Sapi.SpVoice&quot;)
+	&apos; Microsoft SAPI voices have a predictable naming pattern that includes
+	&apos; the language name in the form - `Microsoft David Desktop - English (United States)
+
+	If Sapi.GetVoices.Count = 0 Then
+		fsWindowsCloseMatchVoice = &quot;Ambiguous Or Missing Language&quot;
+	Else
+		For i = 0 To Sapi.GetVoices.Count - 1
+			s3=Sapi.GetVoices.Item(i).GetDescription
+			If Len(s3) &gt; 1 And InStr(s3, s4) &gt; 1 Then
+				fsWindowsCloseMatchVoice = s3
+				Exit For
+			End If
+		Next
+		If fsWindowsCloseMatchVoice = &quot;&quot; Then
+			For i = 0 To Sapi.GetVoices.Count - 1
+				s3 = Sapi.GetVoices.Item(i).GetDescription
+				If Len(s3) &gt; 1 And InStr(s3, s2) &gt; 1 Then
+					fsWindowsCloseMatchVoice = s3
+					Exit For
+				End If
+			Next
+		End If
 	End If
-	Select Case LCase(s1)
-		Case &quot;en-us&quot;
-		S2 = &quot;English (United States)&quot;
-		Case &quot;en-gb&quot;
-		S2 = &quot;English (Great Britain)&quot;
-		Case &quot;en-vg&quot;
-		S2 = &quot;English (British Virgin Islands)&quot;
-		Case &quot;en-io&quot;
-		S2 = &quot;English (Great Britain)&quot;
-		Case &quot;en-gg&quot;
-		S2 = &quot;English (Guernsey)&quot;
-		Case &quot;en-au&quot;
-		S2 = &quot;English (Australia)&quot;
-		Case &quot;en-bz&quot;
-		S2 = &quot;English (Belize)&quot;
-		Case &quot;en-ca&quot;
-		S2 = &quot;English (Canada)&quot;
-		Case &quot;en-bs&quot;
-		S2 = &quot;English (Bahamas)&quot;
-		Case &quot;en-hk&quot;
-		S2 = &quot;English (Hong Kong)&quot;
-		Case &quot;en-in&quot;
-		S2 = &quot;English (India)&quot;
-		Case &quot;en-id&quot;
-		S2 = &quot;English (Indonesia)&quot;
-		Case &quot;en-ie&quot;
-		S2 = &quot;English (Ireland)&quot;
-		Case &quot;en-jm&quot;
-		S2 = &quot;English (Jamaica)&quot;
-		Case &quot;en-my&quot;
-		S2 = &quot;English (Malaysia)&quot;
-		Case &quot;en-nz&quot;
-		S2 = &quot;English (New Zealand)&quot;
-		Case &quot;en-ph&quot;
-		S2 = &quot;English (Philippines)&quot;
-		Case &quot;en-sg&quot;
-		S2 = &quot;English (Singapore)&quot;
-		Case &quot;en-za&quot;
-		S2 = &quot;English (South Africa)&quot;
-		Case &quot;en-tt&quot;
-		S2 = &quot;English (Trinidad &quot; &apos; sic
-		Case &quot;en-zw&quot;
-		S2 = &quot;English (Zimbabwe)&quot;
-		Case &quot;en&quot;
-		S2 = &quot;English&quot;
-		Case &quot;fr-be&quot;
-		S2 = &quot;French (Belgium)&quot;
-		Case &quot;fr-ca&quot;
-		S2 = &quot;French (Canada)&quot;
-		Case &quot;fr-cg&quot;
-		S2 = &quot;French (Congo)&quot;
-		Case &quot;fr-ch&quot;
-		S2 = &quot;French (Switzerland)&quot;
-		Case &quot;fr-ci&quot;
-		S2 = &quot;French (Ivory Coast)&quot;
-		Case &quot;fr-cm&quot;
-		S2 = &quot;French (Cameroon)&quot;
-		Case &quot;fr-fr&quot;
-		S2 = &quot;French (France)&quot;
-		Case &quot;fr-ht&quot;
-		S2 = &quot;French (Haiti)&quot;
-		Case &quot;fr-lu&quot;
-		S2 = &quot;French (Luxembourg)&quot;
-		Case &quot;fr-ma&quot;
-		S2 = &quot;French (Morocco)&quot;
-		Case &quot;fr-mc&quot;
-		S2 = &quot;French (Monaco)&quot;
-		Case &quot;fr-ml&quot;
-		S2 = &quot;French (Mali)&quot;
-		Case &quot;fr-re&quot;
-		S2 = &quot;French (Reunion)&quot;
-		Case &quot;fr-sn&quot;
-		S2 = &quot;French (Senegal)&quot;
-		Case &quot;fr&quot;
-		S2 = &quot;French&quot;
-		Case &quot;it&quot;,&quot;it-it&quot;
-		S2 = &quot;Italian&quot;
-		Case &quot;de-at&quot;
-		S2 = &quot;German (Austria)&quot;
-		Case &quot;de-ch&quot;
-		S2 = &quot;German (Switzerland)&quot;
-		Case &quot;de-de&quot;
-		S2 = &quot;German (Germany)&quot;
-		Case &quot;de-li&quot;
-		S2 = &quot;German (Lithuania)&quot;
-		Case &quot;de-lu&quot;
-		S2 = &quot;German (Luxembourg)&quot;
-		Case &quot;de&quot;
-		S2 = &quot;German&quot;
-		Case &quot;es-es&quot;
-		S2 = &quot;Spanish (Spain)&quot;
-		Case &quot;es-ar&quot;
-		S2 = &quot;Spanish (Argentina)&quot;
-		Case &quot;es-bo&quot;
-		S2 = &quot;Spanish (Bolivia)&quot;
-		Case &quot;es-cl&quot;
-		S2 = &quot;Spanish (Chile)&quot;
-		Case &quot;es-co&quot;
-		S2 = &quot;Spanish (Colombia)&quot;
-		Case &quot;es-cr&quot;
-		S2 = &quot;Spanish (Costa Rica)&quot;
-		Case &quot;es-do&quot;
-		S2 = &quot;Spanish (Dominican Republic)&quot;
-		Case &quot;es-ec&quot;
-		S2 = &quot;Spanish (Ecuador)&quot;
-		Case &quot;es-sv&quot;
-		S2 = &quot;Spanish (Svalbard) &quot;
-		Case &quot;es-gt&quot;
-		S2 = &quot;Spanish (Guatemala)&quot;
-		Case &quot;es-hn&quot;
-		S2 = &quot;Spanish (Honduras)&quot;
-		Case &quot;es-mx&quot;
-		S2 = &quot;Spanish (Mexico)&quot;
-		Case &quot;es-ni&quot;
-		S2 = &quot;Spanish (Nicaragua)&quot;
-		Case &quot;es-pa&quot;
-		S2 = &quot;Spanish (Panama)&quot;
-		Case &quot;es-py&quot;
-		S2 = &quot;Spanish (Paraguay)&quot;
-		Case &quot;es-pe&quot;
-		S2 = &quot;Spanish (Peru)&quot;
-		Case &quot;es-pr&quot;
-		S2 = &quot;Spanish (Puerto Rico)&quot;
-		Case &quot;es-us&quot;
-		S2 = &quot;Spanish (United States)&quot;
-		Case &quot;es-uy&quot;
-		S2 = &quot;Spanish (Uraguay)&quot;
-		Case &quot;es-ve&quot;
-		S2 = &quot;Spanish (Venezuela)&quot;
-		Case &quot;es&quot;
-		S2 = &quot;Spanish&quot;
-		Case &quot;ru&quot;,&quot;ru-ru&quot;
-		S2 = &quot;Russian&quot;
-		Case &quot;hi&quot;,&quot;hi-in&quot;
-		S2 = &quot;Hindi&quot;
-		Case &quot;af&quot;,&quot;af-za&quot;
-		S2 = &quot;Afrikaans&quot;
-		Case &quot;ak&quot;,&quot;ak-gh&quot;
-		S2 = &quot;Akan&quot;
-		Case &quot;an&quot;,&quot;an-es&quot;
-		S2 = &quot;Argonese&quot;
-		Case &quot;az&quot;,&quot;az-az&quot;
-		S2 = &quot;Azerbaijani&quot;
-		Case &quot;ar-sa&quot;
-		S2 = &quot;Arabic (Saudi Arabia)&quot;
-		Case &quot;ar-dz&quot;
-		S2 = &quot;Arabic (Algeria)&quot;
-		Case &quot;ar-bh&quot;
-		S2 = &quot;Arabic (Bhutan)&quot;
-		Case &quot;ar-eg&quot;
-		S2 = &quot;Arabic (Egypt)&quot;
-		Case &quot;ar-iq&quot;
-		S2 = &quot;Arabic (Iraq)&quot;
-		Case &quot;ar-jo&quot;
-		S2 = &quot;Arabic (Jordan)&quot;
-		Case &quot;ar-kw&quot;
-		S2 = &quot;Arabic (Kuwait)&quot;
-		Case &quot;ar-lb&quot;
-		S2 = &quot;Arabic (Lebanon)&quot;
-		Case &quot;ar-ly&quot;
-		S2 = &quot;Arabic (Libya)&quot;
-		Case &quot;ar-om&quot;
-		S2 = &quot;Arabic (Oman)&quot;
-		Case &quot;ar-qa&quot;
-		S2 = &quot;Arabic (Qatar)&quot;
-		Case &quot;ar-sy&quot;
-		S2 = &quot;Arabic (Syria)&quot;
-		Case &quot;ar-tn&quot;
-		S2 = &quot;Arabic (Tunisia)&quot;
-		Case &quot;ar-ae&quot;
-		S2 = &quot;Arabic (United Arab Emirates)&quot;
-		Case &quot;ar-ye&quot;
-		S2 = &quot;Arabic (Yemen)&quot;
-		Case &quot;ar&quot;
-		S2 = &quot;Arabic&quot;
-		Case &quot;be&quot;,&quot;be-by&quot;
-		S2 = &quot;Belarusian&quot;
-		Case &quot;bm&quot;,&quot;bm-ml&quot;
-		S2 = &quot;Bambara&quot;
-		Case &quot;beq&quot;,&quot;beq-cg&quot;
-		S2 = &quot;Beembe&quot;
-		Case &quot;bk&quot;,&quot;bkw-cg&quot;
-		S2 = &quot;Bekwel&quot;
-		Case &quot;bn&quot;,&quot;bn-bd&quot;
-		S2 = &quot;Bengali&quot;
-		Case &quot;bs&quot;,&quot;bs-bn&quot;
-		S2 = &quot;Bosnian&quot;
-		Case &quot;buc&quot;,&quot;buc-yt&quot;
-		S2 = &quot;Bushi&quot;
-		Case &quot;eu&quot;,&quot;eu-fr&quot;,&quot;eu-es&quot;
-		S2 = &quot;Basque&quot;
-		Case &quot;bg&quot;,&quot;bg-bg&quot;
-		S2 = &quot;Bulgarian&quot;
-		Case &quot;ca&quot;,&quot;ca-es&quot;
-		S2 = &quot;Catalan&quot;
-		Case &quot;ceb&quot;,&quot;ceb-ph&quot;
-		S2 = &quot;Cebuano&quot;
-		Case &quot;cop&quot;,&quot;cop-eg&quot;
-		S2 = &quot;Coptic&quot;
-		Case &quot;csb&quot;,&quot;csb-pl&quot;
-		S2 = &quot;Kashubian&quot;
-		Case &quot;cv&quot;,&quot;cv-ru&quot;
-		S2 = &quot;Chuvash&quot;
-		Case &quot;cs&quot;,&quot;cs-cz&quot;
-		S2 = &quot;Czech&quot;
-		Case &quot;cy&quot;,&quot;cy-gb&quot;
-		S2 = &quot;Welsh&quot;
-		Case &quot;da&quot;,&quot;da-dk&quot;
-		S2 = &quot;Danish&quot;
-		Case &quot;dsb&quot;,&quot;dsb-de&quot;
-		S2 = &quot;Sorbian, Lower&quot;
-		Case &quot;ebo&quot;,&quot;ebo-cg&quot;
-		S2 = &quot;Teke-Eboo&quot;
-		Case &quot;ee&quot;,&quot;ee-gh&quot;
-		S2 = Chr(201) &amp; &quot;w&quot; &amp; Chr(233)
-		Case &quot;eo&quot;,&quot;eo-&quot;
-		S2 = &quot;Esperanto&quot;
-		Case &quot;et&quot;,&quot;et-ee&quot;
-		S2 = &quot;Estonian&quot;
-		Case &quot;fa&quot;,&quot;fa-ir&quot;
-		S2 = &quot;Farsi&quot;
-		Case &quot;fi&quot;,&quot;fi-fi&quot;
-		S2 = &quot;Finnish&quot;
-		Case &quot;fj&quot;,&quot;fj-fj&quot;
-		S2 = &quot;Fijian&quot;
-		Case &quot;fu&quot;,&quot;fu-it&quot;
-		S2 = &quot;Friulian&quot;
-		Case &quot;fy&quot;,&quot;fy-nl&quot;
-		S2 = &quot;Frisian&quot;
-		Case &quot;gd&quot;,&quot;gd-gb&quot;
-		S2 = &quot;Gaelic&quot;
-		Case &quot;gl&quot;,&quot;gl-es&quot;
-		S2 = &quot;Galician&quot;
-		Case &quot;gu&quot;,&quot;gu-in&quot;
-		S2 = &quot;Gujarati&quot;
-		Case &quot;ga&quot;,&quot;ga-ie&quot;
-		S2 = &quot;Irish&quot;
-		Case &quot;gd&quot;,&quot;gd-gb&quot;
-		S2 = &quot;Gaelic&quot;
-		Case &quot;gsc&quot;,&quot;gsc-fr&quot;
-		S2 = &quot;Gascon&quot;
-		Case &quot;gug&quot;,&quot;gug-py&quot;
-		S2 = &quot;Guarani&quot;
-		Case &quot;haw&quot;,&quot;haw-us&quot;
-		S2 = &quot;Hawaiian&quot;
-		Case &quot;hl&quot;,&quot;hl-gr&quot;
-		S2 = &quot;Greek&quot;
-		Case &quot;he&quot;,&quot;he-il&quot;
-		S2 = &quot;Hebrew&quot;
-		Case &quot;hr&quot;,&quot;hr-hr&quot;
-		S2 = &quot;Croatian&quot;
-		Case &quot;hsb&quot;,&quot;hsb-de&quot;
-		S2 = &quot;Sorbian, Upper&quot;
-		Case &quot;ht&quot;,&quot;ht-ht&quot;
-		S2 = &quot;Haitian&quot;
-		Case &quot;hu&quot;,&quot;hu-hu&quot;
-		S2 = &quot;Hungarian&quot;
-		Case &quot;ha&quot;,&quot;ha-gh&quot;,&quot;ha-ng&quot;
-		S2 = &quot;Hausa&quot;
-		Case &quot;hil&quot;,&quot;hil-ph&quot;
-		S2 = &quot;Hiligaynon&quot;
-		Case &quot;ia&quot;,&quot;ia-&quot;
-		S2 = &quot;Interlingua&quot;
-		Case &quot;id&quot;,&quot;id-id&quot;
-		S2 = &quot;Indonesian&quot;
-		Case &quot;is&quot;,&quot;is-is&quot;
-		S2 = &quot;Icelandic&quot;
-		Case &quot;jbo&quot;,&quot;jbo-&quot;
-		S2 = &quot;Lojban&quot;
-		Case &quot;jp&quot;,&quot;jp-jp&quot; , &quot;ja&quot;, &quot;ja-jp&quot;
-		S2 = &quot;Japanese&quot;
-		Case &quot;kab&quot;,&quot;kab-dz&quot;
-		S2 = &quot;Kabyle&quot;
-		Case &quot;ki&quot;,&quot;ki-ke&quot;
-		S2 = &quot;Gikuyu&quot;
-		Case &quot;kk&quot;,&quot;kk-kz&quot;
-		S2 = &quot;Kazak&quot;
-		Case &quot;kl&quot;,&quot;kl-gl&quot;
-		S2 = &quot;Kalaallisut&quot;
-		Case &quot;ksf&quot;,&quot;ksf-cm&quot;
-		S2 = &quot;Bafia&quot;
-		Case &quot;ko&quot;,&quot;ko-kp&quot;,&quot;ko-kr&quot;
-		S2 = &quot;Korean&quot;
-		Case &quot;ka&quot;,&quot;ka-ge&quot;
-		S2 = &quot;Georgian&quot;
-		Case &quot;km&quot;,&quot;km-kh&quot;
-		S2 = &quot;Khmer&quot;
-		Case &quot;kn&quot;,&quot;kn-in&quot;
-		S2 = &quot;Kannada&quot;
-		Case &quot;kok&quot;,&quot;kok-in&quot;
-		S2 = &quot;Konkani&quot;
-		Case &quot;ku&quot;,&quot;ku-sy&quot;,&quot;ku-tr&quot;
-		S2 = &quot;Kurdish&quot;
-		Case &quot;ky&quot;,&quot;ky-kg&quot;
-		S2 = &quot;Kirghiz&quot;
-		Case &quot;la&quot;,&quot;la-va&quot;
-		S2 = &quot;Latin&quot;
-		Case &quot;lb&quot;,&quot;lb-lu&quot;
-		S2 = &quot;Luxembourgish&quot;
-		Case &quot;ldi&quot;,&quot;ldi-cg&quot;
-		S2 = &quot;Lari&quot;
-		Case &quot;lg&quot;,&quot;lg-ug&quot;
-		S2 = &quot;Ganda&quot;
-		Case &quot;ln&quot;,&quot;ln-cd&quot;
-		S2 = &quot;Lingala&quot;
-		Case &quot;lo&quot;,&quot;lo-la&quot;
-		S2 = &quot;Lao&quot;
-		Case &quot;lt&quot;,&quot;lt-lt&quot;
-		S2 = &quot;Lithuanian&quot;
-		Case &quot;ltg&quot;,&quot;ltg-lv&quot;
-		S2 = &quot;Latgalian&quot;
-		Case &quot;lv&quot;,&quot;lv-lv&quot;
-		S2 = &quot;Latvian&quot;
-		Case &quot;mdw&quot;,&quot;mdw-cg&quot;
-		S2 = &quot;Mbochi&quot;
-		Case &quot;mi&quot;,&quot;mi-nz&quot;
-		S2 = &quot;Maori (New Zealand)&quot;
-		Case &quot;ms&quot;,&quot;ms-sg&quot;,&quot;ms-my&quot;,&quot;ms-id&quot;,&quot;ms-bn&quot;
-		S2 = &quot;Malay&quot;
-		Case &quot;mk&quot;,&quot;mk-mk&quot;
-		S2 = &quot;Macedonian&quot;
-		Case &quot;mkw&quot;,&quot;mkw-cg&quot;
-		S2 = &quot;Kituba&quot;
-		Case &quot;mn&quot;,&quot;mn-mn&quot;
-		S2 = &quot;Mongolian&quot;
-		Case &quot;mo-mn&quot;,&quot;mo&quot;
-		S2 = &quot;Moldavian&quot;
-		Case &quot;mos&quot;,&quot;mos-bf&quot;
-		S2 = &quot;Moore&quot;
-		Case &quot;mr&quot;,&quot;mr-in&quot;
-		S2 = &quot;Marathi&quot;
-		Case &quot;nds&quot;,&quot;nds-de&quot;
-		S2 = &quot;Low German&quot;
-		Case &quot;nl&quot;,&quot;nl-nl&quot;,&quot;nl-be&quot;
-		S2 = &quot;Dutch&quot;
-		Case &quot;nn&quot;,&quot;nn-no&quot;
-		S2 = &quot;Norwegian Norsk&quot;
-		Case &quot;nb&quot;,&quot;nb-no&quot;
-		S2 = &quot;Norwegian Bokmal&quot;
-		Case &quot;no&quot;,&quot;no-no&quot;
-		S2 = &quot;Norwegian&quot;
-		Case &quot;nr&quot;,&quot;nr-za&quot;
-		S2 = &quot;Ndebele, South&quot;
-		Case &quot;nso&quot;,&quot;nso-za&quot;
-		S2 = &quot;Northern Sotho&quot;
-		Case &quot;ny&quot;,&quot;ny-mw&quot;
-		S2 = &quot;Nyanja&quot;
-		Case &quot;oc&quot;,&quot;oc-fr&quot;
-		S2 = &quot;Occitan&quot;
-		Case &quot;om&quot;,&quot;om-et&quot;
-		S2 = &quot;Oromo&quot;
-		Case &quot;pap&quot;,&quot;pap-aw&quot;,&quot;pap-an&quot;
-		S2 = &quot;Papiamento&quot;
-		Case &quot;pl&quot;,&quot;pl-pl&quot;
-		S2 = &quot;Polish&quot;
-		Case &quot;pli&quot;,&quot;pli-&quot;
-		S2 = &quot;Pali&quot;
-		Case &quot;plt&quot;,&quot;plt-mg&quot;
-		S2 = &quot;Malagasy&quot;
-		Case &quot;pt-br&quot;
-		S2 = &quot;Portuguese (Brazil)&quot;
-		Case &quot;pt-pt&quot;
-		S2 = &quot;Portuguese (Portugal)&quot;
-		Case &quot;pt&quot;
-		S2 = &quot;Portuguese&quot;
-		Case &quot;qtz&quot;,&quot;qtz-&quot;
-		S2 = &quot;KeyID&quot;
-		Case &quot;qul&quot;,&quot;quh&quot;,&quot;qu&quot;,&quot;qul-bo&quot;,&quot;qu-ec&quot;,&quot;quh-bo&quot;
-		S2 = &quot;Quechua&quot;
-		Case &quot;rm&quot;,&quot;rm-ch&quot;
-		S2 = &quot;Rhaeto-Romance&quot;
-		Case &quot;ro&quot;,&quot;ro-ro&quot;
-		S2 = &quot;Romanian&quot;
-		Case &quot;ru&quot;,&quot;ru-ru&quot;
-		S2 = &quot;Russian&quot;
-		Case &quot;rue&quot;,&quot;rue-sk&quot;,&quot;rue-ua&quot;
-		S2 = &quot;Rusyan&quot;
-		Case &quot;rw&quot;,&quot;rw-rw&quot;
-		S2 = &quot;Kinyarwanda&quot;
-		Case &quot;smn&quot;,&quot;se&quot;,&quot;smj&quot;,&quot;sma&quot;,&quot;smn-fi&quot;,&quot;smn-ru&quot;,&quot;smj-no&quot;,&quot;smj-se&quot;,&quot;se-fi&quot;,&quot;se-no&quot;,&quot;se-se&quot;,&quot;sms-fi&quot;,&quot;sma-no&quot;,&quot;sma-se&quot;
-		S2 = &quot;Sami&quot;
-		Case &quot;sh&quot;,&quot;sr&quot;,&quot;sr-me&quot;,&quot;sr-su&quot;,&quot;sr-rs&quot;,&quot;sh-me&quot;,&quot;sh-yu&quot;,&quot;sh-rs&quot;,&quot;sh-su&quot;
-		S2 = &quot;Serbian&quot;
-		Case &quot;shs&quot;,&quot;shs-ca&quot;
-		S2 = &quot;Shuswap&quot;
-		Case &quot;sk&quot;,&quot;sk-sk&quot;
-		S2 = &quot;Slovakian&quot;
-		Case &quot;sl&quot;,&quot;sl-si&quot;
-		S2 = &quot;Slovene&quot;
-		Case &quot;so&quot;,&quot;so-so&quot;
-		S2 = &quot;Somali&quot;
-		Case &quot;sq&quot;,&quot;sq-al&quot;
-		S2 = &quot;Albanian&quot;
-		Case &quot;src&quot;,&quot;src-it&quot;
-		S2 = &quot;Sardinian (Logudorese)&quot;
-		Case &quot;sdc&quot;,&quot;sdc-it&quot;
-		S2 = &quot;Sardinian (Sassarese)&quot;
-		Case &quot;ss&quot;,&quot;ss-za&quot;
-		S2 = &quot;Swazi&quot;
-		Case &quot;st&quot;,&quot;st-za&quot;
-		S2 = &quot;Southern Sotho&quot;
-		Case &quot;sw&quot;,&quot;sw-tz&quot;,&quot;sw-ke&quot;
-		S2 = &quot;Swahili&quot;
-		Case &quot;swb&quot;,&quot;swb-yt&quot;
-		S2 = &quot;Maore&quot;
-		Case &quot;sv&quot;,&quot;sv-se&quot;
-		S2 = &quot;Swedish&quot;
-		Case &quot;tek&quot;,&quot;tek-cg&quot;
-		S2 = &quot;Teke-Ibali&quot;
-		Case &quot;tet&quot;,&quot;tet-id&quot;,&quot;tet-tl&quot;
-		S2 = &quot;Tetun&quot;
-		Case &quot;tg&quot;,&quot;tg-tj&quot;
-		S2 = &quot;Tajic&quot;
-		Case &quot;th&quot;,&quot;th-th&quot;
-		S2 = &quot;Thai&quot;
-		Case &quot;ti&quot;,&quot;ti-er&quot;,&quot;ti-et&quot;
-		S2 = &quot;Tigrigna&quot;
-		Case &quot;tk&quot;,&quot;tk-tm&quot;
-		S2 = &quot;Turkmen&quot;
-		Case &quot;tl&quot;,&quot;tl-ph&quot;
-		S2 = &quot;Tagalog&quot;
-		Case &quot;tn&quot;,&quot;tn-bw&quot;,&quot;tn-za&quot;
-		S2 = &quot;Tswana&quot;
-		Case &quot;tpi&quot;,&quot;tpi-pg&quot;
-		S2 = &quot;Tok Pisin&quot;
-		Case &quot;tr&quot;,&quot;tr-tr&quot;
-		S2 = &quot;Turkish&quot;
-		Case &quot;tt&quot;,&quot;tt-ru&quot;
-		S2 = &quot;Tatar&quot;
-		Case &quot;ts&quot;,&quot;ts-za&quot;
-		S2 = &quot;Tsonga&quot;
-		Case &quot;ty&quot;,&quot;ty-pf&quot;
-		S2 = &quot;Tahitian&quot;
-		Case &quot;tyx&quot;,&quot;tyx-cg&quot;
-		S2 = &quot;Teke-Tyee&quot;
-		Case &quot;uk&quot;,&quot;uk-ua&quot;
-		S2 = &quot;Ukrainian&quot;
-		Case &quot;ur&quot;,&quot;ur-in&quot;,&quot;ur-pk&quot;
-		S2 = &quot;Urdu&quot;
-		Case &quot;uz&quot;,&quot;uz-uz&quot;
-		S2 = &quot;Uzbec&quot;
-		Case &quot;ve&quot;,&quot;ve-za&quot;
-		S2 = &quot;Venda&quot;
-		Case &quot;vi&quot;,&quot;vi-vn&quot;
-		S2 = &quot;Vietnamese&quot;
-		Case &quot;vif&quot;,&quot;vif-cg&quot;
-		S2 = &quot;Vili&quot;
-		Case &quot;wa&quot;,&quot;wa-be&quot;
-		S2 = &quot;Walloon&quot;
-		Case &quot;xh&quot;,&quot;xh-za&quot;
-		S2 = &quot;Xhosa&quot;
-		Case &quot;yi&quot;,&quot;yi-us&quot;
-		s2 = &quot;Yiddish&quot;
-		Case &quot;yo&quot;,&quot;yo-ng&quot;
-		S2 = &quot;Yoruba&quot;
-		Case &quot;zh-cn&quot;
-		S2 = &quot;Chinese (Simplified)&quot;
-		Case &quot;zh-tw&quot;
-		S2 = &quot;Chinese (Traditional)&quot;
-		Case &quot;zh-hk&quot;
-		S2 = &quot;Chinese (Hong Kong)&quot;
-		Case &quot;zh-sg&quot;
-		S2 = &quot;Chinese (Singapore)&quot;
-		Case &quot;zh-mo&quot;
-		S2 = &quot;Chinese (Macau)&quot;
-		Case &quot;zh-yue&quot;,&quot;zh-yu&quot;
-		S2 = &quot;Chinese (Yue)&quot;
-		Case &quot;zh&quot;
-		S2 = &quot;Chinese&quot;
-		Case &quot;zu&quot;,&quot;zu-za&quot;
-		S2 = &quot;Zulu&quot;
-		Case &quot;zxx&quot;, &quot;zxx-&quot;
-		S2 = &quot;Ambiguous Or Missing Language&quot;
-		Case Else
-		S2 = S1 &apos; not Found, So We Return Iso Language Code.
+End Function
+
+
+Function fsIsoToConciseHumanReadable(s1, iForceEnglish)
+&apos;  Returns name of language stripped of region
+	Dim a1
+	Dim s2
+	s2 = fsIsoToHumanReadable(s1, iForceEnglish)
+	Dim s3
+	s3 = s2
+	If InStr(s3, &quot; (&quot;) &gt; 0 Then
+		a1 = Split(s3, &quot;(&quot;)
+		s2 = Trim(a1(LBound(a1)))
+	End If
+	fsIsoToConciseHumanReadable = s2
+End Function
+
+
+Function fsIsoToHumanReadable(sA, iForceEnglish) 
+	&apos;&apos;&apos;
+	&apos; Returns name of language, if known
+	&apos;&apos;&apos;
+	Dim a1
+	a1 = Array(&quot;409&quot;, &quot;English (United States)&quot;, &quot;en-US&quot;)
+	Select Case LCase(sA)
+	Case &quot;en-us&quot;, &quot;english (united states)&quot;, &quot;409&quot;
+		a1 = Array(&quot;409&quot;, &quot;English (United States)&quot;, &quot;en-US&quot;)
+	Case &quot;en-gb&quot;, &quot;english (great britain)&quot;, &quot;809&quot;
+		a1 = Array(&quot;809&quot;, &quot;English (Great Britain)&quot;, &quot;en-GB&quot;)
+	Case &quot;en-vg&quot;, &quot;english (british virgin islands)&quot;
+		a1 = Array(&quot;809&quot;, &quot;English (British Virgin Islands)&quot;, &quot;en-VG&quot;)
+	Case &quot;en-io&quot;
+		a1 = Array(&quot;809&quot;, &quot;English (Great Britain)&quot;, &quot;en-IO&quot;)
+	Case &quot;en-gg&quot;, &quot;english (guernsey)&quot;
+		a1 = Array(&quot;809&quot;, &quot;English (Guernsey)&quot;, &quot;en-GG&quot;)
+	Case &quot;en-au&quot;, &quot;english (australia)&quot;, &quot;c09&quot;
+		a1 = Array(&quot;c09&quot;, &quot;English (Australia)&quot;, &quot;en-AU&quot;)
+	Case &quot;en-bz&quot;, &quot;english (belize)&quot;, &quot;2809&quot;
+		a1 = Array(&quot;2809&quot;, &quot;English (Belize)&quot;, &quot;en-BZ&quot;)
+	Case &quot;en-ca&quot;, &quot;english (canada)&quot;, &quot;1009&quot;
+		a1 = Array(&quot;1009&quot;, &quot;English (Canada)&quot;, &quot;en-CA&quot;)
+	Case &quot;en-bs&quot;, &quot;english (bahamas)&quot;, &quot;2409&quot;
+		a1 = Array(&quot;2409&quot;, &quot;English (Bahamas)&quot;, &quot;en-BS&quot;)
+	Case &quot;en-hk&quot;, &quot;english (hong kong)&quot;, &quot;3c09&quot;
+	   	a1 = Array(&quot;3c09&quot;, &quot;English (Hong Kong)&quot;, &quot;en-HK&quot;)
+	Case &quot;en-in&quot;, &quot;english (india)&quot;, &quot;4009&quot;
+		a1 = Array(&quot;4009&quot;, &quot;English (India)&quot;, &quot;en-IN&quot;)
+	Case &quot;en-id&quot;, &quot;english (indonesia)&quot;, &quot;3809&quot;
+		a1 = Array(&quot;3809&quot;, &quot;English (Indonesia)&quot;, &quot;en-ID&quot;)
+	Case &quot;en-ie&quot;, &quot;english (ireland)&quot;, &quot;1809&quot;
+		a1 = Array(&quot;1809&quot;, &quot;English (Ireland)&quot;, &quot;en-IE&quot;)
+	Case &quot;en-jm&quot;, &quot;english (jamaica)&quot;, &quot;2009&quot;
+		a1 = Array(&quot;2009&quot;, &quot;English (Jamaica)&quot;, &quot;en-JM&quot;)
+	Case &quot;en-my&quot;, &quot;english (malaysia)&quot;, &quot;4409&quot;
+		a1 = Array(&quot;4409&quot;, &quot;English (Malaysia)&quot;, &quot;en-MY&quot;)
+	Case &quot;en-nz&quot;, &quot;english (new zealand)&quot;, &quot;1409&quot;
+		a1 = Array(&quot;1409&quot;, &quot;English (New Zealand)&quot;, &quot;en-NZ&quot;)
+	Case &quot;en-ph&quot;, &quot;english (philippines)&quot;, &quot;3409&quot;
+		a1 = Array(&quot;3409&quot;, &quot;English (Philippines)&quot;, &quot;en-PH&quot;)
+	Case &quot;en-sg&quot;, &quot;english (singapore)&quot;, &quot;4809&quot;
+		a1 = Array(&quot;4809&quot;, &quot;English (Singapore)&quot;, &quot;en-SG&quot;)
+	Case &quot;en-za&quot;, &quot;english (south africa)&quot;, &quot;1c09&quot;
+		a1 = Array(&quot;1c09&quot;, &quot;English (South Africa)&quot;, &quot;en-ZA&quot;)
+	Case &quot;en-tt&quot;, &quot;english (trinidad &quot;, &quot;english (trinidad)&quot;, &quot;2c09&quot;
+		a1 = Array(&quot;2c09&quot;, &quot;English (Trinidad &quot;, &quot;en-TT&quot;) &apos; sic
+	Case &quot;en-zw&quot;, &quot;english (zimbabwe)&quot;, &quot;3009&quot;
+		a1 = Array(&quot;3009&quot;, &quot;English (Zimbabwe)&quot;, &quot;en-ZW&quot;)
+	Case &quot;en&quot;, &quot;english&quot;, &quot;409&quot;
+		a1 = Array(&quot;409&quot;, &quot;English&quot;, &quot;en&quot;)
+	Case &quot;fr-be&quot;, &quot;french (belgium)&quot;, &quot;80c&quot;
+		a1 = Array(&quot;80c&quot;, &quot;French (Belgium)&quot;, &quot;fr-BE&quot;)
+	Case &quot;fr-ca&quot;, &quot;french (canada)&quot;, &quot;c0c&quot;
+		a1 = Array(&quot;c0c&quot;, &quot;French (Canada)&quot;, &quot;fr-CA&quot;)
+	Case &quot;fr-cg&quot;, &quot;french (congo)&quot;, &quot;240c&quot;
+		a1 = Array(&quot;240c&quot;, &quot;French (Congo)&quot;, &quot;fr-CG&quot;)
+	Case &quot;fr-ch&quot;, &quot;french (switzerland)&quot;, &quot;100c&quot;
+		a1 = Array(&quot;100c&quot;, &quot;French (Switzerland)&quot;, &quot;fr-CH&quot;)
+	Case &quot;fr-ci&quot;, &quot;french (ivory coast)&quot;, &quot;300c&quot;
+		a1 = Array(&quot;300c&quot;, &quot;French (Ivory Coast)&quot;, &quot;fr-CI&quot;)
+	Case &quot;fr-cm&quot;, &quot;french (cameroon)&quot;, &quot;2c0c&quot;
+		a1 = Array(&quot;2c0c&quot;, &quot;French (Cameroon)&quot;, &quot;fr-CM&quot;)
+	Case &quot;fr-fr&quot;, &quot;french (france)&quot;, &quot;40c&quot;
+		a1 = Array(&quot;40c&quot;, &quot;French (France)&quot;, &quot;fr-FR&quot;)
+	Case &quot;fr-ht&quot;, &quot;french (haiti)&quot;, &quot;3c0c&quot;
+		a1 = Array(&quot;3c0c&quot;, &quot;French (Haiti)&quot;, &quot;fr-HT&quot;)
+	Case &quot;fr-lu&quot;, &quot;french (luxembourg)&quot;, &quot;140c&quot;
+		a1 = Array(&quot;140c&quot;, &quot;French (Luxembourg)&quot;, &quot;fr-LU&quot;)
+	Case &quot;fr-ma&quot;, &quot;french (morocco)&quot;, &quot;380c&quot;
+		a1 = Array(&quot;380c&quot;, &quot;French (Morocco)&quot;, &quot;fr-MA&quot;)
+	Case &quot;fr-mc&quot;, &quot;french (monaco)&quot;, &quot;180c&quot;
+		a1 = Array(&quot;180c&quot;, &quot;French (Monaco)&quot;, &quot;fr-MC&quot;)
+	Case &quot;fr-ml&quot;, &quot;french (mali)&quot;, &quot;340c&quot;
+		a1 = Array(&quot;340c&quot;, &quot;French (Mali)&quot;, &quot;fr-ML&quot;)
+	Case &quot;fr-re&quot;, &quot;french (reunion)&quot;, &quot;200c&quot;
+		a1 = Array(&quot;200c&quot;, &quot;French (Reunion)&quot;, &quot;fr-RE&quot;)
+	Case &quot;fr-sn&quot;, &quot;french (senegal)&quot;, &quot;280c&quot;
+		a1 = Array(&quot;280c&quot;, &quot;French (Senegal)&quot;, &quot;fr-SN&quot;)
+	Case &quot;fr&quot;, &quot;french&quot;, &quot;40c&quot;
+		a1 = Array(&quot;40c&quot;, &quot;French&quot;, &quot;fr&quot;)
+	Case &quot;it&quot;, &quot;it-it&quot;, &quot;italian&quot;, &quot;410&quot;
+		a1 = Array(&quot;410&quot;, &quot;Italian&quot;, &quot;it-IT&quot;)
+	Case &quot;de-at&quot;, &quot;german (austria)&quot;, &quot;c07&quot;
+		a1 = Array(&quot;c07&quot;, &quot;German (Austria)&quot;, &quot;de-AT&quot;)
+	Case &quot;de-ch&quot;, &quot;german (switzerland)&quot;, &quot;807&quot;
+		a1 = Array(&quot;807&quot;, &quot;German (Switzerland)&quot;, &quot;de-CH&quot;)
+	Case &quot;de-de&quot;, &quot;german (germany)&quot;, &quot;407&quot;
+		a1 = Array(&quot;407&quot;, &quot;German (Germany)&quot;, &quot;de-DE&quot;)
+	Case &quot;de-li&quot;, &quot;german (lithuania)&quot;, &quot;1407&quot;
+		a1 = Array(&quot;1407&quot;, &quot;German (Lithuania)&quot;, &quot;de-LI&quot;)
+	Case &quot;de-lu&quot;, &quot;german (luxembourg)&quot;, &quot;1007&quot;
+		a1 = Array(&quot;1007&quot;, &quot;German (Luxembourg)&quot;, &quot;de-LU&quot;)
+	Case &quot;de&quot;, &quot;german&quot;, &quot;407&quot;
+		a1 = Array(&quot;407&quot;, &quot;German&quot;, &quot;de&quot;)
+	Case &quot;es-es&quot;, &quot;spanish (spain)&quot;, &quot;c0a&quot;
+		a1 = Array(&quot;c0a&quot;, &quot;Spanish (Spain)&quot;, &quot;es-ES&quot;)
+	Case &quot;es-ar&quot;, &quot;spanish (argentina)&quot;, &quot;2c0a&quot;
+		a1 = Array(&quot;2c0a&quot;, &quot;Spanish (Argentina)&quot;, &quot;es-AR&quot;)
+	Case &quot;es-bo&quot;, &quot;spanish (bolivia)&quot;, &quot;400a&quot;
+		a1 = Array(&quot;400a&quot;, &quot;Spanish (Bolivia)&quot;, &quot;es-BO&quot;)
+	Case &quot;es-cl&quot;, &quot;spanish (chile)&quot;, &quot;340a&quot;
+		a1 = Array(&quot;340a&quot;, &quot;Spanish (Chile)&quot;, &quot;es-CL&quot;)
+	Case &quot;es-co&quot;, &quot;spanish (colombia)&quot;, &quot;240a&quot;
+		a1 = Array(&quot;240a&quot;, &quot;Spanish (Colombia)&quot;, &quot;es-CO&quot;)
+	Case &quot;es-cr&quot;, &quot;spanish (costa rica)&quot;, &quot;140a&quot;
+		a1 = Array(&quot;140a&quot;, &quot;Spanish (Costa Rica)&quot;, &quot;es-CR&quot;)
+	Case &quot;es-do&quot;, &quot;spanish (dominican republic)&quot;, &quot;1c0a&quot;
+		a1 = Array(&quot;1c0a&quot;, &quot;Spanish (Dominican Republic)&quot;, &quot;es-DO&quot;)
+	Case &quot;es-ec&quot;, &quot;spanish (ecuador)&quot;, &quot;300a&quot;
+		a1 = Array(&quot;300a&quot;, &quot;Spanish (Ecuador)&quot;, &quot;es-EC&quot;)
+	Case &quot;es-sv&quot;, &quot;spanish (svalbard)&quot;, &quot;440a&quot;
+		a1 = Array(&quot;440a&quot;, &quot;Spanish (Svalbard)&quot;, &quot;es-SV&quot;)
+	Case &quot;es-gt&quot;, &quot;spanish (guatemala)&quot;, &quot;100a&quot;
+		a1 = Array(&quot;100a&quot;, &quot;Spanish (Guatemala)&quot;, &quot;es-GT&quot;)
+	Case &quot;es-hn&quot;, &quot;spanish (honduras)&quot;, &quot;480a&quot;
+		a1 = Array(&quot;480a&quot;, &quot;Spanish (Honduras)&quot;, &quot;es-HN&quot;)
+	Case &quot;es-mx&quot;, &quot;spanish (mexico)&quot;, &quot;80a&quot;
+		a1 = Array(&quot;80a&quot;, &quot;Spanish (Mexico)&quot;, &quot;es-MX&quot;)
+	Case &quot;es-ni&quot;, &quot;spanish (nicaragua)&quot;, &quot;4c0a&quot;
+		a1 = Array(&quot;4c0a&quot;, &quot;Spanish (Nicaragua)&quot;, &quot;es-NI&quot;)
+	Case &quot;es-pa&quot;, &quot;spanish (panama)&quot;, &quot;180a&quot;
+		a1 = Array(&quot;180a&quot;, &quot;Spanish (Panama)&quot;, &quot;es-PA&quot;)
+	Case &quot;es-py&quot;, &quot;spanish (paraguay)&quot;, &quot;3c0a&quot;
+		a1 = Array(&quot;3c0a&quot;, &quot;Spanish (Paraguay)&quot;, &quot;es-PY&quot;)
+	Case &quot;es-pe&quot;, &quot;spanish (peru)&quot;, &quot;280a&quot;
+		a1 = Array(&quot;280a&quot;, &quot;Spanish (Peru)&quot;, &quot;es-PE&quot;)
+	Case &quot;es-pr&quot;, &quot;spanish (puerto rico)&quot;, &quot;500a&quot;
+		a1 = Array(&quot;500a&quot;, &quot;Spanish (Puerto Rico)&quot;, &quot;es-PR&quot;)
+	Case &quot;es-us&quot;, &quot;spanish (united states)&quot;, &quot;540a&quot;
+		a1 = Array(&quot;540a&quot;, &quot;Spanish (United States)&quot;, &quot;es-US&quot;)
+	Case &quot;es-uy&quot;, &quot;spanish (uraguay)&quot;, &quot;540a&quot;
+		a1 = Array(&quot;540a&quot;, &quot;Spanish (Uraguay)&quot;, &quot;es-UR&quot;)
+	Case &quot;es-ve&quot;, &quot;spanish (venezuela)&quot;, &quot;200a&quot;
+		a1 = Array(&quot;200a&quot;, &quot;Spanish (Venezuela)&quot;, &quot;es-VE&quot;)
+	Case &quot;es&quot;, &quot;spanish&quot;, &quot;c0a&quot;
+		a1 = Array(&quot;c0a&quot;, &quot;Spanish&quot;, &quot;es&quot;)
+	Case &quot;ru&quot;, &quot;ru-ru&quot;, &quot;russian&quot;, &quot;419&quot;
+		a1 = Array(&quot;419&quot;, &quot;Russian&quot;, &quot;ru-RU&quot;)
+	Case &quot;hi&quot;, &quot;hi-in&quot;, &quot;hindi&quot;, &quot;439&quot;
+		a1 = Array(&quot;439&quot;, &quot;Hindi&quot;, &quot;hi-IN&quot;)
+	Case &quot;af&quot;, &quot;af-za&quot;, &quot;afrikaans&quot;, &quot;436&quot;
+		a1 = Array(&quot;436&quot;, &quot;Afrikaans&quot;, &quot;af-ZA&quot;)
+	Case &quot;ak&quot;, &quot;ak-gh&quot;, &quot;akan&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Akan&quot;, &quot;ak-GH&quot;)
+	Case &quot;an&quot;, &quot;an-es&quot;, &quot;argonese&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Argonese&quot;, &quot;an-ES&quot;)
+	Case &quot;az&quot;, &quot;az-az&quot;, &quot;azerbaijani&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Azerbaijani&quot;, &quot;az=AZ&quot;)
+	Case &quot;ar-sa&quot;, &quot;arabic (saudi arabia)&quot;, &quot;401&quot;
+		a1 = Array(&quot;401&quot;, &quot;Arabic (Saudi Arabia)&quot;, &quot;ar-SA&quot;)
+	Case &quot;ar-dz&quot;, &quot;arabic (algeria)&quot;, &quot;1401&quot;
+		a1 = Array(&quot;1401&quot;, &quot;Arabic (Algeria)&quot;, &quot;ar-DZ&quot;)
+	Case &quot;ar-bh&quot;, &quot;arabic (bhutan)&quot;, &quot;3c01&quot;
+		a1 = Array(&quot;3c01&quot;, &quot;Arabic (Bhutan)&quot;, &quot;ar-BH&quot;)
+	Case &quot;ar-eg&quot;, &quot;arabic (egypt)&quot;, &quot;c01&quot;
+		a1 = Array(&quot;c01&quot;, &quot;Arabic (Egypt)&quot;, &quot;ar-EG&quot;)
+	Case &quot;ar-iq&quot;, &quot;arabic (iraq)&quot;, &quot;801&quot;
+		a1 = Array(&quot;801&quot;, &quot;Arabic (Iraq)&quot;, &quot;ar-IQ&quot;)
+	Case &quot;ar-jo&quot;, &quot;arabic (jordan)&quot;, &quot;2c01&quot;
+		a1 = Array(&quot;2c01&quot;, &quot;Arabic (Jordan)&quot;, &quot;ar-JO&quot;)
+	Case &quot;ar-kw&quot;, &quot;arabic (kuwait)&quot;, &quot;3401&quot;
+		a1 = Array(&quot;3401&quot;, &quot;Arabic (Kuwait)&quot;, &quot;ar-KW&quot;)
+	Case &quot;ar-lb&quot;, &quot;arabic (lebanon)&quot;, &quot;3001&quot;
+		a1 = Array(&quot;3001&quot;, &quot;Arabic (Lebanon)&quot;, &quot;ar-LB&quot;)
+	Case &quot;ar-ly&quot;, &quot;arabic (libya)&quot;, &quot;1001&quot;
+		a1 = Array(&quot;1001&quot;, &quot;Arabic (Libya)&quot;, &quot;ar-LY&quot;)
+	Case &quot;ar-ma&quot;, &quot;arabic (moroco)&quot;, &quot;1801&quot;
+		a1 = Array(&quot;1801&quot;, &quot;Arabic (Morocco)&quot;, &quot;ar-MA&quot;)
+	Case &quot;ar-om&quot;, &quot;arabic (oman)&quot;, &quot;2001&quot;
+		a1 = Array(&quot;2001&quot;, &quot;Arabic (Oman)&quot;, &quot;ar-OM&quot;)
+	Case &quot;ar-qa&quot;, &quot;arabic (qatar)&quot;, &quot;4001&quot;
+		a1 = Array(&quot;4001&quot;, &quot;Arabic (Qatar)&quot;, &quot;ar-QA&quot;)
+	Case &quot;ar-sy&quot;, &quot;arabic (syria)&quot;, &quot;2801&quot;
+		a1 = Array(&quot;2801&quot;, &quot;Arabic (Syria)&quot;, &quot;ar-SY&quot;)
+	Case &quot;ar-tn&quot;, &quot;arabic (tunisia)&quot;, &quot;1c01&quot;
+		a1 = Array(&quot;1c01&quot;, &quot;Arabic (Tunisia)&quot;, &quot;ar-TU&quot;)
+	Case &quot;ar-ae&quot;, &quot;arabic (united arab emirates)&quot;, &quot;3801&quot;
+		a1 = Array(&quot;3801&quot;, &quot;Arabic (United Arab Emirates)&quot;, &quot;ar-AE&quot;)
+	Case &quot;ar-ye&quot;, &quot;arabic (yemen)&quot;, &quot;2401&quot;
+		a1 = Array(&quot;2401&quot;, &quot;Arabic (Yemen)&quot;, &quot;ar-YE&quot;)
+	Case &quot;ar&quot;, &quot;arabic&quot;, &quot;401&quot;
+		a1 = Array(&quot;401&quot;, &quot;Arabic&quot;, &quot;ar&quot;)
+	Case &quot;be&quot;, &quot;be-by&quot;, &quot;belarusian&quot;, &quot;0423&quot;
+		a1 = Array(&quot;0423&quot;, &quot;Belarusian&quot;, &quot;be-BY&quot;)
+	Case &quot;bm&quot;, &quot;bm-ml&quot;, &quot;bambara&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Bambara&quot;, &quot;bm-ML&quot;)
+	Case &quot;beq&quot;, &quot;beq-cg&quot;, &quot;beembe&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Beembe&quot;, &quot;beq-CG&quot;)
+	Case &quot;bk&quot;, &quot;bkw-cg&quot;, &quot;bekwel&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Bekwel&quot;, &quot;bk-CG&quot;)
+	Case &quot;bn&quot;, &quot;bn-bd&quot;, &quot;bengali&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Bengali&quot;, &quot;bn-BD&quot;)
+	Case &quot;bs&quot;, &quot;bs-bn&quot;, &quot;bosnian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Bosnian&quot;, &quot;bs-BN&quot;)
+	Case &quot;buc&quot;, &quot;buc-yt&quot;, &quot;bushi&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Bushi&quot;, &quot;buc-YT&quot;)
+	Case &quot;eu&quot;, &quot;eu-fr&quot;, &quot;eu-es&quot;, &quot;basque&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Basque&quot;, &quot;eu&quot;)
+	Case &quot;bg&quot;, &quot;bg-bg&quot;, &quot;bulgarian&quot;, &quot;402&quot;
+		a1 = Array(&quot;402&quot;, &quot;Bulgarian&quot;, &quot;bg-BG&quot;)
+	Case &quot;ca&quot;, &quot;ca-es&quot;, &quot;catalan&quot;, &quot;403&quot;
+		a1 = Array(&quot;403&quot;, &quot;Catalan&quot;, &quot;ca-ES&quot;)
+	Case &quot;ceb&quot;, &quot;ceb-ph&quot;, &quot;cebuano&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Cebuano&quot;, &quot;ceb-PH&quot;)
+	Case &quot;cop&quot;, &quot;cop-eg&quot;, &quot;coptic&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Coptic&quot;, &quot;cop-EG&quot;)
+	Case &quot;csb&quot;, &quot;csb-pl&quot;, &quot;kashubian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Kashubian&quot;, &quot;csb-PL&quot;)
+	Case &quot;cv&quot;, &quot;cv-ru&quot;, &quot;chuvash&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Chuvash&quot;, &quot;cv-RU&quot;)
+	Case &quot;cs&quot;, &quot;cs-cz&quot;, &quot;czech&quot;, &quot;405&quot;
+		a1 = Array(&quot;405&quot;, &quot;Czech&quot;, &quot;cs-CZ&quot;)
+	Case &quot;cy&quot;, &quot;cy-gb&quot;, &quot;welsh&quot;, &quot;452&quot;
+		a1 = Array(&quot;452&quot;, &quot;Welsh&quot;, &quot;cy-GB&quot;)
+	Case &quot;da&quot;, &quot;da-dk&quot;, &quot;danish&quot;, &quot;406&quot;
+		a1 = Array(&quot;406&quot;, &quot;Danish&quot;, &quot;da-DK&quot;)
+	Case &quot;dsb&quot;, &quot;dsb-de&quot;, &quot;sorbian, lower&quot;, &quot;425&quot;
+		a1 = Array(&quot;425&quot;, &quot;Sorbian, Lower&quot;, &quot;dsb-DE&quot;)
+	Case &quot;ebo&quot;, &quot;ebo-cg&quot;, &quot;teke-eboo&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Teke-Eboo&quot;, &quot;ebo-CG&quot;)
+	Case &quot;ee&quot;, &quot;ee-gh&quot;, &quot;ewe&quot;, Chr(233) &amp; &quot;w&quot; &amp; Chr(233)
+		a1 = Array(&quot;1000&quot;, Chr(201) &amp; &quot;w&quot; &amp; Chr(233), &quot;ee-GH&quot;)
+	Case &quot;el&quot;, &quot;el-gr&quot;, &quot;greek&quot;, &quot;408&quot;
+		a1 = Array(&quot;408&quot;, &quot;Greek&quot;, &quot;el-GR&quot;)
+	Case &quot;eo&quot;, &quot;eo-&quot;, &quot;esperanto&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Esperanto&quot;, &quot;eo&quot;)
+	Case &quot;et&quot;, &quot;et-ee&quot;, &quot;estonian&quot;, &quot;425&quot;
+		a1 = Array(&quot;425&quot;, &quot;Estonian&quot;, &quot;et-EE&quot;)
+	Case &quot;fa&quot;, &quot;fa-ir&quot;, &quot;farsi&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Farsi&quot;, &quot;fa-IR&quot;)
+	Case &quot;fi&quot;, &quot;fi-fi&quot;, &quot;finnish&quot;, &quot;40b&quot;
+		a1 = Array(&quot;40b&quot;, &quot;Finnish&quot;, &quot;fi-FI&quot;)
+	Case &quot;fj&quot;, &quot;fj-fj&quot;, &quot;fijian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Fijian&quot;, &quot;fj-FJ&quot;)
+	Case &quot;fu&quot;, &quot;fu-it&quot;, &quot;friulian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Friulian&quot;, &quot;fu-IT&quot;)
+	Case &quot;fy&quot;, &quot;fy-nl&quot;, &quot;frisian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Frisian&quot;, &quot;fy-NL&quot;)
+	Case &quot;ga&quot;, &quot;ga-ie&quot;, &quot;irish&quot;, &quot;83c&quot;
+		a1 = Array(&quot;83c&quot;, &quot;Irish&quot;, &quot;ga-IE&quot;)
+	Case &quot;gd&quot;, &quot;gd-gb&quot;, &quot;gaelic&quot;, &quot;43c&quot;
+		a1 = Array(&quot;43c&quot;, &quot;Gaelic&quot;, &quot;gd-GB&quot;)
+	Case &quot;gl&quot;, &quot;gl-es&quot;, &quot;galician&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Galician&quot;, &quot;gl-ES&quot;)
+	Case &quot;gu&quot;, &quot;gu-in&quot;, &quot;gujarati&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Gujarati&quot;, &quot;gu-IN&quot;)
+	Case &quot;gd&quot;, &quot;gd-gb&quot;, &quot;gaelic&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Gaelic&quot;, &quot;gd-GB&quot;)
+	Case &quot;gsc&quot;, &quot;gsc-fr&quot;, &quot;gascon&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Gascon&quot;, &quot;gsc-FR&quot;)
+	Case &quot;gug&quot;, &quot;gug-py&quot;, &quot;guarani&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Guarani&quot;, &quot;fug-PY&quot;)
+	Case &quot;haw&quot;, &quot;haw-us&quot;, &quot;hawaiian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Hawaiian&quot;, &quot;haw-US&quot;)
+	Case &quot;he&quot;, &quot;he-il&quot;, &quot;hebrew&quot;, &quot;40d&quot;
+		a1 = Array(&quot;40d&quot;, &quot;Hebrew&quot;, &quot;he-IL&quot;)
+	Case &quot;hr&quot;, &quot;hr-hr&quot;, &quot;croatian&quot;, &quot;41a&quot;
+		a1 = Array(&quot;41a&quot;, &quot;Croatian&quot;, &quot;hr-HR&quot;)
+	Case &quot;hsb&quot;, &quot;hsb-de&quot;, &quot;sorbian, upper&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Sorbian, Upper&quot;, &quot;hsb-DE&quot;)
+	Case &quot;ht&quot;, &quot;ht-ht&quot;, &quot;haitian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Haitian&quot;, &quot;ht-HT&quot;)
+	Case &quot;hu&quot;, &quot;hu-hu&quot;, &quot;hungarian&quot;, &quot;40e&quot;
+		a1 = Array(&quot;40e&quot;, &quot;Hungarian&quot;, &quot;hu-HU&quot;)
+	Case &quot;ha&quot;, &quot;ha-gh&quot;, &quot;ha-ng&quot;, &quot;hausa&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Hausa&quot;, &quot;ha&quot;)
+	Case &quot;hil&quot;, &quot;hil-ph&quot;, &quot;hiligaynon&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Hiligaynon&quot;, &quot;hil-PH&quot;)
+	Case &quot;ia&quot;, &quot;ia-&quot;, &quot;interlingua&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Interlingua&quot;, &quot;ia&quot;)
+	Case &quot;id&quot;, &quot;id-id&quot;, &quot;indonesian&quot;, &quot;421&quot;
+		a1 = Array(&quot;421&quot;, &quot;Indonesian&quot;, &quot;id-ID&quot;)
+	Case &quot;is&quot;, &quot;is-is&quot;, &quot;icelandic&quot;, &quot;40f&quot;
+		a1 = Array(&quot;40f&quot;, &quot;Icelandic&quot;, &quot;is-IS&quot;)
+	Case &quot;jbo&quot;, &quot;jbo-&quot;, &quot;lojban&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Lojban&quot;, &quot;jbo&quot;)
+	Case &quot;ja&quot;, &quot;ja-jp&quot;, &quot;japanese&quot;, &quot;411&quot;
+		a1 = Array(&quot;411&quot;, &quot;Japanese&quot;, &quot;ja-JP&quot;)
+	Case &quot;kab&quot;, &quot;kab-dz&quot;, &quot;kabyle&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Kabyle&quot;, &quot;kab-DZ&quot;)
+	Case &quot;ki&quot;, &quot;ki-ke&quot;, &quot;gikuyu&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Gikuyu&quot;, &quot;ki-KE&quot;)
+	Case &quot;kk&quot;, &quot;kk-kz&quot;, &quot;kazak&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Kazak&quot;, &quot;kk-KZ&quot;)
+	Case &quot;kl&quot;, &quot;kl-gl&quot;, &quot;kalaallisut&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Kalaallisut&quot;, &quot;kl-GL&quot;)
+	Case &quot;ksf&quot;, &quot;ksf-cm&quot;, &quot;bafia&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Bafia&quot;, &quot;ksf-CM&quot;)
+	Case &quot;ko&quot;, &quot;ko-kp&quot;, &quot;ko-kr&quot;, &quot;korean&quot;, &quot;412&quot;
+		a1 = Array(&quot;412&quot;, &quot;Korean&quot;, &quot;ko&quot;)
+	Case &quot;ka&quot;, &quot;ka-ge&quot;, &quot;georgian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Georgian&quot;, &quot;ka-GE&quot;)
+	Case &quot;km&quot;, &quot;km-kh&quot;, &quot;khmer&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Khmer&quot;, &quot;km-KH&quot;)
+	Case &quot;kn&quot;, &quot;kn-in&quot;, &quot;kannada&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Kannada&quot;, &quot;kn-IN&quot;)
+	Case &quot;kok&quot;, &quot;kok-in&quot;, &quot;konkani&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Konkani&quot;, &quot;kok-IN&quot;)
+	Case &quot;ku&quot;, &quot;ku-sy&quot;, &quot;ku-tr&quot;, &quot;kurdish&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Kurdish&quot;, &quot;ku&quot;)
+	Case &quot;ky&quot;, &quot;ky-kg&quot;, &quot;kirghiz&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Kirghiz&quot;, &quot;ky-KG&quot;)
+	Case &quot;la&quot;, &quot;la-va&quot;, &quot;latin&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Latin&quot;, &quot;la-VA&quot;)
+	Case &quot;lb&quot;, &quot;lb-lu&quot;, &quot;luxembourgish&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Luxembourgish&quot;, &quot;lb-LU&quot;)
+	Case &quot;ldi&quot;, &quot;ldi-cg&quot;, &quot;lari&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Lari&quot;, &quot;ldi-CG&quot;)
+	Case &quot;lg&quot;, &quot;lg-ug&quot;, &quot;ganda&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Ganda&quot;, &quot;lg-UG&quot;)
+	Case &quot;ln&quot;, &quot;ln-cd&quot;, &quot;lingala&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Lingala&quot;, &quot;ln-CD&quot;)
+	Case &quot;lo&quot;, &quot;lo-la&quot;, &quot;lao&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Lao&quot;, &quot;lo-LA&quot;)
+	Case &quot;lt&quot;, &quot;lt-lt&quot;, &quot;lithuanian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Lithuanian&quot;, &quot;lt-LT&quot;)
+	Case &quot;ltg&quot;, &quot;ltg-lv&quot;, &quot;latgalian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Latgalian&quot;, &quot;ltg-LV&quot;)
+	Case &quot;lv&quot;, &quot;lv-lv&quot;, &quot;latvian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Latvian&quot;, &quot;lv-LV&quot;)
+	Case &quot;mdw&quot;, &quot;mdw-cg&quot;, &quot;mbochi&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Mbochi&quot;, &quot;mdw-CG&quot;)
+	Case &quot;mi&quot;, &quot;mi-nz&quot;, &quot;maori (new zealand)&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Maori (New Zealand)&quot;, &quot;mi-NZ&quot;)
+	Case &quot;ms&quot;, &quot;ms-sg&quot;, &quot;ms-my&quot;, &quot;ms-id&quot;, &quot;ms-bn&quot;, &quot;malay&quot;, &quot;43E&quot;
+		a1 = Array(&quot;43E&quot;, &quot;Malay&quot;, &quot;ms&quot;)
+	Case &quot;mk&quot;, &quot;mk-mk&quot;, &quot;macedonian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Macedonian&quot;, &quot;mk-MK&quot;)
+	Case &quot;mkw&quot;, &quot;mkw-cg&quot;, &quot;kituba&quot;, &quot;mk-MK&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Kituba&quot;, &quot;mkw-CG&quot;)
+	Case &quot;mn&quot;, &quot;mn-mn&quot;, &quot;mongolian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Mongolian&quot;, &quot;mn-MN&quot;)
+	Case &quot;mo-mn&quot;, &quot;mo&quot;, &quot;moldavian&quot;, &quot;850&quot;
+		a1 = Array(&quot;850&quot;, &quot;Moldavian&quot;, &quot;mo-MN&quot;)
+	Case &quot;mos&quot;, &quot;mos-bf&quot;, &quot;moore&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Moore&quot;, &quot;mos-BF&quot;)
+	Case &quot;mr&quot;, &quot;mr-in&quot;, &quot;marathi&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Marathi&quot;, &quot;mr-IN&quot;)
+	Case &quot;nds&quot;, &quot;nds-de&quot;, &quot;low german&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Low German&quot;, &quot;nds-DE&quot;)
+	Case &quot;nl&quot;, &quot;nl-nl&quot;, &quot;dutch&quot;, &quot;413&quot;
+		a1 = Array(&quot;413&quot;, &quot;Dutch&quot;, &quot;nl-NL&quot;)
+	Case &quot;nl-be&quot;, &quot;dutch (belgium)&quot;, &quot;813&quot;
+		a1 = Array(&quot;813&quot;, &quot;Dutch (Belgium)&quot;, &quot;nl-BE&quot;)
+	Case &quot;nn&quot;, &quot;nn-no&quot;, &quot;norwegian norsk&quot;, &quot;0814&quot;
+		a1 = Array(&quot;0814&quot;, &quot;Norwegian Norsk&quot;, &quot;nn-NO&quot;)
+	Case &quot;nb&quot;, &quot;nb-no&quot;, &quot;norwegian bokmal&quot;, &quot;0414&quot;
+		a1 = Array(&quot;0414&quot;, &quot;Norwegian Bokmal&quot;, &quot;nb-NO&quot;)
+	Case &quot;no&quot;, &quot;no-no&quot;, &quot;norwegian&quot;, &quot;0014&quot;
+		a1 = Array(&quot;0014&quot;, &quot;Norwegian&quot;, &quot;no-NO&quot;)
+	Case &quot;nr&quot;, &quot;nr-za&quot;, &quot;ndebele, south&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Ndebele, South&quot;, &quot;nr-ZA&quot;)
+	Case &quot;nso&quot;, &quot;nso-za&quot;, &quot;northern sotho&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Northern Sotho&quot;, &quot;nso-ZA&quot;)
+	Case &quot;ny&quot;, &quot;ny-mw&quot;, &quot;nyanja&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Nyanja&quot;, &quot;ny-MW&quot;)
+	Case &quot;oc&quot;, &quot;oc-fr&quot;, &quot;occitan&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Occitan&quot;, &quot;oc-FR&quot;)
+	Case &quot;om&quot;, &quot;om-et&quot;, &quot;oromo&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Oromo&quot;, &quot;om-ET&quot;)
+	Case &quot;pap&quot;, &quot;pap-aw&quot;, &quot;pap-an&quot;, &quot;papiamento&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Papiamento&quot;, &quot;pap&quot;)
+	Case &quot;pl&quot;, &quot;pl-pl&quot;, &quot;polish&quot;, &quot;415&quot;
+		a1 = Array(&quot;415&quot;, &quot;Polish&quot;, &quot;pl-PL&quot;)
+	Case &quot;pli&quot;, &quot;pli-&quot;, &quot;pali&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Pali&quot;, &quot;pli&quot;)
+	Case &quot;plt&quot;, &quot;plt-mg&quot;, &quot;malagasy&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Malagasy&quot;, &quot;plt-MG&quot;)
+	Case &quot;pt-br&quot;, &quot;portuguese (brazil)&quot;, &quot;416&quot;
+		a1 = Array(&quot;416&quot;, &quot;Portuguese (Brazil)&quot;, &quot;pt-BR&quot;)
+	Case &quot;pt-pt&quot;, &quot;816&quot;
+		a1 = Array(&quot;816&quot;, &quot;portuguese (portugal)&quot;, &quot;pt-PT&quot;)
+	Case &quot;pt&quot;, &quot;Portuguese&quot;
+		a1 = Array(&quot;816&quot;, &quot;portuguese&quot;, &quot;pt&quot;)
+	Case &quot;qtz&quot;, &quot;qtz-&quot;, &quot;keyid&quot;
+		a1 = Array(&quot;1000&quot;, &quot;KeyID&quot;, &quot;qtz&quot;)
+	Case &quot;qul&quot;, _
+			&quot;quh&quot;,_
+			&quot;qu&quot;, _
+			&quot;qul-bo&quot;, _
+			&quot;qu-ec&quot;, _
+			&quot;quh-bo&quot;, _
+			&quot;quechua&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Quechua&quot;, &quot;qul&quot;)
+	Case &quot;rm&quot;, &quot;rm-ch&quot;, &quot;rhaeto-romance&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Rhaeto-Romance&quot;, &quot;rm-CH&quot;)
+	Case &quot;ro&quot;, &quot;ro-ro&quot;, &quot;romanian&quot;, &quot;418&quot;
+		a1 = Array(&quot;418&quot;, &quot;Romanian&quot;, &quot;ro-RO&quot;)
+	Case &quot;ru&quot;, &quot;ru-ru&quot;, &quot;ru-ua&quot;, &quot;russian&quot;, &quot;0419&quot;
+		a1 = Array(&quot;0419&quot;, &quot;Russian&quot;, &quot;ru-RU&quot;)
+	Case &quot;rue&quot;, &quot;rue-sk&quot;, &quot;rue-ua&quot;, &quot;rusyan&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Rusyan&quot;, &quot;rue&quot;)
+	Case &quot;rw&quot;, &quot;rw-rw&quot;, &quot;kinyarwanda&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Kinyarwanda&quot;, &quot;rw-RW&quot;)
+	Case &quot;se-fi&quot;, _
+			&quot;se-no&quot;, _
+			&quot;se-se&quot;, _
+			&quot;se&quot;, _
+			&quot;sma-no&quot;, _
+			&quot;sma-se&quot;, _
+			&quot;sma&quot;, _
+			&quot;smj-no&quot;, _
+			&quot;smj-se&quot;, _
+			&quot;smj&quot;, _
+			&quot;smn-fi&quot;, _
+			&quot;smn-ru&quot;, _
+			&quot;smn&quot;, _
+			&quot;sms-fi&quot;, _
+			&quot;sami&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Sami&quot;, &quot;se-FI&quot;)
+	Case &quot;sh-me&quot;, _
+			&quot;sh-rs&quot;, _
+			&quot;sh-su&quot;, _
+			&quot;sh-yu&quot;, _
+			&quot;sh&quot;, _
+			&quot;sr-me&quot;, _
+			&quot;sr-rs&quot;, _
+			&quot;sr-su&quot;, _
+			&quot;sr&quot;, _
+			&quot;serbian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Serbian&quot;, &quot;sh-RS&quot;)
+	Case &quot;shs&quot;, _
+			&quot;shs-ca&quot;, _
+			&quot;shuswap&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Shuswap&quot;, &quot;shs-CA&quot;)
+	Case &quot;sk&quot;, _
+			&quot;sk-sk&quot;, _
+			&quot;slovakian&quot;, _
+			&quot;41b&quot;
+		a1 = Array(&quot;41b&quot;, &quot;Slovakian&quot;, &quot;sk-SK&quot;)
+	Case &quot;sl&quot;, &quot;sl-si&quot;, &quot;slovene&quot;, &quot;424&quot;
+		a1 = Array(&quot;424&quot;, &quot;Slovene&quot;, &quot;si-SI&quot;)
+	Case &quot;so&quot;, &quot;so-so&quot;, &quot;somali&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Somali&quot;, &quot;so-SO&quot;)
+	Case &quot;sq&quot;, &quot;sq-al&quot;, &quot;albanian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Albanian&quot;, &quot;sq-AL&quot;)
+	Case &quot;src&quot;, &quot;src-it&quot;, &quot;sardinian (logudorese)&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Sardinian (Logudorese)&quot;, &quot;src-IT&quot;)
+	Case &quot;sdc&quot;, &quot;sdc-it&quot;, &quot;sardinian (sassarese)&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Sardinian (Sassarese)&quot;, &quot;sdc-IT&quot;)
+	Case &quot;ss&quot;, &quot;ss-za&quot;, &quot;swazi&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Swazi&quot;, &quot;ss-ZA&quot;)
+	Case &quot;st&quot;, &quot;st-za&quot;, &quot;southern sotho&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Southern Sotho&quot;, &quot;st-ZA&quot;)
+	Case &quot;sw&quot;, &quot;sw-tz&quot;, &quot;sw-ke&quot;, &quot;swahili&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Swahili&quot;, &quot;sw&quot;)
+	Case &quot;swb&quot;, &quot;swb-yt&quot;, &quot;maore&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Maore&quot;, &quot;swb-YT&quot;)
+	Case &quot;sv&quot;, &quot;sv-se&quot;, &quot;swedish&quot;, &quot;41D&quot;
+		a1 = Array(&quot;41D&quot;, &quot;Swedish&quot;, &quot;sv-SE&quot;)
+	Case &quot;tek&quot;, &quot;tek-cg&quot;, &quot;teke-ibali&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Teke-Ibali&quot;, &quot;tek-CG&quot;)
+	Case &quot;tet&quot;, &quot;tet-id&quot;, &quot;tet-tl&quot;, &quot;tetun&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Tetun&quot;, &quot;tet&quot;)
+	Case &quot;tg&quot;, &quot;tg-tj&quot;, &quot;tajic&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Tajic&quot;, &quot;tg-TJ&quot;)
+	Case &quot;th&quot;, &quot;th-th&quot;, &quot;thai&quot;, &quot;41E&quot;
+		a1 = Array(&quot;41E&quot;, &quot;Thai&quot;, &quot;th-TH&quot;)
+	Case &quot;ti&quot;, &quot;ti-er&quot;, &quot;ti-et&quot;, &quot;tigrigna&quot;
+	a1 = Array(&quot;1000&quot;, &quot;Tigrigna&quot;, &quot;ti&quot;)
+	Case &quot;tk&quot;, &quot;tk-tm&quot;, &quot;turkmen&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Turkmen&quot;, &quot;tk-TM&quot;)
+	Case &quot;tl&quot;, &quot;tl-ph&quot;, &quot;tagalog&quot;, &quot;464&quot;
+		a1 = Array(&quot;464&quot;, &quot;Tagalog&quot;, &quot;tk-PH&quot;)
+	Case &quot;tn&quot;, &quot;tn-bw&quot;, &quot;tn-za&quot;, &quot;tswana&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Tswana&quot;, &quot;tn&quot;)
+	Case &quot;tpi&quot;, &quot;tpi-pg&quot;, &quot;tok pisin&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Tok Pisin&quot;, &quot;tpi-PG&quot;)
+	Case &quot;tr&quot;, &quot;tr-tr&quot;, &quot;turkish&quot;, &quot;41f&quot;
+		a1 = Array(&quot;41f&quot;, &quot;Turkish&quot;, &quot;tr-TR&quot;)
+	Case &quot;tt&quot;, &quot;tt-ru&quot;, &quot;tatar&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Tatar&quot;, &quot;&quot;)
+	Case &quot;ts&quot;, &quot;ts-za&quot;, &quot;tsonga&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Tsonga&quot;, &quot;ts-ZA&quot;)
+	Case &quot;ty&quot;, &quot;ty-pf&quot;, &quot;tahitian&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Tahitian&quot;, &quot;ty-PF&quot;)
+	Case &quot;tyx&quot;, &quot;tyx-cg&quot;, &quot;teke-tyee&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Teke-Tyee&quot;, &quot;tyx-CG&quot;)
+	Case &quot;uk&quot;, &quot;uk-ua&quot;, &quot;uk-uk&quot;, &quot;ukrainian&quot;, &quot;422&quot;
+		a1 = Array(&quot;422&quot;, &quot;Ukrainian&quot;, &quot;uk-UA&quot;)
+	Case &quot;ur&quot;, &quot;ur-in&quot;, &quot;ur-pk&quot;, &quot;urdu&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Urdu&quot;, &quot;ur&quot;)
+	Case &quot;uz&quot;, &quot;uz-uz&quot;, &quot;uzbec&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Uzbec&quot;, &quot;uz-UZ&quot;)
+	Case &quot;ve&quot;, &quot;ve-za&quot;, &quot;venda&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Venda&quot;, &quot;ve-ZA&quot;)
+	Case &quot;vi&quot;, &quot;vi-vn&quot;, &quot;vietnamese&quot;, &quot;42a&quot;
+		a1 = Array(&quot;42a&quot;, &quot;Vietnamese&quot;, &quot;vi-VN&quot;)
+	Case &quot;vif&quot;, &quot;vif-cg&quot;, &quot;vili&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Vili&quot;, &quot;vif-CG&quot;)
+	Case &quot;wa&quot;, &quot;wa-be&quot;, &quot;walloon&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Walloon&quot;, &quot;wa-BE&quot;)
+	Case &quot;xh&quot;, &quot;xh-za&quot;, &quot;xhosa&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Xhosa&quot;, &quot;xh-ZA&quot;)
+	Case &quot;yi&quot;, &quot;yi-us&quot;, &quot;yiddish&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Yiddish&quot;, &quot;yi-US&quot;)
+	Case &quot;yo&quot;, &quot;yo-ng&quot;, &quot;yoruba&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Yoruba&quot;, &quot;yo-NG&quot;)
+	Case &quot;zh-cn&quot;, &quot;chinese (simplified)&quot;, &quot;804&quot;
+		a1 = Array(&quot;804&quot;, &quot;Chinese (Simplified)&quot;, &quot;zh-CN&quot;)
+	Case &quot;zh-tw&quot;, &quot;chinese (traditional)&quot;, &quot;404&quot;
+		a1 = Array(&quot;404&quot;, &quot;Chinese (Traditional)&quot;, &quot;zh-TW&quot;)
+	Case &quot;zh-hk&quot;, &quot;chinese (hong kong)&quot;, &quot;c04&quot;
+		a1 = Array(&quot;c04&quot;, &quot;Chinese (Hong Kong)&quot;, &quot;zh-HK&quot;)
+	Case &quot;zh-sg&quot;, &quot;chinese (singapore)&quot;, &quot;1004&quot;
+		a1 = Array(&quot;1004&quot;, &quot;Chinese (Singapore)&quot;, &quot;zh-SG&quot;)
+	Case &quot;zh-mo&quot;, &quot;chinese (macau)&quot;, &quot;1404&quot;
+		a1 = Array(&quot;1404&quot;, &quot;Chinese (Macau)&quot;, &quot;zh-MO&quot;)
+	Case &quot;zh-yue&quot;, &quot;zh-yu&quot;, &quot;chinese (yue)&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Chinese (Yue)&quot;, &quot;zh-YUE&quot;)
+	Case &quot;zh&quot;, &quot;chinese&quot;, &quot;804&quot;
+		a1 = Array(&quot;804&quot;, &quot;Chinese&quot;, &quot;zh&quot;)
+	Case &quot;zu&quot;, &quot;zu-za&quot;, &quot;zulu&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Zulu&quot;, &quot;zu-ZA&quot;)
+	Case &quot;zxx&quot;, &quot;zxx-&quot;, &quot;ambiguous or missing language&quot;, &quot;1000&quot;
+		a1 = Array(&quot;1000&quot;, &quot;Ambiguous Or Missing Language&quot;, &quot;zxx&quot;)
+	Case Else
+		&apos; Not Found, So We Return ISO Language Code.
+		a1 = Array(&quot;1000&quot;, sA, sA)
 	End Select
-	Isotoenglish = S2
+	If iForceEnglish = 1 Then
+	&apos; The system uses an English string for a path or process name.
+	&apos; (i. e.: Festival, Windows SAPI)
+		fsIsoToHumanReadable = a1(1)
+	ElseIf iForceEnglish = 2 Then
+	&apos; Use the Microsoft XP compatible language code
+		fsIsoToHumanReadable = a1(0)
+	Else
+	&apos; Use the ISO language
+		fsIsoToHumanReadable = a1(2)
+	End If
+End Function
+
+
+Function englishToIso(ByVal s1) As String
+	&apos; Returns code of language, if known
+	englishToIso = fsIsoToHumanReadable(s1, 0)
+End Function
+
+	
+Function isoToEnglish(ByVal s1) As String
+	&apos; Returns name of language, if known
+	Isotoenglish = fsIsoToHumanReadable(s1, 1)
 End Function
 
 
@@ -4788,13 +4925,13 @@ End Function
 Sub MsgSpeak( _
 	strA As String)
 &apos; MsgSpeak (Basic command)
-	Dim sFile As String
+	Dim sFile As String : sFile = fsFullPathOf(fsExtensionSettingsIni)
 	Dim i1 As Integer
 	Dim msgs() As Variant
 	Dim errorCode As Integer
 	Dim config(fiCountConfigOptions) As Variant
 	
-	sFile = fsFullPathOf(fsExtensionSettingsIni)
+
 	If FileExists(sFile) Then
 		If fbCreatingMediaFile() Then
 			&apos; We show you the settings and ask you to
@@ -4854,6 +4991,14 @@ Sub MsgSpeak( _
 			End If
 		End If
 	Else
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+		If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
+			fsNetSAPI5WindowsSpeech(strA, _
+			fsSelectionLanguageAndRegion(False))
+			Exit Sub
+		End If
+	End Select
 		&apos; Show the settings dialogue
 		ConfigureReadTextAloud()
 	End If
@@ -4897,7 +5042,7 @@ End Function
 
 
 Function fsOptDirectory() As String
-	If fsGetOS = &quot;WINDOWS&quot; Then
+	If fsGetOS() = &quot;WINDOWS&quot; Then
 		fsOptDirectory = fsHomeDrive() &amp; &quot;\opt\&quot;
 	Else
 		fsOptDirectory = &quot;/opt/&quot;
@@ -4908,7 +5053,7 @@ End Function
 Function fsHomeDrive() As String
 	fsHomeDrive = Environ(&quot;HOMEDRIVE&quot;)
 	If fsHomeDrive = &quot;&quot; Then
-		If fsGetOS = &quot;WINDOWS&quot; Then
+		If fsGetOS() = &quot;WINDOWS&quot; Then
 			fsHomeDrive = &quot;C:&quot;
 		Else
 			fsHomeDrive = &quot;&quot;
@@ -4956,7 +5101,7 @@ Function fbIsWin64Program( _
 	ElseIf installPath = &quot;&quot; Then
 		installPath = fsInstallPath()
 	End If
-	If fsGetOS = &quot;WINDOWS&quot; And _
+	If fsGetOS() = &quot;WINDOWS&quot; And _
 		UCase(Environ(&quot;PROCESSOR_ARCHITECTURE&quot;)) = &quot;AMD64&quot; And _
 		InStr(LCase(installPath), &quot;(x86)&quot;) = 0 Then
 		fbIsWin64Program = True
@@ -7429,7 +7574,7 @@ Function fsThisDocGenre() As String
 	Else
 		If fsGetLanguage() = &quot;en&quot; Then
 			&apos; Use language and region
-			sB = isoToEnglish(fsSelectionLanguageAndRegion(True))
+			sB = isoToEnglish(fsSelectionLanguageAndRegion(True), False)
 		Else
 			&apos; Use lookup table for language
 			&apos; Use language and region for Traditional Chinese (zh-TW)
@@ -8326,7 +8471,7 @@ Function flSystemColor()
 End Function
 
 Function fsSystemFont() As String
-	Select Case fsGetOS
+	Select Case fsGetOS()
 		Case &quot;UNIX&quot;
 		fsSystemFont = &quot;Arial;DejaVu Sans;Liberation Sans;Droid Sans;Sans-Serif&quot;
 		Case &quot;WINDOWS&quot;

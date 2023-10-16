@@ -151,19 +151,25 @@ Option Explicit
 
 Sub ReadTextAloud()
 &apos; Use *Read Selection* on the tool bar
-	Dim sFile As String
+	Dim sFile As String : sFile = fsFullPathOf(fsExtensionSettingsIni())
 	Dim msgs()As Variant
 	Dim errorCode As Integer : errorCode = 0
-	Dim config(fiCountConfigOptions)As Variant
-	Dim locklist As Variant
-	Dim x As Integer
+	Dim config(fiCountConfigOptions()) As Variant
+	Dim locklist As Variant : locklist = Array(&quot;lock&quot;)
 	Dim bDone As Boolean : bDone = False
-	locklist = Array(&quot;lock&quot;)
-	If fsGetOS() = &quot;UNIX&quot; Then
+	Dim x As Integer : x = 0
+
+	Select Case fsGetOS()
+	Case &quot;UNIX&quot;
 		locklist = Array(&quot;lock&quot;, &quot;net_speech&quot;)
-	End If
-	
-	sFile = fsFullPathOf(fsExtensionSettingsIni)
+	Case &quot;WINDOWS&quot;
+		If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
+			fsNetSAPI5WindowsSpeech(fsGetTextSelection(False, True), _
+			fsSelectionLanguageAndRegion(False))
+			Exit Sub
+		End If
+	End Select
+
 	If FileExists(sFile) Then
 		tts_config_parseFile(sFile, config(), errorCode)
 		If config(fiAlwaysShowDialogCheckBox()) = 1 Then
@@ -194,6 +200,19 @@ End Sub
 
 Sub SetupReadTextAloud
 &apos; Tools - Add-ons - Read Selection...
+	Select Case fsGetOS()
+	Case &quot;WINDOWS&quot;
+	&apos; Some versions of Windows will disable `wscript.exe`. In this case the
+	&apos; script defaults to using the built-in office NET scripting environment to
+	&apos; enable reading the selected text aloud. Visual Basic Script (vbs) might be
+	&apos; available as an optional Windows add-in. If you enable the option, then
+	&apos; this menu item will behave normally.
+		If Len(WinSpeechProgramPath()) = 0 Then
+			fsNetSAPI5WindowsSpeech(fsGetTextSelection(False, True), _
+			fsSelectionLanguageAndRegion(False))
+			Exit Sub
+		End If
+	End Select
 	ConfigureReadTextAloud()
 End Sub
 
@@ -363,5 +382,109 @@ Sub ReadTheSlidenote
 		End If
 	End If
 End Sub
+
+
+Sub WinStopSpeaking()
+	If fsGetOS() = &quot;WINDOWS&quot; Then
+		Dim speech As Object
+		Dim WinSVSFPurgeBeforeSpeak# : WinSVSFPurgeBeforeSpeak = 2
+		Dim WinvbNullString$ : WinvbNullString = &quot;&quot;
+		Dim WinSVSFlagsAsync# : WinSVSFlagsAsync = 1
+		Set speech = Createobject(&quot;Sapi.SpVoice&quot;)
+		speech.Speak WinvbNullString, WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
+		Set speech = Nothing
+	End If
+End Sub
+
+
+Function WinMarkup(_text As String, _lang As String) As String
+	Dim s3 As String : s3 = &quot;&quot;
+	Dim a1 As Variant : a1 = Array( _
+	fsWindowsCloseMatchLanguage(_lang), _
+	fsWindowsCloseMatchLanguage(LCase(Split(_lang, &quot;-&quot;)(0))))
+	Dim x As Integer : x = 0
+	If Len(_text) = 0 Then
+		WinMarkup = &quot;&quot;
+		Exit Function
+	ElseIf Len(fsFindAppPath(&quot;Microsoft/Edge/Application/msedge.exe&quot;)) = 0 Then
+		WinMarkup = _text
+		Exit Function
+	End If
+	For x = Lbound(a1) To Ubound(a1)
+		If fbWindowsHasVoiceInThisLanguage(a1(x)) Then
+			_text = Replace(_
+				Replace(_
+					_text, &quot;&gt;&quot;, &quot;&amp;#62;&quot;), &quot;&lt;&quot;, &quot;&amp;#60;&quot;)
+			s3 = Join(Array(_
+			&quot;&lt;?xml version = &quot;&quot;1.0&quot;&quot;?&gt; &lt;speak version = &quot;&quot;1.0&quot;&quot; xmlns =&quot;, _
+			&quot; &quot;&quot;http://www.w3.org/2001/10/synthesis&quot;&quot;&quot;, _
+			&quot; xmlns:xsi = &quot;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&quot;&quot;, _
+			&quot; xsi:schemaLocation = &quot;&quot;http://www.w3.org/2001/10/synthesis&quot;, _
+			&quot; http://www.w3.org/TR/speech-synthesis/synthesis.xsd&quot;&quot;&quot;, _
+			&quot; xml:lang = &quot;&quot;&quot;, _
+			a1(x), _
+			&quot;&quot;&quot;&gt;&quot;, _
+			_text, _
+			&quot;&lt;/speak&gt;&quot;), &quot;&quot;)
+			Exit For
+		End If
+	Next
+	If Len(s3) = 0 Then
+		s3 = _text
+	End If
+	WinMarkup = s3
+End Function
+
+
+Function fsNetSAPI5WindowsSpeech(_
+		ByVal sB, _
+		ByVal sLang) As String
+	&apos; NET tool for Windows that invokes SAPI5 directly.
+	&apos;
+	&apos; See also: [SpVoice Speak method][InvokeSAPI2]
+	&apos;
+	&apos; [InvokeSAPI2]: https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ms723609(v=vs.85)
+	&apos;
+	Dim s2$ : s2 = &quot;&quot;
+	Dim iRate# : iRate = 0
+	Dim oFrame
+	oFrame = ThisComponent.getCurrentController().getFrame() &apos; Current frame
+	Dim oBar
+	oBar = oFrame.createStatusIndicator() &apos; Generated status bar 
+	oBar.start(fsLookUpTerm(&quot;s_speech-synthesis&quot;) &amp; &quot; (&quot; &amp; fsWindowsCloseMatchLanguage(sLang) &amp; &quot;)&quot;, 100)
+
+	s2 = fsMyTempLock(&quot;lock&quot;)
+	If FileExists(s2) Then
+		fbRemoveFile(s2)
+		WinStopSpeaking()
+		oBar.End()
+		Wait 20
+		Exit Function
+	End If
+	oBar.Value = 70
+	CreateFile(s2, fsAppSignature(), &quot;utf-8&quot;)
+	Dim WinSVSFPurgeBeforeSpeak# : WinSVSFPurgeBeforeSpeak = 2
+	Dim WinvbNullString$ : WinvbNullString = &quot;&quot;
+	Dim WinSVSFlagsAsync# : WinSVSFlagsAsync = 1
+	Dim speech As Object
+
+	On Local Error Resume Next
+	Set speech = Createobject(&quot;Sapi.SpVoice&quot;)
+	speech.Rate = iRate
+	speech.Speak WinvbNullString, WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
+	speech.Speak WinMarkup(sB, sLang), WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
+	Do
+		&apos; Talking...
+	Loop Until (speech.waitUntilDone(1) or _
+			Not(FileExists(s2)))
+	Set speech = Nothing
+	Wait 28
+	oBar.Value = 85
+	Wait 14
+	fbRemoveFile(s2)
+	oBar.Value = 100	
+	oBar.End()
+	fsNetSAPI5WindowsSpeech = sB
+End Function
 
 </script:module>
