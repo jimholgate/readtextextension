@@ -957,7 +957,7 @@ End Function
 
 
 Function fsExtensionSettingsIni() As String
-	fsExtensionSettingsIni = &quot;ooo_text-to-speech.ini&quot;
+	fsExtensionSettingsIni = fsFullPathOf(&quot;ooo_text-to-speech.ini&quot;)
 End Function
 
 

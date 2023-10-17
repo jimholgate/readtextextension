@@ -151,7 +151,7 @@ Option Explicit
 
 Sub ReadTextAloud()
 &apos; Use *Read Selection* on the tool bar
-	Dim sFile As String : sFile = fsFullPathOf(fsExtensionSettingsIni())
+	Dim sFile As String : sFile = fsExtensionSettingsIni()
 	Dim msgs()As Variant
 	Dim errorCode As Integer : errorCode = 0
 	Dim config(fiCountConfigOptions()) As Variant

@@ -1027,7 +1027,7 @@ Sub ConfigureReadTextAloud()
 		&apos;Load default settings, so any settings undefined by settings file are not empty
 		config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
 		&apos;Load the settings you used last time
-		sFile = fsFullPathOf(fsExtensionSettingsIni)
+		sFile = fsExtensionSettingsIni()
 		If FileExists(sFile) Then
 			tts_config_parseFile(sFile, config(), errorCode)
 		Else

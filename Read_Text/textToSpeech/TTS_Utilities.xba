@@ -962,7 +962,7 @@ Function fbUsingTouchScreen() As Boolean
 	Dim errorCode
 	
 	On Error Goto fbUsingTouchScreenErr
-	sFile = fsFullPathOf(fsExtensionSettingsIni)
+	sFile = fsExtensionSettingsIni()
 	If FileExists(sFile)Then
 		tts_config_parseFile(sFile,config(),errorCode)
 		iSmart = config(fiSmartSelectCheckBox())
@@ -1008,7 +1008,7 @@ End Function
 
 
 Function fsProgramCommand() As String
-
+	&apos; Get the script program path
 	Dim sFile As String
 	Dim sSmart As String
 	Dim config
@@ -1016,11 +1016,10 @@ Function fsProgramCommand() As String
 	Dim msgs
 	
 	On Error Goto fsProgramCommandErr
-	sFile = fsFullPathOf(fsExtensionSettingsIni)
+	sFile = fsExtensionSettingsIni()
 	&apos;Load default settings, so any settings undefined by settings file are not empty
 	config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
 	&apos;Load the settings you used last time
-	sFile = fsFullPathOf(fsExtensionSettingsIni)
 	If FileExists(sFile) Then
 		tts_config_parseFile(sFile, config(), errorCode)
 	Else
@@ -1284,7 +1283,6 @@ Function fsGetSmartTextSelection( _
 	Else &apos; unsupported document format
 		sSelectedText = &quot;&quot;
 	End If
-	
 	If fbCreatingMediaFile(&quot;.aif,.aiff,.ogg,.m4a,.mp3&quot;) Then
 		&apos; Gapless music players make sentences run into each other.
 		&apos; Insert a brief pause at the end of the recording.
@@ -3417,7 +3415,7 @@ Sub ttsActuate( _
 		&quot; &quot; &amp; _
 		fsLookUpTerm(&quot;s_string-cannot-be-analyzed&quot;), 64 , _
 		fsLookUpTerm(&quot;s_read-text&quot;))
-		fbRemoveFile(fsFullPathOf(fsExtensionSettingsIni))
+		fbRemoveFile(fsExtensionSettingsIni())
 		fbRemoveFile(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
 		resetSpeech
 	End If
@@ -3446,7 +3444,7 @@ Sub ttsActuate( _
 	
 	MsgBox(fsLookUpTerm( &quot;s_string-cannot-be-analyzed&quot;), 48, _
 	fsLookUpTerm( &quot;s_read-text&quot;))
-	fbRemoveFile(fsFullPathOf(fsExtensionSettingsIni))
+	fbRemoveFile(fsExtensionSettingsIni())
 	fbRemoveFile(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
 	resetSpeech
 End Sub
@@ -3856,7 +3854,6 @@ Function fsSelectionLanguageAndRegion( _
 		End If
 		sB = fsSelectionLanguage()
 		sA = sB &amp; &quot;-&quot; &amp; fsSelectionCountry()
-
 		If bIgnoreInstalledVoices Then
 			fsSelectionLanguageAndRegion = sA
 		Else
@@ -4925,7 +4922,7 @@ End Function
 Sub MsgSpeak( _
 	strA As String)
 &apos; MsgSpeak (Basic command)
-	Dim sFile As String : sFile = fsFullPathOf(fsExtensionSettingsIni)
+	Dim sFile As String : sFile = fsExtensionSettingsIni()
 	Dim i1 As Integer
 	Dim msgs() As Variant
 	Dim errorCode As Integer
@@ -6438,7 +6435,7 @@ Sub CheckUnixSpeech()
 	&apos; Check the first time the application runs.
 
 	If fsGetOS() = &quot;UNIX&quot; Then
-		If Not(FileExists(fsFullPathOf(fsExtensionSettingsIni))) Then
+		If Not(FileExists(fsExtensionSettingsIni())) Then
 			If isSnap() or isFlatPak() Then
 				&apos; Translate this message for your language
 				If (MsgBox(_(_
@@ -7353,6 +7350,11 @@ Function fbCreatingMediaFile( _
 	&apos; config is a set of preferences. This function uses use config(5); the
 	&apos; string in `Tools - Add-ons - Read Selection... - Command Line Options`
 	&apos; You can test or simulate different command strings with sB.
+	fbCreatingMediaFile = False
+	If Not FileExists(fsExtensionSettingsIni()) Then
+		&apos; By default, the extension reads text aloud.
+		Exit Function
+	End If
 	If ismissing(sA) Then
 		sA = &quot;.3gp,.aac,.aif,.aiff,.au,.avi,.bit,.flac,.m4a,.m4v,.mov,.mkv,.mp2,&quot; &amp; _
 		&quot;.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.opus,.wav,.webm,.wma,.wmv&quot;
@@ -7370,9 +7372,8 @@ Function fbCreatingMediaFile( _
 	Dim errorCode As Integer
 	errorCode = 0
 	Dim config(fiCountConfigOptions) As Variant
-	
-	fbCreatingMediaFile = False
-	sFile = fsFullPathOf(fsExtensionSettingsIni)
+
+	sFile = fsExtensionSettingsIni()
 	tts_config_parseFile(sFile, config(), errorCode)
 	If Len(sB) &lt; 1 Then
 		sB = LCase(config(5))
@@ -7405,7 +7406,10 @@ Function fbGoingOnline() As Boolean
 	Dim config(fiCountConfigOptions)As Variant
 	
 	fbGoingOnline = False
-	sFile = fsFullPathOf(fsExtensionSettingsIni)
+	sFile = fsExtensionSettingsIni()
+	If Not FileExists(sFile) Then
+		Exit Function
+	End If
 	tts_config_parseFile(sFile, config(), errorCode)
 	If config(fiHtmlOption) Then
 		fbGoingOnline = True
@@ -8546,7 +8550,7 @@ Sub NewPresentionFromSelection( _
 	Dim sCountry
 	Dim sLanguage
 	Dim x
-	
+
 	If Not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
 	End If
@@ -8568,8 +8572,8 @@ Sub NewPresentionFromSelection( _
 		sComplexLanguage = fsSelectionLanguage(&quot;COMPLEX&quot;)
 		sComplexCountry = fsSelectionCountry(&quot;COMPLEX&quot;)
 	End Select
-	sAuthor = fsThisDocAuthor
-	
+	sAuthor = fsThisDocAuthor()
+
 	If Len(sA) &lt;&gt; 0 Then
 		&apos; Create a new Impress document
 		oAlbum = StarDesktop.loadComponentFromUrl(&quot;private:factory/simpress&quot;, _
@@ -8649,7 +8653,6 @@ Sub NewPresentionFromSelection( _
 		If s3 = &quot;&quot; Then
 			s3 = fsDateMyRegion(1)
 		End If
-		
 		&apos; Set the text of the speaker notes for the title slide
 		If Not(fbsetnote(x.getDrawPages().getByIndex(0), _
 			&quot;# &quot; &amp; sA &amp; _

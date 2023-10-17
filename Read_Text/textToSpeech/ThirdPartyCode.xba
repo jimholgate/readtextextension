@@ -489,9 +489,17 @@ Sub tts_config_parseFile( _
 	Dim l As String
 	Dim key As String
 	Dim value As String
+	Dim msgs() As Variant
 	
 	CR = Chr(13)
 	CR2 = Chr(10)
+	If Not FileExists(configFilePath) Then
+		&apos; Use defaults
+		config = fvTts_config_createDefaultConfig( _
+		msgs(), _
+		errorCode)
+		Exit Sub
+	End If
 	sA = getTextFromFile(configFilePath, &quot;UTF-8&quot;)
 	If InStr(sA, CR2) &lt; InStr(sA, CR) Then
 		&apos; choose character return or line feed
