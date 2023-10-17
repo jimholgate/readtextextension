@@ -29,4 +29,4 @@ Read Text Extension uses an external program or a web service to read text. Read
 
 ===Related Topics===
 
-[https://help.libreoffice.org/7.3/en-US/text/shared/guide/accessibility.html Accessibility in LibreOffice]
+[https://help.libreoffice.org/latest/en-US/text/shared/guide/accessibility.html?&DbPAR=SHARED&System=WINDOWS Accessibility in LibreOffice]

@@ -28,4 +28,4 @@ Cette extension permet à un programme externe ou une application web lire le te
 -----
 ===Rubriques connexes===
 
-[https://help.libreoffice.org/7.3/fr/text/shared/guide/accessibility.html?DbPAR=SHARED Accessibilité dans LibreOffice]
+[https://help.libreoffice.org/latest/fr/text/shared/guide/accessibility.html?&DbPAR=SHARED&System=WINDOWS Accessibilité dans LibreOffice]

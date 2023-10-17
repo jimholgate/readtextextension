@@ -27,4 +27,4 @@ https://raw.githubusercontent.com/jimholgate/readtextextension/master/wiki/fi/De
 
 ----
 ===Aiheeseen liittyvää===
-[https://help.libreoffice.org/7.3/fi/text/shared/guide/accessibility.html?DbPAR=SHARED Esteettömyys ja LibreOffice]
+[https://help.libreoffice.org/latest/fi/text/shared/guide/accessibility.html?&DbPAR=SHARED&System=WINDOWS Esteettömyys ja LibreOffice]

@@ -27,4 +27,4 @@ Mit Read Text kann ein externes Programm oder eine Web-Anwendung aus Writer, Cal
   
 -----
 ===Verwandte Themen===
-[https://help.libreoffice.org/7.3/de/text/shared/guide/accessibility.html?DbPAR=SHARED Zugänglichkeit in LibreOffice]
+[https://help.libreoffice.org/latest/de/text/shared/guide/accessibility.html?&DbPAR=SHARED&System=WINDOWS Zugänglichkeit in LibreOffice]
