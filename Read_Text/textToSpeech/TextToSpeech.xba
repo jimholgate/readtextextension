@@ -148,6 +148,12 @@ Option Explicit
 &apos;&apos; Impress displays when a computer that doesn’t have read text extension
 &apos;&apos; calls the procedure.
 &apos;&apos;
+Function fbDefaultToSpeechDispatcher() As Boolean
+	&apos; Implies that the python3 `speechd` (speech-dispatcher) library is current.
+	&apos; https://help.libreoffice.org/latest/en-US/text/sbasic/python/main0000.html
+	fbDefaultToSpeechDispatcher = GetSolarVersion() &gt; 70400
+End Function
+
 
 Sub ReadTextAloud()
 &apos; Use *Read Selection* on the tool bar
@@ -162,10 +168,25 @@ Sub ReadTextAloud()
 	Select Case fsGetOS()
 	Case &quot;UNIX&quot;
 		locklist = Array(&quot;lock&quot;, &quot;net_speech&quot;)
+		&apos; Don&apos;t show the dialog on first run.
+		&apos; Load default settings.
+		If Not FileExists(sFile) and fbDefaultToSpeechDispatcher() Then
+			MsgSpeak(fsGetTextSelection(False, True))
+			Exit Sub
+		End If
 	Case &quot;WINDOWS&quot;
 		If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
+			&apos; Don&apos;t show the dialog on first run.
+			&apos; Use the built-in office NET scripting environment..
 			fsNetSAPI5WindowsSpeech(fsGetTextSelection(False, True), _
 			fsSelectionLanguageAndRegion(False))
+			Exit Sub
+		End If
+	Case &quot;MacOS&quot;
+		&apos; Don&apos;t show the dialog on first run.
+		&apos; Load default settings.
+		If Not FileExists(sFile) Then
+			MsgSpeak(fsGetTextSelection(False, True))
 			Exit Sub
 		End If
 	End Select

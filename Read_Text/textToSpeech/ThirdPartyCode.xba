@@ -351,8 +351,8 @@ Function fvTts_config_createDefaultConfig( _
 				&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or FileExists( _
 				Environ(&quot;HOME&quot;) &amp; _
 				&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or Len( _
-				fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
-				
+				fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Or _
+				fbDefaultToSpeechDispatcher() Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;

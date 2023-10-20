@@ -4977,25 +4977,45 @@ Sub MsgSpeak( _
 			ConfigureReadTextAloud()
 		Else
 			&apos; Read strA aloud
-			If FileExists(sFile) Then
-				tts_config_parseFile(sFile,config(),errorCode)
+			tts_config_parseFile(sFile, config(), errorCode)
+			ttsActuate(config(), _
+			msgs(), _
+			errorCode, _
+			strA)
+		End If
+	Else
+		Select Case fsGetOS()
+			Case &quot;WINDOWS&quot;
+			If Len(WinSpeechProgramPath()) = 0 Then
+				fsNetSAPI5WindowsSpeech(strA, _
+				fsSelectionLanguageAndRegion(False))
+				Exit Sub
+			End If
+			Case &quot;MacOS&quot;
+			&apos; Load default settings on First Run
+			config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
+			&apos; Don&apos;t show the dialog
+			config(fiAlwaysShowDialogCheckBox()) = 0
+			tts_config_writeFile(config(), sFile)
+			ttsActuate(config(), _
+			msgs(), _
+			errorCode, _
+			strA)
+			Exit Sub
+			Case Else
+			If fbDefaultToSpeechDispatcher() Then
+				&apos; Load default settings on First Run
+				config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
+				&apos; Don&apos;t show the dialog
+				config(fiAlwaysShowDialogCheckBox()) = 0
+				tts_config_writeFile(config(), sFile)
 				ttsActuate(config(), _
 				msgs(), _
 				errorCode, _
 				strA)
-			Else
-				ConfigureReadTextAloud()
+				Exit Sub	
 			End If
-		End If
-	Else
-	Select Case fsGetOS()
-		Case &quot;WINDOWS&quot;
-		If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
-			fsNetSAPI5WindowsSpeech(strA, _
-			fsSelectionLanguageAndRegion(False))
-			Exit Sub
-		End If
-	End Select
+		End Select
 		&apos; Show the settings dialogue
 		ConfigureReadTextAloud()
 	End If
