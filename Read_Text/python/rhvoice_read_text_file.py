@@ -504,9 +504,8 @@ def main() -> None:
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hovalritnd",
+            "ovalritndh",
             [
-                "help",
                 "output=",
                 "visible=",
                 "audible=",
@@ -516,6 +515,7 @@ def main() -> None:
                 "title=",
                 "artist=",
                 "dimensions=",
+                "help",
             ],
         )
     except getopt.GetoptError:
@@ -524,10 +524,7 @@ def main() -> None:
         usage()
         sys.exit(2)
     for o, a in opts:
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit(0)
-        elif o in ("-o", "--output"):
+        if o in ("-o", "--output"):
             _media_out = a
         elif o in ("-v", "--visible"):
             _visible = a
@@ -546,6 +543,9 @@ def main() -> None:
             _writer = a
         elif o in ("-d", "--dimensions"):
             _size = a
+        elif o in ("-h", "--help"):
+            usage()
+            sys.exit(0)
         else:
             assert False, "unhandled option"
     _rhvoice_cl = RhVoiceClass()

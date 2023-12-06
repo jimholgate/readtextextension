@@ -4,7 +4,7 @@
 This text explains how to use a web service and media player to read a text
 file. It outlines the terms and conditions associated with using the on-line
 service, as well as the potential privacy and security risks. It introduces
-text-to-speech tools, Mimic3, Larynx, Rhvoice, MaryTTS and TTS, and how to
+text-to-speech tools like Mimic3, Rhvoice, MaryTTS and TTS, and how to
 use them. It mentions the need to check if the network is available and to
 set permissions when using these tools. Lastly, it provides advice on how to
 update local libraries and packages when using these tools.
@@ -46,9 +46,6 @@ compatibility mode. The compatibility mode allows the speech synthesis
 image to use the maryTTS address and port and the maryTTS Application
 Program Interface (API) to list installed voices and to produce spoken
 audio files over a local web service.
- 
-See also:
-[Docker docs](https://docs.docker.com/desktop/install/linux-install/)
   
 Mimic 3
 -------
@@ -56,14 +53,11 @@ Mimic 3
 "A fast local neural text to speech engine for Mycroft"
 
 Mycroft Mimic3 is a fast text to speech tool that includes very high quality
-voice assets. As of May 2023, it is still in the development stage. The
-author of Rhasspy Larynx is a major contributor to the project, so anyone
-familiar with Larynx will find it easy to add voice models and manage the
-service using the Mimic 3 locally hosted web page.
+voice assets.
 
 Mimic 3 covers a lot of languages. The locally hosted web page has a Feedback
- button that encourages users to comment on how the pronunciation could be
- improved. 
+button that encourages users to comment on how the pronunciation could be
+improved. 
 
 If your computer architecture supports Mimic 3, you can use Mimic TTS with
 speech-dispatcher or as a localhost web server with this application. When
@@ -73,8 +67,6 @@ local web server at startup using a command to initiate `mimic3-server`.
 If you use a docker image, you can get the computer to start the mimic 
 localhost web server on startup by setting the Docker container restart policy
 to "always". 
-
-[Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
 
 ### It doesn't work?
 
@@ -100,44 +92,6 @@ If you use python pip to install local libraries, you might have to
 manually update them from time to time. Packages that are managed
 by update utilities like `apt-get`, `yum` and `dnf` are upgraded
 by the distribution.
-
-Larynx
-------
-
-You can configure Read Text Extension to use Larynx. Larynx
-works with most Linux distributions, even if provides your
-office application using a container distribution platform
-like `flatpak` or `snap`.
-
-Using Larynx does not require an on-line connection. The
-`larynx-server` application provides speech on a `localhost`
-web service similarly to how [`cups`](https://www.cups.org/)
-provides printing services using a `localhost` server on many
-Posix computers like MacOS and desktop Linux distributions.
-
-> Offline end-to-end text to speech system using gruut and
-> onnx (architecture). There are 50 voices available across
-> 9 languages.
-
--- [Rhasspy Larynx
-Website](https://github.com/rhasspy/larynx)
-
-<https://hub.docker.com/r/rhasspy/larynx>
-
-### It doesn't work?
-
-+ Is the larynx server running? Consider setting up `larynx-server`
-  to automatically start up when you log in.
-+ Is the language of the selected text supported and installed?
-
-If you are using a Docker network service, it might take a little
-more time to than usual to start up when the package updates
-it's files. If you are using a system docker application with a
-personal account, then you might need to manually download updated
-speech resources if the docker application stops working with
-locally installed languages. A system administrator can change your
-account's ability to access a docker service or for the docker
-package to access locally installed resources.
 
 Rhvoice
 -------
@@ -171,14 +125,6 @@ includes voices in several languages by default, including,
 * Telugu
 * Turkish
 
-See also:
-
-[Adding-voices](https://rhasspy.readthedocs.io/en/v2.4.20/text-to-speech/#adding-voices)
-
-[Docker image](https://hub.docker.com/r/synesthesiam/marytts)
-
-[Rhasspy community](https://community.rhasspy.org/)
-
 TTS
 ---
 
@@ -196,7 +142,14 @@ and your computer's hardware. The Read Text Extension's local host web client
 might not be able to access all the features of all TTS language models on all
 computers
 
-[Coqui.ai News](https://tts.readthedocs.io/en/latest/index.html)
+See also:
+
+* [Adding-voices](https://rhasspy.readthedocs.io/en/v2.4.20/text-to-speech/#adding-voices)
+* [Coqui.ai News](https://tts.readthedocs.io/en/latest/index.html)
+* [Docker Docs](https://docs.docker.com/desktop/install/linux-install/)
+* [Docker MaryTTS Image](https://hub.docker.com/r/synesthesiam/marytts)
+* [Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
+* [Rhasspy community](https://community.rhasspy.org/)
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import getopt
@@ -206,7 +159,6 @@ import netgtts
 
 try:
     import requests
-
     REQUESTS_OK = True
 except (AttributeError, ImportError):
     REQUESTS_OK = False
@@ -271,7 +223,6 @@ programming interface (API) of a locally hosted speech server daemon.
 It is normal for a local server to take a moment to start speaking the first
 time that you use it.
 
-* [Larynx](https://github.com/rhasspy/larynx)
 * [MaryTTS](http://mary.dfki.de/)
 * [Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
 * [Open TTS](https://github.com/synesthesiam/opentts#open-text-to-speech-server)
@@ -293,7 +244,7 @@ def network_problem(voice="default"):  # -> str
   or check your on-line account status.
 + If you are using a `localhost` server, it might help to
   enter the local speech server command in a terminal and
-  read what it prints out. (i. e.: `larynx-server`)
+  read what it prints out.
   """
 
 
@@ -410,40 +361,6 @@ def network_main(
                 _size,
                 _speech_rate,
                 _ssml,
-                20,
-                60,
-            )
-            return True
-    except NameError:
-        pass
-    try:
-        _larynx = netlarynx.LarynxClass()
-        if (
-            _larynx.language_supported(
-                _iso_lang,
-                _local_url,
-                _vox,
-            )
-            and _vox in _larynx.accept_voice
-        ):
-            _quality = -1  # Auto; Manual is 0 (lowest) to 2 (highest)
-            _ssml = is_ssml(_text)
-            _larynx.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _quality,
-                _ssml,
-                _denoiser_strength,
-                _noise_scale,
                 20,
                 60,
             )
@@ -602,7 +519,7 @@ def main():  # -> NoReturn
         usage()
         sys.exit(0)
     _speech_rate = 160
-    _iso_lang = "ca-ES"
+    _iso_lang = "en-US"
     try:
         _iso_lang = readtexttools.default_lang().replace("_", "-")
     except (AttributeError, ImportError):
@@ -628,11 +545,10 @@ def main():  # -> NoReturn
             usage()
             sys.exit(0)
         try:
-            opts, args = getopt.getopt(
+            opts, args = getopt.gnu_getopt(
                 sys.argv[1:],
-                "hovalritndsxuec",
+                "ovalritndsxuech",
                 [
-                    "help",
                     "output=",
                     "visible=",
                     "audible=",
@@ -647,6 +563,7 @@ def main():  # -> NoReturn
                     "url=",
                     "denoiser_strength=",
                     "noise_scale=",
+                    "help",
                 ],
             )
         except getopt.GetoptError:
@@ -654,10 +571,7 @@ def main():  # -> NoReturn
             usage()
             sys.exit(2)
         for o, a in opts:
-            if o in ("-h", "--help"):
-                usage()
-                sys.exit(0)
-            elif o in ("-o", "--output"):
+            if o in ("-o", "--output"):
                 _media_out = a
             elif o in ("-v", "--visible"):
                 _visible = a
@@ -698,6 +612,9 @@ def main():  # -> NoReturn
                     pass
                 if not bool(_noise_scale):
                     _noise_scale = 0.667
+            elif o in ("-h", "--help"):
+                usage()
+                sys.exit(0)
             else:
                 assert False, "unhandled option"
         network_main(
@@ -716,6 +633,8 @@ def main():  # -> NoReturn
             _denoiser_strength,
             _noise_scale,
         )
+    else:
+        usage()
     sys.exit(0)
 
 

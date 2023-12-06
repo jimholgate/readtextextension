@@ -440,7 +440,7 @@ Sub tts_config_writeFile( _
 	Dim PyVersion() As String
 	Dim x As Integer
 	ExternalCommand = config(fiExternalCommand())
-	PyVersion = Array(&quot;3&quot;, &quot;2.7&quot;, &quot;2&quot;, &quot;&quot;)
+	PyVersion = Array(&quot;4&quot;, &quot;3&quot;, &quot;2.7&quot;, &quot;2&quot;, &quot;&quot;)
 
 	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
 		&apos; Do not record a temporary Posix python application path.
@@ -452,6 +452,11 @@ Sub tts_config_writeFile( _
 				End If
 			Next
 		End If
+	End If
+	If InStr(config(fiExternalProgramPath()), &quot;python&quot;) &lt;&gt; 0 Then
+		&apos; After updating `~/.local/share/piper-tts/piper-tts/voices.json`, then
+		&apos; store the active command without the update flag.
+		ExternalCommand = fsReplaceText(ExternalCommand, &quot; --update True&quot;, &quot;&quot;) 
 	End If
 	
 	CR = Chr(10)

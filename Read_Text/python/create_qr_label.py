@@ -74,18 +74,16 @@ except ImportError:
         sys.path.append(readtexttools.find_local_pip("qrcode"))
         try:
             import qrcode
-        except (ModuleNotFoundError, TypeError):
-            IMAGE_OK = False
-if not IMAGE_OK:
-    print(
-        """
+        except:
+            print(
+                """
 A python tool cannot find a library that it
 needs to create a QR code. Try 
 
     pip3 install qrcode
     pip3 install Pillow
 """
-    )
+            )
 
 
 def usage():  # -> None
@@ -103,7 +101,7 @@ Encode text in a QR Code image (png). Requires `qrcode`.
 Usage
 -----
 
-    %(sA)s [--size nn] [--level L|M|Q|H] \\ 
+    {0} [--size nn] [--level L|M|Q|H] \\ 
     --fill "0,0,0", --background "255,255,255" \\
     --output "output.png" "input.txt"
 
@@ -119,8 +117,9 @@ Copyright notice
 
 *QR Code* is registered trademark of DENSO WAVE INCORPORATED
 in the following countries: Japan, United States of America,
-Australia and Europe. """
-        % locals()
+Australia and Europe. """.format(
+            sA
+        )
     )
 
 
@@ -150,10 +149,6 @@ def qrencode(
     * _size - The dimension of each QR Code square
     * _level - The degree of redundant data for error correction
     """
-    _url = (
-        "https://chart.apis.google.com/chart?chs=350x350&cht=qr&chl=%(_content)s"
-        % locals()
-    )
     if not bool(_size):
         _size = "3"
     _fill_color = rgb_to_tuple(_fill_color, "black")
@@ -163,7 +158,7 @@ def qrencode(
         if _size == str(i + 1):
             _checked_size = i + 1
             break
-    if _level not in ["L", "M", "Q", "H"]:
+    if not _level in ["L", "M", "Q", "H"]:
         _level = "L"
     _content = _content.strip()
     _image_out = _image_out.strip()
@@ -200,8 +195,10 @@ def qrencode(
     except NameError:
         usage()
         _content = _content.replace(" ", "%20")
-
-        _msg = """<%(_url)s>""" % locals()
+        _url = "https://chart.apis.google.com/chart?chs=350x350&cht=qr&chl={}".format(
+            _content
+        )
+        _msg = """<{}>""".format(_url)
         if not readtexttools.pop_message(
             "`qrcode` missing. `pip3 install qrcode[pil]`",
             _msg,
@@ -209,7 +206,7 @@ def qrencode(
             readtexttools.net_error_icon(),
             1,
         ):
-            webbrowser.open(_url)
+            readtexttools.show_with_app(_url)
         return False
     except Exception:
         try:
@@ -240,8 +237,8 @@ def main():  # -> NoReturn
         try:
             opts, args = getopt.getopt(
                 sys.argv[1:],
-                "hoslfb",
-                ["help", "output=", "size=", "level=", "fill=", "background="],
+                "oslfbh",
+                ["output=", "size=", "level=", "fill=", "background=", "help"],
             )
         except getopt.GetoptError:
             # print help information and exit:
@@ -249,10 +246,7 @@ def main():  # -> NoReturn
             usage()
             sys.exit(2)
         for o, a in opts:
-            if o in ("-h", "--help"):
-                usage()
-                sys.exit(0)
-            elif o in ("-o", "--output"):
+            if o in ("-o", "--output"):
                 _image_out = a
             elif o in ("-s", "--size"):
                 _size = a
@@ -262,6 +256,9 @@ def main():  # -> NoReturn
                 _fill_color = a
             elif o in ("-b", "--background"):
                 _back_color = a
+            elif o in ("-h", "--help"):
+                usage()
+                sys.exit(0)
             else:
                 assert False, "unhandled option"
         if not os.path.isfile(_text_file_in):

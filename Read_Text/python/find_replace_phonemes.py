@@ -114,14 +114,14 @@ def main():  # -> NoReturn
         try:
             opts, args = getopt.getopt(
                 sys.argv[1:],
-                "holmuv",
+                "olmuvh",
                 [
-                    "help",
                     "output=",
                     "language=",
                     "model=",
                     "user_environ_dir=",
                     "verbose=",
+                    "help",
                 ],
             )
         except getopt.GetoptError:
@@ -130,10 +130,7 @@ def main():  # -> NoReturn
             usage()
             sys.exit(2)
         for o, a in opts:
-            if o in ("-h", "--help"):
-                usage()
-                sys.exit(0)
-            elif o in ("-o", "--output"):
+            if o in ("-o", "--output"):
                 _file_out = a
             elif o in ("-l", "--language"):
                 _language = a
@@ -143,6 +140,9 @@ def main():  # -> NoReturn
                 _user_dir = a
             elif o in ("-v", "--verbose"):
                 _verbose = readtexttools.lax_bool(a)
+            elif o in ("-h", "--help"):
+                usage()
+                sys.exit(0)
             else:
                 assert False, "unhandled option"
         if not os.path.isfile(_text_file_in):

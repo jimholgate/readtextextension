@@ -707,9 +707,8 @@ def main() -> None:
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hovarpietnd",
+            "ovarpietndh",
             [
-                "help",
                 "output=",
                 "visible=",
                 "audible=",
@@ -720,18 +719,17 @@ def main() -> None:
                 "title=",
                 "artist=",
                 "dimensions=",
+                "help",
+
             ],
         )
-    except getopt.GetoptError as err:
+    except getopt.GetoptError:
         # print help information and exit
         print("option -a not recognized")
         usage()
         sys.exit(2)
     for o, a in opts:
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit(0)
-        elif o in ("-o", "--output"):
+        if o in ("-o", "--output"):
             _output = a
         elif o in ("-v", "--visible"):
             _visible = a
@@ -757,6 +755,9 @@ def main() -> None:
             _writer = a
         elif o in ("-d", "--dimensions"):
             _image_size = a
+        elif o in ("-h", "--help"):
+            usage()
+            sys.exit(0)
         else:
             assert False, "unhandled option"
     if not _read_festival.language_ok(_eval_lang):

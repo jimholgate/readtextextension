@@ -153,7 +153,7 @@ def espk_languages():  # -> list[str]
     _imported_meta = readtexttools.ImportedMetaData()
     _reported_langs = []
     _espk_lang = _imported_meta.execute_command(
-        "%(_app_name)s --voices" % locals()
+        "{0} --voices".format(_app_name)
     ).replace("  ", "\t")
     if "Ukrainian" in _espk_lang:  # espeak-ng Debian 12 (bookworm) or newer
         for _line in _espk_lang.splitlines():
@@ -404,8 +404,7 @@ def espkread(
     else:
         print(
             """`espeak_read_text_file.py` says:
-`%(_lang)s` is an unsupported language.  Exiting."""
-            % locals()
+`{0}` is an unsupported language.  Exiting.""".format(_lang)
         )
         return 0
     _voice = s  # standard espeak dictionary
@@ -541,8 +540,9 @@ def espkread(
             )[0]
             _content = _imported_meta.escape_gst_pipe_meta(_content)
             _command = (
-                '%(_app)s espeak text="%(_content)s" voice=%(_voice)s ! autoaudiosink'
-                % locals()
+                '{0} espeak text="{1}" voice={2} ! autoaudiosink'.format(
+                    _app, _content, _voice
+                    )
             )
             _post_process = None
         if not bool(_app):
@@ -671,9 +671,8 @@ def main():  # -> NoReturn
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hovalrpitnd",
+            "ovalrpitndh",
             [
-                "help",
                 "output=",
                 "visible=",
                 "audible=",
@@ -684,6 +683,7 @@ def main():  # -> NoReturn
                 "title=",
                 "artist=",
                 "dimensions=",
+                "help",
             ],
         )
     except getopt.GetoptError:
@@ -692,10 +692,7 @@ def main():  # -> NoReturn
         usage()
         sys.exit(2)
     for o, a in opts:
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit(0)
-        elif o in ("-o", "--output"):
+        if o in ("-o", "--output"):
             _wave = a
         elif o in ("-v", "--visible"):
             _visible = a
@@ -717,6 +714,9 @@ def main():  # -> NoReturn
             _author = a
         elif o in ("-d", "--dimensions"):
             _dimensions = a
+        elif o in ("-h", "--help"):
+            usage()
+            sys.exit(0)
         else:
             assert False, "unhandled option"
     _author = readtexttools.check_artist(_author)

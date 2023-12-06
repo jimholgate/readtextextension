@@ -146,9 +146,16 @@ class OpenJTalkClass(object):
         if os.path.isfile(_out_file):
             os.remove(_out_file)
         try:
-            _os_command = (
-                '"%(application)s" -s %(sample)s -p %(sample_period)s -a %(all_pass)s -m "%(hts_voice)s" -r %(rate)s -ow "%(_work_file)s" -x "%(dictionary)s" "%(_in_text)s"'
-                % locals()
+            _os_command = '"{0}" -s {1} -p {2} -a {3} -m "{4}" -r {5} -ow "{6}" -x "{7}" "{8}"'.format(
+                application,
+                sample,
+                sample_period,
+                all_pass,
+                hts_voice,
+                rate,
+                _work_file,
+                dictionary,
+                _in_text,
             )
             if readtexttools.my_os_system(_os_command):
                 if len(_out_file) != 0:
@@ -196,9 +203,8 @@ def main():  # -> NoReturn
         try:
             opts, args = getopt.getopt(
                 sys.argv[1:],
-                "hovalitnd",
+                "ovalitndh",
                 [
-                    "help",
                     "output=",
                     "visible=",
                     "audible=",
@@ -207,6 +213,7 @@ def main():  # -> NoReturn
                     "title=",
                     "artist=",
                     "dimensions=",
+                    "help",
                 ],
             )
         except getopt.GetoptError:
@@ -215,10 +222,8 @@ def main():  # -> NoReturn
             usage()
             sys.exit(2)
         for o, a in opts:
-            if o in ("-h", "--help"):
-                usage()
-                sys.exit(0)
-            elif o in ("-o", "--output"):
+
+            if o in ("-o", "--output"):
                 _output = a
             elif o in ("-v", "--visible"):
                 _visible = a
@@ -234,6 +239,9 @@ def main():  # -> NoReturn
                 _artist = a
             elif o in ("-d", "--dimensions"):
                 _dimensions = a
+            elif o in ("-h", "--help"):
+                usage()
+                sys.exit(0)
             else:
                 assert False, "unhandled option"
 

@@ -276,26 +276,25 @@ Google personnel.
         module_option = ""
         more_url = "https://developer.apple.com/library/archive/documentation/LanguagesUtilities/Conceptual/MacAutomationScriptingGuide/SpeakText.html"
 
-    return (
-        """
+    return """
 Posix speech
 ============
 
-Reads a text file using `%(player)s` -- a Posix system text to speech tool.
+Reads a text file using `{}` -- a Posix system text to speech tool.
 
-%(gtts_data_source)s
+{}
 Usage
 -----
 
-    spd_read_text_file.py %(module_option)s[--language="xx"] \\ 
+    spd_read_text_file.py {}[--language="xx"] \\ 
        [--voice="xx"] [--rate="nn"] input.txt 
-%(module_help)s 
+{} 
 
 Use a specific language - en, fr, es...
     spd_read_text_file.py --language "fr" "TextFile.txt" 
 
-Use a specific voice - %(sample_voices)s
-    spd_read_text_file.py --voice "%(sample_voice)s" "TextFile.txt" 
+Use a specific voice - {}
+    spd_read_text_file.py --voice "{}" "TextFile.txt" 
 
 To say the text slower - minimum -100
     spd_read_text_file.py --rate "-20" "TextFile.txt" 
@@ -303,8 +302,14 @@ To say the text slower - minimum -100
 To say the text faster - maximum 100
     spd_read_text_file.py --rate "20" "TextFile.txt"
 
-[More](%(more_url)s)"""
-        % locals()
+[More]({})""".format(
+        player,
+        gtts_data_source,
+        module_option,
+        module_help,
+        sample_voices,
+        sample_voice,
+        more_url,
     )
 
 
@@ -357,9 +362,9 @@ def hard_reset(sd="speech-dispatcher"):  # -> bool
     if not readtexttools.have_posix_app("killall", False):
         return False
     whoami = get_whoami()
-    command = """killall %(sd)s""" % locals()
+    command = """killall {}""".format(sd)
     if whoami:
-        command = """killall -q -u %(whoami)s %(sd)s""" % locals()
+        command = """killall -q -u {} {}""".format(whoami, sd)
     return readtexttools.my_os_system(command)
 
 
@@ -543,7 +548,7 @@ class SpdFormats(object):
             if _short_lang in self.language_list:
                 return True
             elif os.path.isfile(
-                "/usr/share/espeak-ng-data/%(_short_lang)s_dict" % locals()
+                "/usr/share/espeak-ng-data/{}_dict".format(_short_lang)
             ):
                 return True
             elif _rhvoice.voice_available(_short_lang):
@@ -724,14 +729,13 @@ class SpdFormats(object):
         except [AttributeError, TypeError]:
             pass
         if self.xml_tool.use_mode in ["text"]:
-            _message = ' " %(_txt)s"' % locals()
+            _message = ' " {}"'.format(_txt)
         else:
             # This tool uses standard XML; no need to modify text beyond cleanup.
             _txt = self.xml_tool.clean_for_xml(_txt, False).replace('\\"', '"')
-            _message = (
-                """<?xml version='1.0'?>
-<speak version='1.1' xml:lang='%(language)s'>%(_txt)s</speak>"""
-                % locals()
+            _message = """<?xml version='1.0'?>
+<speak version='1.1' xml:lang='{}'>{}</speak>""".format(
+                language, _txt
             )
         _time = guess_time(_txt, i_rate, _file_spec, language)
         self.client.set_data_mode(self.xml_tool.use_mode)
@@ -1146,16 +1150,16 @@ def app_info_extract(
     * `grep_filter` is ignored if it doesn't start with `| grep `.
     * Use `| grep "en_"` not `"en_"`"""
     if not ask.startswith("-"):
-        ask = "--%(ask)s='?'" % locals()
+        ask = "--{}='?'".format(ask)
     _fmd = readtexttools.ImportedMetaData()
     _grep = ""
     if grep_filter.startswith("| grep "):
-        _grep = " %(grep_filter)s" % locals()
+        _grep = " {}".format(grep_filter)
     _app_out = readtexttools.get_my_lock(tmp_file_name)
     s1 = ""
     try:
         if not os.path.isfile(_app_out):
-            os.system("%(app)s %(ask)s%(_grep)s > %(_app_out)s" % locals())
+            os.system("{} {}{} > {}".format(app, ask, _grep, _app_out))
         if os.path.isfile(_app_out):
             if os.path.getsize(_app_out) == 0:
                 os.remove(_app_out)
@@ -1414,16 +1418,18 @@ class SayFormats(object):
                     self._i = "\n".join(
                         [
                             self._i,
-                            "%(_name)s           %(_locale)s     # %(_spd_voice)s"
-                            % locals(),
+                            "{}           {}     # {}".format(
+                                _name, _locale, _spd_voice
+                            ),
                         ]
                     )
                 if self.debug and 1:
                     if _edition_check in [self.premium]:
                         _edition = str(_edition_check)
                         print(
-                            "'['%(_name)s', '%(_locale)s', %(_edition)s, '%(_spd_voice)s'],  # testing"
-                            % locals()
+                            "'['{}', '{}', {}, '{}'],  # testing".format(
+                                _name, _locale, _edition, _spd_voice
+                            )
                         )
             self._i = self._i.strip()
         self._a1 = self._i.strip().split("\n")
@@ -1434,8 +1440,8 @@ class SayFormats(object):
         # Handle long voice names like `Shelley (Portuguese (Brazil))`
         self._i = (
             self._i.strip()
-            .replace(") ", ")%(_div)s" % locals())
-            .replace("# ", "%(_div)s" % locals())
+            .replace(") ", "){}".format(_div))
+            .replace("# ", "{}".format(_div))
         )
         for line in self._i.splitlines():
             _item1 = tuple(line.split(_div))
@@ -1443,10 +1449,9 @@ class SayFormats(object):
                 self._a2.append(_item1)
             else:
                 _line = line
-                print("""INFO: `say` said `%(_line)s`""" % locals())
+                print("""INFO: `say` said `{}`""".format(_line))
         if self.is_mac:
             self._f = app_info_extract(self.app, "say_f.txt", "file-format", "", ") [")
-        print(1345, self._f)
         if len(self._f) == 0:
             if os.name == "nt":
                 self._f = "                           (,) []\n"
@@ -1474,7 +1479,7 @@ class SayFormats(object):
         _say_prefs = os.path.expanduser(
             "~/Library/Preferences/com.apple.speech.voice.prefs.plist"
         )
-        _command = "plutil -convert json %(_say_prefs)s -o %(_app_out)s" % locals()
+        _command = "plutil -convert json {} -o {}".format(_say_prefs, _app_out)
         if not os.path.isfile(_app_out):
             os.system(_command)
         self.history_json_str = _fmd.meta_from_file(_app_out, _remove)
@@ -1488,17 +1493,14 @@ class SayFormats(object):
         """
         _lcase_name = name.lower().strip()
         _parse_prefs = self.parse_prefs()
-        if (
-            "com.apple.speech.synthesis.voice.%(_lcase_name)s)" % locals()
-            in _parse_prefs
-        ):
+        if "com.apple.speech.synthesis.voice.{})".format(_lcase_name) in _parse_prefs:
             return ""
-        elif "com.apple.speech.synthesis.voice.%(name)s)" % locals() in _parse_prefs:
+        elif "com.apple.speech.synthesis.voice.{})".format(name) in _parse_prefs:
             return ""
         else:
             if " " in _lcase_name:
-                name = "'%(name)s'" % locals()
-            return " | grep -v %(name)s " % locals()
+                name = "'{}'".format(name)
+            return " | grep -v {} ".format(name)
 
     def _getvoicename(self, inti=0):  # -> str
         """i.e. `Alex"""
@@ -1571,7 +1573,7 @@ class SayFormats(object):
                     self.app,
                     "say_spd1.txt",
                     "voice",
-                    """| grep -v '))' | grep %(_lang)s %(_voice_filters)s""" % locals(),
+                    """| grep -v '))' | grep {} {}""".format(_lang, _voice_filters),
                     " # ",
                     _remove,
                 ),
@@ -1579,8 +1581,9 @@ class SayFormats(object):
                     self.app,
                     "say_spd1.txt",
                     "voice",
-                    """| grep -v '))' | grep -v _%(_country)s | grep  %(_alt_lang)s %(_voice_filters)s"""
-                    % locals(),
+                    """| grep -v '))' | grep -v _{} | grep  {} {}""".format(
+                        _country, _alt_lang, _voice_filters
+                    ),
                     " # ",
                     _remove,
                 ),
@@ -1588,7 +1591,7 @@ class SayFormats(object):
                     self.app,
                     "say_spd1.txt",
                     "voice",
-                    """| grep '))' | grep %(_lang)s %(_voice_filters)s""" % locals(),
+                    """| grep '))' | grep {} {}""".format(_lang, _voice_filters),
                     " # ",
                     _remove,
                 ),
@@ -1596,8 +1599,9 @@ class SayFormats(object):
                     self.app,
                     "say_spd1.txt",
                     "voice",
-                    """| grep '))' | grep -v _%(_country)s | grep %(_alt_lang)s %(_voice_filters)s"""
-                    % locals(),
+                    """| grep '))' | grep -v _{} | grep {} {}""".format(
+                        _country, _alt_lang, _voice_filters
+                    ),
                     " # ",
                     _remove,
                 ),
@@ -1607,9 +1611,9 @@ class SayFormats(object):
             print(_voice_lines)
         if len(_voice_lines) == 0:
             return _spd_voice
-        elif " %(_lang)s " % locals() in _voice_lines:
+        elif " {} ".format(_lang) in _voice_lines:
             _lang = _lang.strip(" '\"\t")
-        elif " %(_alt_lang)s" % locals() in _voice_lines:
+        elif " {}".format(_alt_lang) in _voice_lines:
             _lang = _alt_lang
         else:
             return _spd_voice
@@ -1645,27 +1649,37 @@ class SayFormats(object):
                 _lcase_lang = _voice[1].lower()
                 _vox = _voice[2]
                 _vox_id = _vox.replace(" ", "_").lower()
-                _key = """%(_lcase_lang)s/%(_vox_id)s-%(_tts_system)s""" % locals()
-                _sample_url = (
-                    "https://google.com/search?q=MacOS+say+%(_vox)s" % locals()
-                )
-                _found = _voice[0]
-                # Report on found voice.
-                self.json_string = (
-                    """
-{"%(_key)s" : {
+                _key = """{}/{}-{}""".format(_lcase_lang, _vox_id, _tts_system)
+                _sample_url = "https://google.com/search?q=MacOS+say+{}".format(_vox)
+                # Report on found voice
+                _u007B = "{"
+                _u007D = "}"
+                self.json_string = """
+{}
+"{}" : {}
  "downloaded" : false,
- "gender" : "%(_gender)s",
- "id" : "%(_key)s",
- "language" : "%(_lcase_lang)s",
+ "gender" : "{}",
+ "id" : "{}",
+ "language" : "{}",
  "mimetype : "audio/aiff",
- "name" : "%(_vox)s",
- "request" : "%(_spd_voice)s",
- "sample_url" : "%(_sample_url)s",
- "tts_system" : "%(_tts_system)s"
- }
-}"""
-                    % locals()
+ "name" : "{}",
+ "request" : "{}",
+ "sample_url" : "{}",
+ "tts_system" : "{}"
+ {}
+{}""".format(
+                    _u007B,
+                    _key,
+                    _u007B,
+                    _gender,
+                    _key,
+                    _lcase_lang,
+                    _vox,
+                    _spd_voice,
+                    _sample_url,
+                    _tts_system,
+                    _u007D,
+                    _u007D,
                 )
                 if self.debug and 1:
                     print(self.json_string)
@@ -1786,7 +1800,7 @@ class SayFormats(object):
                                 i_rate,
                             ]
                         )
-                    m_rate = " -r %(_wpm)s" % locals()
+                    m_rate = " -r {}".format(_wpm)
             except:
                 pass
         return m_rate, _voice
@@ -1823,21 +1837,19 @@ class SayFormats(object):
             _media_test = readtexttools.get_my_lock("say.aiff")
 
         _app = self.app
-        _command = (
-            "%(_app)s %(m_rate)s %(v_tag)s'%(_voice)s' -f '%(_file_spec)s'" % locals()
+        _command = "{} {} {}'{}' -f '{}'".format(
+            _app, m_rate, v_tag, _voice, _file_spec
         )
-        _base_command = "%(_app)s -f '%(_file_spec)s'" % locals()
-        _test_command = (
-            "%(_app)s %(m_rate)s -v '%(_requested_voice)s' -o '%(_media_test)s' '1 2 3'"
-            % locals()
+        _base_command = "{} -f '{}'".format(_app, _file_spec)
+        _test_command = "{} {} -v '{}' -o '{}' '1 2 3'".format(
+            _app, m_rate, _requested_voice, _media_test
         )
         if len(_voice) == 0:
             os.system(_test_command)
             if os.path.isfile(_media_test):
                 os.remove(_media_test)
-                _command = (
-                    "%(_app)s %(m_rate)s -v '%(_requested_voice)s' -f '%(_file_spec)s'"
-                    % locals()
+                _command = "{} {} -v '{}' -f '{}'".format(
+                    _app, m_rate, _requested_voice, _file_spec
                 )
             else:
                 return False
@@ -1857,7 +1869,7 @@ class SayFormats(object):
             readtexttools.unlock_my_lock()
             return not bool(_result)
         except:
-            print("Cannot execute command: `%(_command)s`" % locals())
+            print("Cannot execute command: `{}`".format(_command))
         return False
 
     def save_audio(
@@ -1903,9 +1915,8 @@ class SayFormats(object):
         if os.path.isfile(_media_out):
             os.remove(_media_out)
         _app = self.app
-        _command = (
-            "%(_app)s %(m_rate)s %(v_tag)s'%(_voice)s' -o '%(_media_work)s' -f '%(_file_spec)s' "
-            % locals()
+        _command = "{} {} {}'{}' -o '{}' -f '{}' ".format(
+            _app, m_rate, v_tag, _voice, _media_work, _file_spec
         )
         try:
             readtexttools.my_os_system(_command)
@@ -1917,7 +1928,7 @@ class SayFormats(object):
                 return False
             _writer = ""
             _size = "600x600"
-            _info = "Apple MacOS Speech Synthesis Voice: %(_voice)s" % locals()
+            _info = "Apple MacOS Speech Synthesis Voice: {}".format(_voice)
             readtexttools.process_wav_media(
                 _info,
                 _media_work,
@@ -1933,9 +1944,7 @@ class SayFormats(object):
             _msg = "Could not play a say media file locally."
             if bool(_media_out):
                 _msg = "Could not save a say media file locally."
-            readtexttools.pop_message(
-                "Python `say`" % locals(), _msg, 5000, _error_icon, 1
-            )
+            readtexttools.pop_message("Python `say`", _msg, 5000, _error_icon, 1)
         self.ok = False
         return False
 
@@ -2050,15 +2059,15 @@ def main():
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hmolvri",
+            "molvrih",
             [
-                "help",
                 "output_module=",
                 "output=",
                 "language=",
                 "voice=",
                 "rate=",
                 "visible=",
+                "help",
             ],
         )
     except getopt.GetoptError:
@@ -2066,10 +2075,7 @@ def main():
         usage()
         sys.exit(2)
     for o, a in opts:
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit()
-        elif o in ("-m", "--output_module"):
+        if o in ("-m", "--output_module"):
             _output_module = a
         elif o in ("-o", "--output"):
             _output = a
@@ -2094,6 +2100,9 @@ def main():
         elif o in ("-i", "--visible"):
             if a.lower() in ["true"]:
                 _visible = True
+        elif o in ("-h", "--help"):
+            usage()
+            sys.exit()
         else:
             assert False, "unhandled option"
     if os.path.isfile("/usr/bin/say"):
@@ -2109,7 +2118,7 @@ def main():
         _voice = _say_formats.spd_voice_to_say_voice(_voice, _language)
         if not _voice.lower() == mac_reader.lower():
             for line in _say_formats._a1:
-                if line.startswith("%(_voice)s " % locals()):
+                if line.startswith("{} ".format(_voice)):
                     mac_reader = _voice
                     break
         _message_old = _imported_metadata.meta_from_file(_file_spec).strip()
@@ -2160,14 +2169,16 @@ def main():
                         ):
                             readtexttools.pop_message(
                                 "Network : Spoken content",
-                                "No `%(_language)s` voice\n%(_voice)s: No `%(_ext)s` audio exported."
-                                % locals(),
+                                "No `{}` voice\n{}: No `{}` audio exported.".format(
+                                    _language, _voice, _ext
+                                ),
                             )
                     else:
                         readtexttools.pop_message(
                             "Accessibility : Spoken content",
-                            "No `%(_language)s` voice\nNo `%(_ext)s` audio exported."
-                            % locals(),
+                            "No `{}` voice\nNo `{}` audio exported.".format(
+                                _language, _ext
+                            ),
                         )
         sys.exit(0)
     elif os.name in ["posix"]:

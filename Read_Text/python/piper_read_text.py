@@ -137,6 +137,12 @@ import find_replace_phonemes
 import netcommon
 import readtexttools
 
+REQUESTS_OK = True
+try:
+    import requests
+except ImportError:
+    REQUESTS_OK = False
+
 
 class PiperTTSClass(object):
     """Piper TTS class"""
@@ -695,6 +701,9 @@ install the binary version.
                         _name_key = self.speaker_id_map_keys[voice_no]
                 except IndexError:
                     pass
+                speaker_name = f"{_onnx}#{_name_key}"
+                if int(self.voice_count) == 1:
+                    speaker_name = f"{_onnx}#0"
                 print(
                     f"""
 Piper TTS
@@ -703,10 +712,10 @@ Piper TTS
 * Language:  `{self.concise_lang}`
 * Model:  `{_onnx}`
 * Requested Language:  `{_iso_lang}`
-* Requested Model:  `{_vox}`
+* Requested Voice:  `{_vox}`
 * Speaker #: `{_variant}`
-* Speaker Name: `{_name_key}`
 * Speaker Count:  `{self.voice_count}`
+* Speaker Voice: `{speaker_name}`
 * Speech Rate:  `{_speech_rate}`
 {_esp_warning}
 [About Piper TTS]({self.help_url})
@@ -728,9 +737,7 @@ Piper TTS
         `True` then add new model subdirectories to the local model
         directory."""
         # Exit fast if not a standard installation
-        try:
-            import requests
-        except:
+        if not REQUESTS_OK:
             return False
         if not os.path.isdir(_dir):
             os.makedirs(_dir)
@@ -783,9 +790,9 @@ Piper TTS
                 pass
             if not os.path.isdir(os.path.join(_dir, "_scripts")):
                 os.makedirs(os.path.join(_dir, "_scripts"))
-            for _script in ["voice_names.sh", "voicefest.py"]:
-                _script_url = f"https://huggingface.co/rhasspy/piper-voices/raw/main/_script/{_script}"
-                _script_path = os.path.join(_dir, "_scripts", _script)
+            for _app in ["voice_names.sh", "voicefest.py"]:
+                _script_url = f"https://huggingface.co/rhasspy/piper-voices/raw/main/_script/{_app}"
+                _script_path = os.path.join(_dir, "_scripts", _app)
                 if not os.path.isfile(_script_path):
                     try:
                         self.common.set_urllib_timeout(4)
@@ -1067,8 +1074,15 @@ def main() -> None:
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "huclrv",
-            ["help", "update=", "config=", "language=", "rate=", "voice="],
+            "uclrvh",
+            [
+                "update=",
+                "config=",
+                "language=",
+                "rate=",
+                "voice=",
+                "help",
+            ],
         )
     except getopt.GetoptError:
         # print help information and exit

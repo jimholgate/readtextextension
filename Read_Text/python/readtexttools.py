@@ -55,7 +55,6 @@ import locale
 import math
 import mimetypes
 import os
-import platform
 import sys
 import tempfile
 import threading
@@ -70,7 +69,6 @@ try:
     import json
 except ImportError:
     pass
-
 
 try:
     import platform
@@ -98,6 +96,16 @@ except ImportError:
 
 try:
     import wave
+except ImportError:
+    pass
+
+try:
+    import webbrowser
+except ImportError:
+    pass
+
+try:
+    import winsound
 except ImportError:
     pass
 
@@ -152,10 +160,10 @@ def killall_process(_process=""):  # -> bool
         if os.name == "posix":
             # `killall` might not be available to the script if it is running
             # in a container that does not include the `killall` command.
-            return os.system("killall %(_process)s" % locals()) == 0
+            return os.system("killall {0}".format(_process)) == 0
         elif os.name == "nt":
             # /f force /im <imagename>
-            return os.system("taskkill /f /im %(_process)s" % locals()) == 0
+            return os.system("taskkill /f /im {0}".format(_process)) == 0
         print("WARNING: NameError in `killall_process`. Requires pip3 `psutil`")
     return False
 
@@ -219,16 +227,14 @@ def have_posix_app(posix_app="vlc", do_test=True):  # -> bool
             return True
     if bool(do_test):
         os_sep = os.sep
-        mute_response = "&> %(os_sep)sdev%(os_sep)snull &" % locals()
+        mute_response = "&> {0}dev{0}null &".format(os_sep)
         if os_sep in posix_app:
             posix_app = os.path.basename(posix_app)
-        if my_os_system("man -w %(posix_app)s %(mute_response)s" % locals()):
+        if my_os_system("man -w {0} {1}".format(posix_app, mute_response)):
             return True
         for tester in ["--version", "--help", "-h", "-?"]:
             app_switch = tester
-            if my_os_system(
-                "%(posix_app)s %(app_switch)s %(mute_response)s" % locals()
-            ):
+            if my_os_system("{0} {1} {2}".format(posix_app, app_switch, mute_response)):
                 # No error
                 return True
     return False
@@ -408,8 +414,11 @@ def remove_unsafe_chars(_test_string="", _forbidden="[]\\{}%|*"):  # -> string
     """Removes unwanted characters from a string."""
     if not bool(_test_string):
         return ""
-    for _letter in _forbidden:
-        _test_string = _test_string.replace(_letter, "")
+    try:
+        for _letter in _forbidden:
+            _test_string = _test_string.replace(_letter, "")
+    except TypeError:
+        return remove_unsafe_chars(str(_test_string), _forbidden)
     return _test_string
 
 
@@ -422,7 +431,7 @@ def net_error_icon():  # -> string
         "Adwaita/32x32/legacy/network-error.png",
         "Humanity/actions/32/stock_not.svg",
     ]:
-        _test = "/usr/share/icons/%(_path)s" % locals()
+        _test = "/usr/share/icons/{0}".format(_path)
         if os.path.isfile(_test):
             return _test
     return ""
@@ -555,20 +564,21 @@ To include enhanced mp3 meta-data, install a converter like `avconv`,
 
 ### Audio:
 
-      %(sa1)s --sound="xxx.wav" --output="xxx.ogg"
-      %(sa1)s --visible="false" --audible="true"  \\ 
+      {0} --sound="xxx.wav" --output="xxx.ogg"
+      {0} --visible="false" --audible="true"  \\ 
        --sound="xxx.wav" --output="xxx.ogg"
 
 ### Video:
 
 Makes an audio with a poster image.  Uses `avconv` or `ffmpeg`.
 
-      %(sa1)s --image="xxx.png" --sound="xxx.wav" \\ 
+      {0} --image="xxx.png" --sound="xxx.wav" \\ 
       --output="xxx.webm"
-      %(sa1)s --visible="true" --audible="true" --image="x.png" \\
+      {0} --visible="true" --audible="true" --image="x.png" \\
        --sound="x.wav"--title="Title" --output="x.webm"
-"""
-        % locals()
+""".format(
+            sa1
+        )
     )
 
 
@@ -636,8 +646,8 @@ def sys_machine_paths():  # list(str)
     if len(machine_type) == 0:
         machine_type = "x86_64"
     return [
-        "/usr/local/lib/%(machine_type)s-linux-gnu/" % locals(),
-        "/usr/lib/%(machine_type)s-linux-gnu/" % locals(),
+        "/usr/local/lib/{0}-linux-gnu/".format(machine_type),
+        "/usr/lib/{0}-linux-gnu/".format(machine_type),
     ] + no_gnus
 
 
@@ -645,7 +655,7 @@ def linux_machine_dir_path(search="espeak-ng-data"):  # -> str
     """If the architecture specific resource directory exists, return the full
     path, otherwise return `''`"""
     for _path in sys_machine_paths():
-        try_path = "".join([_path, search])
+        try_path = "{0}{1}".format(_path, search)
         if os.path.isdir(try_path):
             return try_path
     return ""
@@ -680,14 +690,12 @@ def gst_plugin_path(plug_in_name="libgstvorbis"):  # -> str
         for g_version in g_versions:
             rt1 = path
             version = g_version
-            file_test = (
-                "%(rt1)sgstreamer-%(version)s/%(plug_in_name)s%(_ext)s" % locals()
-            )
-            if os.path.isfile(file_test):
-                return file_test
-            file_test = "%(rt1)sgstreamer-%(version)s/%(plug_in_name)s" % locals()
-            if os.path.isfile(file_test):
-                return file_test
+            for file_test in [
+                "{0}gstreamer-{1}/{2}{3}".format(rt1, version, plug_in_name, _ext),
+                "{0}gstreamer-{1}/{2}".format(rt1, version, plug_in_name),
+            ]:
+                if os.path.isfile(file_test):
+                    return file_test
     return ""
 
 
@@ -704,7 +712,7 @@ class ExtensionTable(object):
             self.vlc = self.win_search("vlc", "vlc")
         elif os.path.exists("/Applications/VLC.app/Contents/MacOS/VLC"):
             if os.path.isfile("/usr/bin/python"):
-                # VLC is not fully supported for legacy MacOS 
+                # VLC is not fully supported for legacy MacOS
                 self.vlc = ""
             else:
                 self.vlc = "/Applications/VLC.app/Contents/MacOS/VLC"
@@ -776,7 +784,7 @@ class ExtensionTable(object):
             self.mime_video = False
         elif _check_mime.startswith("video/"):
             self.mime_video = True
-            print("File mime-type: `%(_check_mime)s`" % locals())
+            print("File mime-type: `{0}`".format(_check_mime))
         else:
             self.mime_video = False
             return False
@@ -822,27 +830,24 @@ class ExtensionTable(object):
             #
             # The information from gstreamer on open desktop is
             # via /usr/share/gstreamer-1.0/<fileextension>.gep
-            for _format in ["flac", "ogg", "opus", "spx"]:
-                _test = _format
-                if test_file_spec.endswith(".%(_test)s" % locals()):
-                    return "audio/x-vorbis;audio/%(_test)s" % locals()
-            for _format in ["ogv", "webm"]:
-                _test = _format
-                if test_file_spec.endswith(".%(_test)s" % locals()):
-                    return "video/x-vorbis;video/%(_test)s" % locals()
-            for _format in ["md", "wiki"]:
-                _test = _format
-                if test_file_spec.endswith(".%(_test)s" % locals()):
-                    return "text/plain;application/x-%(_test)s"
+            for _test in ["flac", "ogg", "opus", "spx"]:
+                if test_file_spec.endswith(".{0}".format(_test)):
+                    return "audio/x-vorbis;audio/{0}".format(_test)
+            for _test in ["ogv", "webm"]:
+                if test_file_spec.endswith(".{0}".format(_test)):
+                    return "video/x-vorbis;video/{0}".format(_test)
+            for _test in ["md", "wiki"]:
+                if test_file_spec.endswith(".{0}".format(_test)):
+                    return "text/plain;application/x-{0}".format(_test)
             return ""
 
     def add_quotes_if_needed(self, app=""):  # -> str
         """Add Windows style Double Quotes to encompass paths that include spaces"""
         if " " in app:
             if not app.startswith('"'):
-                app = "".join(['"', app])
+                app = '"{0}'.format(app)
             if not app.endswith('"'):
-                app = "".join([app, '"'])
+                app = '{0}"'.format(app)
         return app
 
     def check_path_str(self, file_path_str=""):  # -> str
@@ -899,14 +904,14 @@ class ExtensionTable(object):
             "HOMEDRIVE",
         ]
         application_searches = [
-            "%(os_sep)s%(application_name)s%(os_sep)scommand_line%(os_sep)s" % locals(),
-            "%(os_sep)s%(application_name)s%(os_sep)sbin%(os_sep)s" % locals(),
-            "%(os_sep)s%(application_name)s%(os_sep)sprogram%(os_sep)s" % locals(),
-            "%(os_sep)sVideoLAN%(os_sep)sVLC%(os_sep)s" % locals(),
-            "%(os_sep)s%(application_name)s%(os_sep)s" % locals(),
-            "%(os_sep)s" % locals(),
-            "%(os_sep)sLocal%(os_sep)s" % locals(),
-            "%(os_sep)sbin%(os_sep)s" % locals(),
+            "{0}{1}{0}command_line{0}".format(os_sep, application_name),
+            "{0}{1}{0}bin{0}".format(os_sep, application_name),
+            "{0}{1}{0}program{0}".format(os_sep, application_name),
+            "{0}VideoLAN{0}VLC{0}".format(os_sep, application_name),
+            "{0}{1}{0}".format(os_sep, application_name),
+            "{0}".format(os_sep),
+            "{0}Local{0}".format(os_sep, application_name),
+            "{0}bin{0}".format(os_sep, application_name),
         ]
         for program_dir_search in program_dir_searches:
             get_env = os.getenv(program_dir_search)
@@ -915,9 +920,8 @@ class ExtensionTable(object):
             get_env = get_env.replace("\\", os_sep)
             for extension in executable_extensions:
                 for application_search in application_searches:
-                    common_app_executable = (
-                        "%(get_env)s%(application_search)s%(application_executable)s%(extension)s"
-                        % locals()
+                    common_app_executable = "{0}{1}{2}{3}".format(
+                        get_env, application_search, application_executable, extension
                     )
                     if os.path.isfile(common_app_executable):
                         return self.add_quotes_if_needed(
@@ -926,8 +930,9 @@ class ExtensionTable(object):
                     else:
                         # Look for a directory like `ffmpeg-YYYY-MM-DD-git-xxxxxx`
                         developer_app_executables = glob.glob(
-                            "%(get_env)s%(application_search)s%(application_executable)s*"
-                            % locals()
+                            "{0}{1}{1}*".format(
+                                get_env, application_search, application_executable
+                            )
                         )
                         if bool(developer_app_executables):
                             # Get a matching item in `developer_app_executables`
@@ -935,9 +940,8 @@ class ExtensionTable(object):
                             for app_match in developer_app_executables:
                                 if not app_match:
                                     continue
-                                return_value = (
-                                    "%(app_match)s%(os_sep)s%(application_executable)s%(extension)s"
-                                    % locals()
+                                return_value = "{0}{1}{2}{3}".format(
+                                    app_match, os_sep, application_executable, extension
                                 )
                                 return_value = return_value.replace("\\", os_sep)
                                 if os.path.isfile(return_value):
@@ -946,11 +950,12 @@ class ExtensionTable(object):
                                     )
         return ""
 
-def local_pip_search(profile="", lib_name="", py_search="", include_pipx=True):  # -> str
+
+def local_pip_search(
+    profile="", lib_name="", py_search="", include_pipx=True
+):  # -> str
     """Search local posix pip and optionally the posix pipx directories."""
-    _add_path = os.path.join(
-        profile, ".local", "lib", py_search, "site-packages"
-    )
+    _add_path = os.path.join(profile, ".local", "lib", py_search, "site-packages")
     if not os.path.isdir(os.path.join(_add_path, lib_name.lower())):
         if include_pipx and not os.path.isdir(os.path.join(_add_path, lib_name)):
             _add_path = os.path.join(
@@ -966,6 +971,7 @@ def local_pip_search(profile="", lib_name="", py_search="", include_pipx=True): 
     if os.path.isdir(_add_path):
         return _add_path
     return ""
+
 
 def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
     """If you installed a pip tool as a local user, then
@@ -985,12 +991,8 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
     path1 = ""
     path2 = ""
     path3 = ""
-    py_ver = "".join(
-        [
-            platform.python_version_tuple()[0],
-            ".",
-            platform.python_version_tuple()[1],
-        ]
+    py_ver = "{0}.{1}".format(
+        platform.python_version_tuple()[0], platform.python_version_tuple()[1]
     )
     if int(platform.python_version_tuple()[0].strip()) < 3:
         return ""
@@ -1002,13 +1004,15 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
     elif have_posix_app("say", False):
         profile = os.getenv("HOME")
         path1 = os.path.join(profile, "Library", "Python")
-        py_search = "".join(["python", py_ver])
+        py_search = "python{0}".format(py_ver)
         local_pip = local_pip_search(profile, lib_name, py_search)
         if len(local_pip) != 0:
             return local_pip
         if not os.path.isdir(path1):
-            if any(os.path.isdir(_test) and profile in _test for _test in os.getenv("PATH").split(":")):
-                path1 = _test      
+            for _test in os.getenv("PATH").split(":"):
+                if os.path.isdir(_test) and profile in _test:
+                    path1 = _test
+                    break
         path2 = os.path.join("lib", "python", "site-packages")
         path3 = os.sep + os.path.join(
             "Library",
@@ -1026,7 +1030,7 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
         path2 = os.path.join("lib", "python", "site-packages")
         path3 = path2
         pwd_dir = os.getenv("PWD")
-        py_search = "".join(["python", py_ver])
+        py_search = "python{0}".format(py_ver)
         if not profile == pwd_dir:
             if not pwd_dir.startswith(os.path.join(profile, ".config")):
                 # snap & flatpak containment check
@@ -1045,10 +1049,12 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
         return retval
     py_path = ""
     path_result = ""
-    if any(os.path.exists(_item) for _item in [path1, path3]):
-        path_result = _item
+    for _item in [path1, path3]:
+        if os.path.exists(_item):
+            path_result = _item
+            break
     if len(path_result) == 0:
-        print("FAIL: `%(lib_name)s` search: no directory at `%(path1)s`" % locals())
+        print("FAIL: `{0}` search: no directory at `{1}`".format(lib_name, path1))
         return ""
     with os.scandir(path_result) as it:
         for entry in it:
@@ -1232,8 +1238,9 @@ def pop_message(summary="Note", msg="", m_sec=8000, my_icon="", urgent=1):  # ->
         pass
     if have_posix_app("notify-send", False):
         my_os_system(
-            'notify-send -i "%(my_icon)s" -t %(m_sec)s "%(summary)s" "%(msg)s"'
-            % locals()
+            'notify-send -i "{0}" -t {1} "{2}" "{3}"'.format(
+                my_icon, m_sec, summary, msg
+            )
         )
         return True
     elif have_posix_app("osascript", False):
@@ -1246,8 +1253,9 @@ def pop_message(summary="Note", msg="", m_sec=8000, my_icon="", urgent=1):  # ->
         else:
             _sound = ""
         my_os_system(
-            """osascript -e 'display notification "%(msg)s" with title "%(summary)s"%(_sound)s' """
-            % locals()
+            """osascript -e 'display notification "{0}" with title "{1}"{2}' """.format(
+                msg, summary, _sound
+            )
         )
         return True
     return False
@@ -1259,6 +1267,7 @@ def lax_bool(_test):  # -> bool
     if not bool(_test):
         return False
     if _test == True:
+        # Checking for singleton value True
         return True
     try:
         if _test.lower() in ["true", "yes", "-1", "1"]:
@@ -1311,7 +1320,7 @@ def ffmpeg_path():  # -> str
         paths = [
             "/usr/local/bin/ffmpeg",
             "/Applications/Miro.app/Contents/Helpers/ffmpeg",
-            "/Applications/%(mvc)s.app/Contents/Helpers/ffmpeg" % locals(),
+            "/Applications/{0}.app/Contents/Helpers/ffmpeg".format(mvc),
             "/Applications/Shotcut/Shotcut.app/bin/ffmpeg",
         ]
     for path in paths:
@@ -1354,7 +1363,7 @@ def get_work_file_path(_work="", _image="", _type=""):  # -> str
     if _work_ext in [".aac"]:
         if have_posix_app("afconvert", False):
             _out = _work
-            _work = "%(_out)s.aiff" % locals()
+            _work = "{0}.aiff".format(_out)
     elif _work_ext in [".m4a", "m4r"]:
         if (
             have_posix_app("faac", False)
@@ -1362,13 +1371,13 @@ def get_work_file_path(_work="", _image="", _type=""):  # -> str
             or bool(get_nt_path("faac", "faac"))
         ):
             _out = _work
-            _work = "%(_out)s.wav" % locals()
+            _work = "{0}.wav".format(_out)
         elif have_posix_app("afconvert", False):
             _out = _work
-            _work = "%(_out)s.aiff" % locals()
+            _work = "{0}.aiff".format(_out)
         else:
             # Can't make m4a, so make wav
-            _out = "%(_work)s.wav" % locals()
+            _out = "{0}.wav".format(_work)
             _work = _out
     elif lax_mime_match(_work_ext, ".mp3"):
         # _extension_table = ExtensionTable()
@@ -1384,14 +1393,14 @@ def get_work_file_path(_work="", _image="", _type=""):  # -> str
                 or bool(get_nt_path("lame", "lame"))
             ):
                 _out = _work
-                _work = "%(_out)s.wav" % locals()
+                _work = "{0}.wav".format(_out)
             else:
                 # Can't make mp3, so make wav
-                _out = "%(_work)s.wav" % locals()
+                _out = "{0}.wav".format(_work)
                 _work = _out
         else:
             # Can't make mp3, so make wav
-            _out = "%(_work)s.wav" % locals()
+            _out = "{0}.wav".format(_work)
             _work = _out
     elif _work_ext in [".mp2"]:
         if media_converter_installed():
@@ -1401,13 +1410,13 @@ def get_work_file_path(_work="", _image="", _type=""):  # -> str
                 or bool(get_nt_path("twolame", "twolame"))
             ):
                 _out = _work
-                _work = "%(_out)s.wav" % locals()
+                _work = "{0}.wav".format(_out)
             else:
-                _out = "%(_work)s.wav" % locals()
+                _out = "{0}.wav".format(_work)
                 _work = _out
         else:
             # Can't make mp2, so make wav
-            _out = "%(_work)s.wav" % locals()
+            _out = "{0}.wav".format(_work)
             _work = _out
     elif lax_mime_match(_work_ext, ".ogg"):
         if media_converter_installed():
@@ -1419,47 +1428,47 @@ def get_work_file_path(_work="", _image="", _type=""):  # -> str
                 or bool(get_nt_path("oggenc2", "oggenc2"))
             ):
                 _out = _work
-                _work = "%(_out)s.wav" % locals()
+                _work = "{0}.wav".format(_out)
             else:
-                _out = "%(_work)s.wav" % locals()
+                _out = "{0}.wav".format(_work)
                 _work = _out
         else:
             # Can't make ogg, so make wav
-            _out = "%(_work)s.wav" % locals()
+            _out = "{0}.wav".format(_work)
             _work = _out
     elif lax_mime_match(_work_ext, ".aif"):
         if media_converter_installed():
             _out = _work
-            _work = "%(_out)s.wav" % locals()
+            _work = "{0}.wav".format(_out)
         else:
             # Can't make aif, so make wav
-            _out = "%(_work)s.wav" % locals()
+            _out = "{0}.wav".format(_work)
             _work = _out
     elif lax_mime_match(_work_ext, ".flac"):
         # WARNING: `flac` audio file authoring might not work on all platforms.
         if len(gst_plugin_path("libgstflac")) != 0 or bool(get_nt_path("flac", "flac")):
             _out = _work
-            _work = "%(_out)s.wav" % locals()
+            _work = "{0}.wav".format(_out)
         else:
             # Can't make flac, so make wav
-            _out = "%(_work)s.wav" % locals()
+            _out = "{0}.wav".format(_work)
             _work = _out
     elif lax_mime_match(_work_ext, ".opus"):
         if len(gst_plugin_path("libgstopus")) != 0:
             _out = _work
-            _work = "%(_out)s.wav" % locals()
+            _work = "{0}.wav".format(_out)
         else:
             # Can't make opus, so make wav
-            _out = "%(_work)s.wav" % locals()
+            _out = "{0}.wav".format(_work)
             _work = _out
     elif lax_mime_match(_work_ext, ".spx"):
         # DEPRECIATED: `opus` replaces `spx` audio compression.
         if len(gst_plugin_path("libgstspeex")) != 0:
             _out = _work
-            _work = "%(_out)s.wav" % locals()
+            _work = "{0}.wav".format(_out)
         else:
             # Can't make spx, so make wav
-            _out = "%(_work)s.wav" % locals()
+            _out = "{0}.wav".format(_work)
             _work = _out
     elif "video/" in _mime:
         if len(ffmpeg_path()) != 0 and _image_ext.lower() in [
@@ -1469,22 +1478,23 @@ def get_work_file_path(_work="", _image="", _type=""):  # -> str
             ".png",
         ]:
             _out = _work
-            _work = "%(_out)s.wav" % locals()
+            _work = "{0}.wav".format(_out)
         elif os.path.isfile(app_icon_image("poster-001.png")):
             _out = _work
-            _work = "%(_out)s.wav" % locals()
+            _work = "{0}.wav".format(_out)
         else:
             _alt_ext = ".ogg"
-            _out = "".join([os.path.splitext(_work)[0], _alt_ext])
-            _work = "%(_out)s.wav" % locals()
+            _out = "{0}{1}".format(os.path.splitext(_work)[0], _alt_ext)
+            _work = "{0}.wav".format(_out)
 
     if _type.lower() == "temp":
         if bool(_alt_ext):
             print(
                 """
-The `%(_wanted_ext)s` video format you requested needs an image.
-Using the `%(_alt_ext)s` audio format."""
-                % locals()
+The `{0}` video format you requested needs an image.
+Using the `{1}` audio format.""".format(
+                    _wanted_ext, _alt_ext
+                )
             )
         _return_value = _work
     else:
@@ -1639,7 +1649,7 @@ def process_wav_media(
             try:
                 os.remove(_work)
             except (OSError, FileNotFoundError):
-                print("OSError: could not remove %(sTMP)s" % locals())
+                print("OSError: could not remove {0}".format(_work))
     return os.path.isfile(_out)
 
 
@@ -1675,7 +1685,7 @@ def do_gst_parse_launch(_pipe=""):  # -> bool
         return True
     try:
         Gst.init(None)
-        _player = Gst.parse_launch("%(_pipe)s" % locals())
+        _player = Gst.parse_launch("{0}".format(_pipe))
         _player.set_state(Gst.State.NULL)
         _player.set_state(Gst.State.READY)
         _player.set_state(Gst.State.PAUSED)
@@ -1693,7 +1703,7 @@ def do_gst_parse_launch(_pipe=""):  # -> bool
             _terminator = "\u0000"
             Gst.init(None)
             Gst.ParseContext.new()
-            Gst.parse_launchv("%(_pipe)s%(_terminator)s" % locals())
+            Gst.parse_launchv("{0}{1}".format(_pipe, _terminator))
             Gst.ParseContext.free()
             return True
         except:
@@ -1703,8 +1713,8 @@ def do_gst_parse_launch(_pipe=""):  # -> bool
                         "GST_PLUGIN_PATH", gst_plugin_path("libgstwavenc")[0]
                     )
                     gst_l = launch
-                    if my_os_system("%(gst_l)s %(_pipe)s" % locals()):
-                        print("%(gst_l)s %(_pipe)s" % locals())
+                    if my_os_system("{0} {1}".format(gst_l, _pipe)):
+                        print("{0} {1}".format(gst_l, _pipe))
                         return True
     return False
 
@@ -1719,10 +1729,11 @@ def web_info_translate(
         if _language[:2] in ["en"]:
             _language = "es"
         webbrowser.open_new(
-            "https://translate.google.com/?sl=auto&tl=%(_language)s&text=%(_web_text)s&op=translate"
-            % locals()
+            "https://translate.google.com/?sl=auto&tl={0}&text={1}&op=translate".format(
+                _language, _web_text
+            )
         )
-        return True
+        return Truef
     except NameError:
         return False
 
@@ -1747,10 +1758,10 @@ class JsonTools(object):
     def sanitize_json(self, content=""):  # -> str
         """Escape json characters in content"""
         try:
-            test_text = content.strip("\{\}\n\t")
+            test_text = content.strip("\\{}\n\t")
         except AttributeError:
             try:
-                test_text = content.strip("'\{\}\n\t")
+                test_text = content.strip("'\\{}\n\t")
                 if test_text == "None":
                     return ""
             except AttributeError:
@@ -1799,22 +1810,33 @@ class JsonTools(object):
         s_track = self.sanitize_json(s_track)
         title = self.sanitize_json(title)
         voice = self.sanitize_json(voice)
-        return (
-            """{
-  "album": "%(album)s",
-  "author": "%(author)s",
-  "file_spec": "%(file_spec)s",
-  "flags": "%(flags)s",
-  "genre": "%(genre)s",
-  "i_rate": %(s_rate)s,
-  "i_track": %(s_track)s,
-  "language": "%(language)s",
-  "output_module": "%(output_module)s",
-  "secret_key": "%(file_spec)s.json",
-  "title": "%(title)s",
-  "voice": "%(voice)s"
-}"""
-            % locals()
+        s_key = "{}.json".format(file_spec)
+        return """{
+  "album": "{0}",
+  "author": "{1}",
+  "file_spec": "{2}",
+  "flags": "{3}",
+  "genre": "{4}",
+  "i_rate": {5},
+  "i_track": {6},
+  "language": "{7}",
+  "output_module": "{8}",
+  "secret_key": "{9}",
+  "title": "{10}",
+  "voice": "{11}"
+}""".format(
+            album,
+            author,
+            file_spec,
+            genre,
+            flags,
+            s_rate,
+            s_track,
+            language,
+            output_module,
+            s_key,
+            title,
+            voice,
         )
 
 
@@ -1910,7 +1932,7 @@ class ImportedMetaData(object):
                     self.identity = os.getenv(user_env)
                     if self.identity:
                         break
-                except:
+                except TypeError:
                     continue
         if not self.title:
             self.title = time_for_title()
@@ -1919,8 +1941,8 @@ class ImportedMetaData(object):
         if not self.track:
             self.track = str(1)
         if not self.album:
-            self.album = "".join(
-                ["_", app_name().lower().replace(" ", "_"), "_", date_for_album(), ""]
+            self.album = "{0}__{1}_".format(
+                app_name().lower().replace(" ", "_"), date_for_album()
             )
 
     def escape_gst_pipe_meta(self, test_text=""):  # -> str
@@ -2004,7 +2026,7 @@ class ImportedMetaData(object):
             if have_posix_app("gst-discoverer-1.0", False):
                 time_list = ["_duration_not_found", "0", "0", "0"]
                 _result = self.execute_command(
-                    'gst-discoverer-1.0 -v "%(file_path)s" | grep Duration:' % locals()
+                    'gst-discoverer-1.0 -v "{0}" | grep Duration:', format(file_path)
                 )
                 # Duration: 0:00:03.857687075
                 if _result:
@@ -2052,7 +2074,7 @@ class ImportedMetaData(object):
         if image:
             if os.path.splitext(image)[1] in self.image_extensions:
                 if os.path.isfile(image):
-                    lame_image = ' --ti "%(image)s"' % locals()
+                    lame_image = ' --ti "{0}"'.format(image)
                     image_uri = path2url(image)
                 else:
                     image = ""
@@ -2076,16 +2098,14 @@ class ImportedMetaData(object):
         ):
             g_album = self.escape_gst_pipe_meta(album)
             g_author = self.escape_gst_pipe_meta(author)
-            g_composer = self.escape_gst_pipe_meta(composer)
             g_genre = self.escape_gst_pipe_meta(genre)
             g_title = self.escape_gst_pipe_meta(title)
 
             # When using Gst with a pipe, the Composer, Track and Date are
             # omitted. See:
             # <https://gstreamer.freedesktop.org/data/doc/gstreamer/head/gst-plugins-good/html/gst-plugins-good-plugins-taginject.html>
-            gstreamer_meta = (
-                """! taginject tags="album=\\"%(g_album)s\\",artist=\\"%(g_author)s\\",genre=\\"%(g_genre)s\\",title=\\"%(g_title)s\\"" ! id3v2mux"""
-                % locals()
+            gstreamer_meta = """! taginject tags="album=\\"{0}\\",artist=\\"{1}\\",genre=\\"{2}\\",title=\\"{3}\\"" ! id3v2mux""".format(
+                g_album, g_author, g_genre, g_title
             )
         if self.title == time_for_title() or not bool(self.title):
             gstreamer_meta = ""
@@ -2094,39 +2114,72 @@ class ImportedMetaData(object):
             ["Gstreamer", gstreamer_meta],  # 0
             [  # 1
                 "Avconv or ffmpeg MPEG",
-                """ -metadata album="%(album)s" -metadata artist="%(author)s" -metadata genre="%(genre)s" -metadata title="%(title)s" -metadata track="%(track)s" -metadata Year="%(year)s" -acodec libmp3lame -ab 320k -aq 0 """
-                % locals(),
+                """ -metadata album="{album}" -metadata artist="{author}" -metadata genre="{genre}" -metadata title="{title}" -metadata track="{track}" -metadata Year="{year}" -acodec libmp3lame -ab 320k -aq 0 """.format(
+                    album=album,
+                    author=author,
+                    genre=genre,
+                    title=title,
+                    track=track,
+                    year=year,
+                ),
             ],
             [  # 2
                 "Avconv or ffmpeg image",
-                ' -i "%(image)s" -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (Front)" -y'
-                % locals(),
+                ' -i "{image}" -map 0:0 -map 1:0 -c copy -id3v2_version 3 -metadata:s:v title="Album cover" -metadata:s:v comment="Cover (Front)" -y'.format(
+                    image=image
+                ),
             ],
             [  # 3
                 "OGG encoder",
-                """ -metadata album='%(album)s' -metadata artist='%(author)s' -metadata genre='%(genre)s' -metadata title='%(title)s' -metadata track='%(track)s' -metadata Year='%(year)s' """
-                % locals(),
+                """ -metadata album='{album}' -metadata artist='{author}' -metadata genre='{genre}' -metadata title='{title}' -metadata track='{track}' -metadata Year='{year}' """.format(
+                    album=album,
+                    author=author,
+                    genre=genre,
+                    title=title,
+                    track=track,
+                    year=year,
+                ),
             ],
             [  # 4
                 "Nero encoder",
-                """ -meta:album="%(album)s" -meta:artist="%(author)s" -meta:genre="%(genre)s" -meta:title="%(title)s" -meta:track="%(track)s" -meta:year="%(year)s" """
-                % locals(),
+                """ -meta:album="{album}" -meta:artist="{author}" -meta:genre="{genre}" -meta:title="{title}" -meta:track="{track}" -meta:year="{year}" """.format(
+                    album=album,
+                    author=author,
+                    genre=genre,
+                    title=title,
+                    track=track,
+                    year=year,
+                ),
             ],
             [  # 5
                 "Lame (Win)",
-                """ %(lame_image)s --tl "%(album)s" --ta "%(author)s" --tt "%(title)s" --tg "%(genre)s" --tn "%(track)s" --ty %(year)s """
-                % locals(),
+                """ {lame_image} --tl "{album}" --ta "{author}" --tt "{title}" --tg "{genre}" --tn "{track}" --ty {year} """.format(
+                    lame_image=lame_image,
+                    album=album,
+                    author=author,
+                    title=title,
+                    genre=genre,
+                    track=track,
+                    year=year,
+                ),
             ],
             [  # 6
                 "Lame (Posix)",
-                """ --vbr-old %(lame_image)s --tl "%(album)s" --ta "%(author)s" --tt "%(title)s" --tg "%(genre)s" --tn "%(track)s" --ty %(year)s """
-                % locals(),
+                """ --vbr-old {lame_image} --tl "{album}" --ta "{author}" --tt "{title}" --tg "{genre}" --tn "{track}" --ty {year} """.format(
+                    lame_image=lame_image,
+                    album=album,
+                    author=author,
+                    genre=genre,
+                    title=title,
+                    track=track,
+                    year=year,
+                ),
             ],
-            ["Track", "%(track)s" % locals()],  # 7
-            ["Album or document", "%(album)s" % locals()],  # 8
-            ["Artist or author", "%(author)s" % locals()],  # 9
-            ["Track title", "%(title)s" % locals()],  # 10
-            ["Genre", "%(genre)s" % locals()],  # 11
+            ["Track", "{0}".format(track)],  # 7
+            ["Album or document", "{0}".format(album)],  # 8
+            ["Artist or author", "{0}".format(author)],  # 9
+            ["Track title", "{0}".format(title)],  # 10
+            ["Genre", "{0}".format(genre)],  # 11
             [  # 12
                 "VLC Playlist",
                 """<?xml version="1.0" encoding="UTF-8"?>
@@ -2134,13 +2187,13 @@ class ImportedMetaData(object):
     <title>Playlist</title>
     <trackList>
         <track>
-            <location>%(out_uri)s</location>
-            <creator>%(x_author)s</creator>
-            <album>%(x_album)s</album>
-            <duration>%(seconds)s500</duration>
-            <title>%(x_title)s</title>
-            <annotation>%(x_genre)s</annotation>
-            <image>%(image_uri)s</image>
+            <location>{out_uri}</location>
+            <creator>{x_author}</creator>
+            <album>{x_album}</album>
+            <duration>{seconds}500</duration>
+            <title>{x_title}</title>
+            <annotation>{x_genre}</annotation>
+            <image>{image_uri}</image>
             <extension application="http://www.videolan.org/vlc/playlist/0">
                 <vlc:id>0</vlc:id>
             </extension>
@@ -2149,45 +2202,73 @@ class ImportedMetaData(object):
     <extension application="http://www.videolan.org/vlc/playlist/0">
         <vlc:item tid="0"/>
     </extension>
-</playlist>"""
-                % locals(),
+</playlist>""".format(
+                    out_uri=out_uri,
+                    x_author=x_author,
+                    x_album=x_album,
+                    seconds=seconds,
+                    x_title=x_title,
+                    x_genre=x_genre,
+                    image_uri=image_uri,
+                ),
             ],
             [  # 13
                 "M3U playlist",
-                """#EXTM3U\nEXTINF:%(seconds)s,%(author)s - %(title)s\n%(out_uri)s\n"""
-                % locals(),
+                """#EXTM3U\nEXTINF:{seconds},{author} - {title}\n{out_uri}\n""".format(
+                    seconds=seconds, author=author, title=title, out_uri=out_uri
+                ),
             ],
             [  # 14
                 "Metadata",
-                """ * Album: %(album)s\n * Artist: %(author)s\n * Composer: %(composer)s\n * Genre: %(genre)s\n * Title: %(title)s\n * Track: %(track)s\n * Year: %(year)s"""
-                % locals(),
+                """ * Album: {album}\n * Artist: {author}\n * Composer: {composer}\n * Genre: {genre}\n * Title: {title}\n * Track: {track}\n * Year: {year}""".format(
+                    album=album,
+                    author=author,
+                    composer=composer,
+                    genre=genre,
+                    title=title,
+                    track=track,
+                    year=year,
+                ),
             ],
             [  # 15
                 "Avconv or ffmpeg Meta File",
                 """;FFMETADATA1
 ;https://ffmpeg.org/ffmpeg-all.html#toc-Metadata-1
-title=%(title)s
-YEAR=%(year)s
-ALBUM=%(album)s
-ARTIST=%(author)s
-GENRE=%(genre)s
-track=%(track)s"""
-                % locals(),
+title={title}
+YEAR={year}
+ALBUM={album}
+ARTIST={author}
+GENRE={genre}
+track={track}""".format(
+                    title=title,
+                    year=year,
+                    album=album,
+                    author=author,
+                    genre=genre,
+                    track=track,
+                ),
             ],
             [  # 16
                 "Avconv or ffmpeg Meta",
-                """ -metadata album="%(album)s" -metadata artist="%(author)s" -metadata genre="%(genre)s" -metadata title="%(title)s" -metadata track="%(track)s" -metadata Year="%(year)s" """
-                % locals(),
+                """ -metadata album="{album}" -metadata artist="{author}" -metadata genre="{genre}" -metadata title="{title}" -metadata track="{track}" -metadata Year="{year}" """.format(
+                    album=album,
+                    author=author,
+                    genre=genre,
+                    title=title,
+                    track=track,
+                    year=year,
+                ),
             ],
-            ["XML Track", "%(track)s" % locals()],  # 17
-            ["XML Album or document", "%(x_album)s" % locals()],  # 18
-            ["XML Artist or author", "%(x_author)s" % locals()],  # 19
-            ["XML Track title", "%(x_title)s" % locals()],  # 20
-            ["XML Genre", "%(x_genre)s" % locals()],  # 21
+            ["XML Track", "{0}".format(track)],  # 17
+            ["XML Album or document", "{0}".format(x_album)],  # 18
+            ["XML Artist or author", "{0}".format(x_author)],  # 19
+            ["XML Track title", "{0}".format(x_title)],  # 20
+            ["XML Genre", "{0}".format(x_genre)],  # 21
             [  # 22
                 "Popup Meta",
-                """<b>%(x_album)s</b>\n%(x_title)s \n<i>%(x_display_path)s</i>"""
-                % locals(),
+                """<b>{x_album}</b>\n{x_title} \n<i>{x_display_path}</i>""".format(
+                    x_album=x_album, x_title=x_title, x_display_path=x_display_path
+                ),
             ],
         ]
         if index > len(option):
@@ -2205,7 +2286,7 @@ track=%(track)s"""
         return_value = ""
         _encoding = "utf-8"
         if os.name == "nt":
-            if not sys.stdin.encoding == _encoding:
+            if sys.stdin.encoding != _encoding:
                 _encoding = "utf_8_sig"
         try:
             if os.path.isfile(_file_path):
@@ -2226,8 +2307,9 @@ track=%(track)s"""
             return_value = self.meta_from_file(_file_path, erase, "backslashreplace")
             print(
                 """WARNING: Could not decode characters in the file:
-`%(_file_path)s`"""
-                % locals()
+`{0}`""".format(
+                    _file_path
+                )
             )
             return return_value
         except Exception:
@@ -2354,7 +2436,10 @@ class WinMediaPlay(object):
         if not _continue:
             return False
         _denominator = 12209
-        if any(os.path.splitext(file_path.lower())[1] == _test[0] for _test in self.extensions):
+        if any(
+            os.path.splitext(file_path.lower())[1] == _test[0]
+            for _test in self.extensions
+        ):
             _denominator = _test[1]
         if _denominator == 0:
             self.rest = sound_length_seconds(file_path)
@@ -2370,7 +2455,7 @@ class WinMediaPlay(object):
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         _app = self.app
         a = subprocess.call(
-            '%(_app)s /play /close "%(file_path)s"' % locals(), startupinfo=startupinfo
+            '{0} /play /close "{1}"'.format(_app, file_path), startupinfo=startupinfo
         )
         return bool(a)
 
@@ -2394,11 +2479,11 @@ def clean_temp_files(_out=""):  # -> Bool
     """Clean text and image files used to create media"""
     try:
         for _temp_file in [
-            "%(_out)s.wav.txt" % locals(),
-            "%(_out)s.txt" % locals(),
-            "%(_out)stemp.lock" % locals(),
-            "%(_out)s.wav.png" % locals(),
-            "%(_out)s.wav.jpg" % locals(),
+            "{0}.wav.txt".format(_out),
+            "{0}.txt".format(_out),
+            "{0}temp.lock".format(_out),
+            "{0}.wav.png".format(_out),
+            "{0}.wav.jpg".format(_out),
         ]:
             if os.path.isfile(_temp_file):
                 os.remove(_temp_file)
@@ -2437,8 +2522,9 @@ def gst_wav_to_media(
         if os.path.isfile(_out):
             print(
                 """`gst_wav_to_media` says:
-`%(_out)s` already_exists. Exiting."""
-                % locals()
+`{0}` already_exists. Exiting.""".format(
+                    _out
+                )
             )
             return True
         s_out_extension = os.path.splitext(_out)[1].lower()
@@ -2476,13 +2562,11 @@ def gst_wav_to_media(
             code_pad = "! wavenc"
     if code_pad:
         gmeta = get_meta_data(_metas.i_gst, _artist, _image, _out)
-        pipe = (
-            '''filesrc location="%(_work)s" ! %(in_pad)s ! audioconvert %(code_pad)s %(gmeta)s ! filesink location="%(_out)s"'''
-            % locals()
+        pipe = '''filesrc location="{_work}" ! {in_pad} ! audioconvert {code_pad} {gmeta} ! filesink location="{_out}"'''.format(
+            _work=_work, in_pad=in_pad, code_pad=code_pad, gmeta=gmeta, _out=_out
         )
-        pipe2 = (
-            '''filesrc location="%(_work)s" ! %(in_pad)s ! audioconvert %(code_pad)s ! filesink location="%(_out)s"'''
-            % locals()
+        pipe2 = '''filesrc location="{_work}" ! {in_pad} ! audioconvert {code_pad} ! filesink location="{_out}"'''.format(
+            _work=_work, in_pad=in_pad, code_pad=code_pad, _out=_out
         )
     if pipe:
         if do_gst_parse_launch(pipe):
@@ -2516,7 +2600,7 @@ def gst_wav_to_media(
             exit()
         in_uri = path2url(_work)
         # Concise pipe; some sinks can have different settings with a verbose pipee
-        pipe = 'playbin uri="%(in_uri)s"' % locals()
+        pipe = 'playbin uri="{0}"'.format(in_uri)
         lock_my_lock()
         if os.path.splitext(_work)[1].lower() == ".wav":
             if b_audible:
@@ -2538,8 +2622,9 @@ def gst_wav_to_media(
         elif b_visible:
             print(
                 """Play is off - file will not play.
-The file was saved to:  %(_out)s"""
-                % locals()
+The file was saved to:  {0}""".format(
+                    _out
+                )
             )
     return True
 
@@ -2600,9 +2685,16 @@ def vlc_wav_to_media(
         mux = "wav"
     else:
         return False
-    command = (
-        """%(app)s "%(in_sound_path)s" --intf dummy %(verbosity)s--sout="#transcode{vcodec=none,acodec=%(audio_codec)s,ab=%(average_bitrate)s,channels=%(channel_count)s,samplerate=%(sample_rate)s}:std{access=file,mux=%(mux)s,dst='%(out_sound_path)s'}" vlc://quit"""
-        % locals()
+    command = """{app} "{in_sound_path}" --intf dummy {verbosity}--sout="#transcode{{vcodec=none,acodec={audio_codec},ab={average_bitrate},channels={channel_count},samplerate={sample_rate}}}:std{{access=file,mux={mux},dst='{out_sound_path}'}}" vlc://quit""".format(
+        app=app,
+        in_sound_path=in_sound_path,
+        verbosity=verbosity,
+        audio_codec=audio_codec,
+        average_bitrate=average_bitrate,
+        channel_count=channel_count,
+        sample_rate=sample_rate,
+        mux=mux,
+        out_sound_path=out_sound_path,
     )
     if my_os_system(command):
         if _show_meta:
@@ -2611,13 +2703,18 @@ def vlc_wav_to_media(
             """
 VideoLAN VLC 
 ============
-* audio codec = '%(audio_codec)s'
-* average bitrate = '%(average_bitrate)s'
-* channel count = '%(channel_count)s'
-* mux = '%(mux)s'
-* sample rate = '%(sample_rate)s'
-"""
-            % locals()
+* audio codec = '{audio_codec}'
+* average bitrate = '{average_bitrate}'
+* channel count = '{channel_count}'
+* mux = '{mux}'
+* sample rate = '{sample_rate}'
+""".format(
+                audio_codec=audio_codec,
+                average_bitrate=average_bitrate,
+                channel_count=channel_count,
+                mux=mux,
+                sample_rate=sample_rate,
+            )
         )
         if b_visible and b_audible:
             show_with_app(out_sound_path)
@@ -2645,7 +2742,7 @@ def get_meta_data(_index=0, _artist="", _image="", _work=""):  # -> str
     if bool(_text) and bool(_work):
         _title = _metas.get_app_meta_string(_index, _artist, _image, _work)[0]
         _info = _metas.get_app_meta_string(_metas.i_pretty, _artist, _image, _work)[1]
-        print("\n## %(_title)s ##\n\n%(_info)s" % locals())
+        print("\n## {0} ##\n\n{1}".format(_title, _info))
     return _text
 
 
@@ -2702,29 +2799,25 @@ def wav_to_media(
                 if bool(nt_command):
                     nt_command = get_nt_path("oggenc", "oggenc")
                 if nt_command:
-                    my_os_system(
-                        '"%(nt_command)s" -o "%(_out)s" "%(_work)s"' % locals()
-                    )
+                    my_os_system('"{0}" -o "{1}" "{2}"'.format(nt_command, _out, _work))
                 elif bool(_ffmpeg_avconv):
                     my_os_system(
-                        '"%(_ffmpeg_avconv)s" -i "%(_work)s" %(_meta_data)s -acodec libvorbis -ab 320k -aq 0 -y "%(_out)s"'
-                        % locals()
+                        '"{0}" -i "{1}" {2} -acodec libvorbis -ab 320k -aq 0 -y "{3}"'.format(
+                            _ffmpeg_avconv, _work, _meta_data, _out
+                        )
                     )
             else:
                 my_os_system(
-                    '"%(_ffmpeg_avconv)s" -i "%(_work)s" %(_meta_data)s -acodec libvorbis -ab 320k -aq 0 -y "%(_out)s"'
-                    % locals()
+                    '"{0}" -i "{1}" {2} -acodec libvorbis -ab 320k -aq 0 -y "{3}"'.format(
+                        _ffmpeg_avconv, _work, _meta_data, _out
+                    )
                 )
         elif _out_ext in [".aac"]:
             if have_posix_app("afconvert", False):
-                my_os_system(
-                    'afconvert -f adts -d aac "%(_work)s" "%(_out)s"' % locals()
-                )
+                my_os_system('afconvert -f adts -d aac "{0}" "{1}"'.format(_work, _out))
         elif _out_ext in [".m4a", "m4r"]:
             if have_posix_app("afconvert", False):
-                my_os_system(
-                    'afconvert -f m4af -d aac "%(_work)s" "%(_out)s"' % locals()
-                )
+                my_os_system('afconvert -f m4af -d aac "{0}" "{1}"'.format(_work, _out))
         elif lax_mime_match(_out_ext, ".mp3"):
             # Try lame for mp3 or 'audio/mpeg' files that haven't been
             #  dealt with above.
@@ -2749,31 +2842,34 @@ def wav_to_media(
                     # See: http://www.rarewares.org/mp3-lame-bundle.php
                     _meta_data = get_meta_data(_metas.i_winlame, _artist, _out)
                     my_os_system(
-                        '%(s_lame)s -V 4 %(_meta_data)s "%(_work)s" "%(_out)s"'
-                        % locals()
+                        '{0} -V 4 {1} "{2}" "{3}"'.format(
+                            s_lame, _meta_data, _work, _out
+                        )
                     )
                 else:
                     _meta_data = get_meta_data(_metas.i_unixlame, _artist, _image, _out)
                     my_os_system(
-                        '%(s_lame)s %(_meta_data)s "%(_work)s" "%(_out)s"' % locals()
+                        '{0} {1} "{2}" "{3}"'.format(s_lame, _meta_data, _work, _out)
                     )
             elif bool(_ffmpeg_avconv):
                 if len(_image) != 0:
-                    _out_temp = "%(_out)s.mp3" % locals()
+                    _out_temp = "{0}.mp3".format(_out)
                 else:
                     _out_temp = _out
                 _meta_data = get_meta_data(_metas.i_avconv, _artist, _image, _out)
                 my_os_system(
-                    '%(_ffmpeg_avconv)s -i "%(_work)s" %(_meta_data)s "%(_out_temp)s"'
-                    % locals()
+                    '{0} -i "{1}" {2} "{3}"'.format(
+                        _ffmpeg_avconv, _work, _meta_data, _out_temp
+                    )
                 )
                 if len(_image) != 0:
                     # Add image.  Make a straight copy of the audio
                     # so the quality remains the same.
                     _meta_data = get_meta_data(_metas.i_avimage, _artist, _image, _out)
                     my_os_system(
-                        '%(_ffmpeg_avconv)s -i "%(_out_temp)s" %(_meta_data)s "%(_out)s"'
-                        % locals()
+                        '{0} -i "{1}" {2} "{3}"'.format(
+                            _ffmpeg_avconv, _out_temp, _meta_data, _out
+                        )
                     )
                     if os.path.isfile(_out):
                         os.remove(_out_temp)
@@ -2781,7 +2877,7 @@ def wav_to_media(
                         os.rename(_out_temp, _out)
         elif lax_mime_match(_out_ext, ".aif"):
             # .aif doesn't have metadata.
-            my_os_system('"%(_ffmpeg_avconv)s" -i "%(_work)s" -y "%(_out)s"' % locals())
+            my_os_system('"{0}" -i "{1}" -y "{2}"'.format(_ffmpeg_avconv, _work, _out))
         elif lax_mime_match(_out_ext, ".flac"):
             # flac - free lossless audio codec.
             _meta_data = get_meta_data(_metas.i_ffmpeg_meta, _artist, _image, _out)
@@ -2794,30 +2890,34 @@ def wav_to_media(
                 nt_command = get_nt_path("flac", "flac")
                 if bool(nt_command):
                     my_os_system(
-                        '"%(nt_command)s" -f -o "%(_out)s" "%(_work)s"' % locals()
+                        '"{0}" -f -o "{1}" "{2}"'.format(nt_command, _out, _work)
                     )
                 else:
                     my_os_system(
-                        '"%(_ffmpeg_avconv)s" -i "%(_work)s" -af aformat=s16:44100 %(_meta_data)s -y "%(_out)s"'
-                        % locals()
+                        '"{0}" -i "{1}" -af aformat=s16:44100 {2} -y "{3}"'.format(
+                            _ffmpeg_avconv, _work, _meta_data, _out
+                        )
                     )
             else:
                 my_os_system(
-                    '"%(_ffmpeg_avconv)s" -i "%(_work)s" -af aformat=s16:44100 %(_meta_data)s -y "%(_out)s"'
-                    % locals()
+                    '"{0}" -i "{1}" -af aformat=s16:44100 {2} -y "{3}"'.format(
+                        _ffmpeg_avconv, _work, _meta_data, _out
+                    )
                 )
         elif lax_mime_match(_out_ext, ".webm") and bool(_ffmpeg_avconv):
             # Chrome, Firefox (Linux) and totem can open webm directly.
             _meta_data = get_meta_data(_metas.i_ffmpeg_meta, _artist, _out)
             my_os_system(
-                '%(_ffmpeg_avconv)s -loop 1 -i "%(_image)s" -i "%(_work)s" -c:v libvpx -r 1 -c:a copy -shortest %(_meta_data)s -acodec libvorbis -ab 320k -aq 0 -auto-alt-ref 0 -y "%(_out)s"'
-                % locals()
+                '{0} -loop 1 -i "{1}" -i "{2}" -c:v libvpx -r 1 -c:a copy -shortest {3} -acodec libvorbis -ab 320k -aq 0 -auto-alt-ref 0 -y "{4}"'.format(
+                    _ffmpeg_avconv, _image, _work, _meta_data, _out
+                )
             )
         elif lax_mime_match(_out_ext, ".ogv") and bool(_ffmpeg_avconv):
             _meta_data = get_meta_data(_metas.i_ffmpeg_meta, _artist, _out)
             my_os_system(
-                '%(_ffmpeg_avconv)s -loop 1 -i "%(_image)s" -i "%(_work)s" -c:v libtheora -r 1 -c:a copy -shortest %(_meta_data)s -acodec libvorbis -ab 320k -aq 0 -y "%(_out)s"'
-                % locals()
+                '{0} -loop 1 -i "{1}" -i "{2}" -c:v libtheora -r 1 -c:a copy -shortest {3} -acodec libvorbis -ab 320k -aq 0 -y "{4}"'.format(
+                    _ffmpeg_avconv, _image, _work, _meta_data, _out
+                )
             )
         elif _out_ext in [".m4v", ".mp4"] and bool(_ffmpeg_avconv):
             _program = "ffmpeg"
@@ -2825,20 +2925,24 @@ def wav_to_media(
                 _program = "avconv"
             _meta_data = get_meta_data(_metas.i_avconv, _artist, _out)
             if my_os_system(
-                '%(_ffmpeg_avconv)s -loop 1 -i "%(_image)s" -i "%(_work)s"  -ac 2 -c:v libx264 -r 25 -c:a aac -shortest %(_meta_data)s -y "%(_out)s"'
-                % locals()
+                '{0} -loop 1 -i "{1}" -i "{2}"  -ac 2 -c:v libx264 -r 25 -c:a aac -shortest {3} -y "{4}"'.format(
+                    _ffmpeg_avconv, _image, _work, _meta_data, _out
+                )
             ):
                 print(
-                    """WARNING: The %(_program)s encoder uses `libx264` and `aac`
+                    """WARNING: The {0} encoder uses `libx264` and `aac`
 to encode video and audio tracks. Some Windows and MacOS
 players cannot play this `video/mp4` file. Try [VideoLan
-VLC](https://videolan.org/vlc)."""
-                    % locals()
+VLC](https://videolan.org/vlc).""".format(
+                        _program
+                    )
                 )
             else:
                 print(
-                    """FAIL: The %(_program)s app is missing
-the `libx264` or `aac` package to convert media to`video/mp4`."""
+                    """FAIL: The {0} app is missing
+the `libx264` or `aac` package to convert media to`video/mp4`.""".format(
+                        _program
+                    )
                 )
         else:
             _out = _work
@@ -2846,8 +2950,9 @@ the `libx264` or `aac` package to convert media to`video/mp4`."""
             if not lax_bool(_audible):
                 print(
                     """Play is off - file will not play.
-'The file was saved to:   %(_out)s"""
-                    % locals()
+'The file was saved to:   {0}""".format(
+                        _out
+                    )
                 )
                 if have_posix_app("osascript", False):
                     pop_message(app_name(), _out, 8000)
@@ -2993,7 +3098,7 @@ def get_my_lock(_lock=""):  # -> str
     if not _lock:
         return ""
     _lock = remove_unsafe_chars(_lock, "[]\\{}%|*/")
-    p_lock = ".%(_lock)s" % locals()
+    p_lock = ".{0}".format(_lock)
     app_sign = app_signature()
     env_path = os.getenv("READTEXTTEMP")
 
@@ -3099,7 +3204,7 @@ def app_mac_os_command(_app="Safari", _out=""):  # -> str
     ]:
         _dir = os.path.join(_prefix, "Applications", _search)
         if os.path.exists(_dir):
-            return 'open -a "%(_app_description)s" "%(_out)s"' % locals()
+            return 'open -a "{0}" "{1}"'.format(_app_description, _out)
     return ""
 
 
@@ -3129,17 +3234,20 @@ def show_with_app(_out):  # -> bool
                         break
         if len(_command) == 0:
             # Default for MacOS.
-            _command = 'open "%(_out)s"' % locals()
+            _command = 'open "{0}"'.format(_out)
         return my_os_system(_command)
     elif os.name == "nt":
         # Windows
-        os.startfile(_out)
-        return True
+        try:
+            os.startfile(_out)
+            return True
+        except NameError:
+            return False
     else:
         for opener in ["xdg-open", "gnome-open", "kde-open"]:
             if have_posix_app(opener, True):
                 _open = opener
-                my_os_system('%(_open)s "%(_out)s"' % locals())
+                my_os_system('{0} "{1}"'.format(_open, _out))
                 return True
     return False
 
@@ -3150,7 +3258,7 @@ def path2url(_file_path):  # -> str
         return urlparse.urljoin("file:", urllib.pathname2url(_file_path))
     except NameError:
         # Fall back works on Posix
-        return "".join(["file://", _file_path.replace(" ", "%20")])
+        return "file://{0}".format(_file_path.replace(" ", "%20"))
 
 
 def office_user_dir():
@@ -3189,6 +3297,7 @@ def prefix_ohs(_int=1, _str_len=10, _symbol="0"):  # -> str
     _ohs = _str_len * _symbol
     return (_ohs + str(_int))[0 - _str_len :]
 
+
 # NOTE:
 # -----
 #
@@ -3210,9 +3319,9 @@ def prefix_ohs(_int=1, _str_len=10, _symbol="0"):  # -> str
 
 
 def uses_international_phonetic_alphabet(_str_test=""):  # -> bool
-    '''Return True if `_str_test` uses the International Phonetic
+    """Return True if `_str_test` uses the International Phonetic
     Alphabet. IPA Extensions is a block (U+0250 to U+02AF) of the
-    Unicode standard.'''
+    Unicode standard."""
     if len(_str_test) == 0:
         return False
     _min = 592  # int("0250", 16)
@@ -3254,13 +3363,13 @@ def local_pronunciation(
         _test = _lang
         _os_sep = os.sep
         _json_search1 = app_icon_image(
-            "%(_test)s_lexicon.json" % locals(), "po%(_os_sep)s%(my_dir)s" % locals()
+            "{0}_lexicon.json".format(_test), "po{0}{1}".format(_os_sep, my_dir)
         )
-        _json_search2 = os.path.join(_user_dir, "%(_test)s_lexicon.json" % locals())
+        _json_search2 = os.path.join(_user_dir, "{0}_lexicon.json".format(_test))
         _json_search3 = os.path.join(
             _imported_meta.custom_lexicon_path(),
             my_dir,
-            "%(_test)s_lexicon.json" % locals(),
+            "{0}_lexicon.json".format(_test),
         )
         for _json_search in [_json_search3, _json_search2, _json_search1]:
             if len(_json_search) != 0 and os.path.isfile(_json_search):
@@ -3270,9 +3379,10 @@ def local_pronunciation(
             break
     if len(_json_file) == 0:
         print(
-            """NOTE: Did not edit the text because no `%(_test)s_lexicon.json`
-file for `%(my_dir)s` was found."""
-            % locals()
+            """NOTE: Did not edit the text because no `{0}_lexicon.json`
+file for `{1}` was found.""".format(
+                _test, my_dir
+            )
         )
         return [text, _json_text]
     _date = time.strftime("%Y-%m-%d_%H:%M:%S")
@@ -3295,33 +3405,36 @@ file for `%(my_dir)s` was found."""
                     _count_j = 0
                     _json_text = "{\n"
                     _footnotes = [
-                        """    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},"""
-                        % locals(),
-                        """    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}"""
-                        % locals(),
+                        '    "{0}_99998":{{"g":"$[LOCALE]","p":"{1}"}},'.format(
+                            _test, _test
+                        ),
+                        '    "{0}_99999":{{"g":"$[REVISION]","p":"{1}"}}'.format(
+                            _test, _date
+                        ),
                         "}",
                         "",
                     ]
                     do_ipa_test = uses_international_phonetic_alphabet(_content)
-                    _comment = "Phonemic alphabet: %(_phonemic_alphabet)s"
+                    _note = "Phonemic alphabet: {0}".format(_phonemic_alphabet)
                     if len(_phonemic_alphabet) == 0:
                         if do_ipa_test:
-                            _comment = "https://en.wikipedia.org/wiki/International_Phonetic_Alphabet"
+                            _note = "https://en.wikipedia.org/wiki/International_Phonetic_Alphabet"
                             _phonemic_alphabet = "ipa"
                         else:
-                            _comment = "https://en.wikipedia.org/wiki/X-SAMPA"
+                            _note = "https://en.wikipedia.org/wiki/X-SAMPA"
                             _phonemic_alphabet = "x-sampa"
-                    _pls_text = (
-                        """<?xml version="1.0" encoding="UTF-8"?>
+                    _pls_text = """<?xml version="1.0" encoding="UTF-8"?>
 <lexicon version="1.0"
 \txmlns="http://www.w3.org/2005/01/pronunciation-lexicon"
 \txmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 \txsi:schemaLocation="http://www.w3.org/2005/01/pronunciation-lexicon http://www.w3.org/TR/2007/CR-pronunciation-lexicon-20071212/pls.xsd"
-\talphabet="%(_phonemic_alphabet)s" xml:lang="%(iso_lang)s">
-<!-- REVISION: %(_date)s
-%(_comment)s -->"""
-                        % locals()
+\talphabet="{0}" xml:lang="{1}">
+<!-- REVISION: {2}
+{3} -->""".format(
+                        _phonemic_alphabet, iso_lang, _date, _note
                     )
+                    _u007b = "{"
+                    _u0070 = "}"
                     for _item in data:
                         _grapheme = _json_tools.sanitize_json(data[_item]["g"])
                         _phoneme = _json_tools.sanitize_json(data[_item]["p"])
@@ -3333,7 +3446,9 @@ file for `%(my_dir)s` was found."""
                             continue
                         _used_graphemes.append(data[_item]["g"])
                         _good_list.append(
-                            "".join(['":{"g":"', _grapheme, '","p":"', _phoneme, '"},'])
+                            '":{0}"g":"{1}","p":"{1}"{2},'.format(
+                                _u007b, _grapheme, _phoneme, _u0070
+                            )
                         )
                         _grapheme = _xml_transform.clean_for_xml(data[_item]["g"])
                         _alias = _xml_transform.clean_for_xml(data[_item]["p"])
@@ -3351,40 +3466,39 @@ file for `%(my_dir)s` was found."""
                                 _apost = "</phoneme>\n\t</lexeme>"
                                 do_ipa_test = False
                         if do_ipa_test:
-                            if any(uses_international_phonetic_alphabet(_letter) for _letter in _alias):
-                                    # W3C -> wɝːld waɪd web kənˈsɔːr.ʃəm
-                                    _apre = "</grapheme>\n\t\t<phoneme>"
-                                    _apost = "</phoneme>\n\t</lexeme>"
-                        _pls_text = "".join(
-                            [
-                                _pls_text,
-                                "\n\t<lexeme>\n\t\t<grapheme>",
-                                _grapheme,
-                                _apre,
-                                _alias,
-                                _apost,
-                            ]
+                            if any(
+                                uses_international_phonetic_alphabet(_letter)
+                                for _letter in _alias
+                            ):
+                                # W3C -> wɝːld waɪd web kənˈsɔːr.ʃəm
+                                _apre = "</grapheme>\n\t\t<phoneme>"
+                                _apost = "</phoneme>\n\t</lexeme>"
+                        _pls_text = "{0}{1}{2}{3}{4}{5}".format(
+                            _pls_text,
+                            "\n\t<lexeme>\n\t\t<grapheme>",
+                            _grapheme,
+                            _apre,
+                            _alias,
+                            _apost,
                         )
                     _good_list = sorted(sorted(_good_list), key=len)
-                    _pls_text = "".join([_pls_text, "\n</lexicon>\n"])
+                    _pls_text = "{0}{1}".format(_pls_text, "\n</lexicon>\n")
                     for _item in _good_list:
                         _count_j += 1
-                        _json_text = "".join(
-                            [
-                                _json_text,
-                                '    "',
-                                _test,
-                                "_",
-                                prefix_ohs(_count_j, 5, "0"),
-                                _item,
-                                "\n",
-                            ]
+                        _json_text = "{0}{1}{2}{3}{4}{5}{6}".format(
+                            _json_text,
+                            '    "',
+                            _test,
+                            "_",
+                            prefix_ohs(_count_j, 5, "0"),
+                            _item,
+                            "\n",
                         )
                     for _addenda in _footnotes:
-                        _json_text = "".join([_json_text, _addenda, "\n"])
+                        _json_text = "{0}{1}{2}".format(_json_text, _addenda, "\n")
                         if _verbose:
                             try:
-                                print("\n%(_json_text)s" % locals())
+                                print("\n{0}".format(_json_text))
                             except UnicodeEncodeError:
                                 pass
             _len_text3 = len(text) * 3
@@ -3412,30 +3526,33 @@ file for `%(my_dir)s` was found."""
             """WARNING: A text string was not edited because a `json` lexicon
 is incorrectly formatted for this application. (`KeyError`)
 
-%(_json_file)s."""
-            % locals()
+{0}""".format(
+                _json_file
+            )
         )
-        _json_text = """{
-    "%(_test)s_99997":{"g":"$[ERROR]","p":"JSONDecodeError"},
-    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},
-    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}
-}"""
-    except Exception:  # i. e. : python 3 json.decoder.JSONDecodeError:
+        _json_text = """{{
+    "{0}_99997":{{"g":"$[ERROR]","p":"JSONDecodeError"}},
+    "{1}_99998":{{"g":"$[LOCALE]","p":"{2}"}},
+    "{3}_99999":{{"g":"$[REVISION]","p":"{4}"}}
+}}""".format(
+            _test, _test, _test, _test, _date
+        )
+    except ImportError:  # i. e. : python 3 json.decoder.JSONDecodeError:
         _pls_text = ""
         print(
             """WARNING: A text string was not edited because a `json` lexicon
 file is missing or is incorrectly formatted for this application.
 
-%(_json_file)s."""
-            % locals()
+{0}.""".format(
+                _json_file
+            )
         )
-        _json_text = (
-            """{
-    "%(_test)s_99997":{"g":"$[ERROR]","p":"JSONDecodeError"},
-    "%(_test)s_99998":{"g":"$[LOCALE]","p":"%(_test)s"},
-    "%(_test)s_99999":{"g":"$[REVISION]","p":"%(_date)s"}
-}"""
-            % locals()
+        _json_text = """{{
+    "{0}_99997":{{"g":"$[ERROR]","p":"JSONDecodeError"}},
+    "{1}_99998":{{"g":"$[LOCALE]","p":"{2}"}},
+    "{3}_99999":{{"g":"$[REVISION]","p":"{4}"}}
+}}""".format(
+            _test, _test, _test, _test, _date
         )
     return [text.strip(), _json_text, _pls_text]
 
@@ -3543,12 +3660,11 @@ class PosixAudioPlayers(object):
     ):  # -> str
         """Get an audio player command on your system
         that is compatible with the audio file type."""
-        if not "." in file_path:
+        if "." not in file_path:
             return ""
         if check_is_file:
             if not os.path.isfile(file_path):
                 return ""
-        uri_path = path2url(file_path)
         for player in self.players:
             if player == "afplay":
                 b_play_more = os.path.splitext(file_path)[1] in self.afplay_exts
@@ -3565,7 +3681,7 @@ class PosixAudioPlayers(object):
     def player_app(self, file_path="/path/rte-play.ec3"):  # -> str
         """Get the an audio player on your system that is
         compatible with the audio file type."""
-        if not "." in file_path:
+        if "." not in file_path:
             return ""
         _command = self.player_command(file_path, False)
         if len(_command) != 0:
@@ -3577,9 +3693,9 @@ def show_and_play(_command="", a_app="", display_file="", file_path=""):  # -> b
     """Print the play status and play an audio file"""
     if len(_command) != 0:
         if os.path.getsize(file_path) == 0:
-            print("""[>]  %(a_app)s cannot play `%(display_file)s`""" % locals())
+            print("""[>]  {0} cannot play `{1}`""".format(a_app, display_file))
             return True
-        print("[>] %(a_app)s playing `%(display_file)s`" % locals())
+        print("[>] {0} playing `{1}`".format(a_app, display_file))
         return os.system(_command) == 0
     return False
 
@@ -3600,27 +3716,31 @@ def play_wav_no_ui(file_path=""):  # -> bool
             a_app = "Windows Media Player"
             _winm = WinMediaPlay()
             if _winm.app_ok(file_path):
-                print("[>] %(a_app)s playing `%(display_file)s`" % locals())
+                print("[>] {0} playing `{1}`".format(a_app, display_file))
                 _winm.play(file_path)
                 return True
             else:
-                return os.startfile(file_path) == 0
+                try:
+                    return os.startfile(file_path) == 0
+                except NameError:
+                    return False
         elif _win_ext in [".mp4", ".oga", ".ogg", ".opus", ".spx", ".webm"]:
-            os.startfile(file_path)
-            return True
+            try:
+                os.startfile(file_path)
+                return True
+            except NameError:
+                pass
         else:
             try:
-                import winsound
-
-                print("[>] %(a_app)s playing `%(display_file)s`" % locals())
+                print("[>] {0} playing `{1}`".format(a_app, display_file))
                 winsound.PlaySound(
                     file_path, winsound.SND_FILENAME | winsound.SND_NOWAIT
                 )
                 return True
-            except:
+            except (NameError, ImportError):
                 try:
                     return os.startfile(file_path) == 0
-                except:
+                except AttributeError:
                     return False
     else:
         _audio_play = PosixAudioPlayers()
@@ -3628,21 +3748,18 @@ def play_wav_no_ui(file_path=""):  # -> bool
         if len(_command) == 0:
             try:
                 if bool(Gst):
-                    _pipe = 'playbin uri="%(uri_path)s" ' % locals()
+                    _pipe = 'playbin uri="{0}" '.format(uri_path)
                     do_gst_parse_launch(_pipe)
-            except:
+            except NameError:
                 _pipe = ""
             if len(_pipe) == 0:
                 try:
-                    import webbrowser
-
                     print(
-                        "[>] %(a_app)s (default) is playing `%(display_file)s`"
-                        % locals()
+                        "[>] {0} (default) is playing `{1}`".format(a_app, display_file)
                     )
                     webbrowser.open(uri_path)
                     return True
-                except ImportError:
+                except (ImportError, NameError):
                     _apt_get_list = ""
                     for app in _audio_play.player_packages():
                         _apt_get_list = "\n * ".join(
@@ -3650,8 +3767,9 @@ def play_wav_no_ui(file_path=""):  # -> bool
                         )
                     print(
                         "-" * 78,
-                        "\nPython could not access a player for `%(display_file)s`:%(_apt_get_list)s\n"
-                        % locals(),
+                        "\nPython could not access a player for `{0}`:{1}\n".format(
+                            display_file, _apt_get_list
+                        ),
                     )
                     return False
     return show_and_play(_command, _audio_play.found_player, display_file, file_path)
@@ -3670,9 +3788,9 @@ def handle_sound_playing(_media_work="", lock="lock"):  # -> bool
         if len(_player_app) == 0:
             return False
         if killall_process(_player_app):
-            print("\n[>] %(_player_app)s stopping" % locals())
+            print("\n[>] {0} stopping".format(_player_app))
         else:
-            print("\n[>] %(_player_app)s is not ready. Try later." % locals())
+            print("\n[>] {0} is not ready. Try later.".format(_player_app))
         return True
     return False
 
@@ -3696,9 +3814,8 @@ def main():  # -> NoReturn
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hovaistnd",
+            "ovaistndh",
             [
-                "help",
                 "output=",
                 "visible=",
                 "audible=",
@@ -3707,6 +3824,7 @@ def main():  # -> NoReturn
                 "title=",
                 "artist=",
                 "dimensions=",
+                "help"
             ],
         )
     except getopt.GetoptError:
@@ -3715,10 +3833,7 @@ def main():  # -> NoReturn
         usage()
         sys.exit(2)
     for o, a in opts:
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit(0)
-        elif o in ("-o", "--output"):
+        if o in ("-o", "--output"):
             _out = a
         elif o in ("-v", "--visible"):
             _visible = a
@@ -3734,6 +3849,9 @@ def main():  # -> NoReturn
             _artist = a
         elif o in ("-d", "--dimensions"):
             _dimensions = a
+        elif o in ("-h", "--help"):
+            usage()
+            sys.exit(0)
         else:
             assert False, "unhandled option"
             usage()

@@ -77,14 +77,13 @@ Usage
 -----
 
 * To say the text with a specific voice  
-  %(sA)s --voice "xxxxxx" "TextFile.txt"`
+  {0} --voice "xxxxxx" "TextFile.txt"`
 * To say the text with the default voice  
-  %(sA)s "TextFile.txt"`
+  {0} "TextFile.txt"`
 * To say the text slower  
-  %(sA)s --rate "-20" "TextFile.txt"`
+  {0} --rate "-20" "TextFile.txt"`
 * To say the text faster  
-  %(sA)s --rate "20" "TextFile.txt"`)"""
-        % locals()
+  {0} --rate "20" "TextFile.txt"`)""".format(sA)
     )
 
 
@@ -117,7 +116,7 @@ def read_string_aloud(_name="", _rate=0, speechString=""):
 
 def main():  # -> NoReturn
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hvr", ["help", "voice=", "rate="])
+        opts, args = getopt.getopt(sys.argv[1:], "vrh", ["voice=", "rate=", "help"])
     except getopt.GetoptError:
         # print help information and exit:
         print("option -a not recognized")
@@ -126,13 +125,14 @@ def main():  # -> NoReturn
     _name = ""
     _rate = 0
     for o, a in opts:
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit()
-        elif o in ("-v", "--voice"):
+
+        if o in ("-v", "--voice"):
             _name = a
         elif o in ("-r", "--rate"):
             _rate = a
+        elif o in ("-h", "--help"):
+            usage()
+            sys.exit()
         else:
             assert False, "unhandled option"
     try:

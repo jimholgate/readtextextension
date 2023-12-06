@@ -155,15 +155,15 @@ def picoread(
         if "nt" in os.name.lower():
             _command = readtexttools.get_nt_path("opt/picosh.exe")
             if "de" in _lang.lower():
-                _os_command = (
-                    '%(_command)s -v de-DE_gl0 "%(_text)s" "%(_work_file)s"' % locals()
+                _os_command = '{0} -v de-DE_gl0 "{1}" "{2}"'.format(
+                    _command, _text, _work_file
                 )
             else:  # Pico for Windows defaults to British English
-                _os_command = '%(_command)s "%(_text)s" "%(_work_file)s"' % locals()
+                _os_command = '{0} "{1}" "{2}"'.format(_command, _text, _work_file)
         else:
             _command = "pico2wave"
-            _os_command = (
-                '%(_command)s -l %(_lang)s -w "%(_work_file)s"  %(_text)s' % locals()
+            _os_command = '{0} -l {1} -w "{2}"  {3}'.format(
+                _command, _lang, _work_file, _text
             )
         if readtexttools.my_os_system(_os_command):
             if os.path.getsize(_work_file) == 0:
@@ -214,9 +214,8 @@ def main():  # -> NoReturn
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hovalrpitnd",
+            "ovalrpitndh",
             [
-                "help",
                 "output=",
                 "visible=",
                 "audible=",
@@ -227,6 +226,7 @@ def main():  # -> NoReturn
                 "title=",
                 "artist=",
                 "dimensions=",
+                "help",
             ],
         )
     except getopt.GetoptError:
@@ -235,10 +235,7 @@ def main():  # -> NoReturn
         usage()
         sys.exit(2)
     for o, a in opts:
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit(0)
-        elif o in ("-o", "--output"):
+        if o in ("-o", "--output"):
             _output = a
         elif o in ("-v", "--visible"):
             _visible = a
@@ -260,6 +257,9 @@ def main():  # -> NoReturn
             _artist = a
         elif o in ("-d", "--dimensions"):
             _dimensions = a
+        elif o in ("-h", "--help"):
+            usage()
+            sys.exit(0)
         else:
             assert False, "unhandled option"
     _text = _imported_meta.meta_from_file(_file_path)
@@ -272,17 +272,14 @@ def main():  # -> NoReturn
         if _pitch == "100%" and _rate == "100%":
             _text = _text.replace('"', '\\"')
             _text = readtexttools.strip_mojibake(_language, _text)
-            _pico_text = '"%(_text)s"' % locals()
+            _pico_text = '"{}"'.format(_text)
         else:
             _text = readtexttools.strip_mojibake(_language, _text)
             _text = _xml_transform.clean_for_xml(
                 _text.strip(), readtexttools.lax_bool(_strict)
             )
-            _pico_text = (
-                '''"<speed level = '%(_rate)s'>
-<pitch level = '%(_pitch)s'>'%(_text)s</pitch></speed>"'''
-                % locals()
-            )
+            _pico_text = '''"<speed level = '{}'>
+<pitch level = '{}'>'{}</pitch></speed>"'''.format(_rate, _pitch, _text)
     if len(_pico_text) != 0:
         _artist_ok = readtexttools.check_artist(_artist)
         _title_ok = readtexttools.check_title(_title, "pico")
