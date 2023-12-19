@@ -7492,6 +7492,7 @@ Function fsGetThisUsers( _
 	If ismissing(cType) Then
 		cType = &quot;fn&quot;
 	End If
+	On Error Goto fsGetThisUsersErr
 	Dim sNodePath$ : sNodePath = &quot;/org.openoffice.UserProfile/Data&quot;
 	Dim oNode
 	Dim snval
@@ -7548,6 +7549,9 @@ Function fsGetThisUsers( _
 		Case Else
 		fsGetThisUsers = &quot;&quot;
 	End Select
+	Exit Function
+	fsGetThisUsersErr:
+	fsGetThisUsers = &quot;&quot;
 End Function
 
 
