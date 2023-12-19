@@ -113,6 +113,27 @@ Function PosixPythonPath() As String
 	Dim y# : y = 0
 	Dim py_ver$ : py_ver = fsMacPythonVersion()
 	PosixPythonPath = &quot;&quot;
+	Dim EnvironPy$ : EnvironPy = Environ(&quot;READ_TEXT_USE_PY&quot;)
+	If Len(Environ(EnvironPy) &lt;&gt; 0) Then
+		&apos; On Posix systems, you can edit a file to specify environmental
+		&apos; values. To see your current values, open a console and type
+		&apos; `env`. Some platforms use a user dialog to change the settings
+		&apos; but it is more typical to just edit a settings file with a text
+		&apos; editor. See the documentation for your distribution and desktop.
+		&apos; Create an environment variable called `READ_TEXT_USE_PY`. Set
+		&apos; the value to the full path of the python executable you want
+		&apos; to use.		
+		&apos;
+		&apos; Once you have modified your default environment settings, you
+		&apos; when you type `env` in a console you should see a line that
+		&apos; looks something like:
+		&apos;
+		&apos; `READ_TEXT_USE_PY=/usr/.local/bin/python3.12.1`
+		If FileExists(EnvironPy) Then
+			PosixPythonPath = EnvironPy
+			Exit Function
+		End If
+	End If
 	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
 		PosixPythonPath = fsAppImageResourcePath(&quot;python&quot;)
 	Else
