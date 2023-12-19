@@ -2261,6 +2261,14 @@ Function fsPiperPath()
 	_apps = Array(&quot;/piper-cli&quot;, &quot;/piper&quot;)
 	On Local Error GoTo fsPiperPathErr
 	sf = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+		_path = fsFindAppPath(&quot;piper-tts/piper/piper.exe&quot;)
+		If Len(_path) &lt;&gt; 0 Then
+			fsPiperPath = _path
+			Exit Function
+		End If
+	End Select
 	paths = LocalLinuxPaths()
 	For y = Lbound(_apps) to Ubound(_apps)
 		For x = Lbound(paths) to Ubound(paths)
@@ -2544,13 +2552,21 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		&quot; --rate 125% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
 		&quot; --rate 100% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
 		&quot; --rate 75% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
+		&quot; --update True --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
 		&quot; --update True&quot;,_
 		&quot;&quot;)
 		For n = Lbound(_opts) to Ubound(_opts)
-			s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-			_opts(n) &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+			If Instr(_opts(n), &quot;--update True --voice&quot;) = 0 Then
+				s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				_opts(n) &amp; _
+				&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+			Else
+				s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				_opts(n)
+			End If
 			s1 = s1 &amp; fspyPlayOption(oDialog, s4)		
 		Next
+		s4 = &quot;&quot;
 	End If
 	If Len(s1) &gt; 0 Then
 		If Asc(Left(s1, 1)) = 10 Then
@@ -4986,7 +5002,7 @@ Sub MsgSpeak( _
 	Else
 		Select Case fsGetOS()
 			Case &quot;WINDOWS&quot;
-			If Len(WinSpeechProgramPath()) = 0 Then
+			If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
 				fsNetSAPI5WindowsSpeech(strA, _
 				fsSelectionLanguageAndRegion(False))
 				Exit Sub

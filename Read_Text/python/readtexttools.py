@@ -144,6 +144,44 @@ except ImportError:
 
 LOOK_UPS = 0
 
+SITE_QR = """
+    ██████████████████████████████████████████████████████████████████████████
+    ██████████████████████████████████████████████████████████████████████████
+    ██████████████████████████████████████████████████████████████████████████
+    ██████████████████████████████████████████████████████████████████████████
+    ████████              ██████  ██      ██          ██              ████████
+    ████████  ██████████  ██  ██  ████████      ████  ██  ██████████  ████████
+    ████████  ██      ██  ██████████  ████    ████  ████  ██      ██  ████████
+    ████████  ██      ██  ██      ██        ██  ████████  ██      ██  ████████
+    ████████  ██      ██  ████  ████████  ██          ██  ██      ██  ████████
+    ████████  ██████████  ██    ██    ██    ████████████  ██████████  ████████
+    ████████              ██  ██  ██  ██  ██  ██  ██  ██              ████████
+    ██████████████████████████      ██████    ████    ████████████████████████
+    ████████          ██        ██                  ██  ██  ██  ██  ██████████
+    ████████        ██  ██    ██  ██  ██████        ████      ██████  ████████
+    ████████████      ██    ████  ██████    ██  ████    ██    ████████████████
+    ██████████        ██████  ████  ████      ██████  ██        ██  ██████████
+    ████████████      ██                    ██  ██████  ██████    ████████████
+    ████████████  ██    ██  ██████        ██  ████            ██████  ████████
+    ████████    ████████  ██  ██  ██  ████        ██████  ██      ████████████
+    ██████████    ██  ████    ████  ██████  ████████          ████  ██████████
+    ████████████          ████              ██  ██  ██████  ██    ████████████
+    ████████  ████      ██      ██  ████  ██                  ██  ██  ████████
+    ████████  ██    ██    ████  ████████      ██  ██  ████    ██  ████████████
+    ████████  ████      ██  ██      ██████    ████    ██  ████████  ██████████
+    ████████  ██████████  ████  ██          ██  ████          ██      ████████
+    ████████████████████████  ████  ████████  ██████  ██████          ████████
+    ████████              ██    ████████    ██████    ██  ██      ████████████
+    ████████  ██████████  ████  ████  ██  ██████      ██████  ████  ██████████
+    ████████  ██      ██  ██  ████              ████          ██    ██████████
+    ████████  ██      ██  ██  ████  ██  ████  ██      ████████    ██  ████████
+    ████████  ██      ██  ██  ████████        ████                  ██████████
+    ████████  ██████████  ██          ██████  ██████  ██    ██  ██  ██████████
+    ████████              ██  ████████    ████      ████  ██      ████████████
+    ██████████████████████████████████████████████████████████████████████████
+    ██████████████████████████████████████████████████████████████████████████
+    ██████████████████████████████████████████████████████████████████████████"""
+
 
 def killall_process(_process=""):  # -> bool
     """If process is active, then stop it. Posix systems can use the posix
@@ -181,9 +219,15 @@ def write_plain_text_file(_file_path="", _body_text="", scodeco="utf-8"):  # -> 
         writer = codecs.open(_file_path, mode="w", encoding=scodeco, errors="replace")
         writer.write(_body_text)
         writer.close()
-    except:
+    except(ValueError, UnicodeEncodeError, UnicodeDecodeError, PermissionError):
         print("`write_plain_text_file` error in readtexttools.py")
     return os.path.isfile(_file_path)
+
+
+def run_powershell(cmd=""):  # -> str
+    """PowerShell automates tasks, manages systems, and can perform operations
+    with Windows NET services like Azure, Microsoft 365, and SQL Server."""
+    return subprocess.run(["PowerShell", " -Command", cmd], capture_output=True, check=False)
 
 
 def get_temp_prefix():  # -> str
@@ -894,7 +938,7 @@ class ExtensionTable(object):
         elif os.name != "nt":
             return ""
         os_sep = os.sep
-        executable_extensions = [".exe", ""]
+        executable_extensions = [".exe", ".com"]
         common_app_executable = ""
         program_dir_searches = [
             "LOCALAPPDATA",
@@ -905,21 +949,24 @@ class ExtensionTable(object):
         ]
         application_searches = [
             "{0}{1}{0}command_line{0}".format(os_sep, application_name),
+            "{0}Programs{0}{1}{0}".format(os_sep, application_name),
             "{0}{1}{0}bin{0}".format(os_sep, application_name),
             "{0}{1}{0}program{0}".format(os_sep, application_name),
-            "{0}VideoLAN{0}VLC{0}".format(os_sep, application_name),
+            "{0}Programs{0}piper-tts{0}piper{0}".format(os_sep),
+            "{0}Programs{0}piper{0}".format(os_sep),
+            "{0}VideoLAN{0}VLC{0}".format(os_sep),
             "{0}{1}{0}".format(os_sep, application_name),
             "{0}".format(os_sep),
-            "{0}Local{0}".format(os_sep, application_name),
-            "{0}bin{0}".format(os_sep, application_name),
+            "{0}Local{0}".format(os_sep),
+            "{0}bin{0}".format(os_sep),
         ]
         for program_dir_search in program_dir_searches:
             get_env = os.getenv(program_dir_search)
             if not get_env:
                 continue
             get_env = get_env.replace("\\", os_sep)
-            for extension in executable_extensions:
-                for application_search in application_searches:
+            for application_search in application_searches:
+                for extension in executable_extensions:
                     common_app_executable = "{0}{1}{2}{3}".format(
                         get_env, application_search, application_executable, extension
                     )
@@ -930,7 +977,7 @@ class ExtensionTable(object):
                     else:
                         # Look for a directory like `ffmpeg-YYYY-MM-DD-git-xxxxxx`
                         developer_app_executables = glob.glob(
-                            "{0}{1}{1}*".format(
+                            "{0}{1}{2}*".format(
                                 get_env, application_search, application_executable
                             )
                         )
@@ -1266,7 +1313,7 @@ def lax_bool(_test):  # -> bool
     `True`, otherwise returns `False`."""
     if not bool(_test):
         return False
-    if _test == True:
+    if _test is True:
         # Checking for singleton value True
         return True
     try:
@@ -1733,7 +1780,7 @@ def web_info_translate(
                 _language, _web_text
             )
         )
-        return Truef
+        return True
     except NameError:
         return False
 
@@ -1750,6 +1797,13 @@ class JsonTools(object):
                     "}": "\\u0070",
                     '"': "\\u0022",
                     "@": "\\u0040",
+                    "|": "\\u007C",  # VERTICAL LINE
+                    "'": "\\u0027",  # APOSTROPHE
+                    "%": "\\u0025",  # PERCENT SIGN
+                    "$": "\\u0024",  # DOLLAR
+                    "&": "\\u0026",  # AMPERSAND
+                    "^": "\\u005E",  # CARET
+                    "!": "\\u0021",  # EXCLAMATION POINT
                 }
             )
         except AttributeError:
@@ -1774,6 +1828,16 @@ class JsonTools(object):
             .replace("}", "\\u0070")
             .replace('"', "\\u0022")
             .replace("@", "\\u0040")
+            .replace("{", "\\u007B")
+            .replace("|", "\\u007C")
+            .replace("}", "\\u007D")
+            .replace("'", "\\u0027")
+            .replace("%", "\\u0025")
+            .replace("$", "\\u0024")
+            .replace("&", "\\u0026")
+            .replace("^", "\\u005E")
+            .replace("!", "\\u0021")
+            .replace('"', '\\"')
         )
 
     def set_json_content(
@@ -3446,7 +3510,7 @@ file for `{1}` was found.""".format(
                             continue
                         _used_graphemes.append(data[_item]["g"])
                         _good_list.append(
-                            '":{0}"g":"{1}","p":"{1}"{2},'.format(
+                            '":{0}"g":"{1}","p":"{2}"{3},'.format(
                                 _u007b, _grapheme, _phoneme, _u0070
                             )
                         )
@@ -3824,7 +3888,7 @@ def main():  # -> NoReturn
                 "title=",
                 "artist=",
                 "dimensions=",
-                "help"
+                "help",
             ],
         )
     except getopt.GetoptError:
