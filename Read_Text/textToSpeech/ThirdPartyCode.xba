@@ -124,11 +124,13 @@ Function PosixPythonPath() As String
 		&apos; the value to the full path of the python executable you want
 		&apos; to use.		
 		&apos;
-		&apos; Once you have modified your default environment settings, you
+		&apos; Once you have modified your default environment settings,
 		&apos; when you type `env` in a console you should see a line that
 		&apos; looks something like:
 		&apos;
 		&apos; `READ_TEXT_USE_PY=/usr/.local/bin/python3.12.1`
+		&apos;
+		&apos; Now, the extension uses that path for python if the path exists.
 		If FileExists(EnvironPy) Then
 			PosixPythonPath = EnvironPy
 			Exit Function
