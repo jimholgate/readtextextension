@@ -7486,24 +7486,41 @@ Function fsThisDocAuthor() As String
 End Function
 
 
+Function fbExperimentalMode() As Boolean
+&apos; return `True` if the `Tools - Options - Advanced - Experimental` checkbox
+&apos; is enabled.
+	If Not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
+		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	End If
+	Dim sKeyName$ : sKeyName = &quot;ExperimentalMode&quot;
+	Dim sNodePath$ : sNodePath = &quot;org.openoffice.Office.Common/Misc&quot;
+	On Error GoTo fbExperimentalModeErr
+	Dim oNode as Object : oProdNameAccess = GetRegistryKeyContent(_
+	sNodePath)
+	fbExperimentalMode = oNode.getByName(sKeyName)
+Exit Function
+	fbExperimentalModeErr:
+	fbExperimentalMode = False
+End Function
+
+
 Function fsGetThisUsers( _
 	Optional cType As String) As String
 &apos;Your personal information
+	On Error Goto fsGetThisUsersErr
 	If ismissing(cType) Then
 		cType = &quot;fn&quot;
 	End If
 	On Error Goto fsGetThisUsersErr
 	Dim sNodePath$ : sNodePath = &quot;/org.openoffice.UserProfile/Data&quot;
-	Dim oNode
-	Dim snval
-	Dim gnval
-	Dim ival
-	Dim sFullname  &apos; We combine your first and last names.
-	
+	Dim oNode as Object : oNode = GetRegistryKeyContent(_
+	sNodePath)
+	Dim snval$
+	Dim gnval$	
+	Dim sFullname  &apos; We combine your first and last names.	
 	If Not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
 	End If
-	
 	oNode = foGetOOoSetupNode(sNodePath$)
 	snval = oNode.getByName(&quot;sn&quot;)
 	gnval = oNode.getByName(&quot;givenname&quot;)
