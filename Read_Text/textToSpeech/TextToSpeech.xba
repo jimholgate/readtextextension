@@ -155,6 +155,12 @@ Function fbDefaultToSpeechDispatcher() As Boolean
 End Function
 
 
+Function fbPySupportFStrings() As Boolean
+	&apos; Supports strings with fields using `f(&quot;Version {solar_version}&quot;)`
+	fbPySupportFStrings = GetSolarVersion() &gt; 60406
+End Function
+
+
 Sub ReadTextAloud()
 &apos; Use *Read Selection* on the tool bar
 	Dim sFile As String : sFile = fsExtensionSettingsIni()

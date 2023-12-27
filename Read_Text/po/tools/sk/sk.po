@@ -341,3 +341,8 @@ msgstr "Uložiť _ako..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Otvoriť"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Aktivácia experimentálnych funkcií"

@@ -386,3 +386,8 @@ msgstr "s_save_as..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "s_open"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "s_enable_experimental_features"

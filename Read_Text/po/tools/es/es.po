@@ -407,3 +407,8 @@ msgstr "G_uardar como..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Abrir"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Activar las características experimentales"

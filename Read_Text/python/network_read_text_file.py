@@ -155,7 +155,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import getopt
 import os
 import sys
-import netgtts
+try:
+    import netgtts
+except (AttributeError, ImportError, SyntaxError):
+    pass
 
 try:
     import requests
@@ -164,27 +167,27 @@ except (AttributeError, ImportError):
     REQUESTS_OK = False
 try:
     import netmimic3
-except (AttributeError, ImportError):
+except (AttributeError, ImportError, SyntaxError):
     pass
 try:
     import netmary
-except (AttributeError, ImportError):
+except (AttributeError, ImportError, SyntaxError):
     pass
 try:
     import netopentts
-except (AttributeError, ImportError):
+except (AttributeError, ImportError, SyntaxError):
     pass
 try:
     import netrhvoice
-except (AttributeError, ImportError):
+except (AttributeError, ImportError, SyntaxError):
     pass
 try:
     import nettts
-except (AttributeError, ImportError):
+except (AttributeError, ImportError, SyntaxError):
     pass
 try:
     import readtexttools
-except (AttributeError, ImportError):
+except (AttributeError, ImportError, SyntaxError):
     pass
 try:
     import netcommon
@@ -236,16 +239,16 @@ def network_problem(voice="default"):  # -> str
     """Return suggestions to make an on-line voice work."""
     if len(voice) == 0:
         voice = "requested"
-    return f"""Is the network connected?
+    return """Is the network connected?
 =========================
 
-+ The `{voice}` on-line voice is currently unavailable.
++ The `{0}` on-line voice is currently unavailable.
 + It might help to restart your device, refresh the network
   or check your on-line account status.
 + If you are using a `localhost` server, it might help to
   enter the local speech server command in a terminal and
   read what it prints out.
-  """
+  """.format(voice)
 
 
 def network_ok(_iso_lang="en-US", _local_url=""):  # -> bool

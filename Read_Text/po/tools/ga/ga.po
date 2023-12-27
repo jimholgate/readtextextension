@@ -342,3 +342,8 @@ msgstr "Sábháil _Mar..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Oscail"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Gníomhachtú gnéithe turgnamhacha"

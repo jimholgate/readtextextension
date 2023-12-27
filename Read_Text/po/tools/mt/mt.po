@@ -322,3 +322,8 @@ msgstr "Għarbi"
 msgctxt ""
 msgid "Reset"
 msgstr "Irrisettja"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Attivazzjoni ta'karatteristiċi sperimentali"

@@ -166,3 +166,8 @@ msgstr "ऐसे सहेजें (_A)..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "खोलें"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "प्रयोगात्मक सुविधाओं का सक्रियण"

@@ -341,3 +341,8 @@ msgstr "Записване като..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Отваряне"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Разрешаване на експериментални възможности"

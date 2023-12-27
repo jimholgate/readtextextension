@@ -36,7 +36,7 @@ def have_gpu(_test="Radeon"):  # -> bool
     _imported_meta = readtexttools.ImportedMetaData()
     return (
         _test.lower()
-        in _imported_meta.execute_command(f"{_test_app} | grep VGA").lower()
+        in _imported_meta.execute_command("{0} | grep VGA").format(_test_app).lower()
     )
 
 
@@ -311,15 +311,15 @@ have taken too long."""
         if len(spaceval) == 0 and _verbose:
             if not readtexttools.using_container(True):
                 print(
-                    f"""The python `spacy` library or a `{_lang_str}` language model is unavailable.
+                    """The python `spacy` library or a `{0}` language model is unavailable.
 Falling back to `.splitlines()`
 
     sudo apt-get install pipx
     pipx install spacy
-    spacy download {trained_pipeline}
+    spacy download {1}
 
 * See: <https://pypi.org/project/spacy/>
-* Package list: <https://spacy.io/models/ca>"""
+* Package list: <https://spacy.io/models/ca>""".format(_lang_str, trained_pipeline)
                 )
             for _item in ".?!`":
                 _text = _text.replace(_item, _item + "\n")
@@ -403,12 +403,12 @@ Falling back to `.splitlines()`
             _rate = "".join([str(int(_speech_rate / 1.6)), "%"])
         except [AttributeError, TypeError]:
             _rate = "100%"
-        return f"""<?xml version="1.0"?>en
+        return """<?xml version="1.0"?>en
 <speak version="1.1" xmlns="http://www.w3.org/2001/10/synthesis"
-xml:lang="{_xml_lang}">
+xml:lang="{0}">
 <p>
-<prosody rate="{_rate}"><voice name="{_voice}" languages="{_xml_lang}" required="languages">
-{_text}</voice></prosody></p></speak>"""
+<prosody rate="{1}"><voice name="{2}" languages="{3}" required="languages">
+{4}</voice></prosody></p></speak>""".format(_xml_lang, _rate, _voice, _xml_lang, _text)
 
     def do_net_sound(
         self,

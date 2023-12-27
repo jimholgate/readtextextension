@@ -873,6 +873,8 @@ install the binary version.
         speaker_switch = " "
         if os.path.isfile(self.work_file):
             os.remove(self.work_file)
+        if voice_no > self.voice_count - 1:
+            voice_no = 0
         if voice_no != 0:
             speaker_switch = "".join([" --speaker ", str(voice_no)])
         if os.path.isfile(_model):

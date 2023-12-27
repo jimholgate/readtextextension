@@ -235,7 +235,7 @@
 &apos;&apos; If you have downloaded a container version of LibreOffice from a
 &apos;&apos; `flatpak` or `snap` repository, you can use `mimic-server` to read text
 &apos;&apos; aloud with high quality voices. The `mimic-server` works like the
-&apos;&apos; `cups` print server. When the server is running you can access a
+&apos;&apos; `cups` Printer server. When the server is running you can access a
 &apos;&apos; `localhost` speech tool at &lt;http://0.0.0.0:591252&gt;. The read text
 &apos;&apos; extension uses the mimic application program interface to read
 &apos;&apos; text aloud.
@@ -2016,10 +2016,13 @@ Sub dialog1Combo2ShowAppleScriptChoices( _
 	&quot;_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
 	&quot;_QUICKLY)&quot;&quot;&quot; &amp; CR &amp; _
 	&quot;)&quot;&quot;&quot;
-	a1 = Split(s1,CR)
+	a1 = Split(s1, CR)
 	For n = LBound(a1) To UBound(a1)
 		oComboBox.addItem(&quot;&quot;&quot;(SAY_APPLESCRIPT&quot; &amp; a1(n),0)
 	Next
+	If Instr(s1, oComboBox.Model.Text) = 0 Then
+		oComboBox.addItem(oComboBox.Model.Text, 0)
+	End If	
 End Sub
 
 
@@ -2028,7 +2031,7 @@ Sub dialog1Combo2ShowESPEAKChoices( _
 	&apos;espeak
 	Dim n As Integer
 	Dim s1 As String
-	Dim s2(3) As String
+	Dim s2 As Variant
 	Dim s3 As String
 	Dim s4 As String
 	Dim n2 As Integer
@@ -2042,11 +2045,12 @@ Sub dialog1Combo2ShowESPEAKChoices( _
 	n = oComboBox.getItemCount()
 	oComboBox.removeItems(0,n)
 	s3 = &quot;&quot;
-	s2(0) = &quot; -b 1 -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;
-	s2(1) = &quot; -b 1 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;
-	s2(2) = &quot; -b 1 -s 130 -f &apos;(TMP)&apos;&quot;
-	s2(3) = &quot; -b 1 -f &apos;(TMP)&apos;&quot;
-	For n = 0 To 3
+	s2 = Array(_
+	&quot; -b 1 -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;, _
+	&quot; -b 1 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;, _
+	&quot; -b 1 -s 130 -f &apos;(TMP)&apos;&quot;, _
+	&quot; -b 1 -f &apos;(TMP)&apos;&quot;)
+	For n = Lbound(s2) To Ubound(s2)
 		&apos;English
 		s1 = s3 &amp; &quot;-v en-us&quot; &amp; s2(n)
 		oComboBox.addItem(s1,0)
@@ -2091,7 +2095,6 @@ Sub dialog1Combo2ShowESPEAKChoices( _
 			FileExists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Or _
 			FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Then
 			s1 = s3 &amp; &quot;-v mb-(SELECTION_LANGUAGE_CODE)1 &quot; &amp; s2(n)
-			&apos;fsTTSListVoicesVBS            oComboBox.addItem(s1,0)
 		End If
 		For n2 = 0 To fiCountEspeakMbrolaLanguage()
 			s4 = fsGetEspeakMbrolaLanguage(n2,1)
@@ -2108,26 +2111,31 @@ Sub dialog1Combo2ShowESPEAKChoices( _
 		s1 = s3 &amp; s2(n)
 		oComboBox.addItem(s1,0)
 	Next
+	If Instr(oComboBox.Model.Text, &quot;-v &quot;) &lt;&gt; 0 Then
+		oComboBox.addItem(oComboBox.Model.Text, 0)
+	End If
 End Sub
 
 
 Sub dialog1Combo2ShowMEDIAChoices( _
 	oDialog)
 	&apos; Show some URLs
-	Dim n1 As Integer
-	Dim s1 As String
+	Dim a1 As Variant: a1 = Array(_
+	&quot;https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;, _
+	&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;)
+	Dim n As Integer
+	Dim n1 As Integer : n = 0
+	Dim s1 As String : s1 = &quot;&quot;
 	Dim oComboBox As Variant
 	
 	Rem Get control
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
-	Rem first remove all old items from the list
-	n1 = oComboBox.getItemCount()
-	oComboBox.removeItems(0, n1)
-
-	s1 = &quot;https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;
-	oComboBox.addItem(s1, 0)
-	s1 = &quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;
-	oComboBox.addItem(s1, 0)
+	Rem first remove all old items from the list = 
+	oComboBox.removeItems(0, oComboBox.getItemCount())
+	For n = Lbound(a1) To Ubound(a2)
+		s1 = s1 &amp; a1(n) &amp; Chr(10)
+		oComboBox.addItem(a1(0), 0)
+	Next
 	If Len(fsLocalHostSpeech()) &lt;&gt; 0 Then
 		oComboBox.addItem(fsLocalHostSpeech(), 0)
 	End If
@@ -2137,52 +2145,61 @@ End Sub
 Sub dialog1Combo2ShowFESTIVALChoices( _
 	oDialog)
 	&apos; Show some URLs
-	Dim n1 As Integer
-	Dim s1 As String
+	Dim a1 As Variant : a1 = Array(_
+	&quot;--language welsh --tts &quot;&quot;(TMP)&quot;&quot;&quot;, _
+	&quot;--language spanish --tts &quot;&quot;(TMP)&quot;&quot;&quot;, _
+	&quot;--language english --tts &quot;&quot;(TMP)&quot;&quot;&quot;, _
+	&quot;--tts &quot;&quot;(TMP)&quot;&quot;&quot;)
+	Dim n As Integer
+	Dim s1 As String : s1 = &quot;&quot;
 	Dim oComboBox As Variant
 	
 	Rem Get control
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
 	Rem first remove all old items from the list
-	n1 = oComboBox.getItemCount()
-	oComboBox.removeItems( 0,n1)
-	s1 = &quot;--language welsh --tts &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1,0)
-	s1 = &quot;--language spanish --tts &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1,0)
-	s1 = &quot;--language english --tts &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1,0)
-	s1 = &quot;--tts &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1,0)
+	oComboBox.removeItems(0, oComboBox.getItemCount())
+	For n = Lbound(a1) To Ubound(a1)
+		s1 = s1 &amp; a1(n) &amp; Chr(10)
+		oComboBox.addItem(a1(n), 0)
+	Next
+	If Instr(s1, oComboBox.Model.Text) = 0 Then
+		oComboBox.addItem(oComboBox.Model.Text, 0)
+	End If
 End Sub
 
 
 Sub dialog1Combo2ShowTEXT2WAVEChoices( _
 	oDialog)
 	&apos; Show this Festival script options
-	Dim n1 As Integer
-	Dim s1 As String
+	Dim n As Integer : n = 0
+	Dim a1 As Variant : a1 = Array(_
+	&quot;&quot;&quot;(TMP)&quot;&quot; -otype snd -o &quot;&quot;(HOME)(NOW).wav&quot;&quot;&quot;, _
+	&quot;&quot;&quot;(TMP)&quot;&quot; -o &quot;&quot;(HOME)(NOW).wav&quot;&quot;&quot;)
+	Dim s1 As String : s1 = &quot;&quot;
 	Dim oComboBox As Variant
-	
 	Rem Get control
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
 	Rem first remove all old items from the list
-	n1 = oComboBox.getItemCount()
-	oComboBox.removeItems( 0,n1)
-	s1 = &quot;&quot;&quot;(TMP)&quot;&quot; -otype snd -o &quot;&quot;(HOME)(NOW).wav&quot;&quot;&quot;
-	oComboBox.addItem(s1,0)
-	s1 = &quot;&quot;&quot;(TMP)&quot;&quot; -o &quot;&quot;(HOME)(NOW).wav&quot;&quot;&quot;
-	oComboBox.addItem(s1,0)
+	oComboBox.removeItems(0, oComboBox.getItemCount())
+	For n = Lbound(a1) To Ubound(a1)
+		s1 = s1 &amp; a1(n) &amp; Chr(10)
+		oComboBox.addItem(a1(n), 0)
+	Next
+	If Instr(s1, oComboBox.Model.Text) = 0 Then
+		oComboBox.addItem(oComboBox.Model.Text, 0)
+	End If	
 End Sub
 
 
 Sub dialog1Combo1ShowFestivalScripts( _
 	oDialog)
 &apos; Linux
-	Dim n As Integer
-	Dim n2 As Integer
-	Dim s1 As String
-	Dim s2(5) As String
+	Dim n As Integer : n = 0
+	Dim n2 As Integer : n2 = 0
+	Dim s1 As String : s1 = &quot;&quot;
+	Dim s2 As String : s2 = &quot;&quot;
+	Dim CR As String : CR = Chr(10)
+	Dim cmd_list As Variant
 	Dim oComboBox As Variant
 	
 	Rem Get control
@@ -2190,30 +2207,40 @@ Sub dialog1Combo1ShowFestivalScripts( _
 	Rem first remove all old items from the list
 	n = oComboBox.getItemCount()
 	oComboBox.removeItems(0, n)
-	s2(5) = &quot;(audio_mode &apos;shutup)&quot;
-	s2(4) = &quot;(audio_mode &apos;async)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
-	s2(3) = &quot;(SayText &quot;&quot;The selection says: &quot;&quot;)( tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
-	s2(2) = &quot;(SayText &quot;&quot;On (WEEKDAY), (DATE) at (TIME), (AUTHOR) said: &quot;&quot;)( tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
-	s2(1) = &quot;(set! utt1 (Utterance Phrase ((Phrase ((name B))The (selected ((EMPH 3)))text )(Phrase ((name BB)) says: ))))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
+	&apos; Propose language specific commands
+	cmd_list = Array( _
+	&quot;(set! utt1 (Utterance Wave /usr/share/sounds/alsa/Noise.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+	&quot;(set! utt1 (Utterance Phrase ((Phrase ((name B))The (selected ((EMPH 3)))text )(Phrase ((name BB)) says: ))))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+	&quot;(SayText &quot;&quot;On (WEEKDAY), (DATE) at (TIME), (AUTHOR) said: &quot;&quot;)( tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+	&quot;(SayText &quot;&quot;The selection says: &quot;&quot;)( tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+	&quot;(audio_mode &apos;async)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+	)
 	If FileExists(soundsDirectory() &amp; &quot;apert.wav&quot;) Then
-		s2(0) = &quot;(set! utt1 (Utterance Wave (SOUND_GALLERY)apert.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
-	Else
-		s2(0) = &quot;(set! utt1 (Utterance Wave /usr/share/sounds/alsa/Noise.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
+		cmd_list(0) = &quot;(set! utt1 (Utterance Wave (SOUND_GALLERY)apert.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
 	End If
 	For n2 = 0 To fiCountFestivalDirectory()
-		For n = 0 To 4
+		For n = Lbound(cmd_list) To Ubound(cmd_list)
 			If FileExists(fsFestivalDirectory(n2)) Then
-				If n = 4 Or InStr(fsFestivalDirectory(n2) ,&quot;english&quot;) &lt;&gt; 0 Then
+				If n = Ubound(cmd_list) Or InStr(fsFestivalDirectory(n2), &quot;english&quot;) &lt;&gt; 0 Then
 					s1 = &quot;(voice_&quot; &amp; fsFestivalVoice(n2) &amp; &quot;)&quot;
-					oComboBox.addItem(s1 &amp; s2(n),0)
+					oComboBox.addItem(s1 &amp; cmd_list(n), 0)
 				End If
 			End If
 		Next
 	Next
-	n = 5
-	oComboBox.addItem(s2(n),0)
-	n = 4
-	oComboBox.addItem(s2(n),0)
+	&apos; Add default script commands
+	Redim cmd_list
+	cmd_list = Array(_
+	&quot;(audio_mode &apos;async)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+	&quot;(audio_mode &apos;shutup)&quot;_
+	)
+	For n = Lbound(cmd_list) To Ubound(cmd_list)
+		oComboBox.addItem(cmd_list(n),0)
+		s2 = s2 &amp; cmd_list(n) &amp; CR
+	Next
+	If Instr(s2, oComboBox.Model.Text) = 0 Then
+		oComboBox.addItem(oComboBox.Model.Text, 0)
+	End If
 End Sub
 
 
@@ -2281,13 +2308,16 @@ Function fsPiperPath()
 	Next
 Exit Function
 fsPiperPathErr:
-
 End Function
 
-Function fiDialog1Combo2ShowMyPythonChoices( _
-	oDialog) As Integer
+
+Function fiDialog1CombosShowMyPythonChoices( _
+	oDialog, _
+	getControl As String, _
+	FileControl As String) As Integer
 	&apos; Python
 	&apos; Show the python script options
+	fiDialog1CombosShowMyPythonChoices = 0
 	Dim n As Integer
 	Dim n2 As Integer
 	Dim s1 As String
@@ -2302,6 +2332,9 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 	Dim bEnableLocalHostRate As Boolean : bEnableLocalHostRate = True
 	Dim sGetOS As String : sGetOS = fsGetOS()
 	Dim local_suggestion As String
+	If Len(getControl) = 0 Then
+		getControl = &quot;ComboBox2&quot;
+	End If
 	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then bIsAppImage = True
 	CR = Chr(10)
 	s1 = CR
@@ -2321,10 +2354,9 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		Case Else
 		bEnableRate = Len(fsMatchFestivalVoice(&quot;_hts&quot;)) = 0
 	End Select
-	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
+	oComboBox = oDialog.getControl(getControl)
 	n = oComboBox.getItemCount()
-	oComboBox.removeItems(0,n)
-
+	oComboBox.removeItems(0, n)
 	If fbIsSandboxed() Then
 		&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
 		s1 = s1 &amp; CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
@@ -2363,7 +2395,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		CheckComboBox4UrlList(oDialog)
 	End If
-	If fbHavePyQrCode() Then
+	If fbHavePyQrCode() And fbPySupportFStrings() Then
 		Redim _opts : _opts = Array(_
 		&quot;12&quot;,_
 		&quot;9&quot;,_
@@ -2391,7 +2423,7 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		&quot;.png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	End If	
 	
-	If InStr(LCase(f_dlgSpeechSetup.GetControl(&quot;FileControl2&quot;).Model.Text),&quot;bin/python3&quot;) &lt;&gt; 0 or _
+	If InStr(LCase(f_dlgSpeechSetup.GetControl(FileControl).Model.Text),&quot;bin/python3&quot;) &lt;&gt; 0 or _
 	bIsAppImage Then
 		If FileExists(Environ(&quot;HOME&quot;) &amp; _
 			&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or FileExists( _
@@ -2568,11 +2600,13 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 		Next
 		s4 = &quot;&quot;
 	End If
-	If Len(s1) &gt; 0 Then
+	If Len(s1) &lt;&gt; 0 Then
 		If Asc(Left(s1, 1)) = 10 Then
 			s1 = Mid(s1, 2)
 		End If
-		
+		If Instr(s1, oComboBox.Model.Text) = 0 Then
+			s1 = s1 &amp; CR &amp; oComboBox.Model.Text
+		End If
 		a1 = Split(s1, CR)
 		For n = LBound(a1) + 1 To UBound(a1)
 			If Not(Instr(a1(n), &quot;--output&quot;) &lt;&gt; 0 and Instr(Lcase(a1(n)), &quot;--visible true&quot;) &lt;&gt; 0) Then
@@ -2583,12 +2617,10 @@ Function fiDialog1Combo2ShowMyPythonChoices( _
 			End If
 		Next
 	End If
-	n = oComboBox.getItemCount()
-	fiDialog1Combo2ShowMyPythonChoices = n
+	fiDialog1CombosShowMyPythonChoices = oComboBox.getItemCount()
 	Exit Function
-	fiDialog1Combo2ShowMyPythonChoicesErr
-	
-	fiDialog1Combo2ShowMyPythonChoices = 0
+	fiDialog1CombosShowMyPythonChoicesErr
+	fiDialog1CombosShowMyPythonChoices = 0
 End Function
 
 
@@ -3196,7 +3228,7 @@ Sub ttsActuate( _
 			&apos; osascript document.
 			bAddTime = True
 		Else
-			If Bool(config(fiExternalOption())) Or Bool(config(fiFestivalOption())) Then
+			If Bool(config(fiExternalOption())) Or Bool(config(fiExperimentalOption())) Then
 				&apos; Temporary Metadata for an external vbs or python script.
 				&apos; External scripts delete these files once they have been
 				&apos; read.  MacOS creates a script at run-time, so these files
@@ -3229,12 +3261,12 @@ Sub ttsActuate( _
 		CreateFile(fsMyTempLock(&quot;lock.lexicon&quot;), CustomLexiconDir(), &quot;UTF-8&quot;)
 	End If
 	oBar.Value = 70
-	If config(fiFestivalOption()) Then
-		&apos;Write the Festival script and the file to read aloud
-		sProgram = config(fiFestivalPath())
+	If config(fiExperimentalOption()) And Instr(config(fiExperimentalProgramPath), &quot;festival&quot;) &lt;&gt; 0 Then
+		&apos; Write the Festival script and the file to read aloud
+		sProgram = config(fiExperimentalProgramPath())
 		sCommand = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsFestivalScriptName()) &amp; &quot;&quot;&quot;&quot;
 		&apos; Windows - don&apos;t limit to SAPI languages
-		sScript = config(fiFestivalComboChoice())
+		sScript = config(fiExperimentalCommand())
 		sScript = replaceLocalTokensWithStr(sScript)
 		sScript = replacePublicTokensWithStr(sScript)
 		If fsComplexAsiaOrWest(sTextToSpeak) = &quot;WEST&quot; Then
@@ -3245,9 +3277,14 @@ Sub ttsActuate( _
 		End If
 		CreateFile(fsFestivalScriptName(), sScript, scodec)
 		CreateFile(_text_file, sTextToSpeak, scodec)
-	ElseIf config(fiExternalOption()) Then
-		sProgram = config(fiExternalProgramPath())
-		sCommand = config(fiExternalCommand)
+	ElseIf config(fiExternalOption()) Or config(fiExperimentalOption()) Then
+		If config(fiExternalOption()) Then
+			sProgram = config(fiExternalProgramPath())
+			sCommand = config(fiExternalCommand())
+		Else
+			sProgram = config(fiExperimentalProgramPath())
+			sCommand = config(fiExperimentalCommand())
+		End If
 		If InStr(LCase(sProgram), &quot;bin/padsp&quot;) &lt;&gt; 0 Then
 			If InStr(LCase(sCommand), &quot;swift&quot;) &lt;&gt; 0 Then
 				&apos; Cepstral swift Alison (2008) for Linux does not pronounce text around smart quotes correctly,
@@ -3573,7 +3610,7 @@ End Function
 
 
 Function replaceLocalTokensWithStr( _
-	sA As String) As String
+	byVal sA As String) As String
 	&apos; This function takes a String with tokens And replaces each
 	&apos; token with a useful String
 &apos; Tokens
@@ -3721,7 +3758,7 @@ End Function
 
 
 Function replacePublicTokensWithStr( _
-	sA As String) As String
+	ByVal sA As String) As String
 	Dim sFind As String
 	Dim sReplace As String
 	
@@ -6605,18 +6642,23 @@ Function fbOKWithRhVoice(_
 		sA) As Boolean
 	fbOKWithRhVoice = False
 	&apos; The version of RhVoice included in Ubuntu 22.04 does not include
-	&apos; all languages described on the github site.
+	&apos; all languages described on the github site. Supports python 3.8 +
+	&apos; &lt;https://github.com/RHVoice/RHVoice&gt;
+	On Error GoTo fbOKWithRhVoiceErr
+	If Not fbExperimentalMode() Then
+		If Not fbPySupportFStrings() Then
+			Exit Function
+		End If
+	End If
+    If Not FileExists(fsRhVoiceTtsDoc()) Then
+        Exit Function
+    End If
 	Dim _test$ : _test$ = &quot;&quot;
 	Dim languages$ : languages = &quot;file:///usr/share/RHVoice/languages/&quot;
 	Dim a1 : a1 = Array(_
 		&quot;RHVoice-test&quot;)
 	Dim x As Integer : x = 0
-
-    If Not FileExists(fsRhVoiceTtsDoc()) Then
-        Exit Function
-    End If
-    
-	For x = Lbound(a1) to Ubound(a1)
+    For x = Lbound(a1) to Ubound(a1)
 		If FileExists(&quot;/usr/bin/&quot; &amp; a1(x)) Then
 			_test = a1(x)
 			Exit For
@@ -6637,18 +6679,25 @@ Function fbOKWithRhVoice(_
 	Case &quot;pl&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Polish&quot;)
 	Case &quot;pt&quot;
-	fbOKWithRhVoice = FileExists(languages &amp; &quot;Brazilian-Portuguese&quot;)
+	fbOKWithRhVoice = FileExists(_
+	languages &amp; &quot;Brazilian-Portuguese&quot;) Or FileExists(_
+	languages &amp; &quot;Portuguese&quot;)
 	Case &quot;ru&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Russian&quot;)
 	Case &quot;sq&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Albanian&quot;)
 	Case &quot;tt&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Tatar&quot;)
+	Case &quot;ua&quot;
+	fbOKWithRhVoice = FileExists(languages &amp; &quot;Ukrainian&quot;)
 	Case &quot;uk&quot;
 	fbOKWithRhVoice = FileExists(languages &amp; &quot;Ukrainian&quot;)
 	Case Else
 	fbOKWithRhVoice = False
 	End Select 
+Exit Function
+	fbOKWithRhVoiceErr:
+	fbOKWithRhVoice = False 
 End Function
 
 
@@ -6822,6 +6871,10 @@ Function fbHaveNetworkTTS() As Boolean
 	&apos; the application do not necessarily include the required libraries.
 	&apos;
 	&apos; Install `gtts` with `pip3 install python3-gtts-token python3-gtts
+	fbHaveNetworkTTS = False
+	If Not fbPySupportFStrings() Then
+		Exit Function
+	End If
 	If fbInPaths(&quot;docker-init&quot;) And fsGetOS() = &quot;UNIX&quot; Then
 		fbHaveNetworkTTS = True
 		Exit Function
@@ -7048,7 +7101,7 @@ Function fsFindAppPath(sa) As String
 	End Select
 	If Len(sa) &gt; 0 Then
 		For n = LBound(a1) To UBound(a1)
-			If Len(a1(n)) &gt; Len(&quot;file:///&quot;) Then
+			If Len(a1(n)) &gt; 8 Then
 				If FileExists(a1(n) &amp; sa) Then
 					fsFindAppPath = a1(n) &amp; sa
 					Exit Function

@@ -347,3 +347,8 @@ msgstr "Z_apisz jako..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Otwórz"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Włącz funkcje eksperymentalne"

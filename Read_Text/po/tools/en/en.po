@@ -394,3 +394,8 @@ msgstr "Save As..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Open"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Enable experimental features"

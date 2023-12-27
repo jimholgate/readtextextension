@@ -400,3 +400,8 @@ msgstr "Сохранить как..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Открыть"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Активация экспериментальных функций"

@@ -347,3 +347,8 @@ msgstr "S_alvează ca..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Deschide"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Activarea caracteristicilor experimentale"

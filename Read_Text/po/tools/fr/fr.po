@@ -394,3 +394,8 @@ msgstr "Enregistrer _sous..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Ouvrir"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Activer les fonctions expérimentales"

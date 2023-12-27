@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ThirdPartyCode" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  * 
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ThirdPartyCode" script:language="StarBasic">REM *  *  *  *  * BASIC *  *  *  *  * 
 Option Explicit
 &apos;&apos; # Third Party Code
 &apos;&apos;
@@ -20,7 +20,6 @@ Function fbTts_util_stringToBoolean( _
 	b = False
 	Dim v As String
 	v = Trim(value)
-	
 	If StrComp(v,&quot;True&quot;,0) = 0 _
 		Or StrComp(v,&quot;yes&quot;,0) = 0 _
 		Or val(v) &lt;&gt; 0 Then
@@ -96,6 +95,24 @@ Function fsLinux64PythonLib() As String
 End Function
 
 
+Function fbCheckPython3Ok(_cmd) As Boolean
+	&apos; For some local users, the system python3 is unavailable or incomplete.
+	&apos; &lt;https://github.com/urllib3/urllib3/issues/3020#issuecomment-1539843879&gt;
+	&apos; Try importing a library and see if there is an error.
+	fbCheckPython3Ok = False
+	If Len(_cmd) = 0 Then
+		_cmd = &quot;import sys;sys.exec_prefix&quot;
+	End If
+	On Error GoTo fbCheckPython3OkErr
+	If Shell(&quot;python3&quot;, 0, &quot;-c &quot;&quot;&quot; &amp; _cmd &amp; &quot;&quot;&quot;&quot;) = 0 Then
+		fbCheckPython3Ok = True
+	End If
+	Exit Function
+	fbCheckPython3OkErr:
+	fbCheckPython3Ok = False
+End Function
+
+
 Function PosixPythonPath() As String
 	&apos; On MacOS, if you want to use pip3 libraries, the
 	&apos; version of the system python or the developer
@@ -144,11 +161,18 @@ Function PosixPythonPath() As String
 			a0 = Array(&quot;/usr&quot;)
 			a1 = Array(&quot;python3&quot;, &quot;python&quot;)
 			Case Else
+			If fbCheckPython3Ok(&quot;&quot;) Then
 			&apos; [developer, system, LibreOffice]
-			a0 = Array(_
-			&quot;/Library/Frameworks/Python.framework/Versions/&quot; &amp; py_ver, _
-			&quot;/usr&quot;, _
-			&quot;/Applications/LibreOffice.app/Contents/Frameworks/LibreOfficePython.framework/Versions/&quot; &amp; py_ver)
+				a0 = Array(_
+				&quot;/Library/Frameworks/Python.framework/Versions/&quot; &amp; py_ver, _
+				&quot;/usr&quot;, _
+				&quot;/Applications/LibreOffice.app/Contents/Frameworks/LibreOfficePython.framework/Versions/&quot; &amp; py_ver)
+			Else
+			&apos; [developer, LibreOffice]
+				a0 = Array(_
+				&quot;/Library/Frameworks/Python.framework/Versions/&quot; &amp; py_ver, _
+				&quot;/Applications/LibreOffice.app/Contents/Frameworks/LibreOfficePython.framework/Versions/&quot; &amp; py_ver)
+			End If
 			a1 = Array(&quot;python&quot; &amp; py_ver, &quot;python3&quot;)
 		End Select
 		
@@ -178,7 +202,7 @@ End Function
 
 
 Function fbPiperTtsOk(_command) As Boolean
-	&apos; Return `True` if Linux `piper` is executable
+	&apos; Return `True` if `piper` is executable
 	On Error Goto fbPiperTtsOkErr
 	If Len(_command) = 0 Then
 		_command = &quot; -h&quot;
@@ -195,10 +219,24 @@ Function fbPiperTtsOk(_command) As Boolean
 		Exit Function
 	End Select
 	Dim sPiperPath As String : sPiperPath = fsPiperPath()
-	If Len(sPiperPath) = 0 Then
+	If Len(sPiperPath) = 0 or Not fbPySupportFStrings() Then
 		i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 2
 		Exit Function
 	End If
+	&apos; If you don&apos;t have VLC on Windows systems, then piper needs to write a file
+	&apos; instead of streaming. This has the potential for causing a long delay if
+	&apos; you select a long string of text to read aloud. Only show the option if 
+	&apos; someone enables &quot;Enable Experimental Features (May be unstable)&quot; in the
+	&apos; Tools - Options - Advanced menu
+	If Not fbExperimentalMode() Then
+		If fsGetOS() = &quot;WINDOWS&quot; Then
+			If Not fbHaveVLC() Then
+					i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 2
+					Exit Function	
+			End If
+		End If
+	End If
+	
 	If Shell(sPiperPath, 0, _command) = 0 Then
 		i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 3
 		fbPiperTtsOk = True
@@ -313,13 +351,20 @@ Function fvTts_config_createDefaultConfig( _
 	&apos; Create default values for variables
 	If GetGUIType() = 1 Then
 		&apos; Windows
-		config(fiFestivalOption()) = False
-		If FileExists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) Then
-			config(fiFestivalPath()) = fsProgramDirectoryx86() &amp; &quot;festival\festival.exe&quot;
+		If fbPiperTtsOk(&quot;&quot;) Then
+			config(fiExperimentalOption()) = False
+			config(fiExperimentalProgramPath()) = ConvertFromURL(BundlePyPath())
+			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --voice &quot; &amp; _
+			PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0 &quot;&quot;(TMP)&quot;&quot;&quot;
 		Else
- 			config(fiFestivalPath()) = fsProgramDirectory() &amp; &quot;festival\festival.exe&quot;
+			config(fiExperimentalOption()) = False
+			If FileExists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) Then
+				config(fiExperimentalProgramPath()) = fsProgramDirectoryx86() &amp; &quot;festival\festival.exe&quot;
+			Else
+	 			config(fiExperimentalProgramPath()) = fsProgramDirectory() &amp; &quot;festival\festival.exe&quot;
+			End If
+			config(fiExperimentalCommand()) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;		
 		End If
-		config(fiFestivalComboChoice()) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
 		config(fiExternalOption()) = True
 		config(fiHtmlOption()) = False
 		config(fiSmartSelectCheckBox()) = 0
@@ -334,9 +379,26 @@ Function fvTts_config_createDefaultConfig( _
 		config(fiDialogLanguageCombo()) = fsGetLanguage()
 	Else
 		&apos; Posix or MacOS
-		config(fiFestivalOption()) = False
-		config(fiFestivalPath()) = &quot;/usr/bin/festival&quot;
-		config(fiFestivalComboChoice()) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
+		If fbPiperTtsOk(&quot;&quot;) Then
+			config(fiExperimentalOption()) = False
+			config(fiExperimentalProgramPath()) = PosixPythonPath()
+			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --voice &quot; &amp; _
+			PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0 &quot;&quot;(TMP)&quot;&quot;&quot;
+		ElseIf fsGetOS() = &quot;MacOS&quot; Then
+			config(fiExperimentalOption()) = False
+			config(fiExperimentalProgramPath()) = PosixPythonPath()
+			config(fiExperimentalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+		Else  &apos; Posix
+			If FileExists(&quot;/usr/bin/festival&quot;) Then
+				config(fiExperimentalOption()) = False
+				config(fiExperimentalProgramPath()) = &quot;/usr/bin/festival&quot;
+				config(fiExperimentalCommand()) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
+			Else
+				config(fiExperimentalOption()) = False
+				config(fiExperimentalProgramPath()) = PosixPythonPath()
+				config(fiExperimentalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			End If
+		End If
 		config(fiExternalOption()) = True
 		config(fiHtmlOption()) = False
 		config(fiSmartSelectCheckBox()) = 0
@@ -375,7 +437,7 @@ Function fvTts_config_createDefaultConfig( _
 				Environ(&quot;HOME&quot;) &amp; _
 				&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or Len( _
 				fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Or _
-				fbDefaultToSpeechDispatcher() Then
+				fbPySupportFStrings() Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
@@ -462,18 +524,26 @@ Sub tts_config_writeFile( _
 	Dim ExternalCommand As String
 	Dim PyVersion() As String
 	Dim x As Integer
-	ExternalCommand = config(fiExternalCommand())
-	PyVersion = Array(&quot;4&quot;, &quot;3&quot;, &quot;2.7&quot;, &quot;2&quot;, &quot;&quot;)
-
-	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
-		&apos; Do not record a temporary Posix python application path.
-		If InStr(ExternalCommand, &quot;/python&quot;) &lt;&gt; 0 Then
-			For x = Lbound(PyVersion) To Ubound(PyVersion)
-				If Len(fsFindAppPath(&quot;python&quot; &amp; PyVersion(x))) &lt;&gt; 0 Then
-					ExternalCommand = fsFindAppPath(&quot;python&quot; &amp; PyVersion(x))
-					Exit For
-				End If
-			Next
+	ExternalCommand = &quot;&quot;
+	Dim EnvironPy As String : EnvironPy = Environ(&quot;READ_TEXT_USE_PY&quot;)
+	If Len(EnvironPy) &lt;&gt; 0 Then
+		If FileExists(EnvironPy) Then
+			ExternalCommand = EnvironPy
+		End If
+	End If
+	If Len(ExternalCommand) = 0 Then
+		ExternalCommand = config(fiExternalCommand())
+		PyVersion = Array(&quot;4&quot;, &quot;3&quot;, &quot;2.7&quot;, &quot;2&quot;, &quot;&quot;)
+		If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
+			&apos; Do not record a temporary Posix python application path.
+			If InStr(ExternalCommand, &quot;/python&quot;) &lt;&gt; 0 Then
+				For x = Lbound(PyVersion) To Ubound(PyVersion)
+					If Len(fsFindAppPath(&quot;python&quot; &amp; PyVersion(x))) &lt;&gt; 0 Then
+						ExternalCommand = fsFindAppPath(&quot;python&quot; &amp; PyVersion(x))
+						Exit For
+					End If
+				Next
+			End If
 		End If
 	End If
 	If InStr(config(fiExternalProgramPath()), &quot;python&quot;) &lt;&gt; 0 Then
@@ -484,9 +554,9 @@ Sub tts_config_writeFile( _
 	
 	CR = Chr(10)
 	sA = Join(Array(_
-	&quot;text-to-speech.use.festival.boolean=&quot;, fsTts_util_booleanToString(config(fiFestivalOption())), CR, _
-	&quot;text-to-speech.festival.path.string=&quot;, config(fiFestivalPath()), CR, _
-	&quot;text-to-speech.festival.script.string=&quot;, config(fiFestivalComboChoice()), CR, _
+	&quot;text-to-speech.use.experimental.boolean=&quot;, fsTts_util_booleanToString(config(fiExperimentalOption())), CR, _
+	&quot;text-to-speech.experimental.path.string=&quot;, config(fiExperimentalProgramPath()), CR, _
+	&quot;text-to-speech.experimental.script.string=&quot;, config(fiExperimentalCommand()), CR, _
 	&quot;text-to-speech.use.espeak.boolean=&quot;, fsTts_util_booleanToString(config(fiExternalOption())), CR, _
 	&quot;text-to-speech.use.html.boolean=&quot;, fsTts_util_booleanToString(config(fiHtmlOption())), CR, _
 	&quot;text-to-speech.html.string=&quot;, config(fiHtmlComboURL()), CR, _
@@ -540,21 +610,18 @@ Sub tts_config_parseFile( _
 		tts_config_parseLine(l, key, value)
 		If Len(key) &gt; 0 Then
 			Select Case LCase(key)
-				Case &quot;text-to-speech.use.festival.boolean&quot;
-				config(fiFestivalOption()) = fbTts_util_stringToBoolean(value)
-				Case &quot;text-to-speech.festival.path.string&quot;
-				config(fiFestivalPath()) = value
-				
-				Case &quot;text-to-speech.festival.script.string&quot;
-				config(fiFestivalComboChoice()) = value
-				
+				Case &quot;text-to-speech.use.experimental.boolean&quot;
+				config(fiExperimentalOption()) = fbTts_util_stringToBoolean(value)
+				Case &quot;text-to-speech.experimental.path.string&quot;
+				config(fiExperimentalProgramPath()) = value
+				Case &quot;text-to-speech.experimental.script.string&quot;
+				config(fiExperimentalCommand()) = value
 				Case &quot;text-to-speech.use.espeak.boolean&quot;
 				config(fiExternalOption()) = fbTts_util_stringToBoolean(value)
-				
 				Case &quot;text-to-speech.espeak.path.string&quot;
 				Select Case fsGetOS()
 					Case &quot;UNIX&quot;, &quot;MacOS&quot;
-					If InStr(value, &quot;/python&quot;) &lt;&gt; 0 Then
+					If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
 						&apos; Since users sometimes use both containers and native
 						&apos; apps, we update the location of the python to use.
 						&apos; For example, AppImage programs usually create a mount

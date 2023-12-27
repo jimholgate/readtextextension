@@ -161,3 +161,8 @@ msgstr "_Αποθήκευση ως..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Άνοιγμα"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Ενεργοποίηση πειραματικών γνωρισμάτων"

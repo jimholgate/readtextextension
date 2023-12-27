@@ -321,3 +321,8 @@ msgstr "Arabe"
 msgctxt ""
 msgid "Reset"
 msgstr "I-reset"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Pag-activate ng mga pang-eksperimentong tampok"

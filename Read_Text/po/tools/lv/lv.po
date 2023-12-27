@@ -342,3 +342,8 @@ msgstr "S_aglabāt kā..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Atvērt"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Eksperimentālo funkciju aktivizēšana"

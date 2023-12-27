@@ -453,14 +453,14 @@ Function fsZzxToEnglish( _
 	fsZzxToEnglish = &quot;&quot;
 	&apos; zzy
 	Dim isoList0$
-	isoList0 = &quot;s_read-text;s_external-program;s_use-festival-with-a-script;s_script-commands;s_read-with-an-external-program;s_command-line-options;s_display;s_always-show-this-dialog;s_about;s_cancel;s_ok;s_command;s_script;s_c-james-holgate;s_test;s_could-not-locate-the-program;s_string-cannot-be-analyzed;s_on-line-help;s_http-help-url;s_use-a-web-application;s_speech-properties;s_system-settings;&quot;
+	isoList0 = &quot;s_read-text;s_enable_experimental_features;s_external-program;s_use-festival-with-a-script;s_script-commands;s_read-with-an-external-program;s_command-line-options;s_display;s_always-show-this-dialog;s_about;s_cancel;s_ok;s_command;s_script;s_c-james-holgate;s_test;s_could-not-locate-the-program;s_string-cannot-be-analyzed;s_on-line-help;s_http-help-url;s_use-a-web-application;s_speech-properties;s_system-settings;&quot;
 	Dim isoList1$
 	isoList1 = &quot;s_touch-screen;s_speech-synthesis;en;af;bg;ca;cs;da;de;el;es;fr;et;fi;ga;hi;hu;id;is;it;ja;ko;lv;lt;mt;nl;pl;pt;ro;ru;sk;sl;sv;tl;tr;uk;zh;ar&quot;
 	Dim isolist2$
 	isolist2 = &quot;;s_album;s_artist;s_genre;s_imagedefault;s_lyrics;s_title;s_track;s_year;s_mdsample&quot;
 	&apos; defaults
 	Dim s0$
-	s0 = &quot;Read Text;External program;Use Festival with a script;Script commands;Read with an external program;Command line options;Display;Always show this dialog;About;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Could not locate the program.;String cannot be analyzed!;On-line help;https://sites.google.com/site/readtextextension/;Use a web application;Speech properties;System settings;&quot;
+	s0 = &quot;Read Text;Enable experimental features;External program;Use Festival with a script;Script commands;Read with an external program;Command line options;Display;Always show this dialog;About;Cancel;OK;Command;Script;© 2008-2015 James Holgate;Test;Could not locate the program.;String cannot be analyzed!;On-line help;https://sites.google.com/site/readtextextension/;Use a web application;Speech properties;System settings;&quot;
 	Dim s1$
 	s1 = &quot;Touch screen;Speech;English;Afrikaans;Bulgarian;Catalan;Czech;Danish;German;Greek;Spanish;French;Estonian;Finnish;Irish;Hindi;Hungarian;Indonesian;Icelandic;Italian;Japanese;Korean;Latvian;Lithuanian;Maltese;Dutch;Polish;Portuguese;Romanian;Russian;Slovak;Slovenian;Swedish;Tagalog;Turkish;Ukrainian;Chinese;Arabic&quot;
 	Dim s2$
@@ -966,18 +966,18 @@ Function fsExtensionSetJson(po_dir, _lang As String) As String
 End Function
 
 
-Function fiFestivalOption() As Integer
-	fiFestivalOption = 0
+Function fiExperimentalOption() As Integer
+	fiExperimentalOption = 0
 End Function
 
 
-Function fiFestivalPath() As Integer
-	fiFestivalPath = 1
+Function fiExperimentalProgramPath() As Integer
+	fiExperimentalProgramPath = 1
 End Function
 
 
-Function fiFestivalComboChoice() As Integer
-	fiFestivalComboChoice = 2
+Function fiExperimentalCommand() As Integer
+	fiExperimentalCommand = 2
 End Function
 
 

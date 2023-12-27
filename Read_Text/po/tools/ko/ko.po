@@ -381,3 +381,8 @@ msgstr "다른 이름으로 저장(_A)..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "열기"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "실험 기능의 활성화"s

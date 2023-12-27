@@ -201,7 +201,10 @@ import netcommon
 import network_read_text_file
 import openjtalk_read_text_file
 import readtexttools
-import rhvoice_read_text_file
+try:
+    import rhvoice_read_text_file
+except(AttributeError,ImportError, SyntaxError):
+    pass
 
 USE_SPEECHD = True
 try:

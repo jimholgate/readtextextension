@@ -342,3 +342,8 @@ msgstr "Shrani _kot ..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Odpri"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Omogoči poskusne funkcionalnosti"

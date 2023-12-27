@@ -341,3 +341,8 @@ msgstr "儲存新檔(_A)..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "開啟"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "激活实验特征"

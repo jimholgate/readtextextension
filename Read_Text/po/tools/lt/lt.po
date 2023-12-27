@@ -342,3 +342,8 @@ msgstr "Įrašyti kaip…"
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Atverti"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Eksperimentinių funkcijų aktyvinimas"

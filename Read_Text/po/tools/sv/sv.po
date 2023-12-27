@@ -341,3 +341,8 @@ msgstr "Spara so_m..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Öppna"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Aktivering av experimentella funktioner"

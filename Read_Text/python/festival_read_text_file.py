@@ -118,13 +118,13 @@ all rights reserved
 version: flite-2.1-release Dec 2017 (http://cmuflite.org)"""
             _app = "flite - a small simple speech synthesizer"
     print(
-        f"""
+        """
 Festival Read Text
 ==================
 
-{_version}
+{0}
 
-Reads a text file using {_app}.
+Reads a text file using {1}.
 
 Converts format with `avconv`, `lame`, `faac` or `ffmpeg`.
 
@@ -140,7 +140,9 @@ Usage
        --image "input.[png|jpg] "input.txt"
      festival_read_text_file.py --audible "false" --output "output.wav" \\ 
        "input.txt"
-"""
+""".format(
+            _version, _app
+        )
     )
 
 
@@ -389,7 +391,7 @@ class ReadFestivalClass(object):
                 test_path = os.path.join(_root, _path)
                 if os.path.isdir(test_path):
                     path_stem = os.path.split(test_path)[1]
-                    return f"(voice_{path_stem})"
+                    return "(voice_{0})".format(path_stem)
         return ""
 
     def count_your_voices(self) -> int:
@@ -533,11 +535,15 @@ class ReadFestivalClass(object):
             if readtexttools.get_nt_path("festival/text2wave"):
                 _script = readtexttools.get_nt_path("festival/text2wave")
                 _command = (
-                    f'''{_app} --script {_script} "{_file_path}" -o "{_work_file}"'''
+                    '''{0} --script {1} "{2}" -o "{3}"'''.format(
+                        _app, _script, _file_path, _work_file
+                    )
                 )
             else:
                 # With Windows, this script only supports reading text aloud.
-                _command = f'{_app} --tts  "{_file_path}"'
+                _command = '{0} --tts  "{1}"'.format(
+                    _app, _file_path
+                )
         else:
             if readtexttools.have_posix_app("text2wave", False):
                 _app = "text2wave"
@@ -545,19 +551,26 @@ class ReadFestivalClass(object):
                 if len(_eval_token) == 0:
                     _switch = ""
                 else:
-                    _switch = f' -eval "{_eval_token}"'
-                _command = f'{_app}{_switch} "{_file_path}" -o "{_work_file}"'
+                    _switch = ' -eval "{0}"'.format(
+                        _eval_token
+                    )
+                _command = '{0}{1} "{2}" -o "{3}"'.format(
+                    _app, _switch, _file_path, _work_file
+                )
             elif readtexttools.have_posix_app("flite", False):
                 # Flite reates a compact .wav file - Signed 16 bit Little Endian,
                 # Rate 8000 Hz, Mono. This format works with vlc, aplay & paplay,
                 # but might not with a gstreamer app like totem or gst-launch-1.0
                 if os.path.splitext(_file_path)[1] not in [".txt"]:
                     return False
-                _command = f'flite -f "{_file_path}" -o "{_work_file}"'
+                _command = 'flite -f "{0}" -o "{1}"'.format(
+                    _file_path, _work_file
+                    )
         try:
             if not readtexttools.my_os_system(_command):
                 # try with _switch = '' -- default voice
-                _command = f'{_app} "{_file_path}" -o "{_work_file}"'
+                _command = '{0} "{1}" -o "{2}"'.format(
+                    _app, _file_path, _work_file)
         except IOError:
             print("I was unable to read!")
             usage()
@@ -720,7 +733,6 @@ def main() -> None:
                 "artist=",
                 "dimensions=",
                 "help",
-
             ],
         )
     except getopt.GetoptError:
@@ -761,7 +773,7 @@ def main() -> None:
         else:
             assert False, "unhandled option"
     if not _read_festival.language_ok(_eval_lang):
-        print(f"FAIL: `{_eval_lang}` - incompatible language or voice.")
+        print("FAIL: `{0}` - incompatible language or voice.".format(_eval_lang))
         sys.exit(0)
     _content = _imported_meta.meta_from_file(_file_path)
     if len(_content) == 0:
@@ -793,7 +805,7 @@ def main() -> None:
             _image_size,
         )
     else:
-        # Prepare Sable XML (To SLOW DOWN speech use --RATE=75%)
+        # Prepare Sable CODE' (To SLOW DOWN speech use --RATE=75%)
         _domain_table = _read_festival.domain_table
         for i in range(len(_domain_table)):
             if _domain_table[i]["lang1"] == concise_lang:

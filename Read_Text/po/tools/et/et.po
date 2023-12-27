@@ -341,3 +341,8 @@ msgstr "Salvesta kui..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Ava..."
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Eksperimentaalsete funktsioonide aktiveerimine"

@@ -166,3 +166,8 @@ msgstr "שמירה בשם...u\200F"
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "פתיחה"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "הפעלת תכונות ניסיוניות"

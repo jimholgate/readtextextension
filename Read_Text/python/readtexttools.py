@@ -219,7 +219,7 @@ def write_plain_text_file(_file_path="", _body_text="", scodeco="utf-8"):  # -> 
         writer = codecs.open(_file_path, mode="w", encoding=scodeco, errors="replace")
         writer.write(_body_text)
         writer.close()
-    except(ValueError, UnicodeEncodeError, UnicodeDecodeError, PermissionError):
+    except (ValueError, UnicodeEncodeError, UnicodeDecodeError, PermissionError):
         print("`write_plain_text_file` error in readtexttools.py")
     return os.path.isfile(_file_path)
 
@@ -227,7 +227,9 @@ def write_plain_text_file(_file_path="", _body_text="", scodeco="utf-8"):  # -> 
 def run_powershell(cmd=""):  # -> str
     """PowerShell automates tasks, manages systems, and can perform operations
     with Windows NET services like Azure, Microsoft 365, and SQL Server."""
-    return subprocess.run(["PowerShell", " -Command", cmd], capture_output=True, check=False)
+    return subprocess.run(
+        ["PowerShell", " -Command", cmd], capture_output=True, check=False
+    )
 
 
 def get_temp_prefix():  # -> str
@@ -1874,21 +1876,24 @@ class JsonTools(object):
         s_track = self.sanitize_json(s_track)
         title = self.sanitize_json(title)
         voice = self.sanitize_json(voice)
-        s_key = "{}.json".format(file_spec)
-        return """{
-  "album": "{0}",
-  "author": "{1}",
-  "file_spec": "{2}",
-  "flags": "{3}",
-  "genre": "{4}",
-  "i_rate": {5},
-  "i_track": {6},
-  "language": "{7}",
-  "output_module": "{8}",
-  "secret_key": "{9}",
-  "title": "{10}",
-  "voice": "{11}"
-}""".format(
+        s_key = "{0}.json".format(file_spec)
+        l_cur = "{"
+        r_cur = "}"
+        return """{0}
+  "album": "{1}",
+  "author": "{2}",
+  "file_spec": "{3}",
+  "flags": "{4}",
+  "genre": "{5}",
+  "i_rate": {6},
+  "i_track": {7},
+  "language": "{8}",
+  "output_module": "{9}",
+  "secret_key": "{10}",
+  "title": "{11}",
+  "voice": "{12}"
+{13}""".format(
+            l_cur,
             album,
             author,
             file_spec,
@@ -1901,6 +1906,7 @@ class JsonTools(object):
             s_key,
             title,
             voice,
+            r_cur,
         )
 
 

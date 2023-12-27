@@ -341,3 +341,8 @@ msgstr "Ge_m som..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Åbn"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Aktiver eksperimentelle funktioner"

@@ -386,3 +386,8 @@ msgstr "Tallenna ni_mellä..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Avaa"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Kokeellisten ominaisuuksien aktivointi"

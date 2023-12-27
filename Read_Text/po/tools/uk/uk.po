@@ -342,3 +342,8 @@ msgstr "Зберегти _як..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Відкрити"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Активація експериментальних функцій"

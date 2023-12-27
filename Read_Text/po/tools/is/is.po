@@ -336,3 +336,8 @@ msgstr "_Vista sem..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Opna"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Virkjun tilraunaeiginleika"

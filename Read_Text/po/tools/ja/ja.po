@@ -341,3 +341,8 @@ msgstr "名前を付けて保存(_A)..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "開く"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "実験的特徴の活性化"

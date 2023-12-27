@@ -360,3 +360,8 @@ msgstr "Ops_laan als..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Openen"
+
+# help Enable experimental features
+msgctxt ""
+msgid "Enable experimental features"
+msgstr "Zet experimentele functies aan"
