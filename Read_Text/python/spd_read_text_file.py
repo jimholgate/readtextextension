@@ -187,7 +187,7 @@ See also:
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2010 - 2023 James Holgate
+Copyright (c) 2010 - 2024 James Holgate
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import codecs

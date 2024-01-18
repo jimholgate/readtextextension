@@ -729,7 +729,7 @@ Function fsExtensionVersion() As String
 	Dim sLine As String
 	Dim s1 As String
 	Dim s2 As String
-	
+	On Error GoTo fsExtensionVersionErr
 	s1 = fsMyURL() &amp; &quot;/description.xml&quot;
 	s2 = &quot;&quot;
 	aFile = ConvertFromUrl(s1)
@@ -744,6 +744,9 @@ Function fsExtensionVersion() As String
 	close #iNumber
 	s2 = Mid(sLine,InStr(s2,&quot;&quot;&quot;&quot;) + 1)
 	fsExtensionVersion = Left(s2, InStr(s2,&quot;&quot;&quot;&quot;) - 1)
+	Exit Function
+	fsExtensionVersionErr:
+	fsExtensionVersion = &quot;&quot;
 End Function
 
 

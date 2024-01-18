@@ -344,17 +344,18 @@ End Function
 Function fvTts_config_createDefaultConfig( _
 	msgs() As Variant, _
 	errorCode As Integer) As Variant
-	
+	Dim player7 As String : player7 = &quot;&quot;
 	&apos; The place to store the configuration data
 	Dim config(fiCountConfigOptions) As Variant
 	
 	&apos; Create default values for variables
 	If GetGUIType() = 1 Then
 		&apos; Windows
+		player7 = &quot; --player 7&quot;	
 		If fbPiperTtsOk(&quot;&quot;) Then
 			config(fiExperimentalOption()) = False
 			config(fiExperimentalProgramPath()) = ConvertFromURL(BundlePyPath())
-			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --voice &quot; &amp; _
+			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --player 7 --voice &quot; &amp; _
 			PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0 &quot;&quot;(TMP)&quot;&quot;&quot;
 		Else
 			config(fiExperimentalOption()) = False
@@ -382,7 +383,7 @@ Function fvTts_config_createDefaultConfig( _
 		If fbPiperTtsOk(&quot;&quot;) Then
 			config(fiExperimentalOption()) = False
 			config(fiExperimentalProgramPath()) = PosixPythonPath()
-			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --voice &quot; &amp; _
+			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --player 7 --voice &quot; &amp; _
 			PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0 &quot;&quot;(TMP)&quot;&quot;&quot;
 		ElseIf fsGetOS() = &quot;MacOS&quot; Then
 			config(fiExperimentalOption()) = False

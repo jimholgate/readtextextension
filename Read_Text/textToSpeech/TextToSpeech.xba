@@ -145,9 +145,10 @@ Option Explicit
 &apos;&apos; find the script.
 &apos;&apos; 
 &apos;&apos; The name of the function `ReadTheSlidenote` shows in the dialogue that
-&apos;&apos; Impress displays when a computer that doesn’t have read text extension
+&apos;&apos; Impress displays when a computer that does not have read text extension
 &apos;&apos; calls the procedure.
 &apos;&apos;
+
 Function fbDefaultToSpeechDispatcher() As Boolean
 	&apos; Implies that the python3 `speechd` (speech-dispatcher) library is current.
 	&apos; https://help.libreoffice.org/latest/en-US/text/sbasic/python/main0000.html

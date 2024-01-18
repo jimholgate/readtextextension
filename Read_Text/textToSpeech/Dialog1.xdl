@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
-<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Dialog1" dlg:left="18" dlg:top="60" dlg:width="268" dlg:height="221" dlg:closeable="true" dlg:moveable="true" dlg:title="Dialog1">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Dialog1" dlg:left="18" dlg:top="60" dlg:width="269" dlg:height="222" dlg:closeable="true" dlg:moveable="true" dlg:title="Dialog1">
  <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:textToSpeech.TextToSpeechConfiguration.testEvent?language=Basic&amp;location=application" script:language="Script"/>
  <dlg:bulletinboard>
   <dlg:filecontrol dlg:id="FileControl1" dlg:tab-index="6" dlg:disabled="true" dlg:left="16" dlg:top="28" dlg:width="240" dlg:height="14" dlg:value="_file_control1">
@@ -32,16 +32,16 @@
    <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateCombo2F?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:combobox>
   <dlg:radiogroup>
-   <dlg:radio dlg:id="OptionButton1" dlg:tab-index="0" dlg:disabled="true" dlg:left="13" dlg:top="15" dlg:width="242" dlg:height="13" dlg:value="OptionButton1" dlg:group-name="Options">
+   <dlg:radio dlg:id="OptionButton1" dlg:tab-index="0" dlg:disabled="true" dlg:left="13" dlg:top="15" dlg:width="242" dlg:height="13" dlg:value="OptionButton1">
     <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateDisplay?language=Basic&amp;location=application" script:language="Script"/>
     <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.UseFestival_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
    </dlg:radio>
-   <dlg:radio dlg:id="OptionButton2" dlg:tab-index="1" dlg:left="13" dlg:top="72" dlg:width="242" dlg:height="12" dlg:tabstop="true" dlg:value="OptionButton2" dlg:group-name="Options" dlg:checked="true">
+   <dlg:radio dlg:id="OptionButton2" dlg:tab-index="1" dlg:left="13" dlg:top="72" dlg:width="242" dlg:height="12" dlg:tabstop="true" dlg:value="OptionButton2" dlg:checked="true">
     <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateDisplay?language=Basic&amp;location=application" script:language="Script"/>
     <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.UseExternal_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
     <script:event script:event-name="on-keyup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateDisplay?language=Basic&amp;location=application" script:language="Script"/>
    </dlg:radio>
-   <dlg:radio dlg:id="OptionButton3" dlg:tab-index="2" dlg:left="13" dlg:top="128" dlg:width="242" dlg:height="12" dlg:tabstop="true" dlg:value="OptionButton3" dlg:group-name="Options">
+   <dlg:radio dlg:id="OptionButton3" dlg:tab-index="2" dlg:left="13" dlg:top="128" dlg:width="242" dlg:height="12" dlg:tabstop="true" dlg:value="OptionButton3">
     <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateDisplay?language=Basic&amp;location=application" script:language="Script"/>
     <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.UseWeb_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
     <script:event script:event-name="on-keyup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateDisplay?language=Basic&amp;location=application" script:language="Script"/>
@@ -110,13 +110,13 @@
     <dlg:menuitem dlg:value="https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)"/>
+    <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)"/>
     <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=en&amp;text=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=es&amp;text=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=fr&amp;text=(OOO_WEBTEXT)"/>
-    <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)"/>
-    <dlg:menuitem dlg:value="https://twitter.com/intent/tweet?text=(OOO_WEBTEXTSMALL)"/>
     <dlg:menuitem dlg:value="https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)"/>
     <dlg:menuitem dlg:value="https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)"/>
+    <dlg:menuitem dlg:value="https://www.hotbot.com/web?q=(OOO_WEBTEXTSMALL)"/>
    </dlg:menupopup>
   </dlg:combobox>
   <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="12" dlg:left="13" dlg:top="200" dlg:width="84" dlg:height="10" dlg:value="CheckBox2" dlg:checked="false">

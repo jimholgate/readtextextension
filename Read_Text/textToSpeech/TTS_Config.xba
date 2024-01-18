@@ -324,20 +324,15 @@ Function PiperSpeechHostInfo()
 	&apos; On 2023-12-21 synesthesiam (Michael Hansen) committed
 	&apos; &lt;https://github.com/rhasspy/piper/commit/2fa4c2c13933c1f6b8d87e34d12788ca8e6d073b&gt;
 	With _info
-		.about = Join(Array(&quot;[Piper TTS](https://github.com/rhasspy/piper/blob/&quot;, _
-		&quot;2fa4c2c13933c1f6b8d87e34d12788ca8e6d073b/src/python_run/README_http.md)&quot;,_
-		&quot; is a neural text to speech system. It can use a python virtual&quot;, _
-		&quot; instance using `venv` to host a `localhost` server converting&quot;, _
-		&quot; plain text to a .wav file using a single voice.&quot;), _
+		.about = Join(Array(&quot;[Piper TTS](https://github.com/rhasspy/piper)&quot;,_
+		&quot; is a neural text to speech system.&quot;), _
 		&quot;&quot;)
 		.key = &quot;PiperTTS&quot;
 		.label = &quot;piper-server&quot;
 		.token = &quot;&quot;
-		.url = &quot;http://0.0.0.0:8000&quot;
-		.url_info = Join(Array(&quot;https://raw.githubusercontent.com/rhasspy/piper/&quot;, _
-		&quot;2fa4c2c13933c1f6b8d87e34d12788ca8e6d073b/src/python_run/README_http.md&quot;),_
-		&quot;&quot;)
-		.json_dir = &quot;piper&quot;
+		.url = &quot;http://0.0.0.0:8000&quot; &apos; This URL might be used for something else.
+		.url_info = &quot;?text=url_info&quot; &apos; Server returns wav data, check for Error, not content.
+		.json_dir = &quot;default&quot;
 		.sample = &quot;http://0.0.0.0:8000?&amp;text=Hello%20World.&quot;
 		.docker = &quot;&quot;
 		.tags = Array(&quot;spacy-or-splitlines&quot;, &quot;text&quot;, &quot;wav&quot;)
@@ -1264,7 +1259,10 @@ Sub ttsUpdateDisplay()
 		Dim i#
 		Dim _test_text$ : _test_text = .GetControl(&quot;FileControl1&quot;).Model.Text
 		i = Len(.GetControl(&quot;FileControl1&quot;).Model.Text)
-		If fbExperimentalMode() Then
+		If Len(fsMyURL()) = 0 Then
+			.GetControl(&quot;OptionButton1&quot;).model.enabled = False
+			.GetControl(&quot;OptionButton2&quot;).model.enabled = False
+		ElseIf fbExperimentalMode() Then
 			.GetControl(&quot;OptionButton1&quot;).model.enabled = True	
 		ElseIf i = 0 Then
 			&apos; No text in file control box
@@ -1288,7 +1286,7 @@ Sub ttsUpdateDisplay()
 	End With
 End Sub
 
-
+&apos;xxxxxxxxxxxxxxxxxxxx
 Function fvCurrentDialogConfig() As Variant
 	Dim config(fiCountConfigOptions) As Variant
 	Dim file_control_2 As String
@@ -1296,6 +1294,10 @@ Function fvCurrentDialogConfig() As Variant
 		On Error Resume Next
 		file_control_2 = .GetControl(&quot;FileControl2&quot;).Model.Text
 		If fsGetOS() = &quot;MacOS&quot; and fbIsLibreOffice() And _
+		Instr(file_control_2, &quot;/usr/python3&quot;) &lt;&gt; 0 Then
+			file_control_2 = PosixPythonPath()
+		End If
+		If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 And _
 		Instr(file_control_2, &quot;/usr/python3&quot;) &lt;&gt; 0 Then
 			file_control_2 = PosixPythonPath()
 		End If
@@ -1326,11 +1328,13 @@ End Sub
 Sub AboutAddOn( _
 	config() As Variant, _
 	myText As String)
+	&apos; Dialog3
 	Dim f_dlgAboutReadSelection As Variant
 	Dim sFile As String
 	Dim sA As String
 	Dim sC As String
 	Dim sE As String
+	Dim title_special As String : title_special = &quot;&quot;
 	Dim msgs() As Variant
 	Dim errorCode As Integer
 	Dim s1$
@@ -1342,15 +1346,17 @@ Sub AboutAddOn( _
 	Dim s4$
 	s4 = &quot;&quot;
 	Dim TextField$ : TextField = &quot;gjfjfj&quot;
-	
+	If fbExperimentalMode() Then
+		title_special = &quot; - &quot; &amp; fsLookUpTerm2(&quot;s_enable_experimental_features&quot;, s1)
+	End If	
 	&apos; Open up the dialog
-	DialogLibraries.LoadLibrary( &quot;textToSpeech&quot; )
+	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
 	f_dlgAboutReadSelection = CreateUnoDialog( DialogLibraries.textToSpeech.Dialog3)
 	With f_dlgAboutReadSelection
 		&apos;Update the labels And button with your language
 		.model.Title = fsLookUpTerm2(&quot;s_about&quot;, s1) &amp; _
 		&quot; &quot; &amp; fsLookUpTerm2(&quot;s_read-text&quot;, s1) &amp; _
-		&quot; &quot; &amp; fsExtensionVersion()
+		&quot; &quot; &amp; fsExtensionVersion() &amp; title_special
 		If fbHelpIsInstalled() Then
 			.model.HelpURL = fsAppSignature() &amp; &quot;/set_up.xhp&quot;
 		End If
@@ -1372,8 +1378,8 @@ Sub AboutAddOn( _
 			&apos; 2022 - If the clipboard is empty, then the program
 			&apos; might crash in Windows.
 			.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo()
-			.GetControl(&quot;ImageControl4&quot;).model.Enabled = False
-			.GetControl(&quot;Label2&quot;).model.Enabled = False
+			.GetControl(&quot;ImageControl4&quot;).model.Enabled = fbExperimentalMode()
+			.GetControl(&quot;Label2&quot;).model.Enabled = fbExperimentalMode()
 		Else
 			CreateFile(s3, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)  &apos; lock clipboard
 			fsGetClipBoard(False)
@@ -1382,7 +1388,11 @@ Sub AboutAddOn( _
 			&apos; the results.
 			&apos; if it crashes, then we are left with a lock file.
 			fbRemoveFile(s3)  &apos; unlock clipboard
-			s4 = fsGetClipBoard(False)
+			If fbExperimentalMode() Then
+				s4 = fsSelectionLanguageAndRegion()
+			Else:
+				s4 = fsGetClipBoard(False)
+			End If
 			.GetControl(&quot;ImageControl4&quot;).model.helpText = Left( _
 			s4, 99)
 			.GetControl(&quot;Label2&quot;).model.helpText = Left( _
@@ -1390,12 +1400,17 @@ Sub AboutAddOn( _
 			.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo()
 			.GetControl(&quot;Label2&quot;).model.Label = Len(s4)
 		End If
-		If Len(WinSpeechProgramPath()) &lt;&gt; 0 Then
-			.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm2( _
-			&quot;s_speech-properties&quot;, s1)
+		If fbExperimentalMode() Then
+			.GetControl(&quot;ImageControl5&quot;).model.helpText = fsSelectionLanguageAndRegion(False) &amp; _
+			&quot;_lexicon.json&quot;
 		Else
-			.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm2( _
-			&quot;s_system-settings&quot;, s1)
+			If Len(WinSpeechProgramPath()) &lt;&gt; 0 Then
+				.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm2( _
+				&quot;s_speech-properties&quot;, s1)
+			Else
+				.GetControl(&quot;ImageControl5&quot;).model.helpText = fsLookUpTerm2( _
+				&quot;s_system-settings&quot;, s1)
+			End If
 		End If
 		.GetControl(&quot;ImageControl5&quot;).model.ImageURL = fsToolBoxLogo()
 		.GetControl(&quot;Label1&quot;).model.helpText = Left(fsGetTextSelection(False, False),99)

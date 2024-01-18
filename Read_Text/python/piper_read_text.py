@@ -48,7 +48,8 @@ The most recent binary `piper` executable program included in a
 computer's specific processor type. For example, `piper_linux_x86_64.tar.gz`
 works with `x86_64` processors using a Linux desktop.
 
-For example, for the `piper_linux_x86_64` 2023.11.14-2 Linux release, install the following packages:
+For example, for the `piper_linux_x86_64` 2023.11.14-2 Linux release, install
+the following packages:
 
     python3-pipx
     espeak-ng-data
@@ -93,7 +94,8 @@ You can check the voice models online.
 Review the [voice model samples](https://rhasspy.github.io/piper-samples).
 
 The first time you use this client, it will set up a directory to store
-piper voice models (`onnx`) and configuration files (`json`). 
+piper voice models (`onnx`) and configuration files (`json`). For Linux,
+it uses:
 
 `~/.local/share/piper-tts/piper-voices`
 
@@ -152,13 +154,15 @@ to use `piper-tts`:
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2023 James Holgate
+Copyright (c) 2024 James Holgate
 """
 import codecs
 import json
 import os
+import random
 import stat
 import sys
+import time
 import getopt
 import urllib
 
@@ -210,7 +214,7 @@ VLC_WINDOWS_INFO = """
     ██████████████████████████████████████████████████████████████████
 
 If you are using PiperTTS on Windows without installing VLC , it can
-take a few few moments before your computer starts playing Piper speech.
+take a few moments before your computer starts playing Piper speech.
 
 To enable fast and free audio streaming for Windows Piper TTS, use
 VideoLAN [VLC Media Player Desktop](https://www.videolan.org)"""
@@ -230,8 +234,6 @@ class PiperTTSClass(object):
         self.update_request = False
         self.sample_model = "en_GB-jenny_dioco-medium"
         self.sample_phrase = "A rainbow is a meteorological phenomenon."
-        # Is huggingface.co blocked in your region? Add a tested
-        # model and sample phrase here so you don't need to go online.
         self.pip_checked_models = [
             [self.sample_model, self.sample_phrase],
             [
@@ -258,7 +260,7 @@ class PiperTTSClass(object):
             self.app = "piper.exe"
             _extension_table = readtexttools.ExtensionTable()
             for _item in app_list:
-                _app = _extension_table.win_search("piper-tts\\piper", _item)
+                _app = _extension_table.win_search(f"piper-tts{os.path.sep}piper", _item)
                 if len(_app) != 0:
                     self.app = _app
                     break
@@ -268,6 +270,8 @@ class PiperTTSClass(object):
                 for _item in [
                     f"~/.local/bin/{_app}",
                     f"~/.local/share/piper-tts/{_app}/{_app}",
+                    f"/usr/local/lib/piper/{_app}",
+                    f"/usr/lib/piper/{_app}",
                 ]:
                     _path = os.path.expanduser(_item)
                     if os.path.isfile(_path):
@@ -305,6 +309,8 @@ class PiperTTSClass(object):
             "~/piper-voices",
             "/opt/piper-voices",
             "/opt/piper-tts/piper-voices",
+            "/usr/local/lib/piper/",
+            "/usr/lib/piper/",
             readtexttools.linux_machine_dir_path("piper-voices"),
             readtexttools.linux_machine_dir_path("piper-tts/piper-voices"),
         ]
@@ -316,6 +322,8 @@ class PiperTTSClass(object):
             "~/espeak-ng-data",
             "~/Downloads/espeak-ng-data",
             "/opt/piper-tts/piper-tts/piper/espeak-ng-data",
+            "/usr/local/lib/piper/espeak-ng-data",
+            "/usr/lib/piper/espeak-ng-data",
             readtexttools.linux_machine_dir_path("piper-tts/piper/espeak-ng-data"),
             readtexttools.linux_machine_dir_path("espeak-ng-data"),
         ]
@@ -380,12 +388,14 @@ No `espeak-ng-data` directory found at `{espeak_msg}`
         self.length_scale = 1
         self.noise_w = 0.8
         self.voice_count = 0
+        # To hide the VLC interface, use the `--intf dummy` switch
+        self.vlc_intfs = ["--intf dummy ", ""]
         self.use_specific_onnx_path = ""
         self.use_specific_onnx_voice_no = 0
         self.meta = readtexttools.ImportedMetaData()
         self.work_file = os.path.join(readtexttools.get_temp_prefix(), "piper-tts.wav")
 
-    def usage(self, _help="") -> None:
+    def usage(self, _help: str = "") -> None:
         """Usage"""
         cmd = "python3 piper_read_text.py"
         _file = "'<text_path.txt>'"
@@ -477,7 +487,7 @@ not work with the python version.
 """
         return self.quick_start
 
-    def language_supported(self, iso_lang="en-GB", vox="auto") -> bool:
+    def language_supported(self, iso_lang: str = "en-GB", vox: str = "auto") -> bool:
         """Check to see if the language is available"""
         model_test = vox.split("#")[0]
         if model_test.startswith("~"):
@@ -524,7 +534,9 @@ not work with the python version.
         self.ok = any(_file.startswith(self.concise_lang) for _file in _dir_list)
         return self.ok
 
-    def _model_path_list(self, iso_lang="en-GB", _vox="", extension="onnx") -> list:
+    def _model_path_list(
+        self, iso_lang: str = "en-GB", _vox: str = "", extension: str = "onnx"
+    ) -> list:
         """Check the directories for language models, and if found return
         the results in a list.
         """
@@ -623,7 +635,7 @@ voice models, then the generic json configuration will not recognize them.
                 pass
         return _found_models
 
-    def model_path(self, _extension="onnx") -> str:
+    def model_path(self, _extension: str = "onnx") -> str:
         """piper-tts models usually have two essential files with `.json` and
         `.onnx` extensions. If `model.[json | .onyx]` is in an expected
         directory, return the path, otherwise return `''`"""
@@ -658,7 +670,7 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         self.ok = False
         return ""
 
-    def _model_voice_info(self, _model="") -> int:
+    def _model_voice_info(self, _model: str = "") -> int:
         """Get current info from  the `_model.json` file such as the
         number of speakers and the sample rate.  Edit the named
         json elements for individual voices if needed"""
@@ -685,13 +697,13 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
             self.sample_rate = 22050
         return self.voice_count
 
-    def _check_voice_request(self, _vox_number=0, _list_size=0) -> str:
+    def _check_voice_request(self, _vox_number: int = 0, _list_size: int = 0) -> str:
         """Handle out of range numbers using a modulus (`int % _list_size`)
         value."""
         try:
             if _list_size == 0:
                 return 0
-            if _vox_number >= _list_size - 1:
+            if _vox_number <= _list_size - 1:
                 return _vox_number
             return _vox_number % abs(_list_size)
         except (ZeroDivisionError, IndexError, TypeError):
@@ -723,7 +735,10 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
             return False
 
     def retrieve_model(
-        self, speaker="en_GB-jenny_dioco-medium", home="", do_pop_message=True
+        self,
+        speaker: str = "en_GB-jenny_dioco-medium",
+        home: str = "",
+        do_pop_message: bool = True,
     ) -> str:
         """Download remote voice onnx and json model files. Returns the directory
         containing the onnx and json file if successful, or else `""`."""
@@ -741,19 +756,35 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         lang = lang_locale.split("_", maxsplit=1)[0]
         piper_file = ""
         _count = 1
-        _extensions = ["onnx.json", "onnx"]
+        _extensions = ["MODEL_CARD", ".onnx.json", ".onnx"]
         s_count_total = str(len(_extensions))
         for _end in _extensions:
             try:
-                piper_file = f"{lang_locale}-{name}-{quality}.{_end}"
+                if "." in _end:
+                    piper_file = f"{lang_locale}-{name}-{quality}{_end}"
+                else:
+                    piper_file = _end
                 home_file = os.path.join(
                     self.piper_voice_dir, lang, lang_locale, name, quality, piper_file
                 )
+                _rname = urllib.parse.quote(name)
+                _rpiper_file = urllib.parse.quote(piper_file)
+                remote_file = f"{home}{lang}/{lang_locale}/{_rname}/{quality}/{_rpiper_file}?download=true"
+                if bool(self.debug):
+                    print(
+                        f"""`retrieve_model`
+#######################################
+home_file = {home_file}
+
+remote_file = {remote_file}                
+                
+"""
+                    )
                 if os.path.isfile(home_file):
                     continue
                 print(f"Requesting `{piper_file}`")
                 urllib.request.urlretrieve(
-                    f"{home}{lang}/{lang_locale}/{name}/{quality}/{piper_file}?download=true",
+                    remote_file,
                     home_file,
                 )
                 print(f"Retrieved `{piper_file}`")
@@ -769,14 +800,48 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
                     )
                 _count += 1
             except (TimeoutError, ValueError, urllib.error.URLError):
-                return ""
+                pause_time = random.uniform(3, 8)
+                time.sleep(pause_time)
+                continue
             except OSError as e:
                 print(f"OSError downloading `{piper_file}`: {e}")
                 return ""
         return os.path.split(home_file)[0]
 
+    def _vlc_app(self):
+        """Return a list i. e.: `[_vlc="/pathto/vlc", _force_player=True]`
+        item 0 is host system path or `""` if it cannot be found.
+        item 1 is whether to choose `vlc` executable over `aplay`
+        in all cases."""
+        _extension_table = readtexttools.ExtensionTable()
+        if os.name == "nt":
+            _vlc = _extension_table.win_search("vlc", "vlc")
+            _force_player = len(_vlc) != 0
+            return (_vlc, _force_player)
+        _vlc = ""
+        _force_player = False
+        for _check_vlc in [
+            ["/Applications/VLC.app/Contents/MacOS/VLC", True],
+            ["/usr/bin/vlc", False],
+        ]:
+            if os.path.isfile(_check_vlc[0]):
+                _vlc = _check_vlc[0]
+                _force_player = _check_vlc[1]
+                break
+        if len(_vlc) == 0:
+            if not os.path.isfile("/usr/bin/aplay"):
+                if len(_extension_table.vlc) != 0:
+                    _vlc = _extension_table.vlc
+                    _force_player = True
+        return (_vlc, _force_player)
+
     def read(
-        self, _text_file="", _iso_lang="en-GB", _config="", _speech_rate=160
+        self,
+        _text_file: str = "",
+        _iso_lang: str = "en-GB",
+        _config: str = "",
+        _speech_rate: int = 160,
+        _player: int = 1,
     ) -> bool:
         """Read speech aloud"""
         _extension_table = readtexttools.ExtensionTable()
@@ -794,7 +859,7 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         else:
             _model = self.model_path("onnx")
             _vox = self.voice_name
-        _onnx = os.path.splitext(os.path.split(_model)[1])[0]
+        _onnx = os.path.splitext(os.path.basename(_model))[0]
         voice_no = 0
         if "#" not in _vox:
             _vox = f"{_vox}#0"
@@ -812,11 +877,38 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         except (ValueError, IndexError):
             voice_no = 0
         voice_no = self._check_voice_request(voice_no, self._model_voice_info(_model))
-        _outer = f" --output-raw < {_text_file} | aplay -r {self.sample_rate} -f S16_LE -t raw -"
         _vlc = ""
+        _force_player = False
+        _vlc_vis = "--audio-visual visualizer --effect-list "
+        _vlc_demux = (
+            "--demux=rawaud --rawaud-channels 1 --rawaud-samplerate 22050 - vlc://quit"
+        )
+        for _frame in [
+            "--meta-title PiperTTS",
+            f'--meta-title "PiperTTS : {_onnx}#{voice_no}"',
+            f'-f --meta-title "PiperTTS : {_onnx}#{voice_no}"',
+        ]:
+            for _xtra in [
+                "scope",
+                "spectrometer",
+                "spectrum",
+                "vuMeter",
+            ]:
+                self.vlc_intfs.append(f"{_frame} {_vlc_vis}{_xtra} ")
+        if _player >= len(self.vlc_intfs):
+            _player = random.randint(2, len(self.vlc_intfs) - 1)
+        _vlc, _force_player = self._vlc_app()
+        if len(_vlc) != 0 and (bool(_player) or _force_player):
+            if bool(_player):
+                _ui = self.vlc_intfs[_player]
+            else:
+                _ui = self.vlc_intfs[0]
+            _outer = f" --output-raw < {_text_file} | {_vlc} {_ui}{_vlc_demux}"
+        else:
+            _outer = f" --output-raw < {_text_file} | aplay -r {self.sample_rate} -f S16_LE -t raw -"
         _demo_warning = ""
         if os.name == "nt":
-            _vlc = _extension_table.win_search("vlc", "vlc")
+            _vlc, _force_player = self._vlc_app()
             if len(_vlc) == 0:
                 _demo_warning = """
         @
@@ -836,16 +928,19 @@ read text quickly and securely with large or small selections of text."""
                 )
                 _outer = f""" --output_file {_work_file} """
             else:
-                # To hide the interface, use the `--intf dummy` switch
-                _ui = ["--intf dummy ", ""][1]
-                _outer = f""" --output-raw < {_text_file} | {_vlc} {_ui}--demux=rawaud --rawaud-channels 1 --rawaud-samplerate 22050 - vlc://quit"""
-
+                _ui = self.vlc_intfs[_player]
+                _outer = f" --output-raw < {_text_file} | {_vlc} {_ui}{_vlc_demux}"
         if os.path.isfile(self.app_locker):
             readtexttools.unlock_my_lock(self.locker)
             if len(_vlc) != 0:
-                app_list = ["vlc", "piper", "piper-cli"]
+                app_list = ["vlc", "piper", "piper-cli", "VLC"]
+                if os.name == "nt":
+                    app_list = ["VLC.EXE", "PIPER.EXE"]
             else:
                 app_list = ["aplay", "piper", "piper-cli"]
+                if os.name == "nt":
+                    app_list = ["SOX.EXE", "PIPER.EXE"]
+            print(f"[ > ] {self.help_heading} stopping...")
             for _app in app_list:
                 readtexttools.killall_process(_app)
             return True
@@ -870,13 +965,13 @@ support the `{self.phoneme_type}` phoneme type so the `{_model_n}`
 model might not work. If there is a problem, try updating the model or
 install the binary version.
 """
-        speaker_switch = " "
+        speaker_switch = ""
         if os.path.isfile(self.work_file):
             os.remove(self.work_file)
         if voice_no > self.voice_count - 1:
             voice_no = 0
         if voice_no != 0:
-            speaker_switch = "".join([" --speaker ", str(voice_no)])
+            speaker_switch = "".join([" --speaker ", str(voice_no).strip()])
         if os.path.isfile(_model):
             _json_c = f"{_model}.json"
             if os.path.isfile(_config):
@@ -926,8 +1021,8 @@ install the binary version.
                     ]
                 )
             _name_key = "None"
+            _variant = str(voice_no)
             if self.debug == 0:
-                _variant = str(voice_no)
                 _name_key = self.dataset
                 try:
                     if len(self.speaker_id_map_keys) != 0:
@@ -952,6 +1047,8 @@ Piper TTS
 [Piper Voices]({self.voice_url})
 {_demo_warning}\
 
+
+    {_command}
 """
                 )
             else:
@@ -1001,13 +1098,17 @@ Piper TTS
         return False
 
     def update_local_model_dir(
-        self, _dir="", _voice="", _sub_dirs=True, do_pop_message=True
+        self,
+        _dir: str = "",
+        _voice: str = "",
+        _sub_dirs: bool = True,
+        do_pop_message: bool = True,
     ) -> bool:
         """Download the most recent `voices.json` file, and if `_sub_dirs` is
         `True` then add new model subdirectories to the local model
         directory."""
         if not os.path.isdir(_dir):
-            if len(dir) == 0:
+            if len(_dir) == 0:
                 return False
             os.makedirs(_dir)
         try:
@@ -1102,7 +1203,7 @@ It takes a few moments to retrieve the piper voice model
                 readtexttools.show_with_app(_dir)
         return os.path.isfile(f"{_dir}voices.json")
 
-    def load_instructions(self, verbose=True) -> str:
+    def load_instructions(self, verbose: bool = True) -> str:
         """Return installation instructions"""
         _quick_start = ""
         if verbose:
@@ -1357,15 +1458,18 @@ def main() -> None:
     _iso_lang = ""
     _config = ""  # model json path (defaults to onnx path + .json suffix)
     _voice = "AUTO0#0"
+    _player = 0
+    if os.name == "nt":
+        _player = 0
     _text_file_in = sys.argv[-1]
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "uclrvh",
-            ["update=", "config=", "language=", "rate=", "voice=", "help"],
+            "uclprvh",
+            ["update=", "config=", "language=", "player=", "rate=", "voice=", "help"],
         )
     except getopt.GetoptError:
-        # print help information and exit
+        # Show help information and exit
         print("option -a not recognized")
         _piper_tts.usage()
         sys.exit(2)
@@ -1399,6 +1503,14 @@ def main() -> None:
                 a = os.path.expanduser(a)
             if os.path.isfile(a):
                 _config = a
+        elif o in ("-p", "--player"):
+            try_player = _player
+            try:
+                try_player = int(a)
+            except (TypeError, ValueError):
+                try_player = _player
+            if try_player > _player:
+                _player = try_player
         elif o in ("-r", "--rate"):
             _percent_rate = a
         elif o in ("-v", "--voice"):
@@ -1439,7 +1551,7 @@ def main() -> None:
         False,
     )
     _piper_tts.read(
-        _text_file_in, _iso_lang, _config, netcommon.speech_wpm(_percent_rate)
+        _text_file_in, _iso_lang, _config, netcommon.speech_wpm(_percent_rate), _player
     )
     if _piper_tts.debug != 0:
         print(_piper_tts.load_instructions(True))
@@ -1458,4 +1570,4 @@ if __name__ == "__main__":
 # strings like '`eye`, `bye`, `no`, `No`, `null`, `nil`, `None`, `don't` and
 # `False`.
 #
-# Copyright (c) 2023 James Holgate
+# Copyright (c) 2024 James Holgate

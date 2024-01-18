@@ -21,17 +21,17 @@
   <dlg:button dlg:id="CommandButton2" dlg:tab-index="2" dlg:left="172" dlg:top="193" dlg:width="66" dlg:height="16" dlg:help-text="https://sites.google.com/site/readtextextension/" dlg:value="CommandButton2" dlg:grab-focus="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.webHelpButton?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:img dlg:style-id="0" dlg:id="ImageControl1" dlg:tab-index="8" dlg:left="6" dlg:top="14" dlg:width="39" dlg:height="46" dlg:scale-image="false" dlg:scale-mode="none">
+  <dlg:img dlg:style-id="0" dlg:id="ImageControl1" dlg:tab-index="8" dlg:left="6" dlg:top="14" dlg:width="39" dlg:height="46" dlg:scale-image="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.AboutButton_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:img>
-  <dlg:img dlg:style-id="0" dlg:id="ImageControl2" dlg:tab-index="9" dlg:left="3" dlg:top="191" dlg:width="30" dlg:height="20" dlg:scale-image="false" dlg:scale-mode="none">
+  <dlg:img dlg:style-id="0" dlg:id="ImageControl2" dlg:tab-index="9" dlg:left="3" dlg:top="191" dlg:width="30" dlg:height="20" dlg:scale-image="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.myBeep?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:img>
   <dlg:text dlg:id="Label1" dlg:tab-index="10" dlg:left="59" dlg:top="197" dlg:width="29" dlg:height="14" dlg:value="0000"/>
   <dlg:text dlg:id="Label2" dlg:tab-index="11" dlg:left="112" dlg:top="197" dlg:width="29" dlg:height="14" dlg:value="   "/>
-  <dlg:img dlg:style-id="0" dlg:id="ImageControl3" dlg:tab-index="12" dlg:left="37" dlg:top="188" dlg:width="20" dlg:height="26" dlg:scale-image="false" dlg:scale-mode="none"/>
-  <dlg:img dlg:style-id="0" dlg:id="ImageControl4" dlg:tab-index="13" dlg:left="90" dlg:top="188" dlg:width="20" dlg:height="26" dlg:scale-image="false" dlg:scale-mode="none"/>
-  <dlg:img dlg:style-id="0" dlg:id="ImageControl5" dlg:tab-index="14" dlg:left="143" dlg:top="188" dlg:width="20" dlg:height="26" dlg:scale-image="false" dlg:scale-mode="none">
+  <dlg:img dlg:style-id="0" dlg:id="ImageControl3" dlg:tab-index="12" dlg:left="37" dlg:top="188" dlg:width="20" dlg:height="26" dlg:scale-image="false"/>
+  <dlg:img dlg:style-id="0" dlg:id="ImageControl4" dlg:tab-index="13" dlg:left="90" dlg:top="188" dlg:width="20" dlg:height="26" dlg:scale-image="false"/>
+  <dlg:img dlg:style-id="0" dlg:id="ImageControl5" dlg:tab-index="14" dlg:left="143" dlg:top="188" dlg:width="20" dlg:height="26" dlg:scale-image="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.windowsSAPIControl?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:img>
  </dlg:bulletinboard>

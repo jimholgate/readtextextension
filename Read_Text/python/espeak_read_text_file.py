@@ -75,7 +75,7 @@ See the manual page for `espeak` for more detailed information
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2023 James Holgate
+Copyright (c) 2011 - 2024 James Holgate
 
 """
 from __future__ import absolute_import, division, print_function, unicode_literals

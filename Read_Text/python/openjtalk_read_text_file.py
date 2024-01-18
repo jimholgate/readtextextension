@@ -45,7 +45,7 @@ The Japanese source text might be coded as `shift_jis`:
 
 [`shift_jis` to `utf_8`](https://gist.github.com/dogancelik/2777851)
 
-Copyright (c) 2023 James Holgate
+Copyright (c) 2024 James Holgate
 
 """
 from __future__ import absolute_import, division, print_function, unicode_literals

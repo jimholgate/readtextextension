@@ -1640,7 +1640,7 @@ Sub dialog1Combo2ShowSAPIChoices( _
 		sSelectionLangCountryTag = &quot; /language:&quot;&quot;en-US&quot;&quot;&quot;
 		sSelectionLanguageTag = &quot;en&quot;
 	End If
-
+	On Error Goto FichierKO
 	While n &lt; Sapi.GetVoices.Count
 		s1 = Sapi.GetVoices.Item(n).GetDescription
 		For n1 = 10 To - 10 step - 2
@@ -2132,7 +2132,7 @@ Sub dialog1Combo2ShowMEDIAChoices( _
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
 	Rem first remove all old items from the list = 
 	oComboBox.removeItems(0, oComboBox.getItemCount())
-	For n = Lbound(a1) To Ubound(a2)
+	For n = Lbound(a1) To Ubound(a1)
 		s1 = s1 &amp; a1(n) &amp; Chr(10)
 		oComboBox.addItem(a1(0), 0)
 	Next
@@ -2332,6 +2332,12 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	Dim bEnableLocalHostRate As Boolean : bEnableLocalHostRate = True
 	Dim sGetOS As String : sGetOS = fsGetOS()
 	Dim local_suggestion As String
+	Dim player7 As String : player7 = &quot;&quot;
+	Select Case sGetOS
+		Case &quot;WINDOWS&quot;, &quot;MacOS&quot;
+		player7 = &quot; --player 7&quot;		
+	End Select 
+	
 	If Len(getControl) = 0 Then
 		getControl = &quot;ComboBox2&quot;
 	End If
@@ -2575,17 +2581,17 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	If fbPiperTtsOk(&quot;&quot;) Then
 		local_suggestion = PiperLocalSuggestion(&quot;&quot;)
 		Redim _opts : _opts = Array(_
-		&quot; --rate 125% --voice AUTO1#4&quot;,_
-		&quot; --rate 100% --voice AUTO1#0&quot;,_
-		&quot; --rate 75% --voice AUTO1#64&quot;,_
-		&quot; --voice en_US-lessac-high#0&quot;,_
-		&quot; --voice en_US-arctic-medium#jmk&quot;,_
-		&quot; --voice en_GB-vctk-medium#p278&quot;,_
-		&quot; --rate 125% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
-		&quot; --rate 100% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
-		&quot; --rate 75% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
-		&quot; --update True --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
-		&quot; --update True&quot;,_
+			player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
+			player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
+			player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
+			player7 &amp; &quot; --voice en_US-lessac-high#0&quot;,_
+			player7 &amp; &quot; --voice en_US-arctic-medium#jmk&quot;,_
+			player7 &amp; &quot; --voice en_GB-vctk-medium#p278&quot;,_
+			player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
+			player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
+			player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
+			player7 &amp; &quot; --update True --voice &quot; &amp; local_suggestion &amp; &quot;#0&quot;, _
+			player7 &amp; &quot; --update True&quot;,_
 		&quot;&quot;)
 		For n = Lbound(_opts) to Ubound(_opts)
 			If Instr(_opts(n), &quot;--update True --voice&quot;) = 0 Then
@@ -2939,14 +2945,194 @@ End Sub
 
 
 Function fsAbout() As String
+	&apos; The extension location shows in the xml document located in the
+	&apos; `com.sun.star.comp.deployment.bundle.PackageRegistryBackend`
+	&apos; directory. On an unsupported platform, the lookup of 
+	&apos; `/singletons/com.sun.star.deployment.PackageInformationProvider`
+	&apos; returns `&quot;&quot;` instead of the extension URI.
 	fsAbout = getTextFromFile(fsDescriptionDoc(), &quot;UTF-8&quot;)
 	&apos; Application&apos;s Default encoding
+	If Len(fsAbout) = 0 Then
+		fsAbout = Join( _
+		Array( _
+		&quot;`/singletons/com.sun.star.deployment.PackageInformationProvider` returned `&quot;&quot;`&quot;, _
+		&quot;&quot;, _
+		&quot;“Read Text Extension” does not support the current implimentation of the “&quot; &amp; fsGetOS() &amp; &quot;” platform.&quot;, _
+		&quot;&quot;, _
+		&quot;This extension uses an external program or a web service to read text.&quot;, _
+		&quot;Read the selection with Calc, Draw, Impress, Web Writer and Writer.&quot;, _
+		&quot;Read the contents of the clipboard. Use speech synthesis to help to edit&quot;, _
+		&quot;documents. Compare computer documents with printed documents. Learn a new&quot;, _
+		&quot;language. Learn how to pronounce words correctly. Easily transfer text to&quot;, _
+		&quot;your mobile device using QR Codes.&quot;, _
+		), _
+		Chr$(13))
+	End If
+End Function
+
+Function fsVBCodeHead()
+
+Dim sA$ : sA = &quot;&apos;&apos;&apos;\n&quot; &amp; _
+		&quot;&apos;&apos; Read text\n&quot; &amp; _
+		&quot;&apos;&apos; =========\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; **Read Text** reads text aloud, saves audio files and\n&quot; &amp; _
+		&quot;&apos;&apos; can use resources from the web based on the selected\n&quot; &amp; _
+		&quot;&apos;&apos; text.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; * Select text.\n&quot; &amp; _
+		&quot;&apos;&apos; * Click the *Read selection* button.\n&quot; &amp; _
+		&quot;&apos;&apos; * To read aloud, accept the default in the dialogue, or choose\n&quot; &amp; _
+		&quot;&apos;&apos;   another action from the menus.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; Saving files\n&quot; &amp; _
+		&quot;&apos;&apos; ------------\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; Windows lets you save sound files in an uncompressed`.wav` format.\n&quot; &amp; _
+		&quot;&apos;&apos; To save space, convert `.wav` files to small `.m4a` or `mp3` files\n&quot; &amp; _
+		&quot;&apos;&apos; that you can share on most mobile phones, music players and tablets.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; Language support\n&quot; &amp; _
+		&quot;&apos;&apos; ----------------\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; This script uses the Windows speech application programming\n&quot; &amp; _
+		&quot;&apos;&apos; interface (`SAPI`). Depending on the version and locale of\n&quot; &amp; _
+		&quot;&apos;&apos; Windows, voices in different languages may be available.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; Examples:\n&quot; &amp; _
+		&quot;&apos;&apos; ---------\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; External program:\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	C:\Windows\System32\wscript.exe\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; Command line options (default):\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; or (save as a .wav file in the home directory):\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /soundfile:&quot;&quot;(HOME)(NOW).wav&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; or (use a named voice)\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /voice:&quot;&quot;Microsoft Hortense Desktop - French&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; or (read a little slower)\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /rate:-3 &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; or (change voice by language)\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /language:&quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; **Note**: Selecting this option doesn&apos;t work with the SAPI\n&quot; &amp; _
+		&quot;&apos;&apos; speech synthesizer if you haven&apos;t installed a voice in the\n&quot; &amp; _
+		&quot;&apos;&apos; language.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; Visual helper programs\n&quot; &amp; _
+		&quot;&apos;&apos; ======================\n&quot; &amp; _
+		&quot;&apos;&apos;\n&quot; &amp; _
+		&quot;&apos;&apos; Read Text can use helper programs to save audio files using MP3 and other formats.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; ## iTunes\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; **iTunes** is a visual music manager from Apple available at no cost. This\n&quot; &amp; _
+		&quot;&apos;&apos; application allows you to convert sound to different formats. Read text\n&quot; &amp; _
+		&quot;&apos;&apos; can use [iTunes](https://www.apple.com/itunes/) to convert sound files with metadata\n&quot; &amp; _
+		&quot;&apos;&apos; and album cover art. The first time you use iTunes it can take a moment to start.\n&quot; &amp; _
+		&quot;&apos;&apos; iTunes creates an audio file in it&apos;s own directory and signals you with a sound.\n&quot; &amp; _
+		&quot;&apos;&apos; Read Text Extension puts a copy in a sound directory in your home directory.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /language:&quot;&quot;en-US&quot;&quot; /soundfile:&quot;&quot;(HOME)en\(NOW).aif&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /language:&quot;&quot;en-US&quot;&quot; /soundfile:&quot;&quot;(HOME)en\(NOW).m4a&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /language:&quot;&quot;en-US&quot;&quot; /soundfile:&quot;&quot;(HOME)en\(NOW).mp3&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos;\n&quot; &amp; _
+		&quot;&apos;&apos; ## VideoLAN VLC\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; [VideoLAN VLC](https://videolan.org/vlc) is a free viewer, streamer and converter. \n&quot; &amp; _
+		&quot;&apos;&apos; To use VLC, install the desktop application using the installer program default\n&quot; &amp; _
+		&quot;&apos;&apos; location. The script for VLC compresses audio files quickly, and the resulting\n&quot; &amp; _
+		&quot;&apos;&apos; file does not include personalized metadata. In some cases, your system security\n&quot; &amp; _
+		&quot;&apos;&apos; policies will prevent this script from running VLC directly, although you will\n&quot; &amp; _
+		&quot;&apos;&apos; still be able to compress audio files using the desktop application or a `vlc.exe`\n&quot; &amp; _
+		&quot;&apos;&apos; command  from the system Command Prompt program.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /use-optional-app:&quot;&quot;True&quot;&quot; /soundfile:&quot;&quot;(HOME)en\(NOW).mp3&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /use-optional-app:&quot;&quot;True&quot;&quot; /soundfile:&quot;&quot;(HOME)en\(NOW).ogg&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos;\n&quot; &amp; _
+		&quot;&apos;&apos; Command line programs\n&quot; &amp; _
+		&quot;&apos;&apos; =====================\n&quot; &amp; _
+		&quot;&apos;&apos;\n&quot; &amp; _
+		&quot;&apos;&apos; These programs are more challenging to install and use on Windows than visual helper\n&quot; &amp; _
+		&quot;&apos;&apos; programs. You can install them locally in the Windows user `LOCALAPPDATA` directory,\n&quot; &amp; _
+		&quot;&apos;&apos; or choose a custom directory by setting the `READTEXTHELPER` environment variable\n&quot; &amp; _
+		&quot;&apos;&apos; to a directory that you specify.\n&quot; &amp; _
+		&quot;&apos;&apos;\n&quot; &amp; _
+		&quot;&apos;&apos; ## FFmpeg\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; [ffmpeg](https://ffmpeg.org/download.html#build-windows) is a free media converter. \n&quot; &amp; _
+		&quot;&apos;&apos; If it is correctly installed, you will see these options in the Read Text extension\n&quot; &amp; _
+		&quot;&apos;&apos; main dialogue.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /use-optional-app:&quot;&quot;True&quot;&quot; /soundfile:&quot;&quot;(HOME)en\(NOW).mp3&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /use-optional-app:&quot;&quot;True&quot;&quot; /soundfile:&quot;&quot;(HOME)en\(NOW).ogg&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; ## Flac\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; **[FLAC](https://xiph.org/flac/)** is a free lossless audio codec.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;  * [Get flac encoder](https://xiph.org/flac/links.html#software)\n&quot; &amp; _
+		&quot;&apos;&apos;  * [Players and plugins](https://xiph.org/flac/)\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /use-optional-app:&quot;&quot;True&quot;&quot; /soundfile:&quot;&quot;(HOME)en\(NOW).flac&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; ## Lame\n&quot; &amp; _
+		&quot;&apos;&apos;\n&quot; &amp; _
+		&quot;&apos;&apos; **[LAME](https://lame.sourceforge.io/)** (Lame Ain&apos;t an MP3 Encoder)\n&quot; &amp; _
+		&quot;&apos;&apos; is an open source project that creates MP3 compatible audio files\n&quot; &amp; _
+		&quot;&apos;&apos; with options to specify compression and psychoacoustic properties.\n&quot; &amp; _
+		&quot;&apos;&apos;\n&quot; &amp; _
+		&quot;&apos;&apos; &gt; LAME is an educational tool to be used for learning about MP3 encoding.\n&quot; &amp; _
+		&quot;&apos;&apos; &gt;\n&quot; &amp; _
+		&quot;&apos;&apos; &gt; -- *[About LAME](https://lame.sourceforge.io/about.php)*. LAME Project. (2020).\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;  * [Get Lame encoder](https://lame.sourceforge.io/links.php#Binaries)\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /use-optional-app:&quot;&quot;True&quot;&quot; /soundfile:&quot;&quot;(HOME)en\(NOW).mp3&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; ## OggEnc\n&quot; &amp; _
+		&quot;&apos;&apos;\n&quot; &amp; _
+		&quot;&apos;&apos; **[OGG](https://xiph.org/vorbis/)** is a file format that uses free \n&quot; &amp; _
+		&quot;&apos;&apos; audio codecs.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; Play ogg encoded sound files with Firefox and browsers based on the Chromium\n&quot; &amp; _
+		&quot;&apos;&apos; platform, like Chrome and Edge.\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; Use `oggenc.exe` or `oggenc2.exe` to make an ogg file\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;  * [About oggenc2 encoder](https://www.rarewares.org/ogg.php)\n&quot; &amp; _
+		&quot;&apos;&apos;  * [Players and plugins](https://xiph.org/vorbis/)\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos;	 &quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /use-optional-app:&quot;&quot;True&quot;&quot; /soundfile:&quot;&quot;(HOME)en\(NOW).ogg&quot;&quot; &quot;&quot;(TMP)&quot;&quot;\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; ----------------------------------------------------------------------------\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; [Read Text Extension](https://sites.google.com/site/readtextextension/)\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; Copyright (c) 2011 - 2024 James Holgate\n&quot; &amp; _
+		&quot;&apos;&apos; \n&quot; &amp; _
+		&quot;&apos;&apos; &lt;https://raw.githubusercontent.com/jimholgate/readtextextension/master/Read_Text/script/tts_wscript.vbs&gt;&quot;
+		fsVBCodeHead = fsReplaceText(sA, &quot;\n&quot;, Chr(13))
 End Function
 
 
 Function fsVBSTextString() As String
 	fsVBSTextString = getTextFromFile(fsTTSScriptVBS(), &quot;iso-8859-15&quot;)
-	&apos;iso-8859-15 Windows encoding
+	If Len(fsVBSTextString) = 0 Then
+		fsVBSTextString = fsVBCodeHead()
+	End If
+	&apos;iso-8859-15 Windows encoding similar to `latin-1&apos;
 End Function
 
 
@@ -3002,10 +3188,14 @@ Function getTextFromFile( _
 	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t=53813
 	&apos; Use simpleFileAccess instead of Basic file handling to 
 	&apos; translate encoded text
+	getTextFromFile = &quot;&quot;
 	Dim myTextFile As Object,sf As Object,fileStream As Object
 	Dim aLineOfText As String,myFilePath As String
 	
 	myFilePath = convertToURL(sFilePath)
+	If not FileExists(sFilePath) Then
+		Exit Function
+	End if
 	sf = createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
 	On Error Goto fichierKO
 	fileStream = sf.openFileRead(myFilePath)
@@ -3947,6 +4137,7 @@ Function fbWindowsHasVoiceInThisLanguage( _
 		sLang = fsGetSetting(&quot;language&quot;)
 	End If
 	sLang = LCase(sLang)
+	On Error GoTo fbWindowsHasVoiceInThisLanguageErr
 	fbWindowsHasVoiceInThisLanguage = False
 	Set Sapi = CreateObject(&quot;Sapi.SpVoice&quot;)
 	s1 = LCase(isoToEnglish(sLang))
@@ -3960,7 +4151,7 @@ Function fbWindowsHasVoiceInThisLanguage( _
 	Next
 	Set Sapi = Nothing
 	Exit Function
-	VoiceTestError
+	fbWindowsHasVoiceInThisLanguageErr:
 	
 	fbWindowsHasVoiceInThisLanguage = False
 	On Error Resume Next
@@ -4004,6 +4195,7 @@ Function fsWindowsCloseMatchVoice(s1)
 	Dim s4
 	s4 = fsIsoToHumanReadable(s1, 1)
 	Dim Sapi
+	On Error GoTo fsWindowsCloseMatchVoiceErr 
 	Set Sapi = CreateObject(&quot;Sapi.SpVoice&quot;)
 	&apos; Microsoft SAPI voices have a predictable naming pattern that includes
 	&apos; the language name in the form - `Microsoft David Desktop - English (United States)
@@ -4028,6 +4220,9 @@ Function fsWindowsCloseMatchVoice(s1)
 			Next
 		End If
 	End If
+	Exit Function
+	fsWindowsCloseMatchVoiceErr:
+	fsWindowsCloseMatchVoice = &quot;en-US&quot;
 End Function
 
 
@@ -5296,6 +5491,12 @@ Sub windowsSAPIControl(Event As Object)
 	Dim MouseMain As Integer : MouseMain = 1
 	Dim MouseAlt As Integer : MouseAlt = 2
 	Dim MouseOther As Integer : MouseOther = 3
+	If fbExperimentalMode() Then
+		&apos; You have enabled the Experimental Mode so this Dialog3
+		&apos; control edits JSON lexicon files by default.
+		MouseAlt = 1
+		MouseMain = 2	
+	End If
 	Dim MouseEvent As Integer : MouseEvent = fiMyMouseEventToInt(Event)
 
 	oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
@@ -7540,8 +7741,8 @@ End Function
 
 
 Function fbExperimentalMode() As Boolean
-&apos; return `True` if the `Tools - Options - Advanced - Experimental` checkbox
-&apos; is enabled.
+	&apos; If you enable the Office Experimental Mode, the extension unlocks
+	&apos; some tools and does not change what you enter into the main dialog.
 	If Not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
 	End If
@@ -7573,8 +7774,9 @@ Function fsGetThisUsers( _
 	Dim snval$
 	Dim gnval$	
 	Dim sFullname  &apos; We combine your first and last names.	
-	snval = oNode.getByName(&quot;sn&quot;)
-	gnval = oNode.getByName(&quot;givenname&quot;)
+		
+	snval$ = oNode.getByName(&quot;sn&quot;)
+	gnval$ = oNode.getByName(&quot;givenname&quot;)
 	Select Case fsGetSetting(&quot;language&quot;)
 		Case &quot;zh&quot;, &quot;jp&quot;, &quot;ja&quot;, &quot;yu&quot;, &quot;ko&quot; &apos;Asian
 		sFullname = snval &amp; gnval

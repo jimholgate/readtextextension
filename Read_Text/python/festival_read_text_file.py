@@ -86,7 +86,7 @@ See "Festival can not speak other voices than default english" (sic)
 
 [Read Text Extension][3]
 
-Copyright (c) 2011 - 2023 James Holgate
+Copyright (c) 2011 - 2024 James Holgate
 
   [1]: http://cmuflite.org
   [2]: https://www.cs.cmu.edu/~awb/festival_demos/sable.html

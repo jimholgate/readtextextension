@@ -45,11 +45,10 @@ Currently, python3 is *required* for `speech-dispatcher`.  Python2 requires the
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2023 James Holgate
+Copyright (c) 2011 - 2024 James Holgate
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import codecs
-import getopt
 import glob
 import locale
 import math
@@ -66,53 +65,59 @@ except ImportError:
     pass
 
 try:
+    import getopt
+except (ImportError, AssertionError):
+    pass
+
+try:
     import json
-except ImportError:
+except (ImportError, AssertionError):
     pass
 
 try:
     import platform
-except ImportError:
+except (ImportError, AssertionError):
     pass
+
 try:
     import psutil
-except ImportError:
+except (ImportError, AssertionError):
     pass
 
 try:
     import site
-except ImportError:
+except (ImportError, AssertionError):
     pass
 
 try:
     import subprocess
-except ImportError:
+except (ImportError, AssertionError):
     pass
 
 try:
     import tkinter
-except ImportError:
+except (ImportError, AssertionError):
     pass
 
 try:
     import wave
-except ImportError:
+except (ImportError, AssertionError):
     pass
 
 try:
     import webbrowser
-except ImportError:
+except (ImportError, AssertionError):
     pass
 
 try:
     import winsound
-except ImportError:
+except (ImportError, AssertionError):
     pass
 
 try:
     import urllib.parse as urlparse
     import urllib.request as urllib
-except ImportError:
+except (ImportError, AssertionError):
     try:
         import urlparse
         import urllib
@@ -124,7 +129,7 @@ try:
 
     gi.require_version("Gst", "1.0")
     from gi.repository import Gst
-except (ImportError, ValueError):
+except (ImportError, ValueError, AssertionError):
     pass
 
 try:
@@ -134,12 +139,12 @@ except ImportError:
 
 try:
     import pathlib
-except ImportError:
+except (ImportError, AssertionError):
     pass
 
 try:
     import webbrowser
-except ImportError:
+except (ImportError, AssertionError):
     pass
 
 LOOK_UPS = 0
@@ -268,7 +273,7 @@ def have_posix_app(posix_app="vlc", do_test=True):  # -> bool
         return False
     if not bool(posix_app):
         return False
-    for _base_path in os.environ["PATH"].split(":"):
+    for _base_path in os.environ["PATH"].split(os.pathsep):
         if os.path.isfile(os.path.join(_base_path, posix_app)):
             return True
     if bool(do_test):
@@ -655,12 +660,12 @@ def default_lang():  # -> str
     _lang = ""
     try:
         _lang = os.getenv("LANG")
-    except AttributeError:
+    except (AttributeError, TypeError):
         pass
     if not bool(_lang):
         try:
             _lang = os.getenv("LANGUAGE")
-        except AttributeError:
+        except (AttributeError, TypeError):
             pass
     if not bool(_lang):
         _lang = locale.getdefaultlocale()[0]
@@ -721,14 +726,17 @@ def gst_plugin_path(plug_in_name="libgstvorbis"):  # -> str
     _paths = sys_machine_paths()
     _ext = ".so"
     if have_posix_app("say", False):
-        _paths = [os.path.join(os.getenv("HOME"), "/"), os.getenv("GST_PLUGIN_PATH")]
+        _paths = [
+            os.path.join(os.path.expanduser("~"), os.path.sep),
+            os.getenv("GST_PLUGIN_PATH"),
+        ]
         _ext = ".dylib"
     elif os.name == "nt":
         _paths = [
-            "".join([os.getenv("USERPROFILE"), "\\"]),
-            os.path.join(os.getenv("HOMEDRIVE"), "gstreamer-sdk", "/"),
+            "".join([os.getenv("USERPROFILE"), os.path.sep]),
+            os.path.join(os.getenv("HOMEDRIVE"), "gstreamer-sdk", os.path.sep),
             os.getenv("GST_PLUGIN_PATH"),
-            os.path.join(os.getenv("HOMEDRIVE"), "/opt/"),
+            os.path.join(os.getenv("HOMEDRIVE"), "opt", os.path.sep),
         ]
         _ext = ".dll"
 
@@ -1046,19 +1054,19 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
     if int(platform.python_version_tuple()[0].strip()) < 3:
         return ""
     if os.name == "nt":
-        profile = os.getenv("LOCALAPPDATA").strip(os.sep)
+        profile = os.getenv("LOCALAPPDATA").strip(os.path.sep)
         path1 = os.path.join(profile, "Programs", "Python")
         path2 = os.path.join("Lib", "site-packages")
         path3 = path2
     elif have_posix_app("say", False):
-        profile = os.getenv("HOME")
+        profile = profile = os.path.expanduser("~")
         path1 = os.path.join(profile, "Library", "Python")
         py_search = "python{0}".format(py_ver)
         local_pip = local_pip_search(profile, lib_name, py_search)
         if len(local_pip) != 0:
             return local_pip
         if not os.path.isdir(path1):
-            for _test in os.getenv("PATH").split(":"):
+            for _test in os.getenv("PATH").split(os.pathsep):
                 if os.path.isdir(_test) and profile in _test:
                     path1 = _test
                     break
@@ -1074,7 +1082,7 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
             "site-packages",
         )
     elif os.name == "posix":
-        profile = os.getenv("HOME")
+        profile = os.path.expanduser("~")
         path1 = os.path.join(profile, ".local", "lib")
         path2 = os.path.join("lib", "python", "site-packages")
         path3 = path2
@@ -2156,9 +2164,10 @@ class ImportedMetaData(object):
         x_genre = _xml_transform.clean_for_xml(genre)
         x_title = _xml_transform.clean_for_xml(title)
         x_display_path = "~/..."
-        if len(os.getenv("HOME")) != 0:
+        profile = os.path.expanduser("~")
+        if len(os.getenv(profile)) != 0:
             x_display_path = _xml_transform.clean_for_xml(out_path).replace(
-                os.getenv("HOME"), "~"
+                profile, "~"
             )
         out_uri = ""
         if out_path:
@@ -2699,6 +2708,70 @@ The file was saved to:  {0}""".format(
     return True
 
 
+class VlcMuxInfo(object):
+    """The default settings for VideoLAN VLC media conversions"""
+
+    def __init__(self):
+        """Default conversion setting variables"""
+        self.ext = []
+        self.audio_codec = ""
+        self.average_bitrate = ""
+        self.sample_rate = ""
+        self.mux = ""
+        self.channel_count = "1"
+
+    def opus(self):
+        """Opus is a free and flexible audio codec"""
+        self.ext = [".opus"]
+        self.audio_codec = "opus"
+        self.average_bitrate = "16"
+        self.sample_rate = "16000"
+        self.mux = "ogg"
+        self.channel_count = "2"
+
+    def flac(self):
+        """Flac is a free high quality audio codec"""
+        self.ext = [".flac"]
+        self.audio_codec = "flac"
+        self.average_bitrate = "128"
+        self.sample_rate = "44100"
+        self.mux = "raw"
+        self.channel_count = "1"
+
+    def mp3(self):
+        """Mp3 is a common audio codec"""
+        self.ext = [".mp3"]
+        self.audio_codec = "mp3"
+        self.average_bitrate = "128"
+        self.sample_rate = "44100"
+        self.mux = "dummy"
+        self.channel_count = "2"
+
+    def ogg(self):
+        """Ogg is a free audio codec"""
+        self.ext = [".ogg", ".oga"]
+        self.audio_codec = "vorb"
+        self.average_bitrate = "128"
+        self.sample_rate = "44100"
+        self.mux = "ogg"
+        self.channel_count = "2"
+
+    def wave(self):
+        """A wave file is a standard uncompressed audio format"""
+        self.ext = [".wav"]
+        self.audio_codec = "s161"
+        self.average_bitrate = "0"
+        self.sample_rate = "16000"
+        self.mux = "wav"
+        self.channel_count = "1"
+
+    def evaluate_ext(self, _ext):
+        """Set up the variables according to the file extension"""
+        if _ext in self.ext:
+            return True
+        return False
+
+
 def vlc_wav_to_media(
     in_sound_path="",
     out_sound_path="",
@@ -2728,42 +2801,28 @@ def vlc_wav_to_media(
     ext = os.path.splitext(out_sound_path)[1]
     channel_count = ["1", "2"][1]  # mono, stereo
     verbosity = ["", "-vvv "][0]  # no debug, debug
+    _mux_info = VlcMuxInfo()
     if ext == ".flac":
-        audio_codec = "flac"
-        average_bitrate = "128"
-        sample_rate = "44100"
-        mux = "raw"
+        _mux_info.flac()
     elif ext == ".mp3":
-        audio_codec = "mp3"
-        average_bitrate = "128"
-        sample_rate = "44100"
-        mux = "dummy"
+        _mux_info.mp3()
     elif ext in [".ogg", ".oga"]:
-        audio_codec = "vorb"
-        average_bitrate = "128"
-        sample_rate = "44100"
-        mux = "ogg"
+        _mux_info.ogg()
     elif ext == ".opus":
-        audio_codec = "opus"
-        average_bitrate = "16"
-        sample_rate = "16000"
-        mux = "ogg"
+        _mux_info.opus()
     elif ext == ".wav":
-        audio_codec = "s16l"
-        average_bitrate = "0"
-        sample_rate = "16000"
-        mux = "wav"
+        _mux_info.wave()
     else:
         return False
     command = """{app} "{in_sound_path}" --intf dummy {verbosity}--sout="#transcode{{vcodec=none,acodec={audio_codec},ab={average_bitrate},channels={channel_count},samplerate={sample_rate}}}:std{{access=file,mux={mux},dst='{out_sound_path}'}}" vlc://quit""".format(
         app=app,
         in_sound_path=in_sound_path,
         verbosity=verbosity,
-        audio_codec=audio_codec,
-        average_bitrate=average_bitrate,
+        audio_codec=_mux_info.audio_codec,
+        average_bitrate=_mux_info.average_bitrate,
         channel_count=channel_count,
-        sample_rate=sample_rate,
-        mux=mux,
+        sample_rate=_mux_info.sample_rate,
+        mux=_mux_info.mux,
         out_sound_path=out_sound_path,
     )
     if my_os_system(command):
@@ -2779,11 +2838,11 @@ VideoLAN VLC
 * mux = '{mux}'
 * sample rate = '{sample_rate}'
 """.format(
-                audio_codec=audio_codec,
-                average_bitrate=average_bitrate,
+                audio_codec=_mux_info.audio_codec,
+                average_bitrate=_mux_info.average_bitrate,
                 channel_count=channel_count,
-                mux=mux,
-                sample_rate=sample_rate,
+                mux=_mux_info.mux,
+                sample_rate=_mux_info.sample_rate,
             )
         )
         if b_visible and b_audible:
@@ -3203,7 +3262,7 @@ def get_my_lock(_lock=""):  # -> str
         elif bool(os.getenv("TMP")):
             mac_temp = os.getenv("TMP")
         else:
-            mac_temp = os.join(os.getenv("HOME"), "_temporary")
+            mac_temp = os.join(os.path.expanduser("~"), "_temporary")
         if bool(os.getenv("USERNAME")):
             mac_user = os.getenv("USERNAME")
         elif bool(os.getenv("USER")):
@@ -3214,16 +3273,16 @@ def get_my_lock(_lock=""):  # -> str
     else:
         if os.path.isdir("/tmp") and os.access("/tmp", os.W_OK):
             return os.path.join("/tmp", app_sign + "." + os.getenv("USER") + p_lock)
-        elif os.path.isdir(os.path.join(os.getenv("HOME"), ".config/")) and os.access(
-            os.path.join(os.getenv("HOME"), ".config/"), os.W_OK
-        ):
+        elif os.path.isdir(
+            os.path.join(os.path.expanduser("~"), ".config/")
+        ) and os.access(os.path.join(os.path.expanduser("~"), ".config/"), os.W_OK):
             return os.path.join(
-                os.getenv("HOME"),
+                os.path.expanduser("~"),
                 ".config/" + app_sign + "." + os.getenv("USER") + p_lock,
             )
         else:
             return os.path.join(
-                os.getenv("HOME"), app_sign + "." + os.getenv("USER") + p_lock
+                os.path.expanduser("~"), app_sign + "." + os.getenv("USER") + p_lock
             )
     return ""
 
@@ -3329,9 +3388,9 @@ def path2url(_file_path):  # -> str
     except NameError:
         # Fall back works on Posix
         return "file://{0}".format(_file_path.replace(" ", "%20"))
+    
 
-
-def office_user_dir():
+def office_user_dir(_top : str="uno_packages"):  # -> str
     """Returns the local user directory where office stores user assets like
     uno_packages, settings and images. See also `app_icon_image()` for a
     resource search restricted to this extension directory, which your program
@@ -3343,9 +3402,9 @@ def office_user_dir():
     if os.name == "nt":
         drill = ""
     for _subdir in folders:
-        if _subdir == "uno_packages":
+        if _subdir == _top:
             if os.name == "nt":
-                return drill.replace(":", ":\\")
+                return drill.replace(":", ":{os_sep}".format(os_sep=os_sep))
             return drill
         drill = os.path.join(drill, _subdir)
     return drill
@@ -3936,6 +3995,7 @@ def main():  # -> NoReturn
 
 
 if __name__ == "__main__":
+    my_dir = "default"
     main()
 ###############################################################################
 
@@ -3943,7 +4003,7 @@ if __name__ == "__main__":
 #
 # Copyright And License
 #
-# (c) 2023 [James Holgate Vancouver, CANADA](readtextextension(a)outlook.com)
+# (c) 2024 [James Holgate Vancouver, CANADA](readtextextension(a)outlook.com)
 #
 # THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE
 # TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE

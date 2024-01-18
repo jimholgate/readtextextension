@@ -52,7 +52,7 @@ See the manual page for `pico2wave` for more detailed information
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2023 James Holgate
+Copyright (c) 2011 - 2024 James Holgate
 
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -91,15 +91,15 @@ Usage
 
 
 def picoread(
-    _text,
-    _language,
-    _visible,
-    _audible,
-    _media_file,
-    _image,
-    _title,
-    _artist,
-    _dimensions,
+    _text = "",
+    _language="en-US",
+    _visible="false",
+    _audible="true",
+    _media_file="",
+    _image="",
+    _title="",
+    _artist="",
+    _dimensions="600x600",
 ):
     """
     _text - Actual text to speak. The file must be written as utf-8.
@@ -168,7 +168,7 @@ def picoread(
         if readtexttools.my_os_system(_os_command):
             if os.path.getsize(_work_file) == 0:
                 return False
-            readtexttools.process_wav_media(
+            return readtexttools.process_wav_media(
                 _title,
                 _work_file,
                 _image,
@@ -178,7 +178,6 @@ def picoread(
                 _artist,
                 _dimensions,
             )
-            return True
     except IOError:
         print("I was unable to read!")
         usage()
