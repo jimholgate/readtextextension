@@ -179,8 +179,8 @@ Fingerprint
 ```
 """
         )
-    if args.json:
-        save_text(f"""{archive_output_name}.json""", _json)
+        if args.json:
+            save_text(f"""{archive_output_name}.json""", _json)
 
 
 if __name__ == "__main__":
