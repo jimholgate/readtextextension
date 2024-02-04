@@ -1,0 +1,123 @@
+{
+    "ar": {
+        "$[LANGUAGE_ENGLISH]": "Arabic",
+        "About": " حول",
+        "Download a compatible voice model": " تحميل نموذج صوتي متوافق",
+        "No voice model found": " لم يتم العثور على نموذج صوتي",
+        "Python error": "خطأ `python`",
+        "Read Text": " اقرأ النص",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": " العميل Piper_TTS لا يجد نموذج صوتي متوافق",
+        "`gtts` failed to connect.": "فشل `gtts` في الاتصال.",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": "`qrcode` مفقود. `تثبيت pip3 qrcode[pil]`"
+    },
+    "de": {
+        "$[LANGUAGE_ENGLISH]": "German",
+        "About": "Über",
+        "Download a compatible voice model": "Laden Sie ein kompatibles Sprachmodell herunter",
+        "No voice model found": "Kein Sprachmodell gefunden",
+        "Python error": "Python-Fehler",
+        "Read Text": "Read Text",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": "Der Piper_TTS-Client kann kein kompatibles Sprachmodell.",
+        "`gtts` failed to connect.": "`gtts` konnte keine Verbindung herstellen.",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": "`qrcode` fehlt. `pip3 install qrcode[pil]`"
+    },
+    "es": {
+        "$[LANGUAGE_ENGLISH]": "Spanish",
+        "About": "Acerca de",
+        "Download a compatible voice model": "Descargar un modelo de voz compatible",
+        "No voice model found": "No se encontró ningún modelo de voz",
+        "Python error": "Error de Python",
+        "Read Text": "Read Text",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": "El cliente Piper_TTS no puede encontrar un modelo de voz compatible.",
+        "`gtts` failed to connect.": "`gtts` no pudo conectarse.",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": "Falta `qrcode`. `pip3 install qrcode[pil]`"
+    },
+    "fi": {
+        "$[LANGUAGE_ENGLISH]": "Finnish",
+        "About": "Tietoja",
+        "Download a compatible voice model": "Lataa yhteensopiva äänimalli",
+        "No voice model found": "Äänimallia ei löytynyt",
+        "Python error": "Python-virhe",
+        "Read Text": "Read Text",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": "Piper_tts-asiakasohjelma ei löydä yhteensopivaa äänimallia kielellesi.",
+        "`gtts` failed to connect.": "'gtts' ei toiminut kunnolla.",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": "`qr-code` puuttuu. 'pip3 asenna qr-koodi[pil]'"
+    },
+    "fr": {
+        "$[LANGUAGE_ENGLISH]": "French",
+        "About": "À propos",
+        "Download a compatible voice model": "Télécharger un modèle vocal compatible",
+        "No voice model found": "Aucun modèle vocal trouvé",
+        "Python error": "Erreur python",
+        "Read Text": "Read Text",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": "Le client Piper_TTS ne trouve pas de modèle vocal compatible.",
+        "`gtts` failed to connect.": "`gtts` n'a pas réussi à se connecter.",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": "`qrcode` manquant. `pip3 install qrcode[pil]`"
+    },
+    "he": {
+        "$[LANGUAGE_ENGLISH]": "Hebrew",
+        "About": "אוֹדוֹת",
+        "Download a compatible voice model": " להוריד מודל קולי תואם",
+        "No voice model found": " לא נמצא מודל קולי",
+        "Python error": "שגיאת 'python'",
+        "Read Text": "Read Text",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": " לקוח Piper_TTS לא מוצא מודל קולי תואם",
+        "`gtts` failed to connect.": "`gtts` לא הצליח להתחבר.",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": "'qrcode' חסר. `pip3 התקן qrcode[pil]`"
+    },
+    "hi": {
+        "$[LANGUAGE_ENGLISH]": "Hindi",
+        "About": "के बारे में",
+        "Download a compatible voice model": " संगत वाणी मॉडल डाउनलोड करें",
+        "No voice model found": " संगत वाणी मॉडल डाउनलोड करें",
+        "Python error": "'python' त्रुटि",
+        "Read Text": " पाठ पढ़ें",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": " Piper_TTS क्लाइंट को संगत वाणी मॉडल नहीं मिल रहा है",
+        "`gtts` failed to connect.": " `gtts` से कनेक्ट नहीं हो सका",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": " `qrcode` गुम है। `pip3 install qrcode[pil]`"
+    },
+    "pt": {
+        "$[LANGUAGE_ENGLISH]": "Portuguese",
+        "About": "Sobre",
+        "Download a compatible voice model": "Baixar um modelo de voz compatível",
+        "No voice model found": "Nenhum modelo de voz encontrado",
+        "Python error": "Erro python",
+        "Read Text": "Read Text",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": "O cliente Piper_TTS não encontra um modelo de voz compatível",
+        "`gtts` failed to connect.": "gtts não conseguiu se conectar.",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": "qrcode faltando. pip3 install qrcode[pil]"
+    },
+    "ru": {
+        "$[LANGUAGE_ENGLISH]": "Russian",
+        "About": "О программе",
+        "Download a compatible voice model": "Скачать совместимую голосовую модель",
+        "No voice model found": "Голосовая модель не найдена",
+        "Python error": "Ошибка python",
+        "Read Text": "Read Text",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": "Клиент Piper_TTS не находит совместимую голосовую модель.",
+        "`gtts` failed to connect.": "`gtts` не удалось подключиться",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": "Отсутствует `qrcode`. `pip3 install qrcode[pil]"
+    },
+    "uk": {
+        "$[LANGUAGE_ENGLISH]": "Ukrainian",
+        "About": "Про програму",
+        "Download a compatible voice model": "Завантажити сумісну голосову модель",
+        "No voice model found": "Голосову модель не знайдено",
+        "Python error": "Помилка python",
+        "Read Text": "Read Text",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": "Le client Piper_TTS ne trouve pas de modèle vocal compatible.",
+        "`gtts` failed to connect.": "`gtts` не вдалося підключитися",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": "Відсутній `qrcode`. `pip3 install qrcode[pil]"
+    },
+    "zh": {
+        "$[LANGUAGE_ENGLISH]": "Chinese",
+        "About": "关于",
+        "Download a compatible voice model": "下载兼容的语音模型",
+        "No voice model found": "找不到语音模型",
+        "Python error": "Python错误",
+        "Read Text": "阅读文本",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": "Piper_TTS客户端找不到兼容的语音模型",
+        "`gtts` failed to connect.": "`gtts` n'a pas réussi à se connecter.",
+        "`qrcode` missing. `pip3 install qrcode[pil]`": "缺少`qrcode`。`pip3 install qrcode[pil]`"
+    }
+}

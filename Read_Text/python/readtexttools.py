@@ -58,6 +58,7 @@ import sys
 import tempfile
 import threading
 import time
+import unicodedata
 
 try:
     import dbus
@@ -145,6 +146,11 @@ except (ImportError, AssertionError):
 try:
     import webbrowser
 except (ImportError, AssertionError):
+    pass
+
+try:
+    import l10n
+except(ImportError, AssertionError, SyntaxError):
     pass
 
 LOOK_UPS = 0
@@ -1239,7 +1245,117 @@ def is_container_instance():  # -> bool
     return False
 
 
-def pop_message(summary="Note", msg="", m_sec=8000, my_icon="", urgent=1):  # -> bool
+def pop_win_msg_box(msg="", msg_h1="", dialog_title="", f_logo_src="", m_sec=5000):
+    """
+    Pop up a message box that closes after a few seconds. The dialog uses the
+    Read Text logo and shows the information using standard Internet Explorer
+    advisory style. NOTE: This method of displaying text will not work on all
+    platforms (i. e. Wine for Posix or Python versions < 3.3). Don't use it for
+    critical messages.
+    """
+    _xml_transform = XmlTransform()
+    # Malicious programs can use `mshta.exe` inappropriately, so always ensure
+    # that the HTA applications you are running come from a trusted
+    # source. The code below only uses it to display a message and to close
+    # the window after a few seconds. It also "escapes" characters that
+    # users might input that JavaScript uses so that it appears as inline
+    # text instead of acting as program instructions.
+    #
+    # Escape any code-like characters:
+    _strict = True
+    _msg = _xml_transform.clean_for_xml(msg, _strict)
+    _msg_h1 = _xml_transform.clean_for_xml(msg_h1, _strict)
+    _dialog_title = _xml_transform.clean_for_xml(dialog_title, _strict)
+    out_file = os.path.join(tempfile.gettempdir(), "read-text-advisory.html")
+    try:
+        _stime = safechars(str(m_sec), "1234567890")
+    except:
+        _stime = "8000"
+    try:
+        if int(_stime) < 100:
+            _stime = 100
+    except ValueError:
+        _stime = "8000"
+    s1 = ""
+    try:
+        s1 = f"""
+<html>
+<head>
+<script> 
+window.resizeTo(600,180);
+setTimeout(function(){{window.close();}}, {_stime});
+</script>
+<HTA:APPLICATION ID="objReadTextDialog" 
+                APPLICATIONNAME="READTEXTTOOLS" 
+                SCROLL="no" 
+                SINGLEINSTANCE="yes" 
+                CAPTION="yes" 
+                SHOWINTASKBAR="no" 
+                maximizeButton="no" 
+                minimizeButton="no">
+<link rel="stylesheet" type="text/css" 
+      href="res://ieframe.dll/ErrorPageTemplate.css" />
+<meta http-equiv="Content-Type" 
+      content="text/html; charset=UTF-8" />
+<title>{_dialog_title}</title>
+</head>
+<body onkeydown="window.close();" onclick="window.close();" >
+<table width="500" cellpadding="0" cellspacing="0" border="0">
+<tr>
+<td id="infoIconAlign" width="60" align="left" valign="top" rowspan="2">
+<img src="{f_logo_src}" id="infoIcon" alt="Info icon">
+</td>
+<td id="mainTitleAlign" valign="middle" align="left"s width="*">
+<h1 id="mainTitle">{_msg_h1}</h1>{_msg}
+</td>
+</tr>
+<tr height = "60">
+<td id="infoIconAlign2" rowspan="2"></td>
+<td id="mainTitleAlign2" valign="bottom" align="left" width="*"></td>
+</tr>
+</table>
+</body>
+</html>
+"""
+    except (AttributeError, NameError, SyntaxError):
+        return False
+    with open(out_file, "w") as f:
+        # Use XML substitution and combine Unicode duplicates for all non-ASCII charaters.
+        f.write(
+            unicodedata.normalize(
+                "NFKD", s1.encode("ascii", "xmlcharrefreplace").decode()
+            )
+        )
+    # show message
+    try:
+        command = ["mshta.exe", os.path.realpath(out_file)]
+        subprocess.Popen(command)
+    except (AttributeError, FileNotFoundError, NameError, TypeError):
+        webbrowser.open_new_tab(
+            "file://" + os.path.realpath(out_file).replace(os.pathsep, "/")
+        )
+    try:
+        time.sleep(round(int(_stime)/1000))
+    except (TypeError, ValueError):
+        time.sleep(5)
+    if os.path.isfile(out_file):
+        os.remove(out_file)
+        return True
+    return False
+
+
+def translate_ui_element(iso_lang="en-US", msg=""):  # -> str
+    """If a literal translation is available, then return the translated
+    version of the string."""
+    try:
+        _translator = l10n.Translator()
+        return _translator.get_translation(iso_lang, msg)
+    except:
+        pass 
+    return msg
+
+
+def pop_message(summary="Read text", msg="", m_sec=8000, my_icon="", urgent=1, iso_lang="en-US"):  # -> bool
     """Pop up a notification message if supported on the platform"""
     if not msg:
         return False
@@ -1264,8 +1380,9 @@ def pop_message(summary="Note", msg="", m_sec=8000, my_icon="", urgent=1):  # ->
             if os.path.isfile(icon):
                 my_icon = icon
                 break
+    summary = translate_ui_element(iso_lang, summary)
+    msg = translate_ui_element(iso_lang, msg)
     try:
-        path_root = os.path.split(os.path.realpath(__file__))[0]
         if bool(dbus):
             item = "org.freedesktop.Notifications"
             _interface = dbus.Interface(
@@ -1282,16 +1399,7 @@ def pop_message(summary="Note", msg="", m_sec=8000, my_icon="", urgent=1):  # ->
                 m_sec,
             )
             return True
-    except (NameError, ValueError):
-        try:
-            if bool(tkinter):
-                for tag in ["<b>", "</b>", "<i>", "</i>"]:
-                    msg = msg.replace(tag, " ")
-                tkinter.messagebox(summary, msg)
-                return True
-        except (AttributeError, NameError, ValueError):
-            pass
-    except Exception:
+    except (NameError, ValueError, Exception):
         pass
     if have_posix_app("notify-send", False):
         my_os_system(
@@ -1315,7 +1423,9 @@ def pop_message(summary="Note", msg="", m_sec=8000, my_icon="", urgent=1):  # ->
             )
         )
         return True
-    return False
+    main_title = summary.strip()
+    _app = translate_ui_element(iso_lang, app_name())
+    return pop_win_msg_box(msg, main_title, _app, my_icon, m_sec)
 
 
 def lax_bool(_test):  # -> bool
@@ -3388,9 +3498,9 @@ def path2url(_file_path):  # -> str
     except NameError:
         # Fall back works on Posix
         return "file://{0}".format(_file_path.replace(" ", "%20"))
-    
 
-def office_user_dir(_top : str="uno_packages"):  # -> str
+
+def office_user_dir(_top="uno_packages"):  # -> str
     """Returns the local user directory where office stores user assets like
     uno_packages, settings and images. See also `app_icon_image()` for a
     resource search restricted to this extension directory, which your program
@@ -3567,13 +3677,25 @@ file for `{1}` was found.""".format(
                     for _item in data:
                         _grapheme = _json_tools.sanitize_json(data[_item]["g"])
                         _phoneme = _json_tools.sanitize_json(data[_item]["p"])
+                        if data[_item]["g"] in [
+                            data[_item]["g"].upper(),
+                            data[_item]["g"].capitalize(),
+                        ]:
+                            test_item = data[_item]["g"]
+                        else:
+                            # Where possible, avoid invisible duplications
+                            # <https://docs.python.org/3/howto/unicode.htmls>
+                            try:
+                                test_item = data[_item]["g"].casefold()
+                            except (AttributeError, SyntaxError):
+                                test_item = data[_item]["g"].lower()
                         if (
                             "$[" in _grapheme
-                            or data[_item]["g"] in _used_graphemes
+                            or test_item in _used_graphemes
                             or len(_phoneme) == 0
                         ):
                             continue
-                        _used_graphemes.append(data[_item]["g"])
+                        _used_graphemes.append(test_item)
                         _good_list.append(
                             '":{0}"g":"{1}","p":"{2}"{3},'.format(
                                 _u007b, _grapheme, _phoneme, _u0070
@@ -3995,7 +4117,6 @@ def main():  # -> NoReturn
 
 
 if __name__ == "__main__":
-    my_dir = "default"
     main()
 ###############################################################################
 

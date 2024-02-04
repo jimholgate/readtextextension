@@ -182,12 +182,14 @@ Sub ReadTextAloud()
 			Exit Sub
 		End If
 	Case &quot;WINDOWS&quot;
-		If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
-			&apos; Don&apos;t show the dialog on first run.
-			&apos; Use the built-in office NET scripting environment..
-			fsNetSAPI5WindowsSpeech(fsGetTextSelection(False, True), _
-			fsSelectionLanguageAndRegion(False))
-			Exit Sub
+		If Len(fsWineHomeDir()) = 0 Then
+			If Not FileExists(sFile) Then
+				&apos; Don&apos;t show the dialog on first run.
+				&apos; Use the built-in office NET scripting environment..
+				fsNetSAPI5WindowsSpeech(fsGetTextSelection(False, True), _
+				fsSelectionLanguageAndRegion(False))
+				Exit Sub
+			End If
 		End If
 	Case &quot;MacOS&quot;
 		&apos; Don&apos;t show the dialog on first run.
@@ -235,11 +237,13 @@ Sub SetupReadTextAloud
 	&apos; enable reading the selected text aloud. Visual Basic Script (vbs) might be
 	&apos; available as an optional Windows add-in. If you enable the option, then
 	&apos; this menu item will behave normally.
+	If Len(fsWineHomeDir()) = 0 Then
 		If Len(WinSpeechProgramPath()) = 0 Then
 			fsNetSAPI5WindowsSpeech(fsGetTextSelection(False, True), _
 			fsSelectionLanguageAndRegion(False))
 			Exit Sub
 		End If
+	End If
 	End Select
 	ConfigureReadTextAloud()
 End Sub
@@ -413,6 +417,7 @@ End Sub
 
 
 Sub WinStopSpeaking()
+	On Error GoTo WinStopSpeakingErr
 	If fsGetOS() = &quot;WINDOWS&quot; Then
 		Dim speech As Object
 		Dim WinSVSFPurgeBeforeSpeak# : WinSVSFPurgeBeforeSpeak = 2
@@ -422,6 +427,8 @@ Sub WinStopSpeaking()
 		speech.Speak WinvbNullString, WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
 		Set speech = Nothing
 	End If
+	Exit Sub
+	WinStopSpeakingErr:
 End Sub
 
 
@@ -496,7 +503,7 @@ Function fsNetSAPI5WindowsSpeech(_
 	Dim WinSVSFlagsAsync# : WinSVSFlagsAsync = 1
 	Dim speech As Object
 
-	On Local Error Resume Next
+	On Local Error GoTo fsNetSAPI5WindowsSpeechErr
 	Set speech = Createobject(&quot;Sapi.SpVoice&quot;)
 	speech.Rate = iRate
 	speech.Speak WinvbNullString, WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
@@ -513,6 +520,9 @@ Function fsNetSAPI5WindowsSpeech(_
 	oBar.Value = 100	
 	oBar.End()
 	fsNetSAPI5WindowsSpeech = sB
+	Exit Function
+	fsNetSAPI5WindowsSpeechErr:
+	fsNetSAPI5WindowsSpeech = &quot;&quot;
 End Function
 
 </script:module>

@@ -89,6 +89,7 @@ def main() -> None:
     """Give options for compressing a directory"""
     skip_list = [
         ".DS_Store",
+        "._.DS_Store",
         "__pycache__",
         "__MACOSX",
         ".git",
@@ -114,7 +115,7 @@ def main() -> None:
     _default = os.path.dirname(os.path.dirname(__file__))
     _date_time = datetime.now()
     _alt = ""
-    if os.path.splitext(_default)[0][-1] in "ab":
+    if os.path.splitext(_default)[0][-1] not in "0123456789":
         # i.e. : `a` for Apache; `b` for Beta ...
         _alt = os.path.splitext(_default)[0][-1]
     parser = argparse.ArgumentParser(
@@ -179,8 +180,8 @@ Fingerprint
 ```
 """
         )
-        if args.json:
-            save_text(f"""{archive_output_name}.json""", _json)
+    if args.json:
+        save_text(f"""{archive_output_name}.json""", _json)
 
 
 if __name__ == "__main__":

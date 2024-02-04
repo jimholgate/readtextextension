@@ -158,6 +158,7 @@ Copyright (c) 2024 James Holgate
 """
 import codecs
 import json
+import locale
 import os
 import random
 import stat
@@ -165,6 +166,7 @@ import sys
 import time
 import getopt
 import urllib
+import warnings
 
 import find_replace_phonemes
 import netcommon
@@ -260,7 +262,9 @@ class PiperTTSClass(object):
             self.app = "piper.exe"
             _extension_table = readtexttools.ExtensionTable()
             for _item in app_list:
-                _app = _extension_table.win_search(f"piper-tts{os.path.sep}piper", _item)
+                _app = _extension_table.win_search(
+                    f"piper-tts{os.path.sep}piper", _item
+                )
                 if len(_app) != 0:
                     self.app = _app
                     break
@@ -580,16 +584,30 @@ voice models, then the generic json configuration will not recognize them.
             except urllib.error.URLError:
                 readtexttools.unlock_my_lock(self.locker)
                 readtexttools.pop_message(
-                    self.help_heading, _json_file, 8000, self.help_icon
+                    self.help_heading, _json_file, 8000, self.help_icon, 1, iso_lang
                 )
                 self.ok = False
                 sys.exit(0)
-        for _description in [
+        # Use an English voice if a voice model is not available. This
+        # is a common best practice for internationalization. The
+        # client communicates that the program works, but you can tell
+        # that the system currently lacks the requested voice model.
+        # <https://learn.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-international-core-uilanguagefallback>
+        _match_lang = iso_lang.split("_")[0].split("-")[0]
+        _description_list = [
             iso_lang.replace("-", "_"),
-            iso_lang.split("_")[0].split("-")[0],
-        ]:
+            _match_lang,
+            "zzy_AQ",
+        ]
+        available_language = ""
+        for description in _description_list:
             try:
                 for _item in data:
+                    if description == "zzy_AQ" and len(_found_models) == 0:
+                        _description = "en"
+                        available_language = data[_item]["language"]["name_english"]
+                    else:
+                        _description = description
                     # de_DE-thorsten_emotional-medium
                     self.j_key = data[_item]["key"]
                     self.j_key_list.append(self.j_key)
@@ -633,6 +651,17 @@ voice models, then the generic json configuration will not recognize them.
                                         _found_models.append(self.j_path)
             except IndexError:
                 pass
+        if len(available_language) != 0:
+            _download_msg = readtexttools.translate_ui_element(iso_lang, "Download a compatible voice model")
+            readtexttools.pop_message(
+                f"{self.help_heading} ({iso_lang}) : {_download_msg}",
+                f"""{self.sample_webpage}""",
+                5000,
+                self.help_icon,
+                1,
+                iso_lang,
+            )
+
         return _found_models
 
     def model_path(self, _extension: str = "onnx") -> str:
@@ -653,9 +682,11 @@ voice models, then the generic json configuration will not recognize them.
 INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
 <{self.piper_voice_dir}/voices.json>
 
+<{_uri}>
+
 [Get piper-voices]({self.hug_url}/tree/main)"""
             )
-            readtexttools.pop_message(self.help_heading, _uri, 8000, self.help_icon)
+            readtexttools.pop_message(self.help_heading, _uri, 8000, self.help_icon, 1, self.concise_lang)
         _voice_name_base = self.voice_name.split("#")[0]
         os_sep = os.sep
         for _path in _model_list:
@@ -670,6 +701,45 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         self.ok = False
         return ""
 
+    def py_locale(self, default_locale: str = "en-US") -> str:
+        """Try to get the python default locale in using `en_US` format."""
+        if os.name == 'nt':
+            try:
+                # New in Python 3.11
+                return locale.normalize(locale.getlocale()).split(".")[0]
+            except AttributeError:
+                warnings.filterwarnings("ignore", category=DeprecationWarning)
+            # `getdefaultlocale()` is scheduled for removal in python
+            # 3.15.
+            try:
+                return locale.getdefaultlocale()[0]
+            except AttributeError:
+                pass
+            # Let's assume that piper's ["language"]["name_english"]
+            # uses the same language names as the `nt` operating system.
+            # We can only reliably resolve it to the base language code
+            # known as the `family`. (`de`. `es`, `en`, `fr` ...)
+            _json_file = os.path.join(self.piper_voice_dir, "voices.json")
+            try:
+                with codecs.open(
+                    _json_file, mode="r", encoding="utf-8", errors="replace"
+                ) as file_obj:
+                    data = json.load(file_obj)
+                    test_locale = locale.getlocale()[0].split("(")[0].strip()
+                    for _item in data:
+                        if test_locale.startswith(data[_item]["language"]["name_english"]):
+                            return data[_item]["language"]["family"]
+                return default_locale
+            except:
+                return default_locale
+        else:
+            try:
+                # New in Python 3.11
+                return locale.normalize(locale.getlocale()).split(".")[0]
+            except AttributeError:
+                return locale.getlocale()[0]
+        return default_locale
+        
     def _model_voice_info(self, _model: str = "") -> int:
         """Get current info from  the `_model.json` file such as the
         number of speakers and the sample rate.  Edit the named
@@ -797,6 +867,8 @@ remote_file = {remote_file}
 ({s_count}/{s_count_total}) {_dots}""",
                         16000,
                         self.help_icon,
+                        1,
+                        lang
                     )
                 _count += 1
             except (TimeoutError, ValueError, urllib.error.URLError):
@@ -846,6 +918,7 @@ remote_file = {remote_file}
         """Read speech aloud"""
         _extension_table = readtexttools.ExtensionTable()
         _length_scale = self.length_scale  # Fallback rate
+        # Normally, self.lang = _iso_lang
         if _speech_rate != 160:
             _length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)[0]
         if not self.ok:
@@ -1163,7 +1236,7 @@ Piper TTS
                             # Internet.
                             if do_pop_message:
                                 readtexttools.pop_message(
-                                    self.help_heading, _uri, 8000, self.help_icon
+                                    self.help_heading, _uri, 8000, self.help_icon, 1, data[_item]["language"]["code"],
                                 )
                             readtexttools.show_with_app(_dir)
                             self.update_request = False
@@ -1481,6 +1554,8 @@ def main() -> None:
                     _piper_tts.sample_webpage,
                     8000,
                     _piper_tts.help_icon,
+                    1,
+                    _piper_tts.concise_lang,
                 )
                 # `True`, `Yes`, `1`, `-1`
                 try:
@@ -1534,6 +1609,14 @@ def main() -> None:
         _piper_tts.update_local_model_dir(use_dir, _voice, True, True)
     if not _piper_tts.language_supported(_iso_lang, _voice):
         if not _piper_tts.update_request:
+            readtexttools.pop_message(
+                "No voice model found",
+                "The Piper_TTS client cannot find a compatible voice model for your language.",
+                5000,
+                _piper_tts.help_icon,
+                1,
+                _piper_tts.py_locale()
+            )
             sys.exit(0)
     if _text_file_in.startswith("~"):
         _text_file_in = os.path.expanduser(_text_file_in)

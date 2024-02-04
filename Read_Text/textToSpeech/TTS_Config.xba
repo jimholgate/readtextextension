@@ -1374,7 +1374,7 @@ Sub AboutAddOn( _
 		.GetControl(&quot;ImageControl3&quot;).model.helpText = Left(fsGetTextSelection(False, False),99)
 		.GetControl(&quot;ImageControl3&quot;).model.ImageURL = fsSelectionLogo()
 		
-		If fbIsWin64Program() Then
+		If fbIsWin64Program(&quot;&quot;) Then
 			&apos; 2022 - If the clipboard is empty, then the program
 			&apos; might crash in Windows.
 			.GetControl(&quot;ImageControl4&quot;).model.ImageURL = fsClipBoardLogo()

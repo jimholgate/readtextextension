@@ -347,15 +347,17 @@ Function fvTts_config_createDefaultConfig( _
 	Dim player7 As String : player7 = &quot;&quot;
 	&apos; The place to store the configuration data
 	Dim config(fiCountConfigOptions) As Variant
-	
+	Dim bPiperOk As Boolean : bPiperOk = fbPiperTtsOk(&quot;&quot;)
 	&apos; Create default values for variables
 	If GetGUIType() = 1 Then
 		&apos; Windows
-		player7 = &quot; --player 7&quot;	
-		If fbPiperTtsOk(&quot;&quot;) Then
+		If Len(fsWineHomeDir()) = 0 Then
+			player7 = &quot; --player 7&quot;
+		End If
+		If bPiperOk Then
 			config(fiExperimentalOption()) = False
 			config(fiExperimentalProgramPath()) = ConvertFromURL(BundlePyPath())
-			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --player 7 --voice &quot; &amp; _
+			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; player7 &amp; &quot; --voice &quot; &amp; _
 			PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0 &quot;&quot;(TMP)&quot;&quot;&quot;
 		Else
 			config(fiExperimentalOption()) = False
@@ -370,17 +372,28 @@ Function fvTts_config_createDefaultConfig( _
 		config(fiHtmlOption()) = False
 		config(fiSmartSelectCheckBox()) = 0
 		config(fiHtmlComboURL()) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
-		If Len(WinSpeechProgramPath()) = 0 Then
-			config(fiExternalProgramPath()) = &quot;wscript.exe&quot;
-		Else
-			config(fiExternalProgramPath()) = WinSpeechProgramPath()
-		End If
+		If Len(fsWineHomeDir()) = 0 Then
+			If Len(WinSpeechProgramPath()) = 0 Then
+				config(fiExternalProgramPath()) = &quot;wscript.exe&quot;
+			Else
+				config(fiExternalProgramPath()) = WinSpeechProgramPath()
+			End If
 			config(fiExternalCommand()) = WinSpeechArgument()
+		Else
+			&apos; Don&apos;t attempt SAPI speech by default using Wine for Posix.
+			config(fiExternalProgramPath()) = ConvertFromURL(BundlePyPath())
+			If bPiperOk Then
+				config(fiExternalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; player7 &amp; &quot; --voice &quot; &amp; _
+				PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0 &quot;&quot;(TMP)&quot;&quot;&quot;
+			Else
+				config(fiExternalCommand()) = &quot;-c &quot;&quot;import os; os.startfile(&apos;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
+			End If
+		End If
 		config(fiAlwaysShowDialogCheckBox()) = 1
 		config(fiDialogLanguageCombo()) = fsGetLanguage()
 	Else
 		&apos; Posix or MacOS
-		If fbPiperTtsOk(&quot;&quot;) Then
+		If bPiperOk Then
 			config(fiExperimentalOption()) = False
 			config(fiExperimentalProgramPath()) = PosixPythonPath()
 			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --player 7 --voice &quot; &amp; _
@@ -430,7 +443,7 @@ Function fvTts_config_createDefaultConfig( _
 				&apos; Japanese
 				config(fiExternalCommand()) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf fbPiperTtsOk(&quot;&quot;) Then
+			ElseIf bPiperOk Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --rate 100% --voice AUTO1#27 --language (SELECTION_LANGUAGE_COUNTRY_CODE&quot;
 			ElseIf FileExists(Environ(&quot;HOME&quot;) &amp; _

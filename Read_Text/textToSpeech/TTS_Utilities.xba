@@ -250,13 +250,13 @@
 &apos;&apos; 
 &apos;&apos; ##### All
 &apos;&apos; 
-&apos;&apos;    mkdir -p &quot;${HOME}/.local/share/mycroft/mimic3&quot;
-&apos;&apos;    chmod a+rwx &quot;${HOME}/.local/share/mycroft/mimic3&quot;
+&apos;&apos;    mkdir -p &quot;${_HOME}/.local/share/mycroft/mimic3&quot;
+&apos;&apos;    chmod a+rwx &quot;${_HOME}/.local/share/mycroft/mimic3&quot;
 &apos;&apos;    docker run \
 &apos;&apos;        -it \
 &apos;&apos;        -p 59125:59125 \
 &apos;&apos;        --restart=always \
-&apos;&apos;        -v &quot;${HOME}/.local/share/mycroft/mimic3:/home/mimic3/.local/share/mycroft/mimic3&quot; \
+&apos;&apos;        -v &quot;${_HOME}/.local/share/mycroft/mimic3:/home/mimic3/.local/share/mycroft/mimic3&quot; \
 &apos;&apos;        &apos;mycroftai/mimic3&apos;
 &apos;&apos; 
 &apos;&apos; You can find out more about Mimic3 TTS at the `mimic3` website.
@@ -659,6 +659,18 @@ End Function
 
 Function isFlatPak() As Boolean
 	isFlatPak = instr(Environ(&quot;PATH&quot;), &quot;/app/bin:/usr/bin&quot;) = 1
+End Function
+
+
+Function fsWineHomeDir() As String
+	&apos; If you are running an `nt` amd64 type instance of the Posix `wine` 9
+	&apos; command,  then `WINEHOMEDIR` normally points the root of your Posix `~/`
+	&apos; directory as drive `Z:\`, otherwise it is `&quot;&quot;`.
+	fsWineHomeDir = &quot;&quot;
+	Dim sWineHomeDir As String : sWineHomeDir = Environ(&quot;WINEHOMEDIR&quot;)
+	If fbIsWin64Program(&quot;&quot;) Then
+		fsWineHomeDir = sWineHomeDir
+	End If
 End Function
 
 
@@ -1416,6 +1428,7 @@ Function fbGoToMark(MarkType) As Boolean
 	fbGoToMark = False
 End Function
 
+
 Function fbClipBoardAvailable() As Boolean
 	&apos; if program has crashed or is a version known to 
 	&apos; crash when reading the clipboard, provide
@@ -1426,7 +1439,7 @@ Function fbClipBoardAvailable() As Boolean
 	If FileExists(fsFullPathOf(&quot;ReadClipBoard.lock&quot;)) Then
 		fbClipBoardAvailable = False
 	End If
-	If fbIsWin64Program() And _
+	If fbIsWin64Program(&quot;&quot;) And _
 		fsGetSetting( _
 		&quot;oosetupversion&quot;) = &quot;5.0&quot; And _
 		fbIsLibreOffice() Then
@@ -2334,8 +2347,12 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	Dim local_suggestion As String
 	Dim player7 As String : player7 = &quot;&quot;
 	Select Case sGetOS
-		Case &quot;WINDOWS&quot;, &quot;MacOS&quot;
-		player7 = &quot; --player 7&quot;		
+		Case &quot;MacOS&quot;
+		player7 = &quot; --player 7&quot;
+		Case &quot;WINDOWS&quot;
+		If Len(fsWineHomeDir()) = 0 Then
+			player7 = &quot; --player 7&quot;
+		End If		
 	End Select 
 	
 	If Len(getControl) = 0 Then
@@ -2900,7 +2917,7 @@ Function fsMyTitleInputBox( _
 	Dim s5 As String
 	Dim x As Integer
 	Dim unwanted_characters As String
-	unwanted_characters = &quot;,:;-–&gt;&lt;{}|&quot;
+	unwanted_characters = &quot;,:;-–&gt;&lt;{_}|&quot;
 	If b_skip_windows Then
 		If fsGetOS = (&quot;WINDOWS&quot;) Then
 			fsMyTitleInputBox = suggestion
@@ -2972,7 +2989,7 @@ End Function
 
 Function fsVBCodeHead()
 
-Dim sA$ : sA = &quot;&apos;&apos;&apos;\n&quot; &amp; _
+	Dim sA$ : sA = &quot;&apos;&apos;&apos;\n&quot; &amp; _
 		&quot;&apos;&apos; Read text\n&quot; &amp; _
 		&quot;&apos;&apos; =========\n&quot; &amp; _
 		&quot;&apos;&apos; \n&quot; &amp; _
@@ -3331,7 +3348,7 @@ Function fsJsonSettings(_
 	fsJsonSettings = &quot;&quot;
 	Dim x As Integer
 	Dim CR As String : CR = Chr(13)
-	Dim _str as String : _str = &quot;{&quot;&quot;read_text&quot;&quot;:{&quot; &amp; CR
+	Dim _str as String : _str = &quot;{_&quot;&quot;read_text&quot;&quot;:{_&quot; &amp; CR
 	Dim a1 As Variant
 	a1 = faSettingsArray(title, track)
 	For x = Lbound(a1) To Ubound(a1)
@@ -4985,7 +5002,7 @@ Function fsComplexAsiaOrWest( _
 	End If
 	&apos; Ignore numbers, basic punctuation, telephone network code and 
 	&apos; western currency symbols that Asian languages commonly use
-	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤&quot; &amp; _
+	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){_}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤&quot; &amp; _
 	&quot;₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯₰₱₲₳₴₵₶₷₸₹₺⅓⅔⅛⅜⅝&quot; &amp; _
 	Chr$(10) &amp; _
 	Chr$(13)
@@ -5039,7 +5056,7 @@ Function fbIsJapanese( _
 	&apos;
 	&apos; Ignore numbers, basic punctuation, telephone network code and 
 	&apos; western currency symbols that Asian languages commonly use
-	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤&quot; &amp; _
+	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){_}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤&quot; &amp; _
 	&quot;₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯₰₱₲₳₴₵₶₷₸₹₺⅓⅔⅛⅜⅝&quot; &amp; _
 	Chr$(10) &amp; _
 	Chr$(13)
@@ -5076,7 +5093,7 @@ Function fbIsKorean( _
 	&apos;
 	&apos; Ignore numbers, basic punctuation, telephone network code and 
 	&apos; western currency symbols that Asian languages commonly use
-	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤&quot; &amp; _
+	sB = &quot; 0123456789.,-+÷×—–*#$*%#@(){_}|!@&lt;&gt;=[]/:¼½¾&quot;&quot;&apos;“”‘’·€£¥¢¤&quot; &amp; _
 	&quot;₠₡₢₣₤₥₦₧₨₩₪₫€₭₮₯₰₱₲₳₴₵₶₷₸₹₺⅓⅔⅛⅜⅝&quot; &amp; _
 	Chr$(10) &amp; _
 	Chr$(13)
@@ -5234,10 +5251,12 @@ Sub MsgSpeak( _
 	Else
 		Select Case fsGetOS()
 			Case &quot;WINDOWS&quot;
-			If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
-				fsNetSAPI5WindowsSpeech(strA, _
-				fsSelectionLanguageAndRegion(False))
-				Exit Sub
+			If Len(fsWineHomeDir()) = 0 Then
+				If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
+					fsNetSAPI5WindowsSpeech(strA, _
+					fsSelectionLanguageAndRegion(False))
+					Exit Sub
+				End If
 			End If
 			Case &quot;MacOS&quot;
 			&apos; Load default settings on First Run
@@ -5359,19 +5378,33 @@ Function fsInstallPath() As String
 End Function
 
 
+Function fbIsWin64Environ() As Boolean
+	&apos; Instead of getting architecture usung Posix `uname -a` you need to check the
+	&apos; operating system environment settings.
+	fbIsWin64Environ = False
+	If UCase(Environ(&quot;PROCESSOR_ARCHITECTURE&quot;)) = &quot;AMD64&quot; Then
+		fbIsWin64Environ = True
+		&apos; Wine 64 always reports `PROCESSOR_ARCHITECTURE=x86`
+		&apos; but Wine 64 reports `PROCESSOR_IDENTIFIER=Intel64  Family ...`
+	ElseIf Instr(Split(Environ(&quot;PROCESSOR_IDENTIFIER&quot;) &amp; &quot; &quot;, &quot; &quot;)(0), &quot;64&quot;) &lt;&gt; 0 Then
+		fbIsWin64Environ = True
+	EndIf	
+End Function
+
+
 Function fbIsWin64Program( _
 	Optional ByVal installPath) As Boolean
 	If ismissing(installPath) Then
 		installPath = fsInstallPath()
-	ElseIf installPath = &quot;&quot; Then
+	End If
+	If installPath = &quot;&quot; Then
 		installPath = fsInstallPath()
 	End If
+	fbIsWin64Program = False
 	If fsGetOS() = &quot;WINDOWS&quot; And _
-		UCase(Environ(&quot;PROCESSOR_ARCHITECTURE&quot;)) = &quot;AMD64&quot; And _
+		fbIsWin64Environ() And _
 		InStr(LCase(installPath), &quot;(x86)&quot;) = 0 Then
 		fbIsWin64Program = True
-	Else
-		fbIsWin64Program = False
 	End If
 End Function
 
@@ -5563,7 +5596,7 @@ Function faWindowsTestArray() As Variant
 	End If
 	faWindowsTestArrayErr:
 	Dim _system$ : _system = &quot;System32&quot;
-	If fbIsWin64Program() Then
+	If fbIsWin64Program(&quot;&quot;) Then
 		_system = &quot;SysWOW64&quot;
 	End If
 	Dim _skip$ : _skip = &quot;;SYSTEM;SYSTEMAPPS;SYSTEMRESOURCES;SYSTEMTEMP;&quot;
@@ -6391,7 +6424,7 @@ Function fswriteMacOSSpeechScript( _
 		&quot;    if audio_codec is &quot;&quot;&quot;&quot; then&quot;, _
 		&quot;        return false&quot;, _
 		&quot;    else&quot;, _
-		&quot;       set command_line to dq &amp; vlc_app &amp; dq &amp; &quot;&quot; &quot;&quot; &amp; dq &amp; in_sound_path &amp; dq &amp; &quot;&quot; --intf dummy &quot;&quot; &amp; verbosity &amp; &quot;&quot;--sout=&quot;&quot; &amp; dq &amp; &quot;&quot;#transcode{vcodec=none,acodec=&quot;&quot; &amp; audio_codec &amp; &quot;&quot;,ab=&quot;&quot; &amp; average_bitrate &amp; &quot;&quot;,channels=&quot;&quot; &amp; channel_count &amp; &quot;&quot;,samplerate=&quot;&quot; &amp; sample_rate &amp; &quot;&quot;}:std{access=file,mux=ogg,dst=&apos;&quot;&quot; &amp; out_sound_path &amp; &quot;&quot;&apos;}&quot;&quot; &amp; dq &amp; &quot;&quot; vlc://quit&quot;&quot;&quot;, _
+		&quot;       set command_line to dq &amp; vlc_app &amp; dq &amp; &quot;&quot; &quot;&quot; &amp; dq &amp; in_sound_path &amp; dq &amp; &quot;&quot; --intf dummy &quot;&quot; &amp; verbosity &amp; &quot;&quot;--sout=&quot;&quot; &amp; dq &amp; &quot;&quot;#transcode{_vcodec=none,acodec=&quot;&quot; &amp; audio_codec &amp; &quot;&quot;,ab=&quot;&quot; &amp; average_bitrate &amp; &quot;&quot;,channels=&quot;&quot; &amp; channel_count &amp; &quot;&quot;,samplerate=&quot;&quot; &amp; sample_rate &amp; &quot;&quot;}:std{_access=file,mux=ogg,dst=&apos;&quot;&quot; &amp; out_sound_path &amp; &quot;&quot;&apos;}&quot;&quot; &amp; dq &amp; &quot;&quot; vlc://quit&quot;&quot;&quot;, _
 		&quot;        try&quot;, _
 		&quot;            set b to (do shell script command_line)&quot;, _
 		&quot;        On Error&quot;, _
@@ -7743,6 +7776,12 @@ End Function
 Function fbExperimentalMode() As Boolean
 	&apos; If you enable the Office Experimental Mode, the extension unlocks
 	&apos; some tools and does not change what you enter into the main dialog.
+	If Len(fsWineHomeDir()) &lt;&gt; 0 Then
+		&apos; Always enable when using `nt` programs with Wine on Posix
+		&apos; operating systems.
+		fbExperimentalMode = True
+		Exit Function
+	End If
 	If Not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
 		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
 	End If
@@ -8115,7 +8154,7 @@ Function fbMdCode( _
 	&quot;\&quot;, _
 	&quot;[&quot;, _
 	&quot;]&quot;, _
-	&quot;{&quot;, _
+	&quot;{_&quot;, _
 	&quot;}&quot;, _
 	&quot;/&quot;, _
 	&quot;(&quot;, _
@@ -9842,7 +9881,6 @@ Function fbDoWinBat(_
 	fbDoWinBatErr2:
 	fbDoWinBat = False
 End Function
-
 
 
 Function fsReleasenotesCMD( _
