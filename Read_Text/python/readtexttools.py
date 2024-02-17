@@ -96,7 +96,7 @@ except (ImportError, AssertionError):
     pass
 
 try:
-    import tkinter
+    import check_dialog
 except (ImportError, AssertionError):
     pass
 
@@ -150,7 +150,7 @@ except (ImportError, AssertionError):
 
 try:
     import l10n
-except(ImportError, AssertionError, SyntaxError):
+except (ImportError, AssertionError, SyntaxError):
     pass
 
 LOOK_UPS = 0
@@ -1221,23 +1221,49 @@ def app_icon_image(image_selection="", asset_dir="images"):  # -> str
 
 def is_container_instance():  # -> bool
     """If `is_container_instance` is `True` python3 cannot rely on expected
-    desktop paths and user interactions."""
+    desktop paths and user interactions. It might have limited access to
+    the system and data from other applications."""
     try:
         if int(platform.python_version_tuple()[0]) < 3:
             return True
     except:
         pass
+    tests = [
+        "windowsapps",
+        ".wine",
+        "wineprefixes",
+        "com.bottles.usebottles",
+        ".var",
+    ]
     if os.name == "posix":
-        for _test in [
+        tests = [
             "/meta/",
-            "/org.libreoffice.LibreOffice/",
+            "/org.libreoffice.libreoffice/",
             "/run/",
             "/snap/",
             "/.var/",
-        ]:
-            if _test in os.path.realpath(__file__):
+        ]
+    for _path in [
+        os.path.realpath(__file__).lower(),
+        sys.executable.lower(),
+    ]:
+        for _test in tests:
+            if _test in _path:
                 return True
-        # ChromeOS, Server
+    if os.path.exists(os.path.realpath("/.dockerenv")):
+        return True
+    for _test in [
+        ["container", "oci"],
+        ["container", "podman"],
+        ["WINEUSERNAME", os.getenv("USERNAME")],
+    ]:
+        if os.getenv(_test[0]) == _test[1]:
+            if bool(_test[1]):
+                return True
+    if os.name == "posix":
+        if "microsoft" in os.uname().release:
+            # Windows Subsystem for Linux
+            return True
         block_dist = ["penguin", "server"]
         if os.uname().version.lower() in block_dist:
             return True
@@ -1245,21 +1271,72 @@ def is_container_instance():  # -> bool
     return False
 
 
-def pop_win_msg_box(msg="", msg_h1="", dialog_title="", f_logo_src="", m_sec=5000):
+def local_host_pop(
+    msg="", msg_h1="", dialog_title="", urgent=1, m_sec=5000, lang_region="en-US"
+):  # -> bool
+    """Check if localhost menu service is active. If `True`, then
+    display the message in a web browser. Container versions of the
+    office program cannot rely on using local directories or system
+    installed programs like `wscript`, `mshta`, `osascript`, `dbus`
+    `speech-dispatcher` etc."""
+    _local_server = check_dialog.MyServer()
+    _xml_transform = XmlTransform()
+    if _local_server.is_valid_url(""):
+        local_url = _local_server.host_and_port
+    else:
+        try:
+            _local_server.start()
+            local_url = _local_server.host_and_port
+        except:
+            return False
+    _strict = True
+    _msg = _xml_transform.clean_for_xml(msg, _strict)
+    _msg_h1 = _xml_transform.clean_for_xml(msg_h1, _strict)
+    _dialog_title = _xml_transform.clean_for_xml(dialog_title, _strict)
+    s_icon = "1.png"
+    # Only allow curated images
+    if urgent in [0, 1, 2, 3]:
+        s_icon = "{0}.png".format(str(urgent))
+    s_icon = _xml_transform.clean_for_xml(s_icon, _strict)
+    try:
+        _stime = safechars(str(m_sec), "1234567890")
+    except:
+        _stime = "0"  # Do not automatically close the tab.
+    _args = "?msg={0}&msg_h1={1}&dialog_title={2}&f_logo_src={3}&m_sec={4}&lang_region={5}".format(
+        _msg, _msg_h1, _dialog_title, s_icon, _stime, lang_region
+    )
+    try:
+        if webbrowser.open_new_tab("{0}{1}".format(local_url, _args)):
+            time.sleep(5 + m_sec/1000)
+            _local_server.stop()
+            return True
+        else:
+            _local_server.stop()
+    except:
+        pass
+    return False
+
+
+def pop_win_msg_box(
+    msg="", msg_h1="", dialog_title="", urgent=1, m_sec=5000
+):  # -> bool
     """
     Pop up a message box that closes after a few seconds. The dialog uses the
     Read Text logo and shows the information using standard Internet Explorer
     advisory style. NOTE: This method of displaying text will not work on all
-    platforms (i. e. Wine for Posix or Python versions < 3.3). Don't use it for
-    critical messages.
+    platforms (i. e. Wine for Posix or Python versions < 3.3).
     """
+    if is_container_instance():
+        return local_host_pop(msg, msg_h1, dialog_title, urgent, m_sec)
     _xml_transform = XmlTransform()
+
     # Malicious programs can use `mshta.exe` inappropriately, so always ensure
     # that the HTA applications you are running come from a trusted
     # source. The code below only uses it to display a message and to close
     # the window after a few seconds. It also "escapes" characters that
     # users might input that JavaScript uses so that it appears as inline
-    # text instead of acting as program instructions.
+    # text instead of acting as program instructions. We only allow curated
+    # images that are different than standard system images.
     #
     # Escape any code-like characters:
     _strict = True
@@ -1276,7 +1353,21 @@ def pop_win_msg_box(msg="", msg_h1="", dialog_title="", f_logo_src="", m_sec=500
             _stime = 100
     except ValueError:
         _stime = "8000"
-    s1 = ""
+    s_icon = "1.png"
+    # Only allow curated images
+    if urgent in [0, 1, 2, 3]:
+        s_icon = "{0}.png".format(str(urgent))
+    f_logo_src = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "check_dialog", s_icon
+    )
+    ie_css = """<link rel="stylesheet" type="text/css" 
+      href="res://ieframe.dll/ErrorPageTemplate.css" />"""
+    if not os.name == "nt" or is_container_instance():
+        ie_css = """<style>
+body {
+font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
+}
+</style>"""
     try:
         s1 = f"""
 <html>
@@ -1293,8 +1384,7 @@ setTimeout(function(){{window.close();}}, {_stime});
                 SHOWINTASKBAR="no" 
                 maximizeButton="no" 
                 minimizeButton="no">
-<link rel="stylesheet" type="text/css" 
-      href="res://ieframe.dll/ErrorPageTemplate.css" />
+{ie_css}
 <meta http-equiv="Content-Type" 
       content="text/html; charset=UTF-8" />
 <title>{_dialog_title}</title>
@@ -1335,7 +1425,7 @@ setTimeout(function(){{window.close();}}, {_stime});
             "file://" + os.path.realpath(out_file).replace(os.pathsep, "/")
         )
     try:
-        time.sleep(round(int(_stime)/1000))
+        time.sleep(round(int(_stime) / 1000))
     except (TypeError, ValueError):
         time.sleep(5)
     if os.path.isfile(out_file):
@@ -1351,11 +1441,13 @@ def translate_ui_element(iso_lang="en-US", msg=""):  # -> str
         _translator = l10n.Translator()
         return _translator.get_translation(iso_lang, msg)
     except:
-        pass 
+        pass
     return msg
 
 
-def pop_message(summary="Read text", msg="", m_sec=8000, my_icon="", urgent=1, iso_lang="en-US"):  # -> bool
+def pop_message(
+    summary="Read text", msg="", m_sec=8000, my_icon="", urgent=1, iso_lang="en-US"
+):  # -> bool
     """Pop up a notification message if supported on the platform"""
     if not msg:
         return False
@@ -1408,7 +1500,7 @@ def pop_message(summary="Read text", msg="", m_sec=8000, my_icon="", urgent=1, i
             )
         )
         return True
-    elif have_posix_app("osascript", False):
+    elif have_posix_app("osascript", False) and not is_container_instance():
         for tag in ["<b>", "</b>", "<i>", "</i>"]:
             msg = msg.replace(tag, "")
         if urgent == 2:
@@ -1425,7 +1517,7 @@ def pop_message(summary="Read text", msg="", m_sec=8000, my_icon="", urgent=1, i
         return True
     main_title = summary.strip()
     _app = translate_ui_element(iso_lang, app_name())
-    return pop_win_msg_box(msg, main_title, _app, my_icon, m_sec)
+    return pop_win_msg_box(msg, main_title, _app, urgent, m_sec)
 
 
 def lax_bool(_test):  # -> bool
@@ -1891,7 +1983,10 @@ def web_info_translate(
 ):  # -> bool
     """Opens a web browser with the text of the message and a local translation.
     Users of a sandboxed program can get a message."""
-    _web_text = path2url(_msg).replace("file:///", "")
+    try:
+        _web_text = urllib.parse.quote(_msg)
+    except NameError:
+        _web_text = path2url(_msg).replace("file:///", "")
     try:
         if _language[:2] in ["en"]:
             _language = "es"
@@ -2275,10 +2370,12 @@ class ImportedMetaData(object):
         x_title = _xml_transform.clean_for_xml(title)
         x_display_path = "~/..."
         profile = os.path.expanduser("~")
-        if len(os.getenv(profile)) != 0:
-            x_display_path = _xml_transform.clean_for_xml(out_path).replace(
-                profile, "~"
-            )
+        for env_key in ["HOME", "HOMEPATH", "PWD"]:
+            if bool(os.getenv(env_key)):
+                x_display_path = _xml_transform.clean_for_xml(out_path).replace(
+                    profile, "~"
+                )
+                break
         out_uri = ""
         if out_path:
             out_uri = path2url(out_path)

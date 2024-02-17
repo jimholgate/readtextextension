@@ -182,16 +182,15 @@ Sub ReadTextAloud()
 			Exit Sub
 		End If
 	Case &quot;WINDOWS&quot;
-		If Len(fsWineHomeDir()) = 0 Then
-			If Not FileExists(sFile) Then
+		If Not FileExists(sFile) Then
 				&apos; Don&apos;t show the dialog on first run.
-				&apos; Use the built-in office NET scripting environment..
-				fsNetSAPI5WindowsSpeech(fsGetTextSelection(False, True), _
-				fsSelectionLanguageAndRegion(False))
+				fsNetSAPI5WindowsSpeech(_
+			fsGetTextSelection(False, True), _
+				fsSelectionLanguageAndRegion(False), _
+			)
 				Exit Sub
 			End If
-		End If
-	Case &quot;MacOS&quot;
+			Case &quot;MacOS&quot;
 		&apos; Don&apos;t show the dialog on first run.
 		&apos; Load default settings.
 		If Not FileExists(sFile) Then
@@ -237,13 +236,11 @@ Sub SetupReadTextAloud
 	&apos; enable reading the selected text aloud. Visual Basic Script (vbs) might be
 	&apos; available as an optional Windows add-in. If you enable the option, then
 	&apos; this menu item will behave normally.
-	If Len(fsWineHomeDir()) = 0 Then
 		If Len(WinSpeechProgramPath()) = 0 Then
 			fsNetSAPI5WindowsSpeech(fsGetTextSelection(False, True), _
 			fsSelectionLanguageAndRegion(False))
 			Exit Sub
 		End If
-	End If
 	End Select
 	ConfigureReadTextAloud()
 End Sub
@@ -480,46 +477,63 @@ Function fsNetSAPI5WindowsSpeech(_
 	&apos;
 	&apos; [InvokeSAPI2]: https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ms723609(v=vs.85)
 	&apos;
+fsNetSAPI5WindowsSpeech = &quot;&quot;
 	Dim s2$ : s2 = &quot;&quot;
 	Dim iRate# : iRate = 0
 	Dim oFrame
 	oFrame = ThisComponent.getCurrentController().getFrame() &apos; Current frame
 	Dim oBar
 	oBar = oFrame.createStatusIndicator() &apos; Generated status bar 
-	oBar.start(fsLookUpTerm(&quot;s_speech-synthesis&quot;) &amp; &quot; (&quot; &amp; fsWindowsCloseMatchLanguage(sLang) &amp; &quot;)&quot;, 100)
-
-	s2 = fsMyTempLock(&quot;lock&quot;)
-	If FileExists(s2) Then
+	
+	If Len(fsWineHomeDir(False)) = 0 Then
+			oBar.start(_
+			fsLookUpTerm(_
+			&quot;s_speech-synthesis&quot;) &amp; &quot; (&quot; &amp; fsWindowsCloseMatchLanguage(sLang) &amp; &quot;)&quot;, 100)
+		s2 = fsMyTempLock(&quot;lock&quot;)
+		If FileExists(s2) Then
+			fbRemoveFile(s2)
+			WinStopSpeaking()
+			oBar.End()
+			Wait 20
+			Exit Function
+		End If
+		oBar.Value = 70
+		CreateFile(s2, fsAppSignature(), &quot;utf-8&quot;)
+		Dim WinSVSFPurgeBeforeSpeak# : WinSVSFPurgeBeforeSpeak = 2
+		Dim WinvbNullString$ : WinvbNullString = &quot;&quot;
+		Dim WinSVSFlagsAsync# : WinSVSFlagsAsync = 1
+		Dim speech As Object
+	
+		On Local Error GoTo fsNetSAPI5WindowsSpeechErr
+		Set speech = Createobject(&quot;Sapi.SpVoice&quot;)
+		speech.Rate = iRate
+		speech.Speak WinvbNullString, WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
+		speech.Speak WinMarkup(sB, sLang), WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
+		Do
+			&apos; Talking...
+		Loop Until (speech.waitUntilDone(1) or _
+				Not(FileExists(s2)))
+		Set speech = Nothing
+		Wait 28
+		oBar.Value = 85
+		Wait 14
 		fbRemoveFile(s2)
-		WinStopSpeaking()
+		oBar.Value = 100	
 		oBar.End()
-		Wait 20
-		Exit Function
+		fsNetSAPI5WindowsSpeech = sB
+	Else
+		s2 = fsMyTempLock(&quot;lock&quot;)
+		oBar.start(_
+		fsLookUpTerm(_
+		&quot;s_speech-synthesis&quot;) &amp; &quot; (&quot; &amp; sLang &amp; &quot;)&quot;, 100)
+		oBar.Value = 65
+		If fbWineSpdSay(sB, sLang) Then
+			oBar.Value = 85
+			fsNetSAPI5WindowsSpeech = sB
+		End If
+		oBar.Value = 100	
+		oBar.End()
 	End If
-	oBar.Value = 70
-	CreateFile(s2, fsAppSignature(), &quot;utf-8&quot;)
-	Dim WinSVSFPurgeBeforeSpeak# : WinSVSFPurgeBeforeSpeak = 2
-	Dim WinvbNullString$ : WinvbNullString = &quot;&quot;
-	Dim WinSVSFlagsAsync# : WinSVSFlagsAsync = 1
-	Dim speech As Object
-
-	On Local Error GoTo fsNetSAPI5WindowsSpeechErr
-	Set speech = Createobject(&quot;Sapi.SpVoice&quot;)
-	speech.Rate = iRate
-	speech.Speak WinvbNullString, WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
-	speech.Speak WinMarkup(sB, sLang), WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
-	Do
-		&apos; Talking...
-	Loop Until (speech.waitUntilDone(1) or _
-			Not(FileExists(s2)))
-	Set speech = Nothing
-	Wait 28
-	oBar.Value = 85
-	Wait 14
-	fbRemoveFile(s2)
-	oBar.Value = 100	
-	oBar.End()
-	fsNetSAPI5WindowsSpeech = sB
 	Exit Function
 	fsNetSAPI5WindowsSpeechErr:
 	fsNetSAPI5WindowsSpeech = &quot;&quot;

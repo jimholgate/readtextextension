@@ -351,7 +351,7 @@ Function fvTts_config_createDefaultConfig( _
 	&apos; Create default values for variables
 	If GetGUIType() = 1 Then
 		&apos; Windows
-		If Len(fsWineHomeDir()) = 0 Then
+		If Len(fsWineHomeDir(False)) = 0 Then
 			player7 = &quot; --player 7&quot;
 		End If
 		If bPiperOk Then
@@ -372,7 +372,7 @@ Function fvTts_config_createDefaultConfig( _
 		config(fiHtmlOption()) = False
 		config(fiSmartSelectCheckBox()) = 0
 		config(fiHtmlComboURL()) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
-		If Len(fsWineHomeDir()) = 0 Then
+		If Len(fsWineHomeDir(False)) = 0 Then
 			If Len(WinSpeechProgramPath()) = 0 Then
 				config(fiExternalProgramPath()) = &quot;wscript.exe&quot;
 			Else
@@ -429,7 +429,8 @@ Function fvTts_config_createDefaultConfig( _
 				config(fiExternalProgramPath()) = &quot;/usr/bin/python&quot;
 			End If
 			If isSnap() or isFlatPak Then
-				config(fiExternalCommand()) = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;FEMALE1&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				config(fiExternalCommand()) = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;FEMALE1&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf fbIsSandboxed() Then
 				config(fiExternalCommand()) = &quot;-m webbrowser -t &quot; &amp; _
 				&quot;&quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
@@ -445,7 +446,8 @@ Function fvTts_config_createDefaultConfig( _
 				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf bPiperOk Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --rate 100% --voice AUTO1#27 --language (SELECTION_LANGUAGE_COUNTRY_CODE&quot;
+				&quot; --rate 100% --voice AUTO0#0 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; _
+				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf FileExists(Environ(&quot;HOME&quot;) &amp; _
 				&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or FileExists( _
 				Environ(&quot;HOME&quot;) &amp; _
