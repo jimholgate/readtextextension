@@ -1954,7 +1954,6 @@ def do_gst_parse_launch(_pipe=""):  # -> bool
     filesink_location = ""
     if "filesink location=" in _pipe:
         filesink_location = _pipe.rsplit("=", 1)[-1].replace('"', "")
-        print(_pipe)
     try:
         Gst.init(None)
         _player = Gst.parse_launch("{0}".format(_pipe))
@@ -2838,7 +2837,7 @@ def gst_wav_to_media(
             )
             return True
         s_out_extension = os.path.splitext(_out)[1].lower()
-    # Use libgstid3demux? is not the normal meta format of audio files
+    # Use libgstid3demux? id3 is not the normal meta format of audio files
     # like .ogg, .opus and .spx! Install ffmpeg or avconv for metadata.
     b_use_id3_metadata = False
     b_audible = lax_bool(_audible)

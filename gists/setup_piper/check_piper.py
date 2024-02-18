@@ -36,7 +36,10 @@ Windows
 
 PowerShell supersedes the classic console. The safest way to run a [python][5]
 script is by opening it in [Visual Studio Code][6] and clicking the "Run"
-button. Visual Studio Code will show if it finds any issues.
+button. When you install Python, be sure to check the box that adds the file
+path to the Python executable to your local path settings. When you try to
+run the `check_piper` script, Visual Studio Code will show if it finds any
+issues.
 
 > VBScript is deprecated. In future releases of Windows, VBScript will
 > be available as a feature on demand before its removal from the
