@@ -126,6 +126,11 @@ except (ImportError, AssertionError):
         pass
 
 try:
+    from urllib import quote
+except ImportError:
+    from urllib.parse import quote
+
+try:
     import gi
 
     gi.require_version("Gst", "1.0")
@@ -1307,7 +1312,7 @@ def local_host_pop(
     )
     try:
         if webbrowser.open_new_tab("{0}{1}".format(local_url, _args)):
-            time.sleep(5 + m_sec/1000)
+            time.sleep(5 + m_sec / 1000)
             _local_server.stop()
             return True
         else:
@@ -1933,15 +1938,23 @@ def do_gst_parse_launch(_pipe=""):  # -> bool
     ```
     playbin uri='file:///pathto/xx.mp3'
     ```
+    Documentation
+    -------------
 
-    Find examples of commands on the [Gstreamer cheat sheet
-    wiki](http://wiki.oz9aec.net/index.php/Gstreamer_cheat_sheet).
+    [Gitlab](https://gitlab.freedesktop.org/gstreamer/gstreamer)
+
+    *PyGObject API Reference*. "Gst 1.0 (1.22.8.0) - Gst 1.0".
+    [GitHub](https://lazka.github.io/pgi-docs/#Gst-1.0)
 
     Stewart, Ian "GStreamer - Gst : An Introduction to using GStreamer in
     Python3 Programs". [GitHub](https://github.com/irsbugs/GStreaming), 2020.
     """
     if not _pipe:
         return True
+    filesink_location = ""
+    if "filesink location=" in _pipe:
+        filesink_location = _pipe.rsplit("=", 1)[-1].replace('"', "")
+        print(_pipe)
     try:
         Gst.init(None)
         _player = Gst.parse_launch("{0}".format(_pipe))
@@ -1955,6 +1968,12 @@ def do_gst_parse_launch(_pipe=""):  # -> bool
         _player.set_state(Gst.State.PAUSED)
         _player.set_state(Gst.State.READY)
         _player.set_state(Gst.State.NULL)
+        if len(filesink_location) != 0:
+            try:
+                # Waits until file is ready before measuring the size.
+                return os.path.getsize(filesink_location) != 0
+            except FileNotFoundError:
+                return False
         return True
     # gi.repository.GLib.Error: gst_parse_error: no element "filesrc" (1)
     except:
@@ -1974,6 +1993,11 @@ def do_gst_parse_launch(_pipe=""):  # -> bool
                     gst_l = launch
                     if my_os_system("{0} {1}".format(gst_l, _pipe)):
                         print("{0} {1}".format(gst_l, _pipe))
+                        if len(filesink_location) != 0:
+                            try:
+                                return os.path.getsize(filesink_location) != 0
+                            except FileNotFoundError:
+                                return False
                         return True
     return False
 
@@ -2814,11 +2838,15 @@ def gst_wav_to_media(
             )
             return True
         s_out_extension = os.path.splitext(_out)[1].lower()
+    # Use libgstid3demux? is not the normal meta format of audio files
+    # like .ogg, .opus and .spx! Install ffmpeg or avconv for metadata.
+    b_use_id3_metadata = False
     b_audible = lax_bool(_audible)
     b_visible = lax_bool(_visible)
     pipe = ""
     in_uri = ""
     code_pad = ""
+    _location = '''filesrc location="{_work}"'''.format(_work=_work)
     if not os.path.isfile(_work):
         return None
     in_uri = path2url(_work)
@@ -2828,9 +2856,10 @@ def gst_wav_to_media(
     if s_out_extension in [".mp2", ".mp3"]:
         if gst_plugin_path("libgstlame"):
             code_pad = "! lamemp3enc"
+            b_use_id3_metadata = True
     elif s_out_extension in [".mka", ".mkv"]:
         if gst_plugin_path("libgstmatroska"):
-            code_pad = "! matroskamux"
+            code_pad = "! vorbisenc ! matroskamux"
     elif s_out_extension == ".flac":
         if gst_plugin_path("libgstflac"):
             code_pad = "! flacenc ! oggmux"
@@ -2839,7 +2868,15 @@ def gst_wav_to_media(
             code_pad = "! vorbisenc ! oggmux"
     elif s_out_extension == ".opus":
         if gst_plugin_path("libgstopus"):
-            code_pad = "! opusenc ! oggmux"
+            # debian-12-2023-09-29
+            # Opus sample rates can be 8000, 12000, 16000, 24000,
+            # or 48000. Gstreamer needs a streaming pipe for the
+            # resampling to work. 16000 is excellent for voice.
+            # <https://datatracker.ietf.org/doc/html/rfc6716#section-4.2.9>
+            _q_work = quote(_work)
+            _location = 'uridecodebin uri="file://{_q_work}"'.format(_q_work=_q_work)
+            in_pad = " audioconvert ! audioresample "
+            code_pad = "! audio/x-raw, rate=16000 !  opusenc ! oggmux"
     elif s_out_extension == ".spx":
         if gst_plugin_path("libgstspeex"):
             code_pad = "! speexenc ! oggmux"
@@ -2847,12 +2884,18 @@ def gst_wav_to_media(
         if gst_plugin_path("libgstwavenc"):
             code_pad = "! wavenc"
     if code_pad:
-        gmeta = get_meta_data(_metas.i_gst, _artist, _image, _out)
-        pipe = '''filesrc location="{_work}" ! {in_pad} ! audioconvert {code_pad} {gmeta} ! filesink location="{_out}"'''.format(
-            _work=_work, in_pad=in_pad, code_pad=code_pad, gmeta=gmeta, _out=_out
+        gmeta = ""
+        if b_use_id3_metadata:
+            gmeta = get_meta_data(_metas.i_gst, _artist, _image, _out)
+        pipe = '''{_location} ! {in_pad} ! audioconvert {code_pad} {gmeta} ! filesink location="{_out}"'''.format(
+            _location=_location,
+            in_pad=in_pad,
+            code_pad=code_pad,
+            gmeta=gmeta,
+            _out=_out,
         )
-        pipe2 = '''filesrc location="{_work}" ! {in_pad} ! audioconvert {code_pad} ! filesink location="{_out}"'''.format(
-            _work=_work, in_pad=in_pad, code_pad=code_pad, _out=_out
+        pipe2 = '''{_location} !  ! {in_pad} ! audioconvert {code_pad} ! filesink location="{_out}"'''.format(
+            _location=_location, in_pad=in_pad, code_pad=code_pad, _out=_out
         )
     if pipe:
         if do_gst_parse_launch(pipe):

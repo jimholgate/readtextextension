@@ -21,8 +21,8 @@ computer matches the machine type of the program archive.
 Linux
 -----
 
-Use your package manager to check if the [`python3-tkinter`][2] library
-is installed to enable the piper installation script dialogs.
+Use your package manager to check if the [`python3-tkinter`][2] library or the
+Zenity application is installed to enable the piper installation script dialogs.
 
 To enable a visual user interface for playback, install [`vlc`][3].
 
