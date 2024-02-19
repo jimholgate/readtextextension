@@ -696,6 +696,8 @@ def sys_machine_paths():  # list(str)
         "/usr/lib64/",
         "/usr/local/i386/",
         "/usr/i386/",
+        "/usr/local/lib/i386-linux-gnu/",  # Work around wrong machine report.
+        "/usr/lib/i386-linux-gnu/",  #Debian6.1.76-1(2024-02-01)',machine='i686')
         "/usr/local/share/",
         "/usr/share/",
         "/opt/",
