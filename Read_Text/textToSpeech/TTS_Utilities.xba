@@ -6963,7 +6963,18 @@ End Function
 
 
 Function fbHaveVLC() As Boolean
-	fbHaveVLC = Not (Len(vlcPath()) = 0)
+	Select Case fsGetOS()
+		Case &quot;MacOS&quot;
+		Select Case fsGetMyTunesApp()
+			Case &quot;Music&quot;, &quot;&quot;
+			&apos; MacOS 14.3.1 osascript won&apos;t run third party apps! 
+			fbHaveVLC = False
+			Case Else
+			fbHaveVLC = Not (Len(vlcPath()) = 0)
+		End Select
+		Case Else
+		fbHaveVLC = Not (Len(vlcPath()) = 0)
+	End Select
 End Function
 
 

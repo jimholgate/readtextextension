@@ -29,7 +29,10 @@ Windows
 
 PowerShell supersedes the classic console. The safest way to run a [python][5]
 script is by opening it in [Visual Studio Code][6] and clicking the "Run"
-button. Visual Studio Code will show if it finds any issues.
+button. When you install Python, be sure to check the box that adds the file
+path to the Python executable to your local path settings. When you try to
+run the `check_piper` script, Visual Studio Code will show if it finds any
+issues.
 
 > VBScript is deprecated. In future releases of Windows, VBScript will
 > be available as a feature on demand before its removal from the
@@ -48,8 +51,9 @@ The [Rhasspy project][8] released a Windows pre-release of it's Piper TTS
 software.
 
 Starting with Read Text 0.8.74, the extension supports it as an experimental
-feature in Windows. Install the app with the script, then enable it by going
-to  *Tools - Options - Advanced* and selecting *Enable Experimental Features*.
+feature in Windows. Install the app with the script, then enable it in 
+LibreOffice by going to  *Tools - Options - Advanced* and selecting
+*Enable Experimental Features*.
 
 To improve performance and enable a visual user interface for playback,
 install the [VideoLAN VLC Media Player][9] desktop application.
