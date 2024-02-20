@@ -171,7 +171,6 @@ Sub ReadTextAloud()
 	Dim locklist As Variant : locklist = Array(&quot;lock&quot;)
 	Dim bDone As Boolean : bDone = False
 	Dim x As Integer : x = 0
-
 	Select Case fsGetOS()
 	Case &quot;UNIX&quot;
 		locklist = Array(&quot;lock&quot;, &quot;net_speech&quot;)
@@ -294,6 +293,15 @@ Sub ReadClipBoard
 	0, _
 	fsLookUpTerm( _
 	&quot;s_read-text&quot;)
+End Sub
+
+
+Sub ResetAll()
+	&apos; Reset the extension to the original settings on error or dialog option to
+	&apos; `&quot;(RESET_ALL)&quot;`
+	fbRemoveFile(fsExtensionSettingsIni())
+	fbRemoveFile(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
+	resetSpeech
 End Sub
 
 
@@ -477,16 +485,15 @@ Function fsNetSAPI5WindowsSpeech(_
 	&apos;
 	&apos; [InvokeSAPI2]: https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ms723609(v=vs.85)
 	&apos;
-fsNetSAPI5WindowsSpeech = &quot;&quot;
+	fsNetSAPI5WindowsSpeech = &quot;&quot;
 	Dim s2$ : s2 = &quot;&quot;
 	Dim iRate# : iRate = 0
 	Dim oFrame
 	oFrame = ThisComponent.getCurrentController().getFrame() &apos; Current frame
 	Dim oBar
 	oBar = oFrame.createStatusIndicator() &apos; Generated status bar 
-	
-	If Len(fsWineHomeDir(False)) = 0 Then
-			oBar.start(_
+	If Not fbUsingWine(False) Then
+		oBar.start(_
 			fsLookUpTerm(_
 			&quot;s_speech-synthesis&quot;) &amp; &quot; (&quot; &amp; fsWindowsCloseMatchLanguage(sLang) &amp; &quot;)&quot;, 100)
 		s2 = fsMyTempLock(&quot;lock&quot;)

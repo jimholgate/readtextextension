@@ -662,32 +662,35 @@ Function isFlatPak() As Boolean
 End Function
 
 
-Function faSplitString(byVal testString As String, byVal LineLen As Integer) As Variant
+Function faSplitString(byVal testString As String, byVal LineLen As Integer, _
+		byVal delimiters As Variant) As Variant
 	&apos; This function splits a long string into an array with the maximum length
-	&apos; of any item in the array to `LineLen` characters. **EB 2024-02-16**
-	Dim delimiters As Variant
-	delimiters = Array(Chr$(10), Chr$(13), &quot;.&quot;, &quot;:&quot;, &quot;;&quot;, Chr$(9), &quot;“&quot;, &quot;”&quot;, _
-	&quot;&quot;&quot;&quot;, &quot;,&quot;, &quot;(&quot;, &quot;)&quot;, &quot; &quot;)
-	
+	&apos; of any item in the array to `LineLen` characters.
 	Dim splitString() As String
 	ReDim splitString(0)
-	
 	Dim startIndex As Integer
 	startIndex = 0
 	Dim ubi As Integer
-	
+	Dim i As Integer
+	Dim substr As String
+	Dim delimiter As String
+	Dim lastIndex As Integer
+	Dim words As Variant
 	While startIndex &lt; Len(testString)
 		Dim length As Integer
 		length = Min(LineLen, Len(testString) - startIndex)
-		Dim substr As String
+		If length = LineLen Then
+			words = Split(Mid(testString, startIndex + 1, length), &quot; &quot;)
+			substr = &quot;&quot;
+			For i = LBound(words) To UBound(words) - 1
+        		substr = substr &amp; words(i) &amp; &quot; &quot;
+    		Next i
+			length = len(substr)
+		End If
 		substr = Mid(testString, startIndex + 1, length)
-		
-		Dim i As Integer
 		For i = LBound(delimiters) To UBound(delimiters)
-			Dim delimiter As String
 			delimiter = delimiters(i)
-			Dim lastIndex As Integer
-			lastIndex = InStrRev(substr, delimiter)
+			lastIndex = InStrRev(substr, delimiter) - 1
 			If lastIndex &gt; 0 Then
 				substr = Left(substr, lastIndex)
 				Exit For
@@ -698,18 +701,6 @@ Function faSplitString(byVal testString As String, byVal LineLen As Integer) As 
 		splitString(ubi) = substr
 		startIndex = startIndex + Len(substr)
 	Wend
-	&apos; Combine the last two strings if their total length is less than the maximum
-	&apos; characters and the divider is a space.
-	If UBound(splitString) &gt; 0 Then
-		Dim last As String
-		last = splitString(UBound(splitString))
-		Dim secondLast As String
-		secondLast = splitString(UBound(splitString) - 1)
-		If Len(last) + Len(secondLast) &lt; LineLen And Right(secondLast, 1) = &quot; &quot; Then
-			splitString(UBound(splitString) - 1) = secondLast &amp; last
-			ReDim Preserve splitString(UBound(splitString) - 1)
-		End If
-	End If
 	faSplitString = splitString
 End Function
 
@@ -737,15 +728,32 @@ Function Min(a As Integer, b As Integer) As Integer
 End Function
 
 
-Function fsWineHomeDir(_check64) As String
-	&apos; If you are running an `nt` amd64 type instance of the Posix `wine` 9
-	&apos; command,  then `WINEHOMEDIR` normally points the root of your Posix `~/`
-	&apos; directory as drive `Z:\`, otherwise it is `&quot;&quot;`.
-	fsWineHomeDir = &quot;&quot;
-	Dim sWineHomeDir As String : sWineHomeDir = Environ(&quot;WINEHOMEDIR&quot;)
-	If fbIsWin64Program(&quot;&quot;) Or Not _check64 Then
-		fsWineHomeDir = sWineHomeDir
+Function fbUsingWine(_check64) As Boolean
+	&apos; Return `True` if the computer has a unix executable directory
+	&apos; If `_check64` is `True` then only return `True` if rhe
+	&apos; the office program is made for an `amd64` processor type.
+	fbUsingWine = False
+	If fsGetOS() = &quot;WINDOWS&quot; Then
+		If fbIsWin64Program(&quot;&quot;) Or Not _check64 Then
+			fbUsingWine = FileExists(&quot;Z:\usr\bin\python3&quot;)
+		End If
 	End If
+	Exit Function
+	fbUsingWineErr:
+	fbUsingWine = False
+End Function
+
+
+Function fsWineMe() As String
+	&apos; Returns the Wine user name or `wine`
+	fsWineMe = &quot;wine&quot;
+	on Error GoTo fsWineMeErr
+	If fsGetOS() = &quot;WINDOWS&quot; Then
+		fsWineMe = split(_fsGetHomeDir(), &quot;\&quot;)(2)
+	End If
+	Exit Function
+	fsWineMeErr:
+	fsWineMe = &quot;wine&quot;
 End Function
 
 
@@ -760,13 +768,16 @@ Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolea
 	)
 	Dim x As Integer : x = 0
 	Dim s2 As String : s2 = fsMyTempLock(&quot;lock&quot;)
+	Dim wine_me as String: wine_me = fsWineMe()
 	Dim _cmds As Variant : _cmds = Array(_
-	&quot;/unix /usr/bin/spd-say -n wine_main -S &quot;, _
-	&quot;/unix /usr/bin/spd-say -n wine_main -C &quot; _
+	&quot;/unix /usr/bin/spd-say -n &quot; &amp; wine_me &amp; &quot;_main -S &quot;, _
+	&quot;/unix /usr/bin/spd-say -n &quot; &amp; wine_me &amp; &quot;_main -C &quot; _
 	)
 	Dim snippets As Variant
 	Dim bWait As Boolean: bWait = True
 	Dim item As String
+	Dim delimiters As Variant : delimiters = Array(Chr$(10), Chr$(13), &quot;.&quot;, &quot;:&quot;,_
+	&quot;;&quot;, Chr$(9), &quot;“&quot;, &quot;”&quot;, &quot;&quot;&quot;&quot;, &quot;,&quot;, &quot;(&quot;, &quot;)&quot;)
 
 	If FileExists(&quot;Z:\usr\bin\spd-say&quot;) Then
 		If FileExists(s2) Then
@@ -784,7 +795,7 @@ Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolea
 			For x = Lbound(escape_chars) To Ubound(escape_chars)
 				_msg = fsReplaceText(_msg, escape_chars(x), &quot;\&quot; &amp; escape_chars(x))
 			Next
-			snippets = faSplitString(_msg, 80)
+			snippets = faSplitString(_msg, 80, delimiters)
 			For Each item In snippets
 				If Not FileExists(s2) Then
 					Exit For
@@ -798,9 +809,9 @@ Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolea
 					)
 					Select Case Ubound(Split(item, &quot; &quot;))
 					Case 0
-						wait 2200
+						wait 1000
 					Case Else
-						wait 1600 + 400 * (Ubound(Split(item, &quot; &quot;)) - 1)
+						wait 800 + 360 * (Ubound(Split(item, &quot; &quot;)) - 1)
 					End Select
 				End If
 			Next
@@ -1737,7 +1748,7 @@ Function fbWindowsHasAnInternationalVoice( _
 	On Error Goto fbWindowsHasAnInternationalVoiceErr
 	b1 = True
 	If fsGetOS() = &quot;WINDOWS&quot; Then
-		If Len(fsWineHomeDir(False)) &lt;&gt; 0 Then
+		If fbUsingWine(False) Then
 			If Instr(fsLang(), &quot;en&quot;) = 0 Then
 				fbWindowsHasAnInternationalVoice = True
 			End If
@@ -1782,15 +1793,20 @@ Sub dialog1Combo2ShowSAPIChoices( _
 	oDialog)
 &apos; Windows dialogue
 	Dim Sapi As Object
-	Dim n As Integer
-	Dim aLineOfText As String,myScriptPath As String
-	Dim n1 As Integer,s1 As String,oComboBox As Variant
-	Dim sProgram As String,myTextPath As String
-	Dim s2 As String
-	Dim sSelectionLangCountryTag, sSelectionLanguageTag As String
-	Dim bNoMp3Tool As Boolean
-	Dim bHaveVLC As Boolean
-	Dim bHaveFfmpeg As Boolean
+	Dim n As Integer : n = 0
+	Dim aLineOfText As String : aLineOfText = &quot;&quot;
+	Dim myScriptPath As String : myScriptPath = &quot;&quot;
+	Dim n1 As Integer : n1 = 0
+	Dim s1 As String : s1 = &quot;&quot;
+	Dim oComboBox As Variant
+	Dim sProgram As String : sProgram = &quot;&quot;
+	Dim myTextPath As String : myTextPath = &quot;&quot;
+	Dim s2 As String : s2 = &quot;&quot;
+	Dim sSelectionLangCountryTag As String : sSelectionLangCountryTag = &quot;&quot;
+	Dim sSelectionLanguageTag As String : sSelectionLanguageTag = &quot;&quot;
+	Dim bNoMp3Tool As Boolean : bNoMp3Tool = True
+	Dim bHaveVLC As Boolean : bHaveVLC = False
+	Dim bHaveFfmpeg As Boolean : bHaveFfmpeg = False
     bNoMp3Tool = True
 	bHaveVLC = fbHaveVLC()
 	bHaveFfmpeg = fbHaveFfmpeg()
@@ -1800,19 +1816,16 @@ Sub dialog1Combo2ShowSAPIChoices( _
 	n1 = oComboBox.getItemCount()
 	oComboBox.removeItems(0, n1)
 	n = 0
-	If fbWindowsHasAnInternationalVoice(False, &quot;united states&quot;) Then
-		sSelectionLangCountryTag = &quot; /language:&quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
-		sSelectionLanguageTag = &quot;(SELECTION_LANGUAGE_CODE)&quot;
-	Else
-		sSelectionLangCountryTag = &quot; /language:&quot;&quot;en-US&quot;&quot;&quot;
-		sSelectionLanguageTag = &quot;en&quot;
-	End If
+	oComboBox.addItem(&quot;(RESET_ALL)&quot;, 0)
+	n = n + 1
+	sSelectionLangCountryTag = &quot; /language:&quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
+	sSelectionLanguageTag = &quot;(SELECTION_LANGUAGE_CODE)&quot;
 	On Error Goto FichierKO
 	While n &lt; Sapi.GetVoices.Count
 		s1 = Sapi.GetVoices.Item(n).GetDescription
 		For n1 = 10 To - 10 step - 2
-			oComboBox.addItem( &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-			&quot; /voice:&quot;&quot;&quot; &amp; s1 &amp; &quot;&quot;&quot; /rate:&quot; &amp; Trim(n1) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;,0)
+			oComboBox.addItem(&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
+			&quot; /voice:&quot;&quot;&quot; &amp; s1 &amp; &quot;&quot;&quot; /rate:&quot; &amp; Trim(Str(n1)) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;, 0)
 		Next
 		n = n + 1
 	WEnd
@@ -1820,17 +1833,8 @@ Sub dialog1Combo2ShowSAPIChoices( _
 	For n1 = 10 To - 10 step - 2
 		oComboBox.addItem( &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
 		sSelectionLangCountryTag &amp; _
-		&quot; /rate:&quot; &amp; Trim(n1) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;,0)
+		&quot; /rate:&quot; &amp; Trim(Str(n1)) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;, 0)
 	Next
-
-	If bHaveVLC Then
-		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-		sSelectionLangCountryTag &amp; _
-		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).opus&quot;&quot;&quot; &amp; _
-		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1, 0)
-	End If
 
 	If fbHaveOgg() Or bHaveFfmpeg Or bHaveVLC Then
 		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
@@ -1886,7 +1890,6 @@ Sub dialog1Combo2ShowSAPIChoices( _
 		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		oComboBox.addItem(s1, 0)
 	End If
-
 	If bNoMp3Tool Then
 		If fbHaveItunes() Then
 			&apos; We can use iTunes to embed metadata and an album cover.
@@ -2093,7 +2096,7 @@ Sub dialog1Combo2ShowSAYChoices( _
 	If Not b_CaBcVancouverHolgateJamesReadtextextensionHideExports Then
 		For n = LBound(aA) To UBound(aA)
 			s1 = &quot; -f &quot;&quot;(TMP)&quot;&quot;&quot; &amp; &quot;-o &quot;&quot;(HOME)(NOW)&quot; &amp; aA(n) &amp; &quot;&quot;&quot;&quot;
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 		Next
 	End If
 	n = 0
@@ -2107,16 +2110,16 @@ Sub dialog1Combo2ShowSAYChoices( _
 				&quot; -f &quot;&quot;(TMP)&quot;&quot; -o &quot;&quot;(HOME)(NOW).&quot; &amp; _
 				aA(o) &amp; _
 				&quot;&quot;&quot;&quot;
-				oComboBox.addItem(s1,0)
+				oComboBox.addItem(s1, 0)
 			Next
 			s1 = &quot;--voice &quot; &amp; _
 			fsMacVoice(n, selection_IsoLang) &amp; _
 			&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 		End If
 	Next
 	s1 = &quot;-f &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1,0)
+	oComboBox.addItem(s1, 0)
 End Sub
 
 
@@ -2135,20 +2138,14 @@ Sub dialog1Combo2ShowAppleScriptChoices( _
 	
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
 	n = oComboBox.getItemCount()
-	oComboBox.removeItems( 0,n)
+	oComboBox.removeItems(0, n)
+	oComboBox.addItem(&quot;(RESET_ALL)&quot;, 0)
+	
 	Select Case b_CaBcVancouverHolgateJamesReadtextextensionHideExports
 		Case False
 		Select Case fsGetMyTunesApp()
 			Case &quot;Music&quot;
-			&apos; 2021-12 MacOS 12.01 (Monterey)
-			&apos; .m4a opens in third party apps like VideoLan VLC, but not
-			&apos; the native MacOS 11 Music or Quicktime player programs.
-			If Not fbHaveVLC() Then
-				s2 = &quot;.aif,.mp3&quot;
-			Else
-				
-				s2 = &quot;.opus,.ogg,.aif,.mp3&quot;
-			End If
+			s2 = &quot;.aif,.mp3&quot;
 			Case &quot;iTunes&quot;
 			&apos; MacOS 10.13.6 and iTunes 12.8.3.1
 			&apos; .mp3 -- no metadata
@@ -2185,7 +2182,7 @@ Sub dialog1Combo2ShowAppleScriptChoices( _
 	&quot;)&quot;&quot;&quot;
 	a1 = Split(s1, CR)
 	For n = LBound(a1) To UBound(a1)
-		oComboBox.addItem(&quot;&quot;&quot;(SAY_APPLESCRIPT&quot; &amp; a1(n),0)
+		oComboBox.addItem(&quot;&quot;&quot;(SAY_APPLESCRIPT&quot; &amp; a1(n), 0)
 	Next
 	If Instr(s1, oComboBox.Model.Text) = 0 Then
 		oComboBox.addItem(oComboBox.Model.Text, 0)
@@ -2220,42 +2217,42 @@ Sub dialog1Combo2ShowESPEAKChoices( _
 	For n = Lbound(s2) To Ubound(s2)
 		&apos;English
 		s1 = s3 &amp; &quot;-v en-us&quot; &amp; s2(n)
-		oComboBox.addItem(s1,0)
+		oComboBox.addItem(s1, 0)
 		s1 = s3 &amp; &quot;-v en&quot; &amp; s2(n)
-		oComboBox.addItem(s1,0)
+		oComboBox.addItem(s1, 0)
 		Select Case sLanguage
 			Case &quot;es&quot;
 			s1 = s3 &amp; &quot;-v es-mx&quot; &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			s1 = s3 &amp; &quot;-v es-la&quot; &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			s1 = s3 &amp; &quot;-v es&quot; &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			Case &quot;fr&quot;
 			s1 = s3 &amp; &quot;-v fr-be&quot; &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			s1 = s3 &amp; &quot;-v fr&quot; &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			Case &quot;nb&quot;,&quot;nn&quot;,&quot;no&quot;
 			&apos; Norway
 			s1 = s3 &amp; &quot;-v no&quot; &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			Case &quot;pt&quot;
 			&apos; Portugal And Brazil
 			s1 = s3 &amp; &quot;-v pt-pt&quot; &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			s1 = s3 &amp; &quot;-v pt&quot; &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			Case &quot;zh&quot;
 			s1 = s3 &amp; &quot;-v zh-yue&quot; &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			s1 = s3 &amp; &quot;-v zh&quot; &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			Case &quot;af&quot;,&quot;bs&quot;,&quot;ca&quot;,&quot;cs&quot;,&quot;cy&quot;,&quot;da&quot;,&quot;de&quot;,&quot;el&quot;,&quot;eo&quot;,&quot;fi&quot;,&quot;hi&quot;,&quot;hr&quot;,&quot;hu&quot;, _
 			&quot;hy&quot;,&quot;id&quot;,&quot;is&quot;,&quot;it&quot;,&quot;ku&quot;,&quot;la&quot;,&quot;lv&quot;,&quot;mk&quot;,&quot;nl&quot;,&quot;pl&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sk&quot;,&quot;sq&quot;, _
 			&quot;sr&quot;,&quot;sv&quot;,&quot;sw&quot;,&quot;ta&quot;,&quot;tr&quot;,&quot;vi&quot;
 			s1 = s3 &amp; &quot;-v &quot; &amp; sLanguage &amp; s2(n)
-			oComboBox.addItem(s1,0)
+			oComboBox.addItem(s1, 0)
 			Case Else
 		End Select
 		If FileExists(&quot;/usr/bin/mbrola&quot;) Or _
@@ -2272,11 +2269,11 @@ Sub dialog1Combo2ShowESPEAKChoices( _
 				FileExists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Or _
 				FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Then
 				s1 = s3 &amp; &quot;-v mb-&quot; &amp; s4 &amp; &quot; &quot; &amp; s2(n)
-				oComboBox.addItem(s1,0)
+				oComboBox.addItem(s1, 0)
 			End If
 		Next
 		s1 = s3 &amp; s2(n)
-		oComboBox.addItem(s1,0)
+		oComboBox.addItem(s1, 0)
 	Next
 	If Instr(oComboBox.Model.Text, &quot;-v &quot;) &lt;&gt; 0 Then
 		oComboBox.addItem(oComboBox.Model.Text, 0)
@@ -2402,7 +2399,7 @@ Sub dialog1Combo1ShowFestivalScripts( _
 	&quot;(audio_mode &apos;shutup)&quot;_
 	)
 	For n = Lbound(cmd_list) To Ubound(cmd_list)
-		oComboBox.addItem(cmd_list(n),0)
+		oComboBox.addItem(cmd_list(n), 0)
 		s2 = s2 &amp; cmd_list(n) &amp; CR
 	Next
 	If Instr(s2, oComboBox.Model.Text) = 0 Then
@@ -2504,7 +2501,7 @@ Function fiDialog1CombosShowMyPythonChoices( _
 		Case &quot;MacOS&quot;
 		player7 = &quot; --player 7&quot;
 		Case &quot;WINDOWS&quot;
-		If Len(fsWineHomeDir(True)) = 0 Then
+		If Not fbUsingWine(True) Then
 			player7 = &quot; --player 7&quot;
 		End If		
 	End Select 
@@ -2514,7 +2511,7 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	End If
 	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then bIsAppImage = True
 	CR = Chr(10)
-	s1 = CR
+	s1 = &quot;&quot;
 	s3 = &quot;&quot;
 	s4 = &quot;&quot;
 	local_suggestion = &quot;&quot;
@@ -2527,13 +2524,15 @@ Function fiDialog1CombosShowMyPythonChoices( _
 		s1 = s1 &amp; CR &amp; &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
 		s1 = s1 &amp; CR &amp; &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&apos;)&quot;&quot;&quot;
 		Case &quot;MacOS&quot;
-		&apos;pass
+			&apos;pass
 		Case Else
 		bEnableRate = Len(fsMatchFestivalVoice(&quot;_hts&quot;)) = 0
 	End Select
 	oComboBox = oDialog.getControl(getControl)
 	n = oComboBox.getItemCount()
 	oComboBox.removeItems(0, n)
+	oComboBox.addItem(&quot;(RESET_ALL)&quot;, 0)
+	n = 1
 	If fbIsSandboxed() Then
 		&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
 		s1 = s1 &amp; CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
@@ -2836,6 +2835,8 @@ Function gst_plugin_path() As String
 	&quot;/usr/lib/armhf-linux-gnu/gstreamer-1.0/&quot;, _
 	&quot;/usr/local/lib/arm64-linux-gnu/gstreamer-1.0/&quot;, _
 	&quot;/usr/lib/arm64-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/local/lib/i686-linux-gnu/gstreamer-1.0/&quot;, _
+	&quot;/usr/lib/i686-linux-gnu/gstreamer-1.0/&quot;, _
 	&quot;/usr/local/lib/mips-linux-gnu/gstreamer-1.0/&quot;, _
 	&quot;/usr/lib/mips-linux-gnu/gstreamer-1.0/&quot;, _
 	&quot;/usr/local/lib/mips64el-linux-gnu/gstreamer-1.0/&quot;, _
@@ -3084,7 +3085,7 @@ Function fsMyTitleInputBox( _
 	cr = Chr(10)
 	s1 = fsSuperTrim(fsThisDocTitle(), unwanted_characters)
 	s2 = fsSuperTrim(fsThisDocAuthor(), unwanted_characters)
-	s3 = dialog_title  &apos; ###### Dialog Title
+	s3 = dialog_title
 	s4 = fsSuperTrim(fsThisSoundTitle(), unwanted_characters)
 	s5 = Trim(str(fiMyCurrentAudioTrack(False)))
 	suggestion = fsSuperTrim(suggestion, unwanted_characters)
@@ -3646,6 +3647,11 @@ Sub ttsActuate( _
 			sProgram = config(fiExperimentalProgramPath())
 			sCommand = config(fiExperimentalCommand())
 		End If
+		If Instr(sCommand, &quot;(RESET_ALL)&quot;) &lt;&gt; 0 Then
+			ResetAll()
+			oBar.End()
+			Exit Sub
+		End If
 		If InStr(LCase(sProgram), &quot;bin/padsp&quot;) &lt;&gt; 0 Then
 			If InStr(LCase(sCommand), &quot;swift&quot;) &lt;&gt; 0 Then
 				&apos; Cepstral swift Alison (2008) for Linux does not pronounce text around smart quotes correctly,
@@ -3761,7 +3767,6 @@ Sub ttsActuate( _
 			End If
 		End Select
 		If InStr(sCommand,&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot;) = 1 Then
-			
 			&apos;only consider SAPI voices
 			sCommand = fsReplaceText(sCommand,&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,fsSelectionLanguageAndRegion(False))
 		End If
@@ -3829,9 +3834,7 @@ Sub ttsActuate( _
 		&quot; &quot; &amp; _
 		fsLookUpTerm(&quot;s_string-cannot-be-analyzed&quot;), 64 , _
 		fsLookUpTerm(&quot;s_read-text&quot;))
-		fbRemoveFile(fsExtensionSettingsIni())
-		fbRemoveFile(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
-		resetSpeech
+		ResetAll()
 	End If
 	On Error Resume Next
 	oBar.Value = 90
@@ -3858,9 +3861,7 @@ Sub ttsActuate( _
 	
 	MsgBox(fsLookUpTerm( &quot;s_string-cannot-be-analyzed&quot;), 48, _
 	fsLookUpTerm( &quot;s_read-text&quot;))
-	fbRemoveFile(fsExtensionSettingsIni())
-	fbRemoveFile(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
-	resetSpeech
+	ResetAll()
 End Sub
 
 
@@ -5405,7 +5406,7 @@ Sub MsgSpeak( _
 	Else
 		Select Case fsGetOS()
 			Case &quot;WINDOWS&quot;
-			If Len(fsWineHomeDir(False)) = 0 Then
+			If Not fbUsingWine(False) Then
 				If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
 					fsNetSAPI5WindowsSpeech(strA, _
 					fsSelectionLanguageAndRegion(False))
@@ -7941,7 +7942,7 @@ End Function
 Function fbExperimentalMode() As Boolean
 	&apos; If you enable the Office Experimental Mode, the extension unlocks
 	&apos; some tools and does not change what you enter into the main dialog.
-	If Len(fsWineHomeDir(True)) &lt;&gt; 0 Then
+	If fbUsingWine(True) Then
 		&apos; Always enable when using `nt` programs with Wine on Posix
 		&apos; operating systems.
 		fbExperimentalMode = True
@@ -8548,13 +8549,13 @@ Function fsExportAlbumCover( _
 		iScale = 28000 / 600
 	End If
 	If ismissing(sPath) Then
-		sPath = converttourl(fsGetHomeDir) &amp; fsSelectionLanguage() &amp; _
+		sPath = converttourl(fsGetHomeDir()) &amp; fsSelectionLanguage() &amp; _
 		&quot;/poster-&quot; &amp; _
 		Right(&quot;000&quot; &amp; _
 		Trim(str(fiMyCurrentAudioTrack(False))), 3) &amp; _
 		&quot;.jpg&quot;
 	ElseIf sPath = &quot;&quot; Then
-		sPath = converttourl(fsGetHomeDir) &amp; fsSelectionLanguage() &amp; _
+		sPath = converttourl(fsGetHomeDir()) &amp; fsSelectionLanguage() &amp; _
 		&quot;/poster-&quot; &amp; _
 		Right(&quot;000&quot; &amp; _
 		Trim(str(fiMyCurrentAudioTrack(False))), 3) &amp; _
@@ -10085,8 +10086,8 @@ Function fsReleasenotesCMD( _
 	a1 = Split(sA, &quot;,&quot;)
 	For n = LBound(a1) To UBound(a1)
 		s2 = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsMyURL &amp; &quot;/textToSpeech/&quot; &amp; a1(n) &amp; &quot;.xba&quot;) &amp; &quot;&quot;&quot;&quot;
-		s3 = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsGetHomeDir &amp; &quot;&quot; &amp; a1(n) &amp; &quot;.markdown&quot;) &amp; &quot;&quot;&quot;&quot;
-		s4 = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsGetHomeDir &amp; &quot;&quot; &amp; a1(n) &amp; &quot;.markdown-e&quot;) &amp; &quot;&quot;&quot;&quot;
+		s3 = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsGetHomeDir() &amp; &quot;&quot; &amp; a1(n) &amp; &quot;.markdown&quot;) &amp; &quot;&quot;&quot;&quot;
+		s4 = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsGetHomeDir() &amp; &quot;&quot; &amp; a1(n) &amp; &quot;.markdown-e&quot;) &amp; &quot;&quot;&quot;&quot;
 		s1 = &quot;cat &quot; &amp; s2 &amp; &quot; | grep &quot;&quot;&amp;apos;&amp;apos;&quot;&quot; &gt; &quot; &amp; s3 &amp; &quot; ; &quot; &amp; _
 		&quot;sed -i -e &apos;s/&amp;apos;&amp;apos; //g&apos; &quot; &amp; s3 &amp; &quot; ; &quot; &amp; _
 		&quot;sed -i -e &apos;s/&amp;apos;&amp;apos;//g&apos; &quot; &amp; s3 &amp; &quot; ; &quot; &amp; _
@@ -10108,9 +10109,9 @@ Function fsReleasenotesCMD( _
 		If s5 = &quot;&quot; Then
 			Exit For
 		Else
-			fsReleasenotesCMD = fsReleasenotesCMD &amp; &quot;;&quot; &amp; s5
+			fsReleasenotesCMD = fsReleasenotesCMD() &amp; &quot;;&quot; &amp; s5
 			If InStr(sA, &quot;,&quot;) &lt;&gt; 0 Then
-				webhelp(converttourl(fsGetHomeDir &amp; _
+				webhelp(converttourl(fsGetHomeDir() &amp; _
 				a1(LBound(a1)) &amp; _
 				&quot;.markdown&quot;))
 			End If
@@ -10155,7 +10156,7 @@ Sub megaDoc()
 	For n = LBound(a1) To UBound(a1)
 		s1 = s1 &amp; _
 		&quot;&quot;&quot;&quot; &amp; _
-		ConvertFromUrl(fsGetHomeDir &amp; _
+		ConvertFromUrl(fsGetHomeDir() &amp; _
 		a1(n) &amp; _
 		&quot;.markdown&quot;) &amp; _
 		&quot;&quot;&quot; &quot;
@@ -10172,7 +10173,7 @@ Sub megaDoc()
 	fsLookUpTerm(&quot;s_read-text&quot;), _
 	s1)
 	If Not(s1 = &quot;&quot;) Then
-		webhelp(converttourl(fsGetHomeDir &amp; _
+		webhelp(converttourl(fsGetHomeDir() &amp; _
 		&quot;TTS_read-text-all&quot; &amp; _
 		&quot;.markdown&quot;))
 	End If

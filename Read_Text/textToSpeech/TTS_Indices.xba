@@ -766,7 +766,7 @@ Function fsPosterImg() As String
 	Dim s2$
 	s2 = &quot;&quot;
 	Dim s3$
-	s3 = converttourl(fsGetHomeDir)
+	s3 = converttourl(fsGetHomeDir())
 	Dim a1
 	a1 = Array(fsSelectionLanguageAndRegion(True), _
 	fsSelectionLanguage(), _

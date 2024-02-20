@@ -20,7 +20,7 @@
   <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="13" dlg:left="10" dlg:top="5" dlg:width="250" dlg:height="155">
    <dlg:title dlg:value="FrameControl1"/>
   </dlg:titledbox>
-  <dlg:filecontrol dlg:id="FileControl2" dlg:tab-index="8" dlg:disabled="true" dlg:left="16" dlg:top="84" dlg:width="240" dlg:height="14" dlg:value="/usr/bin/python">
+  <dlg:filecontrol dlg:id="FileControl2" dlg:tab-index="8" dlg:disabled="true" dlg:left="16" dlg:top="84" dlg:width="240" dlg:height="14" dlg:value="_file_control2">
    <script:event script:event-name="on-keyup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateCombo2?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:filecontrol>
   <dlg:combobox dlg:id="ComboBox2" dlg:tab-index="9" dlg:disabled="true" dlg:left="16" dlg:top="110" dlg:width="240" dlg:height="14" dlg:value="_combobox2" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true">
