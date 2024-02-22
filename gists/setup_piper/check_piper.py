@@ -287,12 +287,6 @@ class GetPiperData:
             self.program_path = os.path.join(
                 os.environ.get("LOCALAPPDATA"), "Programs", "piper-tts"
             )
-        #        if bool(os.environ.get("WINEHOMEDIR")):
-        #            program_path = os.path.join(
-        #                os.environ.get("WINEHOMEDIR"), ".local", "share", "piper-tts"
-        #            )
-        #            if os.path.isdir(program_path):
-        #                self.program_path = program_path
         self.data_path = os.path.realpath(
             os.path.expanduser("~/.local/share/piper-tts")
         )

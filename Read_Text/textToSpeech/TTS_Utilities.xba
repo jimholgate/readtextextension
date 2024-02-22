@@ -768,6 +768,24 @@ Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolea
 	)
 	Dim x As Integer : x = 0
 	Dim s2 As String : s2 = fsMyTempLock(&quot;lock&quot;)
+	Dim duration : duration = 2.4
+	Dim dirs64 As Variant : dirs64 = Array(_
+	&quot;C:\Program Files (x86)&quot;, _
+	&quot;Z:\usr\lib\amd64&quot;, _
+	&quot;Z:\usr\lib\amd64-linux-gnu&quot;, _
+	&quot;Z:\usr\lib\arm64&quot;, _
+	&quot;Z:\usr\lib\arm64-linux-gnu&quot;, _
+	&quot;Z:\usr\lib\x86_64&quot;, _
+	&quot;Z:\usr\lib\x86_64-linux-gnu&quot;, _
+	&quot;Z:\usr\lib64&quot;, _
+	&quot;Z:\usr\lib64-linux-gnu&quot;, _
+	)
+	For x = Lbound(dirs64) to Ubound(dirs64)
+		If Len(Dir(dirs64(x), 16)) &lt;&gt; 0 Then
+			duration = 1
+			Exit For
+		End If
+	Next
 	Dim wine_me as String: wine_me = fsWineMe()
 	Dim _cmds As Variant : _cmds = Array(_
 	&quot;/unix /usr/bin/spd-say -n &quot; &amp; wine_me &amp; &quot;_main -S &quot;, _
@@ -804,14 +822,14 @@ Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolea
 					shell(_
 					&quot;start&quot;, _
 					0, _
-					&quot;/unix /usr/bin/spd-say -n wine_main -l &quot;&quot;&quot; &amp; _language &amp; &quot;&quot;&quot; &quot;&quot;&quot; &amp; item &amp; &quot;&quot;&quot; &quot;, _
+					&quot;/unix /usr/bin/spd-say -n &quot; &amp; wine_me &amp; &quot;_main -l &quot;&quot;&quot; &amp; _language &amp; &quot;&quot;&quot; &quot;&quot;&quot; &amp; item &amp; &quot;&quot;&quot; &quot;, _
 					bWait _
 					)
 					Select Case Ubound(Split(item, &quot; &quot;))
 					Case 0
-						wait 1000
+						wait 1000 * duration
 					Case Else
-						wait 800 + 360 * (Ubound(Split(item, &quot; &quot;)) - 1)
+						wait duration * (800 + 360 * (Ubound(Split(item, &quot; &quot;)) - 1))
 					End Select
 				End If
 			Next
