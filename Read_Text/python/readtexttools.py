@@ -516,7 +516,10 @@ def strip_mojibake(concise_lang="en", _raw_text="", _strict=False):  # -> str
         _ubound = 126
     else:
         _ubound = 255
-    safe_chars = "".join((chr(i) for i in range(1, _ubound)))
+    try:
+        safe_chars = "".join((chr(i) for i in range(1, _ubound)))
+    except UnicodeDecodeError:
+        return strip_mojibake(concise_lang, _raw_text, True)
     if not _raw_text:
         return ""
     try:
@@ -1376,7 +1379,7 @@ font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans
 }
 </style>"""
     try:
-        s1 = f"""
+        s1 = """
 <html>
 <head>
 <script> 
@@ -1413,7 +1416,8 @@ setTimeout(function(){{window.close();}}, {_stime});
 </table>
 </body>
 </html>
-"""
+""".format(_stime=_stime, ie_css=ie_css, _dialog_title=_dialog_title,
+           f_logo_src=f_logo_src, _msg_h1=_msg_h1, _msg=_msg)
     except (AttributeError, NameError, SyntaxError):
         return False
     with open(out_file, "w") as f:

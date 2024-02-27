@@ -3034,19 +3034,24 @@ Function fsAppImageResourcePath( _
 	&apos; running in a temporary mounted directory.
 	Dim i#
 	i = 0
-	Dim s1$
-	s1 = ConvertFromUrl(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
-	
+	Dim x#
+	x = 0
+	Dim a1 As Variant : a1 = Array(_
+	ConvertFromUrl(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0)), _
+	replace(split(Environ(&quot;PATH&quot;), &quot;:&quot;)(0), &quot;usr/bin/&quot;, &quot;opt/openoffice4/program/&quot;)_
+	)
 	fsAppImageResourcePath = &quot;&quot;
-	If (InStr(s1, &quot;/tmp/.mount_&quot;) = 1) Then
-		For i = 1 To 5
-			fsAppImageResourcePath = fsAppImageResourcePath &amp; &quot;/&quot; &amp; Split(s1, &quot;/&quot;)(i)
-		Next
-		fsAppImageResourcePath = fsAppImageResourcePath &amp; &quot;/&quot; &amp; sApp
-		If Not FileExists(fsAppImageResourcePath) Then
-			fsAppImageResourcePath = &quot;&quot;
+	For x = Lbound(a1) To Ubound(a1)
+		If (InStr(a1(x), &quot;/tmp/.mount_&quot;) = 1) Then
+			For i = 1 To 5
+				fsAppImageResourcePath = fsAppImageResourcePath &amp; &quot;/&quot; &amp; Split(a1(x), &quot;/&quot;)(i)
+			Next
+			fsAppImageResourcePath = fsAppImageResourcePath &amp; &quot;/&quot; &amp; sApp
+			If Not FileExists(fsAppImageResourcePath) Then
+				fsAppImageResourcePath = &quot;&quot;
+			End If
 		End If
-	End If
+	Next
 End Function
 
 
@@ -9942,6 +9947,8 @@ Function BundlePyPath()
 	BundlePyPath = &quot;file:///usr/bin/python3&quot;
 	If FileExists(BundlePyPath) Then Exit Function
 	BundlePyPath = &quot;file:///usr/bin/python&quot;
+	If FileExists(BundlePyPath) Then Exit Function
+	bundlePyPath = &quot;file:///opt/openoffice4/program/python&quot;
 	If FileExists(BundlePyPath) Then Exit Function
 	BundlePyPath = &quot;&quot;	
 	Exit Function
