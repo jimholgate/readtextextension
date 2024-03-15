@@ -1,15 +1,17 @@
 #summary Setting up Read Text Extension
 
-= Set up =
+= Installation de l’extension Read text =
 
-* Click the icon on the menu bar or choose ''Tools - Add-Ons - Read Selection...'' 
-* Choose the program or website you want the extension to use and the command string or script. 
-* By default, the extension uses a working command in the Command Line Options box. 
-* You can test the settings without saving them by right-clicking ''OK'' . 
-* When you are satisfied with the settings, uncheck ''Always show this dialogue'' . 
-* Click ''OK'' . 
+== Configuration ==
 
-= Customize =
+* Cliquez sur l’icône dans la barre de menu ou sélectionnez ''Outils - Add-ons - Lire la sélection …''
+* Choisissez un logiciel ou un site et modifier les paramètres.
+* Par défaut, l’extension utilise ''C:\WINDOWS\system32\wscript.exe'' avec Lire la sélection avec une application externe et '' -f '(TMP)' '' dans Les options sur la ligne de commande .
+* Vous pouvez tester les paramètres sans les enregistrer par un clic droit sur ''OK'' .
+* Lorsque vous êtes satisfait des paramètres, décochez la case Toujours affiche cette boîte de dialogue .
+* Cliquez sur ''OK'' .
 
-* You can use different external applications or websites to speak different languages or translate text. 
-* If you want to view the dialog to change settings, use ''Tools - Add-Ons  - Read Selection...'' 
+== Personnaliser ==
+
+* Vous pouvez utiliser des applications externes ou des sites Web pour la synthese vocale des langues différentes ou pour la traduction de texte.
+* Si vous souhaitez afficher la boîte de dialogue pour modifier les paramètres, utilisez la commande ''Outils - Add-ons - Lire la sélection …''

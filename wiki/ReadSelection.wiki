@@ -1,6 +1,6 @@
 #summary Using Read Text Extension - Read Selection
 
-= Read Selection =
+== Lire la sélection ==
 
-* Open Calc, Draw, Impress, Web Writer or Writer, then make a selection. 
-* Click the ''Read Selection'' button on the menu bar. 
+* Ouvrez Calc, Draw, Impress, Web Writer ou Writer, et sélectionnez du texte.
+* Cliquez le bouton ''Lire la sélection'' sur la barre. 

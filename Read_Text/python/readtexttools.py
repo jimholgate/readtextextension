@@ -700,14 +700,14 @@ def sys_machine_paths():  # list(str)
         "/usr/local/i386/",
         "/usr/i386/",
         "/usr/local/lib/i386-linux-gnu/",  # Work around wrong machine report.
-        "/usr/lib/i386-linux-gnu/",  #Debian6.1.76-1(2024-02-01)',machine='i686')
+        "/usr/lib/i386-linux-gnu/",  # Debian6.1.76-1(2024-02-01)',machine='i686')
         "/usr/local/share/",
         "/usr/share/",
         "/opt/",
     ]
     try:
         machine_type = platform.uname().machine
-    except:
+    except NameError:
         _meta = ImportedMetaData()
         machine_type = _meta.execute_command("uname -m")
     if len(machine_type) == 0:
@@ -1064,10 +1064,13 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
     path1 = ""
     path2 = ""
     path3 = ""
-    py_ver = "{0}.{1}".format(
-        platform.python_version_tuple()[0], platform.python_version_tuple()[1]
-    )
-    if int(platform.python_version_tuple()[0].strip()) < 3:
+    try:
+        py_ver = "{0}.{1}".format(
+            platform.python_version_tuple()[0], platform.python_version_tuple()[1]
+        )
+        if int(platform.python_version_tuple()[0].strip()) < 3:
+            return ""
+    except NameError:
         return ""
     if os.name == "nt":
         profile = os.getenv("LOCALAPPDATA").strip(os.path.sep)
@@ -1236,7 +1239,7 @@ def is_container_instance():  # -> bool
     try:
         if int(platform.python_version_tuple()[0]) < 3:
             return True
-    except:
+    except NameError:
         pass
     tests = [
         "windowsapps",
@@ -1289,7 +1292,10 @@ def local_host_pop(
     office program cannot rely on using local directories or system
     installed programs like `wscript`, `mshta`, `osascript`, `dbus`
     `speech-dispatcher` etc."""
-    _local_server = check_dialog.MyServer()
+    try:
+        _local_server = check_dialog.MyServer()
+    except OSError:
+        return False
     _xml_transform = XmlTransform()
     if _local_server.is_valid_url(""):
         local_url = _local_server.host_and_port
@@ -1416,8 +1422,14 @@ setTimeout(function(){{window.close();}}, {_stime});
 </table>
 </body>
 </html>
-""".format(_stime=_stime, ie_css=ie_css, _dialog_title=_dialog_title,
-           f_logo_src=f_logo_src, _msg_h1=_msg_h1, _msg=_msg)
+""".format(
+            _stime=_stime,
+            ie_css=ie_css,
+            _dialog_title=_dialog_title,
+            f_logo_src=f_logo_src,
+            _msg_h1=_msg_h1,
+            _msg=_msg,
+        )
     except (AttributeError, NameError, SyntaxError):
         return False
     with open(out_file, "w") as f:
@@ -1485,25 +1497,27 @@ def pop_message(
                 break
     summary = translate_ui_element(iso_lang, summary)
     msg = translate_ui_element(iso_lang, msg)
-    try:
-        if bool(dbus):
-            item = "org.freedesktop.Notifications"
-            _interface = dbus.Interface(
-                dbus.SessionBus().get_object(item, "/" + item.replace(".", "/")), item
-            )
-            _interface.Notify(
-                "readtexttools.py",
-                0,
-                my_icon,
-                summary,
-                msg,
-                [],
-                {"urgency": urgent},
-                m_sec,
-            )
-            return True
-    except (NameError, ValueError, Exception):
-        pass
+    if not using_container(False):
+        try:
+            if bool(dbus):
+                item = "org.freedesktop.Notifications"
+                _interface = dbus.Interface(
+                    dbus.SessionBus().get_object(item, "/" + item.replace(".", "/")),
+                    item,
+                )
+                _interface.Notify(
+                    "readtexttools.py",
+                    0,
+                    my_icon,
+                    summary,
+                    msg,
+                    [],
+                    {"urgency": urgent},
+                    m_sec,
+                )
+                return True
+        except (NameError, ValueError, Exception):
+            pass
     if have_posix_app("notify-send", False):
         my_os_system(
             'notify-send -i "{0}" -t {1} "{2}" "{3}"'.format(
@@ -2014,7 +2028,7 @@ def web_info_translate(
     Users of a sandboxed program can get a message."""
     try:
         _web_text = urllib.parse.quote(_msg)
-    except NameError:
+    except (AttributeError, NameError):
         _web_text = path2url(_msg).replace("file:///", "")
     try:
         if _language[:2] in ["en"]:

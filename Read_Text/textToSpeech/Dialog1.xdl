@@ -8,7 +8,8 @@
   </dlg:filecontrol>
   <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="7" dlg:disabled="true" dlg:left="16" dlg:top="55" dlg:width="240" dlg:height="14" dlg:tag=" " dlg:value="_combobox1" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true" dlg:linecount="6">
    <dlg:menupopup>
-    <dlg:menuitem dlg:value="( tts &quot;(TMP)&quot; nil) (quit)"/>
+    <dlg:menuitem dlg:value=""/>
+    <dlg:menuitem dlg:value="(RESET_ALL)"/>
    </dlg:menupopup>
   </dlg:combobox>
   <dlg:button dlg:id="CommandButton1" dlg:tab-index="3" dlg:left="222" dlg:top="198" dlg:width="38" dlg:height="16" dlg:default="true" dlg:value="CommandButton1" dlg:button-type="ok">
@@ -25,9 +26,8 @@
   </dlg:filecontrol>
   <dlg:combobox dlg:id="ComboBox2" dlg:tab-index="9" dlg:disabled="true" dlg:left="16" dlg:top="110" dlg:width="240" dlg:height="14" dlg:value="_combobox2" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true">
    <dlg:menupopup>
-    <dlg:menuitem dlg:value="&quot;(TMP)&quot;"/>
-    <dlg:menuitem dlg:value="-l &quot;(LANGUAGE_CODE)&quot; &quot;(TMP)&quot;"/>
-    <dlg:menuitem dlg:value="-l &quot;(SELECTION_LANGUAGE_CODE)&quot; &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value=""/>
+    <dlg:menuitem dlg:value="(RESET_ALL)"/>
    </dlg:menupopup>
    <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateCombo2F?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:combobox>

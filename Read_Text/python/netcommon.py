@@ -17,7 +17,6 @@ NET_SERVICE_LIST = [
     "AUTO",
     "NETWORK",
     "GTTS",
-    "COQUI",
     "LARYNX",
     "MARYTTS",
     "MIMIC",

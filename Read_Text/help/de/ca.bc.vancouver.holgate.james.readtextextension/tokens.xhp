@@ -8,8 +8,8 @@
         <history>
             <created date="2010-10-22T00:00:00">
                 James Holgate</created>
-            <lastedited date="2011-07-16T23:40:00">
-                Added token description for Title.</lastedited></history></meta>
+            <lastedited date="2024-03-15T20:07:25">
+                James Holgate ID tokens</lastedited></history></meta>
     <body>
         <paragraph role="heading" id="tokens1" xml-lang="de-DE" level="1">
             Installieren der Read Text Extension</paragraph>
@@ -73,6 +73,12 @@
             <listitem>
                 Die ersten 999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXT)</listitem>
             <listitem>
-                Die ersten 9999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXTBIG)</listitem></list>
+                Die ersten 9999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXTBIG)</listitem>    
+            <listitem>
+                Das Sitzungscookie (SESSION_ID)</listitem>
+            <listitem>
+                Ein Einmal-Cookie (UNIQUE_ID)</listitem>
+            <listitem>
+                Eine anonyme Kennung für den aktuellen Benutzer (USER_ID)</listitem></list>
     </body>
 </helpdocument>

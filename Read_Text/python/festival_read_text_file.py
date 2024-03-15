@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+# -*- coding: UTF-8-*-
 """
 Festival
 ========
@@ -93,13 +94,14 @@ Copyright (c) 2011 - 2024 James Holgate
   [3]: http://sites.google.com/site/readtextextension/
 
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
 import getopt
 import os
 import sys
 import readtexttools
 
 
-def usage() -> None:
+def usage():  # -> None
     """
     Command line help
     """
@@ -149,7 +151,7 @@ Usage
 class ReadFestivalClass(object):
     """Read long strings aloud with low latency."""
 
-    def __init__(self) -> None:
+    def __init__(self):  # -> None
         self.player = ""
         if os.name == "nt":
             self.player = readtexttools.get_nt_path("festival/festival.exe")
@@ -367,7 +369,7 @@ class ReadFestivalClass(object):
             },
         ]
 
-    def first_good_voice(self, _test) -> str:
+    def first_good_voice(self, _test):  # -> str
         """Return the first voice in the list. If the voice is
         not supported, then Festival normally shows a message
         then continues in English."""
@@ -394,7 +396,7 @@ class ReadFestivalClass(object):
                     return "(voice_{0})".format(path_stem)
         return ""
 
-    def count_your_voices(self) -> int:
+    def count_your_voices(self):  # -> int
         """'Return a non-zero value only if a festival voice is installed."""
         _count = 0
         test_dir = "/usr/share/festival/voices"
@@ -404,7 +406,7 @@ class ReadFestivalClass(object):
             _count = readtexttools.count_items_in_dir(test_dir)
         return _count
 
-    def iso_lang_to_fest_lang(self, iso_lang="en-US") -> str:
+    def iso_lang_to_fest_lang(self, iso_lang="en-US"):  # -> str
         """Check if the library supports the language or voice.
         If so, return festival's name of the language, otherwise return
         `''`.
@@ -470,7 +472,7 @@ class ReadFestivalClass(object):
             self.lang = ""
         return ""
 
-    def language_ok(self, _lang) -> bool:
+    def language_ok(self, _lang):  # -> bool
         """Third party voices installed in the festival directory might
         not be compatible with the `text2wave` program, and cause a crash."""
         if _lang[:2] in ["uk", "tt", "sq", "ru", "pt", "pl", "mk", "kg", "eo"]:
@@ -497,7 +499,7 @@ class ReadFestivalClass(object):
         _title="",
         _writer="",
         _image_size="",
-    ) -> bool:
+    ):  # -> bool
         """
         Creates a temporary speech-synthesis sound file and optionally
         reads the file aloud.
@@ -534,16 +536,12 @@ class ReadFestivalClass(object):
                 return False
             if readtexttools.get_nt_path("festival/text2wave"):
                 _script = readtexttools.get_nt_path("festival/text2wave")
-                _command = (
-                    '''{0} --script {1} "{2}" -o "{3}"'''.format(
-                        _app, _script, _file_path, _work_file
-                    )
+                _command = '''{0} --script {1} "{2}" -o "{3}"'''.format(
+                    _app, _script, _file_path, _work_file
                 )
             else:
                 # With Windows, this script only supports reading text aloud.
-                _command = '{0} --tts  "{1}"'.format(
-                    _app, _file_path
-                )
+                _command = '{0} --tts  "{1}"'.format(_app, _file_path)
         else:
             if readtexttools.have_posix_app("text2wave", False):
                 _app = "text2wave"
@@ -551,9 +549,7 @@ class ReadFestivalClass(object):
                 if len(_eval_token) == 0:
                     _switch = ""
                 else:
-                    _switch = ' -eval "{0}"'.format(
-                        _eval_token
-                    )
+                    _switch = ' -eval "{0}"'.format(_eval_token)
                 _command = '{0}{1} "{2}" -o "{3}"'.format(
                     _app, _switch, _file_path, _work_file
                 )
@@ -563,14 +559,11 @@ class ReadFestivalClass(object):
                 # but might not with a gstreamer app like totem or gst-launch-1.0
                 if os.path.splitext(_file_path)[1] not in [".txt"]:
                     return False
-                _command = 'flite -f "{0}" -o "{1}"'.format(
-                    _file_path, _work_file
-                    )
+                _command = 'flite -f "{0}" -o "{1}"'.format(_file_path, _work_file)
         try:
             if not readtexttools.my_os_system(_command):
                 # try with _switch = '' -- default voice
-                _command = '{0} "{1}" -o "{2}"'.format(
-                    _app, _file_path, _work_file)
+                _command = '{0} "{1}" -o "{2}"'.format(_app, _file_path, _work_file)
         except IOError:
             print("I was unable to read!")
             usage()
@@ -591,7 +584,7 @@ class ReadFestivalClass(object):
             return True
         return False
 
-    def sable_speaker_name(self, _test="") -> str:
+    def sable_speaker_name(self, _test=""):  # -> str
         """
         Sable
         =====
@@ -609,7 +602,7 @@ class ReadFestivalClass(object):
             my_val = self.voice_eval.replace("(voice_", "").replace(")", "")
         return my_val
 
-    def festival_rate(self, _test="100%") -> str:
+    def festival_rate(self, _test="100%"):  # -> str
         """
         Use RATE for value of Sable `<RATE SPEED="50%">` markup.
         Converts w3 Smil style percentage to Sable style percentage
@@ -640,13 +633,13 @@ class ReadFestivalClass(object):
         myStr = str(my_val) + "%"
         return myStr
 
-    def in_festival_defaults(self, _test="0%") -> bool:
+    def in_festival_defaults(self, _test="0%"):  # -> bool
         """Check if a parameter value is like a default setting."""
         if _test in [None, False, "0", "0%", ""]:
             return True
         return False
 
-    def festival_pitch(self, _test="100%") -> str:
+    def festival_pitch(self, _test="100%"):  # -> str
         """
         Use PITCH for value of Sable `<PITCH BASE="50%">` markup.
         Converts w3 Smil style percentage to Sable percentage
@@ -676,7 +669,7 @@ class ReadFestivalClass(object):
         return str(my_val) + "%"
 
 
-def main() -> None:
+def main():  # -> None
     """
     Creates a temporary speech-synthesis sound file and optionally
     reads the file aloud.

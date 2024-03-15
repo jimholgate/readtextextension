@@ -125,27 +125,10 @@ includes voices in several languages by default, including,
 * Telugu
 * Turkish
 
-TTS
----
-
-TTS is a text to speech authoring tool that includes support for converting
-text to speech. The Read Text Extension accesses TTS as a client of a locally
-hosted Coqui AI TTS web service. To interpret the capabilities of each tts
-model, the Read Text Extension web client requires the `bs4` (beautiful soup)
-pythonlibrary. To correctly parse the text the Read Text python client
-requires the `spacy` python library.
-
-TTS is a development platform. You, like other users and online community
-contributors can create voice models. The speed, reliability and accuracy
-of TTS's artificial intelligence generated speech can vary by model, language
-and your computer's hardware. The Read Text Extension's local host web client
-might not be able to access all the features of all TTS language models on all
-computers
 
 See also:
 
 * [Adding-voices](https://rhasspy.readthedocs.io/en/v2.4.20/text-to-speech/#adding-voices)
-* [Coqui.ai News](https://tts.readthedocs.io/en/latest/index.html)
 * [Docker Docs](https://docs.docker.com/desktop/install/linux-install/)
 * [Docker MaryTTS Image](https://hub.docker.com/r/synesthesiam/marytts)
 * [Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
@@ -155,6 +138,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import getopt
 import os
 import sys
+
 try:
     import netgtts
 except (AttributeError, ImportError, SyntaxError):
@@ -162,6 +146,7 @@ except (AttributeError, ImportError, SyntaxError):
 
 try:
     import requests
+
     REQUESTS_OK = True
 except (AttributeError, ImportError):
     REQUESTS_OK = False
@@ -179,10 +164,6 @@ except (AttributeError, ImportError, SyntaxError):
     pass
 try:
     import netrhvoice
-except (AttributeError, ImportError, SyntaxError):
-    pass
-try:
-    import nettts
 except (AttributeError, ImportError, SyntaxError):
     pass
 try:
@@ -230,7 +211,6 @@ time that you use it.
 * [Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
 * [Open TTS](https://github.com/synesthesiam/opentts#open-text-to-speech-server)
 * [Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest)
-* [CoquiAI demo](https://github.com/coqui-ai/TTS/pkgs/container/tts-cpu)
 """
     )
 
@@ -248,7 +228,9 @@ def network_problem(voice="default"):  # -> str
 + If you are using a `localhost` server, it might help to
   enter the local speech server command in a terminal and
   read what it prints out.
-  """.format(voice)
+  """.format(
+        voice
+    )
 
 
 def network_ok(_iso_lang="en-US", _local_url=""):  # -> bool
@@ -284,12 +266,6 @@ def network_ok(_iso_lang="en-US", _local_url=""):  # -> bool
             _gtts_class = netgtts.GoogleTranslateClass()
             if _gtts_class.check_version(_gtts_class.tested_version):
                 _continue = True
-        except NameError:
-            pass
-    if not _continue:
-        try:
-            _coqui_demo = nettts.CoquiDemoLocalHost()
-            _continue = _coqui_demo.language_supported(_iso_lang, _local_url)
         except NameError:
             pass
     return _continue
@@ -448,28 +424,6 @@ def network_main(
             )
             return True
     except NameError:
-        pass
-    try:
-        _coqui_demo = nettts.CoquiDemoLocalHost()
-        if _coqui_demo.language_supported(_iso_lang, _local_url):
-            _coqui_demo.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _vox,
-                20,
-                60,
-            )
-            return True
-    except (NameError, TypeError):
         pass
     try:
         _gtts_class = netgtts.GoogleTranslateClass()

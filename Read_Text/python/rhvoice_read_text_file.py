@@ -1,45 +1,65 @@
-﻿#!/usr/bin/env python3
+﻿#!/usr/bin/env python
+# -*- coding: UTF-8-*-
 """
-Reads a text file using the rhvoice platform and a media player.
+Reads a text file using the rhvoice platform and a media player. Olga
+Yakovleva created RHVoice in 2011. It now includes several languages.
 
 Install
 -------
 
-To enable rhvoice in Ubuntu 22.04, use:
+### LibreOffice
+
+To enable rhvoice in Ubuntu 22.04, or Debian 12 use:
 
     sudo apt install libportaudio2 librhvoice-audio2 \\
-    librhvoice-core4 librhvoice5 rhvoice-english \\
+    librhvoice5 rhvoice-english \\
     speech-dispatcher-rhvoice rhvoice
 
-To add languages, add the appropriate packages
+Python 3 supports `speech-dispatcher`, and `docker rhvoice-rest`.
+The `speech-dispatcher` framework is recommended because you can
+set it up to use different speech platforms for different languages.
+
+Use a dialog choice that includes `(SPD_READ_TEXT_PY)`
+
+### Apache OpenOffice
+
+To enable rhvoice in Ubuntu 22.04, or Debian 12 use:
+
+    sudo apt install libportaudio2 librhvoice-audio2 \\
+    librhvoice5 rhvoice-english
+
+This client does not support `speech-dispatcher` when using python 2.7. It
+relies on `RHVoice-test`, a test application that has been depreciated.
+
+Use a dialog choice that includes `(RHVOICE_READ_TEXT_PY)`
+
+### Add languages
+
+To add languages, add the appropriate packages. For example,
 
     sudo apt install rhvoice-brazilian-portuguese
+    sudo apt install rhvoice-english
     sudo apt install rhvoice-esperanto
     sudo apt install rhvoice-kyrgyz
+    sudo apt install rhvoice-macedonian
+    sudo apt install rhvoice-polish
     sudo apt install rhvoice-russian
     sudo apt install rhvoice-tatar
     sudo apt install rhvoice-ukrainian
-    sudo apt install rhvoice-english
 
-The command line interface that this script uses is depreciated, so
-it might not continue to work, or it might not work as well as it
-does when using `speech-dispatcher`, `docker rhvoice-rest` or `orca`.
+### Other platforms
 
-If you configure `speech-dispatcher` to use `rhvoice` and enter
-`"(SPD_READ_TEXT_PY)" "(TMP)"` in Read Text Extension's main
-dialog then your system might have a smaller delay when you click
-the *Read Selection* button before the voice starts speaking.
+To install rhvoice on other linux platforms that use python 3, you can use a
+docker image like <https://hub.docker.com/r/aculeasis/rhvoice-rest>.
 
-To enable rhvoice for speech-dispatcher in Ubuntu 22.04, use:
+Use a dialog choice that includes `(NETWORK_READ_TEXT_PY)`
 
-    sudo apt install speech-dispatcher-rhvoice
+The available voices vary according to the specific docker image.
 
-To install rhvoice on other linux platforms, use a docker image
-like <https://hub.docker.com/r/aculeasis/rhvoice-rest>.
-
-The available voices might vary according to the specific image.
+<https://github.com/RHVoice/RHVoice>
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
 import getopt
 import os
 import platform
@@ -47,7 +67,7 @@ import sys
 import readtexttools
 
 
-def usage() -> None:
+def usage():  # -> None
     """
     Command line help
     """
@@ -127,7 +147,7 @@ class RhVoiceClass(object):
 
     """
 
-    def __init__(self) -> None:
+    def __init__(self):  # -> None
         """Initialize data"""
         self.ok = True
         self.app = "RHVoice-test"
@@ -304,7 +324,7 @@ class RhVoiceClass(object):
         _writer="",
         _size="600x600",
         _speech_rate="100",
-    ) -> bool:
+    ):  # -> bool
         """
 
         + `_text` - Text to speak
@@ -331,10 +351,7 @@ class RhVoiceClass(object):
         if not bool(_voice):
             self.ok = False
             return False
-        if (
-            int(platform.python_version_tuple()[0]) < 3
-            or int(platform.python_version_tuple()[1]) < 8
-        ):
+        if sys.version_info < (2, 7):
             self.ok = False
             return False
         _media_out = ""
@@ -355,7 +372,13 @@ class RhVoiceClass(object):
         _app = self.app
         _speech_rate = readtexttools.safechars(_speech_rate, "1234567890")
         _command = (
-            f"{_app} -i '{_text_work}' -r {_speech_rate} -p {_voice} -o '{_media_work}'"
+            "{_app} -i '{_text_work}' -r {_speech_rate} -p {_voice} -o '{_media_work}'"
+        ).format(
+            _app=_app,
+            _text_work=_text_work,
+            _speech_rate=_speech_rate,
+            _voice=_voice,
+            _media_work=_media_work,
         )
         try:
             readtexttools.my_os_system(_command)
@@ -387,7 +410,7 @@ class RhVoiceClass(object):
         self.ok = False
         return False
 
-    def voice_available(self, iso_lang="en-US", _check_list=None) -> bool:
+    def voice_available(self, iso_lang="en-US", _check_list=None):  # -> bool
         """Check if you have installed a language resource for
         a language or a voice."""
         _voice = self.language_to_voice(iso_lang)
@@ -396,13 +419,15 @@ class RhVoiceClass(object):
                 self.ok = True
                 return True
         else:
-            if os.path.isdir(f"/usr/share/RHVoice/voices/{_voice}"):
+            if os.path.isdir(
+                "/usr/share/RHVoice/voices/{_voice}".format(_voice=_voice)
+            ):
                 self.ok = True
                 return True
         self.ok = False
         return False
 
-    def first_good_voice(self, _voices=None, _check_list=None) -> str:
+    def first_good_voice(self, _voices=None, _check_list=None):  # -> str
         """Check the default Linux installation for the first
         voice available from the `_voices` list. The preferred
         voice in English depends on the region. If English is not
@@ -415,13 +440,15 @@ class RhVoiceClass(object):
                         if _voice in _check_list:
                             return _voice
                     else:
-                        if os.path.isdir(f"/usr/share/RHVoice/voices/{_voice}"):
+                        if os.path.isdir(
+                            "/usr/share/RHVoice/voices/{_voice}".format(_voice=_voice)
+                        ):
                             return _voice
             except (AttributeError, SyntaxError):
                 pass
         return ""
 
-    def language_to_voice(self, iso_lang="en-US", _check_list=None) -> str:
+    def language_to_voice(self, iso_lang="en-US", _check_list=None):  # -> str
         """Check if the library supports the language or voice.
         If so, return a voice in the language, otherwise return
         `''`."""
@@ -471,9 +498,9 @@ class RhVoiceClass(object):
         return ""
 
 
-def main() -> None:
-    """Use rhvoice speech synthesis for supported languages while on-line"""
-    if not sys.version_info >= (3, 6) or not os.name in ["posix"]:
+def main():  # -> None
+    """Use rhvoice speech synthesis for supported languages."""
+    if not sys.version_info >= (2, 7) or not os.name in ["posix"]:
         print("Your system does not support the rhvoice python tool.")
         usage()
         sys.exit(0)
@@ -551,7 +578,11 @@ def main() -> None:
     _rhvoice_cl = RhVoiceClass()
     _voice = _rhvoice_cl.language_to_voice(_iso_lang)
     if not _rhvoice_cl.voice_available(_voice):
-        print(f"The {_voice} voice ({_iso_lang}) was not found.")
+        print(
+            "The {_voice} voice ({_iso_lang}) was not found.".format(
+                _voice=_voice, _iso_lang=_iso_lang
+            )
+        )
         usage()
         sys.exit(0)
     _text = _imported_meta.meta_from_file(_text_file_in)

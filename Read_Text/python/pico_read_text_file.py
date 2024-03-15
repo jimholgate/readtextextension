@@ -91,7 +91,7 @@ Usage
 
 
 def picoread(
-    _text = "",
+    _text="",
     _language="en-US",
     _visible="false",
     _audible="true",
@@ -278,7 +278,9 @@ def main():  # -> NoReturn
                 _text.strip(), readtexttools.lax_bool(_strict)
             )
             _pico_text = '''"<speed level = '{}'>
-<pitch level = '{}'>'{}</pitch></speed>"'''.format(_rate, _pitch, _text)
+<pitch level = '{}'>'{}</pitch></speed>"'''.format(
+                _rate, _pitch, _text
+            )
     if len(_pico_text) != 0:
         _artist_ok = readtexttools.check_artist(_artist)
         _title_ok = readtexttools.check_title(_title, "pico")

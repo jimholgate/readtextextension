@@ -168,6 +168,11 @@ import getopt
 import urllib
 import warnings
 
+try:
+    import platform
+except (ImportError, AssertionError):
+    pass
+
 import find_replace_phonemes
 import netcommon
 import readtexttools
@@ -180,41 +185,41 @@ VLC_WINDOWS_INFO = """
 > various streaming protocols.
 
 -- [VLC: Official site]((https://www.videolan.org))
+```
 
-    ██████████████████████████████████████████████████████████████████
-    ██████████████████████████████████████████████████████████████████
-    ██████████████████████████████████████████████████████████████████
-    ██████████████████████████████████████████████████████████████████
-    ████████              ██        ████  ██████              ████████
-    ████████  ██████████  ████████      ████  ██  ██████████  ████████
-    ████████  ██      ██  ████  ██  ██  ████████  ██      ██  ████████
-    ████████  ██      ██  ██████    ██  ██    ██  ██      ██  ████████
-    ████████  ██      ██  ██████      ██  ██  ██  ██      ██  ████████
-    ████████  ██████████  ████  ██  ████████████  ██████████  ████████
-    ████████              ██  ██  ██  ██  ██  ██              ████████
-    ████████████████████████    ████    ████  ████████████████████████
-    ████████    ██    ██  ████  ████  ██      ██  ██████████  ████████
-    ████████████        ████████  ████      ██  ██          ██████████
-    ████████████████      ████  ████    ██  ████    ██  ████  ████████
-    ████████      ████  ████  ████████████████████  ██        ████████
-    ████████  ████  ████  ████    ██████      ██  ██████████  ████████
-    ████████      ██  ████  ████  ██  ██        ████  ████  ██████████
-    ████████    ██████    ████  ████████    ██    ██          ████████
-    ████████  ████  ████████    ████  ██  ██    ██  ██    ██  ████████
-    ████████  ██  ████    ████          ████          ██    ██████████
-    ████████████████████████  ████  ██  ████  ██████  ██    ██████████
-    ████████              ████  ████  ██████  ██  ██  ██████  ████████
-    ████████  ██████████  ████      ██  ██    ██████  ██████  ████████
-    ████████  ██      ██  ██    ██    ██              ████████████████
-    ████████  ██      ██  ██  ██  ██  ██████████  ████████    ████████
-    ████████  ██      ██  ████      ██    ████  ████          ████████
-    ████████  ██████████  ██  ██  ████████  ██████    ██      ████████
-    ████████              ██  ██      ██████    ██████  ████  ████████
-    ██████████████████████████████████████████████████████████████████
-    ██████████████████████████████████████████████████████████████████
-    ██████████████████████████████████████████████████████████████████
-    ██████████████████████████████████████████████████████████████████
 
+
+
+        ██████████████  ████████    ██      ██████████████
+        ██          ██        ██████    ██  ██          ██
+        ██  ██████  ██    ██  ██  ██        ██  ██████  ██
+        ██  ██████  ██      ████  ██  ████  ██  ██████  ██
+        ██  ██████  ██      ██████  ██  ██  ██  ██████  ██
+        ██          ██    ██  ██            ██          ██
+        ██████████████  ██  ██  ██  ██  ██  ██████████████
+                        ████    ████    ██                
+        ████  ████  ██    ██    ██  ██████  ██          ██
+            ████████        ██    ██████  ██  ██████████  
+                ██████    ██    ████  ██    ████  ██    ██
+        ██████    ██    ██                    ██  ████████
+        ██    ██    ██    ████      ██████  ██          ██
+        ██████  ██    ██    ██  ██  ████████    ██    ██  
+        ████      ████    ██        ████  ████  ██████████
+        ██    ██        ████    ██  ██  ████  ██  ████  ██
+        ██  ██    ████    ██████████    ██████████  ████  
+                        ██    ██  ██    ██      ██  ████  
+        ██████████████    ██    ██      ██  ██  ██      ██
+        ██          ██    ██████  ██  ████      ██      ██
+        ██  ██████  ██  ████  ████  ██████████████        
+        ██  ██████  ██  ██  ██  ██          ██        ████
+        ██  ██████  ██    ██████  ████    ██    ██████████
+        ██          ██  ██  ██        ██      ████  ██████
+        ██████████████  ██  ██████      ████      ██    ██
+
+
+
+
+```
 If you are using PiperTTS on Windows without installing VLC , it can
 take a few moments before your computer starts playing Piper speech.
 If you are using PiperTTS using a compatibility layer capable of 
@@ -232,6 +237,13 @@ class PiperTTSClass(object):
     def __init__(self) -> None:
         """Initialize data."""
         _common = netcommon.LocalCommons()
+        self.machine = ""
+        try:
+            self.machine = platform.uname().machine
+        except NameError:
+            _meta = readtexttools.ImportedMetaData()
+            self.machine = _meta.execute_command("uname -m")
+        self.app_data = ".local"
         self.piper_minimum_dictionary = {
             "GB-jenny_dioco-medium": {
                 "key": "en_GB-jenny_dioco-medium",
@@ -296,8 +308,11 @@ class PiperTTSClass(object):
         self.app = "piper"
         # Try to use a complete path for a local installation because the
         # local user might not have added the piper path to their `PATH`
-        # environment.
-        app_list = ["piper-cli", "piper"]
+        # environment.  Some app installer platforms use `piper` to refer
+        # to a gaming mouse setup program. We check alternatives before
+        # testing `piper`.
+        # See: [GitHub](https://github.com/libratbag/piper).
+        app_list = ["piper-cli", "piper-tts", "piper"]
         if os.name in ["nt"]:
             self.app = "piper.exe"
             _extension_table = readtexttools.ExtensionTable()
@@ -314,6 +329,9 @@ class PiperTTSClass(object):
                 for _item in [
                     f"~/.local/bin/{_app}",
                     f"~/.local/share/piper-tts/{_app}/{_app}",
+                    f"~/.local/share/pied/common/{_app}/{_app}",
+                    f"~/snap/pied/common/{_app}/{_app}",
+                    f"~/.var/app/com.mikeasoft.pied/data/pied/piper/piper",
                     f"/usr/local/lib/piper/{_app}",
                     f"/usr/lib/piper/{_app}",
                 ]:
@@ -348,10 +366,14 @@ class PiperTTSClass(object):
         self.model = ""
         self.piper_voice_dir = ""
         self.app_data = ".local"
+        self.pied_list = []
         self.piper_voice_dir_list = [
             f"~/{self.app_data}/share/piper-tts/piper-voices",
             f"~/{self.app_data}/share/piper/piper-voices",
             f"~/{self.app_data}/share/piper-voices",
+            f"~/{self.app_data}/share/pied/common/models",
+            "~/snap/pied/common/models",
+            "~/.var/app/com.mikeasoft.pied/data/pied/models/",
             "~/piper-voices",
             "/opt/piper-voices",
             "/opt/piper-tts/piper-voices",
@@ -365,6 +387,9 @@ class PiperTTSClass(object):
             f"~/{self.app_data}/share/piper-tts/piper/espeak-ng-data",
             f"~/{self.app_data}/share/piper-tts/espeak-ng-data",
             f"~/{self.app_data}/share/piper/espeak-ng-data",
+            f"~/{self.app_data}/share/pied/piper/espeak-ng-data",
+            "~/snap/pied/common/piper/espeak-ng-data",
+            "~/.var/app/com.mikeasoft.pied/data/pied/piper/espeak-ng-data",
             "~/espeak-ng-data",
             "~/Downloads/espeak-ng-data",
             "/opt/piper-tts/piper-tts/piper/espeak-ng-data",
@@ -570,6 +595,58 @@ not work with the python version.
                 )
         return b_done
 
+    def get_valid_qualities(self) -> list:
+        """Determine valid qualities based on machine type and GPU
+        availability."""
+        if self.machine in ["x86_64", "amd64", "x64"]:
+            if any(netcommon.have_gpu(_gpu) for _gpu in ["intel", "nvidia", "ryzen"]):
+                return ["high", "medium", "low", "x_low"]
+            return ["medium", "low", "x_low"]
+        elif self.machine in ["arm64", "aarch64", "arm64-darwin"]:
+            return ["high", "medium", "low", "x_low"]
+        return ["low", "x_low"]
+
+    def unlink_bad_posix_symbolic_link(
+        self, _dest: str = "", filter_qualities: bool = False
+    ) -> str:
+        """If `os.name == 'nt'` always return `realpath`. Otherwise...
+
+        Is `_dest` a real path? Return `_dest` without checking
+        the `filter_qualities`.
+
+        Is `_dest` a symbolic link? Unlink it if it is invalid.
+
+        If `filter_qualities` equals `True` return the real path
+        if it meets the quality criteria. Otherwise, return the
+        real path if the symbolic link points to a valid path.
+
+        If there's no valid link, or there's an error, return `""`
+        """
+        if os.name == "nt":
+            return os.path.realpath(_dest)
+        try:
+            if _dest == os.path.realpath(_dest):
+                return _dest
+        except TypeError:
+            return ""
+        try:
+            if not os.path.islink(_dest) or not os.path.exists(os.readlink(_dest)):
+                os.unlink(_dest)
+                return ""
+            if not filter_qualities:
+                return os.path.realpath(_dest)
+            # Define valid qualities based on machine type and GPU availability
+            _valid_qualities = self.get_valid_qualities()
+            _test_str = _dest.replace(os.path.expanduser("~"), "~", 1)
+            if any(
+                f"{os.sep}{quality}{os.sep}" in _test_str
+                for quality in _valid_qualities
+            ):
+                return os.path.realpath(_dest)
+        except (OSError, TypeError):
+            pass
+        return ""
+
     def language_supported(self, iso_lang: str = "en-GB", vox: str = "auto") -> bool:
         """Check to see if the language is available"""
         model_test = vox.split("#")[0]
@@ -608,6 +685,7 @@ not work with the python version.
         self.concise_lang = iso_lang.split("_")[0].split("-")[0]
         self.lang = iso_lang.replace("-", "_")
         _dir_list = os.listdir(self.piper_voice_dir)
+
         self.ok = False
         if self.concise_lang in _dir_list:
             if any(
@@ -616,6 +694,107 @@ not work with the python version.
                 return self.ok
         self.ok = any(_file.startswith(self.concise_lang) for _file in _dir_list)
         return self.ok
+
+    def link_home_dir_list(self, all_dir_list=None, _iso_lang: str = "en-US") -> bool:
+        """Where onnx.json files exist in a posix home directory and files
+        with the same name are not filed using the extension directory with
+        a voices.json file, then link the home onnx.json and onnx files in
+        the standard directory. Graphical Piper manager applications like the
+        [Pied](https://pied.mikeasoft.com/) installer app might not store
+        MODEL_CARD files in a standarcized directory, so this client tries
+        to download them for your reference into the client directory."""
+        if not os.name == "posix" or bool(all_dir_list) == False:
+            return False
+        _dest_dir = ""
+        _env_lang = _iso_lang.replace("-", "_")
+        _concise_lang = _env_lang.split("_")[0]
+        for _lang in [
+            _env_lang,
+            _concise_lang,
+        ]:
+            for _a_dir in all_dir_list:
+                try:
+                    files = os.listdir(_a_dir)
+                    for _file in files:
+                        if _file.startswith(_lang):
+                            if _file.endswith(".onnx"):
+                                _file, _ext = os.path.splitext(_file)
+                                self.pied_list.append(os.path.join(_a_dir, _file))
+                except FileNotFoundError:
+                    _file = ""
+        if not bool(self.pied_list):
+            return False
+        _data = None
+        _json_file = self.json_file
+        if os.path.exists(_json_file):
+            try:
+                with codecs.open(
+                    _json_file, mode="r", encoding="utf-8", errors="replace"
+                ) as file_obj:
+                    data = json.load(file_obj)
+            except:
+                return False
+        if not bool(data):
+            return False
+        for _extension in ["onnx.json", "onnx"]:
+            try:
+                for _item in data:
+                    for _file_path in self.pied_list:
+                        _key = data[_item]["key"]
+                        if _key in _file_path:
+                            _source = f"{_file_path}.{_extension}"
+                            _dest_dir = os.path.join(
+                                self.piper_voice_dir,
+                                data[_item]["language"]["family"],
+                                data[_item]["language"]["code"],
+                                data[_item]["name"],
+                                data[_item]["quality"],
+                            )
+                            _dest = os.path.join(_dest_dir, f"{_key}.{_extension}")
+                            filter_qualities = True
+                            # Remove an invalid symbolic link. Filter qualities by GPU and machine.
+                            if (
+                                len(
+                                    self.unlink_bad_posix_symbolic_link(
+                                        _dest, filter_qualities
+                                    )
+                                )
+                                == 0
+                            ):
+                                continue
+                            if not os.path.isfile(_dest):
+                                if os.path.isdir(_dest_dir):
+                                    if os.access(_dest_dir, os.W_OK):
+                                        try:
+                                            os.symlink(_source, _dest)
+                                            print(
+                                                f"\nSymbolic link created from `{_source}` to `{_dest}`"
+                                            )
+                                            if _extension in ["onnx"]:
+                                                do_pop_message = True
+                                                # If the network works, get the MODEL_CARD
+                                                _dir = self.retrieve_model(
+                                                    _key, "", do_pop_message
+                                                )
+                                                if len(_dir) == 0:
+                                                    # Failed to download, so show link to `_dest_dir`
+                                                    readtexttools.pop_message(
+                                                        self.help_heading,
+                                                        _dest_dir,
+                                                        5000,
+                                                        self.help_icon,
+                                                        1,
+                                                        self.py_locale(),
+                                                    )
+                                            return True
+                                        except OSError as e:
+                                            print(
+                                                f"\nCannot link `{_source}` to `{_dest}`: \n{e}"
+                                            )
+                                            return False
+            except (KeyError, SyntaxError):
+                return False
+        return False
 
     def model_path_list(
         self, iso_lang: str = "en-GB", _vox: str = "", extension: str = "onnx"
@@ -723,6 +902,11 @@ voice models, then the generic json configuration will not recognize them.
                                             "sample.txt",
                                         ]
                                     )
+                                filter_qualities = False
+                                # There is no need to know the unlink result.
+                                self.unlink_bad_posix_symbolic_link(
+                                    self.j_path, filter_qualities
+                                )
                                 # We need to confirm that items are not
                                 # onnx placeholders that only contain
                                 # brief ASCII text.
@@ -903,8 +1087,8 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         home: str = "",
         do_pop_message: bool = True,
     ) -> str:
-        """Download remote voice onnx and json model files. Returns the directory
-        containing the onnx and json file if successful, or else `""`."""
+        """Download remote voice MODEL_CARD, onnx and json model files. Returns
+        the directory containing the resources if successful, or else `""`."""
         if len(speaker) == 0:
             speaker = "en_GB-jenny_dioco-medium"
         if len(home) == 0:
@@ -1635,12 +1819,12 @@ def main() -> None:
         sys.exit(0)
     _piper_tts = PiperTTSClass()
     _dir = _piper_tts.piper_voice_dir
-    main_dir_list = [_dir]
+    all_dir_list = [_dir]
     for _item in _piper_tts.piper_voice_dir_list:
         _expanded_dir = os.path.expanduser(_item)
         if os.path.isdir(_expanded_dir):
-            if not _expanded_dir in main_dir_list:
-                main_dir_list.append(_expanded_dir)
+            if not _expanded_dir in all_dir_list:
+                all_dir_list.append(_expanded_dir)
     _percent_rate = "100%"
     _iso_lang = ""
     _config = ""  # model json path (defaults to onnx path + .json suffix)
@@ -1648,6 +1832,7 @@ def main() -> None:
     _backup = f"{_piper_tts.json_file}.bak"
     _use_dir = ""
     _player = 0
+    _update_selected = False
     if os.name == "nt":
         _player = 0
     _text_file_in = sys.argv[-1]
@@ -1665,6 +1850,7 @@ def main() -> None:
     for o, a in opts:
         if o in ("-u, --update"):
             if readtexttools.lax_bool(a):
+                _update_selected = True
                 _update_msg = _piper_tts.sample_webpage
                 if os.name == "nt":
                     _update_msg = "Download a compatible voice model"
@@ -1761,10 +1947,15 @@ def main() -> None:
             _iso_lang = "en-US"
     if not os.path.isfile(_piper_tts.json_file):
         _piper_tts.model_path_list(_piper_tts.lang, _piper_tts.model, ".onnx")
-    for _a_dir in main_dir_list:
+    for _a_dir in all_dir_list:
         if os.path.isfile(os.path.join(_a_dir, "voices.json")):
             _use_dir = _a_dir
             break
+    if _piper_tts.link_home_dir_list(all_dir_list, _iso_lang):
+        print(
+            """The Piper TTS client linked to newly installed Piper
+voice model resources."""
+        )
     if len(_use_dir) == 0 or _piper_tts.update_request:
         update_pop_msg = os.name == "posix"
         if os.path.isfile(_piper_tts.app_locker):

@@ -502,9 +502,10 @@ def espkread(
         # for example: /usr/bin/ or /usr/local/bin/
         _app = espeak_path()
         if bool(_app):
-            find_replace_phonemes.fix_up_text_file(
-                _text_path, "", _lang, "default", "SPEECH_USER_DIRECTORY", False
-            )
+            if sys.version_info >= (3, 6):
+                find_replace_phonemes.fix_up_text_file(
+                    _text_path, "", _lang, "default", "SPEECH_USER_DIRECTORY", False
+                )
             _command = "".join(
                 [
                     '"',
@@ -551,6 +552,8 @@ def espkread(
         if not bool(_post_process):
             readtexttools.unlock_my_lock()
         elif _post_process == "process_wav_media":
+            if not os.path.isfile(_work_file):
+                return 0
             if os.path.getsize(_work_file) == 0:
                 return 0
             if bool(
@@ -572,7 +575,7 @@ def espkread(
             print(_seconds)
             print("-----------------------------------------------------")
             return _seconds
-    except IOError:
+    except (IOError, OSError):
         print("I was unable to use espeak and read text tools!")
         usage()
         return 0

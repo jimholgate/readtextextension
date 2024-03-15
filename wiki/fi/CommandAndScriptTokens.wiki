@@ -30,4 +30,7 @@ Jos komentojonoissa tai parametreissä tarvitaan muuttujia, tulee käyttää sop
 * Valitun tekstin 249 lensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT250) 
 * Valitun tekstin 999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT) 
 * Valitun tekstin 9999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTBIG)
+* Istuntoeväste (SESSION_ID)
+* Kertakäyttöinen eväste (UNIQUE_ID)
+* Nykyisen käyttäjän anonyymi tunniste (USER_ID)
 

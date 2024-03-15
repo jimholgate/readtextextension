@@ -201,9 +201,10 @@ import netcommon
 import network_read_text_file
 import openjtalk_read_text_file
 import readtexttools
+
 try:
     import rhvoice_read_text_file
-except(AttributeError,ImportError, SyntaxError):
+except (AttributeError, ImportError, SyntaxError):
     pass
 
 USE_SPEECHD = True
@@ -467,24 +468,25 @@ class SpdFormats(object):
         self.xml_tool = readtexttools.XmlTransform()
         self.json_tools = readtexttools.JsonTools()
         self.imported_meta = readtexttools.ImportedMetaData()
-        self.client_user = get_whoami()
+        self.client_id = get_whoami()
         self.client = None
         self.py_m = platform.python_version_tuple()[0]
         # Speech dispatcher and network tools do not have all
         # voices for all languages, so a tool might substitute
         # a missing voice for one that it does have.
         self.rate_scales = [
-            [320, 289, "---------|", 100],
-            [288, 195, "--------|-", 35],
-            [194, 132, "-------|--", 22],
-            [131, 193, "------|---", 15],
-            [192, 130, "-----|----", 10],
-            [129, 103, "----|----", 0],
-            [102, 96, "---|-----", -35],
-            [95, 66, "--|------", -42],
-            [65, 33, "-|-------", -50],
-            [32, 0, "|--------", -100],
+            (320, 289, "---------|", 100),
+            (288, 195, "--------|-", 35),
+            (194, 132, "-------|--", 22),
+            (131, 193, "------|---", 15),
+            (192, 130, "-----|----", 10),
+            (129, 103, "----|-----", 0),
+            (102, 96, "---|------", -35),
+            (95, 66, "--|-------", -42),
+            (65, 33, "-|--------", -50),
+            (32, 0, "|---------", -100),
         ]
+
         self.spd_voices = [
             "MALE3",
             "MALE2",
@@ -526,14 +528,12 @@ class SpdFormats(object):
         settings and the text to speech tool."""
         try:
             _percent_int = int(_percent_int)
-        except AttributeError:
+        except (AttributeError, ValueError):
             return 0
-        if _percent_int > 320:
-            return 100
-        for _item in self.rate_scales:
-            if _percent_int <= _item[0] and _percent_int >= _item[1]:
-                print("".join(["speech rate : -100 [", _item[2], "] 100"]))
-                return _item[3]
+        for low, high, bar, value in self.rate_scales:
+            if low >= _percent_int >= high:
+                print("speech rate : -100 [{bar}] 100".format(bar=bar))
+                return value
         return 0
 
     def is_a_supported_language(self, _lang="en", experimental=False):  # -> Bool
@@ -582,13 +582,13 @@ class SpdFormats(object):
                 # Sometimes speech-dispatcher sounds distorted and echoes
                 # on first run.
                 bug_cleaner = speechd.SSIPClient(
-                    self.client_app, self.client_user, None, None
+                    self.client_app, self.client_id, None, None
                 )
                 bug_cleaner.speak("\t")
                 time.sleep(0.2)
                 bug_cleaner.close()
             self.client = speechd.SSIPClient(
-                self.client_app, self.client_user, None, None
+                self.client_app, self.client_id, None, None
             )
             return True
         except (
@@ -1135,6 +1135,13 @@ class SpdFormats(object):
         if bool(self.client):
             return self.client.list_output_modules()
         return None
+
+    def revise_client_id(self, client_id=""):
+        """Use a specific client string instead of the default."""
+        if len(client_id.strip()) == 0:
+            return False
+        self.client_id = client_id.strip()
+        return True
 
 
 def app_info_extract(
@@ -2062,8 +2069,9 @@ def main():
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "molvrih",
+            "cmolvrih",
             [
+                "client_id=",
                 "output_module=",
                 "output=",
                 "language=",
@@ -2078,7 +2086,9 @@ def main():
         usage()
         sys.exit(2)
     for o, a in opts:
-        if o in ("-m", "--output_module"):
+        if o in ("-c", "--client_id"):
+            _spd_formats.revise_client_id(a)
+        elif o in ("-m", "--output_module"):
             _output_module = a
         elif o in ("-o", "--output"):
             _output = a

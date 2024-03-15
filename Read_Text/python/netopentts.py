@@ -61,8 +61,8 @@ class OpenTTSClass(object):
             "https://github.com/synesthesiam/opentts#open-text-to-speech-server"
         )
         self.voice = ""
-        self.voice_id = ""  # larynx, glow-speak and coqui-tts use AI.
-        # This subset of models omits espeak, festival and coqui.
+        self.voice_id = ""  # larynx and  glow-speak use AI.
+        # This subset of models omits espeak and festival.
         # In June, 2023, the OpenTTS speech engines that support languages
         # other than English include nanotts and marytts.
         self.vmodels = [
@@ -71,8 +71,6 @@ class OpenTTSClass(object):
             "larynx",
             "marytts",
             "nanotts",  # aka svox pico
-            # "coqui-tts",  # Timeout
-            # "festival",  # Timeout errors; depreciated legacy code
         ]
 
         self.accept_voice = [

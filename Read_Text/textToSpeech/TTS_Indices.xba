@@ -634,7 +634,7 @@ Function fsUser() As String
 	If s1 = &quot;&quot; Then
 		s1 = Environ(&quot;USERNAME&quot;)
 	End If
-	If s1 = &quot;&quot; Then
+	If Len(s1) = 0 Then
 		s1 = &quot;UNKNOWN-USER&quot;
 	End If
 	fsUser = s1
@@ -649,7 +649,7 @@ Function fsMyTempLock(ByVal sExt) As String
 	Dim sDiv$
 	sDiv = &quot;&quot;
 	Dim sUser$
-	sUser = fsUser
+	sUser = fsUser()
 	Dim i#
 	i = 0
 	Dim sHome$
@@ -702,8 +702,9 @@ Function fbTestDirRW( _
 	fbTestDirRW = False
 	If sA = &quot;&quot; Then Exit Function
 	On Error Goto fbTestDirRWErr
-	Dim s1
-	s1 = fsAppSignature() &amp; &quot;.&quot; &amp; fsUser() &amp; &quot;.test.txt&quot;
+	Dim s1$
+	Dim sUser$ : sUser = fsUser()
+	s1 = fsAppSignature() &amp; &quot;.&quot; &amp; sUser &amp; &quot;.test.txt&quot;
 	If InStr(&quot;/\&quot;,Right(sA, 1)) = 0 Then
 		If InStr(sA, &quot;/&quot;) &lt;&gt; 0 Then
 			s1 = &quot;/&quot; &amp; s1
@@ -946,9 +947,10 @@ End Function
 
 
 Function fsTemporaryTextDoc() As String
+	&apos; Include localization
 	fsTemporaryTextDoc = createUnoService( _
 	&quot;com.sun.star.util.PathSettings&quot;).temp &amp; _
-	&quot;/tts_str.txt&quot;
+	&quot;/&quot; &amp; fsUser() &amp; &quot;_tts_str.txt&quot;
 End Function
 
 
@@ -1024,10 +1026,15 @@ Function fiHtmlComboURL() As Integer
 End Function
 
 
+Function fiAnonymousInstallKey() As Integer
+	fiAnonymousInstallKey = 11
+End Function
+
+
 Function fiCountConfigOptions() As Integer
 	&apos; This is the size of the array to hold settings from the configuration file
 	&apos; and dialog
-	fiCountConfigOptions = fiHtmlComboURL
+	fiCountConfigOptions = fiAnonymousInstallKey()
 	&apos; this is the last TTS_OPTION item above - an Integer
 End Function
 
@@ -1191,7 +1198,6 @@ Function fsFestivalDirectory( _
 		Case Else
 		s2 = converttourl(&quot;/usr/share/festival/&quot;)
 	End Select
-
 	a1 = Array( _
 	&quot;lib/voices/english/en1_mbrola&quot;, _
 	&quot;lib/voices/english/nitech_us_slt_arctic_hts&quot;, _
@@ -1240,6 +1246,7 @@ Function fsFestivalDirectory( _
 	&quot;voices/us/cmu_us_bdl_cg&quot;, _
 	&quot;voices/us/cmu_us_clb_arctic_hts&quot;, _
 	&quot;voices/us/cmu_us_clb_cg&quot;, _
+	&quot;voices/us/cmu_us_slt_arctic_hts&quot;, _
 	&quot;voices/us/cmu_us_jmk_arctic_hts&quot;, _
 	&quot;voices/us/cmu_us_jmk_cg&quot;, _
 	&quot;voices/us/cmu_us_rms_arctic_hts&quot;, _
@@ -1676,14 +1683,6 @@ End Function
 
 Function fsWeekDayMyRegion() As String
 	fsWeekDayMyRegion = LTrim(RTrim(format(Now,&quot;NNNN&quot;)))
-End Function
-
-
-Function fsUserName() As String
-	fsUserName = Environ(&quot;USERNAME&quot;)
-	If fsUserName = &quot;&quot; Then
-		fsUserName = Environ(&quot;USER&quot;)
-	End If
 End Function
 
 

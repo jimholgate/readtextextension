@@ -31,3 +31,6 @@ Verwenden Sie das passende Token, wenn Sie diese Werte in einem Befehl oder Scri
 * Die ersten 249 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXT250) 
 * Die ersten 999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXT) 
 * Die ersten 9999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXTBIG)
+* Das Sitzungscookie (SESSION_ID)
+* Ein Einmal-Cookie (UNIQUE_ID)
+* Eine anonyme Kennung für den aktuellen Benutzer (USER_ID)

@@ -8,8 +8,8 @@ Tokens</title>
 <history>
 <created date="2010-10-22T00:00:00">
 James Holgate</created>
-<lastedited date="2011-07-16T23:33:32">
-Added token description for Title.</lastedited></history></meta>
+<lastedited date="2024-03-15T20:07:25">
+James Holgate ID tokens</lastedited></history></meta>
 <body>
 <paragraph role="heading" id="tokens1" xml-lang="fr-CA" level="1">
 Installation de l'extension Read text</paragraph>
@@ -73,6 +73,13 @@ Les 249 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT2
 <listitem>
 Les 999 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT)</listitem>
 <listitem>
-Les 9999 premiers caractères du texte sélectionné codées pour URL (OOO_WEBTEXTBIG)</listitem></list>
+Les 9999 premiers caractères du texte sélectionné codées pour URL (OOO_WEBTEXTBIG)</listitem>
+<listitem>
+Le témoin de session (SESSION_ID)</listitem>
+<listitem>
+Un identifiant à usage unique (UNIQUE_ID)</listitem>     
+<listitem>
+Un identifiant anonyme pour l'utilisateur actuel (USER_ID)</listitem>
+</list>
 </body>
 </helpdocument>

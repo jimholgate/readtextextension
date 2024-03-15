@@ -148,6 +148,9 @@ Option Explicit
 &apos;&apos; Impress displays when a computer that does not have read text extension
 &apos;&apos; calls the procedure.
 &apos;&apos;
+Function fbOnlyShowIfExperiment() As Boolean
+	fbOnlyShowIfExperiment = GetSolarVersion() &gt; 70500
+End Function
 
 Function fbDefaultToSpeechDispatcher() As Boolean
 	&apos; Implies that the python3 `speechd` (speech-dispatcher) library is current.
@@ -301,7 +304,7 @@ Sub ResetAll()
 	&apos; `&quot;(RESET_ALL)&quot;`
 	fbRemoveFile(fsExtensionSettingsIni())
 	fbRemoveFile(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
-	resetSpeech
+	resetSpeech()
 End Sub
 
 

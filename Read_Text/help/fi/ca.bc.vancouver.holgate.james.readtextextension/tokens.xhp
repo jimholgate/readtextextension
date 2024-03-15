@@ -9,8 +9,8 @@ Käyttö</title>
 <history>
 <created date="2010-10-22T00:00:00">
 James Holgate</created>
-<lastedited date="2013-08-08T20:12:00">
-Teijo S, translated help to Finnish</lastedited>
+<lastedited date="2024-03-15T20:07:25">
+James Holgate ID tokens</lastedited>
 </history>
 </meta>
 <body>
@@ -82,6 +82,12 @@ Valitun tekstin 249 lensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBT
 Valitun tekstin 999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT)</listitem>
 <listitem>
 Valitun tekstin 9999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTBIG)</listitem>
+<listitem>
+Istuntoeväste (SESSION_ID)</listitem>
+<listitem>
+Kertakäyttöinen eväste (UNIQUE_ID)</listitem>
+<listitem>
+Nykyisen käyttäjän anonyymi tunniste (USER_ID)</listitem>
 </list>
 </body>
 </helpdocument>

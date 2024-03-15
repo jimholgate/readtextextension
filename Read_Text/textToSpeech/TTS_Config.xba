@@ -30,21 +30,23 @@ Private f_dlgJsonEdit As Variant
 Private f_dlgAboutReadSelection As Variant
 &apos; Persistent information about the current recording track and 
 &apos; the URL of last processed document.
-global s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle As String
-global i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack As Integer
-global s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage As String
-global b_CaBcVancouverHolgateJamesReadtextextensionHideExports As Boolean
-global i_CaBcVancouverHolgateJamesReadtextextensionWinItunesVersion As Integer
-global s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI As String
-global i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult As Integer
+global s_CaReadTextExtensionLastSpokenDocTitle As String
+global i_CaReadTextExtensionLastSpokenTrack As Integer
+global s_CaReadTextExtensionWorkingCountryLanguage As String
+global b_CaReadTextExtensionHideExports As Boolean
+global i_CaReadTextExtensionWinItunesVersion As Integer
+global s_CaReadTextExtensionLocalHostSpeechURI As String
+global i_CaReadTextExtensionPiperTestResult As Integer
+global s_CaReadTextExtensionCurrentSessionCookie As String
+global s_CaReadTextExtensionCurrentAnonymousKey As String
 
 Sub ClearWorkingCountryLanguage()
-	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = &quot;&quot;
+	s_CaReadTextExtensionWorkingCountryLanguage = &quot;&quot;
 End Sub
 
 
 Sub SetWorkingCountryLanguage()
-	s_CaBcVancouverHolgateJamesReadtextextensionWorkingCountryLanguage = fsSelectionLanguageAndRegion(True)
+	s_CaReadTextExtensionWorkingCountryLanguage = fsSelectionLanguageAndRegion(True)
 End Sub
 
 
@@ -54,36 +56,36 @@ Function fiMyCurrentAudioTrack( _
 	On Error Goto fiMyCurrentAudioTrackErr
 	If bIncrement Then
 		&apos; Add one to the track index
-		If s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle = fsThisDocTitle Then
-			If i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack &lt; 256 And _
-				i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack &gt; 0 Then
-				i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = _
-				i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack + 1
+		If s_CaReadTextExtensionLastSpokenDocTitle = fsThisDocTitle Then
+			If i_CaReadTextExtensionLastSpokenTrack &lt; 256 And _
+				i_CaReadTextExtensionLastSpokenTrack &gt; 0 Then
+				i_CaReadTextExtensionLastSpokenTrack = _
+				i_CaReadTextExtensionLastSpokenTrack + 1
 			Else
-				i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 1
+				i_CaReadTextExtensionLastSpokenTrack = 1
 			End If
 		Else
-			i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 1
-			s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle = fsThisDocTitle
+			i_CaReadTextExtensionLastSpokenTrack = 1
+			s_CaReadTextExtensionLastSpokenDocTitle = fsThisDocTitle
 		End If
 	Else
-		If Not(s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle = fsThisDocTitle) Then
-			i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 1
-			s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle = fsThisDocTitle
+		If Not(s_CaReadTextExtensionLastSpokenDocTitle = fsThisDocTitle) Then
+			i_CaReadTextExtensionLastSpokenTrack = 1
+			s_CaReadTextExtensionLastSpokenDocTitle = fsThisDocTitle
 		End If
 	End If
-	fiMyCurrentAudioTrack = i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack
+	fiMyCurrentAudioTrack = i_CaReadTextExtensionLastSpokenTrack
 	Exit Function
 	fiMyCurrentAudioTrackErr:
 	
 	fiMyCurrentAudioTrack = 1
-	i_CaBcVancouverHolgateJamesReadtextextensionLastSpokenTrack = 1
-	s_CaBcVancouverHolgateJamesReadtextextensionLastSpokenDocTitle = fsThisDocTitle
+	i_CaReadTextExtensionLastSpokenTrack = 1
+	s_CaReadTextExtensionLastSpokenDocTitle = fsThisDocTitle
 End Function
 
 
 Function SaveAsJsonDialog(_default As String) As String
-	&apos;&apos;&apos; Returns a URI file path or `&apos;&apos;` if you hit *Cancel*&apos;&apos;&apos;
+	&apos; Returns a URI file path or `&apos;&apos;` if you hit *Cancel*&apos;
 	Dim _file_list As Object
 	SaveAsJsonDialog = &quot;&quot;
 	Dim _file_picker_args As Variant : _file_picker_args = Array(_
@@ -360,25 +362,6 @@ Function RhvoiceSpeechHostInfo()
 End Function
 
 
-Function CoquiAISpeechHostInfo()
-	Dim _info As SpeechHostInfo
-	With _info
-		.about = Join(Array(&quot;Coqui AI TTS was designed to achieve the best trade-off&quot;,_
-		&quot; among ease-of-training, speed and quality.&quot;),&quot;&quot;)
-		.key = &quot;Coqui AI TTS&quot;
-		.label = &quot;tts-server&quot;
-		.token = &quot;&quot;
-		.url = &quot;http://[::1]:5002/&quot;
-		.url_info = &quot;/&quot;
-		.json_dir = &quot;coqui&quot;
-		.sample = &quot;http://[::1]:5002/api/tts?text=Hello%20world&amp;speaker_id=&amp;style_wav=&amp;language_id=&quot;
-		.docker = &quot;https://tts.readthedocs.io/en/latest/docker_images.html&quot;
-		.tags = Array(&quot;text&quot;, &quot;wav&quot;)
-	End With
-	CoquiAISpeechHostInfo = _info
-End Function
-
-
 Function MacOSSpeechAppInfo()
 	Dim _info As SpeechHostInfo
 	Select Case fsGetOS()
@@ -626,9 +609,6 @@ Function SpeechHostInfoList()
 	&apos;
 	&apos; Several speech engines have limited or no support for
 	&apos; phoneme code or can only speak using certain sounds.
-	&apos; Currently Mimic, like MacOS `say`, appears not to.
-	&apos; Coqui TTS client relies on `python3-bs` (beautiful soup)
-	&apos; so it is not available in immutable office packages.
 	SpeechHostInfoList = Array(_
 	MimicSpeechHostInfo(), _
 	OpenttsSpeechHostInfo(), _
@@ -642,7 +622,6 @@ Function SpeechHostInfoList()
 	OpenttsSpeechHostInfo(), _
 	MaryTtsSpeechHostInfo(), _
 	RhvoiceSpeechHostInfo(), _
-	CoquiAISpeechHostInfo() _
 	)
 	End If
 End Function
@@ -652,7 +631,7 @@ Sub ResetHostSpeechURI
 	&apos; On Linux systems using localhost, users might set up their system
 	&apos; to enable or disable speech servers without restarting Office, so
 	&apos; check the status of the localhost uri every time.
-	s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI = &quot;&quot;
+	s_CaReadTextExtensionLocalHostSpeechURI = &quot;&quot;
 End Sub
 
 
@@ -686,20 +665,20 @@ Function fsLocalHostSpeech() As String
 	fsLocalHostSpeech = &quot;&quot;
 	Dim _info As Variant
 	Dim x As Integer
-	Select Case Len(s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI)
+	Select Case Len(s_CaReadTextExtensionLocalHostSpeechURI)
 		Case 0
 		_info = SpeechHostInfoList()
 		For x = Lbound(_info) To Ubound(_info)
 			If Instr(_info(x).url, &quot;http&quot;) = 1 Then
 				If fbLocalHostOk(_info(x).url &amp; _info(x).url_info, _info(x).key) Then
 					fsLocalHostSpeech = _info(x).url
-					s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI = fsLocalHostSpeech
+					s_CaReadTextExtensionLocalHostSpeechURI = fsLocalHostSpeech
 					Exit For
 				End If
 			End If
 		Next
 		Case Else
-		fsLocalHostSpeech = s_CaBcVancouverHolgateJamesReadtextextensionLocalHostSpeechURI
+		fsLocalHostSpeech = s_CaReadTextExtensionLocalHostSpeechURI
 	End Select
 	Exit Function
 	fsLocalHostSpeechErr:
@@ -1039,7 +1018,7 @@ Sub ConfigureReadTextAloud()
 			End Select
 		End If
 	End Select
-	b_CaBcVancouverHolgateJamesReadtextextensionHideExports = bHideExports
+	b_CaReadTextExtensionHideExports = bHideExports
 	With f_dlgSpeechSetup
 		If fbHelpIsInstalled Then
 			.model.HelpURL = fsAppSignature &amp; &quot;/set_up.xhp&quot;
@@ -1152,6 +1131,18 @@ End Sub
 
 Sub updateDialog1FileControlComboBox( _
 	bRefreshText, FileControl, ComboBox)
+	Dim _bin_python As String : _bin_python = &quot;program/python&quot;
+	Dim _app_image_python As String : _app_image_python = fsAppImageResourcePath(&quot;python&quot;)
+	Dim ClientId$ : ClientId = &quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot;
+	Select Case fsGetOS
+		Case &quot;MacOS&quot;, &quot;WINDOWS&quot;
+		ClientId = &quot;&quot;
+	End Select
+	If Len (_app_image_python) = 0 Then
+		_bin_python = &quot;/bin/python&quot;
+	Else
+		_bin_python = _app_image_python
+	End If
     With f_dlgSpeechSetup
 		If InStr(LCase(.GetControl(FileControl).Model.Text), _
 			&quot;\wscript.exe&quot;) &lt;&gt; 0 Then
@@ -1162,18 +1153,18 @@ Sub updateDialog1FileControlComboBox( _
 		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;bin/osascript&quot;) &lt;&gt; 0 Then
 			dialog1Combo2ShowAppleScriptChoices(f_dlgSpeechSetup)
 			&apos; Typical for Linux
-		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;speak-ng&quot;) &lt;&gt; 0 Then
+		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text), &quot;speak-ng&quot;) &lt;&gt; 0 Then
 			dialog1Combo2ShowESPEAKChoices(f_dlgSpeechSetup)
-		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;espeak-ng&quot;) &lt;&gt; 0 Then
+		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text), &quot;espeak-ng&quot;) &lt;&gt; 0 Then
 			dialog1Combo2ShowESPEAKChoices(f_dlgSpeechSetup)
-		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;espeak&quot;) &lt;&gt; 0 Then
+		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text), &quot;espeak&quot;) &lt;&gt; 0 Then
 			dialog1Combo2ShowESPEAKChoices(f_dlgSpeechSetup)
-		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;festival&quot;) &lt;&gt; 0 Then
+		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text), &quot;festival&quot;) &lt;&gt; 0 Then
 			dialog1Combo2ShowFESTIVALChoices(f_dlgSpeechSetup)
 			&apos;Festival text2wav
-		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;text2wave&quot;) &lt;&gt; 0 Then
+		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text), &quot;text2wave&quot;) &lt;&gt; 0 Then
 			dialog1Combo2ShowTEXT2WAVEChoices(f_dlgSpeechSetup)
-		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;/bin/python&quot;) &lt;&gt; 0 Then
+		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text), _bin_python) &lt;&gt; 0 Then
 			If fsGetOS() = &quot;MacOS&quot; And fbIsLibreOffice() Then
 				&apos; Must use LibreOffice python			
 				.GetControl(FileControl).Model.Text = PosixPythonPath()
@@ -1200,10 +1191,13 @@ Sub updateDialog1FileControlComboBox( _
 				If fbHaveNetworkTTS() Then
 					.GetControl(ComboBox).Model.Text = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot;&quot; &amp; _
+					ClientId &amp; _
 					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 				Else
 					.GetControl(ComboBox).Model.Text = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;	
+					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
+					ClientId &amp; _
+					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;	
 				End If
 			Else:
 				.GetControl( _

@@ -9,8 +9,8 @@ Using Read Text Extension</title>
 <history>
 <created date="2010-10-22T00:00:00">
 James Holgate</created>
-<lastedited date="2011-07-16T23:30:00">
-Added token description for Title.</lastedited>
+<lastedited date="2024-03-15T20:07:25">
+James Holgate ID tokens</lastedited>
 </history>
 </meta>
 <body>
@@ -83,6 +83,12 @@ The first 249 letters of the selected text encoded for URL (OOO_WEBTEXT250)</lis
 The first 999 letters of the selected text encoded for URL (OOO_WEBTEXT)</listitem>
 <listitem>
 The first 9999 letters of the selected text encoded for URL (OOO_WEBTEXTBIG)</listitem>
+<listitem>
+The session identifier (SESSION_ID)</listitem>
+<listitem>
+A single-use identifier (UNIQUE_ID)</listitem>
+<listitem>
+An anonymous identifier for the current user (USER_ID)</listitem>
 </list>
 </body>
 </helpdocument>

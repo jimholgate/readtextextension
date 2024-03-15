@@ -208,7 +208,7 @@ Function fbPiperTtsOk(_command) As Boolean
 		_command = &quot; -h&quot;
 	End If
 	fbPiperTtsOk = False
-	Select Case i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult
+	Select Case i_CaReadTextExtensionPiperTestResult
 		&apos; Only test once per session.
 		&apos; Did test complete?
 		&apos; Did the test pass?
@@ -220,7 +220,7 @@ Function fbPiperTtsOk(_command) As Boolean
 	End Select
 	Dim sPiperPath As String : sPiperPath = fsPiperPath()
 	If Len(sPiperPath) = 0 or Not fbPySupportFStrings() Then
-		i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 2
+		i_CaReadTextExtensionPiperTestResult = 2
 		Exit Function
 	End If
 	&apos; If you don&apos;t have VLC on Windows systems, then piper needs to write a file
@@ -231,63 +231,83 @@ Function fbPiperTtsOk(_command) As Boolean
 	If Not fbExperimentalMode() Then
 		If fsGetOS() = &quot;WINDOWS&quot; Then
 			If Not fbHaveVLC() Then
-					i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 2
+					i_CaReadTextExtensionPiperTestResult = 2
 					Exit Function	
 			End If
 		End If
 	End If
 	
 	If Shell(sPiperPath, 0, _command) = 0 Then
-		i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 3
+		i_CaReadTextExtensionPiperTestResult = 3
 		fbPiperTtsOk = True
 	Else
-		i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 2
+		i_CaReadTextExtensionPiperTestResult = 2
 	End If
 	Exit Function
 	fbPiperTtsOkErr:
-	i_CaBcVancouverHolgateJamesReadtextextensionPiperTestResult = 0
+	i_CaReadTextExtensionPiperTestResult = 0
 	fbPiperTtsOk = False
 End Function
 
 
-Function PiperLocalSuggestion(_lang)
+Function PiperLocalSuggestion(_lang As String, _high As Boolean) As String
+	&apos; Return a selection from a curated list of voice models. If `_high` is
+	&apos; `True`, then return a high quality voice model.
+	&apos;
+	&apos; [Canadian and Indian accent reference](http://www.festvox.org/cmu_arctic/)
 	If Len(_lang) = 0 Then
 		_lang = fsSelectionLanguageAndRegion(False)
 	End If
 	PiperLocalSuggestion = &quot;en_GB-jenny_dioco-medium&quot;
-	Dim models As Variant : models = Array(_
-	&quot;ar_JO-kareem-medium&quot;, _
-	&quot;ca_ES-upc_ona-medium&quot;, _
-	&quot;cs_CZ-jirka-medium&quot;, _
-	&quot;da_DK-talesyntese-medium&quot;, _
-	&quot;de_DE-thorsten-medium&quot;, _
-	&quot;en_GB-jenny_dioco-medium&quot;, _
-	&quot;en_US-lessac-medium&quot;, _
-	&quot;es_ES-sharvard-medium&quot;, _
-	&quot;fi_FI-harri-medium&quot;, _
-	&quot;fr_FR-upmc-medium&quot;, _
-	&quot;hu_HU-anna-medium&quot;, _
-	&quot;is_IS-bui-medium&quot;, _
-	&quot;it_IT-riccardo-x_low&quot;, _
-	&quot;ka_GE-natia-medium&quot;, _
-	&quot;kk_KZ-issai-high&quot;, _
-	&quot;lb_LU-marylux-medium&quot;, _
-	&quot;ne_NP-google-medium&quot;, _
-	&quot;nl_BE-nathalie-medium&quot;, _
-	&quot;no_NO-talesyntese-medium&quot;, _
-	&quot;pl_PL-darkman-medium&quot;, _
-	&quot;pt_BR-faber-medium&quot;, _
-	&quot;pt_PT-tugão-medium&quot;, _
-	&quot;ro_RO-mihai-medium&quot;, _
-	&quot;ru_RU-irina-medium&quot;, _
-	&quot;sk_SK-lili-medium&quot;, _
-	&quot;sr_RS-serbski_institut-medium&quot;, _
-	&quot;sv_SE-nst-medium&quot;, _
-	&quot;sw_CD-lanfrica-medium&quot;, _
-	&quot;tr_TR-dfki-medium&quot;, _
-	&quot;uk_UA-ukrainian_tts-medium&quot;, _
-	&quot;vi_VN-vais1000-medium&quot;, _
-	&quot;zh_CN-huayan-medium&quot;)
+	Dim models As Variant
+	If _high Then
+		PiperLocalSuggestion = &quot;en_US-lessac-high&quot;
+		models = Array(_
+		Array(&quot;de_DE&quot;, &quot;de_DE-thorsten-high#0&quot;),_
+		Array(&quot;en_GB&quot;, &quot;en_GB-cori-high#0&quot;),_
+		Array(&quot;en_US&quot;, &quot;en_US-lessac-high#0&quot;),_
+		Array(&quot;es_MX&quot;, &quot;es_MX-claude-high#0&quot;),_
+		Array(&quot;kk_KZ&quot;, &quot;kk_KZ-issai-high#0&quot;),_
+		)
+	Else
+		models = Array(_
+		Array(&quot;ar_JO&quot;, &quot;ar_JO-kareem-medium#0&quot;),_
+		Array(&quot;ca_ES&quot;, &quot;ca_ES-upc_ona-medium#0&quot;),_
+		Array(&quot;cs_CZ&quot;, &quot;cs_CZ-jirka-medium#0&quot;),_
+		Array(&quot;da_DK&quot;, &quot;da_DK-talesyntese-medium#0&quot;),_
+		Array(&quot;de_DE&quot;, &quot;de_DE-thorsten-medium#0&quot;),_
+		Array(&quot;en_CA&quot;, &quot;en_US-arctic-medium#8&quot;),_
+		Array(&quot;en_GB&quot;, &quot;en_GB-alba-medium#0&quot;),_
+		Array(&quot;en_IE&quot;, &quot;en_GB-jenny_dioco-medium#0&quot;),_
+		Array(&quot;en_IN&quot;, &quot;en_US-arctic-medium#3&quot;),_
+		Array(&quot;en_US&quot;, &quot;en_US-lessac-medium#0&quot;),_
+		Array(&quot;es_ES&quot;, &quot;es_ES-sharvard-medium#0&quot;),_
+		Array(&quot;fa_IR&quot;, &quot;fa_IR-gyro-medium#0&quot;),_
+		Array(&quot;fi_FI&quot;, &quot;fi_FI-harri-medium#0&quot;),_
+		Array(&quot;fr_FR&quot;, &quot;fr_FR-upmc-medium#0&quot;),_
+		Array(&quot;hu_HU&quot;, &quot;hu_HU-anna-medium#0&quot;),_
+		Array(&quot;is_IS&quot;, &quot;is_IS-bui-medium#0&quot;),_
+		Array(&quot;it_IT&quot;, &quot;it_IT-riccardo-x_low#0&quot;),_
+		Array(&quot;ka_GE&quot;, &quot;ka_GE-natia-medium#0&quot;),_
+		Array(&quot;lb_LU&quot;, &quot;lb_LU-marylux-medium#0&quot;),_
+		Array(&quot;ne_NP&quot;, &quot;ne_NP-google-medium#0&quot;),_
+		Array(&quot;nl_BE&quot;, &quot;nl_BE-nathalie-medium#0&quot;),_
+		Array(&quot;no_NO&quot;, &quot;no_NO-talesyntese-medium#0&quot;),_
+		Array(&quot;pl_PL&quot;, &quot;pl_PL-darkman-medium#0&quot;),_
+		Array(&quot;pt_BR&quot;, &quot;pt_BR-faber-medium#0&quot;),_
+		Array(&quot;pt_PT&quot;, &quot;pt_PT-tugão-medium#0&quot;),_
+		Array(&quot;ro_RO&quot;, &quot;ro_RO-mihai-medium#0&quot;),_
+		Array(&quot;ru_RU&quot;, &quot;ru_RU-irina-medium#0&quot;),_
+		Array(&quot;sk_SK&quot;, &quot;sk_SK-lili-medium#0&quot;),_
+		Array(&quot;sl_SI&quot;, &quot;sl_SI-artur-medium#0&quot;),_
+		Array(&quot;sr_RS&quot;, &quot;sr_RS-serbski_institut-medium#0&quot;),_
+		Array(&quot;sv_SE&quot;, &quot;sv_SE-nst-medium#0&quot;),_
+		Array(&quot;sw_CD&quot;, &quot;sw_CD-lanfrica-medium#0&quot;),_
+		Array(&quot;tr_TR&quot;, &quot;tr_TR-dfki-medium#0&quot;),_
+		Array(&quot;uk_UA&quot;, &quot;uk_UA-ukrainian_tts-medium#0&quot;),_
+		Array(&quot;vi_VN&quot;, &quot;vi_VN-vais1000-medium#0&quot;),_
+		Array(&quot;zh_CN&quot;, &quot;zh_CN-huayan-medium#0&quot;))
+	End If
 	Dim langs As Variant : langs = Array(_
 	fsReplaceText(_lang, &quot;-&quot;, &quot;_&quot;,), _
 	Split(_lang, &quot;-&quot;)(0), _
@@ -296,8 +316,8 @@ Function PiperLocalSuggestion(_lang)
 	Dim y As Integer : y = 0
 	For x = Lbound(langs) To Ubound(langs)
 		For y = Lbound(models) to Ubound(models)
-			If instr(models(y), langs(x)) = 1 Then
-				PiperLocalSuggestion = models(y)
+			If instr(models(y)(0), langs(x)) = 1 Then
+				PiperLocalSuggestion = models(y)(1)
 				Exit Function
 			End If
 		Next
@@ -347,8 +367,10 @@ Function fvTts_config_createDefaultConfig( _
 	Dim player7 As String : player7 = &quot;&quot;
 	&apos; The place to store the configuration data
 	Dim config(fiCountConfigOptions) As Variant
+	config(fiAnonymousInstallKey()) = fsGetFirstKey(config)
 	Dim bPiperOk As Boolean : bPiperOk = fbPiperTtsOk(&quot;&quot;)
 	&apos; Create default values for variables
+	Dim pyFallBack As String : pyFallBack = &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
 	If GetGUIType() = 1 Then
 		&apos; Windows
 		If not fbUsingWine(False) Then
@@ -358,7 +380,7 @@ Function fvTts_config_createDefaultConfig( _
 			config(fiExperimentalOption()) = False
 			config(fiExperimentalProgramPath()) = ConvertFromURL(BundlePyPath())
 			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; player7 &amp; &quot; --voice &quot; &amp; _
-			PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0 &quot;&quot;(TMP)&quot;&quot;&quot;
+			PiperLocalSuggestion(&quot;&quot;, False) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		Else
 			config(fiExperimentalOption()) = False
 			If FileExists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) Then
@@ -384,9 +406,9 @@ Function fvTts_config_createDefaultConfig( _
 			config(fiExternalProgramPath()) = ConvertFromURL(BundlePyPath())
 			If bPiperOk Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; player7 &amp; &quot; --voice &quot; &amp; _
-				PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0 &quot;&quot;(TMP)&quot;&quot;&quot;
+				PiperLocalSuggestion(&quot;&quot;, False) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			Else
-				config(fiExternalCommand()) = &quot;-c &quot;&quot;import os; os.startfile(&apos;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
+				config(fiExternalCommand()) = pyFallBack
 			End If
 		End If
 		config(fiAlwaysShowDialogCheckBox()) = 1
@@ -397,7 +419,7 @@ Function fvTts_config_createDefaultConfig( _
 			config(fiExperimentalOption()) = False
 			config(fiExperimentalProgramPath()) = PosixPythonPath()
 			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --player 7 --voice &quot; &amp; _
-			PiperLocalSuggestion(&quot;&quot;) &amp; &quot;#0 &quot;&quot;(TMP)&quot;&quot;&quot;
+			PiperLocalSuggestion(&quot;&quot;, False) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		ElseIf fsGetOS() = &quot;MacOS&quot; Then
 			config(fiExperimentalOption()) = False
 			config(fiExperimentalProgramPath()) = PosixPythonPath()
@@ -407,10 +429,14 @@ Function fvTts_config_createDefaultConfig( _
 				config(fiExperimentalOption()) = False
 				config(fiExperimentalProgramPath()) = &quot;/usr/bin/festival&quot;
 				config(fiExperimentalCommand()) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
-			Else
+			ElseIf fbIsLibreOffice() Then
 				config(fiExperimentalOption()) = False
 				config(fiExperimentalProgramPath()) = PosixPythonPath()
 				config(fiExperimentalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			Else
+				config(fiExperimentalOption()) = False
+				config(fiExperimentalProgramPath()) = PosixPythonPath()
+				config(fiExperimentalCommand()) = pyFallBack
 			End If
 		End If
 		config(fiExternalOption()) = True
@@ -448,22 +474,16 @@ Function fvTts_config_createDefaultConfig( _
 				config(fiExternalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --rate 100% --voice AUTO0#0 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf FileExists(Environ(&quot;HOME&quot;) &amp; _
-				&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or FileExists( _
-				Environ(&quot;HOME&quot;) &amp; _
-				&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or Len( _
-				fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Or _
-				fbPySupportFStrings() Then
-				config(fiExternalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf fbHaveEspeak() Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
-			Else
+			ElseIf fbIsLibreOffice() Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
+				&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot; &amp; _
+				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			Else
+				config(fiExternalCommand()) = pyFallBack
 			End If
 		Else
 			&apos;Mac (MacOS)
@@ -567,7 +587,15 @@ Sub tts_config_writeFile( _
 		&apos; store the active command without the update flag.
 		ExternalCommand = fsReplaceText(ExternalCommand, &quot; --update True&quot;, &quot;&quot;) 
 	End If
-	
+	If Len(config(fiAnonymousInstallKey())) = 0 Then
+	&apos; Update `text-to-speech.anonymous.key.string` on computers when you update
+	&apos; the extension version.
+	&apos;
+	&apos; An organization&apos;s networked services can use this key to verify
+	&apos; permission to connect without using your personal information.
+	&apos; Resetting the extension&apos;s settings deletes the local key permanently.
+		config(fiAnonymousInstallKey()) = fsGetFirstKey(config)
+	End If
 	CR = Chr(10)
 	sA = Join(Array(_
 	&quot;text-to-speech.use.experimental.boolean=&quot;, fsTts_util_booleanToString(config(fiExperimentalOption())), CR, _
@@ -576,6 +604,7 @@ Sub tts_config_writeFile( _
 	&quot;text-to-speech.use.espeak.boolean=&quot;, fsTts_util_booleanToString(config(fiExternalOption())), CR, _
 	&quot;text-to-speech.use.html.boolean=&quot;, fsTts_util_booleanToString(config(fiHtmlOption())), CR, _
 	&quot;text-to-speech.html.string=&quot;, config(fiHtmlComboURL()), CR, _
+	&quot;text-to-speech.anonymous.key.string=&quot;, config(fiAnonymousInstallKey()), CR, _
 	&quot;text-to-speech.espeak.path.string=&quot;, config(fiExternalProgramPath()), CR, _
 	&quot;text-to-speech.espeak.options.string=&quot;, ExternalCommand, CR, _
 	&quot;text-to-speech.display.info.integer=&quot;, config(fiAlwaysShowDialogCheckBox()), CR, _
@@ -658,7 +687,10 @@ Sub tts_config_parseFile( _
 				
 				Case &quot;text-to-speech.html.string&quot;
 				config(fiHtmlComboURL()) = value
-				
+
+				Case &quot;text-to-speech.anonymous.key.string&quot;
+				config(fiAnonymousInstallKey()) = value
+
 				Case &quot;text-to-speech.display.info.integer&quot;
 				config(fiAlwaysShowDialogCheckBox()) = fiStringToInteger(value)
 				
