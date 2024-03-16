@@ -30,4 +30,7 @@ Lorsque vous avez besoin de ces valeurs variables dans une commande ou dans un s
 * Les 99 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXTSMALL) 
 * Les 249 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT250) 
 * Les 999 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT) 
-* Les 9999 premiers caractères du texte sélectionné codées pour URL (OOO_WEBTEXTBIG) 
+* Les 9999 premiers caractères du texte sélectionné codées pour URL (OOO_WEBTEXTBIG)
+* Le témoin de session (SESSION_ID)
+* Un identifiant à usage unique (UNIQUE_ID)
+* Un identifiant anonyme pour l'utilisateur actuel (USER_ID)
