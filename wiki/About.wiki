@@ -1,40 +1,32 @@
 #summary About Read Text Extension - An Apache OpenOffice & LibreOffice extension to read text with an external program
 
-= Apropos =
+=About=
 
-Cette extension permet à un programme externe ou une application web lire le
-texte d’Writer, Calc, Draw, Impress, Web Writer et le contenu du
-presse-papiers. Si vous l’utilisez avec un logiciel de synthèse vocale, un
-script ou une application web, il pourrait vous aider à modifier votre
-écriture ou à comparer le texte de votre document avec un document imprimé.
-Il peut vous aider à apprendre une nouvelle langue ou à savoir comment dire
-les mots que vous ne connaissez pas. Vous pouvez faire les codes QR pour
-les appareils mobiles.
+Read Text Extension uses an external program or a web service to read text. Read the selection with Calc, Draw, Impress, Web Writer and Writer. Read the contents of the clipboard. Use speech synthesis to help to edit documents. Compare computer documents with printed documents. Learn a new language. Learn how to pronounce words correctly. Easily transfer text to your mobile device using QR Codes.
 
-== Téléchargement ==
+==Download==
 
 * [https://extensions.libreoffice.org/en/extensions/show/read-text LibreOffice Extensions]
 * [https://extensions.openoffice.org/en/project/read-text Apache OpenOffice Extensions]
 
-== Capture d’écran ==
+==Screen Shot==
 
-[https://raw.githubusercontent.com/jimholgate/readtextextension/master/wiki/fr/Default64.png Boîte de dialogue]
+[File:Default64.png]
 
-== Tutoriel ==
+==Tutorial==
 
 [https://www.youtube.com/watch?v=OCARVoZqC-s YouTube]
 
-== Blog ==
+==Blog==
 
 * [https://sites.google.com/site/readtextextension/ Read Text]
 
-== Le code source ==
+==Source Code==
 
 * [https://github.com/jimholgate/readtextextension/ GitHub]
 
+----
 
------
+===Related Topics===
 
-== Rubriques connexes ==
-
-[https://help.libreoffice.org/latest/fr/text/shared/guide/accessibility.html?&DbPAR=SHARED&System=WINDOWS%20Accessibility%20in%20LibreOffice Accessibilité dans LibreOffice]
+[https://help.libreoffice.org/latest/en-US/text/shared/guide/accessibility.html?&DbPAR=SHARED&System=WINDOWS Accessibility in LibreOffice]
