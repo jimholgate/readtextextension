@@ -1,60 +1,56 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
-<meta>
-<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp" indexer="include" status="PUBLISH">
-<title id="read_clipboard" xml-lang="fi-FI">
-Lue leikepöydältä</title>
-<filename>/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp</filename>
-</topic>
-<history>
-<created date="2010-10-22T00:00:00">
-James Holgate</created>
-<lastedited date="2013-08-08T20:12:00">
-Teijo S, translated help to Finnish</lastedited>
-</history>
-</meta>
-<body>
-<paragraph role="heading" id="read_clipboard1" xml-lang="fi-FI" level="1">
-Käyttö</paragraph>
-<paragraph role="heading" id="read_clipboard1.1" xml-lang="fi-FI" level="2">
-Lue leikepöydältä
-</paragraph>
-<list>
-<listitem>
-Voit lukea ääneen mitä tahansa leikepöydälle kopioitua tekstiä, kuten esimerkiksi makroja, tekstikenttien sisältöjä, taulukoiden soluja tai tekstipätkiä. Tekstit on voitu kopioida leikepöydälle myös muista ohjelmista kuten selaimista, ohjetiedostoista tai uutissyötteistä.
-</listitem>
-<listitem>
-Valitse teksti.
-</listitem>
-<listitem>
-Käytä 
-<emph>
-Muokkaa - Kopioi</emph>
- tai 
-<switchinline select="sys">
-<caseinline select="MAC">
-<emph>
-Command+C</emph>
-</caseinline>
-<caseinline select="UNIX">
-<emph>
-Ctrl+C</emph>
-</caseinline>
-<caseinline select="WIN">
-<emph>
-Ctrl+C</emph>
-</caseinline>
-<defaultinline>
- kopioinnin näppäinyhdistelmää</defaultinline>
-</switchinline>
-. 
-</listitem>
-<listitem>
-Käytä 
-<emph>
-Työkalut - Lisäosat - Lue leikepöydältä</emph>
-.
-</listitem>
-</list>
-</body>
+    <meta>
+        <topic
+            id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp"
+            indexer="include" status="PUBLISH">
+            <title id="read_clipboard" xml-lang="fi-FI">
+                Lue leikepöydältä</title>
+            <filename>/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp</filename>
+        </topic>
+        <history>
+            <created date="2010-10-22T00:00:00">
+                James Holgate</created>
+            <lastedited date="2013-08-08T20:12:00">
+                Teijo S, translated help to Finnish</lastedited>
+        </history>
+    </meta>
+    <body>
+        <paragraph role="heading" id="read_clipboard1" xml-lang="fi-FI" level="1">
+            Käyttö</paragraph>
+        <paragraph role="heading" id="read_clipboard1.1" xml-lang="fi-FI" level="2">
+            Lue leikepöydältä
+        </paragraph>
+        <list>
+            <listitem>
+                Voit lukea ääneen mitä tahansa leikepöydälle kopioitua tekstiä, kuten esimerkiksi
+                makroja, tekstikenttien sisältöjä, taulukoiden soluja tai tekstipätkiä. Tekstit on
+                voitu kopioida leikepöydälle myös muista ohjelmista kuten selaimista,
+                ohjetiedostoista tai uutissyötteistä.
+            </listitem>
+            <listitem>
+                Valitse teksti.
+            </listitem>
+            <listitem> Käytä <emph>
+                    Muokkaa - Kopioi</emph> tai <switchinline select="sys">
+                    <caseinline select="MAC">
+                        <emph>
+                            Command+C</emph>
+                    </caseinline>
+                    <caseinline select="UNIX">
+                        <emph>
+                            Ctrl+C</emph>
+                    </caseinline>
+                    <caseinline select="WIN">
+                        <emph>
+                            Ctrl+C</emph>
+                    </caseinline>
+                    <defaultinline>
+                        kopioinnin näppäinyhdistelmää</defaultinline>
+                </switchinline>
+                . </listitem>
+            <listitem> Käytä <emph>
+                    Työkalut - Lisäosat - Lue leikepöydältä</emph> . </listitem>
+        </list>
+    </body>
 </helpdocument>

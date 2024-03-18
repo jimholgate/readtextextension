@@ -115,7 +115,7 @@ def main() -> None:
     _default = os.path.dirname(os.path.dirname(__file__))
     _date_time = datetime.now()
     _alt = ""
-    if os.path.splitext(_default)[0][-1] not in "0123456789":
+    if os.path.splitext(_default)[0][-1] in "abcdefloxyz":
         # i.e. : `a` for Apache; `b` for Beta ...
         _alt = os.path.splitext(_default)[0][-1]
     parser = argparse.ArgumentParser(

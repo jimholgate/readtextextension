@@ -194,32 +194,67 @@ End Function
 
 
 Function _( _
-	msgid, _
-	Optional ByVal sDirPo, _
-	Optional ByVal sMyLang, _
+	Optional ByVal _msgid, _
+	Optional ByVal sPo, _
+	Optional ByVal sLang, _
 	Optional ByVal iAlt)
+	&apos; A language Function to translate phrases used in
+	&apos; the user interface labels.
+	&apos;
+	&apos;* `_msgid` = string input
+	&apos;* `sPo` = subdirectory path in local mo folder
+	&apos;* `sLang` = language to match with English
+	&apos;* `iAlt` = if -1, then converts from English
+	&apos;   and if 1, then converts to English. If zero returns &quot;&quot;
 	_ = &quot;&quot;
-	&apos; msgid = string input
-	&apos; sDirPo = subdirectory path in local mo folder
-	&apos; sMyLang = language to match with English
-	&apos; iAlt = if False, then converts from English
-	&apos; and if true, then converts to English
 	Dim i As Integer
 	Dim iMax As Integer
 	Dim trad As String
+	Dim UseLang As String : UseLang = fsDisplayLanguage()
+	Dim sMyLang As String : sMyLang = &quot;&quot;
+	Dim sDirPo As String : sDirPo = &quot;&quot;
+	Dim msgid As String : msgid = &quot;&quot;
 	
-	If ismissing(sDirPo) Then
+	On Local Error GoTo _PoErr
+	If ismissing(sPo) Then
 		sDirPo = &quot;tools&quot;
-	ElseIf sDirPo = &quot;&quot; Then
+	Else
+		sDirPo = sPo
+	End If
+	_PoErr:
+	If sDirPo = &quot;&quot; Then
 		sDirPo = &quot;tools&quot;
 	End If
-	If ismissing(sMyLang) Or sMyLang = &quot;&quot; Then
-		sMyLang = fsDisplayLanguage()
+	On Local Error Goto EnglishTableLangErr
+	If ismissing(sLang) Then
+		sMyLang = UseLang
 	End If
-	If ismissing(iAlt) Then iAlt =  - 1
-	If msgid = &quot;&quot; Then
+	EnglishTableLangErr:
+	If Len(sMyLang) = 0 Then
+		sMyLang = UseLang
+	End If
+	On Local Error GoTo EnglishTableAltErr
+	If ismissing(iAlt) Then
+		iAlt =  - 1
+	End If
+	EnglishTableAltErr:
+	Select Case iAlt
+		Case -1, 0, 1
+		&apos; pass
+		Case Else
+		iAlt = -1
+	End Select
+	On Error GoTo EnglishTableMsgErr
+	If ismissing(_msgid) or Len(_msgid) = 0 Then
+		Exit Function
+	Else
+		msgid = _msgid
+	End If
+	EnglishTableMsgErr:
+	If Len(msgid) = 0 Then
 		Exit Function
 	End If
+	On Error GoTo EnglishTableTransErr
 	Dim sMyPoFile
 	sMyPoFile = &quot;&quot;
 	sMyPoFile = ConvertFromUrl( _
@@ -232,7 +267,7 @@ Function _( _
 	If iAlt = 1 Then
 		&apos; Reverse translation
 		For i = 0 To UBound(mMyTranslationStr)
-			If mMyTranslationStr(i,0) = msgid Then
+			If mMyTranslationStr(i, 0) = msgid Then
 				trad = mMyTranslationId(i)
 				Exit For
 			End If
@@ -245,10 +280,10 @@ Function _( _
 		&apos; Normal translation (default)
 		For i = 0 To UBound(mMyTranslationId)
 			If mMyTranslationId(i) = msgid Then
-				trad = mMyTranslationStr(i,0)
+				trad = mMyTranslationStr(i, 0)
 				Exit For
 			ElseIf mMyTranslationIdPlur(i) = msgid Then
-				trad = mMyTranslationStr(i,1)
+				trad = mMyTranslationStr(i, 1)
 				Exit For
 			End If
 		Next i
@@ -259,6 +294,9 @@ Function _( _
 	trad = fsReplaceText(trad, &quot;&quot;&quot;&quot;, &quot;&quot;)
 	trad = fsReplaceText(trad, &quot;\&amp;dblquot;&quot;, &quot;&quot;&quot;&quot;)
 	_ = trad
+	Exit Function
+	EnglishTableTransErr:
+	_ = msgid
 End Function
 
 

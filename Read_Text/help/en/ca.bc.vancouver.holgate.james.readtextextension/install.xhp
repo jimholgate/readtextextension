@@ -1,33 +1,34 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
-<meta>
-<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp" indexer="include" status="PUBLISH">
-<title id="install" xml-lang="en-US">
-Install</title>
-<filename>/ca.bc.vancouver.holgate.james.readtextextension/install.xhp</filename>
-</topic>
-<history>
-<created date="2010-10-22T00:00:00">
-James Holgate</created>
-<lastedited date="2011-04-16T00:00:35">
-Changed Default External UNIX App to python</lastedited>
-</history>
-</meta>
-<body>
-<paragraph role="heading" id="install1" xml-lang="en-US" level="1">
-Setting up Read Text Extension</paragraph>
-<paragraph role="heading" id="install1.1" xml-lang="en-US" level="2">
-Install</paragraph>
-<list>
-<listitem>
-Get the most recent version of the extension at the Extensions web site. 
-</listitem>
-<listitem>
-Open the extension with the %PRODUCTNAME application. Approve the license.
-</listitem>
-<listitem>
-Restart the program.
-</listitem>
-</list>
-</body>
+    <meta>
+        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp"
+            indexer="include" status="PUBLISH">
+            <title id="install" xml-lang="en-US">
+                Install</title>
+            <filename>/ca.bc.vancouver.holgate.james.readtextextension/install.xhp</filename>
+        </topic>
+        <history>
+            <created date="2010-10-22T00:00:00">
+                James Holgate</created>
+            <lastedited date="2011-04-16T00:00:35">
+                Changed Default External UNIX App to python</lastedited>
+        </history>
+    </meta>
+    <body>
+        <paragraph role="heading" id="install1" xml-lang="en-US" level="1">
+            Setting up Read Text Extension</paragraph>
+        <paragraph role="heading" id="install1.1" xml-lang="en-US" level="2">
+            Install</paragraph>
+        <list>
+            <listitem>
+                Get the most recent version of the extension at the Extensions web site.
+            </listitem>
+            <listitem>
+                Open the extension with the %PRODUCTNAME application. Approve the license.
+            </listitem>
+            <listitem>
+                Restart the program.
+            </listitem>
+        </list>
+    </body>
 </helpdocument>

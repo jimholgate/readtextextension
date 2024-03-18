@@ -686,13 +686,13 @@ Function faSplitString(byVal testString As String, byVal LineLen As Integer, _
 	&apos; of any item in the array to `LineLen` characters.
 	Dim splitString() As String
 	ReDim splitString(0)
-	Dim startIndex As Integer
-	startIndex = 0
-	Dim ubi As Integer
-	Dim i As Integer
-	Dim substr As String
-	Dim delimiter As String
-	Dim lastIndex As Integer
+	Dim startIndex As Integer : startIndex = 0
+	Dim ubi As Integer : ubi = 0
+	Dim i As Integer : i = 0
+	Dim substr As String : substr = &quot;&quot;
+	Dim delimiter As String : delimiter = &quot;&quot;
+	Dim last_delimiter As String : last_delimiter = &quot; &quot;
+	Dim lastIndex As Integer : lastIndex = 0
 	Dim words As Variant : words = Array()
 	While startIndex &lt; Len(testString)
 		Dim length As Integer

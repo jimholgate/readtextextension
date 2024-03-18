@@ -1,138 +1,88 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
-<meta>
-<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp" indexer="include" status="PUBLISH">
-<title id="set_up" xml-lang="fr-CA">
-Configuration</title>
-<filename>/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp</filename>
-</topic>
-<history>
-<created date="2010-10-22T00:00:00">
-James Holgate</created>
-<lastedited date="2011-04-16T00:00:35">
-Changed Default External UNIX App to python</lastedited>
-</history>
-</meta>
-<body>
-<paragraph role="heading" id="set_up1" xml-lang="fr-CA" level="1">
-Installation de l'extension Read text</paragraph>
-<paragraph role="heading" id="set_up1.1" xml-lang="fr-CA" level="2">
-Configuration
-</paragraph>
-<list>
-<listitem>
-Cliquez sur l'icône dans la barre de menu ou sélectionnez 
-<emph>
-Outils - Add-ons - Lire la sélection ...</emph>
-</listitem>
-<listitem>
-Choisissez un logiciel ou un site et modifier les paramètres.
-</listitem>
-<listitem>
-<switchinline select="sys">
-<caseinline select="MAC">
-Par défaut, l'extension utilise 
-<emph>
-/usr/bin/say</emph>
-avec 
-<emph>
-Lire la sélection avec une application externe</emph>
-et 
-<emph>
--f '(TMP)'</emph>
-dans 
-<emph>
-Les options sur la ligne de commande</emph>
-. 
-</caseinline>
-<caseinline select="UNIX">
-Par défaut, l'extension utilise 
-<emph>
-/usr/bin/python</emph>
-avec 
-<emph>
-Lire la sélection avec une application externe</emph>
-et 
-<emph>
-"(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false "(TMP)"</emph>
-dans 
-<emph>
-Les options sur la ligne de commande</emph>
-. 
-</caseinline>
-<caseinline select="WIN">
-Par défaut, l'extension utilise 
-<emph>
-C:\WINDOWS\system32\wscript.exe</emph>
-avec 
-<emph>
-Lire la sélection avec une application externe</emph>
-et 
-<emph>
--f '(TMP)'</emph>
-dans 
-<emph>
-Les options sur la ligne de commande</emph>
-. 
-</caseinline>
-<defaultinline>
-Par défaut, l'extension utilise 
-<emph>
-/usr/bin/espeak</emph>
-avec 
-<emph>
-Lire la sélection avec une application externe</emph>
-et 
-<emph>
--f '(TMP)'</emph>
-dans 
-<emph>
-Les options sur la ligne de commande</emph>
-. 
-</defaultinline>
-</switchinline>
-</listitem>
-<listitem>
-<switchinline select="sys">
-<caseinline select="MAC">
-Vous pouvez tester les paramètres sans les enregistrer. Appuyez sur la touche Ctrl et cliquez sur 
-<emph>
-OK</emph>
-.
-</caseinline>
-<defaultinline>
-Vous pouvez tester les paramètres sans les enregistrer par un clic droit sur 
-<emph>
-OK</emph>
-.
-</defaultinline>
-</switchinline>
-</listitem>
-<listitem>
-Lorsque vous êtes satisfait des paramètres, décochez la case 
-<emph>
-Toujours affiche cette boîte de dialogue</emph>
-.
-</listitem>
-<listitem>
-Cliquez sur 
-<emph>
-OK</emph>
-.
-</listitem>
-</list>
-<paragraph role="heading" id="customize" xml-lang="fr-CA" level="2" >
-Personnaliser
-</paragraph>
-<list>
-<listitem>
-Vous pouvez utiliser des applications externes ou des sites Web pour la synthese vocale des langues différentes ou pour la traduction de texte.
-</listitem>
-<listitem>
-Si vous souhaitez afficher la boîte de dialogue pour modifier les paramètres, utilisez la commande 
-<emph>
-Outils - Add-ons - Lire la sélection ...</emph>
-</listitem>
-</list>
-</body>
+    <meta>
+        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp"
+            indexer="include" status="PUBLISH">
+            <title id="set_up" xml-lang="fr-CA">
+                Configuration</title>
+            <filename>/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp</filename>
+        </topic>
+        <history>
+            <created date="2010-10-22T00:00:00">
+                James Holgate</created>
+            <lastedited date="2011-04-16T00:00:35">
+                Changed Default External UNIX App to python</lastedited>
+        </history>
+    </meta>
+    <body>
+        <paragraph role="heading" id="set_up1" xml-lang="fr-CA" level="1">
+            Installation de l'extension Read text</paragraph>
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Default64.png" id="img_dialog1_screenshot">
+            <alt xml-lang="fr-CA"
+                id="alt_dialog1_screenshot">Boîte de dialogue standard « Read text ».</alt>
+        </image>
+        <paragraph role="heading" id="set_up1.1" xml-lang="fr-CA" level="2">
+            Configuration
+        </paragraph>
+        <list>
+            <listitem> Cliquez sur l'icône dans la barre de menu ou sélectionnez <emph>
+                    Outils - Add-ons - Lire la sélection ...</emph>
+            </listitem>
+            <listitem>
+                Choisissez un logiciel ou un site et modifier les paramètres.
+            </listitem>
+            <listitem>
+                <switchinline select="sys">
+                    <caseinline select="MAC"> Par défaut, l'extension utilise <emph>
+                        /usr/bin/osascript</emph> avec <emph>
+                            Lire la sélection avec une application externe</emph> et <emph>
+                            -</emph> dans <emph>
+                            Les options sur la ligne de commande</emph> . </caseinline>
+                    <caseinline select="UNIX"> Par défaut, l'extension utilise <emph>
+                            /usr/bin/python</emph> avec <emph>
+                            Lire la sélection avec une application externe</emph> et <emph>
+                        "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_COUNTRY_CODE)
+                        --visible=false "(TMP)"</emph> dans <emph>
+                            Les options sur la ligne de commande</emph> . </caseinline>
+                    <caseinline select="WIN"> Par défaut, l'extension utilise <emph>
+                        C:\WINDOWS\system32\wscript.exe</emph> avec <emph>
+                            Lire la sélection avec une application externe</emph> et <emph>
+                            -"(TTS_WSCRIPT_VBS)" "(TMP)"</emph> dans <emph>
+                            Les options sur la ligne de commande</emph> . </caseinline>
+                    <defaultinline> Par défaut, l'extension utilise <emph>
+                            /usr/bin/espeak</emph> avec <emph>
+                            Lire la sélection avec une application externe</emph> et <emph>
+                            -f "(TMP)"</emph> dans <emph>
+                            Les options sur la ligne de commande</emph> . </defaultinline>
+                </switchinline>
+            </listitem>
+            <listitem>
+                <switchinline select="sys">
+                    <caseinline select="MAC"> Vous pouvez tester les paramètres sans les
+                        enregistrer. Appuyez sur la touche Ctrl et cliquez sur <emph>
+                            OK</emph> . </caseinline>
+                    <defaultinline> Vous pouvez tester les paramètres sans les enregistrer par un
+                        clic droit sur <emph>
+                            OK</emph> . </defaultinline>
+                </switchinline>
+            </listitem>
+            <listitem> Lorsque vous êtes satisfait des paramètres, décochez la case <emph>
+                    Toujours affiche cette boîte de dialogue</emph> . </listitem>
+            <listitem> Cliquez sur <emph>
+                    OK</emph> . </listitem>
+        </list>
+        <paragraph role="heading" id="customize" xml-lang="fr-CA" level="2">
+            Personnaliser
+        </paragraph>
+        <list>
+            <listitem>
+                Vous pouvez utiliser des applications externes ou des sites Web pour la synthese
+                vocale des langues différentes ou pour la traduction de texte.
+            </listitem>
+            <listitem> Si vous souhaitez afficher la boîte de dialogue pour modifier les paramètres,
+                utilisez la commande <emph>
+                    Outils - Add-ons - Lire la sélection ...</emph>
+            </listitem>
+        </list>
+    </body>
 </helpdocument>
