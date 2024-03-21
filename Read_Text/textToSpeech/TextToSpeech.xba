@@ -148,6 +148,16 @@ Option Explicit
 &apos;&apos; Impress displays when a computer that does not have read text extension
 &apos;&apos; calls the procedure.
 &apos;&apos;
+
+function fbFfmpegPosixOK() As Boolean
+	On Error GoTo fbFfmpegPosixOKErr
+	fbFfmpegPosixOK = shell(&quot;ffmpeg&quot;, 0, &quot;-?&quot;) = 0
+	Exit Function
+	fbFfmpegPosixOKErr:
+	fbFfmpegPosixOK = False
+End Function
+
+
 Function fbOnlyShowIfExperiment() As Boolean
 	fbOnlyShowIfExperiment = GetSolarVersion() &gt; 70500
 End Function

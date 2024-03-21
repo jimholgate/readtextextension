@@ -240,7 +240,7 @@ class PiperTTSClass(object):
         self.machine = ""
         try:
             self.machine = platform.uname().machine
-        except NameError:
+        except (AttributeError, NameError):
             _meta = readtexttools.ImportedMetaData()
             self.machine = _meta.execute_command("uname -m")
         self.app_data = ".local"
@@ -1164,6 +1164,66 @@ remote_file = {remote_file}
                 return ""
         return os.path.split(home_file)[0]
 
+    def _get_outer_play_code(self, _text_file: str = "", _onnx: str = "") -> str:
+        """Return a string with a valid posix command if a given streamer
+        works, otherwise `""`."""
+        _outer = ""
+        _commons = "-autoexit -hide_banner -loglevel info -nostats"
+        _vlc_out = "".join(
+            [
+                f""" --meta-title "{self.help_heading} : {_onnx}" """,
+                """--audio-visual visualizer --effect-list spectrometer """,
+                """--demux=rawaud --rawaud-channels 1 --rawaud-samplerate """,
+                f"""{self.sample_rate} - vlc://quit """,
+            ]
+        )
+        _ffplay_out = "".join(
+            [
+                f"""-f s16le -ar {self.sample_rate}  -window_title " """,
+                f"▶ {self.help_heading} : {_onnx} | 🛑 ",
+                readtexttools.translate_ui_element(
+                    readtexttools.default_lang(), "Stop"
+                ),
+                f""" ⌨ [ESC]" {_commons} -x 800 -y 24 -i -""",
+            ]
+        )
+        try:
+            # If system command `killall` is available, then hide the player window UI.
+            if os.system(f"command -v killall > /dev/null") == 0:
+                _ffplay_out = f"-f s16le -ar {self.sample_rate} {_commons} -nodisp -i -"
+                _vlc_out = f"""--intf dummy --demux=rawaud --rawaud-channels 1 --rawaud-samplerate {self.sample_rate} - vlc://quit"""
+        except (OSError, TypeError):
+            pass
+        for test_app, test_outer in [
+            [
+                "aplay",
+                f"-r {self.sample_rate} -f S16_LE -t raw -",
+            ],
+            [
+                "ffplay",
+                _ffplay_out,
+            ],
+            [
+                "paplay",
+                f"--playback --raw --channels 1 --format s16le --rate {self.sample_rate} -",
+            ],
+            [
+                "pw-cat",
+                f"--playback --channels 1 --format s16 --rate {self.sample_rate} -",
+            ],
+            [
+                "vlc",
+                _vlc_out,
+            ],
+        ]:
+            try:
+                if os.system(f"command -v {test_app} > /dev/null") == 0:
+                    _outer = f" --output-raw < {_text_file} | {test_app} {test_outer}"
+                    break
+            except (OSError, TypeError):
+                continue
+        return _outer
+
     def _vlc_app(self):
         """Return a list i. e.: `[_vlc="/pathto/vlc", _force_player=True]`
         item 0 is host system path or `""` if it cannot be found.
@@ -1261,7 +1321,10 @@ remote_file = {remote_file}
                 _ui = self.vlc_intfs[0]
             _outer = f" --output-raw < {_text_file} | {_vlc} {_ui}{_vlc_demux}"
         else:
-            _outer = f" --output-raw < {_text_file} | aplay -r {self.sample_rate} -f S16_LE -t raw -"
+            if os.name == "posix":
+                _outer = self._get_outer_play_code(_text_file, _onnx)
+                if len(_outer) == 0:
+                    return False
         _demo_warning = ""
         if os.name == "nt":
             _vlc, _force_player = self._vlc_app()
@@ -1293,7 +1356,15 @@ computer can start reading quickly with large or small selections of text."""
                 if os.name == "nt":
                     app_list = ["VLC.EXE", "PIPER.EXE"]
             else:
-                app_list = ["aplay", "piper", "piper-cli"]
+                app_list = [
+                    "aplay",
+                    "ffmpeg",
+                    "ffplay",
+                    "paplay",
+                    "pw-cat",
+                    "piper",
+                    "piper-cli",
+                ]
                 if os.name == "nt":
                     app_list = ["SOX.EXE", "PIPER.EXE"]
             print(f"[ > ] {self.help_heading} stopping...")

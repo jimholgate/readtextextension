@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<tree_view version="24-Aug-2004">
+<tree_view version="21-March-2024">
   <help_section application="readtextextension" id="readtextextension01" title="Read Text Extension">
     <node id="readtextextension0101" title="Setting up Read Text Extension">
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Install</topic>

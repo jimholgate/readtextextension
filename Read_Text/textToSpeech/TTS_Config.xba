@@ -1345,14 +1345,14 @@ Sub AboutAddOn( _
 	End If	
 	&apos; Open up the dialog
 	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
-	f_dlgAboutReadSelection = CreateUnoDialog( DialogLibraries.textToSpeech.Dialog3)
+	f_dlgAboutReadSelection = CreateUnoDialog(DialogLibraries.textToSpeech.Dialog3)
 	With f_dlgAboutReadSelection
 		&apos;Update the labels And button with your language
 		.model.Title = fsLookUpTerm2(&quot;s_about&quot;, s1) &amp; _
 		&quot; &quot; &amp; fsLookUpTerm2(&quot;s_read-text&quot;, s1) &amp; _
 		&quot; &quot; &amp; fsExtensionVersion() &amp; title_special
 		If fbHelpIsInstalled() Then
-			.model.HelpURL = fsAppSignature() &amp; &quot;/set_up.xhp&quot;
+			.model.HelpURL = fsAppSignature() &amp; &quot;/tokens.xhp&quot;
 		End If
 		.GetControl(&quot;TextField1&quot;).model.Text = fsAbout()
 		.GetControl(&quot;CommandButton1&quot;).model.Label = fsLookUpTerm2(&quot;s_ok&quot;, s1)
@@ -1425,6 +1425,7 @@ Sub AboutAddOn( _
 				sE = config(fiExperimentalProgramPath())
 			End If
 			sC = Trim(sA)  &apos; If not byVal in Function arguements, ensure sA is untouched
+			.GetControl(&quot;TextField3&quot;).model.helpText = sC 
 			sC = replaceLocalTokensWithStr(sC)
 			sC = replacePublicTokensWithStr(sC)
 			.GetControl(&quot;TextField3&quot;).model.Text = &quot;&quot;&quot;&quot; &amp; sE &amp; &quot;&quot;&quot; &quot; &amp; sC 

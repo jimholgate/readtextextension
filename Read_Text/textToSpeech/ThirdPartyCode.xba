@@ -277,7 +277,7 @@ Function PiperLocalSuggestion(_lang As String, _high As Boolean) As String
 		Array(&quot;da_DK&quot;, &quot;da_DK-talesyntese-medium#0&quot;),_
 		Array(&quot;de_DE&quot;, &quot;de_DE-thorsten-medium#0&quot;),_
 		Array(&quot;en_CA&quot;, &quot;en_US-arctic-medium#8&quot;),_
-		Array(&quot;en_GB&quot;, &quot;en_GB-alba-medium#0&quot;),_
+		Array(&quot;en_GB&quot;, &quot;en_GB-vctk-medium#64&quot;),_
 		Array(&quot;en_IE&quot;, &quot;en_GB-jenny_dioco-medium#0&quot;),_
 		Array(&quot;en_IN&quot;, &quot;en_US-arctic-medium#3&quot;),_
 		Array(&quot;en_US&quot;, &quot;en_US-lessac-medium#0&quot;),_
@@ -297,14 +297,16 @@ Function PiperLocalSuggestion(_lang As String, _high As Boolean) As String
 		Array(&quot;pt_BR&quot;, &quot;pt_BR-faber-medium#0&quot;),_
 		Array(&quot;pt_PT&quot;, &quot;pt_PT-tugão-medium#0&quot;),_
 		Array(&quot;ro_RO&quot;, &quot;ro_RO-mihai-medium#0&quot;),_
-		Array(&quot;ru_RU&quot;, &quot;ru_RU-irina-medium#0&quot;),_
+		Array(&quot;ru_RU&quot;, &quot;ru_RU-dmitri-medium#0&quot;),_
 		Array(&quot;sk_SK&quot;, &quot;sk_SK-lili-medium#0&quot;),_
 		Array(&quot;sl_SI&quot;, &quot;sl_SI-artur-medium#0&quot;),_
 		Array(&quot;sr_RS&quot;, &quot;sr_RS-serbski_institut-medium#0&quot;),_
 		Array(&quot;sv_SE&quot;, &quot;sv_SE-nst-medium#0&quot;),_
 		Array(&quot;sw_CD&quot;, &quot;sw_CD-lanfrica-medium#0&quot;),_
 		Array(&quot;tr_TR&quot;, &quot;tr_TR-dfki-medium#0&quot;),_
-		Array(&quot;uk_UA&quot;, &quot;uk_UA-ukrainian_tts-medium#0&quot;),_
+		Array(&quot;uk_CA&quot;, &quot;uk_UA-ukrainian_tts-medium#0&quot;),_
+		Array(&quot;uk_RU&quot;, &quot;uk_UA-ukrainian_tts-medium#1&quot;),_
+		Array(&quot;uk_UA&quot;, &quot;uk_UA-ukrainian_tts-medium#2&quot;),_
 		Array(&quot;vi_VN&quot;, &quot;vi_VN-vais1000-medium#0&quot;),_
 		Array(&quot;zh_CN&quot;, &quot;zh_CN-huayan-medium#0&quot;))
 	End If
@@ -454,7 +456,7 @@ Function fvTts_config_createDefaultConfig( _
 			Else
 				config(fiExternalProgramPath()) = &quot;/usr/bin/python&quot;
 			End If
-			If isSnap() or isFlatPak Then
+			If isSnap() or isFlatPak() Then
 				config(fiExternalCommand()) = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;FEMALE1&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf fbIsSandboxed() Then

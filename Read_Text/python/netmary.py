@@ -498,8 +498,11 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library."""
         readtexttools.lock_my_lock(self.locker)
         _no = "0" * 10
         for _item in _items:
+            if not self.ok:
+                return False
             if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop!")
+                self.ok = False
                 return True
             elif len(_item.strip(" ;.!?\n")) == 0:
                 continue

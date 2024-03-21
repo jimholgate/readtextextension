@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<tree_view version="24-Aug-2004">
+<tree_view version="21-March-2024">
   <help_section application="readtextextension" id="readtextextension01" title="Lisäosa 'Teksti puheeksi'">
     <node id="readtextextension0101" title="Käyttöönotto">
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Asentaminen</topic>
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">Asetukset</topic>
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">Komentojonot</topic>
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/img/Default64,png">Normaali “Read Text“ -valintaikkuna.</topic>
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3,png">Normaali “Tietoja” -valintaikkuna.</topic>
     </node>
     <node id="readtextextension0102" title="Käyttö">
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Lue valinta</topic>

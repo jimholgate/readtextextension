@@ -17,6 +17,11 @@
     <body>
         <paragraph role="heading" id="tokens1" xml-lang="en-US" level="1">
             Setting up Read Text Extension</paragraph>
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
+            id="img_dialog3_screenshot">
+            <alt xml-lang="en-US"
+                id="alt_dialog3_screenshot">Standard “About” dialog.</alt>
+        </image>
         <paragraph role="heading" id="tokens1.1" xml-lang="en-US" level="2">
             Command and Script Tokens
         </paragraph>

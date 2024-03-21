@@ -654,6 +654,10 @@ can synthesize speech privately using <{_eurl}>."""
         _end_wait=60,
     ) -> bool:
         """Read Mimic3 speech aloud"""
+        if not self.ok:
+            # You unlocked the lock, but the speech did not stop,
+            # so exit before saying another item... (docker? flatpak?)
+            return True
         _length_scale = 1
         if not _speech_rate == 160:
             _length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)[0]
@@ -713,8 +717,9 @@ can synthesize speech privately using <{_eurl}>."""
         for _item in _items:
             if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop!")
+                self.ok = False
                 return True
-            elif len(_item.strip(" ;.!?\n")) == 0:
+            elif len(_item.strip().strip(""" ;:-,*+=_[]()'".!?\n""")) == 0:
                 continue
             elif "." in _media_out and _tries != 0:
                 _ext = os.path.splitext(_media_out)[1]
@@ -736,6 +741,7 @@ can synthesize speech privately using <{_eurl}>."""
             )
             if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop")
+                self.ok = False
                 return True
             if _done:
                 self.common.do_net_sound(

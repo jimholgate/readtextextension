@@ -349,8 +349,11 @@ Checking {help_heading} voices for `{_iso_lang}`
             else:
                 _items = [_text]
             for _item in _items:
+                if not self.ok:
+                    return False
                 if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                     print("[>] Stop!")
+                    self.ok = False
                     return True
                 if len(_item.strip(_strips)) == 0:
                     continue

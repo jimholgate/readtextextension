@@ -702,7 +702,7 @@ Function faSplitString(byVal testString As String, byVal LineLen As Integer, _
 			words = Split(substr, &quot; &quot;)
 			For Each delimiter in delimiters
 				i = Instr(substr, delimiter)
-				If i &gt; 0 Then
+				If i &lt;&gt; 0 Then
 					words = Split(substr, delimiter)
 					last_delimiter = delimiter
 					Exit For
@@ -717,7 +717,7 @@ Function faSplitString(byVal testString As String, byVal LineLen As Integer, _
 		substr = Mid(testString, startIndex + 1, length)
 		For Each delimiter in delimiters
 			lastIndex = InStrRev(substr, delimiter) - 1
-			If lastIndex &gt; 0 Then
+			If lastIndex &lt;&gt; 0 Then
 				substr = Left(substr, lastIndex)
 				Exit For
 			End If
@@ -1351,6 +1351,25 @@ Function fbHelpIsInstalled() As Boolean
 	Else
 		fbHelpIsInstalled = False
 	End If
+End Function
+
+
+Function galleryLocation() As String
+	&apos;This function returns the localized application gallery location
+	Dim strA As String
+	Dim _specials As Variant : _specials = Array(&quot;.var&quot;, &quot;snap&quot;)
+	Dim _item As String
+	Dim intA As Integer
+	Dim _paths As Variant : _paths = Split(fsPathSettings(&quot;Gallery&quot;), &quot;;&quot;)
+	galleryLocation = _paths(0)
+	For Each _item in _specials
+		For Each strA In _paths
+			If Instr(strA, &quot;/&quot; &amp; _item &amp; &quot;/&quot;) &lt;&gt; 0 Then
+				galleryLocation = strA
+				Exit Function
+			End If
+		Next
+	Next
 End Function
 
 
@@ -2540,11 +2559,12 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	Dim n As Integer
 	Dim n2 As Integer
 	Dim s1 As String
-	Dim _opts(10) As String
+	Dim _opt As String : _opt = &quot;&quot;
+	Dim _opts As Variant
 	Dim s3 As String
 	Dim s4 As String
 	Dim sLanguage As String
-	Dim a1
+	Dim a1 As Variant
 	Dim CR As String
 	Dim oComboBox As Variant
 	Dim bIsAppImage As Boolean : bIsAppImage = False
@@ -2578,9 +2598,11 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	Dim bEnableRate As Boolean
 	bEnableRate = True
 	sLanguage = LCase(fsGetLanguage())
-	Dim sProg As String : sProg = &quot;&quot;
+	Dim sSpdToken As String : sSpdToken = &quot;&quot;
 	If fbIsLibreOffice() Then
-		sProg = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
+		If Not fbIsSandboxed() And Not bIsAppImage Then
+		sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
+		End If
 	End If
 	Select Case sGetOS
 		Case &quot;WINDOWS&quot; &apos; Show examples
@@ -2615,12 +2637,12 @@ Function fiDialog1CombosShowMyPythonChoices( _
 				Redim _opts : _opts = Array(&quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;,_
 				&quot;FEMALE6&quot;, &quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
 			End If
-			For n = Lbound(_opts) To Ubound(_opts)
+			For Each _opt in _opts
 				If bEnableLocalHostRate Then
-					s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; &quot;&quot;&quot;&quot;
+					s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp; _opt &amp; &quot;&quot;&quot;&quot;
 					s1 = s1 &amp; fspyPlayOption(oDialog, s4)
 				End If
-				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;&quot; &amp; _opts(n) &amp; &quot;&quot;&quot;&quot;
+				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;&quot; &amp; _opt &amp; &quot;&quot;&quot;&quot;
 				s1 = s1 &amp; fspyPlayOption(oDialog, s4)
 			Next
 		End If
@@ -2641,7 +2663,7 @@ Function fiDialog1CombosShowMyPythonChoices( _
 		&quot;6&quot;,_
 		&quot;3&quot;,_
 		&quot;1&quot;)
-		For n = 0 To Lbound(_opts)
+		For n = Lbound(_opts) To Ubound(_opts)
 			s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --size &quot; &amp; _opts(n) &amp; _
 			&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			
@@ -2719,34 +2741,35 @@ Function fiDialog1CombosShowMyPythonChoices( _
 				Redim _opts : _opts = Array(_
 				&quot;MALE1&quot;, &quot;FEMALE1&quot;)
 			End Select
-			If Instr(sProg, &quot;(SPD_READ_TEXT_PY)&quot;) = 0 Then
-				ClientId = &quot;&quot;
-			End If
-			If Not fbIsSandboxed() And Len(sProg) &lt;&gt; 0 Then
+			If Len(sSpdToken()) &lt;&gt; 0 Then
 				If Len(fsFindAppPath(&quot;afconvert&quot;)) &lt;&gt; 0 Then
-					s4 = sProg &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+					&apos; Darwin Platform 
+					s4 = sSpdToken &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 					s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 				End If
 				For n = Lbound(_opts) To Ubound(_opts)
+					If Instr(sSpdToken, &quot;(SPD_READ_TEXT_PY)&quot;) = 0 Then
+						ClientId = &quot;&quot;
+					End If
 					If bEnableRate Then
-						s1 = s1 &amp; CR &amp; sProg &amp; _
+						s1 = s1 &amp; CR &amp; sSpdToken &amp; _
 						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
 						&quot;&quot;&quot; --rate &quot;&quot;140%&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-						s1 = s1 &amp; CR &amp; sProg &amp; _
+						s1 = s1 &amp; CR &amp; sSpdToken &amp; _
 						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
 						&quot;&quot;&quot; --rate &quot;&quot;70%&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 					End If
-					s1 = s1 &amp; CR &amp; sProg &amp; _
+					s1 = s1 &amp; CR &amp; sSpdToken &amp; _
 					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
 					&quot;&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 				Next
 				Select Case sGetOS
 					Case &quot;MacOS&quot;
-					s1 = s1 &amp; CR &amp; sProg &amp; _
+					s1 = s1 &amp; CR &amp; sSpdToken &amp; _
 					&quot; --visible True --voice &quot;&quot;AUTO&quot;&quot; --language&quot; &amp;_
 					&quot; &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 				End Select
-				s1 = s1 &amp; CR &amp; sProg &amp; _
+				s1 = s1 &amp; CR &amp; sSpdToken &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
@@ -2754,7 +2777,6 @@ Function fiDialog1CombosShowMyPythonChoices( _
 		End If
 	End If
 	
-
 	If len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or _
 		FileExists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave.exe&quot;) Or _
 		FileExists(fsProgramDirectory() &amp; &quot;festival\texttowave.exe&quot;) Then
@@ -2817,12 +2839,11 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	If fbPiperTtsOk(&quot;&quot;) Then
 		high_suggestion = PiperLocalSuggestion(&quot;&quot;, True)
 		local_suggestion = PiperLocalSuggestion(&quot;&quot;, False)
-		Select Case bIsAppImage
-			Case True
+		If fbIsSandboxed() Then
 			Redim _opts : _opts = Array(_
 				player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
 				player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
-				player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_,_
+				player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
 				player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
 				player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
 				player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
@@ -2831,7 +2852,7 @@ Function fiDialog1CombosShowMyPythonChoices( _
 				player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
 				&quot;&quot;, _
 			)
-			Case Else
+		Else
 			Redim _opts : _opts = Array(_
 				player7 &amp; &quot; --update True --voice &quot; &amp; high_suggestion,_
 				player7 &amp; &quot; --update True --voice &quot; &amp; local_suggestion,_
@@ -2847,7 +2868,7 @@ Function fiDialog1CombosShowMyPythonChoices( _
 				player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
 				&quot;&quot;, _
 			)
-		End Select
+		End If
 		For n = Lbound(_opts) to Ubound(_opts)
 			If Instr(_opts(n), &quot;--update True --voice&quot;) = 0 Then
 				s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
@@ -2899,8 +2920,6 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	fiDialog1CombosShowMyPythonChoicesErr
 	fiDialog1CombosShowMyPythonChoices = 0
 End Function
-
-
 
 
 Function fspyPlayOption( _
@@ -7133,7 +7152,8 @@ End Sub
 
 
 Function fbIsSandboxed() As Boolean
-	&apos; flatpak and snap apps cannot run external programs.
+	&apos; flatpak and snap apps should not run system programs
+	&apos; outside of authorized paths.
 	fbIsSandboxed = False
 	If isSnap() Then
 		If Not isOldSnap() Then
@@ -7141,12 +7161,17 @@ Function fbIsSandboxed() As Boolean
 		End If
 	End If
 	Dim x As Integer
+	
 	Dim sand_path As Variant : sand_path = Array(_
-	&quot;/.var/app/org.libreoffice.LibreOffice/&quot;, _
-	&quot;/snap/libreoffice&quot;_
+	&quot;/.var/app/org.libreoffice.LibreOffice&quot;, _
+	&quot;/.var/app/org.libreoffice.LibreOfficeDev/&quot;, _
+	&quot;/.var/app/org.openoffice.OpenOffice/&quot;, _
+	&quot;/snap/libreoffice&quot;, _
+	&quot;/snap/libreofficedev&quot;, _
+	&quot;/snap/openoffice&quot;_
 	)
 	For x = Lbound(sand_path) to Ubound(sand_path)
-		If Instr(soundsDirectory(), sand_path(x)) &lt;&gt; 0 Then
+		If Instr(Lcase(galleryLocation()), Lcase(sand_path(x))) &lt;&gt; 0 Then
 			fbIsSandboxed = True
 			Exit Function
 		End If
@@ -7156,18 +7181,31 @@ End Function
 
 Function fbHaveEspeak() As Boolean
 	fbHaveEspeak = False
-	Dim n# : n = 0
+	Dim _item As String : _item = &quot;&quot;
+	Dim ErrLevel As Integer
 	Dim a1 : a1 = Array(&quot;espeak-ng&quot;, &quot;speak-ng&quot;, &quot;espeak&quot;)
-	For n = Lbound(a1) To Ubound(a1)
-		If Len(fsFindAppPath(a1(n))) &lt;&gt; 0 Then
+	For Each _item in a1
+		If Len(fsFindAppPath(_item)) &lt;&gt; 0 Then
 			fbHaveEspeak = True
 			Exit Function
 		End If
 	Next
-	If FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
-			FileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
-		fbHaveEspeak = True
-	End If
+	Select Case fsGetOS()
+		Case &quot;WINDOWS&quot;
+		If FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
+				FileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
+			fbHaveEspeak = True
+		End If
+		Case Else
+		On Error GoTo fbHaveEspeakErr
+		ErrLevel = shell(&quot;espeak-ng&quot;, 0, &quot; --version&quot;)
+		If ErrLevel = 0 Then
+			fbHaveEspeak = True
+		End If
+	End Select
+	Exit Function
+	fbHaveEspeakErr:
+	fbHaveEspeak = False
 End Function
 
 Function fbHaveFfmpeg() As Boolean

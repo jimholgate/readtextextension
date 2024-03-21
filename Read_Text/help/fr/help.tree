@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<tree_view version="24-Aug-2004">
+<tree_view version="21-March-2024">
   <help_section application="readtextextension" id="readtextextension01" title="L'extension Read text">
     <node id="readtextextension0101" title="Installation de l'extension Read text">
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Installation</topic>
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">Configuration</topic>
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">Tokens</topic>
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/img/Default64,png">Boîte de dialogue standard « Read text »</topic>
+      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3,png">Boîte de dialogue standard « À propos »</topic>
     </node>
     <node id="readtextextension0102" title="Utilisation de l'extension Read text">
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Lire la sélection</topic>
