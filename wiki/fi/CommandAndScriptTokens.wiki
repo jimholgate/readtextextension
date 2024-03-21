@@ -2,6 +2,8 @@
 
 = Komentojonot =
 
+[File:Dialog3.png]
+
 Jos komentojonoissa tai parametreissä tarvitaan muuttujia, tulee käyttää sopivaa merkkijonoa. Suorituksen aikana suluissa esitetty arvo korvataan tarvittavalla todellisella arvolla.
 
 * Nykyinen päivämäärä aluekohtaisessa esitysmuodossa (DATE) 

@@ -2,6 +2,8 @@
 
 = Befehls- und Script-Tokens =
 
+[File:Dialog3.png]
+
 Verwenden Sie das passende Token, wenn Sie diese Werte in einem Befehl oder Script benötigen. Bei Ausführung wird der Wert in Klammern durch die jeweils benötigte Zeichenkette ersetzt.
 
 * Aktuelles Datum in Landessprache (DATE) 

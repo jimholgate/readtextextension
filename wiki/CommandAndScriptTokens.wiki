@@ -2,6 +2,8 @@
 
 = Command and Script Tokens =
 
+[File:Dialog3.png]
+
 When you need these values in a command or a script use the appropriate token. When the add-on is executed, the value in brackets is replaced by the actual string required.
 
 * Current date as spoken in region (DATE)

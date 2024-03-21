@@ -2,6 +2,8 @@
 
 = Tokens =
 
+[File:Dialog3.png]
+
 Lorsque vous avez besoin de ces valeurs variables dans une commande ou dans un script vous pouvez utiliser une option appropriée. La valeur entre parenthèses serait remplacé par la chaîne approprié.
 
 * La date actuelle (DATE) 
