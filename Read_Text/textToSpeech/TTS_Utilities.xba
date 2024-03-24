@@ -694,8 +694,8 @@ Function faSplitString(byVal testString As String, byVal LineLen As Integer, _
 	Dim last_delimiter As String : last_delimiter = &quot; &quot;
 	Dim lastIndex As Integer : lastIndex = 0
 	Dim words As Variant : words = Array()
+	Dim length As Integer
 	While startIndex &lt; Len(testString)
-		Dim length As Integer
 		length = Min(LineLen, Len(testString) - startIndex)
 		If length = LineLen Then
 			substr = Mid(testString, startIndex + 1, length)
@@ -717,7 +717,7 @@ Function faSplitString(byVal testString As String, byVal LineLen As Integer, _
 		substr = Mid(testString, startIndex + 1, length)
 		For Each delimiter in delimiters
 			lastIndex = InStrRev(substr, delimiter) - 1
-			If lastIndex &lt;&gt; 0 Then
+			If lastIndex &gt; 0 Then
 				substr = Left(substr, lastIndex)
 				Exit For
 			End If
@@ -820,24 +820,23 @@ Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolea
 	Dim snippets As Variant
 	Dim bWait As Boolean: bWait = True
 	Dim item As String
-	Dim delimiters As Variant : delimiters = Array(Chr$(10), Chr$(13), &quot;. &quot;, &quot;:&quot;,_
-	&quot;;&quot;, Chr$(9), &quot;“&quot;, &quot;”&quot;, &quot;&quot;&quot;&quot;, &quot;,&quot;, &quot;(&quot;, &quot;)&quot;)
-
+	Dim delimiters As Variant : delimiters = Array(Chr$(10), Chr$(13), &quot;,&quot;, &quot;:&quot;,_
+	&quot;;&quot;, Chr$(9), &quot;“&quot;, &quot;”&quot;, &quot;&quot;&quot;&quot;, &quot;. &quot;, &quot;(&quot;, &quot;)&quot;)
 	If FileExists(&quot;Z:\usr\bin\spd-say&quot;) Then
 		If FileExists(s2) Then
 			fbRemoveFile(s2)
-			For x = Lbound(_cmds) To Ubound(_cmds)
+			For each item in _cmds
 				shell(_
 				&quot;start&quot;, _
 				0, _
-				_cmds(x), _
+				item, _
 				bWait _
 				)
 			Next
 		Else
 			CreateFile(s2, fsAppSignature(), &quot;utf-8&quot;)
-			For x = Lbound(escape_chars) To Ubound(escape_chars)
-				_msg = fsReplaceText(_msg, escape_chars(x), &quot;\&quot; &amp; escape_chars(x))
+			For Each item in escape_chars
+				_msg = fsReplaceText(_msg, item, &quot;\&quot; &amp; item)
 			Next
 			snippets = faSplitString(_msg, 80, delimiters)
 			For Each item In snippets
@@ -1855,6 +1854,12 @@ End Function
 Sub dialog1Combo2ShowSAPIChoices( _
 	oDialog)
 &apos; Windows dialogue
+&apos; Only some audio file converters are set up to include cover art.
+&apos; We can use iTunes to embed metadata and an album cover.
+&apos; [iTunes][1] makes the file in it&apos;s own directory and indexes it. We
+&apos; copy the file to our sound directory. You can delete either copy.
+&apos; [1]: https://www.apple.com/itunes/
+
 	Dim Sapi As Object
 	Dim n As Integer : n = 0
 	Dim aLineOfText As String : aLineOfText = &quot;&quot;
@@ -1870,142 +1875,65 @@ Sub dialog1Combo2ShowSAPIChoices( _
 	Dim bNoMp3Tool As Boolean : bNoMp3Tool = True
 	Dim bHaveVLC As Boolean : bHaveVLC = False
 	Dim bHaveFfmpeg As Boolean : bHaveFfmpeg = False
+	Dim fileTypes As Variant
+	Dim fileType As Variant
     bNoMp3Tool = True
 	bHaveVLC = fbHaveVLC()
 	bHaveFfmpeg = fbHaveFfmpeg()
 	Set Sapi = CreateObject(&quot;Sapi.SpVoice&quot;)
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
-	Rem first remove all old items from the list
-	n1 = oComboBox.getItemCount()
-	oComboBox.removeItems(0, n1)
-	n = 0
-	oComboBox.addItem(&quot;(RESET_ALL)&quot;, 0)
-	n = n + 1
-	sSelectionLangCountryTag = &quot; /language:&quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
-	sSelectionLanguageTag = &quot;(SELECTION_LANGUAGE_CODE)&quot;
-	On Error Goto FichierKO
-	While n &lt; Sapi.GetVoices.Count
-		s1 = Sapi.GetVoices.Item(n).GetDescription
-		For n1 = 10 To - 10 step - 2
-			oComboBox.addItem(&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-			&quot; /voice:&quot;&quot;&quot; &amp; s1 &amp; &quot;&quot;&quot; /rate:&quot; &amp; Trim(Str(n1)) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;, 0)
-		Next
+	With oComboBox
+		.model.readonly = False
+		Rem first remove all old items from the list
+		n1 = .getItemCount()
+		.removeItems(0, n1)
+		n = 0
+		.addItem(&quot;(RESET_ALL)&quot;, 0)
 		n = n + 1
-	WEnd
-	On Error Goto FichierKO
-	For n1 = 10 To - 10 step - 2
-		oComboBox.addItem( &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-		sSelectionLangCountryTag &amp; _
-		&quot; /rate:&quot; &amp; Trim(Str(n1)) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;, 0)
-	Next
-
-	If fbHaveOgg() Or bHaveFfmpeg Or bHaveVLC Then
-		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-		sSelectionLangCountryTag &amp; _
-		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).ogg&quot;&quot;&quot; &amp; _
-		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1, 0)
-	End If
-
-	If bHaveFfmpeg Or fbHaveLame() Then
-		bNoMp3Tool = False
-		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-		sSelectionLangCountryTag &amp; _
-		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
-		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1, 0)
-	ElseIf bHaveVLC And Not fbHaveItunes() Then
-		bNoMp3Tool = False
-		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-		sSelectionLangCountryTag &amp; _
-		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
-		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1, 0)
-	End If
-
-	If fbHaveNeroEnc() And fbHaveNeroTag() Then
-		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-		sSelectionLangCountryTag &amp; _
-		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
-		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1, 0)
-	ElseIf fbHaveNeroEnc() Then
-		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-		sSelectionLangCountryTag &amp; _
-		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
-		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1, 0)
-	End If
-
-	If fbHaveFlac() Then
-		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-		sSelectionLangCountryTag &amp; _
-		&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
-		&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).flac&quot;&quot;&quot; &amp; _
-		&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-		&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		oComboBox.addItem(s1, 0)
-	End If
-	If bNoMp3Tool Then
-		If fbHaveItunes() Then
-			&apos; We can use iTunes to embed metadata and an album cover.
-			&apos; [iTunes][1] makes the file in it&apos;s own directory and indexes it. We
-			&apos; copy the file to our sound directory. You can delete either copy
-			&apos; if you don&apos;t need one, but if speed is important, and you don&apos;t
-			&apos; want a copy every time use [Nero m4a encoder][2]
-			&apos; [1]: https://www.apple.com/itunes/
-			&apos; [2]: https://www.nero.com/
-			bNoMp3Tool = False
-			s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-			sSelectionLangCountryTag &amp; _
-			&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-			&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).aif&quot;&quot;&quot; &amp; _
-			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			oComboBox.addItem(s1, 0)
-			s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-			sSelectionLangCountryTag &amp; _
-			&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-			&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).mp3&quot;&quot;&quot; &amp; _
-			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			oComboBox.addItem(s1, 0)
-			s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-			sSelectionLangCountryTag &amp; _
-			&quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot; &amp; _
-			&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).m4a&quot;&quot;&quot; &amp; _
-			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			oComboBox.addItem(s1, 0)
+		sSelectionLangCountryTag = &quot; /language:&quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
+		sSelectionLanguageTag = &quot;(SELECTION_LANGUAGE_CODE)&quot;
+		On Error Goto FichierKO
+		While n &lt; Sapi.GetVoices.Count
+			s1 = Sapi.GetVoices.Item(n).GetDescription
+			For n1 = 10 To - 10 step - 2
+				.addItem(&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
+				&quot; /voice:&quot;&quot;&quot; &amp; s1 &amp; &quot;&quot;&quot; /rate:&quot; &amp; Trim(Str(n1)) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;, 0)
+			Next
+			n = n + 1
+		WEnd
+		On Error Goto FichierKO
+		If Not fbReadOnlyCode() Then
+			fileTypes = Array(_
+			Array(&quot;ogg&quot;, fbHaveOgg() Or bHaveFfmpeg Or bHaveVLC, False), _
+			Array(&quot;mp3&quot;, bHaveFfmpeg Or fbHaveLame() Or (bHaveVLC And Not fbHaveItunes()), True), _
+			Array(&quot;m4a&quot;, fbHaveNeroEnc(), fbHaveNeroTag()), _
+			Array(&quot;flac&quot;, fbHaveFlac(), True))
+			For Each fileType In fileTypes
+				If fileType(1) Then
+					s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
+					sSelectionLangCountryTag &amp; _
+					&quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot; &amp; _
+					&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).&quot; &amp; fileType(0) &amp;_
+					&quot;&quot;&quot;&quot;
+					If fileType(2) Then
+						s1 = s1 &amp; &quot; /imagefile:&quot;&quot;(POSTER_IMG)&quot;&quot;&quot;
+					End If
+					
+					s1 = s1 &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+					.addItem(s1, 0)
+				End If
+			Next fileType
 		End If
-	End If
-	s2 = &quot;&quot;
-	If bHaveVLC Then
-		s2 = &quot; /use-optional-app:&quot;&quot;True&quot;&quot;&quot;
-	End If
-	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-	sSelectionLangCountryTag &amp; _
-	s2 &amp; _
-	&quot; /soundfile:&quot;&quot;(HOME)&quot; &amp; sSelectionLanguageTag &amp; &quot;\(NOW).wav&quot;&quot;&quot; &amp; _
-	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1, 0)
-	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /visible:&quot;&quot;True&quot;&quot;&quot; &amp; _
-	sSelectionLangCountryTag &amp; _
-	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1, 0)
-	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-	sSelectionLangCountryTag &amp; _
-	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1, 0)
-	&apos; do not specify the language for the top item.
-	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
-	&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1, 0)
-	fbRemoveFile(myTextPath)
+		For n1 = 10 To - 10 step - 2
+			.addItem( &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
+			sSelectionLangCountryTag &amp; _
+			&quot; /rate:&quot; &amp; Trim(Str(n1)) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;, 0)
+		Next
+			.addItem( &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot; &amp; _
+			sSelectionLangCountryTag &amp; _
+			&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, 0)
+		fbRemoveFile(myTextPath)
+		End With
 	Exit Sub
 	FichierKO:
 	Resume FichierKO2
@@ -2152,37 +2080,39 @@ Sub dialog1Combo2ShowSAYChoices( _
 	
 	Rem Get control
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
-	Rem first remove all old items from the list
-	n = oComboBox.getItemCount()
-	oComboBox.removeItems(0,n)
-	
-	If Not b_CaReadTextExtensionHideExports Then
-		For n = LBound(aA) To UBound(aA)
-			s1 = &quot; -f &quot;&quot;(TMP)&quot;&quot;&quot; &amp; &quot;-o &quot;&quot;(HOME)(NOW)&quot; &amp; aA(n) &amp; &quot;&quot;&quot;&quot;
-			oComboBox.addItem(s1, 0)
-		Next
-	End If
-	n = 0
-	For n = 0 To 40
-		If fsMacVoice(n, selection_IsoLang) = &quot;&quot; Then
-			Exit For
-		Else
-			For o = LBound(aA) To UBound(aA)
+	With oComboBox
+		Rem first remove all old items from the list
+		n = .getItemCount()
+		.removeItems(0,n)
+		
+		If Not b_CaReadTextExtensionHideExports Then
+			For n = LBound(aA) To UBound(aA)
+				s1 = &quot; -f &quot;&quot;(TMP)&quot;&quot;&quot; &amp; &quot;-o &quot;&quot;(HOME)(NOW)&quot; &amp; aA(n) &amp; &quot;&quot;&quot;&quot;
+				.addItem(s1, 0)
+			Next
+		End If
+		n = 0
+		For n = 0 To 40
+			If fsMacVoice(n, selection_IsoLang) = &quot;&quot; Then
+				Exit For
+			Else
+				For o = LBound(aA) To UBound(aA)
+					s1 = &quot;--voice &quot; &amp; _
+					fsMacVoice(n, selection_IsoLang) &amp; _
+					&quot; -f &quot;&quot;(TMP)&quot;&quot; -o &quot;&quot;(HOME)(NOW).&quot; &amp; _
+					aA(o) &amp; _
+					&quot;&quot;&quot;&quot;
+					.addItem(s1, 0)
+				Next
 				s1 = &quot;--voice &quot; &amp; _
 				fsMacVoice(n, selection_IsoLang) &amp; _
-				&quot; -f &quot;&quot;(TMP)&quot;&quot; -o &quot;&quot;(HOME)(NOW).&quot; &amp; _
-				aA(o) &amp; _
-				&quot;&quot;&quot;&quot;
-				oComboBox.addItem(s1, 0)
-			Next
-			s1 = &quot;--voice &quot; &amp; _
-			fsMacVoice(n, selection_IsoLang) &amp; _
-			&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
-			oComboBox.addItem(s1, 0)
-		End If
-	Next
-	s1 = &quot;-f &quot;&quot;(TMP)&quot;&quot;&quot;
-	oComboBox.addItem(s1, 0)
+				&quot; -f &quot;&quot;(TMP)&quot;&quot;&quot;
+				.addItem(s1, 0)
+			End If
+		Next
+		s1 = &quot;-f &quot;&quot;(TMP)&quot;&quot;&quot;
+		.addItem(s1, 0)
+	End With
 End Sub
 
 
@@ -2200,56 +2130,58 @@ Sub dialog1Combo2ShowAppleScriptChoices( _
 	Dim oComboBox As Variant
 	
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
-	n = oComboBox.getItemCount()
-	oComboBox.removeItems(0, n)
-	oComboBox.addItem(&quot;(RESET_ALL)&quot;, 0)
-	
-	Select Case b_CaReadTextExtensionHideExports
-		Case False
-		Select Case fsGetMyTunesApp()
-			Case &quot;Music&quot;
-			s2 = &quot;.aif,.mp3&quot;
-			Case &quot;iTunes&quot;
-			&apos; MacOS 10.13.6 and iTunes 12.8.3.1
-			&apos; .mp3 -- no metadata
-			If fbHaveVLC() Then
-				s2 = &quot;.aif,.m4a&quot;
-			Else
-				s2 = &quot;.opus,.ogg,.aif,.mp3,.m4a&quot;
-			End If
-			Case &quot;VLC&quot;
-			&apos; The VLC script does not add any metadata to
-			&apos; the exported file.
-			s2 = &quot;.opus,.ogg,.mp3&quot;
+	With oComboBox
+		n = .getItemCount()
+		.removeItems(0, n)
+		.addItem(&quot;(RESET_ALL)&quot;, 0)
+		
+		Select Case b_CaReadTextExtensionHideExports
+			Case False
+			Select Case fsGetMyTunesApp()
+				Case &quot;Music&quot;
+				s2 = &quot;.aif,.mp3&quot;
+				Case &quot;iTunes&quot;
+				&apos; MacOS 10.13.6 and iTunes 12.8.3.1
+				&apos; .mp3 -- no metadata
+				If fbHaveVLC() Then
+					s2 = &quot;.aif,.m4a&quot;
+				Else
+					s2 = &quot;.opus,.ogg,.aif,.mp3,.m4a&quot;
+				End If
+				Case &quot;VLC&quot;
+				&apos; The VLC script does not add any metadata to
+				&apos; the exported file.
+				s2 = &quot;.opus,.ogg,.mp3&quot;
+				Case Else
+				&apos; Unknown or missing audio helper program
+				s2 = &quot;.aif&quot;
+			End Select
+			a2 = Split(s2, &quot;,&quot;)
+			s1 = &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR
+			For n = LBound(a2) To UBound(a2)
+				s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; _
+				&quot;&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;_QUICKLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;_SLOWLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
+				&quot;)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR
+			Next
 			Case Else
-			&apos; Unknown or missing audio helper program
-			s2 = &quot;.aif&quot;
+			s1 = &quot;&quot;
+			s2 = &quot;&quot;
 		End Select
-		a2 = Split(s2, &quot;,&quot;)
-		s1 = &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR
-		For n = LBound(a2) To UBound(a2)
-			s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; _
-			&quot;&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;_QUICKLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;_SLOWLY)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR &amp; _
-			&quot;)&quot;&quot; &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW)&quot; &amp; a2(n) &amp; &quot;&quot;&quot;&quot; &amp; CR
+		
+		s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;_QUICKLY)&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;)&quot;&quot;&quot;
+		a1 = Split(s1, CR)
+		For n = LBound(a1) To UBound(a1)
+			.addItem(&quot;&quot;&quot;(SAY_APPLESCRIPT&quot; &amp; a1(n), 0)
 		Next
-		Case Else
-		s1 = &quot;&quot;
-		s2 = &quot;&quot;
-	End Select
-	
-	s1 = s1 &amp; &quot;_SYSTEM_VOICE)&quot;&quot;&quot; &amp; CR &amp; _
-	&quot;_SLOWLY)&quot;&quot;&quot; &amp; CR &amp; _
-	&quot;_QUICKLY)&quot;&quot;&quot; &amp; CR &amp; _
-	&quot;)&quot;&quot;&quot;
-	a1 = Split(s1, CR)
-	For n = LBound(a1) To UBound(a1)
-		oComboBox.addItem(&quot;&quot;&quot;(SAY_APPLESCRIPT&quot; &amp; a1(n), 0)
-	Next
-	If Instr(s1, oComboBox.Model.Text) = 0 Then
-		oComboBox.addItem(oComboBox.Model.Text, 0)
-	End If	
+		If Instr(s1, .Model.Text) = 0 Then
+			.addItem(.Model.Text, 0)
+		End If
+	End With
 End Sub
 
 
@@ -2268,79 +2200,81 @@ Sub dialog1Combo2ShowESPEAKChoices( _
 	sLanguage = LCase(fsGetLanguage())
 	Rem Get control
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
-	Rem first remove all old items from the list
-	n = oComboBox.getItemCount()
-	oComboBox.removeItems(0,n)
-	s3 = &quot;&quot;
-	s2 = Array(_
-	&quot; -b 1 -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;, _
-	&quot; -b 1 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;, _
-	&quot; -b 1 -s 130 -f &apos;(TMP)&apos;&quot;, _
-	&quot; -b 1 -f &apos;(TMP)&apos;&quot;)
-	For n = Lbound(s2) To Ubound(s2)
-		&apos;English
-		s1 = s3 &amp; &quot;-v en-us&quot; &amp; s2(n)
-		oComboBox.addItem(s1, 0)
-		s1 = s3 &amp; &quot;-v en&quot; &amp; s2(n)
-		oComboBox.addItem(s1, 0)
-		Select Case sLanguage
-			Case &quot;es&quot;
-			s1 = s3 &amp; &quot;-v es-mx&quot; &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			s1 = s3 &amp; &quot;-v es-la&quot; &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			s1 = s3 &amp; &quot;-v es&quot; &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			Case &quot;fr&quot;
-			s1 = s3 &amp; &quot;-v fr-be&quot; &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			s1 = s3 &amp; &quot;-v fr&quot; &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			Case &quot;nb&quot;,&quot;nn&quot;,&quot;no&quot;
-			&apos; Norway
-			s1 = s3 &amp; &quot;-v no&quot; &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			Case &quot;pt&quot;
-			&apos; Portugal And Brazil
-			s1 = s3 &amp; &quot;-v pt-pt&quot; &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			s1 = s3 &amp; &quot;-v pt&quot; &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			Case &quot;zh&quot;
-			s1 = s3 &amp; &quot;-v zh-yue&quot; &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			s1 = s3 &amp; &quot;-v zh&quot; &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			Case &quot;af&quot;,&quot;bs&quot;,&quot;ca&quot;,&quot;cs&quot;,&quot;cy&quot;,&quot;da&quot;,&quot;de&quot;,&quot;el&quot;,&quot;eo&quot;,&quot;fi&quot;,&quot;hi&quot;,&quot;hr&quot;,&quot;hu&quot;, _
-			&quot;hy&quot;,&quot;id&quot;,&quot;is&quot;,&quot;it&quot;,&quot;ku&quot;,&quot;la&quot;,&quot;lv&quot;,&quot;mk&quot;,&quot;nl&quot;,&quot;pl&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sk&quot;,&quot;sq&quot;, _
-			&quot;sr&quot;,&quot;sv&quot;,&quot;sw&quot;,&quot;ta&quot;,&quot;tr&quot;,&quot;vi&quot;
-			s1 = s3 &amp; &quot;-v &quot; &amp; sLanguage &amp; s2(n)
-			oComboBox.addItem(s1, 0)
-			Case Else
-		End Select
-		If FileExists(&quot;/usr/bin/mbrola&quot;) Or _
-			FileExists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Or _
-			FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Then
-			s1 = s3 &amp; &quot;-v mb-(SELECTION_LANGUAGE_CODE)1 &quot; &amp; s2(n)
-		End If
-		For n2 = 0 To fiCountEspeakMbrolaLanguage()
-			s4 = fsGetEspeakMbrolaLanguage(n2,1)
-			If FileExists(&quot;/usr/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) Or _
-				FileExists(&quot;/usr/local/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) Or _
-				FileExists(&quot;/usr/share/mbrola/voices/&quot; &amp; s4) Or _
-				FileExists(&quot;/usr/local/share/mbrola/voices/&quot; &amp; s4) Or _
-				FileExists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Or _
-				FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Then
-				s1 = s3 &amp; &quot;-v mb-&quot; &amp; s4 &amp; &quot; &quot; &amp; s2(n)
-				oComboBox.addItem(s1, 0)
+	With oComboBox
+		Rem first remove all old items from the list
+		n = .getItemCount()
+		.removeItems(0,n)
+		s3 = &quot;&quot;
+		s2 = Array(_
+		&quot; -b 1 -s 130 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;, _
+		&quot; -b 1 -f &apos;(TMP)&apos; -w &apos;(HOME)(NOW).wav&apos;&quot;, _
+		&quot; -b 1 -s 130 -f &apos;(TMP)&apos;&quot;, _
+		&quot; -b 1 -f &apos;(TMP)&apos;&quot;)
+		For n = Lbound(s2) To Ubound(s2)
+			&apos;English
+			s1 = s3 &amp; &quot;-v en-us&quot; &amp; s2(n)
+			.addItem(s1, 0)
+			s1 = s3 &amp; &quot;-v en&quot; &amp; s2(n)
+			.addItem(s1, 0)
+			Select Case sLanguage
+				Case &quot;es&quot;
+				s1 = s3 &amp; &quot;-v es-mx&quot; &amp; s2(n)
+				.addItem(s1, 0)
+				s1 = s3 &amp; &quot;-v es-la&quot; &amp; s2(n)
+				.addItem(s1, 0)
+				s1 = s3 &amp; &quot;-v es&quot; &amp; s2(n)
+				.addItem(s1, 0)
+				Case &quot;fr&quot;
+				s1 = s3 &amp; &quot;-v fr-be&quot; &amp; s2(n)
+				.addItem(s1, 0)
+				s1 = s3 &amp; &quot;-v fr&quot; &amp; s2(n)
+				.addItem(s1, 0)
+				Case &quot;nb&quot;,&quot;nn&quot;,&quot;no&quot;
+				&apos; Norway
+				s1 = s3 &amp; &quot;-v no&quot; &amp; s2(n)
+				.addItem(s1, 0)
+				Case &quot;pt&quot;
+				&apos; Portugal And Brazil
+				s1 = s3 &amp; &quot;-v pt-pt&quot; &amp; s2(n)
+				.addItem(s1, 0)
+				s1 = s3 &amp; &quot;-v pt&quot; &amp; s2(n)
+				.addItem(s1, 0)
+				Case &quot;zh&quot;
+				s1 = s3 &amp; &quot;-v zh-yue&quot; &amp; s2(n)
+				.addItem(s1, 0)
+				s1 = s3 &amp; &quot;-v zh&quot; &amp; s2(n)
+				.addItem(s1, 0)
+				Case &quot;af&quot;,&quot;bs&quot;,&quot;ca&quot;,&quot;cs&quot;,&quot;cy&quot;,&quot;da&quot;,&quot;de&quot;,&quot;el&quot;,&quot;eo&quot;,&quot;fi&quot;,&quot;hi&quot;,&quot;hr&quot;,&quot;hu&quot;, _
+				&quot;hy&quot;,&quot;id&quot;,&quot;is&quot;,&quot;it&quot;,&quot;ku&quot;,&quot;la&quot;,&quot;lv&quot;,&quot;mk&quot;,&quot;nl&quot;,&quot;pl&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sk&quot;,&quot;sq&quot;, _
+				&quot;sr&quot;,&quot;sv&quot;,&quot;sw&quot;,&quot;ta&quot;,&quot;tr&quot;,&quot;vi&quot;
+				s1 = s3 &amp; &quot;-v &quot; &amp; sLanguage &amp; s2(n)
+				.addItem(s1, 0)
+				Case Else
+			End Select
+			If FileExists(&quot;/usr/bin/mbrola&quot;) Or _
+				FileExists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Or _
+				FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot;) Then
+				s1 = s3 &amp; &quot;-v mb-(SELECTION_LANGUAGE_CODE)1 &quot; &amp; s2(n)
 			End If
+			For n2 = 0 To fiCountEspeakMbrolaLanguage()
+				s4 = fsGetEspeakMbrolaLanguage(n2,1)
+				If FileExists(&quot;/usr/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) Or _
+					FileExists(&quot;/usr/local/share/mbrola/&quot; &amp; s4 &amp; &quot;/&quot; &amp; s4) Or _
+					FileExists(&quot;/usr/share/mbrola/voices/&quot; &amp; s4) Or _
+					FileExists(&quot;/usr/local/share/mbrola/voices/&quot; &amp; s4) Or _
+					FileExists(fsProgramDirectory() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Or _
+					FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\espeak-data\mbrola\&quot; &amp; s4) Then
+					s1 = s3 &amp; &quot;-v mb-&quot; &amp; s4 &amp; &quot; &quot; &amp; s2(n)
+					.addItem(s1, 0)
+				End If
+			Next
+			s1 = s3 &amp; s2(n)
+			.addItem(s1, 0)
 		Next
-		s1 = s3 &amp; s2(n)
-		oComboBox.addItem(s1, 0)
-	Next
-	If Instr(oComboBox.Model.Text, &quot;-v &quot;) &lt;&gt; 0 Then
-		oComboBox.addItem(oComboBox.Model.Text, 0)
-	End If
+		If Instr(.Model.Text, &quot;-v &quot;) &lt;&gt; 0 Then
+			.addItem(.Model.Text, 0)
+		End If
+	End With
 End Sub
 
 
@@ -2354,18 +2288,19 @@ Sub dialog1Combo2ShowMEDIAChoices( _
 	Dim n1 As Integer : n = 0
 	Dim s1 As String : s1 = &quot;&quot;
 	Dim oComboBox As Variant
-	
+	With oComboBox
 	Rem Get control
 	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
 	Rem first remove all old items from the list = 
-	oComboBox.removeItems(0, oComboBox.getItemCount())
+	.removeItems(0, .getItemCount())
 	For n = Lbound(a1) To Ubound(a1)
 		s1 = s1 &amp; a1(n) &amp; Chr(10)
-		oComboBox.addItem(a1(0), 0)
+		.addItem(a1(0), 0)
 	Next
 	If Len(fsLocalHostSpeech()) &lt;&gt; 0 Then
-		oComboBox.addItem(fsLocalHostSpeech(), 0)
+		.addItem(fsLocalHostSpeech(), 0)
 	End If
+	End With
 End Sub
 
 
@@ -2380,18 +2315,19 @@ Sub dialog1Combo2ShowFESTIVALChoices( _
 	Dim n As Integer
 	Dim s1 As String : s1 = &quot;&quot;
 	Dim oComboBox As Variant
-	
-	Rem Get control
-	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
-	Rem first remove all old items from the list
-	oComboBox.removeItems(0, oComboBox.getItemCount())
-	For n = Lbound(a1) To Ubound(a1)
-		s1 = s1 &amp; a1(n) &amp; Chr(10)
-		oComboBox.addItem(a1(n), 0)
-	Next
-	If Instr(s1, oComboBox.Model.Text) = 0 Then
-		oComboBox.addItem(oComboBox.Model.Text, 0)
-	End If
+	With oComboBox
+		Rem Get control
+		oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
+		Rem first remove all old items from the list
+		.removeItems(0, .getItemCount())
+		For n = Lbound(a1) To Ubound(a1)
+			s1 = s1 &amp; a1(n) &amp; Chr(10)
+			.addItem(a1(n), 0)
+		Next
+		If Instr(s1, .Model.Text) = 0 Then
+			.addItem(.Model.Text, 0)
+		End If
+	End With
 End Sub
 
 
@@ -2404,17 +2340,19 @@ Sub dialog1Combo2ShowTEXT2WAVEChoices( _
 	&quot;&quot;&quot;(TMP)&quot;&quot; -o &quot;&quot;(HOME)(NOW).wav&quot;&quot;&quot;)
 	Dim s1 As String : s1 = &quot;&quot;
 	Dim oComboBox As Variant
-	Rem Get control
-	oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
-	Rem first remove all old items from the list
-	oComboBox.removeItems(0, oComboBox.getItemCount())
-	For n = Lbound(a1) To Ubound(a1)
-		s1 = s1 &amp; a1(n) &amp; Chr(10)
-		oComboBox.addItem(a1(n), 0)
-	Next
-	If Instr(s1, oComboBox.Model.Text) = 0 Then
-		oComboBox.addItem(oComboBox.Model.Text, 0)
-	End If	
+	With oComboBox
+		Rem Get control
+		oComboBox = oDialog.getControl(&quot;ComboBox2&quot;)
+		Rem first remove all old items from the list
+		.removeItems(0, .getItemCount())
+		For n = Lbound(a1) To Ubound(a1)
+			s1 = s1 &amp; a1(n) &amp; Chr(10)
+			.addItem(a1(n), 0)
+		Next
+		If Instr(s1, .Model.Text) = 0 Then
+			.addItem(.Model.Text, 0)
+		End If
+	End With
 End Sub
 
 
@@ -2431,43 +2369,45 @@ Sub dialog1Combo1ShowFestivalScripts( _
 	
 	Rem Get control
 	oComboBox = oDialog.getControl(&quot;ComboBox1&quot;)
-	Rem first remove all old items from the list
-	n = oComboBox.getItemCount()
-	oComboBox.removeItems(0, n)
-	&apos; Propose language specific commands
-	cmd_list = Array( _
-	&quot;(set! utt1 (Utterance Wave /usr/share/sounds/alsa/Noise.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
-	&quot;(set! utt1 (Utterance Phrase ((Phrase ((name B))The (selected ((EMPH 3)))text )(Phrase ((name BB)) says: ))))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
-	&quot;(SayText &quot;&quot;On (WEEKDAY), (DATE) at (TIME), (AUTHOR) said: &quot;&quot;)( tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
-	&quot;(SayText &quot;&quot;The selection says: &quot;&quot;)( tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
-	&quot;(audio_mode &apos;async)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
-	)
-	If FileExists(soundsDirectory() &amp; &quot;apert.wav&quot;) Then
-		cmd_list(0) = &quot;(set! utt1 (Utterance Wave (SOUND_GALLERY)apert.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
-	End If
-	For n2 = 0 To fiCountFestivalDirectory()
-		For n = Lbound(cmd_list) To Ubound(cmd_list)
-			If FileExists(fsFestivalDirectory(n2)) Then
-				If n = Ubound(cmd_list) Or InStr(fsFestivalDirectory(n2), &quot;english&quot;) &lt;&gt; 0 Then
-					s1 = &quot;(voice_&quot; &amp; fsFestivalVoice(n2) &amp; &quot;)&quot;
-					oComboBox.addItem(s1 &amp; cmd_list(n), 0)
+	With oComboBox
+		Rem first remove all old items from the list
+		n = .getItemCount()
+		.removeItems(0, n)
+		&apos; Propose language specific commands
+		cmd_list = Array( _
+		&quot;(set! utt1 (Utterance Wave /usr/share/sounds/alsa/Noise.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+		&quot;(set! utt1 (Utterance Phrase ((Phrase ((name B))The (selected ((EMPH 3)))text )(Phrase ((name BB)) says: ))))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+		&quot;(SayText &quot;&quot;On (WEEKDAY), (DATE) at (TIME), (AUTHOR) said: &quot;&quot;)( tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+		&quot;(SayText &quot;&quot;The selection says: &quot;&quot;)( tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+		&quot;(audio_mode &apos;async)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+		)
+		If FileExists(soundsDirectory() &amp; &quot;apert.wav&quot;) Then
+			cmd_list(0) = &quot;(set! utt1 (Utterance Wave (SOUND_GALLERY)apert.wav))(utt.synth utt1)(utt.play utt1)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;
+		End If
+		For n2 = 0 To fiCountFestivalDirectory()
+			For n = Lbound(cmd_list) To Ubound(cmd_list)
+				If FileExists(fsFestivalDirectory(n2)) Then
+					If n = Ubound(cmd_list) Or InStr(fsFestivalDirectory(n2), &quot;english&quot;) &lt;&gt; 0 Then
+						s1 = &quot;(voice_&quot; &amp; fsFestivalVoice(n2) &amp; &quot;)&quot;
+						.addItem(s1 &amp; cmd_list(n), 0)
+					End If
 				End If
-			End If
+			Next
 		Next
-	Next
-	&apos; Add default script commands
-	Redim cmd_list
-	cmd_list = Array(_
-	&quot;(audio_mode &apos;async)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
-	&quot;(audio_mode &apos;shutup)&quot;_
-	)
-	For n = Lbound(cmd_list) To Ubound(cmd_list)
-		oComboBox.addItem(cmd_list(n), 0)
-		s2 = s2 &amp; cmd_list(n) &amp; CR
-	Next
-	If Instr(s2, oComboBox.Model.Text) = 0 Then
-		oComboBox.addItem(oComboBox.Model.Text, 0)
-	End If
+		&apos; Add default script commands
+		Redim cmd_list
+		cmd_list = Array(_
+		&quot;(audio_mode &apos;async)(tts &quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;, _
+		&quot;(audio_mode &apos;shutup)&quot;_
+		)
+		For n = Lbound(cmd_list) To Ubound(cmd_list)
+			.addItem(cmd_list(n), 0)
+			s2 = s2 &amp; cmd_list(n) &amp; CR
+		Next
+		If Instr(s2, .Model.Text) = 0 Then
+			.addItem(.Model.Text, 0)
+		End If
+	End With
 End Sub
 
 
@@ -2506,11 +2446,11 @@ End Function
 
 Function fsPiperPath()
 	fsPiperPath = &quot;&quot;
-	Dim x As Integer
-	Dim y As Integer
 	Dim paths As Variant
 	Dim _apps As Variant
 	Dim _path As String
+	Dim _item As String
+	Dim _app As String
 	Dim sf as Object
 	Dim _home As String : _home = Environ(&quot;HOME&quot;)
 	Dim alt_paths As Variant : alt_paths = Array(_
@@ -2529,11 +2469,11 @@ Function fsPiperPath()
 		End If
 	End Select
 	paths = LocalLinuxPaths()
-	For y = Lbound(_apps) to Ubound(_apps)
-		For x = Lbound(paths) to Ubound(paths)
-			_path = paths(x) &amp; _apps(y)
-			If sf.exists(_path) Then
-				fsPiperPath = _path
+	For Each _app in _apps
+		For Each _path in paths
+			_item = _path &amp; _app
+			If sf.exists(_item) Then
+				fsPiperPath = _item
 				Exit Function
 			End If
 		Next
@@ -2614,308 +2554,310 @@ Function fiDialog1CombosShowMyPythonChoices( _
 		bEnableRate = Len(fsMatchFestivalVoice(&quot;_hts&quot;)) = 0
 	End Select
 	oComboBox = oDialog.getControl(getControl)
-	n = oComboBox.getItemCount()
-	oComboBox.removeItems(0, n)
-	oComboBox.addItem(&quot;(RESET_ALL)&quot;, 0)
-	n = 1
-	If fbIsSandboxed() Then
-		&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
-		s1 = s1 &amp; CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;-m webbrowser -t &quot;&quot;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
-	End If
-	If fbHaveNetworkTTS() or isSnap() or isFlatPak() Then
-		If fsGetOS() = &quot;UNIX&quot; Then
-			bEnableLocalHostRate = fbEnableLocalHostRate()
-			&apos; Include settings for [mimic3](https://github.com/rhasspy/mimic3)
-			If bEnableLocalHostRate Then
-				Redim _opts : _opts = Array(&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
-			Else
-				&apos; NOTE: Some tts models ignore gender; consider using neutral terms like &quot;VOICE1&quot;
-				&apos; The disadvantage is that the labeling system would not match `speech-dispatcher`
-				Redim _opts : _opts = Array(&quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;,_
-				&quot;FEMALE6&quot;, &quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
-			End If
-			For Each _opt in _opts
+	With oComboBox
+		n = .getItemCount()
+		.removeItems(0, n)
+		.addItem(&quot;(RESET_ALL)&quot;, 0)
+		n = 1
+		If fbIsSandboxed() Then
+			&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
+			s1 = s1 &amp; CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;-m webbrowser -t &quot;&quot;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
+			&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
+		End If
+		If fbHaveNetworkTTS() or isSnap() or isFlatPak() Then
+			If fsGetOS() = &quot;UNIX&quot; Then
+				bEnableLocalHostRate = fbEnableLocalHostRate()
+				&apos; Include settings for [mimic3](https://github.com/rhasspy/mimic3)
 				If bEnableLocalHostRate Then
-					s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp; _opt &amp; &quot;&quot;&quot;&quot;
-					s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+					Redim _opts : _opts = Array(&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
+				Else
+					&apos; NOTE: Some tts models ignore gender; consider using neutral terms like &quot;VOICE1&quot;
+					&apos; The disadvantage is that the labeling system would not match `speech-dispatcher`
+					Redim _opts : _opts = Array(&quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;,_
+					&quot;FEMALE6&quot;, &quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
 				End If
-				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;&quot; &amp; _opt &amp; &quot;&quot;&quot;&quot;
+				For Each _opt in _opts
+					If bEnableLocalHostRate Then
+						s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp; _opt &amp; &quot;&quot;&quot;&quot;
+						s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+					End If
+					s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;&quot; &amp; _opt &amp; &quot;&quot;&quot;&quot;
+					s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+				Next
+			End If
+			If bEnableLocalHostRate Then
+				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot;&quot;
 				s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-			Next
-		End If
-		If bEnableLocalHostRate Then
-			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot;&quot;
+			End If
+			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+			s1 = s1 &amp; CR &amp; _
+			&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			CheckComboBox4UrlList(oDialog)
 		End If
-        s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-		s1 = s1 &amp; CR &amp; _
-		&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		CheckComboBox4UrlList(oDialog)
-	End If
-	If fbHavePyQrCode() And fbPySupportFStrings() Then
-		Redim _opts : _opts = Array(_
-		&quot;12&quot;,_
-		&quot;9&quot;,_
-		&quot;6&quot;,_
-		&quot;3&quot;,_
-		&quot;1&quot;)
-		For n = Lbound(_opts) To Ubound(_opts)
-			s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --size &quot; &amp; _opts(n) &amp; _
-			&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			
-			s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --size &quot; &amp; _opts(n) &amp; _
-			&quot; --output &quot;&quot;/tmp/&quot; &amp; _
+		If fbHavePyQrCode() And fbPySupportFStrings() Then
+			Redim _opts : _opts = Array(_
+			&quot;12&quot;,_
+			&quot;9&quot;,_
+			&quot;6&quot;,_
+			&quot;3&quot;,_
+			&quot;1&quot;)
+			For n = Lbound(_opts) To Ubound(_opts)
+				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --size &quot; &amp; _opts(n) &amp; _
+				&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				
+				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --size &quot; &amp; _opts(n) &amp; _
+				&quot; --output &quot;&quot;/tmp/&quot; &amp; _
+				fsGetSetting(&quot;ooname&quot;) &amp; _
+				&quot; - &quot; &amp; _
+				fsLookUpTerm(&quot;s_read-text&quot;) &amp; &quot; - &quot; &amp; _
+				fsUser() &amp; &quot;.png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			Next
+			s1 = s1 &amp; CR &amp; _
+			&quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --level M --size 3 --fill rgb(0,0,0) --background rgb(255,255,255) --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --output &quot;&quot;/tmp/&quot; &amp; _
 			fsGetSetting(&quot;ooname&quot;) &amp; _
 			&quot; - &quot; &amp; _
-			fsLookUpTerm(&quot;s_read-text&quot;) &amp; &quot; - &quot; &amp; _
-			fsUser() &amp; &quot;.png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		Next
-		s1 = s1 &amp; CR &amp; _
-		&quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --level M --size 3 --fill rgb(0,0,0) --background rgb(255,255,255) --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --output &quot;&quot;/tmp/&quot; &amp; _
-		fsGetSetting(&quot;ooname&quot;) &amp; _
-		&quot; - &quot; &amp; _
-		fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
-		&quot;.png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-	End If	
-	
-	If InStr(LCase(f_dlgSpeechSetup.GetControl(FileControl).Model.Text),&quot;bin/python3&quot;) &lt;&gt; 0 or _
-	bIsAppImage Then
-		If FileExists(Environ(&quot;HOME&quot;) &amp; _
-			&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or FileExists( _
-			Environ(&quot;HOME&quot;) &amp; _
-			&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or bIsAppImage Or _
-			Not(fbHaveEspeak()) or Len(fsGetPipLibPath(&quot;speechd&quot;, False)) &lt;&gt; 0 Then
-			Select Case fsGetOS()
-				Case &quot;UNIX&quot;
-				If fbHaveNetworkTTS() Then
-					Redim _opts : _opts = Array(_
-					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
-					&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;, &quot;AUTO&quot;)
-				Else
-					Redim _opts : _opts = Array(_
-					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
-					&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;)
-				End If
-				Case &quot;MacOS&quot;
-				Select Case FileExists(&quot;/usr/bin/python3&quot;)
-					Case True
+			fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
+			&quot;.png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+		End If	
+		
+		If InStr(LCase(f_dlgSpeechSetup.GetControl(FileControl).Model.Text),&quot;bin/python3&quot;) &lt;&gt; 0 or _
+		bIsAppImage Then
+			If FileExists(Environ(&quot;HOME&quot;) &amp; _
+				&quot;/.speech-dispatcher/conf/speechd.conf&quot;) Or FileExists( _
+				Environ(&quot;HOME&quot;) &amp; _
+				&quot;/.config/speech-dispatcher/speechd.conf&quot;) Or bIsAppImage Or _
+				Not(fbHaveEspeak()) or Len(fsGetPipLibPath(&quot;speechd&quot;, False)) &lt;&gt; 0 Then
+				Select Case fsGetOS()
+					Case &quot;UNIX&quot;
 					If fbHaveNetworkTTS() Then
 						Redim _opts : _opts = Array(_
-						&quot;MALE8&quot;, &quot;MALE7&quot;, &quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;,_
-						&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE8&quot;, &quot;FEMALE7&quot;, &quot;FEMALE6&quot;,_
-						&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
-						&quot;AUTO&quot;)
+						&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+						&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;, &quot;AUTO&quot;)
 					Else
 						Redim _opts : _opts = Array(_
-						&quot;MALE8&quot;, &quot;MALE7&quot;, &quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;,_
-						&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE8&quot;, &quot;FEMALE7&quot;, &quot;FEMALE6&quot;,_
-						&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
-					End If			
-					Case Else
-					If sLanguage = &quot;en&quot; Then
-						If fbHaveNetworkTTS() Then
-							Redim _opts : _opts = Array(_
-							&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
-							&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;AUTO&quot;)
-						Else
-							Redim _opts : _opts = Array(_
-							&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
-							&quot;MALE2&quot;, &quot;MALE1&quot;)
-						End If
-					Else
-						If fbHaveNetworkTTS() Then
-							Redim _opts : _opts = Array(_
-							&quot;FEMALE1&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;AUTO&quot;)
-						Else
-							Redim _opts : _opts = Array(_
-							&quot;FEMALE1&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;)
-						End If					
+						&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+						&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;)
 					End If
-					End Select
-				Case Else
-				Redim _opts : _opts = Array(_
-				&quot;MALE1&quot;, &quot;FEMALE1&quot;)
-			End Select
-			If Len(sSpdToken()) &lt;&gt; 0 Then
-				If Len(fsFindAppPath(&quot;afconvert&quot;)) &lt;&gt; 0 Then
-					&apos; Darwin Platform 
-					s4 = sSpdToken &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-					s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
-				End If
-				For n = Lbound(_opts) To Ubound(_opts)
-					If Instr(sSpdToken, &quot;(SPD_READ_TEXT_PY)&quot;) = 0 Then
-						ClientId = &quot;&quot;
-					End If
-					If bEnableRate Then
-						s1 = s1 &amp; CR &amp; sSpdToken &amp; _
-						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
-						&quot;&quot;&quot; --rate &quot;&quot;140%&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-						s1 = s1 &amp; CR &amp; sSpdToken &amp; _
-						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
-						&quot;&quot;&quot; --rate &quot;&quot;70%&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-					End If
-					s1 = s1 &amp; CR &amp; sSpdToken &amp; _
-					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
-					&quot;&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-				Next
-				Select Case sGetOS
 					Case &quot;MacOS&quot;
-					s1 = s1 &amp; CR &amp; sSpdToken &amp; _
-					&quot; --visible True --voice &quot;&quot;AUTO&quot;&quot; --language&quot; &amp;_
-					&quot; &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+					Select Case FileExists(&quot;/usr/bin/python3&quot;)
+						Case True
+						If fbHaveNetworkTTS() Then
+							Redim _opts : _opts = Array(_
+							&quot;MALE8&quot;, &quot;MALE7&quot;, &quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;,_
+							&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE8&quot;, &quot;FEMALE7&quot;, &quot;FEMALE6&quot;,_
+							&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+							&quot;AUTO&quot;)
+						Else
+							Redim _opts : _opts = Array(_
+							&quot;MALE8&quot;, &quot;MALE7&quot;, &quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;,_
+							&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE8&quot;, &quot;FEMALE7&quot;, &quot;FEMALE6&quot;,_
+							&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
+						End If			
+						Case Else
+						If sLanguage = &quot;en&quot; Then
+							If fbHaveNetworkTTS() Then
+								Redim _opts : _opts = Array(_
+								&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+								&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;AUTO&quot;)
+							Else
+								Redim _opts : _opts = Array(_
+								&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
+								&quot;MALE2&quot;, &quot;MALE1&quot;)
+							End If
+						Else
+							If fbHaveNetworkTTS() Then
+								Redim _opts : _opts = Array(_
+								&quot;FEMALE1&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;AUTO&quot;)
+							Else
+								Redim _opts : _opts = Array(_
+								&quot;FEMALE1&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;)
+							End If					
+						End If
+						End Select
+					Case Else
+					Redim _opts : _opts = Array(_
+					&quot;MALE1&quot;, &quot;FEMALE1&quot;)
 				End Select
-				s1 = s1 &amp; CR &amp; sSpdToken &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
-				ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			End If
-		End If
-	End If
-	
-	If len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or _
-		FileExists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave.exe&quot;) Or _
-		FileExists(fsProgramDirectory() &amp; &quot;festival\texttowave.exe&quot;) Then
-		Select Case fiCountFestivalVoices()
-			Case 0
-			&apos; pass
-			Case 1
-			s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;
-			If Not FileExists(&quot;/usr/bin/apt&quot;) Then
-				&apos; Hide export options
-				&apos; Festival on non-debian (Ubuntu, Mint...) platforms write
-				&apos; a file that you can play, but it might not work with
-				&apos; the `Gst` (gstreamer) file converter with the settings
-				&apos; that we use.
-				s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			Else
-				s1 = s1 &amp; fspyOutOptions(oDialog, s4, bEnableRate)
-			End If		
-			Case 2
-			For n = 0 To fiCountFestivalDirectory()
-				If FileExists(fsFestivalDirectory(n)) Then
-					s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(voice_&quot; &amp; fsFestivalVoice(n) &amp; &quot;)&quot;&quot;&quot;
-					s1 = s1 &amp; fspyOutOptions(oDialog, s4, bEnableRate)
+				If Len(sSpdToken()) &lt;&gt; 0 Then
+					If Len(fsFindAppPath(&quot;afconvert&quot;)) &lt;&gt; 0 Then
+						&apos; Darwin Platform 
+						s4 = sSpdToken &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+						s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
+					End If
+					For n = Lbound(_opts) To Ubound(_opts)
+						If Instr(sSpdToken, &quot;(SPD_READ_TEXT_PY)&quot;) = 0 Then
+							ClientId = &quot;&quot;
+						End If
+						If bEnableRate Then
+							s1 = s1 &amp; CR &amp; sSpdToken &amp; _
+							&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
+							&quot;&quot;&quot; --rate &quot;&quot;140%&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+							s1 = s1 &amp; CR &amp; sSpdToken &amp; _
+							&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
+							&quot;&quot;&quot; --rate &quot;&quot;70%&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+						End If
+						s1 = s1 &amp; CR &amp; sSpdToken &amp; _
+						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
+						&quot;&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+					Next
+					Select Case sGetOS
+						Case &quot;MacOS&quot;
+						s1 = s1 &amp; CR &amp; sSpdToken &amp; _
+						&quot; --visible True --voice &quot;&quot;AUTO&quot;&quot; --language&quot; &amp;_
+						&quot; &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+					End Select
+					s1 = s1 &amp; CR &amp; sSpdToken &amp; _
+					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
+					ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+					s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 				End If
-			Next
-			s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
-			s1 = s1 &amp; fspyOutOptions(oDialog, s4, bEnableRate)
-			Case Else
-			s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
-			s1 = s1 &amp; fspyOutOptions(oDialog, s4, bEnableRate)
-		End Select
-	ElseIf len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
-		s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;
-		s1 = s1 &amp; fspyPlayOption(oDialog, s4)	
-	End If
-	If fbOKWithRhVoice(sLanguage) Then
-		s4 = &quot;&quot;&quot;(RHVOICE_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
-		s4 = &quot;&quot;&quot;(RHVOICE_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)  &apos; 2022.08 voices ignored rate and pitch
-	End If
-	If fbHaveEspeak() Or _
-		FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
-		FileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
-		s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
-		s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &apos; &amp; &quot; --rate 100% --pitch 100% &quot;
-		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
-	End If
-	If Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0  Then
-		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
-		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
-	End If
-	If Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 Then
-		s4 = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; --language ja-JP&quot;
-		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
-	End If
-	If fbPiperTtsOk(&quot;&quot;) Then
-		high_suggestion = PiperLocalSuggestion(&quot;&quot;, True)
-		local_suggestion = PiperLocalSuggestion(&quot;&quot;, False)
-		If fbIsSandboxed() Then
-			Redim _opts : _opts = Array(_
-				player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
-				player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
-				player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
-				player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
-				&quot;&quot;, _
-			)
-		Else
-			Redim _opts : _opts = Array(_
-				player7 &amp; &quot; --update True --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --update True --voice &quot; &amp; local_suggestion,_
-    			player7 &amp; &quot; --update True&quot;,_
-				player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
-				player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
-				player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
-				player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
-				&quot;&quot;, _
-			)
-		End If
-		For n = Lbound(_opts) to Ubound(_opts)
-			If Instr(_opts(n), &quot;--update True --voice&quot;) = 0 Then
-				s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				_opts(n) &amp; _
-				&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
-			Else
-				s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				_opts(n)
 			End If
-			s1 = s1 &amp; fspyPlayOption(oDialog, s4)		
-		Next
-		s4 = &quot;&quot;
-	End If
-	If Len(s1) &lt;&gt; 0 Then
-		If Asc(Left(s1, 1)) = 10 Then
-			s1 = Mid(s1, 2)
 		End If
-		If Instr(s1, oComboBox.Model.Text) = 0 Then
-			s1 = s1 &amp; CR &amp; oComboBox.Model.Text
+		
+		If len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or _
+			FileExists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave.exe&quot;) Or _
+			FileExists(fsProgramDirectory() &amp; &quot;festival\texttowave.exe&quot;) Then
+			Select Case fiCountFestivalVoices()
+				Case 0
+				&apos; pass
+				Case 1
+				s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;
+				If Not FileExists(&quot;/usr/bin/apt&quot;) Then
+					&apos; Hide export options
+					&apos; Festival on non-debian (Ubuntu, Mint...) platforms write
+					&apos; a file that you can play, but it might not work with
+					&apos; the `Gst` (gstreamer) file converter with the settings
+					&apos; that we use.
+					s1 = s1 &amp; CR &amp; &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				Else
+					s1 = s1 &amp; fspyOutOptions(oDialog, s4, bEnableRate)
+				End If		
+				Case 2
+				For n = 0 To fiCountFestivalDirectory()
+					If FileExists(fsFestivalDirectory(n)) Then
+						s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(voice_&quot; &amp; fsFestivalVoice(n) &amp; &quot;)&quot;&quot;&quot;
+						s1 = s1 &amp; fspyOutOptions(oDialog, s4, bEnableRate)
+					End If
+				Next
+				s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
+				s1 = s1 &amp; fspyOutOptions(oDialog, s4, bEnableRate)
+				Case Else
+				s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
+				s1 = s1 &amp; fspyOutOptions(oDialog, s4, bEnableRate)
+			End Select
+		ElseIf len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
+			s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;
+			s1 = s1 &amp; fspyPlayOption(oDialog, s4)	
 		End If
-		a1 = Split(s1, CR)
-		Select Case bIsAppImage or isSnap() or isFlatPak() or fbExperimentalMode() _
-		or fsGetOS() = &quot;WINDOWS&quot;
-			Case True
-			&apos; Hide file export options
-			For n = LBound(a1) To UBound(a1)
-				If Instr(a1(n), &quot;--output&quot;) = 0 Then
-					If Instr(Lcase(a1(n)), &quot;--visible true&quot;) = 0 Then
-						If Instr(a1(n), &quot;&quot;&quot;(TMP)&quot;&quot;&quot;) &lt;&gt; 0 or _
-						Instr(a1(n), &quot;WEBTEXT&quot;) &lt;&gt; 0 Then
-							oComboBox.addItem(a1(n), 0)
+		If fbOKWithRhVoice(sLanguage) Then
+			s4 = &quot;&quot;&quot;(RHVOICE_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+			s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
+			s4 = &quot;&quot;&quot;(RHVOICE_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+			s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)  &apos; 2022.08 voices ignored rate and pitch
+		End If
+		If fbHaveEspeak() Or _
+			FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
+			FileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
+			s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+			s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
+			s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &apos; &amp; &quot; --rate 100% --pitch 100% &quot;
+			s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
+		End If
+		If Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0  Then
+			s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+			s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
+			s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+			s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
+		End If
+		If Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 Then
+			s4 = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; --language ja-JP&quot;
+			s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
+		End If
+		If fbPiperTtsOk(&quot;&quot;) Then
+			high_suggestion = PiperLocalSuggestion(&quot;&quot;, True)
+			local_suggestion = PiperLocalSuggestion(&quot;&quot;, False)
+			If fbIsSandboxed() Then
+				Redim _opts : _opts = Array(_
+					player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
+					player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
+					player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
+					player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
+					player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
+					player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
+					player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion,_
+					player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion,_
+					player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
+					&quot;&quot;, _
+				)
+			Else
+				Redim _opts : _opts = Array(_
+					player7 &amp; &quot; --update True --voice &quot; &amp; high_suggestion,_
+					player7 &amp; &quot; --update True --voice &quot; &amp; local_suggestion,_
+					player7 &amp; &quot; --update True&quot;,_
+					player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
+					player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
+					player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
+					player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
+					player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
+					player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
+					player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion,_
+					player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion,_
+					player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
+					&quot;&quot;, _
+				)
+			End If
+			For n = Lbound(_opts) to Ubound(_opts)
+				If Instr(_opts(n), &quot;--update True --voice&quot;) = 0 Then
+					s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+					_opts(n) &amp; _
+					&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+				Else
+					s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+					_opts(n)
+				End If
+				s1 = s1 &amp; fspyPlayOption(oDialog, s4)		
+			Next
+			s4 = &quot;&quot;
+		End If
+		If Len(s1) &lt;&gt; 0 Then
+			If Asc(Left(s1, 1)) = 10 Then
+				s1 = Mid(s1, 2)
+			End If
+			If Instr(s1, .Model.Text) = 0 Then
+				s1 = s1 &amp; CR &amp; .Model.Text
+			End If
+			a1 = Split(s1, CR)
+			Select Case bIsAppImage or isSnap() or isFlatPak() or fbExperimentalMode() _
+			or fsGetOS() = &quot;WINDOWS&quot;
+				Case True
+				&apos; Hide file export options
+				For n = LBound(a1) To UBound(a1)
+					If Instr(a1(n), &quot;--output&quot;) = 0 Then
+						If Instr(Lcase(a1(n)), &quot;--visible true&quot;) = 0 Then
+							If Instr(a1(n), &quot;&quot;&quot;(TMP)&quot;&quot;&quot;) &lt;&gt; 0 or _
+							Instr(a1(n), &quot;WEBTEXT&quot;) &lt;&gt; 0 Then
+								.addItem(a1(n), 0)
+							End If
 						End If
 					End If
-				End If
-			Next
-			Case Else
-			&apos; Posix global install allows file export or viewing in a media
-			&apos; player for some speech synthesis platforms.
-			For n = LBound(a1) To UBound(a1)
-				If Instr(a1(n), &quot;&quot;&quot;(TMP)&quot;&quot;&quot;) &lt;&gt; 0 or _
-				Instr(a1(n), &quot;WEBTEXT&quot;) &lt;&gt; 0 Then
-					oComboBox.addItem(a1(n), 0)
-				End If
-			Next
-		End Select
-	End If
-	fiDialog1CombosShowMyPythonChoices = oComboBox.getItemCount()
+				Next
+				Case Else
+				&apos; Posix global install allows file export or viewing in a media
+				&apos; player for some speech synthesis platforms.
+				For n = LBound(a1) To UBound(a1)
+					If Instr(a1(n), &quot;&quot;&quot;(TMP)&quot;&quot;&quot;) &lt;&gt; 0 or _
+					Instr(a1(n), &quot;WEBTEXT&quot;) &lt;&gt; 0 Then
+						.addItem(a1(n), 0)
+					End If
+				Next
+			End Select
+		End If
+		fiDialog1CombosShowMyPythonChoices = .getItemCount()
+	End With
 	Exit Function
 	fiDialog1CombosShowMyPythonChoicesErr
 	fiDialog1CombosShowMyPythonChoices = 0
@@ -2936,7 +2878,7 @@ End Function
 Function gst_plugin_path() As String
 	&apos; Enumerate Array FileExists(dir)
 	gst_plugin_path = &quot;&quot;
-	Dim x As Integer
+	Dim _path As String
 	Dim _paths As Variant
 	_paths = Array(_
 	&quot;/usr/local/lib/x86_64-linux-gnu/gstreamer-1.0/&quot;, _
@@ -2969,9 +2911,9 @@ Function gst_plugin_path() As String
 	&quot;/usr/lib/ppc64el-linux-gnu/gstreamer-1.0/&quot;, _
 	&quot;/usr/local/lib/s390x-linux-gnu/gstreamer-1.0/&quot;, _
 	&quot;/usr/lib/s390x-linux-gnu/gstreamer-1.0/&quot;)
-	For x = Lbound(_paths) to Ubound(_paths)
-		If FileExists(_paths(x)) Then
-			gst_plugin_path = _paths(x)
+	For Each _path in _paths
+		If FileExists(_path) Then
+			gst_plugin_path = _path
 			Exit Function
 		End If
 	Next
@@ -3090,24 +3032,26 @@ Function fspyOutOptions( _
 					End If
 				End If
 			End If
-		Else  &apos; WINDOWS			
-			extension = Array(_
-			Array(&quot;.wav&quot;, _vlc, fsMyFfmpeg()), _
-			Array(&quot;.opus&quot;, _vlc, fsMyFfmpeg()), _
-			Array(&quot;.ogg&quot;, _vlc, oggPath()), _
-			Array(&quot;.mp3&quot;, _vlc, lamePath()), _
-			Array(&quot;.flac&quot;, _vlc, flacPath()), _
-			Array(&quot;.aac&quot;, _vlc, neroPath()))
-			For x = Lbound(extension) To Ubound(extension)
-				If FileExists(extension(x)(2)) Or _
-				FileExists(extension(x)(1)) Then
-					ReDim Preserve command_list(_x_ok)
-					command_list(_x_ok) = s4 &amp; _
-					&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)\(NOW)&quot; &amp; _
-					extension(x)(0) &amp; &quot;&quot;&quot;&quot; &amp; s3
-					_x_ok = _x_ok + 1
-				End If
-			Next		
+		Else  &apos; WINDOWS
+			If Not fbReadOnlyCode() Then
+				extension = Array(_
+				Array(&quot;.wav&quot;, _vlc, fsMyFfmpeg()), _
+				Array(&quot;.opus&quot;, _vlc, fsMyFfmpeg()), _
+				Array(&quot;.ogg&quot;, _vlc, oggPath()), _
+				Array(&quot;.mp3&quot;, _vlc, lamePath()), _
+				Array(&quot;.flac&quot;, _vlc, flacPath()), _
+				Array(&quot;.aac&quot;, _vlc, neroPath()))
+				For x = Lbound(extension) To Ubound(extension)
+					If FileExists(extension(x)(2)) Or _
+					FileExists(extension(x)(1)) Then
+						ReDim Preserve command_list(_x_ok)
+						command_list(_x_ok) = s4 &amp; _
+						&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)\(NOW)&quot; &amp; _
+						extension(x)(0) &amp; &quot;&quot;&quot;&quot; &amp; s3
+						_x_ok = _x_ok + 1
+					End If
+				Next
+			EndIf		
 		End If
 		If Len(fsContainerResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
 			&apos;pass
@@ -3620,7 +3564,7 @@ Function fbWestEuropeanLang( _
 	fbWestEuropeanLang = False
 	If Len(test_str) &lt; 2 Then Exit Function
 	test_str = LCase(Left(test_str, 2))
-	Dim x As Integer
+	Dim _lang As String
 	x = 0
 	Dim a1
 	a1 = Array( _
@@ -3636,8 +3580,8 @@ Function fbWestEuropeanLang( _
 	&quot;la&quot;, _
 	&quot;nl&quot;, _
 	&quot;pt&quot;)
-	For x = LBound(a1) To UBound(a1)
-		If test_str = a1(x) Then
+	For Each _lang in a1
+		If test_str = _lang Then
 			fbWestEuropeanLang = True
 			Exit For
 		End If
@@ -3652,9 +3596,10 @@ Function fsGetActuateExtension( _
 	Dim a1 As Variant
 	a1 = Split(media_list, &quot;,&quot;)
 	Dim x As Integer
-	For x = Lbound(a1) To Ubound(a1)
-		If Instr(test_command, a1(x) &amp; &quot;&quot;&quot;&quot;) &lt;&gt; 0 Then
-			fsGetActuateExtension = a1(x)
+	Dim _item As String
+	For Each _item in a1
+		If Instr(test_command, _item &amp; &quot;&quot;&quot;&quot;) &lt;&gt; 0 Then
+			fsGetActuateExtension = _item
 			Exit For
 		End If
 	Next
@@ -3863,6 +3808,13 @@ Sub ttsActuate( _
 			ResetAll()
 			oBar.End()
 			Exit Sub
+		ElseIf fbUsingWine() Then
+			If Instr(sCommand, &quot;(SPD_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
+				ResetAll()
+				oBar.End()
+				fbWineSpdSay(sTextToSpeak, fsSelectionLanguageAndRegion(False))
+				Exit Sub
+			End If		
 		End If
 		If InStr(LCase(sProgram), &quot;bin/padsp&quot;) &lt;&gt; 0 Then
 			If InStr(LCase(sCommand), &quot;swift&quot;) &lt;&gt; 0 Then
@@ -4066,6 +4018,7 @@ Sub ttsActuate( _
 			End If
 		End If
 	End If
+	f_CaReadTextExtensionCurrentConfig = config
 	oBar.Value = 100
 	oBar.End()
 	Exit Sub

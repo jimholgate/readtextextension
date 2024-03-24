@@ -149,18 +149,21 @@ Option Explicit
 &apos;&apos; calls the procedure.
 &apos;&apos;
 
-function fbFfmpegPosixOK() As Boolean
-	On Error GoTo fbFfmpegPosixOKErr
-	fbFfmpegPosixOK = shell(&quot;ffmpeg&quot;, 0, &quot;-?&quot;) = 0
+function fbReadOnlyCode() As Boolean
+	&apos; If this extension is installed as a shared extension then
+	&apos; the code in the Macro editor is read only. 
+	On Error GoTo fbReadOnlyCodeErr
+	fbReadOnlyCode = Instr(fsMyURL(), &quot;/&quot; &amp; fsUser() &amp; &quot;/&quot;) = 0
 	Exit Function
-	fbFfmpegPosixOKErr:
-	fbFfmpegPosixOK = False
+	fbReadOnlyCodeErr:
+	fbReadOnlyCode = True
 End Function
 
 
 Function fbOnlyShowIfExperiment() As Boolean
 	fbOnlyShowIfExperiment = GetSolarVersion() &gt; 70500
 End Function
+
 
 Function fbDefaultToSpeechDispatcher() As Boolean
 	&apos; Implies that the python3 `speechd` (speech-dispatcher) library is current.
@@ -315,7 +318,23 @@ Sub ResetAll()
 	fbRemoveFile(fsExtensionSettingsIni())
 	fbRemoveFile(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
 	resetSpeech()
+	f_CaReadTextExtensionCurrentConfig = Array()
 End Sub
+
+
+Function UboundCurrentConfigItems() As Integer
+	&apos; Reliably report the ubound value of items in the current configuration.
+	&apos; The value of Ubound corresponds to the highest legal value for `x`
+	&apos; in a statement like `For x = 0 to UboundCurrentConfigItems()`
+	&apos; If the `f_CaReadTextExtensionCurrentConfig` variant is not initiated,
+	&apos; then it returns a value of `1`, so `UboundCurrentConfigItems - 1`
+	&apos; represents the count of the items.
+	On Error GoTo UboundCurrentConfigItemsErr
+	UboundCurrentConfigItems = ubound(f_CaReadTextExtensionCurrentConfig)
+	Exit Function
+	UboundCurrentConfigItemsErr:
+	UboundCurrentConfigItems = -1
+End Function
 
 
 Sub ReadImpress()
@@ -505,7 +524,19 @@ Function fsNetSAPI5WindowsSpeech(_
 	oFrame = ThisComponent.getCurrentController().getFrame() &apos; Current frame
 	Dim oBar
 	oBar = oFrame.createStatusIndicator() &apos; Generated status bar 
-	If Not fbUsingWine(False) Then
+	If fbUsingWine(False) Then
+		s2 = fsMyTempLock(&quot;lock&quot;)
+		oBar.start(_
+		fsLookUpTerm(_
+		&quot;s_speech-synthesis&quot;) &amp; &quot; (&quot; &amp; sLang &amp; &quot;)&quot;, 100)
+		oBar.Value = 65
+		If fbWineSpdSay(sB, sLang) Then
+			oBar.Value = 85
+			fsNetSAPI5WindowsSpeech = sB
+		End If
+		oBar.Value = 100	
+		oBar.End()	
+	Else
 		oBar.start(_
 			fsLookUpTerm(_
 			&quot;s_speech-synthesis&quot;) &amp; &quot; (&quot; &amp; fsWindowsCloseMatchLanguage(sLang) &amp; &quot;)&quot;, 100)
@@ -541,18 +572,6 @@ Function fsNetSAPI5WindowsSpeech(_
 		oBar.Value = 100	
 		oBar.End()
 		fsNetSAPI5WindowsSpeech = sB
-	Else
-		s2 = fsMyTempLock(&quot;lock&quot;)
-		oBar.start(_
-		fsLookUpTerm(_
-		&quot;s_speech-synthesis&quot;) &amp; &quot; (&quot; &amp; sLang &amp; &quot;)&quot;, 100)
-		oBar.Value = 65
-		If fbWineSpdSay(sB, sLang) Then
-			oBar.Value = 85
-			fsNetSAPI5WindowsSpeech = sB
-		End If
-		oBar.Value = 100	
-		oBar.End()
 	End If
 	Exit Function
 	fsNetSAPI5WindowsSpeechErr:

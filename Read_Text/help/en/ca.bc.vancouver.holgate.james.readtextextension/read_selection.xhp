@@ -1,48 +1,48 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
-    <meta>
-        <topic
-            id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp"
-            indexer="include" status="PUBLISH">
-            <title id="read_selection" xml-lang="en-US">
-                Read selection</title>
-            <filename>/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp</filename>
-        </topic>
-        <history>
-            <created date="2010-10-22T00:00:00">
-                James Holgate</created>
-            <lastedited date="2011-04-16T00:00:35">
-                Changed Default External UNIX App to python</lastedited>
-        </history>
-    </meta>
-    <body>
-        <paragraph role="heading" id="read_selection1" xml-lang="en-US" level="1">
-            Using Read Text Extension</paragraph>
-        <paragraph role="heading" id="read_selection1.1" xml-lang="en-US" level="2">
-            Read Selection
-        </paragraph>
-        <list>
-            <listitem>
-                <switchinline select="appl">
-                    <caseinline select="CALC">
-                        Select a cell with text or numbers.
-                    </caseinline>
-                    <caseinline select="DRAW">
-                        Select some text in a text box.
-                    </caseinline>
-                    <caseinline select="IMPRESS">
-                        Select some text in the normal slide or note editing pane.
-                    </caseinline>
-                    <caseinline select="WRITER">
-                        Select some text.
-                    </caseinline>
-                    <defaultinline>
-                        Open Calc, Draw, Impress, Web Writer or Writer, then make a selection.
-                    </defaultinline>
-                </switchinline>
-            </listitem>
-            <listitem> Click the <emph>
-                    Read Selection</emph> button on the menu bar. </listitem>
-        </list>
-    </body>
+<meta>
+<topic
+id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp"
+indexer="include" status="PUBLISH">
+<title id="read_selection" xml-lang="en-US">
+Read selection</title>
+<filename>/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp</filename>
+</topic>
+<history>
+<created date="2010-10-22T00:00:00">
+James Holgate</created>
+<lastedited date="2011-04-16T00:00:35">
+Changed Default External UNIX App to python</lastedited>
+</history>
+</meta>
+<body>
+<paragraph role="heading" id="read_selection1" xml-lang="en-US" level="1">
+Using Read Text Extension</paragraph>
+<paragraph role="heading" id="read_selection1.1" xml-lang="en-US" level="2">
+Read Selection
+</paragraph>
+<list>
+<listitem>
+<switchinline select="appl">
+<caseinline select="CALC">
+Select a cell with text or numbers.
+</caseinline>
+<caseinline select="DRAW">
+Select some text in a text box.
+</caseinline>
+<caseinline select="IMPRESS">
+Select some text in the normal slide or note editing pane.
+</caseinline>
+<caseinline select="WRITER">
+Select some text.
+</caseinline>
+<defaultinline>
+Open Calc, Draw, Impress, Web Writer or Writer, then make a selection.
+</defaultinline>
+</switchinline>
+</listitem>
+<listitem>Click the <emph>
+Read Selection</emph> button on the menu bar. </listitem>
+</list>
+</body>
 </helpdocument>

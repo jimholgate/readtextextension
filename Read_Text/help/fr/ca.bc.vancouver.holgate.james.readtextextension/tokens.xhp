@@ -1,127 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
-    <meta>
-        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp"
-            indexer="include" status="PUBLISH">
-            <title id="tokens" xml-lang="fr-CA">
-                Tokens</title>
-            <filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
-        </topic>
-        <history>
-            <created date="2010-10-22T00:00:00">
-                James Holgate</created>
-            <lastedited date="2024-03-15T20:07:25">
-                James Holgate ID tokens</lastedited>
-        </history>
-    </meta>
-    <body>
-        <paragraph role="heading" id="tokens1" xml-lang="fr-CA" level="1">
-            Installation de l'extension Read text</paragraph>
-        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
-            id="img_dialog3_screenshot">
-            <alt xml-lang="ff-FR"
-                id="alt_dialog3_screenshot">Boîte de dialogue standard « À propos ».</alt>
-        </image>
-        <paragraph role="heading" id="tokens1.1" xml-lang="fr-CA" level="2">
-            Tokens</paragraph>
-        <paragraph>
-            Lorsque vous avez besoin de ces valeurs variables dans une commande ou dans un script
-            vous pouvez utiliser une option appropriée. La valeur entre parenthèses serait remplacé
-            par la chaîne approprié.</paragraph>
-        <list>
-            <listitem>
-                La date actuelle (DATE) </listitem>
-            <listitem>
-                Jour de la semaine (WEEKDAY)</listitem>
-            <listitem>
-                Heure actuelle (TIME)</listitem>
-            <listitem>
-                Heure actuelle reformaté pour que vous puissiez l'utiliser dans un fichier (NOW) </listitem>
-            <listitem>
-                Nom de fichier temporaire contenant la sélection de texte (TMP)</listitem>
-            <listitem>
-                Nom de l'auteur (AUTHOR)</listitem>
-            <listitem>
-                Nom du document (TITLE)</listitem>
-            <listitem>
-                %PRODUCTNAME Gallerie de son (SOUND_GALLERY) </listitem>
-            <switchinline select="sys">
-                <caseinline select="WIN">
-                    <listitem>
-                        Un script Windows Visual Basic qui utilise la synthese vocale du système
-                        (TTS_WSCRIPT_VBS)</listitem>
-                </caseinline>
-                <caseinline select="UNIX">
-                    <listitem>
-                        Un script Python qui encode le texte sélectionné dans un image PNG pour les
-                        appareils mobiles (CREATE_QR_LABEL_PY)</listitem>
-                    <listitem>
-                        Chemin d'accès à un script Python pour lire du texte à haute voix
-                        (ESPEAK_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Chemin d'accès à un script Python pour lire du texte à haute voix
-                        (FESTIVAL_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Chemin d'accès à un script Python pour lire du texte à haute voix
-                        (NETWORK_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Chemin d'accès à un script Python pour lire du texte japonais à haute voix
-                        (OPENJTALK_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Chemin d'accès à un script Python pour lire du texte à haute voix
-                        (PICO_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Chemin d'accès à un script Python pour lire du texte à haute voix
-                        (PIPER_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Réinitialiser toutes les préférences (RESET_ALL)</listitem>
-                    <listitem>
-                        Chemin d'accès à un script Python pour lire du texte à haute voix
-                        (RHVOICE_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Chemin d'accès à un script Python pour lire du texte à haute voix à l'aide
-                        de la voix du système (SPD_READ_TEXT_PY)</listitem>
-                </caseinline>
-                <caseinline select="MAC">
-                    <listitem>
-                        Chemin d'accès à un script osascript pour lire du texte à haute voix à
-                        l'aide de la voix du système (SAY_APPLESCRIPT)</listitem>
-                </caseinline>
-                <defaultinline></defaultinline>
-            </switchinline>
-            <listitem>
-                Directoire de travail (HOME)</listitem>
-            <listitem>
-                Code langue de l'application - en pour l'anglais; fr pour le français, etc.
-                (LANGUAGE_CODE)</listitem>
-            <listitem>
-                Code national de l'application - CA pour Canada; FR pour France, etc. (COUNTRY_CODE)</listitem>
-            <listitem>
-                Code régional de l'application - fr-CA pour Canada; fr-FR pour France, etc.
-                (LANGUAGE_COUNTRY_CODE)</listitem>
-            <listitem>
-                Code langue de la sélection - en pour l'anglais; fr pour le français, etc.
-                (SELECTION_LANGUAGE_CODE)</listitem>
-            <listitem>
-                Code national de la sélection - CA pour Canada; FR pour France, etc.
-                (SELECTION_COUNTRY_CODE)</listitem>
-            <listitem>
-                Code régional de la sélection - fr-CA pour Canada; fr-FR pour France, etc.
-                (SELECTION_LANGUAGE_COUNTRY_CODE)</listitem>
-            <listitem>
-                Les 99 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXTSMALL)</listitem>
-            <listitem>
-                Les 249 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT250)</listitem>
-            <listitem>
-                Les 999 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT)</listitem>
-            <listitem>
-                Les 9999 premiers caractères du texte sélectionné codées pour URL (OOO_WEBTEXTBIG)</listitem>
-            <listitem>
-                Le témoin de session (SESSION_ID)</listitem>
-            <listitem>
-                Un identifiant à usage unique (UNIQUE_ID)</listitem>
-            <listitem>
-                Un identifiant anonyme pour l'utilisateur actuel (USER_ID)</listitem>
-        </list>
-    </body>
+<meta>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp"
+indexer="include" status="PUBLISH">
+<title id="tokens" xml-lang="fr-CA">
+Tokens</title>
+<filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
+</topic>
+<history>
+<created date="2010-10-22T00:00:00">
+James Holgate</created>
+<lastedited date="2024-03-15T20:07:25">
+James Holgate ID tokens</lastedited>
+</history>
+</meta>
+<body>
+<paragraph role="heading" id="tokens1" xml-lang="fr-CA" level="1">
+Installation de l'extension Read text</paragraph>
+<image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
+id="img_dialog3_screenshot">
+<alt xml-lang="fr-FR"
+id="alt_dialog3_screenshot">Dialog3 screenshot.</alt>
+</image>
+<paragraph role="heading" id="tokens1.1" xml-lang="fr-CA" level="2">
+Tokens</paragraph>
+<paragraph>
+Lorsque vous avez besoin de ces valeurs variables dans une commande ou dans un script
+vous pouvez utiliser une option appropriée. La valeur entre parenthèses serait remplacé
+par la chaîne approprié.</paragraph>
+<list>
+<listitem>
+La date actuelle (DATE) </listitem>
+<listitem>
+Jour de la semaine (WEEKDAY)</listitem>
+<listitem>
+Heure actuelle (TIME)</listitem>
+<listitem>
+Heure actuelle reformaté pour que vous puissiez l'utiliser dans un fichier (NOW) </listitem>
+<listitem>
+Nom de fichier temporaire contenant la sélection de texte (TMP)</listitem>
+<listitem>
+Nom de l'auteur (AUTHOR)</listitem>
+<listitem>
+Nom du document (TITLE)</listitem>
+<listitem>
+%PRODUCTNAME Gallerie de son (SOUND_GALLERY) </listitem>
+<switchinline select="sys">
+<caseinline select="WIN">
+<listitem>
+Un script Windows Visual Basic qui utilise la synthese vocale du système
+(TTS_WSCRIPT_VBS)</listitem>
+</caseinline>
+<caseinline select="UNIX">
+<listitem>
+Un script Python qui encode le texte sélectionné dans un image PNG pour les
+appareils mobiles (CREATE_QR_LABEL_PY)</listitem>
+<listitem>
+Chemin d'accès à un script Python pour lire du texte à haute voix
+(ESPEAK_READ_TEXT_PY)</listitem>
+<listitem>
+Chemin d'accès à un script Python pour lire du texte à haute voix
+(FESTIVAL_READ_TEXT_PY)</listitem>
+<listitem>
+Chemin d'accès à un script Python pour lire du texte à haute voix
+(NETWORK_READ_TEXT_PY)</listitem>
+<listitem>
+Chemin d'accès à un script Python pour lire du texte japonais à haute voix
+(OPENJTALK_READ_TEXT_PY)</listitem>
+<listitem>
+Chemin d'accès à un script Python pour lire du texte à haute voix
+(PICO_READ_TEXT_PY)</listitem>
+<listitem>
+Chemin d'accès à un script Python pour lire du texte à haute voix
+(PIPER_READ_TEXT_PY)</listitem>
+<listitem>
+Réinitialiser toutes les préférences (RESET_ALL)</listitem>
+<listitem>
+Chemin d'accès à un script Python pour lire du texte à haute voix
+(RHVOICE_READ_TEXT_PY)</listitem>
+<listitem>
+Chemin d'accès à un script Python pour lire du texte à haute voix à l'aide
+de la voix du système (SPD_READ_TEXT_PY)</listitem>
+</caseinline>
+<caseinline select="MAC">
+<listitem>
+Chemin d'accès à un script osascript pour lire du texte à haute voix à
+l'aide de la voix du système (SAY_APPLESCRIPT)</listitem>
+</caseinline>
+<defaultinline></defaultinline>
+</switchinline>
+<listitem>
+Directoire de travail (HOME)</listitem>
+<listitem>
+Code langue de l'application - en pour l'anglais; fr pour le français, etc.
+(LANGUAGE_CODE)</listitem>
+<listitem>
+Code national de l'application - CA pour Canada; FR pour France, etc. (COUNTRY_CODE)</listitem>
+<listitem>
+Code régional de l'application - fr-CA pour Canada; fr-FR pour France, etc.
+(LANGUAGE_COUNTRY_CODE)</listitem>
+<listitem>
+Code langue de la sélection - en pour l'anglais; fr pour le français, etc.
+(SELECTION_LANGUAGE_CODE)</listitem>
+<listitem>
+Code national de la sélection - CA pour Canada; FR pour France, etc.
+(SELECTION_COUNTRY_CODE)</listitem>
+<listitem>
+Code régional de la sélection - fr-CA pour Canada; fr-FR pour France, etc.
+(SELECTION_LANGUAGE_COUNTRY_CODE)</listitem>
+<listitem>
+Les 99 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXTSMALL)</listitem>
+<listitem>
+Les 249 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT250)</listitem>
+<listitem>
+Les 999 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT)</listitem>
+<listitem>
+Les 9999 premiers caractères du texte sélectionné codées pour URL (OOO_WEBTEXTBIG)</listitem>
+<listitem>
+Le témoin de session (SESSION_ID)</listitem>
+<listitem>
+Un identifiant à usage unique (UNIQUE_ID)</listitem>
+<listitem>
+Un identifiant anonyme pour l'utilisateur actuel (USER_ID)</listitem>
+</list>
+
+
+
+<paragraph xml-lang="fr-FR" role="heading" level="2">Modifier la prononciation d’un mot</paragraph>
+<image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog2.png"
+id="img_dialog2_screenshot">
+<alt xml-lang="fr-FR"
+id="alt_dialog2_screenshot">Dialog2.fr-FR_lexicon.json</alt>
+</image>
+<paragraph xml-lang="fr-FR">Ce dialogue n’est pas utilisé dans certains systèmes informatiques.</paragraph>
+
+
+<list type="ordered" xml-lang="fr-FR">
+
+<listitem>Dans l’éditeur, sélectionnez le mot.</listitem>
+
+<listitem>Sélectionnez <emph>Outils – Add-ons – Lire la sélection</emph> .</listitem>
+
+<listitem>Sélectionnez le bouton <emph>Àpropos...</emph> </listitem>
+
+<listitem>Cliquez avec le bouton droit sur l'icône de la clé à molette, qui est la
+quatrième icône à partir de la gauche en bas de la boîte de dialogue.</listitem>
+
+<listitem>Dans la case <emph>Lire avec une application externe</emph> , entrez une
+orthographe alternative pour le mot.</listitem>
+
+<listitem>Sélectionnez le bouton <emph>Appliquer</emph> .</listitem>
+
+</list>
+
+</body>
 </helpdocument>

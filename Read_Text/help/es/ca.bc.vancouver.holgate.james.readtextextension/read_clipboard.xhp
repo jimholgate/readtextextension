@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<meta>
+<topic
+id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp"
+indexer="include" status="PUBLISH">
+<title id="read_clipboard" xml-lang="es-ES">
+Leer el portapapeles</title>
+<filename>/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp</filename>
+</topic>
+<history>
+<created date="2024-03-22T12:04:16">James Holgate</created>
+</history>
+</meta>
+<body>
+<paragraph role="heading" id="read_clipboard1" xml-lang="es-ES" level="1">
+Usando la extensión</paragraph>
+<paragraph role="heading" id="read_clipboard1.1" xml-lang="es-ES" level="2">
+Leer el portapapeles
+</paragraph>
+<list>
+<listitem>
+Puedes leer cualquier texto que puedas copiar al portapapeles. Por ejemplo, puedes
+leer código de macro, el contenido de campos de texto, fuentes de datos, subtítulos
+y texto en partes seleccionadas de tablas. Puedes leer texto copiado de programas
+externos como navegadores web, ayuda o feeds de noticias.
+
+</listitem>
+<listitem>
+Selecciona algunas frases.
+</listitem>
+<listitem>Selecciona <emph>
+Editar - Copiar</emph> o <switchinline select="sys">
+<caseinline select="MAC">
+<emph>
+Command+C</emph> 
+</caseinline>
+<caseinline select="UNIX">
+<emph>
+Ctrl+C</emph> 
+</caseinline>
+<caseinline select="WIN">
+<emph>
+Ctrl+C</emph> 
+</caseinline>
+<defaultinline>
+el método abreviado de teclado para copiar texto</defaultinline>
+</switchinline>
+. </listitem>
+<listitem>Selecciona <emph>
+Herramientas - Complementos - Leer el portapapeles</emph> . </listitem>
+</list>
+</body>
+</helpdocument>

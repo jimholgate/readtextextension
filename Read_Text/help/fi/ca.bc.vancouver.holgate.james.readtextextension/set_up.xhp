@@ -1,81 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
-  <meta>
-    <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp"
-      indexer="include" status="PUBLISH">
-      <title id="set_up" xml-lang="fi-FI">
-        Käyttöönotto</title>
-      <filename>/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp</filename>
-    </topic>
-    <history>
-      <created date="2010-10-22T00:00:00">
-        James Holgate</created>
-      <lastedited date="2013-08-08T20:12:00">
-        Teijo S, translated help to Finnish</lastedited>
-    </history>
-  </meta>
-  <body>
-    <paragraph role="heading" id="set_up1" xml-lang="fi-FI" level="1">
-      Käyttöönotto</paragraph>
-      <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Default64.png" id="img_dialog1_screenshot">
-        <alt xml-lang="fi-FI"
-          id="alt_dialog1_screenshot">Normaali “Read Text“ -valintaikkuna.</alt>
-      </image>
-    <paragraph role="heading" id="set_up1.1" xml-lang="fi-FI" level="2">
-      Asetukset
-    </paragraph>
-    <list>
-      <listitem> Napsauta työkalupalkin kuvaketta tai valitse <emph>
-          Työkalut - Lisäosat - Lue valinta...</emph>
-      </listitem>
-      <listitem>
-        Valitse lisäosan käyttämäksi aiottava sovellus tai internetsivusto sekä komentojono
-        parametreineen.
-      </listitem>
-      <listitem>
-        <switchinline select="sys">
-          <caseinline select="MAC"> Oletuksena lisäosa käyttää <emph>
-              /usr/bin/osascript</emph> ulkoisena sovelluksena ja <emph>
-              "(SAY_APPLESCRIPT)"</emph> komentorivin lisävalitsimina. </caseinline>
-          <caseinline select="UNIX"> Oletuksena lisäosa käyttää <emph>
-              /usr/bin/python</emph> ulkoisena sovelluksena ja <emph>
-              "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false
-            "(TMP)"</emph> komentorivin lisävalitsimina. </caseinline>
-          <caseinline select="WIN"> Oletuksena käytetään <emph>
-              wscript.exe</emph> ulkoisena sovelluksena ja <emph>
-              "(TTS_WSCRIPT_VBS)" "(TMP)"</emph> komentorivin lisävalitsimina. Komentoriviä voidaan
-            käyttää äänen muuttamisessa sekä sen nopeudensäädössä. Nopein puherytmi saavutetaan
-            arvolla 10 ja hitain arvolla -10. </caseinline>
-          <defaultinline> Oletuksena lisäosa käyttää <emph>
-              /usr/bin/espeak</emph> ulkoisena sovelluksena ja <emph>
-              -f "(TMP)"</emph> komentorivin lisävalitsimina. </defaultinline>
-        </switchinline>
-      </listitem>
-      <listitem> Asetukset voi testata tallentamatta <switchinline select="sys">
-          <caseinline select="MAC">
-            pitämällä Control-näppäintä pohjassa ja napsauttamalla </caseinline>
-          <defaultinline>
-            napsauttamalla hiiren oikealla painikkeella
-          </defaultinline>
-        </switchinline>
+<meta>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp"
+indexer="include" status="PUBLISH">
+<title id="set_up" xml-lang="fi-FI">
+Käyttöönotto</title>
+<filename>/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp</filename>
+</topic>
+<history>
+<created date="2010-10-22T00:00:00">
+James Holgate</created>
+<lastedited date="2013-08-08T20:12:00">
+Teijo S, translated help to Finnish</lastedited>
+</history>
+</meta>
+<body>
+<paragraph role="heading" id="set_up1" xml-lang="fi-FI" level="1">
+  Käyttöönotto</paragraph>
+<image src="ca.bc.vancouver.holgate.james.readtextextension/img/Default64.png" id="img_dialog1_screenshot">
+<alt xml-lang="fi-FI"
+  id="alt_dialog1_screenshot">Normaali “Read Text“ -valintaikkuna.</alt>
+</image>
+<paragraph role="heading" id="set_up1.1" xml-lang="fi-FI" level="2">
+  Asetukset
+</paragraph>
+<list>
+<listitem>Napsauta työkalupalkin kuvaketta tai valitse <emph>
+Työkalut - Lisäosat - Lue valinta...</emph> 
+</listitem>
+<listitem>
+Valitse lisäosan käyttämäksi aiottava sovellus tai internetsivusto sekä komentojono
+parametreineen.
+</listitem>
+<listitem>
+<switchinline select="sys">
+<caseinline select="MAC">Oletuksena lisäosa käyttää <emph>
+  /usr/bin/osascript</emph> ulkoisena sovelluksena ja <emph>
+  "(SAY_APPLESCRIPT)"</emph> komentorivin lisävalitsimina. </caseinline>
+<caseinline select="UNIX">Oletuksena lisäosa käyttää <emph>
+  /usr/bin/python</emph> ulkoisena sovelluksena ja <emph>
+  "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false
+"(TMP)"</emph> komentorivin lisävalitsimina. </caseinline>
+<caseinline select="WIN">Oletuksena käytetään <emph>
+  wscript.exe</emph> ulkoisena sovelluksena ja <emph>
+  "(TTS_WSCRIPT_VBS)" "(TMP)"</emph> komentorivin lisävalitsimina. Komentoriviä voidaan
+käyttää äänen muuttamisessa sekä sen nopeudensäädössä. Nopein puherytmi saavutetaan
+arvolla 10 ja hitain arvolla -10. </caseinline>
+<defaultinline>Oletuksena lisäosa käyttää <emph>
+  /usr/bin/espeak</emph> ulkoisena sovelluksena ja <emph>
+  -f "(TMP)"</emph> komentorivin lisävalitsimina. </defaultinline>
+</switchinline>
+</listitem>
+<listitem>Asetukset voi testata tallentamatta <switchinline select="sys">
+<caseinline select="MAC">
+pitämällä Control-näppäintä pohjassa ja napsauttamalla </caseinline>
+<defaultinline>
+napsauttamalla hiiren oikealla painikkeella
+</defaultinline>
+</switchinline>
 <emph>
-        OK</emph> . </listitem>
-      <listitem> Kun asetukset ovat halutunlaiset, poista valinta valintaruudusta <emph>
-          Näytä aina tämä valintaikkuna</emph> . </listitem>
-      <listitem> Napsauta <emph>
-          OK</emph> . </listitem>
-    </list>
-    <paragraph role="heading" id="customize" xml-lang="fi-FI" level="2">
-      Mukauttaminen
-    </paragraph>
-    <list>
-      <listitem>
-        Voit ulkoisen ohjelman tai internetpalvelun avulla lukea tekstejä ääneen tai kääntää niitä
-        toiselle kielelle.
-      </listitem>
-      <listitem> Asetuksien muuttamiseksi avaa valintaikkuna käyttäen <emph>
-          Työkalut - Lisäosat - Lue valinta...</emph>
-      </listitem>
-    </list>
-  </body>
+OK</emph> . </listitem>
+<listitem>Kun asetukset ovat halutunlaiset, poista valinta valintaruudusta <emph>
+  Näytä aina tämä valintaikkuna</emph> . </listitem>
+<listitem>Napsauta <emph>
+  OK</emph> . </listitem>
+</list>
+<paragraph role="heading" id="customize" xml-lang="fi-FI" level="2">
+  Mukauttaminen
+</paragraph>
+<list>
+<listitem>
+Voit ulkoisen ohjelman tai internetpalvelun avulla lukea tekstejä ääneen tai kääntää niitä
+toiselle kielelle.
+</listitem>
+<listitem>Asetuksien muuttamiseksi avaa valintaikkuna käyttäen <emph>
+  Työkalut - Lisäosat - Lue valinta...</emph> 
+</listitem>
+</list>
+</body>
 </helpdocument>

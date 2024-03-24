@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 <tree_view version="21-March-2024">
   <help_section application="readtextextension" id="readtextextension01" title="Read Text Extension">
     <node id="readtextextension0101" title="Installieren der Read Text Extension">
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Installieren</topic>
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">Setup</topic>
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">Befehls- und Script-Tokens</topic>
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/img/Default64,png">Standarddialog „Read Text“.</topic>
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3,png">Standarddialog „Info“.</topic>
     </node>
     <node id="readtextextension0102" title="So verwenden Sie die Read Text Extension">
       <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Markierten Text vorlesen</topic>

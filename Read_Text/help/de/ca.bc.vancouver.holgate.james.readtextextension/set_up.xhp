@@ -1,86 +1,86 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
-    <meta>
-        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp"
-            indexer="include" status="PUBLISH">
-            <title id="set_up" xml-lang="de-DE">
-                Setup</title>
-            <filename>/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp</filename>
-        </topic>
-        <history>
-            <created date="2010-10-22T00:00:00">
-                James Holgate</created>
-            <lastedited date="2011-05-15T00:00:00">
-                Changed default command line - "(ESPEAK_READ_TEXT_PY)"
-                --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false "(TMP)"
-            </lastedited>
-        </history>
-    </meta>
-    <body>
-        <paragraph role="heading" id="set_up1" xml-lang="de-DE" level="1">
-            Installieren der Read Text Extension
-        </paragraph>
-        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Default64.png" id="img_dialog1_screenshot">
-            <alt xml-lang="de-DE"
-                id="alt_dialog1_screenshot">Standarddialog „Read Text“.</alt>
-        </image>
-        <paragraph role="heading" id="set_up1.1" xml-lang="de-DE" level="2">
-            Setup
-        </paragraph>
-        <list>
-            <listitem> Klicken Sie auf das Symbol in der Menüleiste oder wählen Sie <emph>
-                    Extras - Add-Ons - Markierten Text vorlesen...</emph>
-            </listitem>
-            <listitem>
-                Wählen Sie das Programm oder die Website, die Read Text verwenden soll, und wählen
-                Sie eine Befehlszeile oder ein Script aus.
-            </listitem>
-            <listitem>
-                <switchinline select="sys">
-                    <caseinline select="MAC"> Standardmäßig nutzt Read Text <emph>
-                            /usr/bin/osascript</emph> als externe Anwendung und <emph>
-                        "(SAY_APPLESCRIPT)"</emph> für die Befehlszeilen-Optionen </caseinline>
-                    <caseinline select="UNIX"> Standardmäßig nutzt Read Text <emph>
-                            /usr/bin/python</emph> als externe Anwendung und <emph>
-                        "(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_COUNTRY_CODE)
-                        --visible=false "(TMP)"</emph> für die Befehlszeilen-Optionen, wobei <emph>
-                        "(TMP)"</emph> für den Dateinamen steht. Stimme und Sprechgeschwindigkeit
-                        lassen sich in der Befehlszeile einstellen. </caseinline>
-                    <caseinline select="WIN"> Standardmäßig nutzt Read Text <emph>
-                            wscript.exe</emph> als externe Anwendung und <emph>
-                            "(TTS_WSCRIPT_VBS)" "(TMP)"</emph> für die Befehlszeilen-Optionen, wobei <emph>
-                        "(TMP)"</emph> für den Dateinamen steht. Stimme und Sprechgeschwindigkeit
-                        lassen sich in der Befehlszeile einstellen. Dabei ist 10 am schnellsten und
-                        -10 am langsamsten. </caseinline>
-                    <defaultinline> Standardmäßig nutzt Read Text <emph>
-                            /usr/bin/espeak</emph> als externe Anwendung und <emph>
-                            -f "(TMP)"</emph> für die Befehlszeilen-Optionen, wobei <emph>
-                            "(TMP)"</emph> für den Dateinamen steht. Stimme und
-                        Sprechgeschwindigkeit lassen sich in der Befehlszeile einstellen. </defaultinline>
-                </switchinline>
-            </listitem>
-            <listitem> Sie können die Einstellung vorläufig testen, indem Sie <switchinline
-                    select="sys">
-                    <caseinline select="MAC"> Strg gedrückt halten und auf <emph>
-                            OK</emph> klicken. </caseinline>
-                    <defaultinline> auf <emph>
-                            OK</emph> rechtsklicken. </defaultinline>
-                </switchinline>
-            </listitem>
-            <listitem> Sind Sie mit der Einstellung zufrieden, entfernen Sie das Häkchen bei <emph>
-                Diesen Dialog immer zeigen</emph>. </listitem>
-            <listitem> Klicken Sie <emph>
-                    OK</emph>. </listitem>
-        </list>
-        <paragraph role="heading" id="customize" xml-lang="de-DE" level="2">Anpassen
-        </paragraph>
-        <list>
-            <listitem>Mit Hilfe von externen Anwendungen oder Websites können Sie fremdsprachige
-                Texte vorlesen oder übersetzen lassen.
-            </listitem>
-            <listitem>Zum Dialogfeld zum Ändern der Einstellungen gelangen Sie über <emph>Extras -
-                Add-Ons – Markierten Text vorlesen...</emph>
-            </listitem>
-        </list>
-    </body>
+<meta>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp"
+indexer="include" status="PUBLISH">
+<title id="set_up" xml-lang="de-DE">
+Setup</title>
+<filename>/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp</filename>
+</topic>
+<history>
+<created date="2010-10-22T00:00:00">
+James Holgate</created>
+<lastedited date="2011-05-15T00:00:00">
+Changed default command line - "(ESPEAK_READ_TEXT_PY)"
+--language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false "(TMP)"
+</lastedited>
+</history>
+</meta>
+<body>
+<paragraph role="heading" id="set_up1" xml-lang="de-DE" level="1">
+Installieren der Read Text Extension
+</paragraph>
+<image src="ca.bc.vancouver.holgate.james.readtextextension/img/Default64.png" id="img_dialog1_screenshot">
+<alt xml-lang="de-DE"
+id="alt_dialog1_screenshot">Standarddialog „Read Text“.</alt>
+</image>
+<paragraph role="heading" id="set_up1.1" xml-lang="de-DE" level="2">
+Setup
+</paragraph>
+<list>
+<listitem>Klicken Sie auf das Symbol in der Menüleiste oder wählen Sie <emph>
+Extras - Add-Ons - Markierten Text vorlesen...</emph> 
+</listitem>
+<listitem>
+Wählen Sie das Programm oder die Website, die Read Text verwenden soll, und wählen
+Sie eine Befehlszeile oder ein Script aus.
+</listitem>
+<listitem>
+<switchinline select="sys">
+<caseinline select="MAC">Standardmäßig nutzt Read Text <emph>
+/usr/bin/osascript</emph> als externe Anwendung und <emph>
+"(SAY_APPLESCRIPT)"</emph> für die Befehlszeilen-Optionen </caseinline>
+<caseinline select="UNIX">Standardmäßig nutzt Read Text <emph>
+/usr/bin/python</emph> als externe Anwendung und <emph>
+"(ESPEAK_READ_TEXT_PY)" --language=(SELECTION_LANGUAGE_COUNTRY_CODE)
+--visible=false "(TMP)"</emph> für die Befehlszeilen-Optionen, wobei <emph>
+"(TMP)"</emph> für den Dateinamen steht. Stimme und Sprechgeschwindigkeit
+lassen sich in der Befehlszeile einstellen. </caseinline>
+<caseinline select="WIN">Standardmäßig nutzt Read Text <emph>
+wscript.exe</emph> als externe Anwendung und <emph>
+"(TTS_WSCRIPT_VBS)" "(TMP)"</emph> für die Befehlszeilen-Optionen, wobei <emph>
+"(TMP)"</emph> für den Dateinamen steht. Stimme und Sprechgeschwindigkeit
+lassen sich in der Befehlszeile einstellen. Dabei ist 10 am schnellsten und
+-10 am langsamsten. </caseinline>
+<defaultinline>Standardmäßig nutzt Read Text <emph>
+/usr/bin/espeak</emph> als externe Anwendung und <emph>
+-f "(TMP)"</emph> für die Befehlszeilen-Optionen, wobei <emph>
+"(TMP)"</emph> für den Dateinamen steht. Stimme und
+Sprechgeschwindigkeit lassen sich in der Befehlszeile einstellen. </defaultinline>
+</switchinline>
+</listitem>
+<listitem>Sie können die Einstellung vorläufig testen, indem Sie <switchinline
+select="sys">
+<caseinline select="MAC">Strg gedrückt halten und auf <emph>
+OK</emph> klicken. </caseinline>
+<defaultinline>auf <emph>
+OK</emph> rechtsklicken. </defaultinline>
+</switchinline>
+</listitem>
+<listitem>Sind Sie mit der Einstellung zufrieden, entfernen Sie das Häkchen bei <emph>
+Diesen Dialog immer zeigen</emph> . </listitem>
+<listitem>Klicken Sie <emph>
+OK</emph> . </listitem>
+</list>
+<paragraph role="heading" id="customize" xml-lang="de-DE" level="2">Anpassen
+</paragraph>
+<list>
+<listitem>Mit Hilfe von externen Anwendungen oder Websites können Sie fremdsprachige
+Texte vorlesen oder übersetzen lassen.
+</listitem>
+<listitem>Zum Dialogfeld zum Ändern der Einstellungen gelangen Sie über <emph>Extras -
+Add-Ons – Markierten Text vorlesen...</emph> 
+</listitem>
+</list>
+</body>
 </helpdocument>

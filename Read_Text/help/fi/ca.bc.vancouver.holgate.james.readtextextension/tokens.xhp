@@ -1,128 +1,155 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
-    <meta>
-        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp"
-            indexer="include" status="PUBLISH">
-            <title id="tokens" xml-lang="fi-FI">
-                Käyttö</title>
-            <filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
-        </topic>
-        <history>
-            <created date="2010-10-22T00:00:00">
-                James Holgate</created>
-            <lastedited date="2024-03-15T20:07:25">
-                James Holgate ID tokens</lastedited>
-        </history>
-    </meta>
-    <body>
-        <paragraph role="heading" id="tokens1" xml-lang="fi-FI" level="1">
-            Käyttöönotto</paragraph>
-        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
-            id="img_dialog3_screenshot">
-            <alt xml-lang="fi-FI"
-                id="alt_dialog3_screenshot">Normaali “Tietoja” -valintaikkuna.</alt>
-        </image>
-        <paragraph role="heading" id="tokens1.1" xml-lang="fi-FI" level="2">
-            Komentojonot
-        </paragraph>
-        <paragraph>
-            Jos komentojonoissa tai parametreissä tarvitaan muuttujia, tulee käyttää sopivaa
-            merkkijonoa. Suorituksen aikana suluissa esitetty arvo korvataan tarvittavalla
-            todellisella arvolla.</paragraph>
-        <list>
-            <listitem>
-                Nykyinen päivämäärä aluekohtaisessa esitysmuodossa (DATE)</listitem>
-            <listitem>
-                Nykyinen viikonpäivä aluekohtaisessa esitysmuodossa (WEEKDAY)</listitem>
-            <listitem>
-                Nykyinen aika aluekohtaisessa esitysmuodossa (TIME)</listitem>
-            <listitem>
-                Nykyinen aika muodossa joka kelpaa lisättäväksi tiedostonimeen (NOW)</listitem>
-            <listitem>
-                Valitun tekstin sisältävä tilapäinen tiedosto polkuineen (TMP)</listitem>
-            <listitem>
-                Tekijän nimi (AUTHOR)</listitem>
-            <listitem>
-                Asiakirjan nimi (TITLE)</listitem>
-            <listitem>
-                Ohjelman %PRODUCTNAME äänikirjaston polku (SOUND_GALLERY)</listitem>
-            <switchinline select="sys">
-                <caseinline select="WIN">
-                    <listitem>
-                        Järjestelmä-äänien lukemisessa käytettävän Windows Script:n polku
-                        (TTS_WSCRIPT_VBS)</listitem>
-                </caseinline>
-                <caseinline select="UNIX">
-                    <listitem>
-                        PNG-kuvien koodaamisessa mobiilisovelluksille käytettävän
-                        Python-komentojonon polku (CREATE_QR_LABEL_PY)</listitem>
-                    <listitem>
-                        Espeak-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
-                        (ESPEAK_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Festival-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
-                        (FESTIVAL_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Verkkoasetukset-sovelluksen suorittamiseen käytettävän Python-komentojonon
-                        polku
-                        (NETWORK_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Japanin kieli-sovelluksen suorittamiseen käytettävän Python-komentojonon
-                        polku
-                        (OPENJTALK_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Pico-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
-                        (PICO_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Piper-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
-                        (PIPER_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Nollaa kaikki asetukset (RESET_ALL)</listitem>
-                    <listitem>
-                        Rhvoice-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
-                        (RHVOICE_READ_TEXT_PY)</listitem>
-                    <listitem>
-                        Speech-dispatcher -sovelluksen suorittamiseen käytettävän
-                        Python-komentojonon polku (SPD_READ_TEXT_PY)</listitem>
-                </caseinline>
-                <caseinline select="MAC">
-                    <listitem>
-                        Apple-sovelluksen suorittamiseen käytettävän
-                        Osascript-komentojonon polku (SAY_APPLESCRIPT)</listitem>
-                </caseinline>
-                <defaultinline>
-                </defaultinline>
-            </switchinline>
-            <listitem>
-                Työkansio. Käytetään myös nimiä Tiedostot, Omat tiedostot tai kotikansio (HOME)</listitem>
-            <listitem>
-                Sovelluksen kielikoodi: en = englanti, fi = suomi jne. (LANGUAGE_CODE)</listitem>
-            <listitem>
-                Sovelluksen maakoodi: US = U.S.A, FI = Suomi jne. (COUNTRY_CODE)</listitem>
-            <listitem>
-                Sovelluksen aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne.
-                (LANGUAGE_COUNTRY_CODE)</listitem>
-            <listitem>
-                Valinnan kielikoodi: en = englanti, fi = suomi jne. (SELECTION_LANGUAGE_CODE)</listitem>
-            <listitem>
-                Valinnan maakoodi: US = U.S.A, FI = Suomi jne. (SELECTION_COUNTRY_CODE)</listitem>
-            <listitem>
-                Valinnan aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne.
-                (SELECTION_LANGUAGE_COUNTRY_CODE)</listitem>
-            <listitem>
-                Valitun tekstin 99 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTSMALL)</listitem>
-            <listitem>
-                Valitun tekstin 249 lensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT250)</listitem>
-            <listitem>
-                Valitun tekstin 999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT)</listitem>
-            <listitem>
-                Valitun tekstin 9999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTBIG)</listitem>
-            <listitem>
-                Istuntoeväste (SESSION_ID)</listitem>
-            <listitem>
-                Kertakäyttöinen eväste (UNIQUE_ID)</listitem>
-            <listitem>
-                Nykyisen käyttäjän anonyymi tunniste (USER_ID)</listitem>
-        </list>
-    </body>
+<meta>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp"
+indexer="include" status="PUBLISH">
+<title id="tokens" xml-lang="fi-FI">
+Käyttö</title>
+<filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
+</topic>
+<history>
+<created date="2010-10-22T00:00:00">
+James Holgate</created>
+<lastedited date="2024-03-15T20:07:25">
+James Holgate ID tokens</lastedited>
+</history>
+</meta>
+<body>
+<paragraph role="heading" id="tokens1" xml-lang="fi-FI" level="1">
+Käyttöönotto</paragraph>
+<image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
+id="img_dialog3_screenshot">
+<alt xml-lang="fi-FI"
+id="alt_dialog3_screenshot">Dialog3 screenshot.</alt>
+</image>
+<paragraph role="heading" id="tokens1.1" xml-lang="fi-FI" level="2">
+Komentojonot
+</paragraph>
+<paragraph>
+Jos komentojonoissa tai parametreissä tarvitaan muuttujia, tulee käyttää sopivaa
+merkkijonoa. Suorituksen aikana suluissa esitetty arvo korvataan tarvittavalla
+todellisella arvolla.</paragraph>
+<list>
+<listitem>
+Nykyinen päivämäärä aluekohtaisessa esitysmuodossa (DATE)</listitem>
+<listitem>
+Nykyinen viikonpäivä aluekohtaisessa esitysmuodossa (WEEKDAY)</listitem>
+<listitem>
+Nykyinen aika aluekohtaisessa esitysmuodossa (TIME)</listitem>
+<listitem>
+Nykyinen aika muodossa joka kelpaa lisättäväksi tiedostonimeen (NOW)</listitem>
+<listitem>
+Valitun tekstin sisältävä tilapäinen tiedosto polkuineen (TMP)</listitem>
+<listitem>
+Tekijän nimi (AUTHOR)</listitem>
+<listitem>
+Asiakirjan nimi (TITLE)</listitem>
+<listitem>
+Ohjelman %PRODUCTNAME äänikirjaston polku (SOUND_GALLERY)</listitem>
+<switchinline select="sys">
+<caseinline select="WIN">
+<listitem>
+Järjestelmä-äänien lukemisessa käytettävän Windows Script:n polku
+(TTS_WSCRIPT_VBS)</listitem>
+</caseinline>
+<caseinline select="UNIX">
+<listitem>
+PNG-kuvien koodaamisessa mobiilisovelluksille käytettävän
+Python-komentojonon polku (CREATE_QR_LABEL_PY)</listitem>
+<listitem>
+Espeak-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+(ESPEAK_READ_TEXT_PY)</listitem>
+<listitem>
+Festival-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+(FESTIVAL_READ_TEXT_PY)</listitem>
+<listitem>
+Verkkoasetukset-sovelluksen suorittamiseen käytettävän Python-komentojonon
+polku
+(NETWORK_READ_TEXT_PY)</listitem>
+<listitem>
+Japanin kieli-sovelluksen suorittamiseen käytettävän Python-komentojonon
+polku
+(OPENJTALK_READ_TEXT_PY)</listitem>
+<listitem>
+Pico-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+(PICO_READ_TEXT_PY)</listitem>
+<listitem>
+Piper-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+(PIPER_READ_TEXT_PY)</listitem>
+<listitem>
+Nollaa kaikki asetukset (RESET_ALL)</listitem>
+<listitem>
+Rhvoice-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+(RHVOICE_READ_TEXT_PY)</listitem>
+<listitem>
+Speech-dispatcher -sovelluksen suorittamiseen käytettävän
+Python-komentojonon polku (SPD_READ_TEXT_PY)</listitem>
+</caseinline>
+<caseinline select="MAC">
+<listitem>
+Apple-sovelluksen suorittamiseen käytettävän
+Osascript-komentojonon polku (SAY_APPLESCRIPT)</listitem>
+</caseinline>
+<defaultinline>
+</defaultinline>
+</switchinline>
+<listitem>
+Työkansio. Käytetään myös nimiä Tiedostot, Omat tiedostot tai kotikansio (HOME)</listitem>
+<listitem>
+Sovelluksen kielikoodi: en = englanti, fi = suomi jne. (LANGUAGE_CODE)</listitem>
+<listitem>
+Sovelluksen maakoodi: US = U.S.A, FI = Suomi jne. (COUNTRY_CODE)</listitem>
+<listitem>
+Sovelluksen aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne.
+(LANGUAGE_COUNTRY_CODE)</listitem>
+<listitem>
+Valinnan kielikoodi: en = englanti, fi = suomi jne. (SELECTION_LANGUAGE_CODE)</listitem>
+<listitem>
+Valinnan maakoodi: US = U.S.A, FI = Suomi jne. (SELECTION_COUNTRY_CODE)</listitem>
+<listitem>
+Valinnan aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne.
+(SELECTION_LANGUAGE_COUNTRY_CODE)</listitem>
+<listitem>
+Valitun tekstin 99 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTSMALL)</listitem>
+<listitem>
+Valitun tekstin 249 lensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT250)</listitem>
+<listitem>
+Valitun tekstin 999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT)</listitem>
+<listitem>
+Valitun tekstin 9999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTBIG)</listitem>
+<listitem>
+Istuntoeväste (SESSION_ID)</listitem>
+<listitem>
+Kertakäyttöinen eväste (UNIQUE_ID)</listitem>
+<listitem>
+Nykyisen käyttäjän anonyymi tunniste (USER_ID)</listitem>
+</list>
+
+<paragraph xml-lang="fi-FI" role="heading" level="2">Muuta sanan ääntämistä</paragraph>
+<image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog2.png"
+id="img_dialog2_screenshot">
+<alt xml-lang="fi-FI"
+id="alt_dialog2_screenshot">Dialog2.fi-FI_lexicon.json</alt>
+</image>
+<paragraph xml-lang="fi-FI">Tätä dialogia ei käytetä joissakin tietokonejärjestelmissä.</paragraph>
+
+
+<list type="ordered" xml-lang="fi-FI">
+
+<listitem>Editorissa, valitse sana.</listitem>
+
+<listitem>Valitse <emph>Työkalut – Lisäosat – Las valinta</emph> .</listitem>
+
+<listitem>Valitse <emph>Tietoja...</emph> -painike.</listitem>
+
+<listitem>Napsauta hiiren kakkospainikkeella jakoavain-kuvaketta, joka on neljäs kuvake
+vasemmalta alaosan dialogiruudussa.</listitem>
+
+<listitem><emph>Lue ulkoisella sovelluksella</emph> -ruudussa, kirjoita sanalle
+vaihtoehtoinen kirjoitusasu.</listitem>
+
+<listitem>Valitse <emph>Käytä</emph> -painike.</listitem>
+
+</list>
+</body>
 </helpdocument>

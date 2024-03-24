@@ -3939,6 +3939,14 @@ file for `{1}` was found.""".format(
                 elif len(text) > _len_text3:
                     print(memory_warning())
                     break
+                for _skip in [
+                    "$[LOCALE]",
+                    "$[REVISION]",
+                    "\\u0024[LOCALE]",
+                    "\\u0024[REVISION]",
+                    ]:
+                    if _skip in data[_item]["g"]:
+                        continue
                 grapheme = data[_item]["g"].lower()
                 if l_text.count(grapheme) != 0 or "]" in grapheme:
                     text = text.replace(data[_item]["g"], data[_item]["p"]).replace(

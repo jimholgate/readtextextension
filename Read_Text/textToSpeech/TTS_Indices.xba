@@ -56,6 +56,7 @@
 &apos;&apos; 
 &apos;&apos;      /help/*/help.tree
 &apos;&apos;      /help/*/[$unique.id]/install.xhp
+&apos;&apos;      /help/*/[$unique.id]/install.xhp
 &apos;&apos;      /help/*/[$unique.id]/online.xhp
 &apos;&apos;      /help/*/[$unique.id]/read_clipboard.xhp
 &apos;&apos;      /help/*/[$unique.id]/read_selection.xhp

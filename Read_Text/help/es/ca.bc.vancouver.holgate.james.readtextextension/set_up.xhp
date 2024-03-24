@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+  <meta>
+    <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp"
+      indexer="include" status="PUBLISH">
+      <title id="set_up" xml-lang="es-ES">
+        Configuracion</title>
+      <filename>/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp</filename>
+    </topic>
+    <history>
+      <created date="2024-03-22T12:04:16">James Holgate</created>
+    </history>
+  </meta>
+  <body>
+    <paragraph role="heading" id="set_up1" xml-lang="es-ES" level="1">
+      Configuracion de la extensión</paragraph>
+    <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Default64.png"
+      id="img_dialog1_screenshot">
+      <alt xml-lang="es-ES"
+        id="alt_dialog1_screenshot">Standard “Read Text“ dialog box.</alt>
+    </image>
+    <paragraph role="heading" id="set_up1.1" xml-lang="es-ES" level="2">
+      Configuracion
+    </paragraph>
+    <list>
+      <listitem>Haz clic en el botón <emph>Leer la selección</emph> en la barra de menú o
+        selecciona <emph>
+          Herramientas - Complementos - Leer la selección...</emph> 
+      </listitem>
+      <listitem>
+        Choose the program or website you want the extension to use and the command string or
+        script.
+      </listitem>
+      <listitem>
+        <switchinline select="sys">
+          <caseinline select="MAC">Por defecto, la extensión utiliza <emph>/usr/bin/osascript</emph> 
+            como la aplicación externa y <emph>"(SAY_APPLESCRIPT)"</emph> en el cuadro de <emph>Opciones
+            adicionales en linea de comando</emph> . </caseinline>
+          <caseinline select="UNIX">Por defecto, la extensión utiliza <emph>/usr/bin/python</emph> 
+            como la aplicación externa y <emph>"(ESPEAK_READ_TEXT_PY)"
+            --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false "(TMP)"</emph> en el cuadro
+            de <emph>Opciones adicionales en linea de comando</emph> . </caseinline>
+          <caseinline select="WIN">Por defecto, la extensión utiliza <emph>wscript.exe</emph> como
+            la aplicación externa y <emph>(TTS_WSCRIPT_VBS)" "(TMP)"</emph> en el cuadro de <emph>Opciones
+            adicionales en linea de comando</emph> . Puedes usar la línea de comando para cambiar la
+            voz y la velocidad del habla. La velocidad de habla más rápida es <emph>
+              10</emph> y la más lenta es <emph>-10</emph> .</caseinline>
+          <defaultinline>Por defecto, la extensión utiliza <emph>/usr/bin/python</emph> como la
+            aplicación externa y <emph>"(ESPEAK_READ_TEXT_PY)"
+            --language=(SELECTION_LANGUAGE_COUNTRY_CODE) --visible=false "(TMP)"</emph> en el cuadro
+            de <emph>Opciones adicionales en linea de comando</emph> . </defaultinline>
+        </switchinline>
+      </listitem>
+      <listitem>Puedes probar los ajustes sin guardarlos <switchinline select="sys">
+          <caseinline select="MAC">manteniendo presionada la tecla Control y haciendo clic en </caseinline>
+          <defaultinline>en haciendo clic derecho en
+          </defaultinline>
+        </switchinline>
+<emph>OK</emph> . </listitem>
+      <listitem>Cuando estés satisfecho con los ajustes, desmarca el botón <emph>
+          Mostrar siempre este cuadro de dialogo al ejecutar</emph> . </listitem>
+      <listitem>Haz clic en el botón <emph>OK</emph> . </listitem>
+    </list>
+    <paragraph role="heading" id="customize" xml-lang="es-ES" level="2">Personaliza o experimenta
+    </paragraph>
+    <list>
+      <listitem>Puedes probar la configuración como quieras.
+      </listitem>
+      <listitem>Para volver a los ajustes predeterminados, elige una opción que incluya la cadena <emph>
+        (RESET_ALL)</emph> 
+      </listitem>
+    </list>
+  </body>
+</helpdocument>

@@ -1,30 +1,30 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
-    <meta>
-        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp"
-            indexer="include" status="PUBLISH">
-            <title id="online" xml-lang="fr-CA">
-                Informations en ligne</title>
-            <filename>/ca.bc.vancouver.holgate.james.readtextextension/online.xhp</filename>
-        </topic>
-        <history>
-            <created date="2010-10-22T00:00:00">
-                James Holgate</created>
-            <lastedited date="2015-03-13T00:00:35">
-                Changed Default External UNIX App to python</lastedited>
-        </history>
-    </meta>
-    <body>
-        <paragraph role="heading" id="online1" xml-lang="fr-CA" level="1">
-            L'extension Read text en ligne</paragraph>
-        <paragraph role="heading" id="online1.1" xml-lang="fr-CA" level="2">
-            Informations en ligne
-        </paragraph>
-        <paragraph> Pour plus d'informations sur l'extension, visitez <link
-                href="https://sites.google.com/site/readtextextension/"
-                name="https://sites.google.com/site/readtextextension/">
-            http://sites.google.com/site/readtextextension/
-            </link>
-        </paragraph>
-    </body>
+<meta>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp"
+indexer="include" status="PUBLISH">
+<title id="online" xml-lang="fr-CA">
+Informations en ligne</title>
+<filename>/ca.bc.vancouver.holgate.james.readtextextension/online.xhp</filename>
+</topic>
+<history>
+<created date="2010-10-22T00:00:00">
+James Holgate</created>
+<lastedited date="2015-03-13T00:00:35">
+Changed Default External UNIX App to python</lastedited>
+</history>
+</meta>
+<body>
+<paragraph role="heading" id="online1" xml-lang="fr-CA" level="1">
+L'extension Read text en ligne</paragraph>
+<paragraph role="heading" id="online1.1" xml-lang="fr-CA" level="2">
+Informations en ligne
+</paragraph>
+<paragraph>Pour plus d'informations sur l'extension, visitez <link
+href="https://sites.google.com/site/readtextextension/"
+name="https://sites.google.com/site/readtextextension/">
+http://sites.google.com/site/readtextextension/
+</link>
+</paragraph>
+</body>
 </helpdocument>

@@ -39,6 +39,7 @@ global s_CaReadTextExtensionLocalHostSpeechURI As String
 global i_CaReadTextExtensionPiperTestResult As Integer
 global s_CaReadTextExtensionCurrentSessionCookie As String
 global s_CaReadTextExtensionCurrentAnonymousKey As String
+global f_CaReadTextExtensionCurrentConfig As Variant
 
 Sub ClearWorkingCountryLanguage()
 	s_CaReadTextExtensionWorkingCountryLanguage = &quot;&quot;
@@ -188,7 +189,7 @@ End Sub
 
 
 Sub SaveJsonPhonemeTable(Event)
-	&apos; Dialog2 _save_as
+	&apos; Dialog2 _lexicon editor Save As...
 	&apos; See also : ImportJsonPhonemeTable()
 	Dim _mouse_event As Integer : _mouse_event = fiMyMouseEventToInt(Event)
 	Dim MouseAlt As Integer : MouseAlt = 2
@@ -699,6 +700,9 @@ End Function
 
 
 Function EditJsonPhonemeTable() As String
+	&apos; Dialog2 - lexicon editor .helpURL
+	&apos; Dialog1 (f_dlgSpeechSetup) - We gather preliminary data about
+	&apos; the tokens that the first dialog displays.
 	&apos; This Json editor adds new grapheme / phoneme pairs to json file
 	&apos; so individuals can edit the pronunciation of names and things that
 	&apos; are important to them -like employees and students.
@@ -714,34 +718,40 @@ Function EditJsonPhonemeTable() As String
 	Dim x As Integer
 	Dim _json_display As String
 	_json_display = &quot;&quot;
-	Dim _po_dir As String
+	Dim _po_dir As String : _po_dir = &quot;&quot;
 	Dim CR As String
 	CR = Chr(13)
 	Dim is_unique As Boolean
 	Dim _display_phoneme As String
-	Dim posix_py As String
+	Dim token_text As String
 	Dim _info As Variant
+	
+	With f_dlgSpeechSetup
+		If .GetControl(&quot;ComboBox1&quot;).model.enabled Then
+			token_text = .GetControl(&quot;ComboBox1&quot;).Model.Text &amp; CR
+		Else
+			token_text = .GetControl(&quot;ComboBox2&quot;).Model.Text &amp; CR
+		End If
+	End With
 	Select Case fsGetOS()
 		Case &quot;MacOS&quot;
 		_po_dir = MacOSSpeechAppInfo().json_dir
 		Case &quot;WINDOWS&quot;
 		_po_dir = WindowsSpeechAppInfo().json_dir
 		Case Else
-		With f_dlgSpeechSetup
-			posix_py = .GetControl(&quot;ComboBox2&quot;).Model.Text
-		End With
-		If InStr(posix_py, PosixSvoxPicoSpeechAppInfo().token) &lt;&gt; 0 Then
-			_po_dir = PosixSvoxPicoSpeechAppInfo().json_dir
-		ElseIf InStr(posix_py, PosixFestivalSpeechAppInfo().token) &lt;&gt; 0 Then
-			_po_dir = PosixFestivalSpeechAppInfo().json_dir
-		ElseIf InStr(posix_py, PosixRhvoiceSpeechAppInfo().token) &lt;&gt; 0 Then
-			_po_dir = PosixRhvoiceSpeechAppInfo().json_dir
-		ElseIf InStr(posix_py, PosixPiperTtsSpeechAppInfo().token) &lt;&gt; 0 Then
-			_po_dir = PosixPiperTtsSpeechAppInfo().json_dir
-		Else
-			_po_dir = &quot;default&quot;
-		End If
+		_po_dir = &quot;default&quot;
 	End Select
+
+	If InStr(token_text, PosixSvoxPicoSpeechAppInfo().token) &lt;&gt; 0 Then
+		_po_dir = PosixSvoxPicoSpeechAppInfo().json_dir
+	ElseIf InStr(token_text, PosixFestivalSpeechAppInfo().token) &lt;&gt; 0 Then
+		_po_dir = PosixFestivalSpeechAppInfo().json_dir
+	ElseIf InStr(token_text, PosixRhvoiceSpeechAppInfo().token) &lt;&gt; 0 Then
+		_po_dir = PosixRhvoiceSpeechAppInfo().json_dir
+	ElseIf InStr(token_text, PosixPiperTtsSpeechAppInfo().token) &lt;&gt; 0 Then
+		_po_dir = PosixPiperTtsSpeechAppInfo().json_dir
+	End If
+
 	_info = SpeechHostInfoList()
 	For x = Lbound(_info) To Ubound(_info)
 		If fbLocalHostOk(_info(x).url &amp; _info(x).url_info, _info(x).key) Then
@@ -795,6 +805,14 @@ Function EditJsonPhonemeTable() As String
 	End If
 	f_dlgJsonEdit = CreateUnoDialog(DialogLibraries.textToSpeech.Dialog2)
 	With f_dlgJsonEdit
+		If fbHelpIsInstalled() Then
+			&apos; Can&apos;t load &quot;/lexicons.xhp&quot;
+			&apos; Can load &quot;/set_up.xhp&quot;
+			&apos; Can&apos;t load &quot;/tokens.xhp&quot;
+			f_dlgJsonEdit.model.HelpURL = fsAppSignature() &amp; &quot;/set_up.xhp&quot;
+		Else
+			f_dlgJsonEdit.model.HelpURL = &quot;&quot;
+		End If
 		.model.Title = fsLookUpTerm2(_
 		&quot;s_read-text&quot;, _lang)  &amp; &quot; - &quot; &amp; _po_dir &amp; &quot; - &quot; &amp; fsLookUpTerm2(_
 		&quot;s_speech-properties&quot;, _lang)
@@ -953,6 +971,7 @@ End Sub
 
 
 Sub ResetPhonemesGit()
+	&apos; Dialog2 Phoneme Editor Update local lexicon
 	&apos; The online repository of json lexicon tables defaults
 	&apos; to github.com. You can set it to a customized URL by setting
 	&apos; the `READTEXT_ONLINE_LEXICON_URL` environment variable
@@ -1020,7 +1039,7 @@ Sub ConfigureReadTextAloud()
 	End Select
 	b_CaReadTextExtensionHideExports = bHideExports
 	With f_dlgSpeechSetup
-		If fbHelpIsInstalled Then
+		If fbHelpIsInstalled() Then
 			.model.HelpURL = fsAppSignature &amp; &quot;/set_up.xhp&quot;
 		Else
 			.model.HelpURL = &quot;&quot;
@@ -1353,6 +1372,8 @@ Sub AboutAddOn( _
 		&quot; &quot; &amp; fsExtensionVersion() &amp; title_special
 		If fbHelpIsInstalled() Then
 			.model.HelpURL = fsAppSignature() &amp; &quot;/tokens.xhp&quot;
+		Else
+			.model.HelpURL = &quot;&quot;
 		End If
 		.GetControl(&quot;TextField1&quot;).model.Text = fsAbout()
 		.GetControl(&quot;CommandButton1&quot;).model.Label = fsLookUpTerm2(&quot;s_ok&quot;, s1)
