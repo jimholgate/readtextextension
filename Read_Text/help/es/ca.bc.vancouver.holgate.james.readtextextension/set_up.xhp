@@ -28,8 +28,7 @@
           Herramientas - Complementos - Leer la selección...</emph> 
       </listitem>
       <listitem>
-        Choose the program or website you want the extension to use and the command string or
-        script.
+        Elija el programa y la cadena de comando a utilizar .
       </listitem>
       <listitem>
         <switchinline select="sys">
