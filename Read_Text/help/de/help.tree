@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tree_view version="21-March-2024">
-  <help_section application="readtextextension" id="readtextextension01" title="Read Text Extension">
-    <node id="readtextextension0101" title="Installieren der Read Text Extension">
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Installieren</topic>
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">Setup</topic>
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">Befehls- und Script-Tokens</topic>
-    </node>
-    <node id="readtextextension0102" title="So verwenden Sie die Read Text Extension">
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Markierten Text vorlesen</topic>
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp">Zwischenablage vorlesen</topic>
-    </node>
-    <node id="readtextextension0103" title="Read Text Extension Online-Info">
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp">Online-Info</topic>
-    </node>
-  </help_section>
+<help_section application="readtextextension" id="readtextextension01" title="Read Text Extension">
+<node id="readtextextension0101" title="Installieren der Read Text Extension">
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Installieren</topic>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">Setup</topic>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">Erweiterte Funktionen</topic>
+</node>
+<node id="readtextextension0102" title="So verwenden Sie die Read Text Extension">
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Markierten Text vorlesen</topic>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp">Zwischenablage vorlesen</topic>
+</node>
+<node id="readtextextension0103" title="Read Text Extension Online-Info">
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp">Online-Info</topic>
+</node>
+</help_section>
 </tree_view>

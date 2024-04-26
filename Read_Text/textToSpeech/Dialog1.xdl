@@ -18,7 +18,7 @@
   <dlg:button dlg:id="CommandButton2" dlg:tab-index="4" dlg:left="182" dlg:top="198" dlg:width="38" dlg:height="16" dlg:value="CommandButton2" dlg:button-type="cancel">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.Cancel_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="13" dlg:left="10" dlg:top="5" dlg:width="250" dlg:height="155">
+  <dlg:titledbox dlg:id="FrameControl1" dlg:tab-index="17" dlg:left="10" dlg:top="5" dlg:width="250" dlg:height="155">
    <dlg:title dlg:value="FrameControl1"/>
   </dlg:titledbox>
   <dlg:filecontrol dlg:id="FileControl2" dlg:tab-index="8" dlg:disabled="true" dlg:left="16" dlg:top="84" dlg:width="240" dlg:height="14" dlg:value="_file_control2">
@@ -50,19 +50,19 @@
   <dlg:text dlg:id="Label1" dlg:tab-index="11" dlg:left="16" dlg:top="44" dlg:width="240" dlg:height="9" dlg:value="Label1" dlg:multiline="true">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.Label1_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:text>
-  <dlg:text dlg:id="Label2" dlg:tab-index="14" dlg:disabled="true" dlg:left="16" dlg:top="100" dlg:width="240" dlg:height="8" dlg:value="Label2" dlg:multiline="true">
+  <dlg:text dlg:id="Label2" dlg:tab-index="13" dlg:disabled="true" dlg:left="16" dlg:top="100" dlg:width="240" dlg:height="8" dlg:value="Label2" dlg:multiline="true">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.Label2_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:text>
   <dlg:button dlg:id="CommandButton3" dlg:tab-index="5" dlg:left="116" dlg:top="198" dlg:width="50" dlg:height="16" dlg:value="CommandButton3" dlg:grab-focus="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.About_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="15" dlg:left="10" dlg:top="164" dlg:width="250" dlg:height="28">
+  <dlg:titledbox dlg:id="FrameControl2" dlg:tab-index="14" dlg:left="10" dlg:top="164" dlg:width="250" dlg:height="28">
    <dlg:title dlg:value="FrameControl2"/>
   </dlg:titledbox>
-  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="16" dlg:left="13" dlg:top="175" dlg:width="200" dlg:height="10" dlg:value="CheckBox1" dlg:checked="false">
+  <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="15" dlg:left="13" dlg:top="175" dlg:width="200" dlg:height="10" dlg:value="CheckBox1" dlg:checked="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.UseAlwaysShow_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:checkbox>
-  <dlg:combobox dlg:id="ComboBox3" dlg:tab-index="17" dlg:left="221" dlg:top="174" dlg:width="36" dlg:height="14" dlg:tag="Display language" dlg:tabstop="false" dlg:value="_combobox3" dlg:hide-inactive-selection="false" dlg:spin="true">
+  <dlg:combobox dlg:id="ComboBox3" dlg:tab-index="16" dlg:left="221" dlg:top="174" dlg:width="36" dlg:height="14" dlg:tag="Display language" dlg:tabstop="false" dlg:value="_combobox3" dlg:hide-inactive-selection="false" dlg:spin="true">
    <dlg:menupopup>
     <dlg:menuitem dlg:value="af"/>
     <dlg:menuitem dlg:value="ar"/>

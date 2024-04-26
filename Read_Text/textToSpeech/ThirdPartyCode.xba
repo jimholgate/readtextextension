@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ThirdPartyCode" script:language="StarBasic">REM *  *  *  *  * BASIC *  *  *  *  * 
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="ThirdPartyCode" script:language="StarBasic">REM *  *  *  *  * BASIC *  *  *  *  *
+&apos; ThirdPartyCode
 Option Explicit
 &apos;&apos; # Third Party Code
 &apos;&apos;
@@ -71,7 +72,7 @@ End Function
 
 Function fsMacPythonVersion()
 	fsMacPythonVersion = &quot;&quot;
-	If fsGetOS() &lt;&gt; &quot;MacOS&quot; Then
+	If fsGetOs() &lt;&gt; &quot;MACOS&quot; Then
 		Exit Function
 	End If
 	Dim home$ : home = &quot;/Applications/LibreOffice.app/Contents/Frameworks/LibreOfficePython.framework/Versions&quot;
@@ -92,6 +93,24 @@ Function fsLinux64PythonLib() As String
 			 Exit Function
 		End If
 	Next
+End Function
+
+
+Function fbCheckPythonJson(_cmd) As Boolean
+	&apos; For some local users, the system python3 is unavailable or incomplete.
+	&apos; &lt;https://github.com/urllib3/urllib3/issues/3020#issuecomment-1539843879&gt;
+	&apos; Try importing a library and see if there is an error.
+	fbCheckPythonJson = False
+	If Len(_cmd) = 0 Then
+		_cmd = &quot;import json&quot;
+	End If
+	On Error GoTo fbCheckPythonJsonErr
+	If Shell(&quot;python3&quot;, 0, &quot;-c &quot;&quot;&quot; &amp; _cmd &amp; &quot;&quot;&quot;&quot;) = 0 Then
+		fbCheckPython3Ok = True
+	End If
+	Exit Function
+	fbCheckPythonJsonErr:
+	fbCheckPythonJson = False
 End Function
 
 
@@ -122,8 +141,8 @@ Function PosixPythonPath() As String
 	&apos; built-in libraries included with LibreOffice
 	&apos; python. (i.e. : `(SPD_READ_TEXT_PY)` works)
 	&apos;
-	&apos; Linux LibreOffice installations use the system
-	&apos; version of python3, and pip3 just works
+	&apos; Linux LibreOffice installations that use the system
+	&apos; version of python3 and pip3 just work.
 	Dim a0 As Variant
 	Dim a1 As Variant
 	Dim x# : x = 0
@@ -153,8 +172,12 @@ Function PosixPythonPath() As String
 			Exit Function
 		End If
 	End If
-	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
+	If fsTheOsId() = &quot;POSIX.APPIMAGE&quot; Then
 		PosixPythonPath = fsAppImageResourcePath(&quot;python&quot;)
+		If Len(Config(pi_external_path_string)) = 0 Then
+			Config(pi_external_path_string) = PosixPythonPath	
+		End If
+		Exit Function
 	Else
 		Select Case Len(py_ver)
 			Case 0
@@ -225,16 +248,17 @@ Function fbPiperTtsOk(_command) As Boolean
 	End If
 	&apos; If you don&apos;t have VLC on Windows systems, then piper needs to write a file
 	&apos; instead of streaming. This has the potential for causing a long delay if
-	&apos; you select a long string of text to read aloud. Only show the option if 
+	&apos; you select a long string of text to read aloud. Only show the option if
 	&apos; someone enables &quot;Enable Experimental Features (May be unstable)&quot; in the
 	&apos; Tools - Options - Advanced menu
 	If Not fbExperimentalMode() Then
-		If fsGetOS() = &quot;WINDOWS&quot; Then
+		Select Case fsTheOsId()
+			Case &quot;WINDOWS&quot;, &quot;WINDOWS.WINE&quot;, &quot;WINDOWS.NOSCRIPT&quot;
 			If Not fbHaveVLC() Then
-					i_CaReadTextExtensionPiperTestResult = 2
-					Exit Function	
+				i_CaReadTextExtensionPiperTestResult = 2
+				Exit Function
 			End If
-		End If
+			End Select
 	End If
 	
 	If Shell(sPiperPath, 0, _command) = 0 Then
@@ -340,7 +364,8 @@ Function fbUpdateLexiconFile(_
 	If Len(_app) = 0 Then
 		Exit Function
 	End If
-	If fsGetOS() = &quot;WINDOWS&quot; Then
+	Select Case getGUIType()
+		Case 1  &apos; WINDOWS
 		_command = Join(Array(_
 		&quot;&quot;&quot;&quot;, ConvertFromUrl(_app), &quot;&quot;&quot; &quot;&quot;&quot;, ConvertFromUrl(fsMyURL() &amp;_
 		&quot;/python/find_replace_phonemes.py&quot;), &quot;&quot;&quot; --language &quot;, _language,_
@@ -350,13 +375,13 @@ Function fbUpdateLexiconFile(_
 		Else
 			fbUpdateLexiconFile = False
 		End If
-	Else
+		Case Else
 		_command = Join(Array(_
 		&quot;&quot;&quot;&quot;, ConvertFromUrl(fsMyURL() &amp; &quot;/python/find_replace_phonemes.py&quot;),_
 		&quot;&quot;&quot; --language &quot;, _language, &quot; --model &quot;, _model, &quot; &quot;&quot;&quot;,_
 		ConvertFromUrl(_json_file_in), &quot;&quot;&quot;&quot;), &quot;&quot;)
 		fbUpdateLexiconFile = Shell(_app, 0, _command) = 0
-	End If
+	End Select
 	Exit Function
 	fbUpdateLexiconFileErr:
 	fbUpdateLexiconFile = False
@@ -372,153 +397,160 @@ Function fvTts_config_createDefaultConfig( _
 		fvTts_config_createDefaultConfig() = f_CaReadTextExtensionCurrentConfig
 		Exit Function
 	End If
-	Dim config(fiCountConfigOptions) As Variant
-	config(fiAnonymousInstallKey()) = fsGetFirstKey(config)
+	Dim Config(fiUboundConfigOptions) As Variant
+	Config(pi_anonymous_key_string) = fsGetFirstKey(Config)
 	Dim bPiperOk As Boolean : bPiperOk = fbPiperTtsOk(&quot;&quot;)
 	Dim bUsingWine As Boolean : bUsingWine = False
 	&apos; Create default values for variables
-	&apos; fbUsingWine
 
 	Dim pyFallBack As String : pyFallBack = &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
-	If GetGUIType() = 1 Then
-		&apos; Windows
+	Select Case getGUIType()
+		Case 1  &apos; Windows
 		bUsingWine = fbUsingWine(False)
 		If not bUsingWine Then
 			player7 = &quot; --player 7&quot;
 		End If
 		If bPiperOk Then
-			config(fiExperimentalOption()) = False
-			config(fiExperimentalProgramPath()) = ConvertFromURL(BundlePyPath())
-			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; player7 &amp; &quot; --voice &quot; &amp; _
+			Config(pi_use_experimental_boolean) = False
+			Config(pi_experimental_path_string) = ConvertFromURL(BundlePyPath())
+			Config(pi_experimental_options_string) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; player7 &amp; &quot; --voice &quot; &amp; _
 			PiperLocalSuggestion(&quot;&quot;, False) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		Else
-			config(fiExperimentalOption()) = False
+			Config(pi_use_experimental_boolean) = False
 			If FileExists(fsProgramDirectoryx86() &amp; &quot;festival&quot;) Then
-				config(fiExperimentalProgramPath()) = fsProgramDirectoryx86() &amp; &quot;festival\festival.exe&quot;
+				Config(pi_experimental_path_string) = fsProgramDirectoryx86() &amp; &quot;festival\festival.exe&quot;
 			Else
-	 			config(fiExperimentalProgramPath()) = fsProgramDirectory() &amp; &quot;festival\festival.exe&quot;
+	 			Config(pi_experimental_path_string) = fsProgramDirectory() &amp; &quot;festival\festival.exe&quot;
 			End If
-			config(fiExperimentalCommand()) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;		
+			Config(pi_experimental_options_string) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;		
 		End If
-		config(fiExternalOption()) = True
-		config(fiHtmlOption()) = False
-		config(fiSmartSelectCheckBox()) = 0
-		config(fiHtmlComboURL()) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+		Config(pi_use_external_boolean) = True
+		Config(pi_use_html_boolean) = False
+		Config(pi_use_smart_select_integer) = 0
+		Config(pi_html_string) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
 		If bUsingWine Then
 			&apos; Don&apos;t attempt SAPI speech by default using Wine for Posix.
-			config(fiExternalProgramPath()) = ConvertFromURL(BundlePyPath())
-			config(fiExperimentalProgramPath()) = config(fiExternalProgramPath())
-			config(fiExperimentalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			Config(pi_external_path_string) = ConvertFromURL(BundlePyPath())
+			Config(pi_experimental_path_string) = Config(pi_external_path_string)
+			Config(pi_experimental_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			If bPiperOk Then
-				config(fiExternalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; player7 &amp; &quot; --voice &quot; &amp; _
+				Config(pi_external_options_string) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; player7 &amp; &quot; --voice &quot; &amp; _
 				PiperLocalSuggestion(&quot;&quot;, False) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			Else
-				config(fiExternalCommand()) = config(fiExperimentalCommand())
-				config(fiExperimentalCommand()) = pyFallBack
+				Config(pi_external_options_string) = Config(pi_experimental_options_string)
+				Config(pi_experimental_options_string) = pyFallBack
 			End If
 		Else
 			If Len(WinSpeechProgramPath()) = 0 Then
-				config(fiExternalProgramPath()) = &quot;wscript.exe&quot;
+				Config(pi_external_path_string) = &quot;wscript.exe&quot;
 			Else
-				config(fiExternalProgramPath()) = WinSpeechProgramPath()
+				Config(pi_external_path_string) = WinSpeechProgramPath()
 			End If
-			config(fiExternalCommand()) = WinSpeechArgument()		
+			Config(pi_external_options_string) = WinSpeechArgument()		
 		End If
-		config(fiAlwaysShowDialogCheckBox()) = 1
-		config(fiDialogLanguageCombo()) = fsGetLanguage()
-	Else
+		Config(pi_display_info_integer) = 0
+		Config(pi_display_language_string) = fsGetLanguage()
+		Case Else
 		&apos; Posix or MacOS
 		If bPiperOk Then
-			config(fiExperimentalOption()) = False
-			config(fiExperimentalProgramPath()) = PosixPythonPath()
-			config(fiExperimentalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --player 7 --voice &quot; &amp; _
+			Config(pi_use_experimental_boolean) = False
+			Config(pi_experimental_path_string) = PosixPythonPath()
+			Config(pi_experimental_options_string) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --player 7 --voice &quot; &amp; _
 			PiperLocalSuggestion(&quot;&quot;, False) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-		ElseIf fsGetOS() = &quot;MacOS&quot; Then
-			config(fiExperimentalOption()) = False
-			config(fiExperimentalProgramPath()) = PosixPythonPath()
-			config(fiExperimentalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+		ElseIf fsGetOS() = &quot;MACOS&quot; Then
+			Config(pi_use_experimental_boolean) = False
+			Config(pi_experimental_path_string) = PosixPythonPath()
+			Config(pi_experimental_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		Else  &apos; Posix
 			If FileExists(&quot;/usr/bin/festival&quot;) Then
-				config(fiExperimentalOption()) = False
-				config(fiExperimentalProgramPath()) = &quot;/usr/bin/festival&quot;
-				config(fiExperimentalCommand()) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
+				Config(pi_use_experimental_boolean) = False
+				Config(pi_experimental_path_string) = &quot;/usr/bin/festival&quot;
+				Config(pi_experimental_options_string) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
 			ElseIf fbIsLibreOffice() Then
-				config(fiExperimentalOption()) = False
-				config(fiExperimentalProgramPath()) = PosixPythonPath()
-				config(fiExperimentalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				Config(pi_use_experimental_boolean) = False
+				Config(pi_experimental_path_string) = PosixPythonPath()
+				Config(pi_experimental_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			Else
-				config(fiExperimentalOption()) = False
-				config(fiExperimentalProgramPath()) = PosixPythonPath()
-				config(fiExperimentalCommand()) = pyFallBack
+				Config(pi_use_experimental_boolean) = False
+				Config(pi_experimental_path_string) = PosixPythonPath()
+				Config(pi_experimental_options_string) = pyFallBack
 			End If
 		End If
-		config(fiExternalOption()) = True
-		config(fiHtmlOption()) = False
-		config(fiSmartSelectCheckBox()) = 0
+		Config(pi_use_external_boolean) = True
+		Config(pi_use_html_boolean) = False
+		Config(pi_use_smart_select_integer) = 0
 		If Len(fsLocalHostSpeech()) = 0 Then
-			config(fiHtmlComboURL()) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+			Config(pi_html_string) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
 		Else
-			config(fiHtmlComboURL()) = fsLocalHostSpeech()
+			Config(pi_html_string) = fsLocalHostSpeech()
 		End If
-		If fsGetOS() = &quot;UNIX&quot; Then
+		If fsGetOS() = &quot;POSIX&quot; Then
 			&apos; Linux
 			If Len(PosixPythonPath()) &lt;&gt; 0 Then
-				config(fiExternalProgramPath()) = PosixPythonPath()
+				Config(pi_external_path_string) = PosixPythonPath()
 			Else
-				config(fiExternalProgramPath()) = &quot;/usr/bin/python&quot;
+				Config(pi_external_path_string) = &quot;/usr/bin/python&quot;
 			End If
-			If isSnap() or isFlatPak() Then
-				config(fiExternalCommand()) = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+			If fsTheOsId() = &quot;POSIX.SNAP&quot; Then
+				Config(pi_external_options_string) = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;FEMALE1&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf fbIsSandboxed() Then
-				config(fiExternalCommand()) = &quot;-m webbrowser -t &quot; &amp; _
+				Config(pi_external_options_string) = &quot;-m webbrowser -t &quot; &amp; _
 				&quot;&quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
 			ElseIf Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0 Then
-				config(fiExternalCommand()) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+				Config(pi_external_options_string) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or Len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
-				config(fiExternalCommand()) = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+				Config(pi_external_options_string) = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 And fsGetLanguage() = &quot;ja&quot; Then
 				&apos; Japanese
-				config(fiExternalCommand()) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+				Config(pi_external_options_string) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf bPiperOk Then
-				config(fiExternalCommand()) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				Config(pi_external_options_string) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --rate 100% --voice AUTO0#0 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf fbHaveEspeak() Then
-				config(fiExternalCommand()) = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+				Config(pi_external_options_string) = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf fbIsLibreOffice() Then
-				config(fiExternalCommand()) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				Config(pi_external_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			Else
-				config(fiExternalCommand()) = pyFallBack
+				Config(pi_external_options_string) = pyFallBack
 			End If
-		Else
+		Elseif fbIsLibreOffice() Then
 			&apos;Mac (MacOS)
 			If fbOsaScriptOk(&quot;&quot;) And fbHaveItunes() Then
-				config(fiExternalProgramPath()) = AppleScriptPath()
-				config(fiExternalCommand()) = &quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
+				Config(pi_external_path_string) = AppleScriptPath()
+				Config(pi_external_options_string) = &quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
 			ElseIf fbHaveNetworkTTS() Then
-				config(fiExternalProgramPath()) = PosixPythonPath()
-				config(fiExternalCommand()) =  &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				Config(pi_external_path_string) = PosixPythonPath()
+				Config(pi_external_options_string) =  &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; --voice &quot;&quot;AUTO&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			Else
-				config(fiExternalProgramPath()) = PosixPythonPath()
-				config(fiExternalCommand()) =  &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+				Config(pi_external_path_string) = PosixPythonPath()
+				Config(pi_external_options_string) =  &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			End If
+		Else
+			If fbOsaScriptOk(&quot;&quot;) And fbHaveItunes() Then
+				Config(pi_external_path_string) = AppleScriptPath()
+				Config(pi_external_options_string) = &quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
+			Else
+				Config(pi_external_path_string) = PosixPythonPath()
+				Config(pi_external_options_string) = pyFallBack
+			End If		
 		End If
-		config(fiAlwaysShowDialogCheckBox()) = 1
-		config(fiDialogLanguageCombo()) = fsGetLanguage()
-	End If
-	fvTts_config_createDefaultConfig() = config()
+		Config(pi_display_info_integer) = 1
+		Config(pi_display_language_string) = fsGetLanguage()
+	End Select
+	fvTts_config_createDefaultConfig() = Config()
 End Function
 
 
@@ -565,7 +597,7 @@ End Sub
 
 
 Sub tts_config_writeFile( _
-	config() As Variant,ByVal configFilePath As String)
+	Config() As Variant,ByVal configFilePath As String)
 	&apos; Writes a configuration file from an array.
 	&apos; This function updated 2013-08-29 - always write as UTF-8
 	Dim sA As String
@@ -581,82 +613,98 @@ Sub tts_config_writeFile( _
 		End If
 	End If
 	If Len(ExternalCommand) = 0 Then
-		ExternalCommand = config(fiExternalCommand())
+		ExternalCommand = Config(pi_external_options_string)
 		PyVersion = Array(&quot;4&quot;, &quot;3&quot;, &quot;2.7&quot;, &quot;2&quot;, &quot;&quot;)
-		If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
+		If fsTheOsId() = &quot;POSIX.APPIMAGE&quot; Then
 			&apos; Do not record a temporary Posix python application path.
-			If InStr(ExternalCommand, &quot;/python&quot;) &lt;&gt; 0 Then
-				For x = Lbound(PyVersion) To Ubound(PyVersion)
-					If Len(fsFindAppPath(&quot;python&quot; &amp; PyVersion(x))) &lt;&gt; 0 Then
-						ExternalCommand = fsFindAppPath(&quot;python&quot; &amp; PyVersion(x))
-						Exit For
-					End If
-				Next
-			End If
+			ExternalCommand = fsAppImageResourcePath(&quot;python&quot;)
 		End If
 	End If
-	If InStr(config(fiExternalProgramPath()), &quot;python&quot;) &lt;&gt; 0 Then
+	If InStr(Config(pi_external_path_string), &quot;python&quot;) &lt;&gt; 0 Then
 		&apos; After updating `~/.local/share/piper-tts/piper-tts/voices.json`, then
 		&apos; store the active command without the update flag.
-		ExternalCommand = fsReplaceText(ExternalCommand, &quot; --update True&quot;, &quot;&quot;) 
+		Select Case Instr(ExternalCommand, &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;)
+			Case 0
+			ExternalCommand = fsReplaceText(ExternalCommand, &quot; --update True&quot;, _
+			&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;)
+			Case Else
+			ExternalCommand = fsReplaceText(ExternalCommand, &quot; --update True&quot;, _
+			&quot;&quot;)
+		End Select
 	End If
-	If Len(config(fiAnonymousInstallKey())) = 0 Then
+	If Len(Config(pi_anonymous_key_string)) = 0 Then
 	&apos; Update `text-to-speech.anonymous.key.string` on computers when you update
 	&apos; the extension version.
 	&apos;
 	&apos; An organization&apos;s networked services can use this key to verify
 	&apos; permission to connect without using your personal information.
 	&apos; Resetting the extension&apos;s settings deletes the local key permanently.
-		config(fiAnonymousInstallKey()) = fsGetFirstKey(config)
+		Config(pi_anonymous_key_string) = fsGetFirstKey(Config)
+	End If
+	If Len(Config(pi_display_language_string)) = 0 Then
+		Config(pi_display_language_string) = fsGetLanguage()
 	End If
 	CR = Chr(10)
 	sA = Join(Array(_
-	&quot;text-to-speech.use.experimental.boolean=&quot;, fsTts_util_booleanToString(config(fiExperimentalOption())), CR, _
-	&quot;text-to-speech.experimental.path.string=&quot;, config(fiExperimentalProgramPath()), CR, _
-	&quot;text-to-speech.experimental.script.string=&quot;, config(fiExperimentalCommand()), CR, _
-	&quot;text-to-speech.use.espeak.boolean=&quot;, fsTts_util_booleanToString(config(fiExternalOption())), CR, _
-	&quot;text-to-speech.use.html.boolean=&quot;, fsTts_util_booleanToString(config(fiHtmlOption())), CR, _
-	&quot;text-to-speech.html.string=&quot;, config(fiHtmlComboURL()), CR, _
-	&quot;text-to-speech.anonymous.key.string=&quot;, config(fiAnonymousInstallKey()), CR, _
-	&quot;text-to-speech.espeak.path.string=&quot;, config(fiExternalProgramPath()), CR, _
-	&quot;text-to-speech.espeak.options.string=&quot;, ExternalCommand, CR, _
-	&quot;text-to-speech.display.info.integer=&quot;, config(fiAlwaysShowDialogCheckBox()), CR, _
-	&quot;text-to-speech.use.smart.select.integer=&quot;, config(fiSmartSelectCheckBox()), CR, _
-	&quot;text-to-speech.display.language.string=&quot;, config(fiDialogLanguageCombo()), CR), &quot;&quot;)
-	CreateFile(configFilePath, sA, &quot;UTF-8&quot;)
+	&quot;dialog1.anonymous.key.string=&quot;, Config(pi_anonymous_key_string), CR, _
+	&quot;dialog1.display.info.integer=&quot;, Config(pi_display_info_integer), CR, _
+	&quot;dialog1.external.options.string=&quot;,Config(pi_external_options_string), CR, _
+	&quot;dialog1.use.external.boolean=&quot;, fsTts_util_booleanToString(Config(pi_use_external_boolean)), CR, _
+	&quot;dialog1.use.html.boolean=&quot;, fsTts_util_booleanToString(Config(pi_use_html_boolean)), CR, _
+	&quot;dialog1.html.string=&quot;, Config(pi_html_string), CR, _
+	&quot;dialog1.use.experimental.boolean=&quot;, fsTts_util_booleanToString(Config(pi_use_experimental_boolean)), CR, _
+	&quot;dialog1.experimental.options.string=&quot;, Config(pi_experimental_options_string), CR, _
+	&quot;dialog1.external.path.string=&quot;, Config(pi_external_path_string), CR, _
+	&quot;dialog1.experimental.path.string=&quot;, Config(pi_experimental_path_string), CR, _
+	&quot;dialog1.use.smart.select.integer=&quot;, Config(pi_use_smart_select_integer), CR, _
+	&quot;dialog1.display.language.string=&quot;, Config(pi_display_language_string), CR), &quot;&quot;)
+	CreateFile(configFilePath, sA, &quot;&quot;)
 End Sub
 
 
 Sub tts_config_parseFile( _
 	ByVal configFilePath As String, _
-	config() As Variant, _
+	Config() As Variant, _
 	errorCode As Integer)
 	&apos; Parses the configuration file into an array.
 	&apos;
 	&apos; Parameters:
 	&apos; configFilePath (in) The path to the configuration file
-	&apos; config() (in out) The configuration settings to update with settings
+	&apos; Config() (in out) The configuration settings to update with settings
 	&apos;                   from the file.
 	&apos; errorCode (in out) The Error parameter.
 	&apos;
-	Dim sA As String
-	Dim CR As String
-	Dim CR2 As String
-	Dim l As String
-	Dim key As String
-	Dim value As String
+	Dim sA As String : sA = &quot;&quot;
+	Dim CR As String : CR = Chr(13)
+	Dim CR2 As String : CR2 = Chr(10)
+	Dim l As String : l = &quot;&quot;
+	Dim key As String : key = &quot;&quot;
+	Dim value As String : value = &quot;&quot;
 	Dim msgs() As Variant
+	Dim iLimit As Integer : iLimit = 0
 	
-	CR = Chr(13)
-	CR2 = Chr(10)
+
 	If Not FileExists(configFilePath) Then
 		&apos; Use defaults
-		config = fvTts_config_createDefaultConfig( _
+		Config = fvTts_config_createDefaultConfig( _
 		msgs(), _
 		errorCode)
 		Exit Sub
 	End If
-	sA = getTextFromFile(configFilePath, &quot;UTF-8&quot;)
+	For Each iLimit in Array(0, 32766, 5096, 2048, 1024, 512, 256, 128, 79, 64, 32)
+		sA = getTextFromFile(configFilePath, &quot;&quot;, iLimit)
+		If Len(sA) &lt;&gt; 0 Then
+			Exit For
+		End If
+	Next
+
+	If InStr(sA, &quot;dialog1.&quot;) = 0 Then
+		&apos; Use defaults: wrong keys or could not read the file.
+		Config = fvTts_config_createDefaultConfig( _
+		msgs(), _
+		errorCode)
+		Exit Sub
+	End If
 	If InStr(sA, CR2) &lt; InStr(sA, CR) Then
 		&apos; choose character return or line feed
 		CR = CR2
@@ -668,55 +716,63 @@ Sub tts_config_parseFile( _
 		tts_config_parseLine(l, key, value)
 		If Len(key) &gt; 0 Then
 			Select Case LCase(key)
-				Case &quot;text-to-speech.use.experimental.boolean&quot;
-				config(fiExperimentalOption()) = fbTts_util_stringToBoolean(value)
-				Case &quot;text-to-speech.experimental.path.string&quot;
-				config(fiExperimentalProgramPath()) = value
-				Case &quot;text-to-speech.experimental.script.string&quot;
-				config(fiExperimentalCommand()) = value
-				Case &quot;text-to-speech.use.espeak.boolean&quot;
-				config(fiExternalOption()) = fbTts_util_stringToBoolean(value)
-				Case &quot;text-to-speech.espeak.path.string&quot;
-				Select Case fsGetOS()
-					Case &quot;UNIX&quot;, &quot;MacOS&quot;
+				Case &quot;dialog1.use.experimental.boolean&quot;
+				Config(pi_use_experimental_boolean) = fbTts_util_stringToBoolean(value)
+				Case &quot;dialog1.experimental.path.string&quot;
+				Config(pi_experimental_path_string) = value
+				Case &quot;dialog1.experimental.options.string&quot;
+				Config(pi_experimental_options_string) = value
+				Case &quot;dialog1.use.external.boolean&quot;
+				Config(pi_use_external_boolean) = fbTts_util_stringToBoolean(value)
+				Case &quot;dialog1.external.path.string&quot;
+				Select Case fsTheOsId()
+					Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
 					If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
 						&apos; Since users sometimes use both containers and native
 						&apos; apps, we update the location of the python to use.
 						&apos; For example, AppImage programs usually create a mount
 						&apos; point in the `/tmp/` temporary that includes a version of
 						&apos; python that might be incompatible with the system python.
-						config(fiExternalProgramPath()) = PosixPythonPath()
+						Config(pi_external_path_string) = ConvertFromUrl(BundlePyPath())
 					Else
-						config(fiExternalProgramPath()) = value
+						Config(pi_external_path_string) = value
 					End If
 					Case Else
-					config(fiExternalProgramPath()) = value
+					Config(pi_external_path_string) = value
 					End Select
-				Case &quot;text-to-speech.espeak.options.string&quot;
-				config(fiExternalCommand()) = value
+				Case &quot;dialog1.external.options.string&quot;
+				Config(pi_external_options_string) = value
+				Select Case fsTheOsId()
+					Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
+					If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
+						&apos; The path to python can vary by version and by session, so
+						&apos; force a refresh.
+						Config(pi_external_options_string) = &quot;&quot;
+					End If
+				End Select
 				
-				Case &quot;text-to-speech.use.html.boolean&quot;
-				config(fiHtmlOption()) = fbTts_util_stringToBoolean(value)
+				Case &quot;dialog1.use.html.boolean&quot;
+				Config(pi_use_html_boolean) = fbTts_util_stringToBoolean(value)
 				
-				Case &quot;text-to-speech.html.string&quot;
-				config(fiHtmlComboURL()) = value
+				Case &quot;dialog1.html.string&quot;
+				Config(pi_html_string) = value
 
-				Case &quot;text-to-speech.anonymous.key.string&quot;
-				config(fiAnonymousInstallKey()) = value
+				Case &quot;dialog1.anonymous.key.string&quot;
+				Config(pi_anonymous_key_string) = value
 
-				Case &quot;text-to-speech.display.info.integer&quot;
-				config(fiAlwaysShowDialogCheckBox()) = fiStringToInteger(value)
+				Case &quot;dialog1.display.info.integer&quot;
+				Config(pi_display_info_integer) = fiStringToInteger(value)
 				
-				Case &quot;text-to-speech.display.language.string&quot;
-				config(fiDialogLanguageCombo()) = value
+				Case &quot;dialog1.display.language.string&quot;
+				Config(pi_display_language_string) = value
 				
-				Case &quot;text-to-speech.use.smart.select.integer&quot;
-				config(fiSmartSelectCheckBox()) = value
+				Case &quot;dialog1.use.smart.select.integer&quot;
+				Config(pi_use_smart_select_integer) = value
 				Case Else
 			End Select
 		End If
 	Loop
-	f_CaReadTextExtensionCurrentConfig = config
+	f_CaReadTextExtensionCurrentConfig = Config
 End Sub
 
 

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TextToSpeech" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  * 
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TextToSpeech" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  *
+&apos; TextToSpeech
 Option Explicit
 &apos;&apos; # Read Text Extension
 &apos;&apos; 
-&apos;&apos; ![Read Text
-&apos;&apos; Logo](https://github.com/jimholgate/readtextextension/blob/master/Read_Text/images/textToSpeechAbout_64h.png?raw=true)
+&apos;&apos; ##  ![About Read Text Extension][1]
 &apos;&apos; 
 &apos;&apos; **Read Text** reads text aloud, saves audio or video files from text,
 &apos;&apos; and can use resources from the web based on the selected text.
@@ -21,46 +21,17 @@ Option Explicit
 &apos;&apos; -   Create sound or still-image speech files for listening on the go.
 &apos;&apos; -   Use web resources to translate, look up, listen, post, or interface
 &apos;&apos;     with web applications.
+&apos;&apos; -   Get help by pressing the **\[F1\]** key while your computer shows
+&apos;&apos;     a Read Text Extension dialog.
 &apos;&apos; 
 &apos;&apos; ## Installation
 &apos;&apos; 
 &apos;&apos; Get *Read Text* from the download page and install it by double-clicking
 &apos;&apos; it.
 &apos;&apos; 
-&apos;&apos; -   [Apache
-&apos;&apos;     OpenOffice](https://extensions.services.openoffice.org/en/project/read-text)
-&apos;&apos; -   [LibreOffice](https://extensions.libreoffice.org/extension-center/read-text)
-&apos;&apos; -   [GitHub](https://github.com/jimholgate/readtextextension)
-&apos;&apos; 
-&apos;&apos; ## Read text speech API
-&apos;&apos; 
-&apos;&apos; if you want to include speech in your own scripts, use
-&apos;&apos; `msgSpeak(sString)`. This sample shows how to handle a scripting error
-&apos;&apos; if a computer does not have the extension.
-&apos;&apos; 
-&apos;&apos;     sub OnClickMySlide1Image1()
-&apos;&apos;         &apos; Read text aloud.
-&apos;&apos;         dim oSvc
-&apos;&apos;         dim sURL
-&apos;&apos;         dim sArg
-&apos;&apos; 
-&apos;&apos;         sArg = &quot;Hello world!&quot;
-&apos;&apos;         sURL = &quot;https://sites.google.com/site/readtextextension/&quot;
-&apos;&apos;         On Error Goto OnClickMySlide1Image1Err
-&apos;&apos;         msgSpeak(sArg)
-&apos;&apos;         exit sub
-&apos;&apos;         OnClickMySlide1Image1Err:
-&apos;&apos;         if msgbox(&quot;The button couldn&apos;t find a &quot;&quot;text to speech&quot;&quot; add-on.&quot; &amp; _
-&apos;&apos;                 chr(10) &amp; _
-&apos;&apos;                 sArg &amp; _
-&apos;&apos;                 chr(10) &amp; _
-&apos;&apos;                 &quot;Get on-line help?&quot;, _
-&apos;&apos;                 4, _
-&apos;&apos;                 &quot;Read Text&quot;) &lt;&gt; 7 then
-&apos;&apos;             oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
-&apos;&apos;             oSvc.execute(sURL,&quot;&quot;,0)
-&apos;&apos;         end if
-&apos;&apos;     end sub
+&apos;&apos; -   [Apache OpenOffice][2]
+&apos;&apos; -   [LibreOffice][3]
+&apos;&apos; -   [GitHub][4]
 &apos;&apos; 
 &apos;&apos; ### Mixed Asian, Complex and Western Text
 &apos;&apos; 
@@ -82,15 +53,16 @@ Option Explicit
 &apos;&apos; 
 &apos;&apos; ### Use *Read Selection* on the tool bar
 &apos;&apos; 
-&apos;&apos; The first time you use the extension, you can use this button to set it
-&apos;&apos; up. Once you uncheck *Always show this dialogue*, in the dialogue, this
-&apos;&apos; button will simply do the action that you set up, like, for example,
-&apos;&apos; reading text aloud.
+&apos;&apos; The first time you use this command on a supported platform, the
+&apos;&apos; extension reads text aloud, then if you click it while the 
+&apos;&apos; computer is talking, it stops talking.
 &apos;&apos; 
 &apos;&apos; ### Tools - Add-ons - Read Selection…
 &apos;&apos; 
-&apos;&apos; Use this to setup the text conversion options and to read the text
-&apos;&apos; aloud.
+&apos;&apos; On supported platforms, you can use this to manage the extension options.
+&apos;&apos; The ability to change the default options could be disabled on some
+&apos;&apos; computers. In this case, the menu item works like the *Read Selection*
+&apos;&apos; button on the tool bar.
 &apos;&apos; 
 &apos;&apos; ### Tools - Add-ons - Read Clipboard
 &apos;&apos; 
@@ -108,50 +80,94 @@ Option Explicit
 &apos;&apos; 
 &apos;&apos; #### Resetting the clipboard lock
 &apos;&apos; 
-&apos;&apos; To reset the clipboard lock after a updating your office suite, type
+&apos;&apos; On current versions of the extension, reset the lock by entering the
+&apos;&apos; token `(RESET_ALL)` in the the *External program* box in the main
+&apos;&apos; dialogue. 
+&apos;&apos; 
+&apos;&apos; On legacy versions of the extension you can do the same by typing
 &apos;&apos; some random characters into the *External program* box in the main
 &apos;&apos; dialogue. The extension shows an error message and deletes the settings
 &apos;&apos; files that the extension creates. When you click the *Read Selection*
 &apos;&apos; button, the settings are rebuilt from scratch.
 &apos;&apos; 
-&apos;&apos; ### Tools - Add-ons - Impress-View
+&apos;&apos; ### Exporting Audio Files
 &apos;&apos; 
-&apos;&apos; Use this to open the selected text as an Impress document with the full
-&apos;&apos; text in the notes and a summary on the slide itself. The font is big and
-&apos;&apos; the format is square to make it easy to export sounds using the image of
-&apos;&apos; the presentation as album cover art for music players. Exporting cover
-&apos;&apos; art requires a compatible converter program like [Nero AAC
-&apos;&apos; Encoder](https://www.nero.com), [avconv](https://libav.org/),
-&apos;&apos; [FFmpeg](https://www.ffmpeg.org) or
-&apos;&apos; [iTunes](https://www.apple.com/itunes/).
+&apos;&apos; Some computers are able to export audio files using a system interface (API).
+&apos;&apos; Some are able to export audio files if you install specialized software.
+&apos;&apos; However, your computer might not support exporting speech synthesis to an
+&apos;&apos; audio file or your system administrator might disable it.
 &apos;&apos; 
-&apos;&apos; ### Read the note
+&apos;&apos; For those platforms that support exporting audio files, including cover
+&apos;&apos; art requires a compatible converter program like [Nero AAC Encoder][5],
+&apos;&apos; [Avconv][6], [FFmpeg][7] or [iTunes][8].
 &apos;&apos; 
-&apos;&apos; if you created a presentation using *Tools - Add-ons - Impress-View*,
-&apos;&apos; you can show a presentation and read the text of the note aloud.
+&apos;&apos; ---
 &apos;&apos; 
-&apos;&apos; -   if the slideshow isn’t showing, use *Slide Show - Start from first
-&apos;&apos;     slide*
-&apos;&apos; -   Click the text to read the text aloud.
-&apos;&apos; -   Click the text while the speech synthesizer is talking to switch the
-&apos;&apos;     speech synthesizer off.
-&apos;&apos; -   To go to the next slide, press the down arrow or the right arrow on
-&apos;&apos;     your keyboard.
+&apos;&apos; (c) [James Holgate][9], 2024.
 &apos;&apos; 
-&apos;&apos; The computer needs [read text
-&apos;&apos; extension](https://extensions.services.openoffice.org/en/project/read-text)
-&apos;&apos; to execute this procedure. if the computer doesn’t have the extension,
-&apos;&apos; clicking the shape will show a dialogue telling you that it couldn’t
-&apos;&apos; find the script.
-&apos;&apos; 
-&apos;&apos; The name of the function `ReadTheSlidenote` shows in the dialogue that
-&apos;&apos; Impress displays when a computer that does not have read text extension
-&apos;&apos; calls the procedure.
-&apos;&apos;
+&apos;&apos;   [1]: https://github.com/jimholgate/readtextextension/blob/master/Read_Text/images/textToSpeechAbout_64h.png?raw=true
+&apos;&apos;   [2]: https://extensions.services.openoffice.org/en/project/read-text
+&apos;&apos;   [3]: https://extensions.libreoffice.org/en/extensions/show/read-text
+&apos;&apos;   [4]: https://github.com/jimholgate/readtextextension
+&apos;&apos;   [5]: https://www.nero.com
+&apos;&apos;   [6]: https://libav.org/
+&apos;&apos;   [7]: https://www.ffmpeg.org
+&apos;&apos;   [8]: https://www.apple.com/itunes/
+&apos;&apos;   [9]: https://raw.githubusercontent.com/jimholgate/readtextextension/master/Read_Text/registration/LICENSE?raw=true
 
-function fbReadOnlyCode() As Boolean
+Private s_CaReadTextExtensionLastSpokenDocTitle As String
+Private i_CaReadTextExtensionLastSpokenTrack As Integer
+Private s_CaReadTextExtensionWorkingCountryLanguage As String
+Private b_CaReadTextExtensionHideExports As Boolean
+Private i_CaReadTextExtensionWinItunesVersion As Integer
+Private s_CaReadTextExtensionLocalHostSpeechURI As String
+Private i_CaReadTextExtensionPiperTestResult As Integer
+Private s_CaReadTextExtensionCurrentSessionCookie As String
+Private s_CaReadTextExtensionCurrentAnonymousKey As String
+Private s_CaReadTextExtensionGetOS As String
+Private f_CaReadTextExtensionCurrentConfig As Variant
+Private UpdatePoSettingsDone As Integer
+Private mMyTranslationId(0) As Variant
+Private mMyTranslationIdPlur(0) As Variant
+Private mMyTranslationStr(0,0) As Variant
+Private Config As Variant
+
+
+Function fsAboutScriptHint(file_spec)
+	fsAboutScriptHint = &quot;OS ID : &quot; &amp; fsTheOsId()
+	If FileExists(file_spec) Then
+	fsAboutScriptHint = &quot;OS ID : &quot; &amp; fsTheOsId() &amp; &quot;; REV : &quot; &amp; FileDateTime(file_spec)
+	End If
+End Function
+
+
+Function fbStandardPosix()
+	&apos; Quick check if the os filesystem has a standard posix file structure.
+	&apos; and that it does not have not standard or temporary folders in the
+	&apos; path.
+	On Local Error GoTo fbStandardPosixErr
+	fbStandardPosix = False
+	Dim EnviroPath$ : EnviroPath = Environ(&quot;PATH&quot;)
+	Select Case Getattr(&quot;/usr/local/&quot;)
+		Case 17, 16
+		If Instr(EnviroPath, &quot;:/tmp/.mount_&quot;) = 0 Then
+			If Instr(EnviroPath, &quot;/app/sbin:/app/bin:/usr/sbin:/usr/bin&quot;) = 0 Then
+				If Instr(EnviroPath, &quot;/snap/&quot;) = 0 Then
+					fbStandardPosix = True
+				End If
+			End If
+		End If
+	End Select
+	Exit Function
+	fbStandardPosixErr:
+	&apos; `FileNotFoundError` because `GetAttrib` cannot locate the file or directory.
+	fbStandardPosix = False
+End Function
+
+
+Function fbReadOnlyCode() As Boolean
 	&apos; If this extension is installed as a shared extension then
-	&apos; the code in the Macro editor is read only. 
+	&apos; the code in the Macro editor is read only.
 	On Error GoTo fbReadOnlyCodeErr
 	fbReadOnlyCode = Instr(fsMyURL(), &quot;/&quot; &amp; fsUser() &amp; &quot;/&quot;) = 0
 	Exit Function
@@ -160,8 +176,121 @@ function fbReadOnlyCode() As Boolean
 End Function
 
 
-Function fbOnlyShowIfExperiment() As Boolean
-	fbOnlyShowIfExperiment = GetSolarVersion() &gt; 70500
+Function fbTestLibraryLoaded(_library As String) As Boolean
+	fbTestLibraryLoaded = False 
+	On Error GoTo fbTestLibraryLoadedErr
+	If Not GlobalScope.BasicLibraries.isLibraryLoaded(_library) Then
+		GlobalScope.BasicLibraries.LoadLibrary(_Library)
+	End If
+		fbTestLibraryLoaded = True
+	Exit Function
+	fbTestLibraryLoadedErr:
+End Function
+
+
+Function fbHaveSnap() As Boolean
+	&apos; By default, Snap Ubuntu installations run in strict containment mode and
+	&apos; therefore might not be able to access certain paths, programs, data etc.
+	&apos; that are required. Only proceed if the version of the app is one compiled
+	&apos; since the latest release of Debian.
+	fbHaveSnap = False
+	On Local Error GoTo fbHaveSnapErr
+	Select Case getGUIType()
+	Case 4
+		fbHaveSnap = shell(&quot;snap&quot;, 0, &quot; --version &gt; /dev/null&quot;) = 0
+	End Select
+	Exit Function
+	fbHaveSnapErr:
+	fbHaveSnap = False
+End Function
+
+
+Function fsScriptForgePython(Detail As Integer) As String
+	&apos; Returns the script version reported by the ScriptForge BASIC library.
+	&apos; This is useful to determine if a python library is available or if an
+	&apos; optional library is compatible. NOTE: Some sources of Office have a
+	&apos; version of ScriptForge that cannot be verified or that does not work;
+	&apos; these return `&quot;&quot;`.
+	&apos;
+	&apos; NOTE: The system version of python could be different than the version
+	&apos; that the office program uses.
+	&apos;
+	&apos; For example: MacOS 10.13.6
+	&apos; Office Version: 7.4.6.2 / LibreOffice Community
+	&apos; ScriptForge `platform.PythonVersion` reports: 3.8.16
+	&apos; `python --version` reports: Python 2.7.16
+	&apos;
+	&apos; &lt;https://help.libreoffice.org/latest/en-US/text/sbasic/shared/03/sf_platform.html?DbPAR=BASIC&gt;
+
+	fsScriptForgePython = &quot;&quot;
+
+	If GetSolarVersion &lt; 70407 Then
+		&apos; Can&apos;t check, so exit.
+		Exit Function
+	End If
+	On Error GoTo fsScriptForgePythonErr
+	If fbTestLibraryLoaded(&quot;ScriptForge&quot;) Then
+	Dim platform
+	Dim Item as String
+	Dim x As Integer : x = 0
+	Dim test_array As Variant 
+	platform = CreateScriptService(&quot;Platform&quot;)
+	For Each Item in Array(&quot;Python 3&quot;, &quot;Python 4&quot;, &quot;Python 5&quot;)
+		If Instr(platform.PythonVersion, Item) = 1 Then
+			test_array = Split(platform.PythonVersion, &quot;.&quot;)
+			Select Case Detail
+			Case 0, -1
+				fsScriptForgePython = Lcase(Replace(test_array(0), &quot; &quot;, &quot;&quot;))			
+			Case 1
+				fsScriptForgePython = Join(Array(_
+				Lcase(Replace(test_array(0), &quot; &quot;, &quot;&quot;)), _
+				test_array(1)), &quot;.&quot;)
+			Case Else
+				fsScriptForgePython = Lcase(Replace(platform.PythonVersion, &quot; &quot;, &quot;&quot;))
+			End Select
+		End If
+	Next
+	End If
+	Exit Function
+	fsScriptForgePythonErr:
+	fsScriptForgePython = &quot;&quot;
+End Function
+
+
+Function fbScriptForgePythonOK(Detail As Integer) As Boolean
+	&apos; Test whether STARBASIC can access supported python functions. If
+	&apos; `bTestShell` is not `0` then check if the reported version
+	&apos; of python works from a shell command without specifying the
+	&apos; real full path.
+	&apos;
+	&apos; The Value of `Detail` describes parameters for checking python.
+	&apos; 
+	&apos; * `-1` - `True` if No Error and running `python.n`, `python4` or `python5`
+	&apos;   works. (Use to check if a legacy platform can use a version of python
+	&apos;   greater than 2.)
+	&apos; * `0`  - `True` if No Error, however, do not check if shell commands work.
+	&apos; * `1`  - `True` if No Error and running `python3.n`, `python4.n` or
+	&apos;   `python5.n` works. (Use to check if a `venv` or `system` python has
+	&apos;    the same major and minor version of python as the SourceForge result).
+	&apos; * Else - `True` if No Error and running `python3.n.n`, `python4.n.n` or
+	&apos;   `python5.n.n` works. (This will almost never be `True` in a user&apos;s system
+	&apos;    but the result might be useful for debugging if you set a symbolic link
+	&apos;    that fully describes the python version that you are testing.)
+
+	fbScriptForgePythonOK = False
+	If Len(fsScriptForgePython(Detail)) &lt;&gt; 0 Then
+		On Error GoTo fbScriptForgePythonOKErr
+		fbScriptForgePythonOK = True
+		If Detail &lt;&gt; 0 Then
+			If shell(fsScriptForgePython(Detail), 0 , &quot; --version&quot;) = 0 Then
+				fbScriptForgePythonOK = True
+				Exit Function
+			End If
+		End If
+	End If
+	Exit Function
+	fbScriptForgePythonOKErr:
+	fbScriptForgePythonOK = False
 End Function
 
 
@@ -183,12 +312,12 @@ Sub ReadTextAloud()
 	Dim sFile As String : sFile = fsExtensionSettingsIni()
 	Dim msgs()As Variant
 	Dim errorCode As Integer : errorCode = 0
-	Dim config(fiCountConfigOptions()) As Variant
+	Dim Config(fiUboundConfigOptions()) As Variant
 	Dim locklist As Variant : locklist = Array(&quot;lock&quot;)
 	Dim bDone As Boolean : bDone = False
 	Dim x As Integer : x = 0
-	Select Case fsGetOS()
-	Case &quot;UNIX&quot;
+	Select Case fsTheOsId()
+	Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;POSIX.PYVENV&quot;
 		locklist = Array(&quot;lock&quot;, &quot;net_speech&quot;)
 		&apos; Don&apos;t show the dialog on first run.
 		&apos; Load default settings.
@@ -196,7 +325,7 @@ Sub ReadTextAloud()
 			MsgSpeak(fsGetTextSelection(False, True))
 			Exit Sub
 		End If
-	Case &quot;WINDOWS&quot;
+	Case &quot;WINDOWS&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;, &quot;WINDOWS.NOSCRIPT&quot;, &quot;WINDOWS.PYVENV&quot;
 		If Not FileExists(sFile) Then
 				&apos; Don&apos;t show the dialog on first run.
 				fsNetSAPI5WindowsSpeech(_
@@ -205,7 +334,8 @@ Sub ReadTextAloud()
 			)
 				Exit Sub
 			End If
-			Case &quot;MacOS&quot;
+	Case &quot;MACOS&quot;, &quot;MACOS.EXPERIMENTAL&quot;, &quot;WINDOWS.WINE&quot;, &quot;MACOS.PYVENV&quot;
+		&apos; No working Windows SAPI
 		&apos; Don&apos;t show the dialog on first run.
 		&apos; Load default settings.
 		If Not FileExists(sFile) Then
@@ -215,8 +345,8 @@ Sub ReadTextAloud()
 	End Select
 
 	If FileExists(sFile) Then
-		tts_config_parseFile(sFile, config(), errorCode)
-		If config(fiAlwaysShowDialogCheckBox()) = 1 Then
+		tts_config_parseFile(sFile, Config(), errorCode)
+		If Config(pi_display_info_integer) = 1 Then
 			ConfigureReadTextAloud()
 		Else
 			On Error Resume Next
@@ -230,7 +360,7 @@ Sub ReadTextAloud()
 			If bDone Then
 				resetSpeechDispatcher(True)
 			Else
-				ttsActuate(config(), _
+				ttsActuate(Config(), _
 				msgs(), _
 				errorCode, _
 				&quot;&quot;)
@@ -275,7 +405,7 @@ Sub ReadClipBoard
 	Else
 		If FileExists(s1) Or fbClipBoardAvailable() = False Then
 			If FileExists(s1) Then
-				If fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getTextFromFile(s1, &quot;UTF-8&quot;) Then
+				If fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getTextFromFile(s1, &quot;&quot;, 0) Then
 					&apos; You updated office after a crash, so resume
 					&apos; the normal operation on the next run.
 					fbRemoveFile(s1)
@@ -291,7 +421,7 @@ Sub ReadClipBoard
 				msgSpeak(s2)
 			End If
 		Else
-			CreateFile(s1, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)
+			CreateFile(s1, fsGetSetting(&quot;oosetupversion&quot;), &quot;&quot;)
 			fsGetClipBoard(False)
 			&apos; Try it - if it crashes, then we are left with the lock file
 			fbRemoveFile(s1)
@@ -310,6 +440,18 @@ Sub ReadClipBoard
 	fsLookUpTerm( _
 	&quot;s_read-text&quot;)
 End Sub
+
+
+Function FsRefreshAppImagePythonPath(byVal sPythonPath As String) As String
+	&apos; Test stale AppImage Location. Try to update the python path; return the
+	&apos; path if found, or `&quot;&quot;` if not found. `&quot;POSIX.APPIMAGE&quot;`
+	FsRefreshAppImagePythonPath = &quot;&quot;
+	On Error GoTo FsRefreshAppImagePythonPathErr
+	ps_appimageresourcepath = &quot;&quot;
+	FsRefreshAppImagePythonPath = fsAppImageResourcePath(&quot;python&quot;)
+	FsRefreshAppImagePythonPathErr:
+	FsRefreshAppImagePythonPath = &quot;&quot;
+End Function
 
 
 Sub ResetAll()
@@ -355,7 +497,7 @@ Sub testLTR
 End Sub
 
 Sub PresentSelection2(sB)
-	&apos; sB - the language to show.  Defaults to interface language or 
+	&apos; sB - the language to show.  Defaults to interface language or
 	&apos; English if the interface language is not available.
 	&apos;
 	&apos; sB = &quot;ar&quot;  &apos; Arabic - RTL complex script
@@ -381,11 +523,11 @@ Sub PresentSelection2(sB)
 	&apos; subsequent slides include a summary on the slide with
 	&apos; the full text of each paragraph in the notes.
 	&apos;
-	&apos; - if there is no specific language selection, the presentation 
+	&apos; - if there is no specific language selection, the presentation
 	&apos;   routines use the user interface language.
 	&apos; - As a result,  Right to left languages will only be aligned
 	&apos;   to the right margin in the help template if the language of
-	&apos;   the user interface is a right to left language. 
+	&apos;   the user interface is a right to left language.
 	&apos;   
 	Dim b1 As Boolean
 	Dim i As Integer
@@ -438,7 +580,7 @@ Sub ReadTheSlidenote
 			)
 			If fbGoingOnline() Then
 				Select Case fiReportOnlineRequest()
-					Case 6 &apos; if you click &quot;Yes&quot;, 
+					Case 6 &apos; if you click &quot;Yes&quot;,
 					msgSpeak(s1)
 					Case 7 &apos; if you click &quot;No&quot;,
 					ConfigureReadTextAloud()
@@ -455,7 +597,8 @@ End Sub
 
 Sub WinStopSpeaking()
 	On Error GoTo WinStopSpeakingErr
-	If fsGetOS() = &quot;WINDOWS&quot; Then
+	Select Case fsGetOS()
+	Case &quot;WINDOWS&quot;
 		Dim speech As Object
 		Dim WinSVSFPurgeBeforeSpeak# : WinSVSFPurgeBeforeSpeak = 2
 		Dim WinvbNullString$ : WinvbNullString = &quot;&quot;
@@ -463,7 +606,7 @@ Sub WinStopSpeaking()
 		Set speech = Createobject(&quot;Sapi.SpVoice&quot;)
 		speech.Speak WinvbNullString, WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
 		Set speech = Nothing
-	End If
+	End Select
 	Exit Sub
 	WinStopSpeakingErr:
 End Sub
@@ -523,7 +666,7 @@ Function fsNetSAPI5WindowsSpeech(_
 	Dim oFrame
 	oFrame = ThisComponent.getCurrentController().getFrame() &apos; Current frame
 	Dim oBar
-	oBar = oFrame.createStatusIndicator() &apos; Generated status bar 
+	oBar = oFrame.createStatusIndicator() &apos; Generated status bar
 	If fbUsingWine(False) Then
 		s2 = fsMyTempLock(&quot;lock&quot;)
 		oBar.start(_
@@ -549,7 +692,7 @@ Function fsNetSAPI5WindowsSpeech(_
 			Exit Function
 		End If
 		oBar.Value = 70
-		CreateFile(s2, fsAppSignature(), &quot;utf-8&quot;)
+		CreateFile(s2, fsAppSignature(), &quot;&quot;)
 		Dim WinSVSFPurgeBeforeSpeak# : WinSVSFPurgeBeforeSpeak = 2
 		Dim WinvbNullString$ : WinvbNullString = &quot;&quot;
 		Dim WinSVSFlagsAsync# : WinSVSFlagsAsync = 1

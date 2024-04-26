@@ -11,6 +11,8 @@ The contents of this resource are not affiliated with, sponsored by, or endorsed
 by Google nor does the documention represent the views or opinions of Google or
 Google personnel.
 """
+
+
 import os
 import sys
 import netcommon

@@ -78,6 +78,8 @@ See the manual page for `espeak` for more detailed information
 Copyright (c) 2011 - 2024 James Holgate
 
 """
+
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 import getopt
 import math
@@ -668,7 +670,7 @@ def main():  # -> NoReturn
         usage()
         sys.exit(0)
     elif not bool(espeak_path()):
-        print("Please install espeak.  Use `sudo apt-get install espeak-ng`")
+        print("The espeak program is not available to this client.")
         usage()
         sys.exit(0)
     try:

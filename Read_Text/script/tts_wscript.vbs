@@ -148,6 +148,8 @@
 '' 
 '' Copyright (c) 2011 - 2024 James Holgate
 '''
+
+
 Const ForReading = 1
 Const ForWriting = 3
 Const AUDIO_FORMAT = 34  ' (16 bit mono 44.100 KHz).
@@ -155,8 +157,6 @@ Const AUDIO_FORMAT = 34  ' (16 bit mono 44.100 KHz).
 	' 35 (44 KHz 16-bit Stereo), 65 (GSM 8 KHz), 66 (GSM 11 KHz)
 Const APP_SIGNATURE = "ca.bc.vancouver.holgate.james.readtextextension"
 Const APP_NAME = "Read Text"
-
-
 Sub Usage(sA)
 	'''
 	' Shows usage in a dialog box when the program has a problem parsing a line.
@@ -180,8 +180,6 @@ Sub Usage(sA)
 			"""filename.txt"" Text Document to read (required)"
 	MsgBox s1, 0, APP_NAME
 End Sub
-
-
 Function bWriteText(outFile, theString)
 	'''
 	' Write text to a new file using UTF-8 character coding
@@ -198,8 +196,6 @@ Function bWriteText(outFile, theString)
 	End With
 	bwriteText = fbFileExists(outFile)
 End Function
-
-
 Function FileSize(sfilespec)
 	'''
 	' If file size exists, return file size, otherwise `0`
@@ -213,8 +209,6 @@ Function FileSize(sfilespec)
 	End If
 	FileSize = file_size
 End Function
-
-
 Function EscapeReturnsAndReplaceQuotes(sA)
 	'''
 	' Use a normal plain text string to generate a 'lyrics' string
@@ -225,8 +219,6 @@ Function EscapeReturnsAndReplaceQuotes(sA)
 	Dim RQ
 	LQ = Chr(147)
 	RQ = Chr(148)
-
-
 	EscapeReturnsAndReplaceQuotes = ""
 	' Not all audio players can show lyrics longer than 1000 characters.
 	If Len(sA) > 1000 Then
@@ -245,23 +237,18 @@ Function EscapeReturnsAndReplaceQuotes(sA)
 	s1 = Replace(s1, """", RQ)  ' all others, right double quote
 	EscapeReturnsAndReplaceQuotes = s1
 End Function
-
-
 Function strExt(sA)
 	'''
 	' Given a file path, returns the extension
 	'''
 	strExt = LCase(Mid(sA,InStrRev(sA,".")))
 End Function
-
-
 Function doExecute(sA, bWaitTilDone)
 	'''
 	' Execute a string as a command
 	'''
 	Dim oExec
 	Dim WshShell
-
 	On Error Resume Next
 	If Len(sA) > 0  Then
 		Set WshShell = CreateObject("WScript.Shell")
@@ -279,8 +266,6 @@ Function doExecute(sA, bWaitTilDone)
 		doExecute = True
 	End If
 End Function
-
-
 Function OpenWithWindowsMedia(sfilespec)
 	'''
 	' Play a sound file with Windows Media Player. Returns true if successful.
@@ -310,8 +295,6 @@ Function OpenWithWindowsMedia(sfilespec)
 		End If
 	Next
 End Function
-
-
 Function fbRemoveFile(sfilespec)
 	'''
 	' Remove file. Returns true if successful or if no file exists.
@@ -323,8 +306,6 @@ Function fbRemoveFile(sfilespec)
 	End If
 	fbRemoveFile = Not(fso.FileExists(sfilespec))
 End Function
-
-
 Function fsGetPath(app)
 	' Use the system path to select a complete application URI
 	' or return `''` if the application is not in the path.
@@ -345,8 +326,6 @@ Function fsGetPath(app)
 	Next
 	Exit Function
 End Function
-
-
 Function fsXmlInputBox(s1)
 	'''
 	' Debug or pause execution. Returns string or blank if you click 'Cancel'
@@ -362,7 +341,6 @@ Function fsXmlInputBox(s1)
 	Dim title
 	Dim track
 	Dim xDoc
-
 	source = sLockPath("lock") & ".xml"
 	If fbFileExists(source) Then
 		Set xDoc = Nothing
@@ -387,8 +365,6 @@ Function fsXmlInputBox(s1)
 	cr = Chr(10)
 	fsXmlInputBox = InputBox(album & cr & artist & cr & cr & track & ". " & title, genre, s1)
 End Function
-
-
 Function fsMyInputBox(sA)
 	'''
 	' Debug or pause execution. Returns string or blank if you click 'Cancel'
@@ -399,7 +375,6 @@ Function fsMyInputBox(sA)
 	Dim s3
 	Dim s4
 	Dim s5
-
 	cr = Chr(10)
 	s1 = EscapeReturnsAndReplaceQuotes(fsMetaalbum)
 	s2 = EscapeReturnsAndReplaceQuotes(fsMetaId)
@@ -408,8 +383,6 @@ Function fsMyInputBox(sA)
 	s5 = EscapeReturnsAndReplaceQuotes(fsMetatrack)
 	fsMyInputBox = InputBox(s1 & cr & s2 & cr & cr & s5 & ". " & s4, s3, sA)
 End Function
-
-
 Function fbFileExists(sfilespec)
 	'''
 	' Test if file exists.
@@ -422,8 +395,6 @@ Function fbFileExists(sfilespec)
 		fbFileExists = fso.FileExists(sfilespec)
 	End If
 End Function
-
-
 Function fsfixfFfmpegMetaVal(s1)
 	fsfixfFfmpegMetaVal = ""
 	Dim a1 : a1 = array(_
@@ -442,8 +413,6 @@ Function fsfixfFfmpegMetaVal(s1)
 	End If
 	fsfixfFfmpegMetaVal = s1
 End Function
-
-
 Function getXmlMeta(sformat, bShowInput)
 	' Format a c9hverter's metadata string using an XML data
 	' source.
@@ -503,7 +472,6 @@ Function getXmlMeta(sformat, bShowInput)
 			track = EscapeReturnsAndReplaceQuotes(track)
 			syear = EscapeReturnsAndReplaceQuotes(syear)
 		End Select
-
 		Select Case sformat
 		' Simple strings - iTunes
 		Case "album"
@@ -598,7 +566,6 @@ Exit Function
 getXmlMetaErr:
 getXmlMeta = ""
 End Function
-
 Function fsGetEnvironResult(sA)
 	'''
 	' `fsGetEnvironResult("ProgramFiles(x86)")`
@@ -627,7 +594,6 @@ Function fsGetEnvironResult(sA)
 	End If
 	fsGetEnvironResult = return_value
 End Function
-
 Function fsFindAppPath(sA)
 	 '''
 	' Given an Application subpath in the form
@@ -681,8 +647,6 @@ Function fsFindAppPath(sA)
 	End If
 	fsFindAppPath = fsGetPath(sA)
 End Function
-
-
 Function fbIsAppDataFile(sA, bTattle)
 	'''
 	' Identify files that shouldn't be manually edited or deleted.
@@ -696,7 +660,6 @@ Function fbIsAppDataFile(sA, bTattle)
 	Dim objFSO
 	Dim WshEnv
 	Dim WshShell
-
 	fbIsAppDataFile = False
 	Set objFSO=CreateObject("Scripting.FileSystemObject")
 	Set WshShell = CreateObject("WScript.Shell")
@@ -728,7 +691,6 @@ Function fbIsAppDataFile(sA, bTattle)
 		b1 = InputBox("Restricted path!", APP_NAME, sA)
 	End If
 End Function
-
 Function canUseSpeechXML
 	'''
 	' Can the installed version of SAPI use XML?
@@ -751,8 +713,6 @@ Function canUseSpeechXML
 		End If
 	Next
 End Function
-
-
 Function lamePath()
 	'''
 	' Returns path to the lame mp3 converter program.
@@ -772,8 +732,6 @@ Function lamePath()
 		End If
 	Next
 End Function
-
-
 Function oggPath()
 	oggPath = ""
 	Dim a1
@@ -792,8 +750,6 @@ Function oggPath()
 		End If
 	Next
 End Function
-
-
 Function wav2ogg(wavfile, outfile, sMyWords)
 	'''
 	' Use a downloaded command line program to convert sound file
@@ -805,7 +761,6 @@ Function wav2ogg(wavfile, outfile, sMyWords)
 	Dim sMeta
 	Dim sLyrics
 	Dim sPath
-
 	wav2ogg = False
 	On Error Resume Next
 	s1 = oggPath()
@@ -846,8 +801,6 @@ Function wav2ogg(wavfile, outfile, sMyWords)
 		fbRemoveFile wavfile
 	End If
 End Function
-
-
 Function fsVorbisMeta
 	'''
 	' [Tag specifications](https://www.xiph.org/vorbis/doc/v-comment.html)
@@ -856,8 +809,7 @@ Function fsVorbisMeta
 	' ignored.
 	'''
 	Dim s3
-
-	s3 = fsVerifiedMetatitle
+	s3 = fsVerifiedMetatitle()
 	If s3 = "" Then
 	fsVorbisMeta = ""
 	Else
@@ -869,8 +821,6 @@ Function fsVorbisMeta
 					""" "
 	End If
 End Function
-
-
 Function flacPath()
 	flacPath = ""
 	Dim a1
@@ -888,8 +838,6 @@ Function flacPath()
 		End If
 	Next
 End Function
-
-
 Function wav2flac(wavfile, outfile, sMyWords, sImage)
 	'''
 	' Converts wav audio file to free lossless audio codec.
@@ -900,7 +848,6 @@ Function wav2flac(wavfile, outfile, sMyWords, sImage)
 	Dim s3
 	Dim sA
 	Dim sMeta
-
 	wav2flac = False
 	s1 = flacPath()
 	If fbFileExists(s1) Then
@@ -928,7 +875,6 @@ Function wav2flac(wavfile, outfile, sMyWords, sImage)
 		fbRemoveFile wavfile
 	End If
 End Function
-
 Function neroEncPath()
 	neroEncPath = ""
 	Dim a1
@@ -945,8 +891,6 @@ Function neroEncPath()
 		End If
 	Next
 End Function
-
-
 Function wav2m4a(wavfile, outFile, sMyWords, sImage)
 	'''
 	' Use a downloaded command line program to convert sound file.
@@ -981,7 +925,6 @@ Function wav2m4a(wavfile, outFile, sMyWords, sImage)
 		fbRemoveFile wavfile
 	End If
 End Function
-
 Function neroTagPath()
 	neroTagPath = ""
 	Dim a1
@@ -998,8 +941,6 @@ Function neroTagPath()
 		End If
 	Next
 End Function
-
-
 Function fbTagM4a(s2, sMyWords, sImage)
 	'''
 	' Use a downloaded command line program to tag a sound file.
@@ -1013,7 +954,6 @@ Function fbTagM4a(s2, sMyWords, sImage)
 	Dim s1
 	Dim s3
 	Dim sMeta
-
 	fbTagM4a = False
 	s1 = neroTagPath()
 	s3 = fsVerifiedMetatitle()
@@ -1044,8 +984,6 @@ Function fbTagM4a(s2, sMyWords, sImage)
 		fbTagM4a = True
 	End If
 End Function
-
-
 Function executeVideoLanVLC(in_sound_path, out_sound_path)
 	' Create a simple compressed file with the [VideoLAN
 	' VLC](https://videolan.org/vlc) Desktop application
@@ -1207,8 +1145,6 @@ Function executeVideoLanVLC(in_sound_path, out_sound_path)
 	executeVideoLanVLCErr:
 	executeVideoLanVLC = False 
 End Function
-
-
 Function wav2mp3(wavfile, outFile, sImage)
 	'''
 	' Use [L. A. M. E.](https://www.rarewares.org) - a free
@@ -1220,7 +1156,6 @@ Function wav2mp3(wavfile, outFile, sImage)
 	Dim s3
 	Dim sMeta
 	Dim sPath
-
 	wav2mp3 = False
 	On Error Resume Next
 	s1 = lamePath()
@@ -1266,12 +1201,9 @@ Function wav2mp3(wavfile, outFile, sImage)
 		fbRemoveFile wavfile
 	End If
 End Function
-
-
 Function fsMetaalbum()
 	Dim s1
 	Dim s2
-
 	s2 = sLockPath("lock")
 	If fbFileExists(s2 & ".album") Then
 		s1 = readFile(s2 & ".album")
@@ -1280,12 +1212,9 @@ Function fsMetaalbum()
 	End If
 	fsMetaalbum = EscapeReturnsAndReplaceQuotes(s1)
 End Function
-
-
 Function fsMetagenre()
 	Dim s1
 	Dim s2
-
 	s2 = sLockPath("lock")
 	If fbFileExists(s2 & ".genre") Then
 		s1 = readFile(s2 & ".genre")
@@ -1294,12 +1223,9 @@ Function fsMetagenre()
 	End If
 	fsMetagenre = EscapeReturnsAndReplaceQuotes(s1)
 End Function
-
-
 Function fsMetaId()
 	Dim s1
 	Dim s2
-
 	s2 = sLockPath("lock")
 	If fbFileExists(s2 & ".id") Then
 		s1 = readFile(s2 & ".id")
@@ -1308,12 +1234,9 @@ Function fsMetaId()
 	End If
 	fsMetaId = EscapeReturnsAndReplaceQuotes(s1)
 End Function
-
-
 Function fsMetatitle()
 	Dim s1
 	Dim s2
-
 	s2 = sLockPath("lock")
 	If fbFileExists(s2 & ".title") Then
 		s1 = readFile(s2 & ".title")
@@ -1322,23 +1245,16 @@ Function fsMetatitle()
 	End If
 	fsMetatitle = EscapeReturnsAndReplaceQuotes(s1)
 End Function
-
-
-
 Function fsVerifiedMetatitle()
 	Dim s1
-
 	s1 = fsMetatitle
 	PlaySound "C:\Windows\Media\notify.wav"
 	s1 = fsMyInputBox(s1)
 	fsVerifiedMetatitle = EscapeReturnsAndReplaceQuotes(s1)
 End Function
-
-
 Function fsMetatrack
 	Dim s1
 	Dim s2
-
 	s2 = sLockPath("lock")
 	If fbFileExists(s2 & ".track") Then
 		s1 = readFile(s2 & ".track")
@@ -1347,21 +1263,16 @@ Function fsMetatrack
 	End If
 	fsMetatrack = EscapeReturnsAndReplaceQuotes(s1)
 End Function
-
-
 Sub removeMetaFiles()
 	Dim a1
 	Dim s1
 	Dim n
-
 	s1 = sLockPath("lock")
 	a1 = Split(".album,.genre,.id,.title,.track", ",")
 	For n = LBound(a1) To UBound(a1)
 		fbRemoveFile s1 & a1(n)
 	Next
 End Sub
-
-
 Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
 	'''
 	' iTunes makes a mp3, aac or m4a in the iTunes Music Library
@@ -1380,7 +1291,6 @@ Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
 	Dim s3
 	Dim track
 	Dim vers
-
 	wav2iTunes = False
 	On Error Resume Next
 	vers = "Unknown version"
@@ -1438,9 +1348,6 @@ Function wav2iTunes(wavfile,sOut2file,sMyWords,sImage, bPlay)
 		End If
 	End If
 End Function
-
-
-
 Function compressWaveAudioWithFfmpeg(sWaveName, sOutName, sImage, sDimensions)
 	'''
 	''
@@ -1475,20 +1382,15 @@ Function compressWaveAudioWithFfmpeg(sWaveName, sOutName, sImage, sDimensions)
 	doJob1 = ""
 	doJob2 = ""
 	ffMeta = ""
-
 	If Len(sDimensions) = 0 Then
 		sDimensions = "400x400"
 	End If
-	sFileNameExt = strExt(sOutName)
-
-' ### Where's ffmpeg?
+	sFileNameExt = strExt(sOutName)' ### Where's ffmpeg?
 	myConverter = fsFindAppPath("ffmpeg\bin\ffmpeg.exe")
 	If Len(myConverter) = 0 Then
 		Exit Function
 	End If
-
-' ### Which codecs can skip the preflight check?
-
+	' ### Which codecs can skip the preflight check?
 	Select Case sFileNameExt
 		Case ".m4a"
 			sPreProcess = ""
@@ -1536,21 +1438,17 @@ Function compressWaveAudioWithFfmpeg(sWaveName, sOutName, sImage, sDimensions)
 		Case Else ' ".aac"
 			Exit Function
 	End Select
-
-' ###Ffmpeg metadata
+	' ###Ffmpeg metadata
 '
 ' A muxer may ignore some or all metadata tags. For example if the format
 ' doesn't support a field, ffmpeg ignores the tag.
-
-	ffmeta = Join(Array(" -metadata album=""", fsMetaalbum, _
+ffmeta = Join(Array(" -metadata album=""", fsMetaalbum, _
 			""" -metadata artist=""", fsMetaId, _
 			""" -metadata comment=""", "[FFmpeg](https://www.ffmpeg.org)", _
 			""" -metadata genre=""", fsMetagenre, _
 			""" -metadata title=""", fsMetatitle, _
 			""" -metadata track=""", fsMetatrack, _
-			""" -metadata year=""", Year(Now), """ "), "")
-
-' ### Default muxer settings
+			""" -metadata year=""", Year(Now), """ "), "")' ### Default muxer settings
 '
 	doJob = Join(Array("""", myConverter, """ -i """, sWaveName, """ ", _
 	ffmeta, " -y """, sOutName, """"), "")
@@ -1572,9 +1470,7 @@ Function compressWaveAudioWithFfmpeg(sWaveName, sOutName, sImage, sDimensions)
 				doJob = retVal
 			End If
 		End If
-		b1 = doExecute(doJob, True)
-
-		' Add the image
+		b1 = doExecute(doJob, True)		' Add the image
 		If Len(sImage) > 0 And fbFileExists(sImage) Then
 			If sPreProcess = "preFlightCheck" Or sPreProcess = "postFlightCheck" Then
 				retval = fsMyInputBox(doJob2)
@@ -1586,7 +1482,6 @@ Function compressWaveAudioWithFfmpeg(sWaveName, sOutName, sImage, sDimensions)
 			End If
 			b1 = doExecute(doJob2, True)
 		End If
-
 		' If we succeeded, Then delete the temporary file.
 		If fbFileExists(sOutName) Then
 			fbRemoveFile(cout2)
@@ -1635,8 +1530,6 @@ Function compressWaveAudioWithFfmpeg(sWaveName, sOutName, sImage, sDimensions)
 		compressWaveAudioWithFfmpeg = True
 	End If
 End Function
-
-
 Function AddLanguageCodes(s1, s4)
 	'''
 	' On supported Windows systems, adds standard speech XML.
@@ -1675,8 +1568,6 @@ Function AddLanguageCodes(s1, s4)
 	End If
 	AddLanguageCodes = s3
 End Function
-
-
 Function sTempDir()
 	sTempDir = ""
 	Dim WshShell
@@ -1689,8 +1580,6 @@ Function sTempDir()
 		sTempDir = WshEnv("TEMP")
 	End If
 End Function
-
-
 Sub PopMsgBox(sMsg, sHead, sTitle)
 	'''
 	' Pops up a message box that closes after a few seconds
@@ -1703,7 +1592,6 @@ Sub PopMsgBox(sMsg, sHead, sTitle)
 	Dim outFile
 	Dim s1
 	Dim WshShell
-
 	Set objFSO = CreateObject("Scripting.FileSystemObject")
 	' write temporary file
 	outFile = sTempDir() & "\read-text-advisory.hta"
@@ -1718,8 +1606,6 @@ Sub PopMsgBox(sMsg, sHead, sTitle)
 	Loop
 	fbRemoveFile outFile
 End Sub
-
-
 Function SayIt(s1, sRate, sVoice)
 	'''
 	' Says the text aloud as long as the text lasts or
@@ -1730,7 +1616,6 @@ Function SayIt(s1, sRate, sVoice)
 	Dim objFSO
 	Dim Sapi
 	Dim TaskLock
-
 	SayIt = False
 	Set objFSO = CreateObject("Scripting.FileSystemObject")
 	' write temporary file
@@ -1772,8 +1657,6 @@ Function SayIt(s1, sRate, sVoice)
 	fbRemoveFile TaskLock
  SayIt = True
 End Function
-
-
 Function WriteIt(s1, _
 		sRate, _
 		sVoice, _
@@ -1936,7 +1819,6 @@ Function WriteIt(s1, _
 		End If
         fbRemoveFile CruftTest
     Next
-
 	bTattle = False
 	If Len(sImage) > 0 And Not(fbIsAppDataFile(sImage, bTattle)) Then
 		' Remove the temporary song front cover art image created by Impress.
@@ -1952,8 +1834,6 @@ Function WriteIt(s1, _
 	End If
 	WriteIt = bOK
 End Function
-
-
 Function fsDone(b)
 	'''
 	' b - the language name of a culture group. Returns the
@@ -2042,8 +1922,6 @@ Function fsDone(b)
 	End Select
 	fsDone = a1
 End Function
-
-
 Function PlaySound(sURL)
 	'''
 	' Plays a sound in the background
@@ -2065,8 +1943,6 @@ Function PlaySound(sURL)
 	End If
 	PlaySound = b1
 End Function
-
-
 Function sLockPath(s1)
 	'''
 	' Path to temporary file with extension s1
@@ -2079,8 +1955,6 @@ Function sLockPath(s1)
 	userid = WshEnv("USERNAME")
 	sLockPath = sTempDir() & "\" & APP_SIGNATURE & "." & userid & "." & s1
 End Function
-
-
 Function bValidEnvironVar(sA)
 	'''
 	' Is an optional system environment variable like `READTEXTTEMP` valid?
@@ -2089,7 +1963,6 @@ Function bValidEnvironVar(sA)
 	Dim userid
 	Dim WshEnv
 	Dim wshShell
-
 	Set WshShell = CreateObject("WScript.Shell")
 	Set WshEnv = WshShell.Environment("Process")
 	s1= WshEnv(sA)
@@ -2099,16 +1972,12 @@ Function bValidEnvironVar(sA)
 		bValidEnvironVar = True
 	End If
 End Function
-
-
 Function fLogoSrc
 	'''
 	' Read Text logo base 64 encoded data
 	'''
 	fLogoSrc = "data:image/png;base64,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"
 End Function
-
-
 Function getTextFileContent(strFileName, strCharSet)
 	'''
 	' Open a text file using a particular character set.
@@ -2118,7 +1987,6 @@ Function getTextFileContent(strFileName, strCharSet)
 	'''
 	Const adTypeBinary = 1 'not used
 	Const adTypeText = 2
-
 	'Set default CharSet
 	If strCharSet = "" Then strCharSet = "ASCII"
 	' *** CharSets ***
@@ -2141,16 +2009,12 @@ Function getTextFileContent(strFileName, strCharSet)
 	End With
 	Set objStreamFile = Nothing
 End Function
-
-
 Function readFile(s0)
 	'''
 	' Open text file using defaults
 	'''
 	readFile=getTextFileContent(s0, "UTF-8")
 End Function
-
-
 Function fsIsoToHumanReadable(sA, iForceEnglish)
 	'''
 	' Returns name of language, if known
@@ -2684,8 +2548,6 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
 		fsIsoToHumanReadable = a1(2)
 	End If
 End Function
-
-
 Function fsWindowsCloseMatchLanguage(s1)
 		Dim s2
 		s2 = fsWindowsCloseMatchVoice(s1)
@@ -2706,8 +2568,6 @@ Function fsWindowsCloseMatchLanguage(s1)
 			fsWindowsCloseMatchLanguage = s4
 		End If
 End Function
-
-
 Function fsWindowsCloseMatchVoice(s1)
 	' s1 - iso language string in the form `es-ES` or `en-CA`
 	' Returns a human readable string of a language that
@@ -2726,7 +2586,6 @@ Function fsWindowsCloseMatchVoice(s1)
 	Set Sapi = CreateObject("Sapi.SpVoice")
 	' Microsoft SAPI voices have a predictable naming pattern that includes
 	' the language name in the form - `Microsoft David Desktop - English (United States)
-
 	If Sapi.GetVoices.Count = 0 Then
 		fsWindowsCloseMatchVoice = "Ambiguous Or Missing Language"
 	Else
@@ -2748,8 +2607,6 @@ Function fsWindowsCloseMatchVoice(s1)
 		End If
 	End If
 End Function
-
-
 Function fsIsoToConciseHumanReadable(s1, iForceEnglish)
 '  Returns name of language stripped of region
 	Dim a1
@@ -2763,12 +2620,9 @@ Function fsIsoToConciseHumanReadable(s1, iForceEnglish)
 	End If
 	fsIsoToConciseHumanReadable = s2
 End Function
-
-
 Function fsDec2Hex(i1)
 ' Given an integer, returns a hex string
 	Dim s1
-
 	If i1 < 16 Then
 		s1 = Mid("0123456789abcdef", i1 + 1, 1)
 	Else
@@ -2777,8 +2631,6 @@ Function fsDec2Hex(i1)
 	End If
 	fsDec2Hex = s1
 End Function
-
-
 Sub main()
 	'''
 	' Interpret command line, Then speak or convert a text file to a sound file.
@@ -2798,7 +2650,6 @@ Sub main()
 	Dim sImage
 	Dim sDimensions
 	Dim sOutFile
-
 	bOK = False
 	sVisible = ""
 	On Error Resume Next
@@ -2818,7 +2669,6 @@ Sub main()
 		sOutFile = WScript.Arguments.Named.Item("wavefile") 'depreciated
 	End If
 	s0 = WScript.Arguments.Unnamed.Item(0)
-
 	Select Case s0
 		Case "-h","--help","/h","-?"
 			Usage "Help"
@@ -2901,7 +2751,4 @@ Sub main()
 		Usage APP_NAME & ": SAPI speech is not available"
 	End If
 End Sub
-
-
 main()
-

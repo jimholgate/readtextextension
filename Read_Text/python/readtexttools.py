@@ -47,6 +47,8 @@ Currently, python3 is *required* for `speech-dispatcher`.  Python2 requires the
 
 Copyright (c) 2011 - 2024 James Holgate
 """
+
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 import codecs
 import glob
@@ -1881,12 +1883,25 @@ def process_wav_media(
     """
     if not bool(_work):
         return False
+    try:
+        if os.path.isfile(_work):
+            if os.path.getsize(os.path.realpath(_work)) < 200:
+                # Checking size forces python to wait until the TTS engine
+                # finishes writing. If the file size is less than 200 then
+                # the TTS engine failed or it created an unusable link.
+                os.remove(_work)
+                return False
+    except OSError as os_err:
+        print("OSError in `process_wav_media`: {0}".format(os_err))
+        return False
+    except (FileNotFoundError, TypeError, AttributeError):
+        return False
+
     _extension_table = ExtensionTable()
     if not _extension_table.audio_extension_ok(_out):
         clean_temp_files(_work)
         if os.path.isfile(get_my_lock("lock")):
             return True
-        # ignore `_audible` status
         if lax_bool(_visible):
             show_with_app(_work)
         else:
@@ -1917,6 +1932,13 @@ def process_wav_media(
                 or os.path.isfile(_test[_extension_table.standalone])
                 or posix_compressor_ok(out_ext)
             ):
+                if bool(_ffmpeg):
+                    if os.name == "posix":
+                        # If you are using a FlatPak, then force showing the ffmpeg UI
+                        # si that you can hit the [ESC] key to quit, or use other
+                        # ffmpeg keyboard commands. 
+                        if "/app/bin:/usr/bin" in os.environ["PATH"]:
+                            _visible = "true"
                 wav_to_media(
                     _title,
                     _work,
@@ -3864,6 +3886,7 @@ file for `{1}` was found.""".format(
                                 test_item = data[_item]["g"].lower()
                         if (
                             "$[" in _grapheme
+                            or "\\u0024[" in _grapheme           
                             or test_item in _used_graphemes
                             or len(_phoneme) == 0
                         ):
@@ -4205,6 +4228,11 @@ def play_wav_no_ui(file_path=""):  # -> bool
                         "[>] {0} (default) is playing `{1}`".format(a_app, display_file)
                     )
                     webbrowser.open(uri_path)
+                    # Sleep to stop the player from closing midsentence.
+                    calculated_pause = sound_length_seconds(file_path)
+                    if calculated_pause < (1.5):
+                        calculated_pause = 1.5
+                    time.sleep(calculated_pause)
                     return True
                 except (ImportError, NameError):
                     _apt_get_list = ""

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
 """Common tools for network and neural speech synthesis clients"""
+
+
 import math
 import os
 import platform

@@ -1,56 +1,35 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
-<meta>
-<topic
-id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp"
-indexer="include" status="PUBLISH">
-<title id="read_clipboard" xml-lang="en-US">
-Read Clipboard</title>
-<filename>/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp</filename>
-</topic>
-<history>
-<created date="2010-10-22T00:00:00">
-James Holgate</created>
-<lastedited date="2011-04-16T00:00:35">
-Changed Default External UNIX App to python</lastedited>
-</history>
-</meta>
-<body>
-<paragraph role="heading" id="read_clipboard1" xml-lang="en-US" level="1">
-Using Read Text Extension</paragraph>
-<paragraph role="heading" id="read_clipboard1.1" xml-lang="en-US" level="2">
-Read Clipboard
-</paragraph>
-<list>
-<listitem>
-You can read any text you can copy to the clipboard. For example, you can read macro
-code, the contents of text fields, data sources, captions and text in selected parts
-of tables. You can read text copied from external programs like web browsers, help
-or news feeds.
-</listitem>
-<listitem>
-Select some text.
-</listitem>
-<listitem>Use <emph>
-Edit - Copy</emph> or <switchinline select="sys">
-<caseinline select="MAC">
-<emph>
-Command+C</emph> 
-</caseinline>
-<caseinline select="UNIX">
-<emph>
-Ctrl+C</emph> 
-</caseinline>
-<caseinline select="WIN">
-<emph>
-Ctrl+C</emph> 
-</caseinline>
-<defaultinline>
-the keyboard shortcut for copying text</defaultinline>
-</switchinline>
-. </listitem>
-<listitem>Use <emph>
-Tools - Add-Ons - Read Clipboard</emph> . </listitem>
-</list>
-</body>
+    <meta>
+    <topic>
+        <title xml-lang="en-US">Read the clipboard</title>
+        <filename>ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp</filename>
+    </topic>
+    <history>
+        <created date="2024-04-18T15:50:56Z">James Holgate</created>
+    </history>
+    </meta>
+
+    <body xml-lang="en-US">
+
+        <paragraph role="heading" level="1">Read the clipboard</paragraph>
+
+        <paragraph>This extension lets you read any text that you can copy to the clipboard. For example, this includes macro code, text field contents, databases, subtitles and selected content in tables. As well, you can read text that you copy from external programs
+            like web browsers, help or newsfeeds. To read the clipboard, follow these steps:
+        </paragraph>
+
+
+        <list type="ordered">
+
+            <listitem>Select some text.</listitem>
+
+            <listitem>Use the keyboard shortcut to copy text (generally
+                <emph>CTRL + C</emph> or
+                <emph>⌘ + C</emph>).</listitem>
+            <listitem>Select
+                <emph>Tools ▸ Add-ons ▸ Read the clipboard</emph>.</listitem>
+
+        </list>
+
+    </body>
 </helpdocument>

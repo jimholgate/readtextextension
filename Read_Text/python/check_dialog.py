@@ -1,5 +1,6 @@
 """Simple HTML Server to serve a local static web page."""
 
+
 import http.server
 import socketserver
 import os
@@ -7,7 +8,6 @@ import platform
 
 try:
     import requests
-
     REQUESTS_OK = True
 except:
     REQUESTS_OK = False

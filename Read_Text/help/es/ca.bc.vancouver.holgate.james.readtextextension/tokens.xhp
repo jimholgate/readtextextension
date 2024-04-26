@@ -1,154 +1,159 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
-<meta>
-<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp"
-indexer="include" status="PUBLISH">
-<title id="tokens" xml-lang="es-ES">
-Usando la extensión</title>
-<filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
-</topic>
-<history>
-<created date="2024-03-22T12:04:16">James Holgate</created>
-</history>
-</meta>
-<body>
-<paragraph role="heading" id="tokens1" xml-lang="es-ES" level="1">
-Configuracion de la extensión</paragraph>
-<image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
-id="img_dialog3_screenshot">
-<alt xml-lang="es-ES"
-id="alt_dialog3_screenshot">Dialog3 screenshot.</alt>
-</image>
-<paragraph role="heading" id="tokens1.1" xml-lang="es-ES" level="2">
-Tokens
-</paragraph>
-<paragraph>
-Cuando requiera estos valores en un comando o script, haga uso del token
-correspondiente. Cuando el complemento se ejecuta, el valor entre paréntesis se
-sustituye por la cadena real necesaria.</paragraph>
-<list>
-<listitem>
-La fecha actuel (DATE)</listitem>
-<listitem>
-Día actual de la semana tal como se habla en la región (WEEKDAY)</listitem>
-<listitem>
-Hora actual hablada en la región (TIME)</listitem>
-<listitem>
-Hora actual reformateada para que puedas usarla en un nombre de archivo (NOW)</listitem>
-<listitem>
-Nombre completo de la ruta y archivo temporal que contiene el texto seleccionado
-(TMP)</listitem>
-<listitem>
-Nombre del autor o de la autora (AUTHOR)</listitem>
-<listitem>
-Nombre del documento (TITLE)</listitem>
-<listitem>
-Ruta del archivo a la galería de sonidos de la aplicación %PRODUCTNAME
-(SOUND_GALLERY)</listitem>
-<switchinline select="sys">
-<caseinline select="WIN">
-<listitem>
-Un guión de Windows (TTS_WSCRIPT_VBS)</listitem>
-</caseinline>
-<caseinline select="UNIX">
-<listitem>
-Un script en Python para crear un código QR
-(CREATE_QR_LABEL_PY)</listitem>
-<listitem>
-Un script en Python
-(ESPEAK_READ_TEXT_PY)</listitem>
-<listitem>
-Un script en Python
-(FESTIVAL_READ_TEXT_PY)</listitem>
-<listitem>
-Un script en Python
-(NETWORK_READ_TEXT_PY)</listitem>
-<listitem>
-Un programa Python japonés
-(OPENJTALK_READ_TEXT_PY)</listitem>
-<listitem>
-Path to a Python script for reading text aloud
-(PICO_READ_TEXT_PY)</listitem>
-<listitem>
-Un script en Python
-(PIPER_READ_TEXT_PY)</listitem>
-<listitem>
-Restablecer todas las configuraciones (RESET_ALL)</listitem>
-<listitem>
-Un script en Python
-(RHVOICE_READ_TEXT_PY)</listitem>
-<listitem>
-Un guión de síntesis de voz en plataforma Posix.
-(SPD_READ_TEXT_PY)</listitem>
-</caseinline>
-<caseinline select="MAC">
-<listitem>
-Un guión de síntesis de voz en plataforma Apple.
-(SAY_APPLESCRIPT)</listitem>
-</caseinline>
-<defaultinline>
-</defaultinline>
-</switchinline>
-<listitem>
-Su directorio de inicio (HOME)</listitem>
-<listitem>
-Su código de idioma. (LANGUAGE_CODE)</listitem>
-<listitem>
-Su país (COUNTRY_CODE)</listitem>
-<listitem>
-Su país y su idioma (LANGUAGE_COUNTRY_CODE)</listitem>
-<listitem>
-El idioma del texto seleccionado.
-(SELECTION_LANGUAGE_CODE)</listitem>
-<listitem>
-El país del texto seleccionado.
-(SELECTION_COUNTRY_CODE)</listitem>
-<listitem>
-El código regional del texto seleccionado. (SELECTION_LANGUAGE_COUNTRY_CODE)</listitem>
-<listitem>
-(OOO_WEBTEXTSMALL)</listitem>
-<listitem>
-Las primeras 249 letras del texto seleccionado codificadas para URL (OOO_WEBTEXT250)</listitem>
-<listitem>
-Las primeras 9999 letras del texto seleccionado codificadas para URL (OOO_WEBTEXT)</listitem>
-<listitem>
-Las primeras 9999 letras del texto seleccionado codificadas para URL
-(OOO_WEBTEXTBIG)</listitem>
-<listitem>
-El identificador de sesión (SESSION_ID)</listitem>
-<listitem>
-Un identificador de usuario de un solo uso (UNIQUE_ID)</listitem>
-<listitem>
-Un identificador de usuario anónimo (USER_ID)</listitem>
-</list>
-<image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog2.png"
-id="img_dialog2_screenshot">
-<alt xml-lang="es-ES"
-id="alt_dialog2_screenshot">Dialog2.es-ES_lexicon.json</alt>
-</image>
+    <meta>
+        <topic>
+            <title xml-lang="es-ES">Propiedades Avanzadas</title>
+            <filename>ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
+        </topic>
+        <history>
+            <created date="2024-04-18T16:40:21Z">James Holgate</created>
+        </history>
+    </meta>
+    <body xml-lang="es-ES">
 
-<paragraph xml-lang="es-ES" role="heading" level="2">Modificar la pronunciación de una
-palabra</paragraph>
+        <paragraph role="heading" level="1">Propiedades Avanzadas</paragraph>
 
-<paragraph xml-lang="es-ES">Este diálogo no se utiliza en algunos sistemas de computadora.</paragraph>
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
+            id="img_dialog3_screenshot">
+            <alt
+                id="alt_dialog3_screenshot">Dialog3 screenshot.</alt>
+        </image>
+
+        <paragraph role="heading" level="2">Personalice o experimente</paragraph>
 
 
-<list type="ordered" xml-lang="es-ES">
+        <list>
 
-<listitem>En el editor, selecciona la palabra.</listitem>
+            <listitem>Es libre de probar la configuración como desee.</listitem>
 
-<listitem>Selecciona <emph>Herramientas – Complementos – Leer la selección</emph> .</listitem>
+            <listitem>Para volver a los ajustes predeterminados, elija una opción que incluya la
+                cadena <code>(RESET_ALL)</code>.</listitem>
 
-<listitem>Haz clic en el botón <emph>Acerca...</emph> </listitem>
+        </list>
 
-<listitem>Haz clic derecho en el icono de la llave inglesa, que es el cuarto icono desde
-la izquierda en la parte inferior del cuadro de diálogo.</listitem>
 
-<listitem>En el campo <emph>Leer el texto con un programa distinto</emph> , introduce una
-ortografía alternativa para la palabra.</listitem>
+        <paragraph role="heading" level="2">Modificar la pronunciación de una palabra</paragraph>
 
-<listitem>Selecciona el botón <emph>Aplicar</emph> .</listitem>
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog2.png"
+            id="img_dialog2_screenshot">
+            <alt
+                id="alt_dialog2_screenshot">Propiedades de voz</alt>
+        </image>
+        <paragraph>Para modificar la pronunciación de una palabra, siga estos pasos:</paragraph>
 
-</list>
-</body>
+
+        <list type="ordered">
+
+            <listitem>En el editor, seleccione la palabra que desea modificar.</listitem>
+
+            <listitem>Vaya a <emph>Herramientas ▸ Complementos ▸ Leer la selección</emph>….</listitem>
+
+            <listitem>Haga clic en el botón <emph>Acerca</emph>….</listitem>
+
+            <listitem>Haga clic derecho en el icono de la llave inglesa, que es el cuarto icono
+                desde la izquierda en la parte inferior del cuadro de diálogo. Este icono significa
+                “Propiedades de voz”.</listitem>
+
+            <listitem>En el campo <emph>Leer el texto con un programa distinto</emph>, introduzca
+                una ortografía alternativa para la palabra.</listitem>
+
+            <listitem>Haga clic en el botón <emph>Aplicar</emph> para guardar los cambios.</listitem>
+
+        </list>
+
+
+        <paragraph>Con estos pasos, debería poder modificar la pronunciación de cualquier palabra en
+            su texto.</paragraph>
+
+
+        <paragraph role="heading" level="2">Tokens</paragraph>
+
+
+        <list>
+
+            <listitem><code>(AUTHOR)</code> Nombre del autor o de la autora</listitem>
+
+            <listitem><code>(COUNTRY_CODE)</code> Su país</listitem>
+
+            <listitem><code>(CREATE_QR_LABEL_PY)</code> Un script en Python para crear un código QR</listitem>
+
+            <listitem><code>(DATE)</code> La fecha actuel</listitem>
+
+            <listitem><code>(ESPEAK_READ_TEXT_PY)</code> Un script en Python</listitem>
+
+            <listitem><code>(FESTIVAL_READ_TEXT_PY)</code> Un script en Python</listitem>
+
+            <listitem><code>(HOME)</code> Su directorio de inicio</listitem>
+
+            <listitem><code>(LANGUAGE_CODE)</code> Su código de idioma</listitem>
+
+            <listitem><code>(LANGUAGE_COUNTRY_CODE)</code> Su país y su idioma</listitem>
+
+            <listitem><code>(NETWORK_READ_TEXT_PY)</code> Un script en Python</listitem>
+
+            <listitem><code>(NOW)</code> Hora actual reformateada para que puedas usarla en un
+                nombre de archivo</listitem>
+
+            <listitem><code>(OOO_WEBTEXT)</code> Las primeras 9999 letras del texto seleccionado
+                codificadas para URL</listitem>
+
+            <listitem><code>(OOO_WEBTEXT250)</code> Las primeras 249 letras del texto seleccionado
+                codificadas para URL</listitem>
+
+            <listitem><code>(OOO_WEBTEXTBIG)</code> Las primeras 9999 letras del texto seleccionado
+                codificadas para URL</listitem>
+
+            <listitem><code>(OOO_WEBTEXTSMALL)</code> Las primeras 99 letras del texto seleccionado
+                codificadas para URL</listitem>
+
+            <listitem><code>(OPENJTALK_READ_TEXT_PY)</code> Un programa en Python (japonés)</listitem>
+
+            <listitem><code>(PICO_READ_TEXT_PY)</code> Un script en Python</listitem>
+
+            <listitem><code>(PIPER_READ_TEXT_PY)</code> Un script en Python</listitem>
+
+            <listitem><code>(RESET_ALL)</code> Volver a los ajustes predeterminados</listitem>
+
+            <listitem><code>(RHVOICE_READ_TEXT_PY)</code> Un script en Python</listitem>
+
+            <listitem><code>(SAY_APPLESCRIPT)</code> Un guión de síntesis de voz en plataforma MacOS</listitem>
+
+            <listitem><code>(SELECTION_COUNTRY_CODE)</code> El país del texto seleccionado</listitem>
+
+            <listitem><code>(SELECTION_LANGUAGE_CODE)</code> El idioma del texto seleccionado</listitem>
+
+            <listitem><code>(SELECTION_LANGUAGE_COUNTRY_CODE)</code> El código regional del texto
+                seleccionado</listitem>
+
+            <listitem><code>(SESSION_ID)</code> El identificador de sesión</listitem>
+
+            <listitem><code>(SOUND_GALLERY)</code> Ruta del archivo a la galería de sonidos de la
+                aplicación</listitem>
+
+            <listitem><code>(SPD_READ_TEXT_PY)</code> Un guión de síntesis de voz en plataforma
+                Posix</listitem>
+
+            <listitem><code>(TIME)</code> Hora actual hablada en la región</listitem>
+
+            <listitem><code>(TITLE)</code> Nombre del documento</listitem>
+
+            <listitem><code>(TMP)</code> Nombre completo de la ruta y archivo temporal que contiene
+                el texto seleccionado</listitem>
+
+            <listitem><code>(TTS_WSCRIPT_VBS)</code> Un guión de síntesis de voz en plataforma
+                Windows</listitem>
+
+            <listitem><code>(UNIQUE_ID)</code> Un identificador de usuario de un solo uso</listitem>
+
+            <listitem><code>(USER_ID)</code> Un identificador de usuario anónimo</listitem>
+
+            <listitem><code>(WEEKDAY)</code> Día actual de la semana tal como se habla en la región</listitem>
+
+        </list>
+
+
+        <paragraph>Cuando requiera estos valores en un comando o script, haga uso del <code>token</code>
+            correspondiente. Cuando el complemento se ejecuta, el valor entre paréntesis se
+            sustituye por la secuencia de caracteres necesaria.</paragraph>
+    </body>
 </helpdocument>

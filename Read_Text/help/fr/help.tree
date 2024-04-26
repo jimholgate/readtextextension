@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tree_view version="21-March-2024">
-  <help_section application="readtextextension" id="readtextextension01" title="L'extension Read text">
-    <node id="readtextextension0101" title="Installation de l'extension Read text">
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Installation</topic>
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">Configuration</topic>
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">Tokens</topic>
-    </node>
-    <node id="readtextextension0102" title="Utilisation de l'extension Read text">
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Lire la sélection</topic>
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp">Lire le presse-papiers</topic>
-    </node>
-    <node id="readtextextension0103" title="L'extension Read text en ligne">
-      <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp">Informations en ligne</topic>
-    </node>
-  </help_section>
+<help_section application="readtextextension" id="readtextextension01" title="L'extension Read text">
+<node id="readtextextension0101" title="Installation de l'extension Read text">
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Installation</topic>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">Configuration</topic>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">Propriétés avancées</topic>
+</node>
+<node id="readtextextension0102" title="Utilisation de l'extension Read text">
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Lire la sélection</topic>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp">Lire le presse-papiers</topic>
+</node>
+<node id="readtextextension0103" title="L'extension Read text en ligne">
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp">Informations en ligne</topic>
+</node>
+</help_section>
 </tree_view>

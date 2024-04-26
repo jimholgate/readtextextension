@@ -48,6 +48,8 @@ The Japanese source text might be coded as `shift_jis`:
 Copyright (c) 2024 James Holgate
 
 """
+
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 import getopt
 import os

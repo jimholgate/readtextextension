@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
-<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Indices" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  * 
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Indices" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  *
+&apos; TTS_Indices
 &apos;&apos; # Language editing
 &apos;&apos; 
 &apos;&apos; -   [PoEdit](https://poedit.net/) is an open source language string
@@ -121,11 +122,212 @@
 &apos;&apos; extension looks to read and write temporary files.
 &apos;&apos;
 Option Explicit
-global UpdatePoSettingsDone As Integer
+Private pi_anonymous_key_string As Integer
+Private pi_display_info_integer As Integer
+Private pi_external_options_string As Integer
+Private pi_use_external_boolean As Integer
+Private pi_use_html_boolean As Integer
+Private pi_html_string As Integer
+Private pi_use_experimental_boolean As Integer
+Private pi_experimental_options_string As Integer
+Private pi_external_path_string As Integer
+Private pi_experimental_path_string As Integer
+Private pi_use_smart_select_integer As Integer
+Private pi_display_language_string As Integer
 
-global mMyTranslationId(0) As Variant
-global mMyTranslationIdPlur(0) As Variant
-global mMyTranslationStr(0,0) As Variant
+
+Function fvExtensionKeys() As Variant
+	&apos; | --------------------------------------|
+	&apos; | This is a lookup table.               |
+	&apos; | --------------------------------------|
+	&apos; | The Indices | Key Strings | Private   |
+	&apos; | --------------------------------------|	
+	fvExtensionKeys = Array(_
+		Array(0, &quot;dialog1.anonymous.key.string&quot;, &quot;pi_anonymous_key_string&quot;), _
+		Array(1, &quot;dialog1.display.info.integer&quot;, &quot;pi_display_info_integer&quot;), _
+		Array(2, &quot;dialog1.external.options.string&quot;, &quot;pi_external_options_string&quot;), _
+		Array(3, &quot;dialog1.use.external.boolean&quot;, &quot;pi_use_external_boolean&quot;), _
+		Array(4, &quot;dialog1.use.html.boolean&quot;, &quot;pi_use_html_boolean&quot;), _
+		Array(5, &quot;dialog1.html.string&quot;, &quot;pi_html_string&quot;), _
+		Array(6, &quot;dialog1.use.experimental.boolean&quot;, &quot;pi_use_experimental_boolean&quot;), _
+		Array(7, &quot;dialog1.experimental.options.string&quot;, &quot;pi_experimental_options_string&quot;), _
+		Array(8, &quot;dialog1.external.path.string&quot;, &quot;pi_external_path_string&quot;), _
+		Array(9, &quot;dialog1.experimental.path.string&quot;, &quot;pi_experimental_path_string&quot;), _
+		Array(10, &quot;dialog1.use.smart.select.integer&quot;, &quot;pi_use_smart_select_integer&quot;), _
+		Array(11, &quot;dialog1.display.language.string&quot;, &quot;pi_display_language_string&quot;) _
+)
+End Function
+
+Sub PopulateConfigPrivates()
+	&apos; Populate declared private variables with an Integer from
+	&apos; the `fvExtensionKeys()` Array
+	Dim key_info_list As Variant : key_info_list = fvExtensionKeys()
+	Dim i As Integer
+	For i = LBound(key_info_list) To UBound(key_info_list)
+		Select Case key_info_list(i)(0)
+			Case 0 
+			pi_anonymous_key_string = key_info_list(i)(0)
+			Case 1 
+			pi_display_info_integer = key_info_list(i)(0)
+			Case 2 
+			pi_external_options_string = key_info_list(i)(0)
+			Case 3 
+			pi_use_external_boolean = key_info_list(i)(0)
+			Case 4 
+			pi_use_html_boolean = key_info_list(i)(0)
+			Case 5 
+			pi_html_string = key_info_list(i)(0)
+			Case 6 
+			pi_use_experimental_boolean = key_info_list(i)(0)
+			Case 7 
+			pi_experimental_options_string = key_info_list(i)(0)
+			Case 8 
+			pi_external_path_string = key_info_list(i)(0)
+			Case 9 
+			pi_experimental_path_string = key_info_list(i)(0)
+			Case 10 
+			pi_use_smart_select_integer = key_info_list(i)(0)
+			Case 11 
+			pi_display_language_string = key_info_list(i)(0)
+		End Select
+	Next i
+End Sub
+
+
+Sub DevRepairConfigPrivates()
+	&apos; Create Values with the current `Config` List.
+	Dim Story$ : Story = &quot;&quot;
+	Dim x#
+	Dim Item$ : Item = &quot;&quot;
+	Dim Prefix$ : Prefix = &quot;dialog1.&quot;
+	Dim DevPrivate As Variant : DevPrivate = Array()
+
+	For x = 0 To fiUboundConfigOptions()
+		ReDim Preserve DevPrivate(x)
+		DevPrivate(Ubound(DevPrivate)) = Replace(Replace(fsIntegerToKey(x), Prefix, &quot;pi_&quot;), &quot;.&quot;, &quot;_&quot;)
+		Item = DevPrivate(Ubound(DevPrivate))
+		Story = Story &amp; &quot;Private &quot; &amp; Item &amp; &quot; As Integer&quot; &amp; Chr(10)
+	Next
+
+	Story = Story &amp; Join(Array(_
+		&quot;&quot;, _
+		&quot;&quot;, _
+		&quot;Function fvExtensionKeys() As Variant&quot;, _
+		&quot;	&apos; | --------------------------------------|&quot;, _
+		&quot;	&apos; | This is a lookup table.               |&quot;, _
+		&quot;	&apos; | --------------------------------------|&quot;, _
+		&quot;	&apos; | The Indices | Key Strings | Private   |&quot;, _
+		&quot;	&apos; | --------------------------------------|	&quot;, _
+		&quot;	fvExtensionKeys = Array(_&quot; _
+	), Chr(10))
+	
+	For x = Lbound(DevPrivate) To Ubound(DevPrivate)
+		Story = Story &amp; Chr(10) &amp; &quot;		&quot; &amp; &quot;Array(&quot; &amp; Trim(Str(x)) &amp; &quot;, &quot;&quot;&quot;
+		Item = &quot;&quot; &amp; Replace(fsIntegerToKey(x), &quot;_&quot;, &quot;.&quot;)
+		If x = Ubound(DevPrivate) Then
+			Story = Story &amp; Item &amp; &quot;&quot;&quot;, &quot;&quot;&quot; &amp; DevPrivate(x) &amp; &quot;&quot;&quot;) _&quot;
+		Else
+			Story = Story &amp; Item &amp; &quot;&quot;&quot;, &quot;&quot;&quot; &amp; DevPrivate(x) &amp; &quot;&quot;&quot;), _&quot;
+		End If
+	Next
+
+	Story = Story &amp; Join(Array(_
+		&quot;&quot;, _
+		&quot;)&quot;, _
+		&quot;End Function&quot;,_
+		&quot;&quot;, _
+		&quot;&quot; _
+	), Chr(10))
+	Story = Story &amp; Join(Array(_	
+		&quot;Sub PopulateConfigPrivates()&quot;,_
+		&quot;	&apos; Populate declared private variables with an Integer from&quot;,_
+		&quot;	&apos; the `fvExtensionKeys()` Array&quot;,_
+		&quot;	Dim key_info_list As Variant : key_info_list = fvExtensionKeys()&quot;,_
+		&quot;	Dim i As Integer&quot;,_
+		&quot;	For i = LBound(key_info_list) To UBound(key_info_list)&quot;,_
+		&quot;		Select Case key_info_list(i)(0)&quot;,_
+		), Chr(10))
+	For x = Lbound(DevPrivate) To Ubound(DevPrivate)
+		Story = Story &amp; Chr(10) &amp; &quot;			Case &quot; &amp; Trim(Str(x)) &amp; &quot; &quot; &amp; Chr(10)
+		Story = Story &amp; &quot;			&quot; &amp; DevPrivate(x) &amp; &quot; = key_info_list(i)(0)&quot;
+		If x = Ubound(DevPrivate) Then
+			
+		Else
+
+		End If
+	Next
+
+	Story = Story &amp; Join(Array(_
+		&quot;&quot;,_	
+		&quot;		End Select&quot;,_
+		&quot;	Next i&quot;,_
+		&quot;End Sub&quot;,_
+		&quot;&quot;,_
+		&quot;&quot;_
+		), Chr(10))
+	CreateWriterDocumentWithString(Story)
+End Sub
+
+
+Sub CreateWriterDocumentWithString(TextToWrite)
+	&apos; Write `TextToWrite` to a new Writer file.
+	Dim oDoc As Object
+	Dim theComponent As Object
+	oDoc = StarDesktop.loadComponentFromURL(&quot;private:factory/swriter&quot;, &quot;_blank&quot;, 0, Array())
+	theComponent = ThisComponent
+	Dim oCursor As Object
+	oCursor = oDoc.Text.createTextCursor()
+	oDoc.Text.insertString(oCursor, TextToWrite, False)
+	theComponent.setModified(False)
+End Sub
+
+
+Function fvGetKeyInfo(i, j) As Variant
+	fvGetKeyInfo = &quot;&quot;
+	&apos; On Error return `&quot;&quot;. This is a value that identifies an
+	&apos; error in this context.
+	Dim key_info_list As Variant : key_info_list = fvExtensionKeys()
+	If i &gt; Ubound(key_info_list) Then
+		Exit Function
+	End If
+
+	On Error GoTo fvGetKeyInfoErr
+	fvGetKeyInfo = key_info_list(i)(j)
+	Exit Function
+	fvGetKeyInfoErr:
+	fvGetKeyInfo = &quot;&quot;
+End Function
+
+
+Function fsIntegerToKey(_key_no As Integer) As String
+	fsIntegerToKey = &quot;&quot;
+	On Error GoTo fsIntegerToKeyErr
+	If _key_no &gt; Ubound(fvExtensionKeys) Then
+		Exit Function
+	End If
+	fsIntegerToKey = trim(fvGetKeyInfo(_key_no, 1))
+	Exit Function
+	fsIntegerToKeyErr:
+	fsIntegerToKey = &quot;&quot;
+End Function
+
+
+Function fiKeyToInteger(_key As String) As Integer
+	&apos; Return zero or a positive integer for a matching key, otherwise `-1`.
+
+	On Error GoTo fiKeyToIntegerErr
+    Dim key_info_list As Variant : key_info_list = fvExtensionKeys()
+    Dim i As Integer
+    For i = LBound(key_info_list) To UBound(key_info_list)
+        If key_info_list(i)(1) = _key Then
+            fiKeyToInteger = key_info_list(i)(0)
+            Exit Function
+        End If
+    Next i
+    fiKeyToIntegerErr:
+    fiKeyToInteger = -1
+End Function
+
 
 Function fsLookUpTerm( _
 	ByVal sTermCode As String) As String
@@ -169,21 +371,21 @@ Function fsLookUpTerm3( _
 	&apos;   i. e.: en for English, es for Spanish
 	&apos;
 	&apos; Example: Get the language of the selected text:
-	&apos; 
+	&apos;
 	&apos;     fsLookUpTerm3(fsSelectionLanguage())
-	&apos; 
+	&apos;
 	&apos; Example: Get the language of the user interface:
 	&apos;
-	&apos; 
+	&apos;
 	&apos;     fsLookUpTerm3(fsGetLanguage())
-	&apos; 
+	&apos;
 	&apos;
 	&apos;  ### note ###
 	&apos;
 	&apos; Pierre Chef&apos;s PO lookup code stores the current
-	&apos; interface language resources in global variables.  To update
-	&apos; the language on the fly, you need to set the 
-	&apos; `UpdatePoSettingsDone` global variable to -1.
+	&apos; interface language resources in Private variables.  To update
+	&apos; the language on the fly, you need to set the
+	&apos; `UpdatePoSettingsDone` Private variable to -1.
 	&apos;
 	fsLookUpTerm3 = &quot;&quot;
 	Dim s2$
@@ -333,14 +535,14 @@ Function UpdatePoSettings( _
 	podir As String, _
 	Optional ByVal isoCode) As Boolean
 	&apos; Adaptation du code ecrit par [Pierre Chef][UpdatePoSettings1]
-	&apos; en juin, 2009. 
+	&apos; en juin, 2009.
 	&apos;
 	&apos; + Ajoute une option pour le directoire `podir`
 	&apos; + Ajoute une option pour les langues `isoCode`.
 	&apos; + Avec les fichiers encode en UTF-8, vous pouvez utiliser
 	&apos;   les langues complexes et asiatiques sur le platforme
 	&apos;   Windows. (`myTextFile.Encoding=&quot;UTF-8&quot;`)
-	&apos; + On ferme le fichier explicitement a la fin. 
+	&apos; + On ferme le fichier explicitement a la fin.
 	&apos;   (`myTextFile.closeInput`)
 	&apos;
 	&apos; [UpdatePoSettings1]: http://www.oooforum.org/forum/viewtopic.phtml?t=85441
@@ -451,7 +653,7 @@ Function UpdatePoSettings( _
 					position = InStr(lineRead,&quot;nplurals=&quot;)
 					nbPluralMax = Int(Mid(lineRead,position + 9,1)) - 1
 					If nbPluralMax &lt; 0 Then nbPluralMax = 0
-					&apos; Potential bugs : procedure can only use a single digit 
+					&apos; Potential bugs : procedure can only use a single digit
 					&apos; number of plurals (max is Arabic with 6)
 					&apos; if &quot;\n&quot; in readLine set the plural rule
 					&apos; or else you need to get next line(s) until you get &quot;\n&quot;
@@ -566,7 +768,7 @@ Function fsSampleMd(ByVal hl) As String
 	Select Case hl
 		Case &quot;ar&quot;
 		&apos; Excerpt of a Wikipedia article about [Apache OpenOffice][1] accessed 2015-04-09&quot;.
-		&apos; [1]: https://ar.wikipedia.org/wiki/%D8%A3%D9%88%D8%A8%D9%86_%D8%A3%D9%88%D9%81%D9%8A%D8%B3.%D8%A3%D9%88%D8%B1%D8%AC 
+		&apos; [1]: https://ar.wikipedia.org/wiki/%D8%A3%D9%88%D8%A8%D9%86_%D8%A3%D9%88%D9%81%D9%8A%D8%B3.%D8%A3%D9%88%D8%B1%D8%AC
 		&apos; chr(8207) is the unicode rtl marker to switch the reading direction from left to right (LTR)
 		&apos; to right to left (RTL).
 		s1 = fsLookUpTerm2(&quot;s_mdsample&quot;, hl)
@@ -590,10 +792,10 @@ Function fsSampleMd(ByVal hl) As String
 			setWesternDocLanguage(&quot;es-AR&quot;)
 			Case Else
 			setWesternDocLanguage(&quot;es-ES&quot;)
-		End Select 
+		End Select
 		Case &quot;fi&quot;
 		s1 = fsLookUpTerm2(&quot;s_mdsample&quot;, hl)
-		setWesternDocLanguage(&quot;fi-FI&quot;)    
+		setWesternDocLanguage(&quot;fi-FI&quot;)
 		Case &quot;fr&quot;
 		s1 = fsLookUpTerm2(&quot;s_mdsample&quot;, hl)
 		setWesternDocLanguage(&quot;fr-FR&quot;)
@@ -680,6 +882,7 @@ Function fsUser() As String
 End Function
 
 
+
 Function fsMyTempLock(ByVal sExt) As String
 	Dim a1
 	Dim a2
@@ -707,11 +910,11 @@ Function fsMyTempLock(ByVal sExt) As String
 		End If
 	Next
 	If sTemp = &quot;&quot; Then
-		&apos; An environmental setting is missing or the directory is locked. 
+		&apos; An environmental setting is missing or the directory is locked.
 		&apos; The routine checks for an alternative directory using specific paths.
 		sHome = Environ(&quot;HOME&quot;)
 		a2 = Array(&quot;/tmp&quot;, _
-		sHome &amp; &quot;/.config&quot;, _
+		sHome &amp; &quot;/.Config&quot;, _
 		sHome &amp; &quot;/.tmp&quot;, _
 		sHome &amp; &quot;/.temp&quot;, _
 		CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).temp &amp; &quot;&quot;, _
@@ -751,7 +954,7 @@ Function fbTestDirRW( _
 			s1 = &quot;\&quot; &amp; s1
 		End If
 	End If
-	CreateFile(sA &amp; s1, s1, &quot;UTF-8&quot;)
+	CreateFile(sA &amp; s1, s1, &quot;&quot;)
 	If FileExists(sA &amp; s1) Then
 		fbRemoveFile(sA &amp; s1)
 		fbTestDirRW = True
@@ -1001,7 +1204,36 @@ End Function
 
 
 Function fsExtensionSettingsIni() As String
-	fsExtensionSettingsIni = fsFullPathOf(&quot;ooo_text-to-speech.ini&quot;)
+	&apos; On systems with multiple editions of the office application, there
+	&apos; might be several applications that share the same settings directory.
+	&apos; Make sure that the extension settings for each identifiable variant
+	&apos; are distinct.
+	On Error GoTo fsExtensionSettingsIniErr
+	Dim IniVer As String : IniVer = fsGetSetting(&quot;oosetupversion&quot;) &amp; &quot;.ini&quot;
+	Dim Found As String : Found = &quot;&quot;
+	Select Case fsTheOsId()
+	Case &quot;POSIX.APPIMAGE&quot;
+		Found = &quot;appimage_text-to-speech.&quot; &amp; IniVer
+	Case &quot;POSIX.FLATPAK&quot;
+		Found = &quot;flatpak_text-to-speech.&quot; &amp; IniVer
+	Case &quot;POSIX.PYVENV&quot;, &quot;MACOS.PYVENV&quot;, &quot;WINDOWS.PYVENV&quot;
+		Found = &quot;pyvenv_text-to-speech.&quot; &amp; IniVer
+	Case &quot;POSIX.SNAP&quot;
+		Found = &quot;snap_text-to-speech.&quot; &amp; IniVer
+	Case Else
+		If fbIsLibreOffice() Then
+		Found = &quot;lo_text-to-speech.ini&quot;
+		Else
+		Found = &quot;ooo_text-to-speech.ini&quot;
+		End If
+	End Select
+	If fbExperimentalMode() Then
+		Found = &quot;experiment.&quot; &amp; Found
+	End If	
+	fsExtensionSettingsIni = fsFullPathOf(Found)
+	Exit Function
+	fsExtensionSettingsIniErr:
+	fsExtensionSettingsIni = fsFullPathOf(&quot;error_log_text-to-speech.ini&quot;)
 End Function
 
 
@@ -1010,76 +1242,10 @@ Function fsExtensionSetJson(po_dir, _lang As String) As String
 End Function
 
 
-Function fiExperimentalOption() As Integer
-	fiExperimentalOption = 0
-End Function
-
-
-Function fiExperimentalProgramPath() As Integer
-	fiExperimentalProgramPath = 1
-End Function
-
-
-Function fiExperimentalCommand() As Integer
-	fiExperimentalCommand = 2
-End Function
-
-
-Function fiExternalOption() As Integer
-	fiExternalOption = 3
-End Function
-
-
-Function fiExternalProgramPath() As Integer
-	fiExternalProgramPath = 4
-End Function
-
-
-Function fiExternalCommand() As Integer
-	fiExternalCommand = 5
-End Function
-
-
-Function fiAlwaysShowDialogCheckBox() As Integer
-	fiAlwaysShowDialogCheckBox = 6
-End Function
-
-
-Function fiDialogLanguageCombo() As Integer
-	fiDialogLanguageCombo = 7
-End Function
-
-
-Function fiHtmlOption() As Integer
-	fiHtmlOption = 8
-End Function
-
-
-Function fiSmartSelectCheckBox() As Integer
-	fiSmartSelectCheckBox = 9
-End Function
-
-
-Function fiHtmlComboURL() As Integer
-	fiHtmlComboURL = 10
-End Function
-
-
-Function fiAnonymousInstallKey() As Integer
-	fiAnonymousInstallKey = 11
-End Function
-
-
-Function fiCountConfigOptions() As Integer
+Function fiUboundConfigOptions() As Integer
 	&apos; This is the size of the array to hold settings from the configuration file
 	&apos; and dialog
-	fiCountConfigOptions = fiAnonymousInstallKey()
-	&apos; this is the last TTS_OPTION item above - an Integer
-End Function
-
-
-Function fsKeyUSE_SMART_SELECT() As String
-	fsKeyUSE_SMART_SELECT = &quot;text-to-speech.use.smart.select.integer&quot;
+	fiUboundConfigOptions = Ubound(fvExtensionKeys())
 End Function
 
 
@@ -1093,33 +1259,121 @@ Function fsGetLanguage() As String
 End Function
 
 
-Function fsGetOS() As String
-	Select Case getGUIType
+Function fsTheOsId() As String
+	&apos; Return a specific system platform identifier
+	&apos; Example 1 : `WINDOWS.NOSCRIPT`
+	&apos; Example 2 : `POSIX.APPIMAGE
+	&apos; Example 2 : `MACOS.EXPERIMENTAL
+	&apos; Returns the base type `WINDOWS`, `POSIX` or `UNKNOWN` if no more specific
+	&apos; information is available.
+	&apos; UNIX (in capitals) refers to a specific Posix platform, but here, &quot;POSIX&quot;
+	&apos; refers to Posix compliant systems generally, with the exception of MACOS.
+
+	Dim ErrLevel As Integer
+	On Error GoTo fsTheOsIdErr1
+	If Len(s_CaReadTextExtensionGetOS) &lt;&gt; 0 Then
+		fsTheOsId = s_CaReadTextExtensionGetOS
+			Exit Function
+	End If
+	&apos; Do the first session configuration setup
+	PopulateConfigPrivates()
+	fsTheOsIdErr1:
+	Select Case getGUIType()
 		Case 1
-		fsGetOS = &quot;WINDOWS&quot;
+		fsTheOsId = &quot;WINDOWS&quot;
+		On Error GoTo fsTheOsIdErr2
+		If fbUsingWine(False) Then
+			fsTheOsId = &quot;WINDOWS.WINE&quot;
+		ElseIf Len(WinSpeechProgramPath()) = 0 Then
+			fsTheOsId = &quot;WINDOWS.NOSCRIPT&quot;
+		ElseIf fbExperimentalOsId() Then
+			fsTheOsId = &quot;WINDOWS.EXPERIMENTAL&quot;
+		ElseIf fbScriptForgePythonOK(0) Then
+			&apos; Check if the `ScriptForge` library works with the bundled python.
+			fsTheOsId = &quot;WINDOWS.PYVENV&quot;
+		End If
+		fsTheOsIdErr2:
+		s_CaReadTextExtensionGetOS = fsTheOsId
 		Case 4
-		If FileExists(AppleScriptPath()) Then
-			fsGetOS = &quot;MacOS&quot;
-		ElseIf Len(Environ(&quot;ANDROID_ROOT&quot;)) &gt; 0 Then
-			fsGetOS = &quot;ANDROID&quot;
+		Dim PosixPath As String
+		Dim TestPath As String
+		Dim IsMac As Boolean : IsMac = FileExists(AppleScriptPath())
+		On Error GoTo fsTheOsIdErr3
+		If Not IsMac Then
+			If fbStandardPosix() Then
+				fsTheOsId = &quot;POSIX&quot;
+				s_CaReadTextExtensionGetOS = fsTheOsId
+				Exit Function
+			End If
+		End If
+		fsTheOsIdErr3:
+		On Error GoTo fsTheOsIdErr
+		If isMac Then
+			If fbExperimentalOsId() Then
+				fsTheOsId = &quot;MACOS.EXPERIMENTAL&quot;
+			Elseif fbScriptForgePythonOK(1) Then
+				&apos; Major/Minor python version; for example `python3.8`
+				fsTheOsId = &quot;MACOS.PYVENV&quot;
+			Else
+				fsTheOsId = &quot;MACOS&quot;
+			End If
+		ElseIf Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 Then
+			&apos; Replace last session&apos;s temporary path
+			Config(pi_external_path_string) = fsAppImageResourcePath(&quot;python&quot;)
+			Config(pi_display_info_integer) = 0
+			fsTheOsId = &quot;POSIX.APPIMAGE&quot;
+		ElseIf isFlatPak() Then
+			fsTheOsId = &quot;POSIX.FLATPAK&quot;
+		ElseIf isSnap() Then
+			&apos; NOTE: Check periodically to see which non `localhost` speech
+			&apos; synthesis  platforms that Snap supports -- ideally 
+			&apos; speech-dispatcher, but perhaps the `pied` UI download of
+			&apos; `piper-tts`installed in a local snap directory would be accessible.
+			&apos;
+			Config(pi_external_path_string) = ConvertFromUrl(BundlePyPath())
+			fsTheOsId = &quot;POSIX.SNAP&quot;
+		ElseIf fbExperimentalOsId() Then
+			fsTheOsId = &quot;POSIX.EXPERIMENTAL&quot;
+		ElseIf fbScriptForgePythonOK(-1) Then
+			&apos; Major python version; For Example, `python3`
+			fsTheOsId = &quot;POSIX.PYVENV&quot;
+		ElseIf Len(Environ(&quot;ANDROID_ROOT&quot;)) &lt;&gt; 0 Then
+			fsTheOsId = &quot;POSIX.ANDROID&quot;
 		Else
-			fsGetOS = &quot;UNIX&quot;
+			fsTheOsId = &quot;POSIX&quot;
 		End If
 		Case Else
-		If Len(Environ(&quot;ANDROID_ROOT&quot;)) &gt; 0 Then
-			fsGetOS = &quot;ANDROID&quot;
+		&apos; In March, 2024 STARBASIC only has getGUIType 1 and 4
+		If Len(Environ(&quot;ANDROID_ROOT&quot;)) &lt;&gt; 0 Then
+			fsTheOsId = &quot;UNKNOWN.ANDROID&quot;
+		ElseIf fbExperimentalOsId() Then
+			fsTheOsId = &quot;UNKNOWN.EXPERIMENTAL&quot;
 		Else
-			fsGetOS = &quot;UNKNOWN&quot;
+			fsTheOsId = &quot;UNKNOWN&quot;
 		End If
 	End Select
+	s_CaReadTextExtensionGetOS = fsTheOsId
+	Exit Function
+	fsTheOsIdErr:
+	fsTheOsId = &quot;UNKNOWN.ERROR&quot;
+End Function
+
+
+Function fsGetOs()
+	&apos; Return a general system platform identifier
+	&apos; Example : `WINDOWS`
+	&apos; `getGUIType()` is much faster than `fsGetOS()` or
+	&apos; `fsTheOsId()` so use it for determining how to handle
+	&apos; `os.path`, `os.sep`, etc.
+		fsGetOs = Split(fsTheOsId(), &quot;.&quot;)(0)
 End Function
 
 
 Function fsGetSetting(sA) As String
 	Dim oProdNameAccess As Object
-	
-	If Not globalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) Then
-		globalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	fsGetSetting = &quot;&quot;
+	If Not fbTestLibraryLoaded(&quot;Tools&quot;) Then
+		Exit Function
 	End If
 	oProdNameAccess = GetRegistryKeyContent(&quot;org.openoffice.Setup/Product&quot;)
 	Select Case LCase(sA)
@@ -1227,13 +1481,15 @@ Function fsFestivalDirectory( _
 	&apos; Incorrectly installed voices will be silent. Some instructions on
 	&apos; the web for installing mbrola voices need to be updated to work
 	&apos; with the latest version of Festival.
-	Select Case fsGetOS()
+	Select Case fsTheOsId()
 		Case &quot;WINDOWS&quot;
 		If FileExists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
 			s2 = converttourl(fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;)
 		Else
 			s2 = converttourl(fsProgramDirectory &amp; &quot;Festival\voices\&quot;)
 		End If
+		Case &quot;WINDOWS.WINE&quot;, &quot;WINDOWS.NOSCRIPT&quot;
+		Exit Function
 		Case Else
 		s2 = converttourl(&quot;/usr/share/festival/&quot;)
 	End Select
@@ -1378,235 +1634,111 @@ Function fiCountFestivalLanguage() As Integer
 End Function
 
 
-Function fsGetEspeakMbrolaLanguage( _
-	i As Integer, _
-	j As Integer) As String
-	&apos;Values for j
-	&apos;1 is mbrola voice file name
-	&apos;2 is language and country code
-	&apos; See &lt;https://www.loc.gov/standards/iso639-2/php/English_list.php&gt;
-	&apos; and &lt;https://www.iso.org/iso-3166-country-codes.html&gt;
-	&apos;3 is gender
-	&apos;4 is name of voice in English
-	Dim s(fiCountEspeakMbrolaLanguage(), 4)
+
+Function fvMbrolaVoiceList() As Variant
+	fvMbrolaVoiceList = Array(_
+		Array(&quot;vz1&quot;, &quot;es-VE&quot;, &quot;male&quot;, &quot;Venezuelan Spanish 1&quot;), _
+		Array(&quot;us3&quot;, &quot;en-US&quot;, &quot;male&quot;, &quot;American English 3&quot;), _
+		Array(&quot;us2&quot;, &quot;en-US&quot;, &quot;male&quot;, &quot;American English 2&quot;), _
+		Array(&quot;us1&quot;, &quot;en-US&quot;, &quot;female&quot;, &quot;American English 1&quot;), _
+		Array(&quot;tr2&quot;, &quot;tr-TR&quot;, &quot;female&quot;, &quot;Turkish 2&quot;), _
+		Array(&quot;tr1&quot;, &quot;tr-TR&quot;, &quot;male&quot;, &quot;Turkish 1&quot;), _
+		Array(&quot;sw2&quot;, &quot;sv-SE&quot;, &quot;female&quot;, &quot;Swedish 2&quot;), _
+		Array(&quot;sw1&quot;, &quot;sv-SE&quot;, &quot;male&quot;, &quot;Swedish 1&quot;), _
+		Array(&quot;ro1&quot;, &quot;ro-RO&quot;, &quot;male&quot;, &quot;Romanian 1&quot;), _
+		Array(&quot;pt1&quot;, &quot;pt-PT&quot;, &quot;female&quot;, &quot;European Portuguese 1&quot;), _
+		Array(&quot;pl1&quot;, &quot;en-us&quot;, &quot;female&quot;, &quot;Polish 1&quot;), _
+		Array(&quot;nl3&quot;, &quot;nl-NL&quot;, &quot;female&quot;, &quot;Dutch 3&quot;), _
+		Array(&quot;nl2&quot;, &quot;nl-NL&quot;, &quot;male&quot;, &quot;Dutch 1&quot;), _
+		Array(&quot;nl1&quot;, &quot;nl-NL&quot;, &quot;male&quot;, &quot;Dutch 2&quot;), _
+		Array(&quot;mx2&quot;, &quot;es-MX&quot;, &quot;male&quot;, &quot;Mexican Spanish 2&quot;), _
+		Array(&quot;mx1&quot;, &quot;es-MX&quot;, &quot;male&quot;, &quot;Mexican Spanish 1&quot;), _
+		Array(&quot;la1&quot;, &quot;la-IT&quot;, &quot;male&quot;, &quot;Classical Latin 1&quot;), _
+		Array(&quot;it4&quot;, &quot;it-IT&quot;, &quot;female&quot;, &quot;Italian 4&quot;), _
+		Array(&quot;it3&quot;, &quot;it-IT&quot;, &quot;male&quot;, &quot;Italian 3&quot;), _
+		Array(&quot;it2&quot;, &quot;it-IT&quot;, &quot;female&quot;, &quot;Italian 2&quot;), _
+		Array(&quot;it1&quot;, &quot;it-IT&quot;, &quot;male&quot;, &quot;Italian 1&quot;), _
+		Array(&quot;in2&quot;, &quot;hi-IN&quot;, &quot;female&quot;, &quot;Hindi 2&quot;), _
+		Array(&quot;in1&quot;, &quot;hi-IN&quot;, &quot;male&quot;, &quot;Hindi 1&quot;), _
+		Array(&quot;id1&quot;, &quot;en-us&quot;, &quot;male&quot;, &quot;Indonesian 1&quot;), _
+		Array(&quot;hu1&quot;, &quot;en-us&quot;, &quot;female&quot;, &quot;Hungarian 1&quot;), _
+		Array(&quot;gr2&quot;, &quot;he-GR&quot;, &quot;male&quot;, &quot;Greek 2&quot;), _
+		Array(&quot;gr1&quot;, &quot;he-GR&quot;, &quot;male&quot;, &quot;Greek 1&quot;), _
+		Array(&quot;fr7&quot;, &quot;fr-FR&quot;, &quot;male&quot;, &quot;French 7&quot;), _
+		Array(&quot;fr6&quot;, &quot;fr-FR&quot;, &quot;male&quot;, &quot;French 6&quot;), _
+		Array(&quot;fr5&quot;, &quot;fr-FR&quot;, &quot;male&quot;, &quot;French 5&quot;), _
+		Array(&quot;fr4&quot;, &quot;fr-FR&quot;, &quot;female&quot;, &quot;French 4&quot;), _
+		Array(&quot;fr3&quot;, &quot;fr-FR&quot;, &quot;male&quot;, &quot;French 3&quot;), _
+		Array(&quot;fr2&quot;, &quot;fr-FR&quot;, &quot;female&quot;, &quot;French 2&quot;), _
+		Array(&quot;fr1&quot;, &quot;fr-FR&quot;, &quot;male&quot;, &quot;French 1&quot;), _
+		Array(&quot;es4&quot;, &quot;es-ES&quot;, &quot;male&quot;, &quot;Spanish 4&quot;), _
+		Array(&quot;es2&quot;, &quot;es-ES&quot;, &quot;male&quot;, &quot;Spanish 2&quot;), _
+		Array(&quot;es1&quot;, &quot;es-ES&quot;, &quot;male&quot;, &quot;Spanish 1&quot;), _
+		Array(&quot;en1&quot;, &quot;en-GB&quot;, &quot;male&quot;, &quot;British English 1&quot;), _
+		Array(&quot;de8&quot;, &quot;de-DE&quot;, &quot;male&quot;, &quot;German 8&quot;), _
+		Array(&quot;de7&quot;, &quot;de-DE&quot;, &quot;female&quot;, &quot;German 7&quot;), _
+		Array(&quot;de6&quot;, &quot;de-DE&quot;, &quot;male&quot;, &quot;German 6&quot;), _
+		Array(&quot;de5&quot;, &quot;de-DE&quot;, &quot;female&quot;, &quot;German 5&quot;), _
+		Array(&quot;de4&quot;, &quot;de-DE&quot;, &quot;male&quot;, &quot;German 4&quot;), _
+		Array(&quot;de3&quot;, &quot;de-DE&quot;, &quot;female&quot;, &quot;German 3&quot;), _
+		Array(&quot;de2&quot;, &quot;de-DE&quot;, &quot;male&quot;, &quot;German 2&quot;), _
+		Array(&quot;de1&quot;, &quot;de-DE&quot;, &quot;male&quot;, &quot;German-Bavarian 1&quot;), _
+		Array(&quot;cz2&quot;, &quot;cs-CZ&quot;, &quot;male&quot;, &quot;Czech 2&quot;), _
+		Array(&quot;cz1&quot;, &quot;cs-CZ&quot;, &quot;female&quot;, &quot;Czech 1&quot;), _
+		Array(&quot;ca2&quot;, &quot;fr-CA&quot;, &quot;male&quot;, &quot;Canadian French 2&quot;), _
+		Array(&quot;ca1&quot;, &quot;fr-CA&quot;, &quot;male&quot;, &quot;Canadian French 1&quot;), _
+		Array(&quot;br4&quot;, &quot;pt-BR&quot;, &quot;male&quot;, &quot;Brazilian Portuguese 4&quot;), _
+		Array(&quot;br3&quot;, &quot;pt-BR&quot;, &quot;male&quot;, &quot;Brazilian Portuguese 3&quot;), _
+		Array(&quot;br1&quot;, &quot;pt-BR&quot;, &quot;male&quot;, &quot;Brazilian Portuguese 2&quot;), _
+		Array(&quot;af1&quot;, &quot;af-ZA&quot;, &quot;male&quot;, &quot;Afrikaans 1&quot;), _
+	)
+End Function
+
+
+Sub zzz_HowToUse_fsGetEspeakMbrolaLanguage()
+	&apos; test code
+	Dim voice_name As Integer : voice_name = 0
+	Dim iso_lang As Integer : iso_lang = 1
+	Dim gender As Integer : gender = 2
+	Dim verbose_lang As Integer : verbose_lang = 3
+
+	&apos; `n` represents the row
+	Dim MbrolaVoiceList As Variant : MbrolaVoiceList = fvMbrolaVoiceList()
+	&apos; Rather than setting a fixed value for the maximum value of `Ubound`, examine
+	&apos; the data
+	Dim n  As Integer : n = Ubound(MbrolaVoiceList)
+	print fsGetEspeakMbrolaLanguage(n, voice_name)
+	print fsGetEspeakMbrolaLanguage(n, iso_lang)
+	print fsGetEspeakMbrolaLanguage(n, gender)
+	print fsGetEspeakMbrolaLanguage(n, verbose_lang)
+End Sub
+
+
+Function fsGetEspeakMbrolaLanguage(i As Integer, j As Integer) As String
+	&apos; This function returns information about Espeak Mbrola languages.
+	&apos; The parameters i and j determine the specific information returned.
+	&apos;
+	&apos; Parameters:
+	&apos; i: Index of the language.
+	&apos; j: Type of information to return.
+	&apos;	0: Returns the mbrola voice file name.
+	&apos;	1: Returns the language and country code.
+	&apos;	   See https://www.loc.gov/standards/iso639-2/php/English_list.php
+	&apos;	   and https://www.iso.org/iso-3166-country-codes.html
+	&apos;	2: Returns the gender.
+	&apos;	3: Returns the name of the voice in English.
 	
-	s(0,1) = &quot;vz1&quot;
-	s(0,2) = &quot;es-VE&quot;
-	s(0,3) = &quot;male&quot;
-	s(0,4) = &quot;Venezuelan Spanish 1&quot;
-	s(1,1) = &quot;us3&quot;
-	s(1,2) = &quot;en-US&quot;
-	s(1,3) = &quot;male&quot;
-	s(1,4) = &quot;American English 3&quot;
-	s(2,1) = &quot;us2&quot;
-	s(2,2) = &quot;en-US&quot;
-	s(2,3) = &quot;male&quot;
-	s(2,4) = &quot;American English 2&quot;
-	s(3,1) = &quot;us1&quot;
-	s(3,2) = &quot;en-US&quot;
-	s(3,3) = &quot;female&quot;
-	s(3,4) = &quot;American English 1&quot;
-	s(4,1) = &quot;tr2&quot;
-	s(4,2) = &quot;tr-TR&quot;
-	s(4,3) = &quot;female&quot;
-	s(4,4) = &quot;Turkish 2&quot;
-	s(5,1) = &quot;tr1&quot;
-	s(5,2) = &quot;tr-TR&quot;
-	s(5,3) = &quot;male&quot;
-	s(5,4) = &quot;Turkish 1&quot;
-	s(6,1) = &quot;sw2&quot;
-	s(6,2) = &quot;sv-SE&quot;
-	s(6,3) = &quot;female&quot;
-	s(6,4) = &quot;Swedish 2&quot;
-	s(7,1) = &quot;sw1&quot;
-	s(7,2) = &quot;sv-SE&quot;
-	s(7,3) = &quot;male&quot;
-	s(7,4) = &quot;Swedish 1&quot;
-	s(8,1) = &quot;ro1&quot;
-	s(8,2) = &quot;ro-RO&quot;
-	s(8,3) = &quot;male&quot;
-	s(8,4) = &quot;Romanian 1&quot;
-	s(9,1) = &quot;pt1&quot;
-	s(9,2) = &quot;pt-PT&quot;
-	s(9,3) = &quot;female&quot;
-	s(9,4) = &quot;European Portuguese 1&quot;
-	s(10,1) = &quot;pl1&quot;
-	s(10,2) = &quot;en-us&quot;
-	s(10,3) = &quot;female&quot;
-	s(10,4) = &quot;Polish 1&quot;
-	s(11,1) = &quot;nl3&quot;
-	s(11,2) = &quot;nl-NL&quot;
-	s(11,3) = &quot;female&quot;
-	s(11,4) = &quot;Dutch 3&quot;
-	s(12,1) = &quot;nl2&quot;
-	s(12,2) = &quot;nl-NL&quot;
-	s(12,3) = &quot;male&quot;
-	s(12,4) = &quot;Dutch 1&quot;
-	s(13,1) = &quot;nl1&quot;
-	s(13,2) = &quot;nl-NL&quot;
-	s(13,3) = &quot;male&quot;
-	s(13,4) = &quot;Dutch 2&quot;
-	s(14,1) = &quot;mx2&quot;
-	s(14,2) = &quot;es-MX&quot;
-	s(14,3) = &quot;male&quot;
-	s(14,4) = &quot;Mexican Spanish 2&quot;
-	s(15,1) = &quot;mx1&quot;
-	s(15,2) = &quot;es-MX&quot;
-	s(15,3) = &quot;male&quot;
-	s(15,4) = &quot;Mexican Spanish 1&quot;
-	s(16,1) = &quot;la1&quot;
-	s(16,2) = &quot;la-IT&quot;
-	s(16,3) = &quot;male&quot;
-	s(16,4) = &quot;Classical Latin 1&quot;
-	s(17,1) = &quot;it4&quot;
-	s(17,2) = &quot;it-IT&quot;
-	s(17,3) = &quot;female&quot;
-	s(17,4) = &quot;Italian 4&quot;
-	s(18,1) = &quot;it3&quot;
-	s(18,2) = &quot;it-IT&quot;
-	s(18,3) = &quot;male&quot;
-	s(18,4) = &quot;Italian 3&quot;
-	s(19,1) = &quot;it2&quot;
-	s(19,2) = &quot;it-IT&quot;
-	s(19,3) = &quot;female&quot;
-	s(19,4) = &quot;Italian 2&quot;
-	s(20,1) = &quot;it1&quot;
-	s(20,2) = &quot;it-IT&quot;
-	s(20,3) = &quot;male&quot;
-	s(20,4) = &quot;Italian 1&quot;
-	s(21,1) = &quot;in2&quot;
-	s(21,2) = &quot;hi-IN&quot;
-	s(21,3) = &quot;female&quot;
-	s(21,4) = &quot;Hindi 2&quot;
-	s(22,1) = &quot;in1&quot;
-	s(22,2) = &quot;hi-IN&quot;
-	s(22,3) = &quot;male&quot;
-	s(22,4) = &quot;Hindi 1&quot;
-	s(23,1) = &quot;id1&quot;
-	s(23,2) = &quot;en-us&quot;
-	s(23,3) = &quot;male&quot;
-	s(23,4) = &quot;Indonesian 1&quot;
-	s(24,1) = &quot;hu1&quot;
-	s(24,2) = &quot;en-us&quot;
-	s(24,3) = &quot;female&quot;
-	s(24,4) = &quot;Hungarian 1&quot;
-	s(25,1) = &quot;gr2&quot;
-	s(25,2) = &quot;he-GR&quot;
-	s(25,3) = &quot;male&quot;
-	s(25,4) = &quot;Greek 2&quot;
-	s(26,1) = &quot;gr1&quot;
-	s(26,2) = &quot;he-GR&quot;
-	s(26,3) = &quot;male&quot;
-	s(26,4) = &quot;Greek 1&quot;
-	s(27,1) = &quot;fr7&quot;
-	s(27,2) = &quot;fr-FR&quot;
-	s(27,3) = &quot;male&quot;
-	s(27,4) = &quot;French 7&quot;
-	s(28,1) = &quot;fr6&quot;
-	s(28,2) = &quot;fr-FR&quot;
-	s(28,3) = &quot;male&quot;
-	s(28,4) = &quot;French 6&quot;
-	s(29,1) = &quot;fr5&quot;
-	s(29,2) = &quot;fr-FR&quot;
-	s(29,3) = &quot;male&quot;
-	s(29,4) = &quot;French 5&quot;
-	s(30,1) = &quot;fr4&quot;
-	s(30,2) = &quot;fr-FR&quot;
-	s(30,3) = &quot;female&quot;
-	s(30,4) = &quot;French 4&quot;
-	s(31,1) = &quot;fr3&quot;
-	s(31,2) = &quot;fr-FR&quot;
-	s(31,3) = &quot;male&quot;
-	s(31,4) = &quot;French 3&quot;
-	s(32,1) = &quot;fr2&quot;
-	s(32,2) = &quot;fr-FR&quot;
-	s(32,3) = &quot;female&quot;
-	s(32,4) = &quot;French 2&quot;
-	s(33,1) = &quot;fr1&quot;
-	s(33,2) = &quot;fr-FR&quot;
-	s(33,3) = &quot;male&quot;
-	s(33,4) = &quot;French 1&quot;
-	s(34,1) = &quot;es4&quot;
-	s(34,2) = &quot;es-ES&quot;
-	s(34,3) = &quot;male&quot;
-	s(34,4) = &quot;Spanish 4&quot;
-	s(35,1) = &quot;es2&quot;
-	s(35,2) = &quot;es-ES&quot;
-	s(35,3) = &quot;male&quot;
-	s(35,4) = &quot;Spanish 2&quot;
-	s(36,1) = &quot;es1&quot;
-	s(36,2) = &quot;es-ES&quot;
-	s(36,3) = &quot;male&quot;
-	s(36,4) = &quot;Spanish 1&quot;
-	s(37,1) = &quot;en1&quot;
-	s(37,2) = &quot;en-GB&quot;
-	s(37,3) = &quot;male&quot;
-	s(37,4) = &quot;British English 1&quot;
-	s(38,1) = &quot;de8&quot;
-	s(38,2) = &quot;de-DE&quot;
-	s(38,3) = &quot;male&quot;
-	s(38,4) = &quot;German 8&quot;
-	s(39,1) = &quot;de7&quot;
-	s(39,2) = &quot;de-DE&quot;
-	s(39,3) = &quot;female&quot;
-	s(39,4) = &quot;German 7&quot;
-	s(40,1) = &quot;de6&quot;
-	s(40,2) = &quot;de-DE&quot;
-	s(40,3) = &quot;male&quot;
-	s(40,4) = &quot;German 6&quot;
-	s(41,1) = &quot;de5&quot;
-	s(41,2) = &quot;de-DE&quot;
-	s(41,3) = &quot;female&quot;
-	s(41,4) = &quot;German 5&quot;
-	s(42,1) = &quot;de4&quot;
-	s(42,2) = &quot;de-DE&quot;
-	s(42,3) = &quot;male&quot;
-	s(42,4) = &quot;German 4&quot;
-	s(43,1) = &quot;de3&quot;
-	s(43,2) = &quot;de-DE&quot;
-	s(43,3) = &quot;female&quot;
-	s(43,4) = &quot;German 3&quot;
-	s(44,1) = &quot;de2&quot;
-	s(44,2) = &quot;de-DE&quot;
-	s(44,3) = &quot;male&quot;
-	s(44,4) = &quot;German 2&quot;
-	s(45,1) = &quot;de1&quot;
-	s(45,2) = &quot;de-DE&quot;
-	s(45,3) = &quot;male&quot;
-	s(45,4) = &quot;German-Bavarian 1&quot;
-	s(46,1) = &quot;cz2&quot;
-	s(46,2) = &quot;cs-CZ&quot;
-	s(46,3) = &quot;male&quot;
-	s(46,4) = &quot;Czech 2&quot;
-	s(47,1) = &quot;cz1&quot;
-	s(47,2) = &quot;cs-CZ&quot;
-	s(47,3) = &quot;female&quot;
-	s(47,4) = &quot;Czech 1&quot;
-	s(48,1) = &quot;ca2&quot;
-	s(48,2) = &quot;fr-CA&quot;
-	s(48,3) = &quot;male&quot;
-	s(48,4) = &quot;Canadian French 2&quot;
-	s(49,1) = &quot;ca1&quot;
-	s(49,2) = &quot;fr-CA&quot;
-	s(49,3) = &quot;male&quot;
-	s(49,4) = &quot;Canadian French 1&quot;
-	s(50,1) = &quot;br4&quot;
-	s(50,2) = &quot;pt-BR&quot;
-	s(50,3) = &quot;male&quot;
-	s(50,4) = &quot;Brazilian Portuguese 4&quot;
-	s(51,1) = &quot;br3&quot;
-	s(51,2) = &quot;pt-BR&quot;
-	s(51,3) = &quot;male&quot;
-	s(51,4) = &quot;Brazilian Portuguese 3&quot;
-	s(52,1) = &quot;br1&quot;
-	s(52,2) = &quot;pt-BR&quot;
-	s(52,3) = &quot;male&quot;
-	s(52,4) = &quot;Brazilian Portuguese 2&quot;
-	s(53,1) = &quot;af1&quot;
-	s(53,2) = &quot;af-ZA&quot;
-	s(53,3) = &quot;male&quot;
-	s(53,4) = &quot;Afrikaans 1&quot;
-	fsGetEspeakMbrolaLanguage = s(i,j)
+	&apos; Populate the array with the language information.
+	&apos; Each row represents a language, and the columns represent different types of information.
+	fsGetEspeakMbrolaLanguage = &quot;&quot;
+	On Error GoTo fsGetEspeakMbrolaLanguageErr
+	&apos; On Error return `&quot;&quot;`
+	Dim mbrola_voices As Variant : mbrola_voices = fvMbrolaVoiceList()
+	&apos; Return the requested information.	
+	fsGetEspeakMbrolaLanguage = mbrola_voices(i)(j)
+	Exit Function
+	fsGetEspeakMbrolaLanguageErr:
+	fsGetEspeakMbrolaLanguage = &quot;&quot;
 End Function
 
 
@@ -1676,7 +1808,7 @@ Function fsTimeMyRegion(i As Integer) As String
 		&apos; Use language of doc
 		s1 = fsDocLanguage()
 	ElseIf i = 1 Then
-		&apos; Use language neutral notation 
+		&apos; Use language neutral notation
 		s1 = &quot;zzy&quot;
 	Else
 		&apos; Use language of UI
@@ -1686,7 +1818,7 @@ Function fsTimeMyRegion(i As Integer) As String
 	Select Case s1
 		Case &quot;es&quot;  &apos;la 1 y 40 de la mañana; las 2 y 40 de la tarde
 		If Hour(Now) = 0 Then
-			sL10N = &quot;medionoche y &quot; &amp; Minute(Now)
+			sL10N = &quot;medianoche y &quot; &amp; Minute(Now)
 		ElseIf Hour(Now) = 1 Then
 			sL10N = &quot;la &quot; &amp; Hour(Now) &amp; &quot; y &quot; &amp; Minute(Now) &amp; &quot;de la mañana&quot;
 		ElseIf Hour(Now) &lt; 12 Then
@@ -1747,7 +1879,7 @@ Function fsGetHomeDir() As String
 		For n = LBound(a1) To UBound(a1)
 			If Len(a1(n)) &gt; 0 Then
 				If CreateFile(a1(n) &amp; &quot;log.txt&quot;, fsGetSetting(&quot;ooname&quot;) &amp; _
-					&quot; - &quot; &amp; fsFileTime(), &quot;UTF-8&quot;) Then
+					&quot; - &quot; &amp; fsFileTime(), &quot;&quot;) Then
 					kill a1(n) &amp; &quot;log.txt&quot;
 					fsGetHomeDir = a1(n)
 					Exit For

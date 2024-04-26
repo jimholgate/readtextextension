@@ -4,19 +4,19 @@
 <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp"
 indexer="include" status="PUBLISH">
 <title id="tokens" xml-lang="de-DE">
-Befehls- und Script-Tokens</title>
+    Erweiterte Funktionen</title>
 <filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
 </topic>
 <history>
 <created date="2010-10-22T00:00:00">
 James Holgate</created>
-<lastedited date="2024-03-15T20:07:25">
+<lastedited date="2024-04-15T20:13:25">
 James Holgate ID tokens</lastedited>
 </history>
 </meta>
 <body>
 <paragraph role="heading" id="tokens1" xml-lang="de-DE" level="1">
-Installieren der Read Text Extension</paragraph>
+Erweiterte Funktionen</paragraph>
 <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
 id="img_dialog3_screenshot">
 <alt xml-lang="de-DE"

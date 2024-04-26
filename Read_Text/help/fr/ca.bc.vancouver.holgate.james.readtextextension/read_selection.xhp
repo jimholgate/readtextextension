@@ -11,13 +11,13 @@ Lire la sélection</title>
 <history>
 <created date="2010-10-22T00:00:00">
 James Holgate</created>
-<lastedited date="2011-04-16T00:00:35">
-Changed Default External UNIX App to python</lastedited>
+<lastedited date="2024-04-19T11:51:48Z">
+Normalize vocabulary and punctuation</lastedited>
 </history>
 </meta>
 <body>
 <paragraph role="heading" id="read_selection1" xml-lang="fr-CA" level="1">
-Utilisation de l'extension Read text</paragraph>
+Utilisation de l’extension Read text</paragraph>
 <paragraph role="heading" id="read_selection1.1" xml-lang="fr-CA" level="2">
 Lire la sélection
 </paragraph>
@@ -31,7 +31,7 @@ Sélectionnez un cellule.
 Sélectionnez du texte dans une boite texte.
 </caseinline>
 <caseinline select="IMPRESS">
-Sélectionnez du texte en mode d'affichage normal ou en mode d'affichage
+Sélectionnez du texte en mode d’affichage normal ou en mode d’affichage
 notes.
 </caseinline>
 <caseinline select="WRITER">
@@ -42,7 +42,7 @@ Ouvrez Calc, Draw, Impress, Web Writer ou Writer, et sélectionnez du texte.
 </defaultinline>
 </switchinline>
 </listitem>
-<listitem>Cliquez le bouton <emph>
+<listitem>Cliquez l’icône <emph>
 Lire la sélection</emph> sur la barre. </listitem>
 </list>
 </body>

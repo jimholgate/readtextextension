@@ -1,29 +1,20 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
-<meta>
-<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp"
-indexer="include" status="PUBLISH">
-<title id="online" xml-lang="es-ES">
-Ayuda On-line</title>
-<filename>/ca.bc.vancouver.holgate.james.readtextextension/online.xhp</filename>
-</topic>
-<history>
-<created date="2024-03-22T12:04:16">James Holgate</created>
-</history>
-</meta>
-<body>
-<bookmark branch="hid/ca_bc_vancouver_holgate_james_readtextextension:READTEXT0006"
-xml-lang="es-ES" id="BOOKMARK0006" />
-<paragraph role="heading" id="online1" xml-lang="es-ES" level="1">
-El sitio web</paragraph>
-<paragraph role="heading" id="online1.1" xml-lang="es-ES" level="2">
-Ayuda On-line
-</paragraph>
-<paragraph>Para obtener más información sobre la extensión, visite el sitio. <link
-href="https://sites.google.com/site/readtextextension/"
-name="https://sites.google.com/site/readtextextension/">
-http://sites.google.com/site/readtextextension/
-</link>
-</paragraph>
-</body>
+    <meta>
+        <topic>
+            <title xml-lang="es-ES">Ayuda en linea</title>
+            <filename>ca.bc.vancouver.holgate.james.readtextextension/online.xhp</filename>
+        </topic>
+        <history>
+            <created date="2024-04-18T16:03:23Z">James Holgate</created>
+        </history>
+    </meta>
+    <body xml-lang="es-ES">
+
+        <paragraph role="heading" level="1">Ayuda en linea</paragraph>
+
+        <paragraph>Si desea obtener más información sobre la extensión, puede visitar este sitio
+            web. <link href="https://sites.google.com/site/readtextextension/">
+            https://sites.google.com/site/readtextextension/</link></paragraph>
+    </body>
 </helpdocument>

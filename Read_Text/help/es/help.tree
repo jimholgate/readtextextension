@@ -1,26 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tree_view version="22-March-2024">
-  <help_section application="readtextextension" id="readtextextension01"
-title="La extensión Read Text">
-<node id="readtextextension0101" title="Configuracion de la extensión">
-  <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">
-Installacion</topic>
-  <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">
-Configuracion</topic>
-  <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">
-Tokens</topic>
+<tree_view version="18-April-2024">
+<help_section application="readtextextension" id="readtextextension01"
+title="El complemento “Read Text”">
+<node id="readtextextension0101" title="Configuración de la extensión">
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp">Instalación</topic>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp">Configuración</topic>
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp">Propiedades Avanzadas</topic>
 </node>
-<node id="readtextextension0102" title="Usando la extensión">
-  <topic
-id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Leer
-la selección</topic>
-  <topic
-id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp">Leer
-el portapapeles</topic>
+<node id="readtextextension0102" title="Utilisación de la extensión">
+<topic
+id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp">Leer la selección</topic>
+<topic
+id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp">Leer el portapapeles</topic>
 </node>
-<node id="readtextextension0103" title="El sitio web">
-  <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp">Ayuda
-On-line</topic>
+<node id="readtextextension0103" title="Documentación en linea">
+<topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp">El sitio web</topic>
 </node>
-  </help_section>
+</help_section>
 </tree_view>

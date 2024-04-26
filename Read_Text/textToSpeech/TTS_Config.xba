@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Config" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  *
+&apos;&apos; TTS_Config
 &apos;&apos; # Configuration tools
 &apos;&apos; 
 &apos;&apos; These procedures make dialogues, get settings and write settings.
@@ -28,18 +29,8 @@ Option Explicit
 Private f_dlgSpeechSetup As Variant
 Private f_dlgJsonEdit As Variant
 Private f_dlgAboutReadSelection As Variant
-&apos; Persistent information about the current recording track and 
+&apos; Persistent information about the current recording track and
 &apos; the URL of last processed document.
-global s_CaReadTextExtensionLastSpokenDocTitle As String
-global i_CaReadTextExtensionLastSpokenTrack As Integer
-global s_CaReadTextExtensionWorkingCountryLanguage As String
-global b_CaReadTextExtensionHideExports As Boolean
-global i_CaReadTextExtensionWinItunesVersion As Integer
-global s_CaReadTextExtensionLocalHostSpeechURI As String
-global i_CaReadTextExtensionPiperTestResult As Integer
-global s_CaReadTextExtensionCurrentSessionCookie As String
-global s_CaReadTextExtensionCurrentAnonymousKey As String
-global f_CaReadTextExtensionCurrentConfig As Variant
 
 Sub ClearWorkingCountryLanguage()
 	s_CaReadTextExtensionWorkingCountryLanguage = &quot;&quot;
@@ -52,7 +43,7 @@ End Sub
 
 
 Function fiMyCurrentAudioTrack( _
-	ByVal bIncrement) As Integer  
+	ByVal bIncrement) As Integer
 	fiMyCurrentAudioTrack = 1
 	On Error Goto fiMyCurrentAudioTrackErr
 	If bIncrement Then
@@ -122,7 +113,7 @@ End Function
 Function OpenJsonFileDialog() As String
 	&apos; Returns a file path if found or `&apos;&apos;` if Cancelled.
 	&apos; Adapted from LibreOffice Ref Card LibreOffice Basic Dialogs
-	&apos; v. 103, 2018.01.17 
+	&apos; v. 103, 2018.01.17
 	&apos; &lt;https://documentation.libreoffice.org&gt;
 	OpenJsonFileDialog = &quot;&quot;
 	Dim FileName As String : FileName = &quot;&quot;
@@ -161,7 +152,7 @@ Sub ImportJsonPhonemeTable(Event)
 	If Len(_in_file) = 0 Then
 		Exit Sub
 	End If
-	_json_display = getTextFromFile(_in_file, &quot;UTF-8&quot;)
+	_json_display = getTextFromFile(_in_file, &quot;&quot;, 0)
 	If Instr(_json_display, &quot;&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot;) = 0 Or Instr(_
 	_json_display, &quot;}&quot;) = 0 Then
 		Exit Sub
@@ -174,7 +165,7 @@ Sub ImportJsonPhonemeTable(Event)
 		.GetControl(&quot;_json_text&quot;).visible = False
 		.GetControl(&quot;_json_text&quot;).model.Text = _json_display
 		.GetControl(&quot;_json_text&quot;).visible = True
-		CreateFile(_file, _json_display, &quot;UTF-8&quot;)
+		CreateFile(_file, _json_display, &quot;&quot;)
 		If FileExists(_file) Then
 			.GetControl(&quot;_phoneme&quot;).model.enabled = False
 			.GetControl(&quot;_phoneme&quot;).model.Text = &quot;&quot;
@@ -222,19 +213,19 @@ Sub SaveJsonPhonemeTable(Event)
 		_json_display = .GetControl(&quot;_json_text&quot;).model.Text
 		Select Case Lcase(_ext)
 			Case &quot;js&quot;, &quot;json&quot;, &quot;&quot;
-			CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
+			CreateFile(_out_file, _json_display, &quot;&quot;)
 			Select Case _mouse_event
 				Case MouseAlt
 				&apos; Update json and remove duplicate items.
 				fbUpdateLexiconFile(_language, _model, _out_file)
 				.GetControl(&quot;_json_text&quot;).visible = False
-				.GetControl(&quot;_json_text&quot;).model.Text = getTextFromFile(_out_file, &quot;UTF-8&quot;)
+				.GetControl(&quot;_json_text&quot;).model.Text = getTextFromFile(_out_file, &quot;&quot;, 0)
 				.GetControl(&quot;_json_text&quot;).visible = True	
 			End Select
 			Case &quot;xml&quot;, &quot;pls&quot;, &quot;lmxl&quot;
-				CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
+				CreateFile(_out_file, _json_display, &quot;&quot;)
 				fbUpdateLexiconFile(_language, _model, _out_file)
-		End Select 
+		End Select
 	End With
 End Sub
 
@@ -275,12 +266,12 @@ Function MaryTtsSpeechHostInfo()
 		.json_dir = &quot;mary_tts&quot;
 		.sample = &quot;http://0.0.0.0:59125?AUDIO=WAVE_FILE&amp;OUTPUT_TYPE=AUDIO&amp;INPUT_TYPE=TEXT&amp;LOCALE=de&amp;INPUT_TEXT=Hallo+welt&quot;
 		.docker = &quot;https://hub.docker.com/r/synesthesiam/marytts&quot;
-		If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0  or isSnap() or _
-		isFlatPak() Then
+		Select Case fsTheOsId()
+			Case &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;POSIX.FLATPAK&quot;
 			.tags = Array(&quot;text&quot;, &quot;phonetic&quot;, &quot;wav&quot;, &quot;web-ui&quot;)
-		Else
+		Case Else
 			.tags = Array(&quot;text&quot;, &quot;xml&quot;, &quot;ssml&quot;, &quot;rawmaryxml&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;web-ui&quot;)
-		End If
+		End Select
 	End With
 	MaryTtsSpeechHostInfo = _info
 End Function
@@ -365,8 +356,8 @@ End Function
 
 Function MacOSSpeechAppInfo()
 	Dim _info As SpeechHostInfo
-	Select Case fsGetOS()
-		Case &quot;MacOS&quot;
+	Select Case fsTheOsId()
+		Case &quot;MACOS&quot;
 		With _info
 			.about = &quot;&quot;
 			.key = &quot;&quot;
@@ -444,7 +435,7 @@ Function PosixRhvoiceSpeechAppInfo()
 		.url_info = &quot;/en-US_lexicon.json&quot;
 		.json_dir = &quot;rhvoice&quot;
 		.sample = &quot;&quot; &apos; &quot;https://rhvoice.su/downloads/lyubov/demo.mp3?_=11&quot;
-		.docker = &quot;&quot; 
+		.docker = &quot;&quot;
 		.tags = Array(&quot;text&quot;, &quot;wav&quot;, &quot;optional-voices&quot;, &quot;ubuntu&quot;, &quot;developer&quot;, &quot;depreciated&quot;)
 	End With
 	PosixRhvoiceSpeechAppInfo = _info
@@ -471,9 +462,9 @@ End Function
 
 Function WindowsSpeechAppInfo()
 	Dim _info As SpeechHostInfo
-	Select Case fsGetOS()
-		Case &quot;WINDOWS&quot;
-		With _info
+	With _info
+		Select Case fsGetOs()
+			Case &quot;WINDOWS&quot;
 			.about = &quot;Windows Speech Application Interface (SAPI)&quot;
 			.key = &quot;&quot;
 			.label = &quot;windows-sapi&quot;
@@ -485,10 +476,35 @@ Function WindowsSpeechAppInfo()
 			.tags = Array(_
 			&quot;always-available&quot;, &quot;text&quot;, &quot;wav&quot;, &quot;rate&quot;, &quot;audio-only-option&quot;, _
 			&quot;optional-voices&quot;)
-		End With
-		Case Else
-		_info = MaryTtsSpeechHostInfo()
+			Case &quot;WINDOWS.WINE&quot;
+			.about = &quot;Wine Speech Stub or Test&quot;
+			.key = &quot;&quot;
+			.label = &quot;windows-sapi&quot;
+			.url = fsMyURL() &amp; &quot;/po/windows_sapi&quot;
+			.url_info = &quot;/en-US_lexicon.json&quot;
+			.json_dir = &quot;windows_sapi&quot;
+			.sample = &quot;&quot;
+			.docker = &quot;&quot;
+			.tags = Array(_
+			&quot;stub&quot;, _
+			&quot;wine&quot;)
+			Case &quot;WINDOWS.NOSCRIPT&quot;
+			.about = &quot;Windows NET Speech&quot;
+			.key = &quot;&quot;
+			.label = &quot;windows-sapi&quot;
+			.url = fsMyURL() &amp; &quot;/po/windows_sapi&quot;
+			.url_info = &quot;/en-US_lexicon.json&quot;
+			.json_dir = &quot;windows_sapi&quot;
+			.sample = &quot;&quot;
+			.docker = &quot;&quot;
+			.tags = Array(_
+			&quot;stub&quot;, _
+			&quot;noscript&quot;, _
+			&quot;net&quot;)
+			Case Else
+			_info = MaryTtsSpeechHostInfo()
 	End Select
+	End With
 	WindowsSpeechAppInfo = _info
 End Function
 
@@ -501,7 +517,7 @@ Function fsGitRawJson(_
 	&apos; Obtain the most recent published phoneme transcription. If you are editing
 	&apos; or creating a list to publish, note that not all platforms or voices
 	&apos; support the International Phonetic Alphabet. In these cases, you have to
-	&apos; experiment with spelling and similar sounding words to get the 
+	&apos; experiment with spelling and similar sounding words to get the
 	&apos; pronunciation you want. For example:
 	&apos;
 	&apos; + &quot;reed&quot; for the verb &quot;to read&quot; instead of the sound of the colour &quot;red&quot;.
@@ -509,7 +525,7 @@ Function fsGitRawJson(_
 	&apos;
 	&apos; `raw_git` : a custom URL
 	&apos; ------------------------
-	&apos; 
+	&apos;
 	&apos; You can use a custom lexicon URL for your class, school or organization.
 	&apos; Set up a server that  points to a private local access point that uses
 	&apos; the same directory structure as the `po` directory in the extension code.
@@ -519,13 +535,13 @@ Function fsGitRawJson(_
 	&apos; * &lt;https://forums.docker.com/t/using-localhost-for-to-access-running-container/3148/6&gt;
 	&apos; * &lt;https://docs.docker.com/network/&gt;
 	&apos; * &lt;https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml&gt;
-	&apos; 
+	&apos;
 	&apos; The default docker address is &lt;http://localhost:41604/po/&gt;. Developers or
 	&apos; other third parties can use a docker server to provide customized lexicons
 	&apos; to suit your needs.
 	&apos;
 	&apos; For development on your network, you should set `raw-git` to point to a URL
-	&apos; that works on your network using a local environment variable called 
+	&apos; that works on your network using a local environment variable called
 	&apos; `READTEXT_ONLINE_LEXICON_URL`. The json document location for a region is
 	&apos; `~/po/&lt;speech-engine&gt;/&lt;language&gt;-&lt;locale&gt;_lexicon.json`
 
@@ -559,16 +575,16 @@ Function fsGitRawJson(_
 	Dim x As Integer
 	Dim _search$ : _search = &quot;&quot;
 	
-	Dim _get$ : _get = &quot;&quot; 
+	Dim _get$ : _get = &quot;&quot;
 	For x = Lbound(_searches) To Ubound(_searches)
 		_search = Join(_
 		Array(raw_git, json_dir, &quot;/&quot;, _searches(x), &quot;_lexicon.json&quot;), &quot;&quot;)
 		_get = fsGetWebService(_search)
 		If Len(_get) &lt;&gt; 0 Then
 			&apos; Update json and remove duplicate items
-			CreateFile(_temp_json, _get, &quot;UTF-8&quot;)
+			CreateFile(_temp_json, _get, &quot;&quot;)
 			fbUpdateLexiconFile(lang_region, json_dir, _temp_json)
-			fsGitRawJson = getTextFromFile(_temp_json, &quot;UTF-8&quot;)
+			fsGitRawJson = getTextFromFile(_temp_json, &quot;&quot;, 0)
 			fbRemoveFile(_temp_json)
 			If Len(fsGitRawJson) = 0 Then
 				fsGitRawJson = _get
@@ -603,28 +619,28 @@ End Function
 
 
 Function SpeechHostInfoList()
-	If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0  or isSnap() or _
-	isFlatPak() Then
-	&apos; Python3 `requests` library is not available so MaryTTS
-	&apos; has limited functionality. See `network_read_textfile.py`
-	&apos;
-	&apos; Several speech engines have limited or no support for
-	&apos; phoneme code or can only speak using certain sounds.
-	SpeechHostInfoList = Array(_
-	MimicSpeechHostInfo(), _
-	OpenttsSpeechHostInfo(), _
-	RhvoiceSpeechHostInfo(), _
-	MaryTtsSpeechHostInfo(), _
-	)	
-	Else
-	&apos; Prioritize recent tts frameworks
-	SpeechHostInfoList = Array(_
-	MimicSpeechHostInfo(), _
-	OpenttsSpeechHostInfo(), _
-	MaryTtsSpeechHostInfo(), _
-	RhvoiceSpeechHostInfo(), _
-	)
-	End If
+	Select Case fsTheOsId()
+		Case &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;POSIX.FLATPAK&quot;
+		&apos; Python3 `requests` library is not available so MaryTTS
+		&apos; has limited functionality. See `network_read_textfile.py`
+		&apos;
+		&apos; Several speech engines have limited or no support for
+		&apos; phoneme code or can only speak using certain sounds.
+		SpeechHostInfoList = Array(_
+		MimicSpeechHostInfo(), _
+		OpenttsSpeechHostInfo(), _
+		RhvoiceSpeechHostInfo(), _
+		MaryTtsSpeechHostInfo(), _
+		)
+	Case Else
+		&apos; Prioritize recent tts frameworks
+		SpeechHostInfoList = Array(_
+		MimicSpeechHostInfo(), _
+		OpenttsSpeechHostInfo(), _
+		MaryTtsSpeechHostInfo(), _
+		RhvoiceSpeechHostInfo(), _
+		)
+	End Select
 End Function
 
 
@@ -733,11 +749,12 @@ Function EditJsonPhonemeTable() As String
 			token_text = .GetControl(&quot;ComboBox2&quot;).Model.Text &amp; CR
 		End If
 	End With
-	Select Case fsGetOS()
-		Case &quot;MacOS&quot;
+	Select Case fsTheOsId()
+		Case &quot;MACOS&quot;, &quot;MACOS.EXPERIMENTAL&quot;
 		_po_dir = MacOSSpeechAppInfo().json_dir
-		Case &quot;WINDOWS&quot;
+		Case &quot;WINDOWS&quot;, &quot;WINDOWS.WINE&quot;, &quot;WINDOWS.NOSCRIPT&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;
 		_po_dir = WindowsSpeechAppInfo().json_dir
+		fbHaveItunes()
 		Case Else
 		_po_dir = &quot;default&quot;
 	End Select
@@ -770,7 +787,7 @@ Function EditJsonPhonemeTable() As String
 	Next
 	_lang = fsDisplayLanguage()
 	_out_file = fsFullPathOf(fsExtensionSetJson(&quot;lexicons/&quot; &amp; _po_dir, _select_lang))
-	If FileExists(_out_file) Then 
+	If FileExists(_out_file) Then
 		_in_file = _out_file
 	Else
 		ReDim lang_array
@@ -789,7 +806,7 @@ Function EditJsonPhonemeTable() As String
 	_grapheme = fsGetTheSelectedWord()
 	_display_phoneme = &quot;&quot;
 	If FileExists(_in_file) Then
-		_json_display = getTextFromFile(_in_file, &quot;UTF-8&quot;)
+		_json_display = getTextFromFile(_in_file, &quot;&quot;, 0)
 		_display_phoneme = bespokeJsonExtraction(_json_display, _grapheme)
 		If Len(_display_phoneme) = 0 Then
 			_display_phoneme = Lcase(_grapheme)
@@ -809,7 +826,7 @@ Function EditJsonPhonemeTable() As String
 			&apos; Can&apos;t load &quot;/lexicons.xhp&quot;
 			&apos; Can load &quot;/set_up.xhp&quot;
 			&apos; Can&apos;t load &quot;/tokens.xhp&quot;
-			f_dlgJsonEdit.model.HelpURL = fsAppSignature() &amp; &quot;/set_up.xhp&quot;
+			f_dlgJsonEdit.model.HelpURL = fsAppSignature() &amp; &quot;/tokens.xhp&quot;
 		Else
 			f_dlgJsonEdit.model.HelpURL = &quot;&quot;
 		End If
@@ -876,7 +893,7 @@ Function EditJsonPhonemeTable() As String
 				_json_display,_
 				_grapheme)
 			End If
-			CreateFile(_out_file, _json_display, &quot;UTF-8&quot;)
+			CreateFile(_out_file, _json_display, &quot;&quot;)
 		End If
 	End With
 	If FileExists(_out_file) Then
@@ -1008,8 +1025,8 @@ Sub ConfigureReadTextAloud()
 	Dim sFile As String
 	Dim msgs() As Variant
 	Dim errorCode As Integer
-	Dim config(fiCountConfigOptions) As Variant
 	Dim bHideExports As Boolean
+	Dim _integer As Integer
 	bHideExports = False
 	
 	&apos; Open up the dialog
@@ -1017,11 +1034,11 @@ Sub ConfigureReadTextAloud()
 	ClearWorkingCountryLanguage()
 	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
 	f_dlgSpeechSetup = CreateUnoDialog(DialogLibraries.textToSpeech.Dialog1)
-	Select Case fsGetOS()
-		Case &quot;MacOS&quot;
+	Select Case fsTheOsId()
+		Case &quot;MACOS&quot;
 		&apos; New versions of MacOS restrict third party apps from writing
 		&apos; media files, so the extension hides export options in the main
-		&apos; dialogue.  High Sierra and newer versions of MscOS do not 
+		&apos; dialogue.  High Sierra and newer versions of MscOS do not
 		&apos; include a built-in telnet command.
 		If Not( _
 			FileExists( _
@@ -1036,6 +1053,12 @@ Sub ConfigureReadTextAloud()
 				bHideExports = True
 			End Select
 		End If
+		Case &quot;POSIX.APPIMAGE&quot;
+			bHideExports = True
+			&apos;If Len(Config(pi_external_options_string)) = 0 Then
+			&apos;	Config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
+			&apos;	print Config(pi_external_options_string)
+			&apos;End If
 	End Select
 	b_CaReadTextExtensionHideExports = bHideExports
 	With f_dlgSpeechSetup
@@ -1045,44 +1068,46 @@ Sub ConfigureReadTextAloud()
 			.model.HelpURL = &quot;&quot;
 		End If
 		&apos;Load default settings, so any settings undefined by settings file are not empty
-		config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
+		Config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
 		&apos;Load the settings you used last time
 		sFile = fsExtensionSettingsIni()
 		If FileExists(sFile) Then
-			tts_config_parseFile(sFile, config(), errorCode)
+			tts_config_parseFile(sFile, Config(), errorCode)
 		Else
 			&apos; The &quot;About&quot; dialog needs this file to show current information
-			tts_config_writeFile(config(), sfile)
+			tts_config_writeFile(Config(), sfile)
+		End If
+		If Len(Config(pi_display_language_string)) = 0 Then
+			Config(pi_display_language_string) = fsGetLanguage()
 		End If
 		&apos;Now apply the settings to the dialog box
-		.GetControl(&quot;CheckBox1&quot;).Model.State = config(fiAlwaysShowDialogCheckBox())
+		.GetControl(&quot;CheckBox1&quot;).Model.State = Config(pi_display_info_integer)
 		If fbEnhancedRTVersion And fbClipBoardAvailable() Then
-			.GetControl(&quot;CheckBox2&quot;).Model.State = config(fiSmartSelectCheckBox())
+			.GetControl(&quot;CheckBox2&quot;).Model.State = Config(pi_use_smart_select_integer)
 		Else
 			.GetControl(&quot;CheckBox2&quot;).Model.State = 0
 			.GetControl(&quot;CheckBox2&quot;).Visible = False
 		End If
 		ttsUpdateCombo2F()
 		&apos;Update the labels with your language
-
-		.GetControl(&quot;ComboBox1&quot;).Model.Text = config(fiExperimentalCommand())
-		.GetControl(&quot;ComboBox2&quot;).Model.Text = config(fiExternalCommand())
-		.GetControl(&quot;ComboBox3&quot;).Model.Text = config(fiDialogLanguageCombo())
-		.GetControl(&quot;ComboBox4&quot;).Model.Text = config(fiHtmlComboURL())
-		.GetControl(&quot;FileControl1&quot;).Model.Text = config(fiExperimentalProgramPath())
-		.GetControl(&quot;FileControl2&quot;).Model.Text = config(fiExternalProgramPath)
+		.GetControl(&quot;ComboBox1&quot;).Model.Text = Config(pi_experimental_options_string)
+		.GetControl(&quot;ComboBox2&quot;).Model.Text = Config(pi_external_options_string)
+		.GetControl(&quot;ComboBox3&quot;).Model.Text = Config(pi_display_language_string)
+		.GetControl(&quot;ComboBox4&quot;).Model.Text = Config(pi_html_string)
+		.GetControl(&quot;FileControl1&quot;).Model.Text = Config(pi_experimental_path_string)
+		.GetControl(&quot;FileControl2&quot;).Model.Text = Config(pi_external_path_string)
 		If fbExperimentalMode() Then
-			.GetControl(&quot;OptionButton1&quot;).Model.State = config(fiExperimentalOption())
-			.GetControl(&quot;OptionButton2&quot;).Model.State = config(fiExternalOption())
-			.GetControl(&quot;OptionButton3&quot;).Model.State = config(fiHtmlOption)
+			.GetControl(&quot;OptionButton1&quot;).Model.State = Config(pi_use_experimental_boolean)
+			.GetControl(&quot;OptionButton2&quot;).Model.State = Config(pi_use_external_boolean)
+			.GetControl(&quot;OptionButton3&quot;).Model.State = Config(pi_use_html_boolean)
 		Else
-			If config(fiExperimentalOption()) Then
+			If Config(pi_use_experimental_boolean) Then
 				.GetControl(&quot;OptionButton1&quot;).Model.State = 0
-				config(fiExperimentalOption()) = 0
+				Config(pi_use_experimental_boolean) = 0
 				.GetControl(&quot;OptionButton2&quot;).Model.State = 1
-				config(fiExternalOption()) = 1
+				Config(pi_use_external_boolean) = 1
 			End If
-			.GetControl(&quot;OptionButton3&quot;).Model.State = config(fiHtmlOption)
+			.GetControl(&quot;OptionButton3&quot;).Model.State = Config(pi_use_html_boolean)
 		End If
 		ttsUpdateLabels()
 		ttsUpdateCombo1()
@@ -1111,13 +1136,14 @@ Sub ConfigureReadTextAloud()
 		End If
 		If .Execute() &lt;&gt; 0 Then
 			&apos;Replace the old settings file
-			config() = fvCurrentDialogConfig()
+			Config() = fvCurrentDialogConfig()
 			.Dispose()
 			On Error Resume Next
 			fbRemoveFile(sFile)
-			tts_config_writeFile(config(), sfile)
+			Config(pi_display_info_integer) = GetControl(&quot;CheckBox1&quot;).Model.State
+			tts_config_writeFile(Config(), sfile)
 			&apos;Call the shell to execute the program specified with the commands specified
-			ttsActuate(config(), _
+			ttsActuate(Config(), _
 			msgs(), _
 			errorCode, _
 			&quot;&quot;)
@@ -1127,11 +1153,10 @@ End Sub
 
 
 Sub ttsUpdateCombo1()
-	Dim config As Variant : config = fvCurrentDialogConfig()
 	With f_dlgSpeechSetup
 	If InStr(LCase(.GetControl(&quot;FileControl1&quot;).Model.Text), &quot;festival&quot;) &lt;&gt; 0 Then
 		dialog1Combo1ShowFestivalScripts(f_dlgSpeechSetup)
-	Else 
+	Else
 		updateDialog1FileControlComboBox(False, &quot;FileControl1&quot;, &quot;ComboBox1&quot;)
 	End If
 	End With
@@ -1151,17 +1176,17 @@ End Sub
 Sub updateDialog1FileControlComboBox( _
 	bRefreshText, FileControl, ComboBox)
 	Dim _bin_python As String : _bin_python = &quot;program/python&quot;
-	Dim _app_image_python As String : _app_image_python = fsAppImageResourcePath(&quot;python&quot;)
 	Dim ClientId$ : ClientId = &quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot;
-	Select Case fsGetOS
-		Case &quot;MacOS&quot;, &quot;WINDOWS&quot;
+	Select Case fsTheOsId()
+		Case &quot;MACOS&quot;, &quot;WINDOWS&quot;, &quot;WINDOWS.WINE&quot;, &quot;WINDOWS.NOSCRIPT&quot;
 		ClientId = &quot;&quot;
-	End Select
-	If Len (_app_image_python) = 0 Then
+		Case &quot;POSIX.APPIMAGE&quot;
+		_bin_python = fsAppImageResourcePath(&quot;python&quot;)
+&apos;		Case &quot;POSIX.FLATPAK&quot;, &quot;POSIX.SNAP&quot;
+&apos;		_bin_python = ConvertFromUrl(BundlePyPath())
+		Case Else
 		_bin_python = &quot;/bin/python&quot;
-	Else
-		_bin_python = _app_image_python
-	End If
+	End Select
     With f_dlgSpeechSetup
 		If InStr(LCase(.GetControl(FileControl).Model.Text), _
 			&quot;\wscript.exe&quot;) &lt;&gt; 0 Then
@@ -1184,7 +1209,7 @@ Sub updateDialog1FileControlComboBox( _
 		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text), &quot;text2wave&quot;) &lt;&gt; 0 Then
 			dialog1Combo2ShowTEXT2WAVEChoices(f_dlgSpeechSetup)
 		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text), _bin_python) &lt;&gt; 0 Then
-			If fsGetOS() = &quot;MacOS&quot; And fbIsLibreOffice() Then
+			If fsTheOsId() = &quot;MACOS&quot; And fbIsLibreOffice() Then
 				&apos; Must use LibreOffice python			
 				.GetControl(FileControl).Model.Text = PosixPythonPath()
 			End If
@@ -1192,9 +1217,9 @@ Sub updateDialog1FileControlComboBox( _
 		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;python.exe&quot;) &lt;&gt; 0 Then
 			fiDialog1CombosShowMyPythonChoices(f_dlgSpeechSetup, ComboBox, FileControl)
 		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;/bin/open&quot;) &lt;&gt; 0 And _
-			fsGetOS() = &quot;MacOS&quot; Then
+			fsTheOsId() = &quot;MACOS&quot; Then
 			&apos;The system chooses an application to open the file or URL (See man: gnome-open and xdg-open)
-			&apos;There are some examples at https://ss64.com/MacOS/open.html and 
+			&apos;There are some examples at https://ss64.com/MacOS/open.html and
 			&apos;https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man1/open.1.html
 			dialog1Combo2ShowMEDIAChoices(f_dlgSpeechSetup)
 			&apos; You entered a media player
@@ -1204,7 +1229,7 @@ Sub updateDialog1FileControlComboBox( _
 			
 		End If
 		If bRefreshText And FileExists(.GetControl(FileControl).Model.Text) Then
-			If fsGetOS() = &quot;MacOS&quot; And _
+			If fsTheOsId() = &quot;MACOS&quot; And _
 			fbIsLibreOffice() And _
 			.GetControl(FileControl).Model.Text = PosixPythonPath() Then
 				If fbHaveNetworkTTS() Then
@@ -1241,7 +1266,7 @@ Sub ttsUpdateLabels()
 		.GetControl(&quot;CommandButton3&quot;).model.Label = fsLookUpTerm2(&quot;s_about&quot;, s1) &amp; &quot;...&quot;
 		.GetControl(&quot;FrameControl1&quot;).model.Label = fsLookUpTerm2(&quot;s_external-program&quot;, s1)
 		.GetControl(&quot;FrameControl2&quot;).model.Label = fsLookUpTerm2(&quot;s_display&quot;, s1)
-		If fbPiperTtsOk() or fsGetOS() = &quot;MacOS&quot; Then
+		If fbPiperTtsOk(&quot;&quot;) or fsTheOsId() = &quot;MACOS&quot; Then
 			.GetControl(&quot;Label1&quot;).model.Label = fsLookUpTerm2(&quot;s_command-line-options&quot;, s1)
 			.GetControl(&quot;OptionButton1&quot;).model.Label = fsLookUpTerm2(&quot;s_enable_experimental_features&quot;, s1)
 		ElseIf InStr(LCase(.GetControl(&quot;FileControl1&quot;).Model.Text),&quot;festival&quot;) &lt;&gt; 0 Then
@@ -1259,6 +1284,7 @@ Sub ttsUpdateLabels()
 		.model.Title = fsLookUpTerm2(&quot;s_read-text&quot;, s1)
 	End With
 End Sub
+
 
 Function fbUsingFestival(_test_text As String) As Boolean
 	fbUsingFestival = FileExists(_test_text) And Instr(LCase(_
@@ -1299,47 +1325,42 @@ Sub ttsUpdateDisplay()
 	End With
 End Sub
 
-&apos;xxxxxxxxxxxxxxxxxxxx
+
 Function fvCurrentDialogConfig() As Variant
-	Dim config(fiCountConfigOptions) As Variant
 	Dim file_control_2 As String
 	With f_dlgSpeechSetup
 		On Error Resume Next
 		file_control_2 = .GetControl(&quot;FileControl2&quot;).Model.Text
-		If fsGetOS() = &quot;MacOS&quot; and fbIsLibreOffice() And _
-		Instr(file_control_2, &quot;/usr/python3&quot;) &lt;&gt; 0 Then
+		If fsTheOsId() = &quot;MACOS&quot; and fbIsLibreOffice() And _
+		Instr(file_control_2, &quot;/usr/python&quot;) &lt;&gt; 0 Then
 			file_control_2 = PosixPythonPath()
 		End If
-		If Len(fsAppImageResourcePath(&quot;python&quot;)) &lt;&gt; 0 And _
-		Instr(file_control_2, &quot;/usr/python3&quot;) &lt;&gt; 0 Then
-			file_control_2 = PosixPythonPath()
+		If fsTheOsId() = &quot;POSIX.APPIMAGE&quot; And _
+		Instr(file_control_2, &quot;/usr/python&quot;) &lt;&gt; 0 Then
+			file_control_2 = ConvertFromUrl(BundlePyPath())
 		End If
-		config(fiAlwaysShowDialogCheckBox()) = .GetControl(&quot;CheckBox1&quot;).model.State
-		config(fiSmartSelectCheckBox()) = .GetControl(&quot;CheckBox2&quot;).model.State
-		config(fiDialogLanguageCombo()) = .GetControl(&quot;ComboBox3&quot;).model.Text
-		config(fiExternalCommand()) = .GetControl(&quot;ComboBox2&quot;).model.Text
-		config(fiExternalOption()) = .GetControl(&quot;OptionButton2&quot;).Model.State
-		config(fiExternalProgramPath) = file_control_2
-		config(fiExperimentalCommand()) = .GetControl(&quot;ComboBox1&quot;).model.Text
-		config(fiExperimentalOption()) = .GetControl(&quot;OptionButton1&quot;).Model.State
-		config(fiExperimentalProgramPath()) = .GetControl(&quot;FileControl1&quot;).Model.Text
-		config(fiHtmlComboURL()) = .GetControl(&quot;ComboBox4&quot;).model.Text
-		config(fiHtmlOption) = .GetControl(&quot;OptionButton3&quot;).Model.State
+		Config(pi_display_info_integer) = .GetControl(&quot;CheckBox1&quot;).model.State
+		Config(pi_use_smart_select_integer) = .GetControl(&quot;CheckBox2&quot;).model.State
+		Config(pi_display_language_string) = .GetControl(&quot;ComboBox3&quot;).model.Text
+		Config(pi_external_options_string) = .GetControl(&quot;ComboBox2&quot;).model.Text
+		Config(pi_use_external_boolean) = .GetControl(&quot;OptionButton2&quot;).Model.State
+		Config(pi_external_path_string) = file_control_2
+		Config(pi_experimental_options_string) = .GetControl(&quot;ComboBox1&quot;).model.Text
+		Config(pi_use_experimental_boolean) = .GetControl(&quot;OptionButton1&quot;).Model.State
+		Config(pi_experimental_path_string) = .GetControl(&quot;FileControl1&quot;).Model.Text
+		Config(pi_html_string) = .GetControl(&quot;ComboBox4&quot;).model.Text
+		Config(pi_use_html_boolean) = .GetControl(&quot;OptionButton3&quot;).Model.State
 	End With
-	fvCurrentDialogConfig() = config()
+	fvCurrentDialogConfig() = Config()
 End Function
 
 
 Sub aboutReadTextDialog()
-	Dim config(fiCountConfigOptions) As Variant
-	
-	config() = fvCurrentDialogConfig()
-	AboutAddOn(config(), &quot;&quot;)
+	AboutAddOn(&quot;&quot;)
 End Sub
 
 
 Sub AboutAddOn( _
-	config() As Variant, _
 	myText As String)
 	&apos; Dialog3
 	Dim f_dlgAboutReadSelection As Variant
@@ -1347,6 +1368,7 @@ Sub AboutAddOn( _
 	Dim sA As String
 	Dim sC As String
 	Dim sE As String
+	Dim file_spec As String : file_spec = fsTTSScriptVBS()
 	Dim title_special As String : title_special = &quot;&quot;
 	Dim msgs() As Variant
 	Dim errorCode As Integer
@@ -1358,7 +1380,7 @@ Sub AboutAddOn( _
 	s3 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
 	Dim s4$
 	s4 = &quot;&quot;
-	Dim TextField$ : TextField = &quot;gjfjfj&quot;
+	Dim TextField$ : TextField = &quot;_text_field&quot;
 	If fbExperimentalMode() Then
 		title_special = &quot; - &quot; &amp; fsLookUpTerm2(&quot;s_enable_experimental_features&quot;, s1)
 	End If	
@@ -1396,9 +1418,9 @@ Sub AboutAddOn( _
 			.GetControl(&quot;ImageControl4&quot;).model.Enabled = fbExperimentalMode()
 			.GetControl(&quot;Label2&quot;).model.Enabled = fbExperimentalMode()
 		Else
-			CreateFile(s3, fsGetSetting(&quot;oosetupversion&quot;), &quot;UTF-8&quot;)  &apos; lock clipboard
+			CreateFile(s3, fsGetSetting(&quot;oosetupversion&quot;), &quot;&quot;)  &apos; lock clipboard
 			fsGetClipBoard(False)
-			&apos; To avoid a crash, the testing version of office 
+			&apos; To avoid a crash, the testing version of office
 			&apos; needs a dummy run of function before evaluating
 			&apos; the results.
 			&apos; if it crashes, then we are left with a lock file.
@@ -1431,63 +1453,84 @@ Sub AboutAddOn( _
 		.GetControl(&quot;Label1&quot;).model.helpText = Left(fsGetTextSelection(False, False),99)
 		.GetControl(&quot;Label1&quot;).model.Label = Len(fsGetTextSelection(False, False))
 		&apos;Change the text in the information text boxes&apos;
-		If config(fiExperimentalOption()) And Instr(LCase(config(fiExperimentalProgramPath())), &quot;festival&quot;) &lt;&gt; 0 Then
-			.GetControl(&quot;TextField3&quot;).model.Text = config(fiExperimentalProgramPath()) &amp; &quot; &quot; &amp; _
+		If Config(pi_use_experimental_boolean) And Instr(LCase(Config(pi_experimental_path_string)), &quot;festival&quot;) &lt;&gt; 0 Then
+			.GetControl(&quot;TextField3&quot;).model.Text = Config(pi_experimental_path_string) &amp; &quot; &quot; &amp; _
 			&quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsFestivalScriptName()) &amp; &quot;&quot;&quot;&quot;
-			sA = replaceLocalTokensWithStr(config(fiExperimentalCommand()))
+			sA = replaceLocalTokensWithStr(Config(pi_experimental_options_string))
 			sA = replacePublicTokensWithStr(sA)
 			.GetControl(&quot;TextField2&quot;).model.Text = sA
-		ElseIf config(fiExternalOption()) or config(fiExperimentalOption()) Then
-			If config(fiExternalOption()) Then
-				sA = config(fiExternalCommand())
-				sE = config(fiExternalProgramPath())
-			Else &apos; config(fiExperimentalOption())
-				sA = config(fiExperimentalCommand())
-				sE = config(fiExperimentalProgramPath())
+		ElseIf Config(pi_use_external_boolean) or Config(pi_use_experimental_boolean) Then
+			If Config(pi_use_external_boolean) Then
+				sA = Config(pi_external_options_string)
+				sE = Config(pi_external_path_string)
+			Else &apos; Config(pi_use_experimental_boolean)
+				sA = Config(pi_experimental_options_string)
+				sE = Config(pi_experimental_path_string)
 			End If
 			sC = Trim(sA)  &apos; If not byVal in Function arguements, ensure sA is untouched
-			.GetControl(&quot;TextField3&quot;).model.helpText = sC 
+			.GetControl(&quot;TextField3&quot;).model.helpText = sC
 			sC = replaceLocalTokensWithStr(sC)
 			sC = replacePublicTokensWithStr(sC)
-			.GetControl(&quot;TextField3&quot;).model.Text = &quot;&quot;&quot;&quot; &amp; sE &amp; &quot;&quot;&quot; &quot; &amp; sC 
-			If InStr(sA, &quot;(TTS_WSCRIPT_VBS)&quot;) &lt;&gt; 0 Then
+			.GetControl(&quot;TextField3&quot;).model.Text = &quot;&quot;&quot;&quot; &amp; sE &amp; &quot;&quot;&quot; &quot; &amp; sC
+
+			.GetControl(&quot;TextField2&quot;).model.helpText = fsAboutScriptHint(file_spec)
+			If Len(myText) &lt;&gt; 0 Then
+				TextField = myText
+			ElseIf InStr(sA, &quot;(TTS_WSCRIPT_VBS)&quot;) &lt;&gt; 0 Then
 				TextField = fsVBSTextString()
 			ElseIf InStr(sA, &quot;(SPD_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
-				TextField = fsSPDTextString()
+				file_spec = fsPythonSpdDoc()
+				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
+				If Len(TextField) = 0 Then
+					TextField = getTextFromFile(file_spec, &quot;&quot;, 3200)				
+				End If
 			ElseIf InStr(sA, &quot;(ESPEAK_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
-				TextField = fsEspeakTextString()
+				file_spec = fsPythonEspeakDoc()
+				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
 			ElseIf InStr(sA, &quot;(FESTIVAL_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
-				TextField = fsFestivalTextString()
+				file_spec = fsPythonFestivalDoc()
+				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
 			ElseIf InStr(sA, &quot;(NETWORK_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
-				TextField = fsPythonNetTtsTextString()
+				file_spec = fsNetworkTtsDoc()
+				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
 			ElseIf InStr(sA, &quot;(OPENJTALK_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
-				TextField = fsOpenJtalkTextString()
+				file_spec = fsPythonOpenJTalkDoc()
+				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
 			ElseIf InStr(sA, &quot;(PICO_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
-				TextField = fsPicoTextString()
+				file_spec = fsPythonPicoDoc()
+				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
 			ElseIf InStr(sA, &quot;(PIPER_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
-				TextField = fsPiperTextString()
+				file_spec = fsPythonPiperDoc()
+				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
 			ElseIf InStr(sA,  &quot;(RHVOICE_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
-				TextField = fsRhVoiceTextString()
-			ElseIf InStr(sA, &quot;(CREATE_QR_LABEL_PY)&quot;) &lt;&gt; 0 Then
-				TextField = fsQRTextString()
+				file_spec = fsRhVoiceTtsDoc()
+				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
+			ElseIf InStr(sA, &quot;(CREATE_QR_LABEL_PY)&quot;) &lt;&gt; 0 Then			
+				file_spec = fsPythonCreateQR()
+				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)			
 			ElseIf InStr(sA, &quot;(SAY_APPLESCRIPT)&quot;) &lt;&gt; 0 Then
+				file_spec = &quot;&quot;
 				TextField = fswriteMacOSSpeechScript(&quot;&quot;, _
 				fsSelectionLanguageAndRegion(True), &quot;&quot;)
 			ElseIf InStr(sA, &quot;(SAY_APPLESCRIPT_SLOWLY)&quot;) &lt;&gt; 0 Then
+				file_spec = &quot;&quot;
 				TextField = fswriteMacOSSpeechScript(&quot;-r 110 &quot;, _
 				fsSelectionLanguageAndRegion(True), &quot;&quot;)
 			ElseIf InStr(sA, &quot;(SAY_APPLESCRIPT_QUICKLY)&quot;) &lt;&gt; 0 Then
+				file_spec = &quot;&quot;
 				TextField = fswriteMacOSSpeechScript(&quot;-r 240 &quot;, _
 				fsSelectionLanguageAndRegion(True), &quot;&quot;)
 			ElseIf InStr(sA, &quot;(SAY_APPLESCRIPT_SYSTEM_VOICE)&quot;) &lt;&gt; 0 Then
+				file_spec = &quot;&quot;
 				TextField = fswriteMacOSSpeechScript(&quot;&quot;, _
 				&quot;&quot;, &quot;&quot;)
 			Else
+				file_spec = &quot;&quot;
 				TextField = &quot;&quot;
 			End If
 			.GetControl(&quot;TextField2&quot;).model.Text = TextField
-		Else &apos; if config(fiHtmlOption) then
-			sA = replacePublicTokensWithStr(config(fiHtmlComboURL()))
+		Else &apos; if Config(pi_use_html_boolean) then
+			sA = replacePublicTokensWithStr(Config(pi_html_string))
 			.GetControl(&quot;TextField3&quot;).model.Text = &quot;[com.sun.star.system.SystemShellExecute]&quot;
 			If InStr(sA,&quot;.google.&quot;) &lt;&gt; 0 Then
 				sA = sA &amp; Chr(13) &amp; Chr(13) &amp; &quot;Powered by Google TM&quot;
@@ -1499,4 +1542,5 @@ Sub AboutAddOn( _
 		.Execute()
 	End With
 End Sub
+
 </script:module>

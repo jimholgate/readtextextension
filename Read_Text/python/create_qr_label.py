@@ -49,8 +49,9 @@ See the manual page for `qrencode` for more detailed information.
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
 Copyright (c) 2010 - 2024 James Holgate
-
 """
+
+
 import getopt
 import codecs
 import os

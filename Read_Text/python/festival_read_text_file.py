@@ -94,6 +94,8 @@ Copyright (c) 2011 - 2024 James Holgate
   [3]: http://sites.google.com/site/readtextextension/
 
 """
+
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 import getopt
 import os
@@ -163,6 +165,7 @@ class ReadFestivalClass(object):
         self.script = readtexttools.get_my_lock("festival.scr")
         self.voice_eval = ""
         self.lang = ""
+        self.help_icon = ""
         try:
             self.punctuation = str.maketrans(
                 {
@@ -557,6 +560,7 @@ class ReadFestivalClass(object):
                 # Flite reates a compact .wav file - Signed 16 bit Little Endian,
                 # Rate 8000 Hz, Mono. This format works with vlc, aplay & paplay,
                 # but might not with a gstreamer app like totem or gst-launch-1.0
+                _app = "flite"
                 if os.path.splitext(_file_path)[1] not in [".txt"]:
                     return False
                 _command = 'flite -f "{0}" -o "{1}"'.format(_file_path, _work_file)
@@ -569,8 +573,25 @@ class ReadFestivalClass(object):
             usage()
             sys.exit(2)
         if os.path.isfile(_work_file):
-            if os.path.getsize(_work_file) == 0:
+            work_size = os.path.getsize(_work_file)
+            if work_size == 0:
                 return False
+            elif work_size < 200:
+                readtexttools.pop_message(
+                    os.path.basename(_app),
+                    "No voice model found",
+                    8000,
+                    self.help_icon,
+                    2,
+                    readtexttools.default_lang(),
+                )
+                print(
+                    "FAIL: `{0}` - incompatible language, character encoding or voice.".format(
+                        _app
+                    )
+                )
+                sys.exit(0)
+
             readtexttools.process_wav_media(
                 _title,
                 _work_file,
