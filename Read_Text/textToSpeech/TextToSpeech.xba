@@ -227,6 +227,12 @@ Function fsScriptForgePython(Detail As Integer) As String
 	If GetSolarVersion &lt; 70407 Then
 		&apos; Can&apos;t check, so exit.
 		Exit Function
+	ElseIf fbHaveSnap() Then
+		&apos; `platform.PythonVersion` does not work by default on a fresh install of
+		&apos; Ubuntu 24.04.01 LTS.
+		Exit Function
+	ElseIf Instr(Environ(&quot;XDG_DATA_DIRS&quot;), &quot;ubuntu&quot;) &lt;&gt; 0 Then
+		Exit Function
 	End If
 	On Error GoTo fsScriptForgePythonErr
 	If fbTestLibraryLoaded(&quot;ScriptForge&quot;) Then
