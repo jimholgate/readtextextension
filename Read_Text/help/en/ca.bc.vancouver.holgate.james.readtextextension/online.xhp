@@ -1,21 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
     <meta>
-    <topic>
-        <title xml-lang="en-US">Online Help</title>
-        <filename>ca.bc.vancouver.holgate.james.readtextextension/online.xhp</filename>
-    </topic>
-    <history>
-        <created date="2024-04-18T16:03:23Z">James Holgate</created>
-    </history>
+        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/online.xhp"
+            indexer="include" status="PUBLISH">
+            <title xml-lang="en-US">Online Help</title>
+            <filename>ca.bc.vancouver.holgate.james.readtextextension/online.xhp</filename>
+        </topic>
+        <history>
+            <created date="2024-04-18T16:03:23Z">James Holgate</created>
+        </history>
     </meta>
 
     <body xml-lang="en-US">
 
         <paragraph role="heading" level="1">Online Help</paragraph>
 
-        <paragraph>If you want more information about the extension, you can use this link:
-            <link href="https://sites.google.com/site/readtextextension/"> https://sites.google.com/site/readtextextension/
+        <paragraph>If you want more information about the extension, you can use this link: <link
+                href="https://sites.google.com/site/readtextextension/">
+            https://sites.google.com/site/readtextextension/
             </link>
         </paragraph>
     </body>

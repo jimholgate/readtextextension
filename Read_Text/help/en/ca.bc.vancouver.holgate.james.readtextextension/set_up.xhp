@@ -1,26 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
     <meta>
-    <topic>
-        <title xml-lang="en-US">Configuration</title>
-        <filename>ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp</filename>
-    </topic>
-    <history>
-        <created date="2024-04-18T17:08:20Z">James Holgate</created>
-    </history>
+        <topic
+            id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp"
+            indexer="include" status="PUBLISH">
+            <title xml-lang="en-US">Configuration</title>
+            <filename>ca.bc.vancouver.holgate.james.readtextextension/set_up.xhp</filename>
+        </topic>
+        <history>
+            <created date="2024-04-18T17:08:20Z">James Holgate</created>
+        </history>
     </meta>
 
     <body xml-lang="en-US">
 
         <paragraph role="heading" level="1">Configuration</paragraph>
 
-        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Default64.png" id="img_dialog1_screenshot">
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Default64.png"
+            id="img_dialog1_screenshot">
             <alt id="alt_dialog1_screenshot">The “Read Text” Extension</alt>
         </image>
 
         <paragraph role="heading" level="2">About</paragraph>
 
-        <paragraph>The “Read Text” extension can read aloud any text that you are working with, whether you are writing an essay, creating a presentation, making a drawing, working on a spreadsheet, or designing a web page. No matter what you are doing, “Read Text”
+        <paragraph>The “Read Text” extension can read aloud any text that you are working with,
+            whether you are writing an essay, creating a presentation, making a drawing, working on
+            a spreadsheet, or designing a web page. No matter what you are doing, “Read Text”
             can help you check your work and help you to make sure that everything is okay.
         </paragraph>
 
@@ -30,16 +35,21 @@
         <list>
 
             <listitem>
-                <emph>Correct writing mistakes</emph>: When you hear your text read aloud, you can identify and correct mistakes.</listitem>
+                <emph>Correct writing mistakes</emph>: When you hear your text read aloud, you can
+                identify and correct mistakes.</listitem>
 
             <listitem>
-                <emph>Compare documents</emph>: You can use the extension to compare a printed document with your own to make sure that they are the same.</listitem>
+                <emph>Compare documents</emph>: You can use the extension to compare a printed
+                document with your own to make sure that they are the same.</listitem>
 
             <listitem>
-                <emph>Learn languages</emph>: If you are learning a language, this extension can help you learn the correct pronunciation of new words.</listitem>
+                <emph>Learn languages</emph>: If you are learning a language, this extension can
+                help you learn the correct pronunciation of new words.</listitem>
 
             <listitem>
-                <emph>Generate QR codes</emph>: You can use QR codes to securely transfer short text selections like phone numbers and email addresses from your computer to mobile devices without needing a local network connection.</listitem>
+                <emph>Generate QR codes</emph>: You can use QR codes to securely transfer short text
+                selections like phone numbers and email addresses from your computer to mobile
+                devices without needing a local network connection.</listitem>
 
         </list>
 
@@ -49,21 +59,19 @@
 
         <list type="ordered">
 
-            <listitem>Select
-                <emph>Tools ▸ Add-ons ▸ Read selection…</emph>
+            <listitem>Select <emph>Tools ▸ Add-ons ▸ Read selection…</emph>
             </listitem>
 
-            <listitem>By default, the extension uses a default application path and some additional default options on the command line.</listitem>
+            <listitem>By default, the extension uses a default application path and some additional
+                default options on the command line.</listitem>
 
-            <listitem> You can try different options without saving them by right-clicking the
-                <emph>OK</emph>
-                button .</listitem>
+            <listitem> You can try different options without saving them by right-clicking the <emph>
+                OK</emph> button .</listitem>
 
-            <listitem>When you are statisfied with all the settings, set the option to
-                <emph>Always show this dialog</emph> to unchecked.</listitem>
+            <listitem>When you are statisfied with all the settings, set the option to <emph>Always
+                show this dialog</emph> to unchecked.</listitem>
 
-            <listitem>Click the
-                <emph>OK</emph> button to save the changes.</listitem>
+            <listitem>Click the <emph>OK</emph> button to save the changes.</listitem>
 
         </list>
 

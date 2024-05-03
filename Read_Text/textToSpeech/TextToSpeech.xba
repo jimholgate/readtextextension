@@ -125,6 +125,7 @@ Private i_CaReadTextExtensionPiperTestResult As Integer
 Private s_CaReadTextExtensionCurrentSessionCookie As String
 Private s_CaReadTextExtensionCurrentAnonymousKey As String
 Private s_CaReadTextExtensionGetOS As String
+Private i_CaReadTextExtensionScriptForge As String
 Private f_CaReadTextExtensionCurrentConfig As Variant
 Private UpdatePoSettingsDone As Integer
 Private mMyTranslationId(0) As Variant
@@ -138,6 +139,50 @@ Function fsAboutScriptHint(file_spec)
 	If FileExists(file_spec) Then
 	fsAboutScriptHint = &quot;OS ID : &quot; &amp; fsTheOsId() &amp; &quot;; REV : &quot; &amp; FileDateTime(file_spec)
 	End If
+End Function
+
+
+Function JavaSettingFile() As String
+	&apos; Returns java settings file path in the URI format
+	&apos; i. e.: `file:///home/user/.config/libreoffice/4/config/&lt;file&gt;.xml`
+	JavaSettingFile = &quot;&quot;
+	Dim sPath As String
+	Dim sDir as String
+	Dim sValue as String
+	
+	sPath = CreateUNOService(_
+		&quot;com.sun.star.util.PathSettings&quot;).userConfig
+	sValue = Dir$(sPath + getPathSeparator + &quot;java*.xml&quot;, 0)
+	Do
+		If sValue &lt;&gt; &quot;.&quot; and sValue &lt;&gt; &quot;..&quot; Then
+		sDir = sValue
+		End If
+		sValue = Dir$
+	Loop Until sValue = &quot;&quot;
+	If Len(sDir) Then
+		JavaSettingFile = sPath &amp; &quot;/&quot; &amp; sDir
+	End If
+End Function
+
+
+Function fbJavaActive() As Boolean
+	fbJavaActive = False
+	On Error GoTo fbJavaActiveErr
+	Dim s1 As String  : s1 = JavaSettingFile()
+	Dim Content As String : Content = &quot;&quot;
+	Dim sLook As String : sLook = &quot;&quot;
+	If FileExists(s1) Then
+		Content = getLimitedTextFromFile(s1)
+		For Each sLook in Array(&quot;&lt;enabled xsi:nil=&quot;&quot;true&quot;&quot;&quot;, &quot;&lt;enabled xsi:nil=&quot;&quot;-1&quot;&quot;&quot;)
+			If Instr(Content, sLook) &lt;&gt; 0 Then
+				fbJavaActive = True
+				Exit Function
+			End If
+		Next
+	End If
+	Exit Function
+	fbJavaActiveErr:
+	fbJavaActive = False
 End Function
 
 
@@ -191,8 +236,6 @@ End Function
 Function fbHaveSnap() As Boolean
 	&apos; By default, Snap Ubuntu installations run in strict containment mode and
 	&apos; therefore might not be able to access certain paths, programs, data etc.
-	&apos; that are required. Only proceed if the version of the app is one compiled
-	&apos; since the latest release of Debian.
 	fbHaveSnap = False
 	On Local Error GoTo fbHaveSnapErr
 	Select Case getGUIType()
@@ -209,8 +252,9 @@ Function fsScriptForgePython(Detail As Integer) As String
 	&apos; Returns the script version reported by the ScriptForge BASIC library.
 	&apos; This is useful to determine if a python library is available or if an
 	&apos; optional library is compatible. NOTE: Some sources of Office have a
-	&apos; version of ScriptForge that cannot be verified or that does not work;
-	&apos; these return `&quot;&quot;`.
+	&apos; version of ScriptForge that cannot be verified or that does not work.
+	&apos; If your platform does not support ScriptForge, then the function always
+	&apos; returns `&quot;&quot;` (i. e.: Ubuntu LTS 22.04 and LTS 24.04 `apt-get` versions)
 	&apos;
 	&apos; NOTE: The system version of python could be different than the version
 	&apos; that the office program uses.
@@ -220,27 +264,28 @@ Function fsScriptForgePython(Detail As Integer) As String
 	&apos; ScriptForge `platform.PythonVersion` reports: 3.8.16
 	&apos; `python --version` reports: Python 2.7.16
 	&apos;
-	&apos; &lt;https://help.libreoffice.org/latest/en-US/text/sbasic/shared/03/sf_platform.html?DbPAR=BASIC&gt;
+	&apos; Knowing the python version that Office uses is useful for determining whether
+	&apos; a particular python library would function using the bundled python package
+	&apos; used in MacOS and Windows installations, as well as flatpak and snap versions.
+	&apos;
+	&apos; &lt;https://help.libreoffice.org/latest/lo/text/sbasic/shared/03/sf_services.html&gt;
 
 	fsScriptForgePython = &quot;&quot;
 
 	If GetSolarVersion &lt; 70407 Then
 		&apos; Can&apos;t check, so exit.
 		Exit Function
-	ElseIf fbHaveSnap() Then
-		&apos; `platform.PythonVersion` does not work by default on a fresh install of
-		&apos; Ubuntu 24.04.01 LTS.
-		Exit Function
-	ElseIf Instr(Environ(&quot;XDG_DATA_DIRS&quot;), &quot;ubuntu&quot;) &lt;&gt; 0 Then
-		Exit Function
 	End If
+	
 	On Error GoTo fsScriptForgePythonErr
 	If fbTestLibraryLoaded(&quot;ScriptForge&quot;) Then
 	Dim platform
 	Dim Item as String
 	Dim x As Integer : x = 0
-	Dim test_array As Variant 
-	platform = CreateScriptService(&quot;Platform&quot;)
+	Dim test_array As Variant
+	&apos; Must use the full &quot;ScriptForge.Platform&quot; description to trigger
+	&apos; an error on the next line if not the service is not supported.
+	platform = CreateScriptService(&quot;ScriptForge.Platform&quot;)
 	For Each Item in Array(&quot;Python 3&quot;, &quot;Python 4&quot;, &quot;Python 5&quot;)
 		If Instr(platform.PythonVersion, Item) = 1 Then
 			test_array = Split(platform.PythonVersion, &quot;.&quot;)
@@ -267,7 +312,8 @@ Function fbScriptForgePythonOK(Detail As Integer) As Boolean
 	&apos; Test whether STARBASIC can access supported python functions. If
 	&apos; `bTestShell` is not `0` then check if the reported version
 	&apos; of python works from a shell command without specifying the
-	&apos; real full path.
+	&apos; real full path. NOTE: Bundled python releases might only work
+	&apos; with `python` or `python.exe` regardless of the office version.
 	&apos;
 	&apos; The Value of `Detail` describes parameters for checking python.
 	&apos; 
@@ -320,10 +366,10 @@ Sub ReadTextAloud()
 	Dim errorCode As Integer : errorCode = 0
 	Dim Config(fiUboundConfigOptions()) As Variant
 	Dim locklist As Variant : locklist = Array(&quot;lock&quot;)
+	Dim LockItem As String : LockItem = &quot;&quot;
 	Dim bDone As Boolean : bDone = False
-	Dim x As Integer : x = 0
 	Select Case fsTheOsId()
-	Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;POSIX.PYVENV&quot;
+	Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;
 		locklist = Array(&quot;lock&quot;, &quot;net_speech&quot;)
 		&apos; Don&apos;t show the dialog on first run.
 		&apos; Load default settings.
@@ -331,7 +377,7 @@ Sub ReadTextAloud()
 			MsgSpeak(fsGetTextSelection(False, True))
 			Exit Sub
 		End If
-	Case &quot;WINDOWS&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;, &quot;WINDOWS.NOSCRIPT&quot;, &quot;WINDOWS.PYVENV&quot;
+	Case &quot;WINDOWS&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;, &quot;WINDOWS.NOSCRIPT&quot;
 		If Not FileExists(sFile) Then
 				&apos; Don&apos;t show the dialog on first run.
 				fsNetSAPI5WindowsSpeech(_
@@ -340,7 +386,7 @@ Sub ReadTextAloud()
 			)
 				Exit Sub
 			End If
-	Case &quot;MACOS&quot;, &quot;MACOS.EXPERIMENTAL&quot;, &quot;WINDOWS.WINE&quot;, &quot;MACOS.PYVENV&quot;
+	Case &quot;MACOS&quot;, &quot;MACOS.EXPERIMENTAL&quot;, &quot;WINDOWS.WINE&quot;
 		&apos; No working Windows SAPI
 		&apos; Don&apos;t show the dialog on first run.
 		&apos; Load default settings.
@@ -357,9 +403,14 @@ Sub ReadTextAloud()
 		Else
 			On Error Resume Next
 			ClearWorkingCountryLanguage()
-			For x = LBound(locklist) To Ubound(locklist)
-				If FileExists(fsMyTempLock(locklist(x))) Then
-					fbRemoveFile(fsMyTempLock(locklist(x)))
+			For Each LockItem in locklist
+				If FileExists(fsMyTempLock(LockItem)) Then
+					&apos; Check file size so that the script pauses and
+					&apos; succeeds at deleting files on slow drives.
+					If FileLen(fsMyTempLock(LockItem)) = 0 Then
+						wait 0.25
+					End If
+					fbRemoveFile(fsMyTempLock(LockItem))
 					bDone = True
 				End If
 			Next
@@ -411,7 +462,7 @@ Sub ReadClipBoard
 	Else
 		If FileExists(s1) Or fbClipBoardAvailable() = False Then
 			If FileExists(s1) Then
-				If fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getTextFromFile(s1, &quot;&quot;, 0) Then
+				If fsGetSetting(&quot;oosetupversion&quot;) &lt;&gt; getLimitedTextFromFile(s1) Then
 					&apos; You updated office after a crash, so resume
 					&apos; the normal operation on the next run.
 					fbRemoveFile(s1)
@@ -455,6 +506,7 @@ Function FsRefreshAppImagePythonPath(byVal sPythonPath As String) As String
 	On Error GoTo FsRefreshAppImagePythonPathErr
 	ps_appimageresourcepath = &quot;&quot;
 	FsRefreshAppImagePythonPath = fsAppImageResourcePath(&quot;python&quot;)
+	Exit Function
 	FsRefreshAppImagePythonPathErr:
 	FsRefreshAppImagePythonPath = &quot;&quot;
 End Function

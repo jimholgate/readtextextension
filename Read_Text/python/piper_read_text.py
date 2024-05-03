@@ -369,6 +369,10 @@ class PiperTTSClass(object):
         self.piper_voice_dir = ""
         self.app_data = ".local"
         self.pied_list = []
+        self.pied_voice_dir_list = [
+            "~/snap/pied/common/models",
+            "~/.var/app/com.mikeasoft.pied/data/pied/models/",
+        ]
         self.piper_voice_dir_list = [
             f"~/{self.app_data}/share/piper-tts/piper-voices",
             f"~/{self.app_data}/share/piper/piper-voices",
@@ -425,9 +429,10 @@ class PiperTTSClass(object):
                 f"{_prog_search}\\espeak-ng-data",
             ]
         for _piper_dir in self.piper_voice_dir_list:
-            if os.path.isdir(os.path.expanduser(_piper_dir)):
-                self.piper_voice_dir = os.path.expanduser(_piper_dir)
-                break
+            if not _piper_dir in self.pied_voice_dir_list:
+                if os.path.isdir(os.path.expanduser(_piper_dir)):
+                    self.piper_voice_dir = os.path.expanduser(_piper_dir)
+                    break
         if len(self.piper_voice_dir) == 0:
             try:
                 new_dir = os.path.expanduser(self.piper_voice_dir_list[0])
@@ -736,15 +741,18 @@ not work with the python version.
                     data = json.load(file_obj)
             except:
                 return False
-        if not bool(data):
+        try:
+            if not data:
+                return False
+        except UnboundLocalError:
             return False
-        for _extension in ["onnx.json", "onnx"]:
+        for _extension in [".onnx.json", ".onnx", ""]:
             try:
                 for _item in data:
                     for _file_path in self.pied_list:
                         _key = data[_item]["key"]
                         if _key in _file_path:
-                            _source = f"{_file_path}.{_extension}"
+                            _source = f"{_file_path}{_extension}"
                             _dest_dir = os.path.join(
                                 self.piper_voice_dir,
                                 data[_item]["language"]["family"],
@@ -752,7 +760,9 @@ not work with the python version.
                                 data[_item]["name"],
                                 data[_item]["quality"],
                             )
-                            _dest = os.path.join(_dest_dir, f"{_key}.{_extension}")
+                            if not os.path.isdir(_dest_dir):
+                                os.makedirs(_dest_dir)
+                            _dest = os.path.join(_dest_dir, f"{_key}{_extension}")
                             filter_qualities = True
                             # Remove an invalid symbolic link. Filter qualities by GPU and machine.
                             if (
@@ -768,11 +778,14 @@ not work with the python version.
                                 if os.path.isdir(_dest_dir):
                                     if os.access(_dest_dir, os.W_OK):
                                         try:
+                                            if os.path.getsize(_source) < 20:
+                                                # Don't link to an invalid file.
+                                                continue
                                             os.symlink(_source, _dest)
                                             print(
                                                 f"\nSymbolic link created from `{_source}` to `{_dest}`"
                                             )
-                                            if _extension in ["onnx"]:
+                                            if _extension in [".onnx"]:
                                                 do_pop_message = True
                                                 # If the network works, get the MODEL_CARD
                                                 _dir = self.retrieve_model(
@@ -1045,6 +1058,16 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
             self.voice_count = 0
             self.sample_rate = 22050
         return self.voice_count
+
+    def pied_model_path(self) -> str:
+        """Return model path if using a pied speech manager is available for
+        a platform that supports pied on current flatpak or snap applications,
+        otherwise return `""`."""
+        if os.name == "posix":
+            for _path in self.pied_voice_dir_list:
+                if os.path.isdir(os.path.expanduser(_path)):
+                    return os.path.expanduser(_path)
+        return ""
 
     def _check_voice_request(self, _vox_number: int = 0, _list_size: int = 0) -> str:
         """Handle out of range numbers using a modulus (`int % _list_size`)
@@ -1882,6 +1905,16 @@ Links
 * [Thorsten Müller - Piper Voice Training](https://www.youtube.com/watch?v=b_we_jma220)
     """
         return self.instructions
+
+    def test_for_pied_linkage(self) -> bool:
+        """If a pied directory exists, and the local directory has not been
+        configured, then return `True`."""
+        if len(self.pied_model_path()) != 0:
+            if not os.path.isdir(
+                os.path.join(os.path.expanduser(self.piper_voice_dir_list[0]), "ar")
+            ):
+                return True
+        return False
 
 
 def main() -> None:

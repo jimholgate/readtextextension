@@ -1,26 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
     <meta>
-    <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp" indexer="include" status="PUBLISH">
-        <title id="tokens" xml-lang="en-US">
-            Advanced settings</title>
-        <filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
-    </topic>
-    <history>
-        <created date="2024-04-18T17:08:20Z">James Holgate</created>
-    </history>
+        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp"
+            indexer="include" status="PUBLISH">
+            <title id="tokens" xml-lang="en-US">
+                Advanced settings</title>
+            <filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
+        </topic>
+        <history>
+            <created date="2024-04-18T17:08:20Z">James Holgate</created>
+        </history>
     </meta>
 
     <body>
         <paragraph role="heading" id="tokens1" xml-lang="en-US" level="1">
             Advanced settings</paragraph>
-        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png" id="img_dialog3_screenshot">
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
+            id="img_dialog3_screenshot">
             <alt xml-lang="en-US" id="alt_dialog3_screenshot">About Read Text dialog</alt>
         </image>
 
         <paragraph xml-lang="en-US" role="heading" level="2">Change the pronunciation of a word</paragraph>
 
-        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog2.png" id="img_dialog2_screenshot">
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog2.png"
+            id="img_dialog2_screenshot">
             <alt xml-lang="en-US" id="alt_dialog2_screenshot">Change the pronunciation dialog</alt>
         </image>
 
@@ -30,19 +33,17 @@
 
             <listitem>In the editor, select a word.</listitem>
 
-            <listitem>Select
-                <emph>Tools ▸ Add-ons ▸ Read selection</emph> .</listitem>
+            <listitem>Select <emph>Tools ▸ Add-ons ▸ Read selection</emph> .</listitem>
 
-            <listitem>Select the
-                <emph>About...</emph> button.</listitem>
+            <listitem>Select the <emph>About...</emph> button.</listitem>
 
-            <listitem>Right-click on the wrench icon, which is the fourth icon from the left at the bottom of the dialog box.</listitem>
+            <listitem>Right-click on the wrench icon, which is the fourth icon from the left at the
+                bottom of the dialog box.</listitem>
 
-            <listitem>In the
-                <emph>Read with an external application</emph> box, enter an alternative spelling for the word.</listitem>
+            <listitem>In the <emph>Read with an external application</emph> box, enter an
+                alternative spelling for the word.</listitem>
 
-            <listitem>Select the
-                <emph>Apply</emph> button.</listitem>
+            <listitem>Select the <emph>Apply</emph> button.</listitem>
 
         </list>
 
@@ -72,13 +73,17 @@
 
             <listitem><code>(NOW)</code>: Current time reformatted so you can use it in a file name</listitem>
 
-            <listitem><code>(OOO_WEBTEXT)</code>: The first 9999 letters of the selected text encoded as part of a URL</listitem>
+            <listitem><code>(OOO_WEBTEXT)</code>: The first 9999 letters of the selected text
+                encoded as part of a URL</listitem>
 
-            <listitem><code>(OOO_WEBTEXT250)</code>: The first 249 letters of the selected text encoded as part of a URL</listitem>
+            <listitem><code>(OOO_WEBTEXT250)</code>: The first 249 letters of the selected text
+                encoded as part of a URL</listitem>
 
-            <listitem><code>(OOO_WEBTEXTBIG)</code>: The first 9999 letters of the selected text encoded as part of a URL</listitem>
+            <listitem><code>(OOO_WEBTEXTBIG)</code>: The first 9999 letters of the selected text
+                encoded as part of a URL</listitem>
 
-            <listitem><code>(OOO_WEBTEXTSMALL)</code>: The first 99 letters of the selected text encoded as part of a URL</listitem>
+            <listitem><code>(OOO_WEBTEXTSMALL)</code>: The first 99 letters of the selected text
+                encoded as part of a URL</listitem>
 
             <listitem><code>(OPENJTALK_READ_TEXT_PY)</code>: A Python program (Japanese)</listitem>
 
@@ -96,7 +101,8 @@
 
             <listitem><code>(SELECTION_LANGUAGE_CODE)</code>: The language of the selected text</listitem>
 
-            <listitem><code>(SELECTION_LANGUAGE_COUNTRY_CODE)</code>: The regional code of the selected text</listitem>
+            <listitem><code>(SELECTION_LANGUAGE_COUNTRY_CODE)</code>: The regional code of the
+                selected text</listitem>
 
             <listitem><code>(SESSION_ID)</code>: The session identifier</listitem>
 
@@ -108,8 +114,8 @@
 
             <listitem><code>(TITLE)</code>: Name of the document</listitem>
 
-            <listitem><code>(TMP)</code>: Full path and temporary file name containing the selected text
-            </listitem>
+            <listitem><code>(TMP)</code>: Full path and temporary file name containing the selected
+                text </listitem>
 
             <listitem><code>(TTS_WSCRIPT_VBS)</code>: A Windows platform voice synthesis script</listitem>
 

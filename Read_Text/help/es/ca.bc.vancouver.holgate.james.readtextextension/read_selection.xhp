@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
     <meta>
-        <topic>
-            <title xml-lang="es-ES">Leer la selección</title>
+        <topic
+            id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp"
+            indexer="include" status="PUBLISH">
+        <title xml-lang="es-ES">Leer la selección</title>
             <filename>ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp</filename>
         </topic>
         <history>

@@ -2489,6 +2489,20 @@ Function LocalLinuxPaths()
 End Function
 
 
+Function SkipPiedCheck() As Boolean
+	&apos; Does a .local Piper settings file exist?
+	Dim _home As String : _home = Environ(&quot;HOME&quot;)
+	SkipPiedCheck = False
+	If getGUIType() = 4 Then
+		If Instr(fsPiperPath(), &quot;pied&quot;) &lt;&gt; 0 Then
+			If FileExists(_home &amp; &quot;/.local/share/piper-tts/piper-voices/voices.json&quot;) Then
+				SkipPiedCheck = True
+			End If	
+		End If
+	End If
+End Function
+
+
 Function fsPiperPath()
 	fsPiperPath = &quot;&quot;
 	Dim paths As Variant
@@ -2612,8 +2626,10 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	sLanguage = LCase(fsGetLanguage())
 	Dim sSpdToken As String : sSpdToken = &quot;&quot;
 	If fbIsLibreOffice() Then
-		If Not fbIsSandboxed() And Not bIsAppImage Then
-		sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
+		If fsTheOsId() = &quot;POSIX.FLATPAK&quot; Then
+			sSpdToken = &quot;&quot;
+		ElseIf Not fbIsSandboxed() And Not bIsAppImage Then
+			sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
 		End If
 	End If
 	Select Case fsGetOS()
@@ -2848,7 +2864,7 @@ Function fiDialog1CombosShowMyPythonChoices( _
 		If fbPiperTtsOk(&quot;&quot;) Then
 			high_suggestion = PiperLocalSuggestion(&quot;&quot;, True)
 			local_suggestion = PiperLocalSuggestion(&quot;&quot;, False)
-			If fbIsSandboxed() Then
+			If fbIsSandboxed() or SkipPiedCheck() Then
 				ReDim _opts : _opts = Array(_
 					player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
 					player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
@@ -3406,7 +3422,7 @@ Function fsAbout() As String
 	&apos; directory. On an unsupported platform, the lookup of
 	&apos; `/singletons/com.sun.star.deployment.PackageInformationProvider`
 	&apos; returns `&quot;&quot;` instead of the extension URI.
-	fsAbout = getTextFromFile(fsDescriptionDoc(), &quot;&quot;, 0)
+	fsAbout = getLimitedTextFromFile(fsDescriptionDoc())
 	&apos; Application&apos;s Default encoding
 	If Len(fsAbout) = 0 Then
 		fsAbout = Join( _
@@ -3445,36 +3461,6 @@ Function fsPiperTextString() As String
 		iLimit = 5323
 		fsPiperTextString = getTextFromFile(fsPythonPiperDoc(), &quot;UTF-8&quot;, iLimit)
 	End If
-End Function
-
-
-Function fsEspeakTextString() As String
-	fsEspeakTextString = getTextFromFile(fsPythonEspeakDoc(), &quot;UTF-8&quot;, 0)
-End Function
-
-
-Function fsFestivalTextString() As String
-	fsFestivalTextString = getTextFromFile(fsPythonFestivalDoc(), &quot;UTF-8&quot;, 0)
-End Function
-
-
-Function fsPythonNetTtsTextString() As String
-	fsPythonNetTtsTextString = getTextFromFile(fsNetworkTtsDoc(), &quot;UTF-8&quot;, 0)
-End Function
-
-
-Function fsRhVoiceTextString() As String
-	fsRhVoiceTextString = getTextFromFile(fsRhVoiceTtsDoc(), &quot;UTF-8&quot;, 0)
-End Function
-
-
-Function fsOpenJtalkTextString() As String
-	fsOpenJtalkTextString = getTextFromFile(fsPythonOpenJTalkDoc(), &quot;UTF-8&quot;, 0)
-End Function
-
-
-Function fsQRTextString() As String
-	fsQRTextString = getTextFromFile(fsPythonCreateQR(), &quot;UTF-8&quot;, 0)
 End Function
 
 
@@ -3534,10 +3520,27 @@ Function getTextFromFile( _
 	FichierKO2:
 	
 	On Error Resume Next
-	MsgBox(&quot;File read Error !&quot;,16)
+	MsgBox(&quot;File read Error !&quot;, 16)
 	fileStream.closeInput
 	myTextFile.closeInput
 	On Error Goto 0
+End Function
+
+
+Function getLimitedTextFromFile(FilePath As String) As String
+	&apos; Get some text even if the platform cannot handle the full length of the
+	&apos; UTF-8 encoded plain text file.
+	getLimitedTextFromFile = &quot;&quot;
+	Dim sA As String
+	Dim iLimit As Integer
+	For Each iLimit in Array(0, 32766, 5096, 2048, 1024, 512, 256, 128, 79, 64,_
+	32)
+		sA = getTextFromFile(FilePath, &quot;UTF-8&quot;, iLimit)
+		If Len(sA) &lt;&gt; 0 Then
+			getLimitedTextFromFile = sA
+			Exit For
+		End If
+	Next
 End Function
 
 
@@ -3567,10 +3570,12 @@ Function fbWestEuropeanLang( _
 	&quot;fr&quot;, _
 	&quot;ga&quot;, _
 	&quot;gd&quot;, _
+	&quot;ia&quot;, _
 	&quot;it&quot;, _
 	&quot;la&quot;, _
 	&quot;nl&quot;, _
-	&quot;pt&quot;)
+	&quot;pt&quot;, _
+	&quot;ro&quot;)
 	For Each _lang in a1
 		If test_str = _lang Then
 			fbWestEuropeanLang = True
@@ -7070,7 +7075,7 @@ Function fbCheckPosixSpeech() As Boolean
 
 	Select Case getGUIType()
 		Case 1  &apos; WINDOWS
-			fbCheckPosixSpeech = fbScriptForgePythonOK(0)
+			fbCheckPosixSpeech = False
 		Case Else
 			fbCheckPosixSpeech = CheckPosixSpeech(osId, Apps)
 	End Select
@@ -7080,7 +7085,7 @@ End Function
 Function CheckPosixSpeech(osId As String, Apps As Variant) As Boolean
 	CheckPosixSpeech = False
 	Select Case osId
-		Case &quot;POSIX.PYVENV&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;POSIX.FLATPAK&quot;
+		Case &quot;POSIX.EXPERIMENTAL&quot;, &quot;POSIX.FLATPAK&quot;
 			CheckPosixSpeech = True
 		Case &quot;POSIX.SNAP&quot;
 			If fbIsLibreOffice() And fbHaveNetworkTTS() Then
@@ -7090,7 +7095,7 @@ Function CheckPosixSpeech(osId As String, Apps As Variant) As Boolean
 			If fbIsLibreOffice() And fbPiperTtsOk(&quot;&quot;) Then
 				CheckPosixSpeech = True
 			End If
-		Case &quot;MACOS&quot;, &quot;MACOS.PYVENV&quot;, &quot;MACOS.EXPERIMENTAL&quot;
+		Case &quot;MACOS&quot;, &quot;MACOS.EXPERIMENTAL&quot;
 			Apps = Array(&quot;say&quot;)
 	End Select
     If Not CheckPosixSpeech Then
@@ -7143,7 +7148,7 @@ Sub zzz_print_available_apps
 	For Each Item in Array(&quot;festival&quot;, &quot;flite&quot;, &quot;open_jtalk&quot;, _
 	&quot;pico2wave&quot;, &quot;piper&quot;, &quot;RHVoice-test&quot;, &quot;spd-say&quot;, &quot;ffmpeg&quot;, _
 	&quot;say&quot;, &quot;open&quot;, &quot;xdg-open&quot;, &quot;gnome-open&quot;, &quot;osascript&quot;, &quot;vlc&quot;, _
-	&quot;python3&quot;, fsScriptForgePython())
+	&quot;python3&quot;)
 		If Len(fsFindAppPath(Item)) &lt;&gt; 0 Then
 			print fsFindAppPath(Item)
 		End If

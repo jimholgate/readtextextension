@@ -152,7 +152,7 @@ Sub ImportJsonPhonemeTable(Event)
 	If Len(_in_file) = 0 Then
 		Exit Sub
 	End If
-	_json_display = getTextFromFile(_in_file, &quot;&quot;, 0)
+	_json_display = getLimitedTextFromFile(_in_file)
 	If Instr(_json_display, &quot;&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot;) = 0 Or Instr(_
 	_json_display, &quot;}&quot;) = 0 Then
 		Exit Sub
@@ -806,7 +806,7 @@ Function EditJsonPhonemeTable() As String
 	_grapheme = fsGetTheSelectedWord()
 	_display_phoneme = &quot;&quot;
 	If FileExists(_in_file) Then
-		_json_display = getTextFromFile(_in_file, &quot;&quot;, 0)
+		_json_display = getLimitedTextFromFile(_in_file)
 		_display_phoneme = bespokeJsonExtraction(_json_display, _grapheme)
 		If Len(_display_phoneme) = 0 Then
 			_display_phoneme = Lcase(_grapheme)
@@ -1480,34 +1480,31 @@ Sub AboutAddOn( _
 				TextField = fsVBSTextString()
 			ElseIf InStr(sA, &quot;(SPD_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				file_spec = fsPythonSpdDoc()
-				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
-				If Len(TextField) = 0 Then
-					TextField = getTextFromFile(file_spec, &quot;&quot;, 3200)				
-				End If
+				TextField = getLimitedTextFromFile(file_spec)
 			ElseIf InStr(sA, &quot;(ESPEAK_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				file_spec = fsPythonEspeakDoc()
-				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
+				TextField = getLimitedTextFromFile(file_spec)
 			ElseIf InStr(sA, &quot;(FESTIVAL_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				file_spec = fsPythonFestivalDoc()
-				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
+				TextField = getLimitedTextFromFile(file_spec)
 			ElseIf InStr(sA, &quot;(NETWORK_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				file_spec = fsNetworkTtsDoc()
-				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
+				TextField = getLimitedTextFromFile(file_spec)
 			ElseIf InStr(sA, &quot;(OPENJTALK_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				file_spec = fsPythonOpenJTalkDoc()
-				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
+				TextField = getLimitedTextFromFile(file_spec)
 			ElseIf InStr(sA, &quot;(PICO_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				file_spec = fsPythonPicoDoc()
-				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
+				TextField = getLimitedTextFromFile(file_spec)
 			ElseIf InStr(sA, &quot;(PIPER_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				file_spec = fsPythonPiperDoc()
-				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
+				TextField = getLimitedTextFromFile(file_spec)
 			ElseIf InStr(sA,  &quot;(RHVOICE_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
 				file_spec = fsRhVoiceTtsDoc()
-				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)
+				TextField = getLimitedTextFromFile(file_spec)
 			ElseIf InStr(sA, &quot;(CREATE_QR_LABEL_PY)&quot;) &lt;&gt; 0 Then			
 				file_spec = fsPythonCreateQR()
-				TextField = getTextFromFile(file_spec, &quot;&quot;, 0)			
+				TextField = getLimitedTextFromFile(file_spec)			
 			ElseIf InStr(sA, &quot;(SAY_APPLESCRIPT)&quot;) &lt;&gt; 0 Then
 				file_spec = &quot;&quot;
 				TextField = fswriteMacOSSpeechScript(&quot;&quot;, _

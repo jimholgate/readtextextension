@@ -1,13 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
     <meta>
-    <topic>
-        <title xml-lang="en-US">Read selection</title>
-        <filename>ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp</filename>
-    </topic>
-    <history>
-        <created date="2024-04-18T17:01:17Z">James Holgate</created>
-    </history>
+        <topic
+            id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp"
+            indexer="include" status="PUBLISH">
+            <title xml-lang="en-US">Read selection</title>
+            <filename>ca.bc.vancouver.holgate.james.readtextextension/read_selection.xhp</filename>
+        </topic>
+        <history>
+            <created date="2024-04-18T17:01:17Z">James Holgate</created>
+        </history>
     </meta>
 
     <body xml-lang="en-US">
@@ -21,8 +23,7 @@
 
             <listitem>Select the text that you want to read.</listitem>
 
-            <listitem>Click the
-                <emph>Read selection</emph> button on the menu bar.</listitem>
+            <listitem>Click the <emph>Read selection</emph> button on the menu bar.</listitem>
 
         </list>
 

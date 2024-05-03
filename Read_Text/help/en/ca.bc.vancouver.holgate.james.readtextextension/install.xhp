@@ -1,13 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
     <meta>
-    <topic>
-        <title xml-lang="en-US">Installation</title>
-        <filename>ca.bc.vancouver.holgate.james.readtextextension/install.xhp</filename>
-    </topic>
-    <history>
-        <created date="2024-04-18T15:44:33Z">James Holgate</created>
-    </history>
+        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp"
+            indexer="include" status="PUBLISH">
+            <title xml-lang="en-US">Installation</title>
+            <filename>ca.bc.vancouver.holgate.james.readtextextension/install.xhp</filename>
+        </topic>
+        <history>
+            <created date="2024-04-18T15:44:33Z">James Holgate</created>
+        </history>
     </meta>
 
     <body xml-lang="en-US">
@@ -19,7 +20,8 @@
 
         <list type="ordered">
 
-            <listitem>Download the most recent version of the extension from the %PRODUCTNAME extensions site.</listitem>
+            <listitem>Download the most recent version of the extension from the %PRODUCTNAME
+                extensions site.</listitem>
 
             <listitem>Open the extension.</listitem>
 

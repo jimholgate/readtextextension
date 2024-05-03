@@ -1216,8 +1216,6 @@ Function fsExtensionSettingsIni() As String
 		Found = &quot;appimage_text-to-speech.&quot; &amp; IniVer
 	Case &quot;POSIX.FLATPAK&quot;
 		Found = &quot;flatpak_text-to-speech.&quot; &amp; IniVer
-	Case &quot;POSIX.PYVENV&quot;, &quot;MACOS.PYVENV&quot;, &quot;WINDOWS.PYVENV&quot;
-		Found = &quot;pyvenv_text-to-speech.&quot; &amp; IniVer
 	Case &quot;POSIX.SNAP&quot;
 		Found = &quot;snap_text-to-speech.&quot; &amp; IniVer
 	Case Else
@@ -1288,9 +1286,6 @@ Function fsTheOsId() As String
 			fsTheOsId = &quot;WINDOWS.NOSCRIPT&quot;
 		ElseIf fbExperimentalOsId() Then
 			fsTheOsId = &quot;WINDOWS.EXPERIMENTAL&quot;
-		ElseIf fbScriptForgePythonOK(0) Then
-			&apos; Check if the `ScriptForge` library works with the bundled python.
-			fsTheOsId = &quot;WINDOWS.PYVENV&quot;
 		End If
 		fsTheOsIdErr2:
 		s_CaReadTextExtensionGetOS = fsTheOsId
@@ -1311,9 +1306,6 @@ Function fsTheOsId() As String
 		If isMac Then
 			If fbExperimentalOsId() Then
 				fsTheOsId = &quot;MACOS.EXPERIMENTAL&quot;
-			Elseif fbScriptForgePythonOK(1) Then
-				&apos; Major/Minor python version; for example `python3.8`
-				fsTheOsId = &quot;MACOS.PYVENV&quot;
 			Else
 				fsTheOsId = &quot;MACOS&quot;
 			End If
@@ -1334,9 +1326,6 @@ Function fsTheOsId() As String
 			fsTheOsId = &quot;POSIX.SNAP&quot;
 		ElseIf fbExperimentalOsId() Then
 			fsTheOsId = &quot;POSIX.EXPERIMENTAL&quot;
-		ElseIf fbScriptForgePythonOK(-1) Then
-			&apos; Major python version; For Example, `python3`
-			fsTheOsId = &quot;POSIX.PYVENV&quot;
 		ElseIf Len(Environ(&quot;ANDROID_ROOT&quot;)) &lt;&gt; 0 Then
 			fsTheOsId = &quot;POSIX.ANDROID&quot;
 		Else

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
     <meta>
-        <topic>
+        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp"
+            indexer="include" status="PUBLISH">
             <title xml-lang="es-ES">Propiedades Avanzadas</title>
             <filename>ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
         </topic>
@@ -16,7 +17,7 @@
         <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
             id="img_dialog3_screenshot">
             <alt
-                id="alt_dialog3_screenshot">Dialog3 screenshot.</alt>
+                id="alt_dialog3_screenshot">Acerca</alt>
         </image>
 
         <paragraph role="heading" level="2">Personalice o experimente</paragraph>

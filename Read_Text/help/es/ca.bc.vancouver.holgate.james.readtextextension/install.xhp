@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
     <meta>
-        <topic>
+        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/install.xhp"
+            indexer="include" status="PUBLISH">
             <title xml-lang="es-ES">Instalación</title>
             <filename>ca.bc.vancouver.holgate.james.readtextextension/install.xhp</filename>
         </topic>

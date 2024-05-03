@@ -691,12 +691,7 @@ Sub tts_config_parseFile( _
 		errorCode)
 		Exit Sub
 	End If
-	For Each iLimit in Array(0, 32766, 5096, 2048, 1024, 512, 256, 128, 79, 64, 32)
-		sA = getTextFromFile(configFilePath, &quot;&quot;, iLimit)
-		If Len(sA) &lt;&gt; 0 Then
-			Exit For
-		End If
-	Next
+	sA = getLimitedTextFromFile(configFilePath)
 
 	If InStr(sA, &quot;dialog1.&quot;) = 0 Then
 		&apos; Use defaults: wrong keys or could not read the file.

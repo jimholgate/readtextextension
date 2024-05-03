@@ -1,20 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
     <meta>
-    <topic>
-        <title xml-lang="en-US">Read the clipboard</title>
-        <filename>ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp</filename>
-    </topic>
-    <history>
-        <created date="2024-04-18T15:50:56Z">James Holgate</created>
-    </history>
+        <topic
+            id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp"
+            indexer="include" status="PUBLISH">
+            <title xml-lang="en-US">Read the clipboard</title>
+            <filename>ca.bc.vancouver.holgate.james.readtextextension/read_clipboard.xhp</filename>
+        </topic>
+        <history>
+            <created date="2024-04-18T15:50:56Z">James Holgate</created>
+        </history>
     </meta>
 
     <body xml-lang="en-US">
 
         <paragraph role="heading" level="1">Read the clipboard</paragraph>
 
-        <paragraph>This extension lets you read any text that you can copy to the clipboard. For example, this includes macro code, text field contents, databases, subtitles and selected content in tables. As well, you can read text that you copy from external programs
+        <paragraph>This extension lets you read any text that you can copy to the clipboard. For
+            example, this includes macro code, text field contents, databases, subtitles and
+            selected content in tables. As well, you can read text that you copy from external
+            programs
             like web browsers, help or newsfeeds. To read the clipboard, follow these steps:
         </paragraph>
 
@@ -23,11 +28,9 @@
 
             <listitem>Select some text.</listitem>
 
-            <listitem>Use the keyboard shortcut to copy text (generally
-                <emph>CTRL + C</emph> or
-                <emph>⌘ + C</emph>).</listitem>
-            <listitem>Select
-                <emph>Tools ▸ Add-ons ▸ Read the clipboard</emph>.</listitem>
+            <listitem>Use the keyboard shortcut to copy text (generally <emph>CTRL + C</emph> or <emph>⌘
+                + C</emph>).</listitem>
+            <listitem>Select <emph>Tools ▸ Add-ons ▸ Read the clipboard</emph>.</listitem>
 
         </list>
 
