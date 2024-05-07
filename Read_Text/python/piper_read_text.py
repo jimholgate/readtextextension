@@ -38,6 +38,13 @@ Install piper-tts
 If you are not online, then you cannot download voice models or configuration
 files. Once they are installed, piper handles speech locally.
 
+Pied (Linux)
+------------
+
+[Pied](https://pied.mikeasoft.com/) uses a simple graphical interface to install
+and manage text-to-speech Piper voices for use with Linux Speech Dispatcher on
+supported architectures and distributions.
+
 Binary release (Linux)
 ----------------------
 
@@ -187,41 +194,7 @@ VLC_WINDOWS_INFO = """
 > various streaming protocols.
 
 -- [VLC: Official site]((https://www.videolan.org))
-```
 
-
-
-
-        ██████████████  ████████    ██      ██████████████
-        ██          ██        ██████    ██  ██          ██
-        ██  ██████  ██    ██  ██  ██        ██  ██████  ██
-        ██  ██████  ██      ████  ██  ████  ██  ██████  ██
-        ██  ██████  ██      ██████  ██  ██  ██  ██████  ██
-        ██          ██    ██  ██            ██          ██
-        ██████████████  ██  ██  ██  ██  ██  ██████████████
-                        ████    ████    ██                
-        ████  ████  ██    ██    ██  ██████  ██          ██
-            ████████        ██    ██████  ██  ██████████  
-                ██████    ██    ████  ██    ████  ██    ██
-        ██████    ██    ██                    ██  ████████
-        ██    ██    ██    ████      ██████  ██          ██
-        ██████  ██    ██    ██  ██  ████████    ██    ██  
-        ████      ████    ██        ████  ████  ██████████
-        ██    ██        ████    ██  ██  ████  ██  ████  ██
-        ██  ██    ████    ██████████    ██████████  ████  
-                        ██    ██  ██    ██      ██  ████  
-        ██████████████    ██    ██      ██  ██  ██      ██
-        ██          ██    ██████  ██  ████      ██      ██
-        ██  ██████  ██  ████  ████  ██████████████        
-        ██  ██████  ██  ██  ██  ██          ██        ████
-        ██  ██████  ██    ██████  ████    ██    ██████████
-        ██          ██  ██  ██        ██      ████  ██████
-        ██████████████  ██  ██████      ████      ██    ██
-
-
-
-
-```
 If you are using PiperTTS on Windows without installing VLC , it can
 take a few moments before your computer starts playing Piper speech.
 If you are using PiperTTS using a compatibility layer capable of 
@@ -708,7 +681,7 @@ not work with the python version.
         a voices.json file, then link the home onnx.json and onnx files in
         the standard directory. Graphical Piper manager applications like the
         [Pied](https://pied.mikeasoft.com/) installer app might not store
-        MODEL_CARD files in a standarcized directory, so this client tries
+        MODEL_CARD files in a standardized directory, so this client tries
         to download them for your reference into the client directory."""
         if not os.name == "posix" or bool(all_dir_list) == False:
             return False
@@ -778,7 +751,11 @@ not work with the python version.
                                 if os.path.isdir(_dest_dir):
                                     if os.access(_dest_dir, os.W_OK):
                                         try:
-                                            if os.path.getsize(_source) < 20:
+                                            if not os.path.exists(_source):
+                                                continue
+                                            elif os.path.exists(_dest):
+                                                continue
+                                            elif os.path.getsize(_source) < 20:
                                                 # Don't link to an invalid file.
                                                 continue
                                             os.symlink(_source, _dest)

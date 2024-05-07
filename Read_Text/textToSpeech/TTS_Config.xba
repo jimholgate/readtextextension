@@ -1472,7 +1472,6 @@ Sub AboutAddOn( _
 			sC = replaceLocalTokensWithStr(sC)
 			sC = replacePublicTokensWithStr(sC)
 			.GetControl(&quot;TextField3&quot;).model.Text = &quot;&quot;&quot;&quot; &amp; sE &amp; &quot;&quot;&quot; &quot; &amp; sC
-
 			.GetControl(&quot;TextField2&quot;).model.helpText = fsAboutScriptHint(file_spec)
 			If Len(myText) &lt;&gt; 0 Then
 				TextField = myText
@@ -1525,6 +1524,9 @@ Sub AboutAddOn( _
 				file_spec = &quot;&quot;
 				TextField = &quot;&quot;
 			End If
+			If Len(file_spec) &lt;&gt; 0 Then
+				.GetControl(&quot;TextField2&quot;).model.helpText = fsAboutScriptHint(file_spec)
+			End If
 			.GetControl(&quot;TextField2&quot;).model.Text = TextField
 		Else &apos; if Config(pi_use_html_boolean) then
 			sA = replacePublicTokensWithStr(Config(pi_html_string))
@@ -1539,5 +1541,4 @@ Sub AboutAddOn( _
 		.Execute()
 	End With
 End Sub
-
 </script:module>

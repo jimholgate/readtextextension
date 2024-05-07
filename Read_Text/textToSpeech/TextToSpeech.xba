@@ -136,8 +136,12 @@ Private Config As Variant
 
 Function fsAboutScriptHint(file_spec)
 	fsAboutScriptHint = &quot;OS ID : &quot; &amp; fsTheOsId()
+	Dim SFPython As String : SFPython = fsScriptForgePython(1)
 	If FileExists(file_spec) Then
-	fsAboutScriptHint = &quot;OS ID : &quot; &amp; fsTheOsId() &amp; &quot;; REV : &quot; &amp; FileDateTime(file_spec)
+		fsAboutScriptHint = &quot;OS ID : &quot; &amp; fsTheOsId() &amp; &quot;; REV : &quot; &amp; FileDateTime(file_spec)
+		If Right(file_spec, 3) = &quot;.py&quot; And Len(SFPython) &lt;&gt; 0 Then
+			fsAboutScriptHint = fsAboutScriptHint &amp; &quot;; PYTHON : &quot; &amp; SFPython
+		End If
 	End If
 End Function
 
@@ -254,7 +258,7 @@ Function fsScriptForgePython(Detail As Integer) As String
 	&apos; optional library is compatible. NOTE: Some sources of Office have a
 	&apos; version of ScriptForge that cannot be verified or that does not work.
 	&apos; If your platform does not support ScriptForge, then the function always
-	&apos; returns `&quot;&quot;` (i. e.: Ubuntu LTS 22.04 and LTS 24.04 `apt-get` versions)
+	&apos; returns `&quot;&quot;.
 	&apos;
 	&apos; NOTE: The system version of python could be different than the version
 	&apos; that the office program uses.
@@ -285,7 +289,7 @@ Function fsScriptForgePython(Detail As Integer) As String
 	Dim test_array As Variant
 	&apos; Must use the full &quot;ScriptForge.Platform&quot; description to trigger
 	&apos; an error on the next line if not the service is not supported.
-	platform = CreateScriptService(&quot;ScriptForge.Platform&quot;)
+	platform = ScriptForge.CreateScriptService(&quot;ScriptForge.Platform&quot;)
 	For Each Item in Array(&quot;Python 3&quot;, &quot;Python 4&quot;, &quot;Python 5&quot;)
 		If Instr(platform.PythonVersion, Item) = 1 Then
 			test_array = Split(platform.PythonVersion, &quot;.&quot;)
