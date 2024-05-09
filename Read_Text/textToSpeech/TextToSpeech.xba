@@ -136,7 +136,7 @@ Private Config As Variant
 
 Function fsAboutScriptHint(file_spec)
 	fsAboutScriptHint = &quot;OS ID : &quot; &amp; fsTheOsId()
-	Dim SFPython As String : SFPython = fsScriptForgePython(1)
+	Dim SFPython As String : SFPython = fsScriptForgePython(2)
 	If FileExists(file_spec) Then
 		fsAboutScriptHint = &quot;OS ID : &quot; &amp; fsTheOsId() &amp; &quot;; REV : &quot; &amp; FileDateTime(file_spec)
 		If Right(file_spec, 3) = &quot;.py&quot; And Len(SFPython) &lt;&gt; 0 Then
@@ -276,8 +276,8 @@ Function fsScriptForgePython(Detail As Integer) As String
 
 	fsScriptForgePython = &quot;&quot;
 
-	If GetSolarVersion &lt; 70407 Then
-		&apos; Can&apos;t check, so exit.
+	If GetSolarVersion() &lt; 240000 Then
+		&apos; Not reliable, so exit.
 		Exit Function
 	End If
 	
