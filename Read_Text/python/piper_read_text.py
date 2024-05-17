@@ -546,7 +546,7 @@ not work with the python version.
 """
         return self.quick_start
 
-    def _pretty_json_write(
+    def pretty_json_write(
         self, data: any = None, _json_file: str = "", iso_lang: str = "en-US"
     ) -> bool:
         """Use `json.dumps` to verify the format and convert the data to a
@@ -821,7 +821,7 @@ not work with the python version.
                 )
                 self.ok = False
                 sys.exit(0)
-        if not self._pretty_json_write(data, _json_file, iso_lang):
+        if not self.pretty_json_write(data, _json_file, iso_lang):
             _warning = f"WARNING: Missing {self.help_heading} File!"
             underline = len(_warning) * "="
             print(
@@ -1557,7 +1557,7 @@ Piper TTS
         piper_file = ""
         if len(_content) != 0:
             data = json.loads(data_response)
-            if not self._pretty_json_write(data, self.json_file, self.concise_lang):
+            if not self.pretty_json_write(data, self.json_file, self.concise_lang):
                 return False
         else:
             return False
@@ -1896,11 +1896,11 @@ Links
 
 def main() -> None:
     """Use Piper TTS speech synthesis for supported languages."""
+    _piper_tts = PiperTTSClass()
     if not sys.version_info >= (3, 6) or not os.name in ["nt", "posix"]:
         print("Your system does not support the piper python tool.")
         _piper_tts.usage()
         sys.exit(0)
-    _piper_tts = PiperTTSClass()
     _dir = _piper_tts.piper_voice_dir
     all_dir_list = [_dir]
     for _item in _piper_tts.piper_voice_dir_list:
@@ -1951,7 +1951,7 @@ def main() -> None:
                 if not os.path.isdir(_dir):
                     try:
                         os.makedirs(_dir)
-                        _piper_tts._pretty_json_write(
+                        _piper_tts.pretty_json_write(
                             _piper_tts.piper_minimum_dictionary,
                             _piper_tts.json_file,
                             "en-GB",

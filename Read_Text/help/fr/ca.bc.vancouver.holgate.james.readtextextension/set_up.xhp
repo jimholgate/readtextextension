@@ -10,13 +10,13 @@
         <history>
             <created date="2010-10-22T00:00:00">
                 James Holgate</created>
-            <lastedited date="2024-04-19T11:51:48Z">
+            <lastedited date="2024-5-15T10:24:00">
                 Show Dialog1 image; Edit text, arrows and quotes</lastedited>
         </history>
     </meta>
     <body xml-lang="fr-FR">
         <paragraph role="heading" id="set_up1" level="1">
-            Installation de l’extension Read text</paragraph>
+            Configuration de l’extension Read text</paragraph>
         <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Default64.png"
             id="img_dialog1_screenshot">
             <alt

@@ -287,7 +287,7 @@ Checking {help_heading} voices for `{_iso_lang}`
         _out_path="",
         _icon="",
         _info="",
-        _post_process=None,
+        _post_process="",
         _writer="",
         _size="600x600",
         _speech_rate=160,

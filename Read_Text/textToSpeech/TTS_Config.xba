@@ -317,6 +317,21 @@ Function PiperSpeechHostInfo()
 	Dim _info As SpeechHostInfo
 	&apos; On 2023-12-21 synesthesiam (Michael Hansen) committed
 	&apos; &lt;https://github.com/rhasspy/piper/commit/2fa4c2c13933c1f6b8d87e34d12788ca8e6d073b&gt;
+	&apos; See: https://raw.githubusercontent.com/rhasspy/piper/master/src/python_run/piper/http_server.py
+	&apos; See: https://www.youtube.com/watch?v=pLR5AsbCMHs
+	&apos; ```(venv)
+	&apos;python -m piper.http_server --model ~/pathto/en_US-lessac-medium.onnx
+	&apos;
+	&apos; * Serving Flask app &apos;http_server&apos;
+	&apos; * Debug mode: off
+	&apos;INFO:werkzeug:WARNING: This is a development server. Do not use it in a
+	&apos; production deployment. Use a production WSGI server instead.
+	&apos;
+	&apos; * Running on all addresses (0.0.0.0)
+	&apos; * Running on http://127.0.0.1:5000
+	&apos; * Running on http://192.168.0.108:5000
+	&apos; ```
+
 	With _info
 		.about = Join(Array(&quot;[Piper TTS](https://github.com/rhasspy/piper)&quot;,_
 		&quot; is a neural text to speech system.&quot;), _
@@ -324,12 +339,12 @@ Function PiperSpeechHostInfo()
 		.key = &quot;PiperTTS&quot;
 		.label = &quot;piper-server&quot;
 		.token = &quot;&quot;
-		.url = &quot;http://0.0.0.0:8000&quot; &apos; This URL might be used for something else.
-		.url_info = &quot;?text=url_info&quot; &apos; Server returns wav data, check for Error, not content.
+		.url = &quot;http://127.0.0.1:5000&quot;  &apos; The server uses 1 voice model.
+		.url_info = &quot;?text=0&quot;  &apos; No UI, check for Error, not content.
 		.json_dir = &quot;default&quot;
-		.sample = &quot;http://0.0.0.0:8000?&amp;text=Hello%20World.&quot;
+		.sample = &quot;http://127.0.0.1:5000/?text=Hello%20World.&quot;
 		.docker = &quot;&quot;
-		.tags = Array(&quot;spacy-or-splitlines&quot;, &quot;text&quot;, &quot;wav&quot;)
+		.tags = Array(&quot;splitlines&quot;, &quot;text&quot;, &quot;wav&quot;)
 	End With
 	PiperSpeechHostInfo = _info
 End Function
@@ -767,15 +782,15 @@ Function EditJsonPhonemeTable() As String
 		_po_dir = PosixRhvoiceSpeechAppInfo().json_dir
 	ElseIf InStr(token_text, PosixPiperTtsSpeechAppInfo().token) &lt;&gt; 0 Then
 		_po_dir = PosixPiperTtsSpeechAppInfo().json_dir
+	Else
+		_info = SpeechHostInfoList()
+		For x = Lbound(_info) To Ubound(_info)
+			If fbLocalHostOk(_info(x).url &amp; _info(x).url_info, _info(x).key) Then
+				_po_dir = _info(x).json_dir
+				Exit For
+			End If
+		Next
 	End If
-
-	_info = SpeechHostInfoList()
-	For x = Lbound(_info) To Ubound(_info)
-		If fbLocalHostOk(_info(x).url &amp; _info(x).url_info, _info(x).key) Then
-			_po_dir = _info(x).json_dir
-			Exit For
-		End If
-	Next
 	x = 0
 	Dim lang_array As Variant
 	lang_array = fvGetIsoLangArray()

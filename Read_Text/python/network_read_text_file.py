@@ -66,7 +66,7 @@ local web server at startup using a command to initiate `mimic3-server`.
 
 If you use a docker image, you can get the computer to start the mimic 
 localhost web server on startup by setting the Docker container restart policy
-to "always". 
+to "always".
 
 ### It doesn't work?
 
@@ -92,6 +92,32 @@ If you use python pip to install local libraries, you might have to
 manually update them from time to time. Packages that are managed
 by update utilities like `apt-get`, `yum` and `dnf` are upgraded
 by the distribution.
+
+Rhasspy Piper
+-------------
+
+[Rhasspy Piper](https://github.com/rhasspy/piper) is a fast, local
+neural text to speech system. A local network server version of
+Rhasspy Piper can serve a single voice model to different devices
+for a home network as an assistant to home automation devices
+or as a speech synthesis system for computer desktop applications
+that cannot run a locally installed piper program or model.
+
+This Rhasspy Piper network client will only work correctly if the
+language of the model that it serves is the same as the language
+locale of the user.
+
+When running the piper server in a command line window, it shows
+the following warning:
+
+> WARNING: This is a development server. Do not use it in a
+> production deployment.
+
+You can find out more about installing and using the server on
+[The GitHub Rhasspy project
+site](https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.md)
+
+See also: <https://www.youtube.com/watch?v=pLR5AsbCMHs>
 
 Rhvoice
 -------
@@ -162,6 +188,10 @@ except (AttributeError, ImportError, SyntaxError):
     pass
 try:
     import netopentts
+except (AttributeError, ImportError, SyntaxError):
+    pass
+try:
+    import netpiper
 except (AttributeError, ImportError, SyntaxError):
     pass
 try:
@@ -238,6 +268,12 @@ def network_problem(voice="default"):  # -> str
 def network_ok(_iso_lang="en-US", _local_url=""):  # -> bool
     """Do at least one of the classes support an on-line speech library?"""
     _continue = False
+    if not _continue:
+        try:
+            _piper = netpiper.RhasspyPiperClass()
+            _continue = _piper.language_supported(_iso_lang, _local_url)
+        except NameError:
+            pass
     if not _continue:
         try:
             _mimic3 = netmimic3.Mimic3Class()
@@ -324,6 +360,29 @@ def network_main(
     # Prioritize engines where everything can be achieved using `urllib`
     # because some immutable office packages do not include `requests`
     # support.
+    try:
+        _piper = netpiper.RhasspyPiperClass()
+        _ssml = False
+        if _piper.language_supported(_iso_lang, _local_url):
+            _piper.read(
+                _text,
+                _iso_lang,
+                _visible,
+                _audible,
+                _media_out,
+                _icon,
+                clip_title,
+                _post_processes[5],
+                _info,
+                _size,
+                _speech_rate,
+                _ssml,
+                20,
+                60,
+            )
+            return True
+    except NameError:
+        pass
     try:
         _mimic3 = netmimic3.Mimic3Class()
         if _mimic3.language_supported(_iso_lang, _local_url, _vox):
