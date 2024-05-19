@@ -272,7 +272,7 @@ have taken too long."""
         retval = _text.splitlines()
         try:
             import spacy
-        except (ImportError, ModuleNotFoundError):
+        except (ImportError, ModuleNotFoundError, KeyError, TypeError):
             try:
                 _local_pip = readtexttools.find_local_pip("spacy")
                 if len(_local_pip) != 0:
