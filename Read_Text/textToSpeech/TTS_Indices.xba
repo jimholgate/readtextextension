@@ -1295,7 +1295,11 @@ Function fsTheOsId() As String
 		Dim IsMac As Boolean : IsMac = FileExists(AppleScriptPath())
 		On Error GoTo fsTheOsIdErr3
 		If Not IsMac Then
-			If fbStandardPosix() Then
+			If fbExperimentalOsId() Then
+			fsTheOsId = &quot;POSIX.EXPERIMENTAL&quot;
+				s_CaReadTextExtensionGetOS = fsTheOsId
+				Exit Function
+			ElseIf fbStandardPosix() Then
 				fsTheOsId = &quot;POSIX&quot;
 				s_CaReadTextExtensionGetOS = fsTheOsId
 				Exit Function

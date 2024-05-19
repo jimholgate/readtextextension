@@ -272,7 +272,7 @@ have taken too long."""
         retval = _text.splitlines()
         try:
             import spacy
-        except (ImportError, ModuleNotFoundError, KeyError):
+        except (ImportError, ModuleNotFoundError):
             try:
                 _local_pip = readtexttools.find_local_pip("spacy")
                 if len(_local_pip) != 0:
@@ -336,7 +336,7 @@ Falling back to `.splitlines()`
         if os.name == "posix":
             try:
                 _uname_ver = platform.uname().version
-            except:
+            except (AttributeError, NameError, TypeError):
                 try:
                     _importmeta = readtexttools.ImportedMetaData()
                     _uname_ver = _importmeta.execute_command("uname -a")

@@ -633,7 +633,7 @@ Function fsGetWebService(_
 End Function
 
 
-Function SpeechHostInfoList()
+Function SpeechHostInfoList() As Variant
 	Select Case fsTheOsId()
 		Case &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;POSIX.FLATPAK&quot;
 		&apos; Python3 `requests` library is not available so MaryTTS
@@ -646,6 +646,10 @@ Function SpeechHostInfoList()
 		OpenttsSpeechHostInfo(), _
 		RhvoiceSpeechHostInfo(), _
 		MaryTtsSpeechHostInfo(), _
+		)
+	Case &quot;WINDOWS.EXPERIMENTAL&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;MACOS.EXPERIMENTAL&quot;
+		SpeechHostInfoList = Array(_
+		MimicSpeechHostInfo(), _
 		)
 	Case Else
 		&apos; Prioritize recent tts frameworks

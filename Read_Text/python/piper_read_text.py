@@ -215,7 +215,7 @@ class PiperTTSClass(object):
         self.machine = ""
         try:
             self.machine = platform.uname().machine
-        except (AttributeError, NameError):
+        except (AttributeError, NameError, TypeError):
             _meta = readtexttools.ImportedMetaData()
             self.machine = _meta.execute_command("uname -m")
         self.app_data = ".local"
@@ -420,18 +420,7 @@ class PiperTTSClass(object):
             if os.path.isdir(os.path.expanduser(espeak_ng_dir)):
                 self.espeak_ng_dir = os.path.expanduser(espeak_ng_dir)
                 break
-        if len(self.espeak_ng_dir) == 0:
-            espeak_msg = os.path.expanduser(espeak_ng_data_list[0])
-            print(
-                f"""
-Note
-====
-                  
-The Piper speech client can't find a required resource.
 
-No `espeak-ng-data` directory found at `{espeak_msg}`
-"""
-            )
         self.j_key = ""
         self.j_key_list = []
         self.j_lang = ""

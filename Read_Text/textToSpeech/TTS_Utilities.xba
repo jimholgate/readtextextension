@@ -2586,6 +2586,7 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	Dim oComboBox As Variant
 	Dim bIsAppImage As Boolean : bIsAppImage = False
 	Dim bEnableLocalHostRate As Boolean : bEnableLocalHostRate = True
+	Dim sOsId As String : sOsId = fsTheOsId()
 	Dim sGetOS As String : sGetOS = fsGetOS()
 	Dim high_suggestion As String
 	Dim local_suggestion As String
@@ -2602,7 +2603,7 @@ Function fiDialog1CombosShowMyPythonChoices( _
 		Case &quot;WINDOWS.WINE&quot;
 			player7 = &quot;&quot;
 		Case Else
-			Select Case fsTheOsId()
+			Select Case sOsId
 				Case &quot;POSIX.APPIMAGE&quot;
 				bIsAppImage = True
 				Case &quot;POSIX.SNAP&quot;, &quot;POSIX.FLATPAK&quot;
@@ -2626,7 +2627,7 @@ Function fiDialog1CombosShowMyPythonChoices( _
 	sLanguage = LCase(fsGetLanguage())
 	Dim sSpdToken As String : sSpdToken = &quot;&quot;
 	If fbIsLibreOffice() Then
-		If fsTheOsId() = &quot;POSIX.FLATPAK&quot; Then
+		If sOsId = &quot;POSIX.FLATPAK&quot; Then
 			sSpdToken = &quot;&quot;
 		ElseIf Not fbIsSandboxed() And Not bIsAppImage Then
 			sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
@@ -2650,8 +2651,15 @@ Function fiDialog1CombosShowMyPythonChoices( _
 			&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
 			&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
 		End If
-		If fbHaveNetworkTTS() or fsTheOsId() = &quot;POSIX.FLATPAK&quot; or _
-		fsTheOsId() = &quot;POSIX.SNAP&quot; or fsTheOsId() = &quot;POSIX.EXPERIMENTAL&quot; Then
+		Select Case sOsId
+			&apos; Rhasspy PiperTTS Server Home network
+			&apos; https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.md
+			Case &quot;MACOS.EXPERIMENTAL&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;
+			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --url http://192.168.0.108:5000 --voice piper &quot;
+			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+		End Select
+		If fbHaveNetworkTTS() or sOsId = &quot;POSIX.FLATPAK&quot; or _
+		sOsId = &quot;POSIX.SNAP&quot; or sOsId = &quot;POSIX.EXPERIMENTAL&quot; Then
 			If sGetOS = &quot;POSIX&quot; Then
 				&apos; Include settings for [mimic3](https://github.com/rhasspy/mimic3)
 				If bEnableLocalHostRate Then

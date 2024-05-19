@@ -723,7 +723,7 @@ def sys_machine_paths():  # list(str)
     ]
     try:
         machine_type = platform.uname().machine
-    except (AttributeError, NameError):
+    except (AttributeError, NameError, TypeError):
         _meta = ImportedMetaData()
         machine_type = _meta.execute_command("uname -m")
     if len(machine_type) == 0:
