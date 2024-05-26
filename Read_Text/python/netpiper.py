@@ -5,7 +5,6 @@
 server](https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.md)
 """
 
-import locale
 import os
 import tempfile
 
@@ -24,7 +23,7 @@ class RhasspyPiperClass(object):
     """On 2023-12-21 synesthesiam (Michael Hansen) committed
     <https://github.com/rhasspy/piper/commit/2fa4c2c13933c1f6b8d87e34d12788ca8e6d073b>
     See: https://raw.githubusercontent.com/rhasspy/piper/master/src/python_run/piper/http_server.py
-    See: https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.md
+    See:https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.md
     See: https://www.youtube.com/watch?v=pLR5AsbCMHs
 
     `(venv)`
@@ -106,7 +105,9 @@ class RhasspyPiperClass(object):
         if self.ok:
             return self.ok
         if BASICS_OK:
-            base_locale = locale.getlocale()[0].split("_")[0]
+            _piper_tts = piper_read_text.PiperTTSClass()
+            test_locale = _piper_tts.py_locale()
+            base_locale = test_locale.split("_")[0]
             base_lang = _iso_lang.split("-")[0].split("_")[0]
             if base_locale == base_lang:
                 self.ok = self.ping_local_server(f"{self.url}?text=0")

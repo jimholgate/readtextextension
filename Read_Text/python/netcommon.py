@@ -19,10 +19,10 @@ NET_SERVICE_LIST = [
     "AUTO",
     "NETWORK",
     "GTTS",
-    "LARYNX",
     "MARYTTS",
     "MIMIC",
     "OPENTTS",
+    "PIPER",
     "RHVOICE",
     "TTS",
 ]

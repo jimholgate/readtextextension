@@ -191,7 +191,9 @@ OpenTTS
                 print(
                     f"""
 [OpenTTS](https://github.com/synesthesiam/opentts#)
-can synthesize speech privately using <{_eurl}>."""
+can synthesize speech privately using <http://0.0.0.0:5500>
+or a local URL that you specify.
+"""
                 )
             self.ok = False
             return False

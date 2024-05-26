@@ -949,7 +949,7 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
             _model = netcommon.index_number_to_list_item(self.voice, _model_list)
         if os.path.isfile(_model):
             self.ok = True
-            return _model
+            return os.path.realpath(_model)
         self.ok = False
         return ""
 
@@ -1187,6 +1187,10 @@ remote_file = {remote_file}
             pass
         for test_app, test_outer in [
             [
+                "pw-cat",
+                f"--playback --channels 1 --format s16 --rate {self.sample_rate} -",
+            ],
+            [
                 "aplay",
                 f"-r {self.sample_rate} -f S16_LE -t raw -",
             ],
@@ -1199,8 +1203,8 @@ remote_file = {remote_file}
                 f"--playback --raw --channels 1 --format s16le --rate {self.sample_rate} -",
             ],
             [
-                "pw-cat",
-                f"--playback --channels 1 --format s16 --rate {self.sample_rate} -",
+                "play",  # SoX - Sound eXchange
+                f"-r {self.sample_rate} -c 1 -b 16 -e signed-integer -t raw -",
             ],
             [
                 "vlc",
@@ -1214,12 +1218,28 @@ remote_file = {remote_file}
             except (OSError, TypeError):
                 continue
         return _outer
+    
+    def _supported_player_list(self) -> list:
+        """If the client can access a compatible posix system sound player,
+        then return the player in a list, otherwise return `[]`."""
+        _programs = []
+        for _program in [
+                    "pw-cat",
+                    "aplay",
+                    "ffmpeg",
+                    "ffplay",
+                    "paplay",
+                    "play",
+                ]:
+            if os.path.isfile(os.path.join("usr", "bin", _program)):
+                _programs.append(_program)
+        return _programs
 
-    def _vlc_app(self):
+    def _vlc_app(self) -> list:
         """Return a list i. e.: `[_vlc="/pathto/vlc", _force_player=True]`
-        item 0 is host system path or `""` if it cannot be found.
-        item 1 is whether to choose `vlc` executable over `aplay`
-        in all cases."""
+        * item 0 is host system path or `""` if it cannot be found.
+        * item 1 is whether to choose `vlc` executable over a system player
+          in all cases."""
         _extension_table = readtexttools.ExtensionTable()
         if os.name == "nt":
             _vlc = _extension_table.win_search("vlc", "vlc")
@@ -1236,7 +1256,7 @@ remote_file = {remote_file}
                 _force_player = _check_vlc[1]
                 break
         if len(_vlc) == 0:
-            if not os.path.isfile("/usr/bin/aplay"):
+            if len(self._supported_player_list()) == 0:
                 if len(_extension_table.vlc) != 0:
                     _vlc = _extension_table.vlc
                     _force_player = True
@@ -1347,12 +1367,7 @@ computer can start reading quickly with large or small selections of text."""
                 if os.name == "nt":
                     app_list = ["VLC.EXE", "PIPER.EXE"]
             else:
-                app_list = [
-                    "aplay",
-                    "ffmpeg",
-                    "ffplay",
-                    "paplay",
-                    "pw-cat",
+                app_list = self._supported_player_list + [
                     "piper",
                     "piper-cli",
                 ]

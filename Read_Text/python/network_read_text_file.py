@@ -218,7 +218,7 @@ Network Speech Synthesis
 ========================
 
 Reads a text file using an on-line voice and a media player like `pw-cat`,
-`ffmpeg` or `avconv`.
+`ffmpeg`, `sox` or `avconv`.
 
 Usage
 -----
@@ -242,6 +242,7 @@ time that you use it.
 * [MaryTTS](http://mary.dfki.de/)
 * [Mimic TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
 * [Open TTS](https://github.com/synesthesiam/opentts#open-text-to-speech-server)
+* [Rhasspy Piper](https://github.com/rhasspy/piper)
 * [Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest)
 """
     )

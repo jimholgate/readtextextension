@@ -533,7 +533,9 @@ Mimic 3
                 print(
                     f"""
 [Mimic 3](https://github.com/MycroftAI/mimic3)
-can synthesize speech privately using <{_eurl}>."""
+can synthesize speech privately using <http://0.0.0.0:59125> or
+a local URL that you specify.
+"""
                 )
             self.ok = False
             return False
