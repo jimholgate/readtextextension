@@ -636,7 +636,7 @@ a local URL that you specify.
                 f.write(response.read())
             if os.path.isfile(_media_work):
                 _done = os.path.getsize(_media_work) != 0
-        except TimeoutError:
+        except (TimeoutError, urllib.error.HTTPError):
             _done = False
         return _done
 
