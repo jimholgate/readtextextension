@@ -166,3 +166,13 @@ msgstr "Άνοιγμα"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Ενεργοποίηση πειραματικών γνωρισμάτων"
+
+#: sc/inc/globstr.hrc:53
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Αντικατάσταση"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Εύρεση"

@@ -107,7 +107,7 @@
   </dlg:combobox>
   <dlg:combobox dlg:id="ComboBox4" dlg:tab-index="10" dlg:left="16" dlg:top="139" dlg:width="240" dlg:height="14" dlg:page="-6" dlg:value="_combobox4" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true" dlg:linecount="-43">
    <dlg:menupopup>
-    <dlg:menuitem dlg:value="https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)"/>
+    <dlg:menuitem dlg:value="https://quickchart.io/qr?size=300&amp;text=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)"/>
     <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)"/>
     <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)"/>

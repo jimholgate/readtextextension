@@ -386,3 +386,13 @@ msgstr "Anomena i _desa..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Obre"
+
+#: sd/inc/strings.hrc:31
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Reemplaça"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Cerca"

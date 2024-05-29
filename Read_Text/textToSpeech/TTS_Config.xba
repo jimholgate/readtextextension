@@ -855,7 +855,7 @@ Function EditJsonPhonemeTable() As String
 		.GetControl(&quot;_add&quot;).Model.enabled = True
 		.GetControl(&quot;_cancel&quot;).model.Label = fsLookUpTerm2(&quot;s_cancel&quot;, _lang)
 		.GetControl(&quot;_replace&quot;).model.Label = fsLookUpTerm2(_
-		&quot;s_read-with-an-external-program&quot;, _lang) &amp; &quot; (&quot; &amp;_po_dir &amp; &quot;)&quot;
+		&quot;s_replace&quot;, _lang) &amp; &quot; (&quot; &amp;_po_dir &amp; &quot;)&quot;
 		.GetControl(&quot;_open&quot;).model.Label = _(&quot;Open&quot;, &quot;tools&quot;, _lang)
 		.GetControl(&quot;_save_as&quot;).model.Label = _(&quot;Save As&quot;, &quot;tools&quot;, _lang)
 		.GetControl(&quot;_phoneme&quot;).model.helpText = &quot;&quot;&quot;p&quot;&quot;:&quot;
@@ -881,8 +881,7 @@ Function EditJsonPhonemeTable() As String
 		.GetControl(&quot;_test2&quot;).model.helpText = _po_dir
 		.GetControl(&quot;_test2&quot;).model.enabled = is_unique
 		.GetControl(&quot;_code_frame&quot;).model.Label = fsLookUpTerm2(&quot;s_script&quot;, _lang)
-		.GetControl(&quot;_find&quot;).model.Label = Join(Array(_
-		fsGetSetting(&quot;ooname&quot;), &quot;-&quot;, fsLookUpTerm2(&quot;s_display&quot;, _lang)))
+		.GetControl(&quot;_find&quot;).model.Label = fsLookUpTerm2(&quot;s_find&quot;, _lang)
 		If .Execute() &lt;&gt; 0 Then
 			If Len(fsJsonSafe(_
 			.GetControl(_
@@ -930,7 +929,7 @@ Function bespokeJsonDeletion(_
 	If Instr(_json_display, CR) = 0 Then CR = Chr(10)
 	bespokeJsonDeletion = &quot;&quot;
 	Dim _list As Variant : _list = Split(_json_display, CR)
-	Dim _row As Variant
+	Dim _col As Variant
 	Dim x As Integer
 	If Instr(_json_display, &quot;99999&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;$[REVISION]&quot;&quot;,&quot;&quot;p&quot;&quot;&quot;) = 0 Then
 		bespokeJsonDeletion = _json_display
@@ -954,16 +953,16 @@ Function bespokeJsonExtraction(_
 	Dim CR$ : CR = Chr(13)
 	If Instr(_json_display, CR) = 0 Then CR = Chr(10)
 	Dim _list As Variant : _list = Split(_json_display, CR)
-	Dim _row As Variant
+	Dim _col As Variant
 	Dim x As Integer
 	For x = LBound(_list) To Ubound(_list)
 		If Instr(_list(x), &quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;&quot; &amp; _grapheme &amp; &quot;&quot;&quot;&quot;) &lt;&gt; 0 Then
-			_row = Split(_list(x), &quot;:&quot;)
+			_col = Split(_list(x), &quot;:&quot;)
 			bespokeJsonExtraction = Mid(_
 			fsReplaceText(_
-			_row(_
+			_col(_
 			Ubound(_
-			_row)), &quot;&quot;&quot;},&quot;, &quot;&quot;), 2)
+			_col)), &quot;&quot;&quot;},&quot;, &quot;&quot;), 2)
 			Exit Function
 		End If
 	Next

@@ -326,3 +326,13 @@ msgstr "I-reset"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Pag-activate ng mga pang-eksperimentong tampok"
+
+#: sd/inc/strings.hrc:31
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Palitan"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Hanapin"

@@ -351,3 +351,13 @@ msgstr "打开"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "激活实验特征"
+
+#: sd/inc/strings.hrc:31
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "替换"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "查找"

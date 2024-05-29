@@ -346,3 +346,13 @@ msgstr "Megnyitás"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "A kísérleti funkciók aktiválása"
+
+#: sd/inc/strings.hrc:31
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Csere"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Keresés"

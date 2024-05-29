@@ -346,3 +346,13 @@ msgstr "Отваряне"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Разрешаване на експериментални възможности"
+
+#: sc/inc/globstr.hrc:53
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Замяна"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Търсене"

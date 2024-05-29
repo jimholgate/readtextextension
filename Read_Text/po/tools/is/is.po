@@ -341,3 +341,13 @@ msgstr "Opna"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Virkjun tilraunaeiginleika"
+
+#: sd/inc/strings.hrc:31
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Skipta út"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Finna"

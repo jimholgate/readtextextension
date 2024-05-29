@@ -381,3 +381,13 @@ msgstr "Stoor _as..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Open"
+
+#: sc/inc/globstr.hrc:53
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Vervang"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Soek"

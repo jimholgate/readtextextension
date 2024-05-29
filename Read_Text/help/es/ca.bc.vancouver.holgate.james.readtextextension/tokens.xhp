@@ -8,6 +8,9 @@
         </topic>
         <history>
             <created date="2024-04-18T16:40:21Z">James Holgate</created>
+            <lastedited date="2024-05-29T05:56:00">
+                Update Dialog 2 label
+            </lastedited>
         </history>
     </meta>
     <body xml-lang="es-ES">
@@ -55,7 +58,7 @@
                 desde la izquierda en la parte inferior del cuadro de diálogo. Este icono significa
                 “Propiedades de voz”.</listitem>
 
-            <listitem>En el campo <emph>Leer el texto con un programa distinto</emph>, introduzca
+            <listitem>En el campo <emph>Reemplazar</emph>, introduzca
                 una ortografía alternativa para la palabra.</listitem>
 
             <listitem>Haga clic en el botón <emph>Aplicar</emph> para guardar los cambios.</listitem>

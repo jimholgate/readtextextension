@@ -385,4 +385,9 @@ msgstr "열기"
 # help Enable experimental features
 msgctxt ""
 msgid "Enable experimental features"
-msgstr "실험 기능의 활성화"s
+msgstr "실험 기능의 활성화"
+
+#: sd/inc/strings.hrc:31
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "바꾸기"

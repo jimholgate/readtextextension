@@ -8,6 +8,9 @@
 </topic>
 <history>
 <created date="2024-04-28T17:42:10Z">James Holgate</created>
+<lastedited date="2024-05-29T05:56:00">
+    Update Dialog 2 label
+</lastedited>
 </history>
 </meta>
 <body xml-lang="de-DE">
@@ -30,7 +33,7 @@ id="alt_dialog2_screenshot">Spracheigenschaften</alt>
 <listitem>Wählen Sie die Schaltfläche <emph>Info...</emph></listitem>
 <listitem>Klicken Sie mit der rechten Maustaste auf das Schraubenschlüsselsymbol, das
 das vierte Symbol von links unten im Dialogfeld ist.</listitem>
-<listitem>Geben Sie im Feld <emph>Vorlesen mit externem Programm</emph>eine alternative
+<listitem>Geben Sie im Feld <emph>Ersetzen</emph> eine alternative
 Schreibweise für das Wort ein.</listitem>
 <listitem>Wählen Sie die Schaltfläche <emph>Anwenden</emph>.</listitem>
 </list>

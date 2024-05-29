@@ -10,8 +10,9 @@
         <history>
             <created date="2010-10-22T00:00:00">
                 James Holgate</created>
-            <lastedited date="2024-04-28T12:41:36">
-                James Holgate Sort and consolidate ID tokens; Image Alternate Text in Finnish</lastedited>
+                <lastedited date="2024-05-29T05:56:00">
+                    Update Dialog 2 label
+                </lastedited>
         </history>
     </meta>
     <body xml-lang="fi-FI">
@@ -43,7 +44,7 @@
             <listitem>Napsauta hiiren kakkospainikkeella jakoavain-kuvaketta, joka on neljäs kuvake
                 vasemmalta alaosan dialogiruudussa.</listitem>
 
-            <listitem><emph>Lue ulkoisella sovelluksella</emph> -ruudussa, kirjoita sanalle
+            <listitem><emph>Korvaa</emph> -ruudussa, kirjoita sanalle
                 vaihtoehtoinen kirjoitusasu.</listitem>
 
             <listitem>Valitse <emph>Käytä</emph> -painike.</listitem>

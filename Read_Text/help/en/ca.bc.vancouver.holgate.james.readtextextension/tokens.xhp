@@ -9,6 +9,9 @@
         </topic>
         <history>
             <created date="2024-04-18T17:08:20Z">James Holgate</created>
+            <lastedited date="2024-05-29T05:56:00">
+                Update Dialog 2 label
+            </lastedited>
         </history>
     </meta>
 
@@ -40,7 +43,7 @@
             <listitem>Right-click on the wrench icon, which is the fourth icon from the left at the
                 bottom of the dialog box.</listitem>
 
-            <listitem>In the <emph>Read with an external application</emph> box, enter an
+            <listitem>In the <emph>Replace</emph> box, enter an
                 alternative spelling for the word.</listitem>
 
             <listitem>Select the <emph>Apply</emph> button.</listitem>

@@ -347,3 +347,13 @@ msgstr "Oscail"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Gníomhachtú gnéithe turgnamhacha"
+
+#: sc/inc/globstr.hrc:53
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Ionadaigh"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Faigh"

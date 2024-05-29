@@ -166,7 +166,6 @@ Copyright (c) 2024 James Holgate
 
 
 import codecs
-import json
 import locale
 import os
 import random
@@ -176,6 +175,11 @@ import time
 import getopt
 import urllib
 import warnings
+
+try:
+    import json
+except (ImportError, AssertionError):
+    pass
 
 try:
     import platform

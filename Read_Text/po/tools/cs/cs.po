@@ -346,3 +346,13 @@ msgstr "Otevřít"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Povolit experimentální funkce"
+
+#: sc/inc/globstr.hrc:53
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Nahradit"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Najít"

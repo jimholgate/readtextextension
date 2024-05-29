@@ -346,3 +346,13 @@ msgstr "Buka"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Aktivasi fitur eksperimental"
+
+#: sd/inc/strings.hrc:31
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Ganti"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Cari"

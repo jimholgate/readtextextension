@@ -171,3 +171,13 @@ msgstr "खोलें"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "प्रयोगात्मक सुविधाओं का सक्रियण"
+
+#: sc/inc/globstr.hrc:53
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "बदलें"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "खोजो"

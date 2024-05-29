@@ -327,3 +327,14 @@ msgstr "Irrisettja"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Attivazzjoni ta'karatteristiċi sperimentali"
+
+#: sc/inc/globstr.hrc:53
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Ibdel"
+
+#:
+msgctxt "STR_UNDO_REPLACE"
+msgid "Find"
+msgstr "Sib"
+

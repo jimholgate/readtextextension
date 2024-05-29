@@ -46,3 +46,13 @@ msgstr "حفظ باس_م..."
 msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "افتح"
+
+#: sc/inc/globstr.hrc:53
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "استبدل"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "جِد"

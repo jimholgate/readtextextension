@@ -9,8 +9,9 @@
 	<history>
 		<created date="2010-10-22T00:00:00">
 			James Holgate</created>
-		<lastedited date="2024-04-19T11:51:48Z">
-			James Holgate edited text</lastedited>
+			<lastedited date="2024-05-29T05:56:00">
+				Update Dialog 2 label
+			</lastedited>
 	</history>
 	</meta>
 
@@ -44,7 +45,7 @@
 			<listitem>Cliquez avec le bouton droit sur l’icône de la clé à molette, qui est la quatrième icône à partir de la gauche en bas de la boîte de dialogue.</listitem>
 
 			<listitem>Dans la case
-				<emph>Lire avec une application externe</emph> , entrez une orthographe alternative pour le mot.</listitem>
+				<emph>Remplacer</emph>, entrez une orthographe alternative pour le mot.</listitem>
 
 			<listitem>Cliquez sur
 				<emph>Appliquer</emph> .</listitem>

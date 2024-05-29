@@ -15,6 +15,12 @@ of the selection as small as possible. Use less than 800 characters.
 
 Requires python 3.8 or newer.
 
+Use a system package manager:
+
+    apt-get install python3-pil python3-qrcode
+
+or install `qrcode` as a local user:
+
     pip3 install qrcode
     pip3 install Pillow
 
@@ -22,8 +28,11 @@ QR Code is registered trademark of DENSO WAVE INCORPORATED in the
 following countries: Japan, United States of America, Australia and
 Europe.
 
-[python qrcode](https://pypi.org/project/qrcode/)
-[zbar](http://zbar.sourceforge.net/)
+* [python qrcode](https://pypi.org/project/qrcode/)
+* [zbar](http://zbar.sourceforge.net/)
+* [QuickChart.io](https://github.com/typpo/quickchart) code uses the 
+GNU Affero General Public License v3.0 license, which is displayed at
+[GitHub](https://raw.githubusercontent.com/typpo/quickchart/master/LICENSE).
 
 Read Selection... Dialog setup:
 -------------------------------
@@ -57,6 +66,7 @@ import codecs
 import os
 import sys
 import readtexttools
+from urllib.parse import quote
 
 try:
     import webbrowser
@@ -195,8 +205,8 @@ def qrencode(
         qrencode(_content, _image_out, _size, _level, "black", "white")
     except NameError:
         usage()
-        _content = _content.replace(" ", "%20")
-        _url = "https://chart.apis.google.com/chart?chs=350x350&cht=qr&chl={}".format(
+        _content = quote(_content)
+        _url = "https://quickchart.io/qr?size=300&amp;text={}".format(
             _content
         )
         _msg = """<{}>""".format(_url)

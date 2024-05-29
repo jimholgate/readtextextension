@@ -365,3 +365,13 @@ msgstr "Openen"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Zet experimentele functies aan"
+
+#: sd/inc/strings.hrc:31
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Vervangen"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Zoeken"

@@ -346,3 +346,13 @@ msgstr "Åbn"
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Aktiver eksperimentelle funktioner"
+
+#: sc/inc/globstr.hrc:53
+msgctxt "STR_UNDO_REPLACE"
+msgid "Replace"
+msgstr "Erstat"
+
+#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
+msgctxt "findreplace|find"
+msgid "Find"
+msgstr "Søg"
