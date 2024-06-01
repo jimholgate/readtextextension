@@ -54,7 +54,6 @@ class GoogleTranslateClass(object):
 
         sudo apt -y install python3-gtts
 
-
     or
 
         pipx install gTTS
@@ -72,7 +71,7 @@ class GoogleTranslateClass(object):
         self.translator = "Google"
         self.translator_domain = self.translator.lower()
         self.default_extension = ".mp3"
-        self.tested_version = 2.3  # April, 2023
+        self.tested_version = 2.5  # May, 2024 - Ubuntu LTS 20.04 depreciated.
 
     def version(self):  # -> string
         """Returns the version in the form `nn.nn.nn`."""
@@ -80,25 +79,28 @@ class GoogleTranslateClass(object):
             return gtts.version.__version__
         except (AttributeError, NameError):
             self.ok = False
-            return ""
+            return "0.0.0"
 
     def check_version(self, minimum_version=0):  # -> bool
         """Check for minimum version."""
         if minimum_version == 0:
             minimum_version = self.tested_version
-        if os.name == "nt":
-            # The library is not available in the LibreOffice
-            # and OpenOffice for Windows python environments.
-            # winsound.PlaySound does not play mp3 content.
+        if readtexttools.is_container_instance():
             self.ok = False
             return self.ok
+        if os.name == "nt":
+            # Require Windows Media Player play mp3 audio files.
+            _wmp = readtexttools.WinMediaPlay()
+            if len(_wmp.get_nt_path("Windows Media Player", "wmplayer.exe")) == 0:
+                self.ok = False
+                return self.ok
         _test_version = self.version()
         try:
             self.ok = float(".".join(_test_version.split(".")[:2])) >= minimum_version
         except (AttributeError, IndexError, ValueError):
             self.ok = False
         _commons = netcommon.LocalCommons()
-        self.accept_voice.extend(netcommon.spd_voice_list(0, 100, ["female", "male"]))
+        self.accept_voice.extend(netcommon.spd_voice_list(0, 100, ["female", "male", "auto"]))
         return self.ok
 
     def read(
@@ -226,7 +228,7 @@ class GoogleTranslateClass(object):
         if _lang != _lang1:
             # Translate **to** default language
             _lang2 = _lang1
-        if readtexttools.have_posix_app("osascript", False):
+        if readtexttools.have_posix_app("osascript", False) or os.name == "nt":
             _msg = f"https://translate.{_domain}.{_tld}"
         else:
             _msg = f"`<https://translate.{_domain}.{_tld}?&langpair=auto|{_lang2}&tbb=1&ie=&hl={_env_lang}&text={_short_text}>"

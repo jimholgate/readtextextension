@@ -6,7 +6,7 @@ run the two localhost servers together using the defaults."""
 
 
 import os
-import platform
+import sys
 import tempfile
 
 try:
@@ -502,10 +502,7 @@ Mimic 3
            a different url."""
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
-        if (
-            int(platform.python_version_tuple()[0]) < 3
-            or int(platform.python_version_tuple()[1]) < 8
-        ):
+        if sys.version_info < (3, 8):
             self.ok = False
             return self.ok
         if len(self.voice_id) != 0:

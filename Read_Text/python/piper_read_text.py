@@ -312,7 +312,9 @@ class PiperTTSClass(object):
                     f"~/snap/pied/common/{_app}/{_app}",
                     f"~/.var/app/com.mikeasoft.pied/data/pied/piper/piper",
                     f"/usr/local/lib/piper/{_app}",
+                    f"/usr/local/share/piper/{_app}",
                     f"/usr/lib/piper/{_app}",
+                    f"/usr/share/piper/{_app}",
                 ]:
                     _path = os.path.expanduser(_item)
                     if os.path.isfile(_path):
@@ -334,7 +336,8 @@ class PiperTTSClass(object):
         self.voice_url = f"{self.hug_url}/tree/main"
         self.json_url = f"{self.hug_url}/raw/main/voices.json"
         self.sample_webpage = "https://rhasspy.github.io/piper-samples"
-        self.json_alt_url = f"{self.sample_webpage}/voices.json"
+        self.json_url_alt = f"{self.sample_webpage}/voices.json"
+        self.json_url_wyoming = "https://raw.githubusercontent.com/rhasspy/wyoming-piper/master/wyoming_piper/voices.json"
         self.local_dir = "default"
         self.default_speaker = 0  # All models have at least one voice.
         self.voice = self.default_speaker
@@ -348,7 +351,7 @@ class PiperTTSClass(object):
         self.pied_list = []
         self.pied_voice_dir_list = [
             "~/snap/pied/common/models",
-            "~/.var/app/com.mikeasoft.pied/data/pied/models/",
+            "~/.var/app/com.mikeasoft.pied/data/pied/models",
         ]
         self.piper_voice_dir_list = [
             f"~/{self.app_data}/share/piper-tts/piper-voices",
@@ -356,12 +359,14 @@ class PiperTTSClass(object):
             f"~/{self.app_data}/share/piper-voices",
             f"~/{self.app_data}/share/pied/common/models",
             "~/snap/pied/common/models",
-            "~/.var/app/com.mikeasoft.pied/data/pied/models/",
+            "~/.var/app/com.mikeasoft.pied/data/pied/models",
             "~/piper-voices",
             "/opt/piper-voices",
             "/opt/piper-tts/piper-voices",
-            "/usr/local/lib/piper/",
-            "/usr/lib/piper/",
+            "/usr/local/lib/piper",
+            "/usr/local/share/piper",
+            "/usr/lib/piper",
+            "/usr/share/piper",
             readtexttools.linux_machine_dir_path("piper-voices"),
             readtexttools.linux_machine_dir_path("piper-tts/piper-voices"),
         ]
@@ -1191,10 +1196,6 @@ remote_file = {remote_file}
             pass
         for test_app, test_outer in [
             [
-                "pw-cat",
-                f"--playback --channels 1 --format s16 --rate {self.sample_rate} -",
-            ],
-            [
                 "aplay",
                 f"-r {self.sample_rate} -f S16_LE -t raw -",
             ],
@@ -1205,6 +1206,10 @@ remote_file = {remote_file}
             [
                 "paplay",
                 f"--playback --raw --channels 1 --format s16le --rate {self.sample_rate} -",
+            ],
+            [
+                "pw-cat",
+                f"--playback --channels 1 --format s16 --rate {self.sample_rate} -",
             ],
             [
                 "play",  # SoX - Sound eXchange
@@ -1228,8 +1233,8 @@ remote_file = {remote_file}
         then return the player in a list, otherwise return `[]`."""
         _programs = []
         for _program in [
-                    "pw-cat",
                     "aplay",
+                    "pw-cat",
                     "ffmpeg",
                     "ffplay",
                     "paplay",
@@ -1251,10 +1256,18 @@ remote_file = {remote_file}
             return (_vlc, _force_player)
         _vlc = ""
         _force_player = False
-        for _check_vlc in [
+        # A Ubuntu VLC snap is sandboxed, so this client cannot use it.
+        # Check only custom installed paths.
+        vlc_list = [
+            ["/usr/local/bin/vlc", False],
+            ["/opt/vlc/bin/vlc", False],
+        ]
+        if not os.path.isdir("/snapd"):
+            vlc_list = vlc_list + [
             ["/Applications/VLC.app/Contents/MacOS/VLC", True],
             ["/usr/bin/vlc", False],
-        ]:
+        ]
+        for _check_vlc in vlc_list:
             if os.path.isfile(_check_vlc[0]):
                 _vlc = _check_vlc[0]
                 _force_player = _check_vlc[1]
@@ -1970,7 +1983,8 @@ def main() -> None:
                     _piper_tts.common.set_urllib_timeout(4)
                 for json_url in [
                     _piper_tts.json_url,
-                    _piper_tts.json_alt_url,
+                    _piper_tts.json_url_alt,
+                    _piper_tts.json_url_wyoming,
                 ]:
                     try:
                         response = urllib.request.urlopen(json_url)

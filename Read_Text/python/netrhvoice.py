@@ -12,7 +12,7 @@ r"""Module supporting Docker rhvoice-rest speech synthesis.
 
 
 import os
-import platform
+import sys
 import tempfile
 
 try:
@@ -184,10 +184,7 @@ class RhvoiceLocalHost(object):
             self.url = alt_local_url
         if self.ok:
             return self.ok
-        if (
-            int(platform.python_version_tuple()[0]) < 3
-            or int(platform.python_version_tuple()[1]) < 8
-        ):
+        if sys.version_info < (3, 8):
             self.ok = False
             return self.ok
         if not bool(self.verified_voices):

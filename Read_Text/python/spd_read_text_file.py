@@ -195,7 +195,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import codecs
 import getopt
 import os
-import platform
 import sys
 import time
 import espeak_read_text_file
@@ -472,7 +471,6 @@ class SpdFormats(object):
         self.imported_meta = readtexttools.ImportedMetaData()
         self.client_id = get_whoami()
         self.client = None
-        self.py_m = platform.python_version_tuple()[0]
         # Speech dispatcher and network tools do not have all
         # voices for all languages, so a tool might substitute
         # a missing voice for one that it does have.
@@ -512,7 +510,7 @@ class SpdFormats(object):
         except:
             self.spd_ok = False
         if self.spd_ok:
-            self.spd_ok = int(self.py_m) > 2
+            self.spd_ok = sys.version_info >= (3, 0)
         try:
             if len(os.getenv("HOME")) != 0:
                 local_config = os.path.join(
@@ -2050,8 +2048,6 @@ def main():
     _visible = False
     _voice = "MALE1"
     verbose_language = readtexttools.default_lang()
-    py_m = platform.python_version_tuple()[0]
-    py_m_verbose = ".".join(platform.python_version_tuple())
     if verbose_language:
         for splitter in ["_", ":"]:
             if splitter in verbose_language:

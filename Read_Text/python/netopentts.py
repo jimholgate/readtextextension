@@ -4,7 +4,7 @@
 
 
 import os
-import platform
+import sys
 import tempfile
 import netcommon
 import readtexttools
@@ -155,10 +155,7 @@ OpenTTS
            a different url."""
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
-        if (
-            int(platform.python_version_tuple()[0]) < 3
-            or int(platform.python_version_tuple()[1]) < 8
-        ):
+        if sys.version_info < (3, 8):
             self.ok = False
             return self.ok
 

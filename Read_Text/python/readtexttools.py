@@ -1080,12 +1080,13 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
     path1 = ""
     path2 = ""
     path3 = ""
+    if sys.version_info.major < 3:
+        return ""
+    py_ver = "3.8"
     try:
         py_ver = "{0}.{1}".format(
-            platform.python_version_tuple()[0], platform.python_version_tuple()[1]
+            sys.version_info.major, sys.version_info.minor
         )
-        if int(platform.python_version_tuple()[0].strip()) < 3:
-            return ""
     except NameError:
         return ""
     if os.name == "nt":
@@ -2106,10 +2107,10 @@ class JsonTools(object):
     def sanitize_json(self, content=""):  # -> str
         """Escape json characters in content"""
         try:
-            test_text = content.strip("\\{}\n\t")
+            test_text = content.strip("\\\n\t\r")
         except AttributeError:
             try:
-                test_text = content.strip("'\\{}\n\t")
+                test_text = content.strip("'\\\n\t\r")
                 if test_text == "None":
                     return ""
             except AttributeError:
@@ -3872,6 +3873,8 @@ file for `{1}` was found.""".format(
                     for _item in data:
                         _grapheme = _json_tools.sanitize_json(data[_item]["g"])
                         _phoneme = _json_tools.sanitize_json(data[_item]["p"])
+                        if len(_grapheme) == 0:
+                            continue
                         if data[_item]["g"] in [
                             data[_item]["g"].upper(),
                             data[_item]["g"].capitalize(),
@@ -4254,12 +4257,18 @@ def handle_sound_playing(_media_work="", lock="lock"):  # -> bool
     """If a sound is playing in the background, then try to stop it,
     or at least stop it from starting a new process. Return `False`
     if it did not find a known player working, otherwise return `True`"""
-    _audio_players = PosixAudioPlayers()
+    _player_app = ""
     if len(_media_work) == 0:
         return False
     if os.path.isfile(get_my_lock(lock)):
         unlock_my_lock(lock)
-        _player_app = _audio_players.player_app(_media_work)
+        if os.name == "posix":
+            _audio_players = PosixAudioPlayers()
+            _player_app = _audio_players.player_app(_media_work)
+        else:
+            _wmp = WinMediaPlay()
+            if len(_wmp.get_nt_path("Windows Media Player", "wmplayer.exe")) != 0:
+                _player_app = "wmplayer.exe"
         if len(_player_app) == 0:
             return False
         if killall_process(_player_app):
