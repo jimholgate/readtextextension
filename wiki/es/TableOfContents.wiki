@@ -1,11 +1,11 @@
 * Acerca
-** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/About.wiki Acerca]
-* Installation
-** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/Install.wiki Instalación]
-** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/SetUp.wiki Configuración]
-** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/CommandAndScriptTokens.wiki Tokens]
-* Utilisation
-** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/ReadClipboard.wiki Leer el portapapeles]
-** [https://github.com/jimholgate/readtextextension/blob/master/wiki/fr/ReadSelection.wiki Leer la selección]
-* Télécharger
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/es/About.wiki Acerca]
+* Instalación
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/es/Install.wiki Instalación]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/es/SetUp.wiki Configuración]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/es/CommandAndScriptTokens.wiki Tokens]
+* Utilización
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/es/ReadClipboard.wiki Leer el portapapeles]
+** [https://github.com/jimholgate/readtextextension/blob/master/wiki/es/ReadSelection.wiki Leer la selección]
+* Descargar
 ** [http://extensions.openoffice.org/en/project/read-text Descargar]
