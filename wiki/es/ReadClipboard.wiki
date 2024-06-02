@@ -1,0 +1,5 @@
+= Leer el portapapeles  =
+
+* Seleccione algunas frases. 
+* Utilice el método abreviado de teclado para copiar el texto. 
+* Vaya a ''Herramientas - Complementos - Leer el portapapeles'' . 

@@ -1,0 +1,4 @@
+= Leer la selección =
+
+* Seleccione el texto que desea leer. 
+* Haga clic en el botón  ''Leer la selección'' sur la barre.

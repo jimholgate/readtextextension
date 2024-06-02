@@ -1,0 +1,29 @@
+= Acerca =
+
+Esta extensión permite utilizar un programa externo para leer en voz alta el texto dentro de una aplicación (Writer, Impress, Draw y Calc). Puede ayudarte a corregir errores de escritura o comparar un documento impreso con el tuyo. Podría ayudarte a aprender un idioma nuevo o a pronunciar correctamente alguna palabra que no conozcas. Podría descargar el texto en un dispositivo móvil con códigos QR.
+
+== Téléchargement ==
+
+* [https://extensions.libreoffice.org/fr/extensions/show/read-text LibreOffice extensión]
+* [https://extensions.openoffice.org/fr/project/read-text Apache OpenOffice extensión]
+
+== Captura de pantalla ==
+
+[File:Default64.png]
+
+== Tutorial ==
+
+[https://www.youtube.com/watch?v=OCARVoZqC-s YouTube]
+
+==Blog==
+
+* [https://sites.google.com/site/readtextextension/ Read Text]
+
+== El Código fuente ==
+
+* [https://github.com/jimholgate/readtextextension/ GitHub]
+
+-----
+=== Temas relacionados ===
+
+[https://help.libreoffice.org/latest/es/text/shared/guide/accessibility.html?&DbPAR=SHARED&System=WINDOWS Accesibilidad en LibreOffice]

@@ -1,0 +1,6 @@
+= Instalación =
+
+* Descargue la versión más reciente de la extensión del sitio web oficial de Extensiones.
+* Abra la extensión. Acepte la licencia de la extensión. 
+* Reinicie el programa para completar la Instalación.
+

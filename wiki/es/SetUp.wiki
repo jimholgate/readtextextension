@@ -1,0 +1,12 @@
+= Configuración =
+
+* Seleccione ''Herramientas ▸ Complementos ▸ Leer la selección…''
+* Por defecto, la extensión utiliza una ruta de archivo predeterminada a la aplicación externa y algunas opciones adicionales en la línea de comando. 
+* Puede probar los ajustes sin guardarlos haciendo clic derecho en ''Aceptar''. 
+* Cuando esté satisfecho con los ajustes, desmarque la opción ''Mostrar siempre este cuadro de diálogo al ejecutar''. 
+* Haga clic en el botón ''Aceptar'' para guardar los cambios. 
+
+= Personalice o experimente =
+
+* Es libre de probar la configuración como desee. 
+* Para volver a los ajustes predeterminados, elija una opción que incluya la cadena ''(RESET_ALL)''. 
