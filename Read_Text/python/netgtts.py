@@ -100,7 +100,9 @@ class GoogleTranslateClass(object):
         except (AttributeError, IndexError, ValueError):
             self.ok = False
         _commons = netcommon.LocalCommons()
-        self.accept_voice.extend(netcommon.spd_voice_list(0, 100, ["female", "male", "auto"]))
+        self.accept_voice.extend(
+            netcommon.spd_voice_list(0, 100, ["female", "male", "auto"])
+        )
         return self.ok
 
     def read(

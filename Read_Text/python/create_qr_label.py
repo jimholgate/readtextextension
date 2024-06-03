@@ -60,7 +60,6 @@ See the manual page for `qrencode` for more detailed information.
 Copyright (c) 2010 - 2024 James Holgate
 """
 
-
 import getopt
 import codecs
 import os
@@ -206,9 +205,7 @@ def qrencode(
     except NameError:
         usage()
         _content = quote(_content)
-        _url = "https://quickchart.io/qr?size=300&amp;text={}".format(
-            _content
-        )
+        _url = "https://quickchart.io/qr?size=300&amp;text={}".format(_content)
         _msg = """<{}>""".format(_url)
         if not readtexttools.pop_message(
             "`qrcode` missing. `pip3 install qrcode[pil]`",

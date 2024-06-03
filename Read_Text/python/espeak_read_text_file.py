@@ -406,7 +406,9 @@ def espkread(
     else:
         print(
             """`espeak_read_text_file.py` says:
-`{0}` is an unsupported language.  Exiting.""".format(_lang)
+`{0}` is an unsupported language.  Exiting.""".format(
+                _lang
+            )
         )
         return 0
     _voice = s  # standard espeak dictionary
@@ -542,10 +544,8 @@ def espkread(
                 _lang, _content, "default", "SPEECH_USER_DIRECTORY", False
             )[0]
             _content = _imported_meta.escape_gst_pipe_meta(_content)
-            _command = (
-                '{0} espeak text="{1}" voice={2} ! autoaudiosink'.format(
-                    _app, _content, _voice
-                    )
+            _command = '{0} espeak text="{1}" voice={2} ! autoaudiosink'.format(
+                _app, _content, _voice
             )
             _post_process = None
         if not bool(_app):

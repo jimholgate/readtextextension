@@ -320,7 +320,9 @@ Falling back to `.splitlines()`
     spacy download {1}
 
 * See: <https://pypi.org/project/spacy/>
-* Package list: <https://spacy.io/models/ca>""".format(_lang_str, trained_pipeline)
+* Package list: <https://spacy.io/models/ca>""".format(
+                        _lang_str, trained_pipeline
+                    )
                 )
             for _item in ".?!`":
                 _text = _text.replace(_item, _item + "\n")
@@ -409,7 +411,9 @@ Falling back to `.splitlines()`
 xml:lang="{0}">
 <p>
 <prosody rate="{1}"><voice name="{2}" languages="{3}" required="languages">
-{4}</voice></prosody></p></speak>""".format(_xml_lang, _rate, _voice, _xml_lang, _text)
+{4}</voice></prosody></p></speak>""".format(
+            _xml_lang, _rate, _voice, _xml_lang, _text
+        )
 
     def do_net_sound(
         self,

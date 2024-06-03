@@ -2,40 +2,40 @@
 
 [File:Dialog3.png]
 
- * (AUTHOR) Nombre del autor o de la autora 
- * (COUNTRY_CODE) Su país 
- * (CREATE_QR_LABEL_PY) Un script en Python para crear un código QR 
- * (DATE) La fecha actuel 
- * (ESPEAK_READ_TEXT_PY) Un script en Python 
- * (FESTIVAL_READ_TEXT_PY) Un script en Python 
- * (HOME) Su directorio de inicio 
- * (LANGUAGE_CODE) Su código de idioma 
- * (LANGUAGE_COUNTRY_CODE) Su país y su idioma 
- * (NETWORK_READ_TEXT_PY) Un script en Python 
- * (NOW) Hora actual reformateada para que puedas usarla en un nombre de archivo 
- * (OOO_WEBTEXT) Las primeras 9999 letras del texto seleccionado codificadas para URL 
- * (OOO_WEBTEXT250) Las primeras 249 letras del texto seleccionado codificadas para URL 
- * (OOO_WEBTEXTBIG) Las primeras 9999 letras del texto seleccionado codificadas para URL 
- * (OOO_WEBTEXTSMALL) Las primeras 99 letras del texto seleccionado codificadas para URL 
+ * (AUTHOR) Nombre del autor o de la autora
+ * (COUNTRY_CODE) Su país
+ * (CREATE_QR_LABEL_PY) Un script en Python para crear un código QR
+ * (DATE) La fecha actuel
+ * (ESPEAK_READ_TEXT_PY) Un script en Python
+ * (FESTIVAL_READ_TEXT_PY) Un script en Python
+ * (HOME) Su directorio de inicio
+ * (LANGUAGE_CODE) Su código de idioma
+ * (LANGUAGE_COUNTRY_CODE) Su país y su idioma
+ * (NETWORK_READ_TEXT_PY) Un script en Python
+ * (NOW) Hora actual reformateada para que puedas usarla en un nombre de archivo
+ * (OOO_WEBTEXT) Las primeras 9999 letras del texto seleccionado codificadas para URL
+ * (OOO_WEBTEXT250) Las primeras 249 letras del texto seleccionado codificadas para URL
+ * (OOO_WEBTEXTBIG) Las primeras 9999 letras del texto seleccionado codificadas para URL
+ * (OOO_WEBTEXTSMALL) Las primeras 99 letras del texto seleccionado codificadas para URL
  * (OPENJTALK_READ_TEXT_PY) Un programa en Python (japonés)
- * (PICO_READ_TEXT_PY) Un script en Python 
- * (PIPER_READ_TEXT_PY) Un script en Python 
- * (RESET_ALL) Volver a los ajustes predeterminados 
- * (RHVOICE_READ_TEXT_PY) Un script en Python 
- * (SAY_APPLESCRIPT) Un guión de síntesis de voz en plataforma MacOS 
- * (SELECTION_COUNTRY_CODE) El país del texto seleccionado 
- * (SELECTION_LANGUAGE_CODE) El idioma del texto seleccionado 
- * (SELECTION_LANGUAGE_COUNTRY_CODE) El código regional del texto seleccionado 
- * (SESSION_ID) El identificador de sesión 
- * (SOUND_GALLERY) Ruta del archivo a la galería de sonidos de la aplicación 
- * (SPD_READ_TEXT_PY) Un guión de síntesis de voz en plataforma Posix 
- * (TIME) Hora actual hablada en la región 
- * (TITLE) Nombre del documento 
- * (TMP) Nombre completo de la ruta y archivo temporal que contiene el texto seleccionado 
- * (TTS_WSCRIPT_VBS) Un guión de síntesis de voz en plataforma Windows 
- * (UNIQUE_ID) Un identificador de usuario de un solo uso 
- * (USER_ID) Un identificador de usuario anónimo 
- * (WEEKDAY) Día actual de la semana tal como se habla en la región 
+ * (PICO_READ_TEXT_PY) Un script en Python
+ * (PIPER_READ_TEXT_PY) Un script en Python
+ * (RESET_ALL) Volver a los ajustes predeterminados
+ * (RHVOICE_READ_TEXT_PY) Un script en Python
+ * (SAY_APPLESCRIPT) Un guión de síntesis de voz en plataforma MacOS
+ * (SELECTION_COUNTRY_CODE) El país del texto seleccionado
+ * (SELECTION_LANGUAGE_CODE) El idioma del texto seleccionado
+ * (SELECTION_LANGUAGE_COUNTRY_CODE) El código regional del texto seleccionado
+ * (SESSION_ID) El identificador de sesión
+ * (SOUND_GALLERY) Ruta del archivo a la galería de sonidos de la aplicación
+ * (SPD_READ_TEXT_PY) Un guión de síntesis de voz en plataforma Posix
+ * (TIME) Hora actual hablada en la región
+ * (TITLE) Nombre del documento
+ * (TMP) Nombre completo de la ruta y archivo temporal que contiene el texto seleccionado
+ * (TTS_WSCRIPT_VBS) Un guión de síntesis de voz en plataforma Windows
+ * (UNIQUE_ID) Un identificador de usuario de un solo uso
+ * (USER_ID) Un identificador de usuario anónimo
+ * (WEEKDAY) Día actual de la semana tal como se habla en la región
 
 Cuando requiera estos valores en un comando o script, haga uso del token correspondiente.
 Cuando el complemento se ejecuta, el valor entre paréntesis se sustituye por la secuencia

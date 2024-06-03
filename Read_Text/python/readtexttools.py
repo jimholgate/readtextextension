@@ -1084,9 +1084,7 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
         return ""
     py_ver = "3.8"
     try:
-        py_ver = "{0}.{1}".format(
-            sys.version_info.major, sys.version_info.minor
-        )
+        py_ver = "{0}.{1}".format(sys.version_info.major, sys.version_info.minor)
     except NameError:
         return ""
     if os.name == "nt":
@@ -1937,7 +1935,7 @@ def process_wav_media(
                     if os.name == "posix":
                         # If you are using a FlatPak, then force showing the ffmpeg UI
                         # si that you can hit the [ESC] key to quit, or use other
-                        # ffmpeg keyboard commands. 
+                        # ffmpeg keyboard commands.
                         if "/app/bin:/usr/bin" in os.environ["PATH"]:
                             _visible = "true"
                 wav_to_media(
@@ -3889,7 +3887,7 @@ file for `{1}` was found.""".format(
                                 test_item = data[_item]["g"].lower()
                         if (
                             "$[" in _grapheme
-                            or "\\u0024[" in _grapheme           
+                            or "\\u0024[" in _grapheme
                             or test_item in _used_graphemes
                             or len(_phoneme) == 0
                         ):
@@ -3970,7 +3968,7 @@ file for `{1}` was found.""".format(
                     "$[REVISION]",
                     "\\u0024[LOCALE]",
                     "\\u0024[REVISION]",
-                    ]:
+                ]:
                     if _skip in data[_item]["g"]:
                         continue
                 grapheme = data[_item]["g"].lower()

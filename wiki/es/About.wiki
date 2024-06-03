@@ -4,8 +4,8 @@ Esta extensión permite utilizar un programa externo para leer en voz alta el te
 
 == Téléchargement ==
 
-* [https://extensions.libreoffice.org/fr/extensions/show/read-text LibreOffice extensión]
-* [https://extensions.openoffice.org/fr/project/read-text Apache OpenOffice extensión]
+* [https://extensions.libreoffice.org/en/extensions/show/read-text LibreOffice extensión]
+* [https://extensions.openoffice.org/es/project/read-text Apache OpenOffice extensión]
 
 == Captura de pantalla ==
 

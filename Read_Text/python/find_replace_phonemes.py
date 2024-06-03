@@ -8,6 +8,7 @@ import os
 import sys
 import readtexttools
 
+
 def usage():  # -> None
     """Show usage"""
     print(

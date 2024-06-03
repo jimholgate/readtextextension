@@ -73,8 +73,8 @@ Use the following commands:
     pipx ensurepath
     ~/.local/bin/piper-cli --version
 
-Python release (Linux)
-----------------------
+Python client (Linux pipx)
+--------------------------
 
 The python pipx package has higher latency, but the `piper` script simplifies
 automating downloading the required `onnx` data and `json` configuration
@@ -92,6 +92,15 @@ Then use pipx to install `piper-tts`
     pipx install piper-tts
     pipx ensurepath
     piper -h
+
+Python (developer)
+------------------
+
+[Github](https://github.com/rhasspy/piper?tab=readme-ov-file#installation)
+installation notes have information about installing the full package. As a
+developer you can create and edit piper models and run piper as a home network
+[web](https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.md)
+service.
 
 Audition and download a voice model
 -----------------------------------
@@ -1227,19 +1236,19 @@ remote_file = {remote_file}
             except (OSError, TypeError):
                 continue
         return _outer
-    
+
     def _supported_player_list(self) -> list:
         """If the client can access a compatible posix system sound player,
         then return the player in a list, otherwise return `[]`."""
         _programs = []
         for _program in [
-                    "aplay",
-                    "pw-cat",
-                    "ffmpeg",
-                    "ffplay",
-                    "paplay",
-                    "play",
-                ]:
+            "aplay",
+            "pw-cat",
+            "ffmpeg",
+            "ffplay",
+            "paplay",
+            "play",
+        ]:
             if os.path.isfile(os.path.join("usr", "bin", _program)):
                 _programs.append(_program)
         return _programs
@@ -1264,9 +1273,9 @@ remote_file = {remote_file}
         ]
         if not os.path.isdir("/snapd"):
             vlc_list = vlc_list + [
-            ["/Applications/VLC.app/Contents/MacOS/VLC", True],
-            ["/usr/bin/vlc", False],
-        ]
+                ["/Applications/VLC.app/Contents/MacOS/VLC", True],
+                ["/usr/bin/vlc", False],
+            ]
         for _check_vlc in vlc_list:
             if os.path.isfile(_check_vlc[0]):
                 _vlc = _check_vlc[0]

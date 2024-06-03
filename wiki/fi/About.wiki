@@ -6,7 +6,7 @@ Tämä lisäosa lukee tekstiä ulkoisen ohjelman tai internetpalvelun avulla. Va
 
 ==Lataa==
 
-* [https://extensions.libreoffice.org/extensions/read-text LibreOffice Extensions]
+* [https://extensions.libreoffice.org/en/extensions/show/read-text LibreOffice Extensions]
 * [https://extensions.openoffice.org/en/project/read-text Apache OpenOffice Extensions]
 
 ==Kuvakaappaus==

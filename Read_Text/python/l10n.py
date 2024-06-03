@@ -1,10 +1,10 @@
 """A useful library for handling multiple languages. Run to check JSON
 translation code. Run with `--help` to see more options."""
 
-
 import json
 import os
 import argparse
+
 
 class Translator:
     """Translate from key English phrases"""
