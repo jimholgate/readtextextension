@@ -478,8 +478,8 @@ End Function
 Function WindowsSpeechAppInfo()
 	Dim _info As SpeechHostInfo
 	With _info
-		Select Case fsGetOs()
-			Case &quot;WINDOWS&quot;
+		Select Case fsTheOsId()
+			Case &quot;WINDOWS&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;
 			.about = &quot;Windows Speech Application Interface (SAPI)&quot;
 			.key = &quot;&quot;
 			.label = &quot;windows-sapi&quot;

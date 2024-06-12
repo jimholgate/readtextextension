@@ -803,6 +803,32 @@ Function fsWineMe() As String
 End Function
 
 
+Function fbKillWineSpdSay(s2 As String) As Boolean
+	fbKillWineSpdSay = False
+	Dim wine_me as String: wine_me = fsWineMe()
+	Dim item As String : item = &quot;&quot;
+	Dim bWait As Boolean : bWait = True
+	Dim _cmds As Variant : _cmds = Array(_
+	&quot;/unix /usr/bin/spd-say -n &quot; &amp; wine_me &amp; &quot;_main -S &quot;, _
+	&quot;/unix /usr/bin/spd-say -n &quot; &amp; wine_me &amp; &quot;_main -C &quot; _
+	)
+	If FileExists(s2) Then
+		fbRemoveFile(s2)
+		For each item in _cmds
+			shell(_
+			&quot;start&quot;, _
+			0, _
+			item, _
+			bWait _
+			)
+		Next
+		fbKillWineSpdSay = True
+	End If
+	Exit Function
+	fbKillWineSpdSayErr:
+	fbKillWineSpdSay = False
+End Function
+
 Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolean
 	&apos;On Wine compatible platforms, use the default system voice.
 	&apos; We need to break up the text into brief snippets, because
@@ -1798,11 +1824,22 @@ End Function
 
 Function WinSpeechArgument() As String
 	&apos;OOo for Windows uses these commands if wscript.exe exists and works.
-	Dim s1 As String
-	s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-	If fbWindowsHasAnInternationalVoice(False, &quot;united states&quot;) Then
-		s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /language:&quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+	Dim s1 As String : s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /language:&quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+	On Error GoTo WinSpeechArgumentErr
+	If fbScriptForgePythonOK(0) Then
+		&apos; Skip running SAPI query to reduce latency.
+		&apos; ScriptForge can run on Windows versions (10+) that allow users to install
+		&apos; SAPI voices in other languages in Home and Special Editions of Windows.
+		&apos; https://prod.support.services.microsoft.com/en-us/windows/appendix-a-supported-languages-and-voices-4486e345-7730-53da-fcfe-55cc64300f01
+		WinSpeechArgument = s1
+		Exit Function
 	End If
+	Select Case fsLang()
+		Case &quot;en-US&quot;
+		If Not fbWindowsHasAnInternationalVoice(False, &quot;united states&quot;) Then
+			s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+		End If
+	End Select
 	WinSpeechArgument = s1
 	Exit Function
 	WinSpeechArgumentErr:
@@ -1831,7 +1868,7 @@ Function fbWindowsHasAnInternationalVoice( _
 	On Error Goto fbWindowsHasAnInternationalVoiceErr
 	b1 = True
 	Select Case fsTheOsId()
-		Case &quot;WINDOWS&quot;, &quot;WINDOWS.NOSCRIPT&quot;
+		Case &quot;WINDOWS&quot;, &quot;WINDOWS.NOSCRIPT&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;
 		Dim Sapi As Object
 		Set Sapi = CreateObject(&quot;Sapi.SpVoice&quot;)
 		b1 = False
@@ -2600,12 +2637,16 @@ Function fiDialog1CombosShowMyPythonChoices(_
 		Case &quot;MACOS&quot;
 		ClientId = &quot;&quot;
 		player7 = &quot; --player 7&quot;
-		Case &quot;WINDOWS&quot;, &quot;WINDOWS.NOSCRIPT&quot;
-		ClientId = &quot;&quot;
-		player7 = &quot; --player 7&quot;
-		Case &quot;WINDOWS.WINE&quot;
-			player7 = &quot;&quot;
-			bEnableRate = False
+		Case &quot;WINDOWS&quot;
+			Select Case sTheOsId
+				Case &quot;WINDOWS.WINE&quot;
+				&apos; Use a unique `ClientId` for Linux `speech-dispatcher`
+				player7 = &quot;&quot;
+				bEnableRate = False
+				Case Else
+				ClientId = &quot;&quot;
+				player7 = &quot; --player 7&quot;
+			End Select
 		Case Else
 			Select Case sTheOsId
 				Case &quot;POSIX.APPIMAGE&quot;
@@ -5597,14 +5638,27 @@ Sub MsgSpeak( _
 		End If
 	Else
 		Select Case fsTheOsId()
-			Case &quot;WINDOWS&quot;
+			Case &quot;WINDOWS&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;
 			If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
 				fsNetSAPI5WindowsSpeech(strA, _
 				fsSelectionLanguageAndRegion(False))
 				Config(pi_display_info_integer) = 0
 				Exit Sub
 			End If
-			Case &quot;WINDOWS.WINE&quot;, &quot;WINDOWS.NOSCRIPT&quot;
+			Case &quot;WINDOWS.NOSCRIPT&quot;
+			Config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
+			Config(pi_display_info_integer) = 0
+			Case &quot;WINDOWS.WINE&quot;
+			&apos; Windows Wine : Cancel Speech if lock file exists
+			If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
+				fbKillWineSpdSay(fsMyTempLock(&quot;lock&quot;))
+				Exit Sub
+			ElseIf fbDefaultToSpeechDispatcher() Then
+				fsNetSAPI5WindowsSpeech(strA, _
+				fsSelectionLanguageAndRegion(False))
+				Config(pi_display_info_integer) = 0
+				Exit Sub
+			End If
 			Config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
 			Config(pi_display_info_integer) = 0
 			Case &quot;MACOS&quot;
