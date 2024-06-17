@@ -829,20 +829,37 @@ Function fbKillWineSpdSay(s2 As String) As Boolean
 	fbKillWineSpdSay = False
 End Function
 
+
 Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolean
-	&apos;On Wine compatible platforms, use the default system voice.
+	&apos; On Wine compatible platforms, use the default system voice.
 	&apos; We need to break up the text into brief snippets, because
 	&apos; Wine 9 does not support the shell `bWait` instruction when
 	&apos; using start.exe to call a host system command.
 	On Error GoTo fbWineSpdSayErr
+	Dim snippets As Variant
+	Dim bWait As Boolean: bWait = True
+	Dim item As String
+	Dim items As Variant
 	Dim escape_chars As Variant : escape_chars = Array(_
-	&quot;\&quot;, &quot;&quot;&quot;&quot;, &quot;&gt;&quot;, &quot;&lt;&quot;, &quot;{&quot;, &quot;}&quot;, &quot;$&quot;, &quot;|&quot;, &quot;(&quot;, &quot;)&quot;, &quot;`&quot;, chr(10), chr(13)_
+	Array(&quot;\&quot;, &quot;\\&quot;), _
+	Array(&quot;&quot;&quot;&quot;, &quot;\&quot;&quot;&quot;), _
+	Array(&quot;&gt;&quot;, &quot;\&gt;&quot;), _
+	Array(&quot;&lt;&quot;, &quot;\&lt;&quot;), _
+	Array(&quot;{&quot;, &quot;\{&quot;), _
+	Array(&quot;}&quot;, &quot;\}&quot;), _
+	Array(&quot;$&quot;, &quot;\$&quot;), _
+	Array(&quot;|&quot;, &quot;\|&quot;), _
+	Array(&quot;(&quot;, &quot;\(&quot;), _
+	Array(&quot;)&quot;, &quot;\)&quot;), _
+	Array(&quot;`&quot;, &quot;\`&quot;), _	
+	Array(&quot;/&quot;, &quot; &quot;), _	
+	Array(Chr(13), &quot; &quot;) _	
 	)
 	Config(pi_display_info_integer) = 0
 	Dim x As Integer : x = 0
 	Dim s2 As String : s2 = fsMyTempLock(&quot;lock&quot;)
 	Dim duration : duration = 2.4
-	Dim dirs64 As Variant : dirs64 = Array(_
+	For Each item in Array(_
 	&quot;C:\Program Files (x86)&quot;, _
 	&quot;Z:\usr\lib\amd64&quot;, _
 	&quot;Z:\usr\lib\amd64-linux-gnu&quot;, _
@@ -853,26 +870,21 @@ Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolea
 	&quot;Z:\usr\lib64&quot;, _
 	&quot;Z:\usr\lib64-linux-gnu&quot;, _
 	)
-	For x = Lbound(dirs64) to Ubound(dirs64)
-		If Len(Dir(dirs64(x), 16)) &lt;&gt; 0 Then
+		If Len(Dir(item, 16)) &lt;&gt; 0 Then
 			duration = 1
 			Exit For
 		End If
 	Next
 	Dim wine_me as String: wine_me = fsWineMe()
-	Dim _cmds As Variant : _cmds = Array(_
-	&quot;/unix /usr/bin/spd-say -n &quot; &amp; wine_me &amp; &quot;_main -S &quot;, _
-	&quot;/unix /usr/bin/spd-say -n &quot; &amp; wine_me &amp; &quot;_main -C &quot; _
-	)
-	Dim snippets As Variant
-	Dim bWait As Boolean: bWait = True
-	Dim item As String
-	Dim delimiters As Variant : delimiters = Array(Chr$(10), Chr$(13), &quot;,&quot;, &quot;:&quot;,_
+	Dim delimiters As Variant : delimiters = Array(Chr$(10), &quot;,&quot;, &quot;:&quot;,_
 	&quot;;&quot;, Chr$(9), &quot;“&quot;, &quot;”&quot;, &quot;&quot;&quot;&quot;, &quot;. &quot;, &quot;(&quot;, &quot;)&quot;)
 	If FileExists(&quot;Z:\usr\bin\spd-say&quot;) Then
 		If FileExists(s2) Then
 			fbRemoveFile(s2)
-			For each item in _cmds
+			For each item in Array(_
+			&quot;/unix /usr/bin/spd-say -n &quot; &amp; wine_me &amp; &quot;_main -S &quot;, _
+			&quot;/unix /usr/bin/spd-say -n &quot; &amp; wine_me &amp; &quot;_main -C &quot; _
+			)
 				shell(_
 				&quot;start&quot;, _
 				0, _
@@ -882,8 +894,8 @@ Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolea
 			Next
 		Else
 			CreateFile(s2, fsAppSignature(), &quot;&quot;)
-			For Each item in escape_chars
-				_msg = fsReplaceText(_msg, item, &quot;\&quot; &amp; item)
+			For Each items in escape_chars
+				_msg = fsReplaceText(_msg, items(0), items(1))
 			Next
 			snippets = faSplitString(_msg, 80, delimiters)
 			For Each item In snippets
