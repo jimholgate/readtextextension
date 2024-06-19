@@ -300,7 +300,7 @@ def have_posix_app(posix_app="vlc", do_test=True):  # -> bool
                 return True
         except (OSError, SyntaxError, TypeError):
             pass
-    for _base_path in os.environ["PATH"].split(os.pathsep):
+    for _base_path in os.environ["PATH"].split(os.sep):
         if os.path.isfile(os.path.join(_base_path, posix_app)):
             return True
     if bool(do_test):
@@ -759,16 +759,16 @@ def gst_plugin_path(plug_in_name="libgstvorbis"):  # -> str
     _ext = ".so"
     if have_posix_app("say", False):
         _paths = [
-            os.path.join(os.path.expanduser("~"), os.path.sep),
+            os.path.join(os.path.expanduser("~"), os.sep),
             os.getenv("GST_PLUGIN_PATH"),
         ]
         _ext = ".dylib"
     elif os.name == "nt":
         _paths = [
-            "".join([os.getenv("USERPROFILE"), os.path.sep]),
-            os.path.join(os.getenv("HOMEDRIVE"), "gstreamer-sdk", os.path.sep),
+            "".join([os.getenv("USERPROFILE"), os.sep]),
+            os.path.join(os.getenv("HOMEDRIVE"), "gstreamer-sdk", os.sep),
             os.getenv("GST_PLUGIN_PATH"),
-            os.path.join(os.getenv("HOMEDRIVE"), "opt", os.path.sep),
+            os.path.join(os.getenv("HOMEDRIVE"), "opt", os.sep),
         ]
         _ext = ".dll"
 
@@ -1088,7 +1088,7 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
     except NameError:
         return ""
     if os.name == "nt":
-        profile = os.getenv("LOCALAPPDATA").strip(os.path.sep)
+        profile = os.getenv("LOCALAPPDATA").strip(os.sep)
         path1 = os.path.join(profile, "Programs", "Python")
         path2 = os.path.join("Lib", "site-packages")
         path3 = path2
@@ -1100,7 +1100,7 @@ def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
         if len(local_pip) != 0:
             return local_pip
         if not os.path.isdir(path1):
-            for _test in os.getenv("PATH").split(os.pathsep):
+            for _test in os.getenv("PATH").split(os.sep):
                 if os.path.isdir(_test) and profile in _test:
                     path1 = _test
                     break
@@ -1460,7 +1460,7 @@ setTimeout(function(){{window.close();}}, {_stime});
         subprocess.Popen(command)
     except (AttributeError, FileNotFoundError, NameError, TypeError):
         webbrowser.open_new_tab(
-            "file://" + os.path.realpath(out_file).replace(os.pathsep, "/")
+            "file://" + os.path.realpath(out_file).replace(os.sep, "/")
         )
     try:
         time.sleep(round(int(_stime) / 1000))

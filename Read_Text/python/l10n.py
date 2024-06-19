@@ -15,7 +15,7 @@ class Translator:
             os.path.dirname(os.path.dirname(__file__)), "po", "_l10n"
         )
         self.json_path = os.path.join(l10n_dir, "messages.json")
-        self.new_json_path = os.path.expanduser(f"~{os.path.sep}new_messages.json")
+        self.new_json_path = os.path.expanduser(f"~{os.sep}new_messages.json")
         self.messages = {
             "fr": {
                 "$[LANGUAGE_ENGLISH]": "French",

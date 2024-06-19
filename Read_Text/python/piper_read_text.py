@@ -306,7 +306,7 @@ class PiperTTSClass(object):
             _extension_table = readtexttools.ExtensionTable()
             for _item in app_list:
                 _app = _extension_table.win_search(
-                    f"piper-tts{os.path.sep}piper", _item
+                    f"piper-tts{os.sep}piper", _item
                 )
                 if len(_app) != 0:
                     self.app = _app
@@ -1393,7 +1393,8 @@ computer can start reading quickly with large or small selections of text."""
                 if os.name == "nt":
                     app_list = ["VLC.EXE", "PIPER.EXE"]
             else:
-                app_list = self._supported_player_list + [
+                base_list = self._supported_player_list()
+                app_list = base_list + [
                     "piper",
                     "piper-cli",
                 ]

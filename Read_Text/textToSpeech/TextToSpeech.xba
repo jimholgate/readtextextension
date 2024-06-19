@@ -353,9 +353,11 @@ End Function
 Function fbDefaultToSpeechDispatcher() As Boolean
 	&apos; Implies that the python3 `speechd` (speech-dispatcher) library is current.
 	&apos; https://help.libreoffice.org/latest/en-US/text/sbasic/python/main0000.html
-	fbDefaultToSpeechDispatcher = True
 	If fbIsLibreOffice() Then
 		fbDefaultToSpeechDispatcher = GetSolarVersion() &gt; 70400
+	Else
+		&apos; Is python current?
+		fbDefaultToSpeechDispatcher = fbScriptForgePythonOK(0)
 	End If
 End Function
 

@@ -50,7 +50,7 @@ def zip_directory(
                 for file in files:
                     file_path = os.path.join(root, file)
                     # Exclude omit_list files
-                    list_dir = root.split(os.path.sep)
+                    list_dir = root.split(os.sep)
                     if list_dir[len(list_dir) - 1] not in omit_list:
                         zipf.write(file_path, os.path.relpath(file_path, folder_path))
         return os.path.isfile(zip_name)
@@ -150,7 +150,7 @@ def main() -> None:
     _default = os.path.dirname(os.path.dirname(__file__))
     _date_time = datetime.now()
     _alt = ""
-    _os_sep = os.path.sep
+    _os_sep = os.sep
     if os.path.splitext(_default)[0][-1] in "abcdefloxyz":
         # i.e. : `a` for Apache; `b` for Beta ...
         _alt = os.path.splitext(_default)[0][-1]

@@ -577,7 +577,7 @@ class SpdFormats(object):
         if not self.spd_ok:
             return False
         try:
-            if sys.version_info.major == 3 and sys.version_info.minor < 9:
+            if sys.version_info < (3, 9):
                 # Your computer uses an older version of python3.
                 # Sometimes speech-dispatcher sounds distorted and echoes
                 # on first run.

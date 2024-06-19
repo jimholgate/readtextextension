@@ -549,7 +549,7 @@ class GetPiperData:
             return False
         current_path = os.environ.get("PATH")
         if not new_path in current_path and os.path.exists(new_path):
-            os.environ["PATH"] = f"{current_path}{os.pathsep}{new_path}"
+            os.environ["PATH"] = f"{current_path}{os.sep}{new_path}"
         _now = datetime.now()
         str_now = _now.strftime("%Y-%m-%d %H:%M:%S")
         _base_name = os.path.basename(__file__)
@@ -890,7 +890,7 @@ Do you want to install the contents of `{file_spec}` locally?""",
                                 )
                 current_path = os.environ.get("PATH")
                 if not new_path in current_path and os.path.exists(new_path):
-                    os.environ["PATH"] = f"{current_path}{os.pathsep}{new_path}"
+                    os.environ["PATH"] = f"{current_path}{os.sep}{new_path}"
                     if os.name == "nt":
                         subprocess.run(
                             ["setx", "PATH", os.environ["PATH"]], check=False
