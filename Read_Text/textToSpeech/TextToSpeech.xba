@@ -355,6 +355,8 @@ Function fbDefaultToSpeechDispatcher() As Boolean
 	&apos; https://help.libreoffice.org/latest/en-US/text/sbasic/python/main0000.html
 	If fbIsLibreOffice() Then
 		fbDefaultToSpeechDispatcher = GetSolarVersion() &gt; 70400
+	ElseIf fsTheOsId() = &quot;WINDOWS.WINE&quot; Then
+		fbDefaultToSpeechDispatcher = True
 	Else
 		&apos; Is python current?
 		fbDefaultToSpeechDispatcher = fbScriptForgePythonOK(0)
