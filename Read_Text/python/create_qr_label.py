@@ -205,7 +205,7 @@ def qrencode(
     except NameError:
         usage()
         _content = quote(_content)
-        _url = "https://quickchart.io/qr?size=300&amp;text={}".format(_content)
+        _url = "https://quickchart.io/qr?size=350&amp;text={}".format(_content)
         _msg = """<{}>""".format(_url)
         if not readtexttools.pop_message(
             "`qrcode` missing. `pip3 install qrcode[pil]`",
