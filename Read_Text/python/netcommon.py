@@ -5,6 +5,7 @@
 
 import math
 import os
+import re
 import platform
 import time
 
@@ -103,7 +104,6 @@ class LocalCommons(object):
 
     def __init__(self):  # -> None
         self.debug = [0, 1, 2, 3][0]
-
         self.default_lang = readtexttools.default_lang()
         self.default_extension = ".wav"
         self.help_icon = "/usr/share/icons/HighContrast/32x32/apps/web-browser.png"
@@ -265,11 +265,18 @@ taken too long."""
 a sound file. It might be missing a required library or an operation might
 have taken too long."""
 
+    def _split_sentence(self, _text=""):  # -> list
+        """This is a fallback method to split `_text` into a list using ASCII
+        or Asian punctuation if the `spacy` library is not available."""
+        if _text:
+            _text = re.sub(r"([.?!`．！？。︁︒]) ", r"\1\n", _text)
+            return _text.splitlines()
+        return []
+
     def big_play_list(self, _text="", _lang_str="en", _verbose=True):  # -> list
         """Split a long string of sentences or paragraphs into a list.
         Best practice is to install [spacy](https://spacy.io/)
         in a virtual environment and download the parsing components."""
-        retval = _text.splitlines()
         try:
             import spacy
         except (ImportError, ModuleNotFoundError, KeyError, TypeError):
@@ -280,9 +287,9 @@ have taken too long."""
                     try:
                         import spacy
                     except:
-                        return retval
+                        return self._split_sentence(_text)
             except:
-                return retval
+                return self._split_sentence(_text)
         spaceval = []
         trained_pipeline = "xx_ent_wiki_sm"
         for _item in self.spacy_dat:
@@ -324,10 +331,7 @@ Falling back to `.splitlines()`
                         _lang_str, trained_pipeline
                     )
                 )
-            for _item in ".?!`":
-                _text = _text.replace(_item, _item + "\n")
-            retval = _text.splitlines()
-            return retval
+            return self._split_sentence(_text)
         return spaceval
 
     def is_ai_developer_platform(self):  # -> bool

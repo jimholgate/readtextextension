@@ -15,6 +15,10 @@ This python tool reads a text file using an web service and a media player.
 Online services require a network connection and installation of an online
 connection library.
 
+Computers can synthesise voices of people without their knowledge. Make sure
+people you use as voice models were able to consent and that listeners have a
+way to tell if a voice performance was made by a computer or by a real person.
+
 Check the terms and conditions that apply to the on-line service provider.
 There may be acceptable use policies, limits or costs.
 
@@ -27,7 +31,7 @@ There may be acceptable use policies, limits or costs.
   provided outside of your country's jurisdiction.
 * An online provider could block your access because your use
   is excessive or otherwise violates their terms of service.
-* If you run the application in a prsotected container like a flatpak
+* If you run the application in a protected container like a flatpak
   or snap, some functions might not work because the application
   does not have permission to execute them.
 * On some systems, you might need to install additional software
