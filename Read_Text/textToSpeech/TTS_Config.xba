@@ -372,7 +372,7 @@ End Function
 Function MacOSSpeechAppInfo()
 	Dim _info As SpeechHostInfo
 	Select Case fsTheOsId()
-		Case &quot;MACOS&quot;
+		Case &quot;MACOS&quot;, &quot;MACOS.EXPERIMENTAL&quot;
 		With _info
 			.about = &quot;&quot;
 			.key = &quot;&quot;
