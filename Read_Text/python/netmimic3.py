@@ -660,7 +660,7 @@ a local URL that you specify.
             # so exit before saying another item... (docker? flatpak?)
             return True
         _length_scale = 1
-        if not _speech_rate == 160:
+        if _speech_rate != 160:
             _length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)[0]
         if not self.ok:
             return False
@@ -732,7 +732,7 @@ a local URL that you specify.
                 _ssml = "true"
             _done = self.try_url_lib(
                 _voice,
-                _item,
+                _item.strip(),
                 _url,
                 _length_scale,
                 _ssml,

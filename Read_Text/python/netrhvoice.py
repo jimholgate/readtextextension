@@ -363,7 +363,7 @@ Checking {help_heading} voices for `{_iso_lang}`
                 _item = "\n".join(["", _item.strip(_strips), ""])
                 # The API uses GET and a `text` argument for text
 
-                q_text = urllib.parse.quote(_item)
+                q_text = urllib.parse.quote(_item.strip())
                 my_url = f'{_url}?{_body_data}"{q_text}"'
                 try:
                     # See: <https://docs.python.org/3/library/urllib.request.html>

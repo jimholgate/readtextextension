@@ -392,7 +392,7 @@ Check the server settings or use a different voice.
                 print("[>] Stop!")
                 self.ok = False
                 return True
-            elif len(_item.strip(" ;.!?\n")) == 0:
+            if len(_item.strip(" ;.!?\n")) == 0:
                 continue
             elif "." in _media_out and _tries != 0:
                 _ext = os.path.splitext(_media_out)[1]
@@ -401,7 +401,7 @@ Check the server settings or use a different voice.
             _tries += 1
             _done = self.try_url_lib(
                 _voice,
-                _item,
+                _item.strip(),
                 _url,
                 _vocoder,
                 _denoiser_strength,

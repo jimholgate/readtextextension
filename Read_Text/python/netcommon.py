@@ -446,7 +446,7 @@ xml:lang="{0}">
                 print("Unable to write media work file.")
                 return False
             # NOTE: Calling process should unlock_my_lock()
-            # In a loop, this would cause the voice to continue..
+            # In a loop, this would cause the voice to continue.
             if handle_unlock:
                 readtexttools.unlock_my_lock()
             readtexttools.process_wav_media(
