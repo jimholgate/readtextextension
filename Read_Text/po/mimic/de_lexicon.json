@@ -1,0 +1,22 @@
+{
+    "de_00001":{"g":"€","p":"euro"},
+    "de_00002":{"g":"Dr.","p":"doktor"},
+    "de_00003":{"g":"\u0026","p":" und "},
+    "de_00004":{"g":"\u0024","p":"dollar"},
+    "de_00005":{"g":" km","p":" kilometer"},
+    "de_00006":{"g":">","p":" größer als "},
+    "de_00007":{"g":"CTRL","p":"steuerung"},
+    "de_00008":{"g":" Km.","p":" kilometer"},
+    "de_00009":{"g":" cm","p":" zentimeter"},
+    "de_00010":{"g":" ml","p":" milliliter"},
+    "de_00011":{"g":" mm","p":" millimeter"},
+    "de_00012":{"g":"<","p":" weniger als "},
+    "de_00013":{"g":"°C","p":"grad celsius"},
+    "de_00014":{"g":"usw","p":"und so weiter"},
+    "de_00015":{"g":"°F","p":"grad fahrenheit"},
+    "de_00016":{"g":"\u0040","p":" klammeraffe "},
+    "de_00017":{"g":"\u007B","p":" linke geschweifte klammer "},
+    "de_00018":{"g":"\u007D","p":" rechte geschweifte klammer "},
+    "de_99998":{"g":"$[LOCALE]","p":"de"},
+    "de_99999":{"g":"$[REVISION]","p":"2024-05-31_04:28:03"}
+}

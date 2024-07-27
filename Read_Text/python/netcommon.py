@@ -2,7 +2,7 @@
 # -*- coding: UTF-8-*-
 """Common tools for network and neural speech synthesis clients"""
 
-
+import importlib
 import math
 import os
 import re
@@ -121,6 +121,7 @@ class LocalCommons(object):
             [64, 33, "-|-------", 2.50],
             [32, 0, "|--------", 5.00],
         ]
+        self.spacy_ok = False
         self.spd_fm = [
             "female1",
             "female2",
@@ -183,7 +184,7 @@ class LocalCommons(object):
             "nathalie",
             "hajdurova",
         ]
-        # Updated for spacy 3.5
+        # Review English requirements at <https://spacy.io/models/en>.
         self.spacy_dat = [
             [["en"], "_core_web_sm"],
             [
@@ -217,6 +218,7 @@ class LocalCommons(object):
         ]
         self.checked_spacy = False
         self.ai_developer_platforms = [
+            "alma",
             "centos",
             "darwin",
             "debian",
@@ -269,26 +271,27 @@ have taken too long."""
         """This is a fallback method to split `_text` into a list using ASCII
         or Asian punctuation if the `spacy` library is not available."""
         if _text:
-            _text = re.sub(r"([.?!`．！？。︁︒]) ", r"\1\n", _text)
+            _text = re.sub(r"([.?!`—;:．！？。︁︒]) ", r"\1\n", _text)
             return _text.splitlines()
         return []
 
     def big_play_list(self, _text="", _lang_str="en", _verbose=True):  # -> list
-        """Split a long string of sentences or paragraphs into a list.
-        Best practice is to install [spacy](https://spacy.io/)
-        in a virtual environment and download the parsing components."""
+        """Split a long string of sentences or paragraphs into a list
+        using [spacy](https://spacy.io/) in a virtual environment."""
         try:
-            import spacy
+            spacy = importlib.import_module("spacy")
+            self.spacy_ok = True
         except (ImportError, ModuleNotFoundError, KeyError, TypeError):
             try:
                 _local_pip = readtexttools.find_local_pip("spacy")
                 if len(_local_pip) != 0:
                     sys.path.append(_local_pip)
                     try:
-                        import spacy
-                    except:
+                        spacy = importlib.import_module("spacy")
+                        self.spacy_ok = True
+                    except (ImportError, ModuleNotFoundError, KeyError, TypeError):
                         return self._split_sentence(_text)
-            except:
+            except (ImportError, ModuleNotFoundError, KeyError, TypeError):
                 return self._split_sentence(_text)
         spaceval = []
         trained_pipeline = "xx_ent_wiki_sm"
@@ -299,11 +302,19 @@ have taken too long."""
         try:
             nlp = spacy.load(trained_pipeline)
             try:
+                # Required `en_core_web_sm model` per sample code at
+                # <https://spacy.io/models> Accessed July 27, 2024.
+                _imported_module = importlib.import_module(trained_pipeline)
+            except (ImportError, ModuleNotFoundError, KeyError, TypeError):
+                _imported_module = None
+            if not bool(_imported_module):
+                return self._split_sentence(_text)
+            try:
                 # The `senter` component is ~10× faster than `parser` and
                 # more accurate than the rule-based sentencizer. Not all
                 # models include the `senter` component.
-                nlp.disable_pipe("parser")
                 nlp.enable_pipe("senter")
+                nlp.disable_pipe("parser")
             except AttributeError:
                 try:
                     nlp.enable_pipe("parser")
@@ -314,21 +325,29 @@ have taken too long."""
                 if len(item.text) != 0:
                     spaceval.append(item.text)
             self.checked_spacy = True
-        except:
+        except Exception as e:
+            print(
+                """
+There was an error loading the `{0}` spacy pipeline:
+{1}\n""".format(
+                    trained_pipeline, e
+                )
+            )
             self.checked_spacy = False
+            self.spacy_ok = False
         if len(spaceval) == 0 and _verbose:
             if not readtexttools.using_container(True):
                 print(
-                    """The python `spacy` library or a `{0}` language model is unavailable.
-Falling back to `.splitlines()`
+                    """Falling back to `.splitlines()`
 
     sudo apt-get install pipx
     pipx install spacy
-    spacy download {1}
+    spacy download {0}
+    spacy validate
 
 * See: <https://pypi.org/project/spacy/>
 * Package list: <https://spacy.io/models/ca>""".format(
-                        _lang_str, trained_pipeline
+                        trained_pipeline
                     )
                 )
             return self._split_sentence(_text)
