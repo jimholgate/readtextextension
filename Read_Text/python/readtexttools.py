@@ -715,8 +715,17 @@ def sys_machine_paths():  # list(str)
         "/usr/lib64/",
         "/usr/local/i386/",
         "/usr/i386/",
+        "/usr/local/lib/x86_64-linux-gnu/",  # Debian 6.1.99-1 (2024-07-15) x86_64
         "/usr/local/lib/i386-linux-gnu/",  # Work around wrong machine report.
+        "/usr/lib/x86_64-linux-gnu/",  # Debian 6.1.99-1 (2024-07-15) x86_64
         "/usr/lib/i386-linux-gnu/",  # Debian6.1.76-1(2024-02-01)',machine='i686')
+        "/usr/lib/aarch64-linux-gnu/",
+        "/usr/lib/arm-linux-gnueabi/",
+        "/usr/lib/arm-linux-gnueabihf/",
+        "/usr/lib/arm-linux-gnueabi64/",
+        "/usr/lib/mipsel-linux-gnu/",
+        "/usr/lib/powerpc64le-linux-gnu/",
+        "/usr/lib/s390x-linux-gnu/",
         "/usr/local/share/",
         "/usr/share/",
         "/opt/",
@@ -819,7 +828,7 @@ class ExtensionTable(object):
         self.alt_standalones = 3
         self.extension_test = [
             [[".flac"], "libgstflac", "/usr/bin/flac", [w_flac, self.vlc]],
-            [[".aac"], "alpha_libgstaac", mac_afconvert, []],
+            [[".aac"], "alpha_libgstfdkaac", mac_afconvert, []],
             [[".m4a"], "alpha_libgstm4a", mac_afconvert, []],
             [[".mp4"], "libgstbadvideo", self.ffmpeg, ["/usr/bin/avconv", self.ffmpeg]],
             [[".m4v"], "libgstbadvideo", self.ffmpeg, ["/usr/bin/avconv", self.ffmpeg]],
@@ -904,6 +913,8 @@ class ExtensionTable(object):
             _ext = test_file_spec.lower()
         if not test_file_spec:
             return ""
+        if not _ext.startswith("."):
+            _ext = ".{0}".format(_ext)
         try:
             mimetypes.init()
             return mimetypes.types_map[_ext]

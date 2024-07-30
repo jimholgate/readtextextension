@@ -267,6 +267,26 @@ taken too long."""
 a sound file. It might be missing a required library or an operation might
 have taken too long."""
 
+    def _print_spacy_info(self, trained_pipeline="xx_ent_wiki_sm"):  # -> None
+        """Print fallback message and show basic instructions how to install
+        python3 spacy with `apt-get` for Linux."""
+        print(
+            """Falling back to `.splitlines()`"""
+        )
+        if os.path.isfile("/usr/bin/apt-get"):
+            print(
+                """
+    sudo apt-get install pipx
+    pipx install spacy
+    spacy download {0}
+    spacy validate
+
+* See: <https://pypi.org/project/spacy/>
+* Package list: <https://spacy.io/models/ca>""".format(
+                    trained_pipeline
+                )
+            )
+
     def _split_sentence(self, _text=""):  # -> list
         """This is a fallback method to split `_text` into a list using ASCII
         or Asian punctuation if the `spacy` library is not available."""
@@ -277,7 +297,8 @@ have taken too long."""
 
     def big_play_list(self, _text="", _lang_str="en", _verbose=True):  # -> list
         """Split a long string of sentences or paragraphs into a list
-        using [spacy](https://spacy.io/) in a virtual environment."""
+        using [spacy](https://spacy.io/) in a virtual environment if
+        it is available, otherwise split by sentence."""
         try:
             spacy = importlib.import_module("spacy")
             self.spacy_ok = True
@@ -290,19 +311,22 @@ have taken too long."""
                         spacy = importlib.import_module("spacy")
                         self.spacy_ok = True
                     except (ImportError, ModuleNotFoundError, KeyError, TypeError):
-                        return self._split_sentence(_text)
+                        self.spacy_ok = False
             except (ImportError, ModuleNotFoundError, KeyError, TypeError):
-                return self._split_sentence(_text)
+                self.spacy_ok = False
         spaceval = []
         trained_pipeline = "xx_ent_wiki_sm"
         for _item in self.spacy_dat:
             if _lang_str in _item[0]:
                 trained_pipeline = "".join([_lang_str, _item[1]])
                 break
+        if not self.spacy_ok:
+            self._print_spacy_info(trained_pipeline)
+            return self._split_sentence(_text)
         try:
             nlp = spacy.load(trained_pipeline)
             try:
-                # Required `en_core_web_sm model` per sample code at
+                # Required for `en_core_web_sm model` per sample code at
                 # <https://spacy.io/models> Accessed July 27, 2024.
                 _imported_module = importlib.import_module(trained_pipeline)
             except (ImportError, ModuleNotFoundError, KeyError, TypeError):
@@ -337,19 +361,7 @@ There was an error loading the `{0}` spacy pipeline:
             self.spacy_ok = False
         if len(spaceval) == 0 and _verbose:
             if not readtexttools.using_container(True):
-                print(
-                    """Falling back to `.splitlines()`
-
-    sudo apt-get install pipx
-    pipx install spacy
-    spacy download {0}
-    spacy validate
-
-* See: <https://pypi.org/project/spacy/>
-* Package list: <https://spacy.io/models/ca>""".format(
-                        trained_pipeline
-                    )
-                )
+                self._print_spacy_info(trained_pipeline)
             return self._split_sentence(_text)
         return spaceval
 
