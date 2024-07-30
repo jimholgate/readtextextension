@@ -217,6 +217,7 @@ class LocalCommons(object):
             [["xx"], "_ent_wiki_sm"],
         ]
         self.checked_spacy = False
+        self.displayed_spacy = False
         self.ai_developer_platforms = [
             "alma",
             "centos",
@@ -270,22 +271,30 @@ have taken too long."""
     def _print_spacy_info(self, trained_pipeline="xx_ent_wiki_sm"):  # -> None
         """Print fallback message and show basic instructions how to install
         python3 spacy with `apt-get` for Linux."""
-        print(
-            """Falling back to `.splitlines()`"""
-        )
-        if os.path.isfile("/usr/bin/apt-get"):
-            print(
-                """
-    sudo apt-get install pipx
+        if not self.displayed_spacy:
+            self.displayed_spacy = True
+            print("""Falling back to `.splitlines()`""")
+            _installer = ""
+            for _app in ["apt-get", "apt", "dnf"]:
+                if os.path.isfile("/usr/bin/{0}".format(_app)):
+                    _installer = _app
+            if len(_installer) != 0:
+                print(
+                    """
+    sudo {0} install pipx
     pipx install spacy
-    spacy download {0}
+    spacy download {1}
     spacy validate
+
+Each time you use `pipx upgrade-all`, you should check the model package list
+to make sure that you are using the newest version of each `spacy` model that
+you use.
 
 * See: <https://pypi.org/project/spacy/>
 * Package list: <https://spacy.io/models/ca>""".format(
-                    trained_pipeline
+                        _installer, trained_pipeline
+                    )
                 )
-            )
 
     def _split_sentence(self, _text=""):  # -> list
         """This is a fallback method to split `_text` into a list using ASCII
