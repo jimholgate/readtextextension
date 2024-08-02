@@ -3727,7 +3727,7 @@ End Function
 Sub ttsActuate( _
 	Config() As Variant, _
 	msgs() As Variant, _
-	errorCode As Integer, _
+	ErrorCode As Integer, _
 	ByVal sTextToSpeak As String)
 	Dim a1
 	a1 = Array(_
@@ -3764,6 +3764,8 @@ Sub ttsActuate( _
 	Dim bWait As Boolean
 	bWait = False
 	Dim n As Integer
+	Dim bIsLibreOffice As Boolean
+	bIsLibreOffice = fbIsLibreOffice()
 	n = 0
 	Dim oBar    &apos; Generated status bar
 	Dim oFrame  &apos; Current frame
@@ -3960,7 +3962,7 @@ Sub ttsActuate( _
 &apos;&apos;   that works for you.
 &apos;&apos;
 			&apos; NOTE: Apache OpenOffice 4 for Windows does not support python 3
-			If fbIsLibreOffice() Then
+			If bIsLibreOffice Then
 			model = WindowsSpeechAppInfo().json_dir
 				If FileExists(fsFullPathOf(fsExtensionSetJson(&quot;lexicons/&quot; &amp; model, language))) Then
 					fbWindowsReplacePhonemes(language, model, _text_file)
@@ -4029,18 +4031,25 @@ Sub ttsActuate( _
 		If sCommand &lt;&gt; &quot;&quot; Then
 			Select Case getGUIType()
 				Case 1 &apos; WINDOWS
-				errorCode = Shell(_
-				sProgram, 0, sCommand, bWait)
+				If fbPySupportFStrings() And InStr(sProgram, &quot;\python&quot;) &lt;&gt; 0 And _
+				InStr(sCommand, &quot;--update&quot;) = 0 Then
+					If fbDoWinBat(&quot;&quot;&quot;&quot; &amp; sProgram &amp; &quot;&quot;&quot; &quot; &amp; sCommand) Then
+						ErrorCode = 0
+					Else
+						ErrorCode = 5
+					End If
+				Else
+					ErrorCode = Shell(sProgram, 0, sCommand, bWait)
+				End If
 				Case Else
 				&apos; Specify a program path as URL because
 				&apos; a program path to a python application
 				&apos; could include spaces.
-				If sGetOS =&quot;MACOS&quot; And _
-					InStr(sProgram, &quot;/python&quot;) &lt;&gt; 0 And _
-					fbIsLibreOffice() Then
-						sProgram = PosixPythonPath()				
+				If bIsLibreOffice And sGetOS =&quot;MACOS&quot; And _
+				InStr(sProgram, &quot;/python&quot;) &lt;&gt; 0 Then
+					sProgram = PosixPythonPath()				
 				End If
-				errorCode = Shell(_
+				ErrorCode = Shell(_
 				converttourl(_
 				sProgram), 0, sCommand, bWait)
 			End Select

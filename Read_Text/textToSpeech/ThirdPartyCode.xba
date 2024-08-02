@@ -260,7 +260,6 @@ Function fbPiperTtsOk(_command) As Boolean
 			End If
 			End Select
 	End If
-	
 	If Shell(sPiperPath, 0, _command) = 0 Then
 		i_CaReadTextExtensionPiperTestResult = 3
 		fbPiperTtsOk = True
