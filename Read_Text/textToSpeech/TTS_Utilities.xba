@@ -2657,7 +2657,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 				bEnableRate = False
 				Case Else
 				ClientId = &quot;&quot;
-				player7 = &quot; --player 7&quot;
+				player7 = &quot; --player 0&quot;
 			End Select
 		Case Else
 			Select Case sTheOsId

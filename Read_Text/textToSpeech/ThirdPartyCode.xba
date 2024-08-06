@@ -407,7 +407,7 @@ Function fvTts_config_createDefaultConfig( _
 		Case 1  &apos; Windows
 		bUsingWine = fbUsingWine(False)
 		If not bUsingWine Then
-			player7 = &quot; --player 7&quot;
+			player7 = &quot; --player 0&quot;
 		End If
 		If bPiperOk Then
 			Config(pi_use_experimental_boolean) = False
