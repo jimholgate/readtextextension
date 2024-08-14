@@ -941,4 +941,54 @@ Sub ChangeBackground( _
 	End If
 End Sub
 
+
+Sub zzTestPlaySound
+	PlaySound(&quot;https://github.com/jimholgate/readtextextension/raw/master/media/mac_os_alex-bill_freeman-environmental_science_excerpt_cc_by_international.mp3&quot;)
+End Sub
+
+
+Function PlaySound(i_soundpath as string) As Boolean
+	&apos; Return `True` if there is no error. For Windows and Linux. Adapted from:
+	&apos; &lt;https://forum.openoffice.org/en/forum/viewtopic.php?p=387091&amp;sid=3eead031a698db5d92833cf3df9bfaad#p387091&gt;
+	&apos; &lt;https://opengrok.libreoffice.org/xref/core/avmedia/source/macavf/avmediaMacAVF.component?r=43d2f3d5&gt;
+	&apos; The Function blocks BASIC code execution while the sound is playing.
+	PlaySound = False
+	Dim oPlayer1 As Object
+	Dim sUrlSound As String
+	Dim oSounMgr As Object
+	
+	sUrlSound = ConvertToUrl(i_soundpath)
+
+	If Not FileExists(sUrlSound) And Instr(sUrlSound, &quot;file://&quot;) = 1 Then	   
+		MsgBox sUrlSound &amp; &quot; does not exist&quot;, 16
+	Else
+		If GetGuiType() = 1 Then
+			oSounMgr = CreateUnoService(&quot;com.sun.star.media.Manager_DirectX&quot;)
+		ElseIf fsGetOs() = &quot;POSIX&quot; Then
+			oSounMgr = CreateUnoService(&quot;com.sun.star.comp.media.Manager_GStreamer&quot;)
+		Else
+			oSounMgr = CreateUnoService(&quot;com.sun.star.media.Manager_MacAVF&quot;)
+		End If
+		
+		If IsNull(oSounMgr) Then
+			MsgBox &quot;Sound Manager not set&quot;, 16
+		Else
+			oPlayer1 = oSounMgr.createPlayer(sUrlSound)
+			With oPlayer1
+				.setMediaTime(0.0)
+				.setVolumeDB(-10) &apos; Adjust volume as needed
+				.setPlayBackLoop(0) &apos; Set to 1 if you want to loop
+				.start(0)
+				While .isPlaying()
+					DoEvents
+				Wend
+			End With
+			oPlayer1 = Nothing
+			oSounMgr = Nothing
+			PlaySound = True
+
+		End If
+	End If
+End Function
+
 </script:module>

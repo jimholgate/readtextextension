@@ -704,6 +704,22 @@ def default_lang():  # -> str
     return ""
 
 
+def posix_lib_check(check_dir="gstreamer-1.0"):  # -> str
+    """Check if the library path is in a standard posix directory and return
+    it if it is."""
+    for checkpath in [
+        "/lib/*/{0}".format(check_dir),
+        "/usr/local/*/{0}".format(check_dir),
+        "/usr/lib/*/{0}".format(check_dir),
+        "/usr/*/{0}".format(check_dir),
+    ]:
+        _paths = glob.glob(checkpath)
+        for path in _paths:
+            if os.path.isdir(path):
+                return path
+    return ""
+
+
 def sys_machine_paths():  # list(str)
     """Return a list of posix `usr` architecture specific paths to resources
     like gstreamer plugins or espeak-ng-data."""
@@ -746,6 +762,9 @@ def sys_machine_paths():  # list(str)
 def linux_machine_dir_path(search="espeak-ng-data"):  # -> str
     """If the architecture specific resource directory exists, return the full
     path, otherwise return `''`"""
+    _standard_path = posix_lib_check(search)
+    if len(_standard_path) != 0:
+        return _standard_path
     for _path in sys_machine_paths():
         try_path = "{0}{1}".format(_path, search)
         if os.path.isdir(try_path):
@@ -762,24 +781,29 @@ def gst_plugin_path(plug_in_name="libgstvorbis"):  # -> str
         return ""
     rt1 = ""
     version = ""
-
     g_versions = ["1.2", "1.1", "1.0", "1", "0.10"]
-    _paths = sys_machine_paths()
-    _ext = ".so"
-    if have_posix_app("say", False):
-        _paths = [
-            os.path.join(os.path.expanduser("~"), os.sep),
-            os.getenv("GST_PLUGIN_PATH"),
-        ]
-        _ext = ".dylib"
-    elif os.name == "nt":
+    if os.name == "posix":
+        _ext = ".so"
+        _standard_path = posix_lib_check("gstreamer-1.*")
+        if len(_standard_path) != 0:
+            file_test = os.path.join(_standard_path, "{}{}".format(plug_in_name, _ext))
+            if os.path.isfile(file_test):
+                return file_test
+        _paths = sys_machine_paths()
+        if have_posix_app("say", False):
+            _ext = ".dylib"
+            _paths = [
+                os.path.join(os.path.expanduser("~"), os.sep),
+                os.getenv("GST_PLUGIN_PATH"),
+            ]
+    else:
+        _ext = ".dll"
         _paths = [
             "".join([os.getenv("USERPROFILE"), os.sep]),
             os.path.join(os.getenv("HOMEDRIVE"), "gstreamer-sdk", os.sep),
             os.getenv("GST_PLUGIN_PATH"),
             os.path.join(os.getenv("HOMEDRIVE"), "opt", os.sep),
         ]
-        _ext = ".dll"
 
     for path in _paths:
         for g_version in g_versions:
