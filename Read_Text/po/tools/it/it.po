@@ -378,7 +378,7 @@ msgstr ""
 #: template.src
 msgctxt ""
 "Get on-line help for snap? Read Text uses a http speech daemon like "
-"[larynx-server](https://github.com/rhasspy/larynx)."
+"[mimic3-server](https://github.com/rhasspy/mimic3)."
 msgstr ""
 "Aiuto per snap? Read Text utilizza uno strumento vocale come "
 "[larynx-server] (https://github.com/rhasspy/larynx)"

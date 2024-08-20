@@ -365,10 +365,10 @@ msgstr "Read Text – Síntese de fala\n=========\n\n>_Abri um documento e selec
 #: template.src
 msgctxt ""
 "Get on-line help for snap? Read Text uses a http speech daemon like "
-"[larynx-server](https://github.com/rhasspy/larynx)."
+"[mimic3-server](https://github.com/rhasspy/mimic3)."
 msgstr ""
 "Ajuda para snap? Read Text usa uma ferramenta de fala como "
-"[larynx-server](https://github.com/rhasspy/larynx)"
+"[mimic3-server](https://github.com/rhasspy/mimic3)"
 
 #: sw/inc/strings.hrc:30 (pt)
 msgctxt "STR_RESET_LABEL"

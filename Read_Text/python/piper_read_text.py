@@ -1178,9 +1178,15 @@ remote_file = {remote_file}
         works, otherwise `""`."""
         _outer = ""
         _commons = "-autoexit -hide_banner -loglevel info -nostats"
+        _gstreamer_out = "".join(
+            [
+                f"fdsrc ! audio/x-raw,format=S16LE,rate={self.sample_rate},",
+                "channels=1 ! autoaudiosink",
+            ]
+        )
         _vlc_out = "".join(
             [
-                f""" --meta-title "{self.help_heading} : {_onnx}" """,
+                f"""--meta-title "{self.help_heading} : {_onnx}" """,
                 """--audio-visual visualizer --effect-list spectrometer """,
                 """--demux=rawaud --rawaud-channels 1 --rawaud-samplerate """,
                 f"""{self.sample_rate} - vlc://quit """,
@@ -1203,14 +1209,10 @@ remote_file = {remote_file}
                 _vlc_out = f"""--intf dummy --demux=rawaud --rawaud-channels 1 --rawaud-samplerate {self.sample_rate} - vlc://quit"""
         except (OSError, TypeError):
             pass
-        for test_app, test_outer in [
+        _posix_play_apps = [
             [
                 "aplay",
                 f"-r {self.sample_rate} -f S16_LE -t raw -",
-            ],
-            [
-                "ffplay",
-                _ffplay_out,
             ],
             [
                 "paplay",
@@ -1225,10 +1227,34 @@ remote_file = {remote_file}
                 f"-r {self.sample_rate} -c 1 -b 16 -e signed-integer -t raw -",
             ],
             [
+                "gst-launch-1.0",
+                _gstreamer_out,
+            ],
+            [
                 "vlc",
                 _vlc_out,
             ],
-        ]:
+            [
+                "ffplay",
+                _ffplay_out,
+            ],
+        ]
+        if ".var" in os.path.realpath(__file__):
+            # With flatpak instances, the `kill` command does not work.
+            # However, an application like `ffplay`, which can show
+            # a player window that you can close, allows you to stop
+            # playback by httting the [ESC] key to dismiss the window.
+            _posix_play_apps = [
+                [
+                    "ffplay",
+                    _ffplay_out,
+                ],
+                [
+                    "gst-launch-1.0",
+                    _gstreamer_out,
+                ],
+            ]
+        for test_app, test_outer in _posix_play_apps:
             try:
                 if os.system(f"command -v {test_app} > /dev/null") == 0:
                     _outer = f" --output-raw < {_text_file} | {test_app} {test_outer}"
@@ -1244,8 +1270,8 @@ remote_file = {remote_file}
         for _program in [
             "aplay",
             "pw-cat",
-            "ffmpeg",
             "ffplay",
+            "gst-launch-1.0",
             "paplay",
             "play",
         ]:
