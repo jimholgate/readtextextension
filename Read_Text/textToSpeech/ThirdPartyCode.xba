@@ -953,6 +953,11 @@ Function PlaySound(i_soundpath as string) As Boolean
 	&apos; &lt;https://opengrok.libreoffice.org/xref/core/avmedia/source/macavf/avmediaMacAVF.component?r=43d2f3d5&gt;
 	&apos; The Function blocks BASIC code execution while the sound is playing.
 	PlaySound = False
+	Select Case fsTheOsId()
+	Case &quot;POSIX.APPIMAGE&quot;, &quot;WINDOWS.WINE&quot;
+		Exit Function
+	End Select
+	On Error GoTo PlaySoundErr
 	Dim oPlayer1 As Object
 	Dim sUrlSound As String
 	Dim oSounMgr As Object
@@ -986,9 +991,11 @@ Function PlaySound(i_soundpath as string) As Boolean
 			oPlayer1 = Nothing
 			oSounMgr = Nothing
 			PlaySound = True
-
 		End If
 	End If
+	Exit Function
+	PlaySoundErr:
+	PlaySound = False
 End Function
 
 </script:module>

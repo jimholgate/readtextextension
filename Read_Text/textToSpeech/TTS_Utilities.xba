@@ -5895,22 +5895,19 @@ End Function
 Sub myBeep()
 	Dim sA As String
 	Dim oSvc As Object
-	sA = soundsDirectory() &amp; &quot;apert.wav&quot;
-	If FileExists(sA) Then
-		Select Case fsGetOS()
-			Case &quot;POSIX&quot;
-			sA = ConvertToURL(sA)
-		End Select
-	ElseIf FileExists(&quot;/usr/share/sounds/alsa/Noise.wav&quot;) Then
-		sA = convertToURL(&quot;/usr/share/sounds/alsa/Noise.wav&quot;)
-	Else
-		sA = convertToURL(&quot;/usr/share/sounds/speech-dispatcher/test.wav&quot;)
+	sA = &quot;&quot;
+	For Each sA in Array(_
+	soundsDirectory() &amp; &quot;apert.wav&quot;, _
+	&quot;/usr/share/sounds/alsa/Noise.wav&quot;, _
+	&quot;/usr/share/sounds/speech-dispatcher/test.wav&quot;)
+		If FileExists(sA) Then
+			Exit For
+		End If
+	Next
+	If Len(sA) = 0 Then
+		sA = &quot;https://github.com/jimholgate/readtextextension/raw/master/media/mac_os_alex-bill_freeman-environmental_science_excerpt_cc_by_international.mp3&quot;
 	End If
-	If FileExists(&quot;/usr/bin/afplay&quot;) Then
-		Shell(&quot;afplay&quot;, 0, sA)
-	ElseIf FileExists(&quot;/usr/bin/gst-play-1.0&quot;) Then
-		Shell(&quot;gst-play-1.0&quot;, 0, sA)
-	Else
+	If Not PlaySound(sA) Then
 		On Error Goto myBeepErr
 		oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 		oSvc.execute(sA, &quot;&quot;, 1)
