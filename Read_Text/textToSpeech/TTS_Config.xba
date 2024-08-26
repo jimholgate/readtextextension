@@ -1424,7 +1424,8 @@ Sub AboutAddOn( _
 		.GetControl(&quot;FrameControl3&quot;).model.Label = fsLookUpTerm2(&quot;s_command&quot;, s1)
 		.GetControl(&quot;ImageControl1&quot;).model.helpText = .model.Title
 		.GetControl(&quot;ImageControl1&quot;).model.ImageURL = fsExtensionLogo()
-		.GetControl(&quot;ImageControl2&quot;).model.Enabled = Instr(fsTheOsId(), &quot;WINDOWS.WINE&quot;) = 0
+		.GetControl(&quot;ImageControl2&quot;).model.Enabled = Instr(fsTheOsId(), &quot;.WINE&quot;) = 0 And _
+		Instr(fsTheOsId(), &quot;.APPIMAGE&quot;) = 0
 		.GetControl(&quot;ImageControl2&quot;).model.helpText = fsLookUpTerm2(&quot;s_test&quot;, s1)
 		.GetControl(&quot;ImageControl2&quot;).model.ImageURL = fsSpeakerLogo()
 		.GetControl(&quot;ImageControl3&quot;).model.helpText = Left(fsGetTextSelection(False, False),99)
