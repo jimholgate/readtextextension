@@ -81,7 +81,7 @@ def speech_wpm(_percent="100%"):  # -> int
     _p_cent = ""
 
     try:
-        if "%" in _percent:
+        if "%" in _percent or "percent" in _percent:
             _p_cent = readtexttools.safechars(_percent, "1234567890.")
             _calc_product = float(_p_cent) if "." in _p_cent else int(_p_cent) / 100
             _result = math.ceil(_calc_product * _normal)

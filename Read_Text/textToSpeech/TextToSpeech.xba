@@ -442,8 +442,8 @@ End Sub
 
 Sub SetupReadTextAloud
 &apos; Tools - Add-ons - Read Selection...
-	Select Case fsGetOS()
-	Case &quot;WINDOWS&quot;
+	Select Case getGUIType()
+	Case 1
 	&apos; Some versions of Windows will disable `wscript.exe`. In this case the
 	&apos; script defaults to using the built-in office NET scripting environment to
 	&apos; enable reading the selected text aloud. Visual Basic Script (vbs) might be
@@ -666,8 +666,8 @@ End Sub
 
 Sub WinStopSpeaking()
 	On Error GoTo WinStopSpeakingErr
-	Select Case fsGetOS()
-	Case &quot;WINDOWS&quot;
+	Select Case getGUIType()
+	Case 1
 		Dim speech As Object
 		Dim WinSVSFPurgeBeforeSpeak# : WinSVSFPurgeBeforeSpeak = 2
 		Dim WinvbNullString$ : WinvbNullString = &quot;&quot;

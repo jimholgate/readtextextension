@@ -1623,8 +1623,8 @@ Function fsFestivalLanguage( _
 	&apos; Incorrectly installed voices will be silent. Some instructions on
 	&apos; the web for installing mbrola voices need to be updated to work
 	&apos; with the latest version of Festival.
-	Select Case fsGetOS()
-		Case &quot;WINDOWS&quot;
+	Select Case getGUIType()
+		Case 1
 		If FileExists(fsProgramDirectoryx86() &amp; &quot;Festival&quot;) Then
 			s2 = converttourl(fsProgramDirectoryx86 &amp; &quot;Festival\voices\&quot;)
 		Else

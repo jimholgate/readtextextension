@@ -402,7 +402,7 @@ Function fvTts_config_createDefaultConfig( _
 	Dim bUsingWine As Boolean : bUsingWine = False
 	&apos; Create default values for variables
 
-	Dim pyFallBack As String : pyFallBack = &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
+	Dim pyFallBack As String : pyFallBack = &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://quickchart.io/qr?size=350&amp;text=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
 	Select Case getGUIType()
 		Case 1  &apos; Windows
 		bUsingWine = fbUsingWine(False)

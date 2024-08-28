@@ -2689,14 +2689,14 @@ Function fiDialog1CombosShowMyPythonChoices(_
 	End If
 	Select Case sGetOS
 		Case &quot;WINDOWS&quot;  &apos; Show examples
-		s1 = s1 &amp; CR &amp; &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
+		s1 = s1 &amp; CR &amp; &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://quickchart.io/qr?size=350&amp;text=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
 		s1 = s1 &amp; CR &amp; &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=(OOO_WEBTEXTSMALL)&apos;)&quot;&quot;&quot;
 	End Select
 	n = 1
 	If fbIsSandboxed() Then
 		&apos; https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)
 		s1 = s1 &amp; CR &amp; &quot;-m webbrowser -t &quot;&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
-		&quot;-m webbrowser -t &quot;&quot;https://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=(OOO_WEBTEXT)&quot;&quot;&quot; &amp; CR &amp; _
+		&quot;-m webbrowser -t &quot;&quot;https://quickchart.io/qr?size=350&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
 	End If
@@ -2928,21 +2928,41 @@ Function fiDialog1CombosShowMyPythonChoices(_
 				player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
 				&quot;&quot;, _
 			)
+		ElseIf getGUIType() = 1 Then
+			&apos; A hidden WINDOWS player cannot include `%` in the command.
+			&apos; When the command includes `--update` then a Windows python
+			&apos; command window with debugging data appears.
+			ReDim _opts : _opts = Array(_
+			player7 &amp; &quot; --update True --voice &quot; &amp; high_suggestion,_
+			player7 &amp; &quot; --update True --voice &quot; &amp; local_suggestion,_
+			player7 &amp; &quot; --update True&quot;,_
+			player7 &amp; &quot; --update False&quot;,_
+			player7 &amp; &quot; --rate &quot;&quot;125 percent&quot;&quot; --voice AUTO1#4&quot;,_
+			player7 &amp; &quot; --rate &quot;&quot;100 percent&quot;&quot; --voice AUTO1#0&quot;,_
+			player7 &amp; &quot; --rate &quot;&quot;75 percent&quot;&quot; --voice AUTO1#64&quot;,_
+			player7 &amp; &quot; --rate &quot;&quot;125 percent&quot;&quot; --voice &quot; &amp; high_suggestion,_
+			player7 &amp; &quot; --rate &quot;&quot;100 percent&quot;&quot; --voice &quot; &amp; high_suggestion,_
+			player7 &amp; &quot; --rate &quot;&quot;75 percent&quot;&quot; --voice &quot; &amp; high_suggestion,_
+			player7 &amp; &quot; --rate &quot;&quot;125 percent&quot;&quot; --voice &quot; &amp; local_suggestion,_
+			player7 &amp; &quot; --rate &quot;&quot;100 percent&quot;&quot; --voice &quot; &amp; local_suggestion,_
+			player7 &amp; &quot; --rate &quot;&quot;75 percent&quot;&quot; --voice &quot; &amp; local_suggestion,_
+			&quot;&quot;, _
+			)		
 		Else
 			ReDim _opts : _opts = Array(_
-				player7 &amp; &quot; --update True --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --update True --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --update True&quot;,_
-				player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
-				player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
-				player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
-				player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
-				&quot;&quot;, _
+			player7 &amp; &quot; --update True --voice &quot; &amp; high_suggestion,_
+			player7 &amp; &quot; --update True --voice &quot; &amp; local_suggestion,_
+			player7 &amp; &quot; --update True&quot;,_
+			player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
+			player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
+			player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
+			player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
+			player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
+			player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
+			player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion,_
+			player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion,_
+			player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
+			&quot;&quot;, _
 			)
 		End If
 		For n = Lbound(_opts) to Ubound(_opts)
@@ -7013,8 +7033,8 @@ Function CreateFile( _
 	
 	CR = Chr(13)
 	If ismissing(sEncoding) Then
-		Select Case fsGetOS()
-			Case &quot;WINDOWS&quot;
+		Select Case getGUIType()
+			Case 1
 			sEncoding = &quot;ISO-8859-15&quot; &apos;ISO-8859-15 is Windows &quot;western&quot; encoding
 			Case Else
 			sEncoding = &quot;UTF-8&quot; &apos; Posix standard
@@ -7809,8 +7829,8 @@ Function fsFindAppPath(sa As String) As String
 
 	Dim n As Integer
 	Dim a1
-	Select Case fsGetOs()
-		Case &quot;WINDOWS&quot;
+	Select Case getGUIType()
+		Case 1
 		a1 = Array( _
 		converttourl(Environ(&quot;READTEXTHELPER&quot;) &amp; &quot;\&quot;), _
 		converttourl(Environ(&quot;LOCALAPPDATA&quot;) &amp; &quot;\&quot;), _
