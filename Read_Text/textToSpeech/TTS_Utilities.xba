@@ -2915,8 +2915,22 @@ Function fiDialog1CombosShowMyPythonChoices(_
 	If fbPiperTtsOk(&quot;&quot;) Then
 		high_suggestion = PiperLocalSuggestion(&quot;&quot;, True)
 		local_suggestion = PiperLocalSuggestion(&quot;&quot;, False)
-		If fbIsSandboxed() or SkipPiedCheck() Then
+		If fbIsSandboxed() Then
 			ReDim _opts : _opts = Array(_
+				player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
+				player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
+				player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
+				player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
+				player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
+				player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
+				player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion,_
+				player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion,_
+				player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
+				&quot;&quot;, _
+			)
+		ElseIf SkipPiedCheck() Then
+			ReDim _opts : _opts = Array(_
+				player7 &amp; &quot; --update True&quot;,_
 				player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
 				player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
 				player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
