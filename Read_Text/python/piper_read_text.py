@@ -49,24 +49,98 @@ Pied (Linux)
 install and manage text-to-speech Piper voices for use with Linux Speech
 Dispatcher on supported architectures and distributions.
 
-### Flatpak requirements
+### Update System Resources
 
-A Flatpak is a standalone version of a program where the system can isolate
-a program system resources that are not deemed necessary. In the case of
-the LibreOffice Flatpak, the system blocks access to the system `speechd`
-daemon.
+Make sure that you have a version of the Read Text Extension published
+later than September 3, 2024. You can find the most recently published
+site from your office application's extension download site. 
+
+### FlatPak preparation
+
+[Flatpak](https://flatpak-docs.readthedocs.io/en/latest/) is an application
+distribution tool system  where the system can isolate program resources that
+are not deemed necessary. In the case of the LibreOffice Flatpak, the system
+blocks access to the system `speechd` speech synthesis daemon.
 
 LibreOffice can use Piper in place of `speechd` if you install the `ffmpeg`
-package to make Piper streamed speech playback possible. Some versions of
-Linux require enable a `contributor` or `non-free` respository to install
-`ffmpeg`, but Ubuntu and Mint both include the required repository unless
-you disable it.
+package to make Piper streamed speech playback possible. Some versions of Linux
+require enabling a `contributor` or `non-free` repository to install `ffmpeg`,
+but Ubuntu and Mint both include the required repository unless you disable it.
+
+Check that you have a recent version of [ffmpeg](https://ffmpeg.org/) and
+[Flatpak](https://flatpak-docs.readthedocs.io/en/latest/). If you use
+a Mint or Ubuntu compatible distribution you can check this with:
 
 ```
 sudo apt-get update
 sudo apt-get upgrade
+sudo apt-get install --upgrade flatpak
 sudo apt-get install --upgrade ffmpeg
 ```
+
+Check that your system has the most recent version of LibreOffice Flatpak:
+
+```
+flatpak list
+flatpak search org.libreoffice.LibreOffice
+```
+
+If the `flatpak list` command does not include `org.libreoffice.LibreOffice`
+in the results then install it.
+
+```
+sudo flatpak install org.libreoffice.LibreOffice
+```
+
+If the version is not current, then update it.
+
+```
+sudo flatpak update org.libreoffice.LibreOffice
+```
+
+Your system menu might not update immediately unless you log out then log in
+again.
+
+### Pied (Linux)
+
+[Pied](https://pied.mikeasoft.com/) uses a simple graphical interface to install
+and manage text-to-speech Piper voices for use with Linux Speech Dispatcher on
+supported architectures and distributions.
+
+On many modern Linux desktop distributions, Pied is available directly using the
+Flatpak or Snap *Software* store applicaiton. 
+
+### What if the *Software* Application Does Not List Pied?
+
+If your computer supports it, you can find "Pied" in the *Software* application
+and install it with the click of a button.
+
+Otherwise, if you are using an Enterprise Linux distribution, you can install
+Pied on supported architectures using a series of commands in a `bash` terminal.
+
+1. **Add the Flathub Repository**: Open your terminal and run the following
+   command to add the Flathub repository:
+    
+    ```
+    sudo flatpak remote-add --if-not-exists \
+        flathub https://flathub.org/repo/flathub.flatpakrepo
+    ```
+    
+2. **Install the Required Runtime**: Install the required runtime by running:
+    
+    ```
+    sudo flatpak install flathub org.freedesktop.Platform//22.08
+    ```
+
+3. **Get the Installer**: Download the most recent Pied Flatpak installer from
+   the [Pied website](https://pied.mikeasoft.com/).  
+   
+4. **Install the Application**: Install `com.mikeasoft.pied` using the following
+   command:
+    
+    ```
+    sudo flatpak install ~/Downloads/com.mikeasoft.pied.flatpak
+    ```
 
 ### What if the *Software* application does not list Pied?
 
@@ -1799,13 +1873,14 @@ Piper TTS
                         pass
                     except OSError as e:
                         print(f"OSError downloading `{_script_path}`: {e}")
-            print(
-                f"""Please wait
+            if len(piper_file) != 0:
+                print(
+                    f"""Please wait
 ===========
 
 It takes a few moments to retrieve the piper voice model
 `{piper_file}` from <{self.hug_url}> """
-            )
+                )
             _dir = self.retrieve_model(piper_file, "", do_pop_message)
             if len(_dir) != 0:
                 readtexttools.show_with_app(_dir)
