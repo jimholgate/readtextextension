@@ -1171,7 +1171,7 @@ def app_info_extract(
         if not os.path.isfile(_app_out):
             os.system("{} {}{} > {}".format(app, ask, _grep, _app_out))
         if os.path.isfile(_app_out):
-            if os.path.getsize(_app_out) == 0:
+            if os.path.getsize(os.path.realpath(_app_out)) == 0:
                 os.remove(_app_out)
             else:
                 s1 = _fmd.meta_from_file(_app_out, _remove)
@@ -1934,7 +1934,7 @@ class SayFormats(object):
             self.ok = False
             return False
         if os.path.isfile(_media_work):
-            if os.path.getsize(_media_work) == 0:
+            if os.path.getsize(os.path.realpath(_media_work)) == 0:
                 return False
             _writer = ""
             _size = "600x600"

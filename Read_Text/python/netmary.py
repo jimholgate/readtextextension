@@ -335,7 +335,7 @@ It did not respond correctly."""
             with open(_media_work, "wb") as f:
                 f.write(response.content)
             if os.path.isfile(_media_work):
-                _done = os.path.getsize(_media_work) != 0
+                _done = os.path.getsize(os.path.realpath(_media_work)) != 0
         except:
             _done = False
         return _done
@@ -381,7 +381,7 @@ It did not respond correctly."""
             with open(_media_work, "wb") as f:
                 f.write(response_content)
             if os.path.isfile(_media_work):
-                _done = os.path.getsize(_media_work) != 0
+                _done = os.path.getsize(os.path.realpath(_media_work)) != 0
         except:
             _done = False
         if _done:

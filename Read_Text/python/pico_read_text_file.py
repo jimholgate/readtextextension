@@ -168,7 +168,7 @@ def picoread(
                 _command, _lang, _work_file, _text
             )
         if readtexttools.my_os_system(_os_command):
-            if os.path.getsize(_work_file) == 0:
+            if os.path.getsize(os.path.realpath(_work_file)) == 0:
                 return False
             return readtexttools.process_wav_media(
                 _title,

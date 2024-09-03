@@ -202,7 +202,7 @@ def main() -> None:
         _json = make_json_str(
             base_name,
             _date_time.strftime("%Y.%m.%d_%H:%M:%S.%f"),
-            os.path.getsize(archive_output_name),
+            os.path.getsize(os.path.realpath(archive_output_name)),
             calculate_md5(archive_output_name),
         )
         print(

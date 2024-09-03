@@ -573,7 +573,7 @@ class ReadFestivalClass(object):
             usage()
             sys.exit(2)
         if os.path.isfile(_work_file):
-            work_size = os.path.getsize(_work_file)
+            work_size = os.path.getsize(os.path.realpath(_work_file))
             if work_size == 0:
                 return False
             elif work_size < 200:

@@ -556,7 +556,7 @@ def espkread(
         elif _post_process == "process_wav_media":
             if not os.path.isfile(_work_file):
                 return 0
-            if os.path.getsize(_work_file) == 0:
+            if os.path.getsize(os.path.realpath(_work_file)) == 0:
                 return 0
             if bool(
                 readtexttools.process_wav_media(

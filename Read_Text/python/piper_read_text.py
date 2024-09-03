@@ -24,9 +24,13 @@ External program:
 
     /usr/bin/python3
 
+Update the Piper TTS model folder and find local voice models.
+
+    "(PIPER_READ_TEXT_PY)" --update "True" --language (SELECTION_LANGUAGE_CODE) "(TMP)"
+
 Use the first available voice.
 
-    "(PIPER_READ_TEXT_PY)"  --rate 100% --language (SELECTION_LANGUAGE_CODE) "(TMP)"
+    "(PIPER_READ_TEXT_PY)" --language (SELECTION_LANGUAGE_CODE) "(TMP)"
 
 Use a particular model (`auto5`) and speaker (`45`):
 
@@ -35,15 +39,67 @@ Use a particular model (`auto5`) and speaker (`45`):
 Install piper-tts
 =================
 
-If you are not online, then you cannot download voice models or configuration
-files. Once they are installed, piper handles speech locally.
+If you are not online, then you cannot download voice models or
+configuration files. Once they are installed, piper handles speech locally.
 
 Pied (Linux)
 ------------
 
-[Pied](https://pied.mikeasoft.com/) uses a simple graphical interface to install
-and manage text-to-speech Piper voices for use with Linux Speech Dispatcher on
-supported architectures and distributions.
+[Pied](https://pied.mikeasoft.com/) uses a simple graphical interface to
+install and manage text-to-speech Piper voices for use with Linux Speech
+Dispatcher on supported architectures and distributions.
+
+### Flatpak requirements
+
+A Flatpak is a standalone version of a program where the system can isolate
+a program system resources that are not deemed necessary. In the case of
+the LibreOffice Flatpak, the system blocks access to the system `speechd`
+daemon.
+
+LibreOffice can use Piper in place of `speechd` if you install the `ffmpeg`
+package to make Piper streamed speech playback possible. Some versions of
+Linux require enable a `contributor` or `non-free` respository to install
+`ffmpeg`, but Ubuntu and Mint both include the required repository unless
+you disable it.
+
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install --upgrade ffmpeg
+```
+
+### What if the *Software* application does not list Pied?
+
+If your computer supports it, you can find "Pied" in the *Software*
+application and install it with the click of a button.
+
+Otherwise, if you are using an Enterprise Linux distribution, you can
+install Pied on supported architectures using a series of commands using a
+`bash` terminal.
+
+1. **Add the Flathub Repository**: Open your terminal and run the following
+  command to add the Flathub repository:
+    
+    ```
+    sudo flatpak remote-add --if-not-exists \
+        flathub https://flathub.org/repo/flathub.flatpakrepo
+    ```
+    
+2. **Install the Required Runtime**: Install the required runtime by running:
+    
+    ```
+    sudo flatpak install flathub org.freedesktop.Platform//22.08
+    ```
+
+3. **Get the Installer** Download the most recent Pied Flatpak installer from
+  the [Pied website](https://pied.mikeasoft.com/).  
+   
+4. **Install the Application**: Install `com.mikeasoft.pied` using the
+  following command:
+    
+    ```
+    sudo flatpak install ~/Downloads/com.mikeasoft.pied.flatpak
+    ```
 
 Binary release (Linux)
 ----------------------
@@ -168,6 +224,14 @@ to use `piper-tts`:
 
     "(SPD_READ_TEXT_PY)" --language "(SELECTION_LANGUAGE_CODE)" "(TMP)"
 
+The following command returns the `speech-dispatcher` to the defaults. It
+does not erase Piper models or Piper configuration files.
+
+    (RESET)
+
+To reenable Pied, simply open the Pied application, select a voice, then
+click *Apply*.
+
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
 Copyright (c) 2024 James Holgate
@@ -195,6 +259,7 @@ try:
 except (ImportError, AssertionError):
     pass
 
+import build_extension
 import find_replace_phonemes
 import netcommon
 import readtexttools
@@ -305,9 +370,7 @@ class PiperTTSClass(object):
             self.app = "piper.exe"
             _extension_table = readtexttools.ExtensionTable()
             for _item in app_list:
-                _app = _extension_table.win_search(
-                    f"piper-tts{os.sep}piper", _item
-                )
+                _app = _extension_table.win_search(f"piper-tts{os.sep}piper", _item)
                 if len(_app) != 0:
                     self.app = _app
                     break
@@ -433,6 +496,7 @@ class PiperTTSClass(object):
             if os.path.isdir(new_dir):
                 self.piper_voice_dir = new_dir
         self.json_file = os.path.join(self.piper_voice_dir, "voices.json")
+        self.md5sum = ""
         self.espeak_ng_dir = ""
         for espeak_ng_dir in espeak_ng_data_list:
             if os.path.isdir(os.path.expanduser(espeak_ng_dir)):
@@ -641,7 +705,8 @@ not work with the python version.
             model_test = os.path.expanduser(model_test)
         if os.path.isfile(f"{model_test}.json"):
             if os.path.isfile(model_test):
-                if "onnx: data" in self.meta.execute_command(f"file '{model_test}'"):
+                # August 31, 2024: the smallest valid onnx file is 20628813 bytes
+                if os.path.getsize(os.path.realpath(model_test)) > 10000000:
                     self.use_specific_onnx_path = model_test
                     self.lang = iso_lang
                     file_name = os.path.split(model_test)[1]
@@ -693,6 +758,7 @@ not work with the python version.
         if not os.name == "posix" or bool(all_dir_list) == False:
             return False
         _dest_dir = ""
+        retval = False
         _env_lang = _iso_lang.replace("-", "_")
         _concise_lang = _env_lang.split("_")[0]
         for _lang in [
@@ -700,9 +766,12 @@ not work with the python version.
             _concise_lang,
         ]:
             for _a_dir in all_dir_list:
+                if not os.path.exists(_a_dir):
+                    continue
                 try:
                     files = os.listdir(_a_dir)
                     for _file in files:
+
                         if _file.startswith(_lang):
                             if _file.endswith(".onnx"):
                                 _file, _ext = os.path.splitext(_file)
@@ -762,9 +831,42 @@ not work with the python version.
                                                 continue
                                             elif os.path.exists(_dest):
                                                 continue
-                                            elif os.path.getsize(_source) < 20:
+                                            elif (
+                                                os.path.getsize(
+                                                    os.path.realpath(_source)
+                                                )
+                                                < 20
+                                            ):
                                                 # Don't link to an invalid file.
                                                 continue
+                                            if _extension == ".onnx":
+                                                real_md5 = (
+                                                    build_extension.calculate_md5(
+                                                        os.path.realpath(_source)
+                                                    )
+                                                )
+                                                _path_ref = "/".join(
+                                                    [
+                                                        data[_item]["language"][
+                                                            "family"
+                                                        ],
+                                                        data[_item]["language"]["code"],
+                                                        data[_item]["name"],
+                                                        data[_item]["quality"],
+                                                    ]
+                                                )
+                                                json_md5 = data[_item]["files"][
+                                                    f"{_path_ref}/{_key}{_extension}"
+                                                ]["md5_digest"]
+                                                if not real_md5 == json_md5:
+                                                    print(
+                                                        f"""WARNING: 
+=======
+
+Your local copy of `{_key}{_extension}` failed the `md5_sum` check.
+Consider deleting it and downloading it again."""
+                                                    )
+                                                    continue
                                             os.symlink(_source, _dest)
                                             print(
                                                 f"\nSymbolic link created from `{_source}` to `{_dest}`"
@@ -785,15 +887,15 @@ not work with the python version.
                                                         1,
                                                         self.py_locale(),
                                                     )
-                                            return True
+                                            retval = True
                                         except OSError as e:
                                             print(
                                                 f"\nCannot link `{_source}` to `{_dest}`: \n{e}"
                                             )
-                                            return False
+                                            retval = False
             except (KeyError, SyntaxError):
                 return False
-        return False
+        return retval
 
     def model_path_list(
         self, iso_lang: str = "en-GB", _vox: str = "", extension: str = "onnx"
@@ -910,7 +1012,10 @@ voice models, then the generic json configuration will not recognize them.
                                 # onnx placeholders that only contain
                                 # brief ASCII text.
                                 if os.path.isfile(self.j_path):
-                                    if os.path.getsize(self.j_path) > 1000:
+                                    if (
+                                        os.path.getsize(os.path.realpath(self.j_path))
+                                        > 1000
+                                    ):
                                         _found_models.append(self.j_path)
             except IndexError:
                 pass
@@ -919,10 +1024,15 @@ voice models, then the generic json configuration will not recognize them.
             _download_msg = readtexttools.translate_ui_element(
                 iso_lang, "Download a compatible voice model"
             )
+            help_heading = self.help_heading
+            _web_page = self.sample_webpage
+            if "/pied/" in self.espeak_ng_dir:
+                help_heading = "Pied"
+                _web_page = "https://pied.mikeasoft.com/"
             if not os.path.isfile(self.app_locker):
                 readtexttools.pop_message(
-                    f"{self.help_heading} ({iso_lang}) : {_download_msg}",
-                    f"""{self.sample_webpage}""",
+                    f"{help_heading} ({iso_lang}) : {_download_msg}",
+                    f"""{_web_page}""",
                     5000,
                     self.help_icon,
                     1,
@@ -1076,7 +1186,9 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
             real_app = os.path.realpath(self.app)
             if os.name == "posix":
                 for watermark in ["ELF", "64-bit executable"]:
-                    if watermark in self.meta.execute_command(f"file {real_app}"):
+                    if watermark in self.meta.execute_command(
+                        f"file {os.path.realpath(real_app)}"
+                    ):
                         return True
         try:
             return (
@@ -1565,7 +1677,7 @@ Piper TTS
                     print(_response)
                     if os.path.isfile(self.work_file):
                         print(VLC_WINDOWS_INFO)
-                        if os.path.getsize(self.work_file) == 0:
+                        if os.path.getsize(os.path.realpath(self.work_file)) == 0:
                             return False
                         readtexttools.process_wav_media(
                             "untitled",

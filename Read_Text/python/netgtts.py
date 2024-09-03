@@ -283,7 +283,7 @@ class GoogleTranslateClass(object):
             "process_mp3_media",
             "process_audio_media",
         ]:
-            if os.path.getsize(_media_work) == 0:
+            if os.path.getsize(os.path.realpath(_media_work)) == 0:
                 return False
             # NOTE: Calling process must unlock_my_lock()
             readtexttools.process_wav_media(

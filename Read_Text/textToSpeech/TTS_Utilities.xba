@@ -5931,7 +5931,7 @@ Sub myBeep()
 	Dim oSvc As Object
 	sA = &quot;&quot;
 	For Each sA in Array(_
-	soundsDirectory() &amp; &quot;apert.wav&quot;, _
+	fsMyURL() &amp; &quot;/media/apert.mp3&quot;, _
 	&quot;/usr/share/sounds/alsa/Noise.wav&quot;, _
 	&quot;/usr/share/sounds/speech-dispatcher/test.wav&quot;)
 		If FileExists(sA) Then

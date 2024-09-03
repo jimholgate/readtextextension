@@ -210,7 +210,7 @@ Server running on: <{self.url}>
                     with open(_media_work, "wb") as _handle:
                         _handle.write(response_content)
                     if os.path.isfile(_media_work):
-                        _done = os.path.getsize(_media_work) != 0
+                        _done = os.path.getsize(os.path.realpath(_media_work)) != 0
                 except:
                     # bare-except because qualifying it causes an error on some
                     # platforms.

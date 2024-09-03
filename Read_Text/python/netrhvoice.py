@@ -374,7 +374,7 @@ Checking {help_heading} voices for `{_iso_lang}`
                     with open(_media_work, "wb") as _handle:
                         _handle.write(response_content)
                     if os.path.isfile(_media_work):
-                        _done = os.path.getsize(_media_work) != 0
+                        _done = os.path.getsize(os.path.realpath(_media_work)) != 0
                 except:
                     _done = False
                     break

@@ -304,7 +304,7 @@ or a local URL that you specify.
             with open(_media_work, "wb") as _handle:
                 _handle.write(response.read())
             if os.path.isfile(_media_work):
-                _done = os.path.getsize(_media_work) != 0
+                _done = os.path.getsize(os.path.realpath(_media_work)) != 0
         except (TimeoutError, urllib.error.HTTPError):
             print(
                 f"""

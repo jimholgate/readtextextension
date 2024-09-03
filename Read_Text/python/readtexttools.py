@@ -2060,7 +2060,7 @@ def do_gst_parse_launch(_pipe=""):  # -> bool
         if len(filesink_location) != 0:
             try:
                 # Waits until file is ready before measuring the size.
-                return os.path.getsize(filesink_location) != 0
+                return os.path.getsize(os.path.realpath(filesink_location)) != 0
             except FileNotFoundError:
                 return False
         return True
@@ -2084,7 +2084,7 @@ def do_gst_parse_launch(_pipe=""):  # -> bool
                         print("{0} {1}".format(gst_l, _pipe))
                         if len(filesink_location) != 0:
                             try:
-                                return os.path.getsize(filesink_location) != 0
+                                return os.path.getsize(os.path.realpath(filesink_location)) != 0
                             except FileNotFoundError:
                                 return False
                         return True
@@ -2843,7 +2843,7 @@ class WinMediaPlay(object):
         if _denominator == 0:
             self.rest = sound_length_seconds(file_path)
         else:
-            self.rest = int(os.path.getsize(file_path) / _denominator) + 1
+            self.rest = int(os.path.getsize(os.path.realpath(file_path)) / _denominator) + 1
         return self.rest != 0
 
     def _windowsmedia(self, file_path=""):  # -> bool
@@ -4198,7 +4198,7 @@ class PosixAudioPlayers(object):
 def show_and_play(_command="", a_app="", display_file="", file_path=""):  # -> bool
     """Print the play status and play an audio file"""
     if len(_command) != 0:
-        if os.path.getsize(file_path) == 0:
+        if os.path.getsize(os.path.realpath(file_path)) == 0:
             print("""[>]  {0} cannot play `{1}`""".format(a_app, display_file))
             return True
         print("[>] {0} playing `{1}`".format(a_app, display_file))

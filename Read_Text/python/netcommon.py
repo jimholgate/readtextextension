@@ -476,13 +476,13 @@ xml:lang="{0}">
         # use `getsize` to ensure that python waits for file to finish download
         if not os.path.isfile(_media_work):
             return False
-        if os.path.getsize(_media_work) == 0:
+        if os.path.getsize(os.path.realpath(_media_work)) == 0:
             time.sleep(2)
         if os.path.isfile(_media_work) and _post_process in [
             "process_audio_media",
             "process_wav_media",
         ]:
-            if os.path.getsize(_media_work) == 0:
+            if os.path.getsize(os.path.realpath(_media_work)) == 0:
                 print("Unable to write media work file.")
                 return False
             # NOTE: Calling process should unlock_my_lock()

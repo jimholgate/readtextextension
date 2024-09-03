@@ -162,7 +162,7 @@ class OpenJTalkClass(object):
             if readtexttools.my_os_system(_os_command):
                 if len(_out_file) != 0:
                     readtexttools.unlock_my_lock()
-                if os.path.getsize(_work_file) == 0:
+                if os.path.getsize(os.path.realpath(_work_file)) == 0:
                     return False
                 if readtexttools.process_wav_media(
                     _title,
