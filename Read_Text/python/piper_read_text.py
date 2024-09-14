@@ -142,39 +142,6 @@ Pied on supported architectures using a series of commands in a `bash` terminal.
     sudo flatpak install ~/Downloads/com.mikeasoft.pied.flatpak
     ```
 
-### What if the *Software* application does not list Pied?
-
-If your computer supports it, you can find "Pied" in the *Software*
-application and install it with the click of a button.
-
-Otherwise, if you are using an Enterprise Linux distribution, you can
-install Pied on supported architectures using a series of commands using a
-`bash` terminal.
-
-1. **Add the Flathub Repository**: Open your terminal and run the following
-  command to add the Flathub repository:
-    
-    ```
-    sudo flatpak remote-add --if-not-exists \
-        flathub https://flathub.org/repo/flathub.flatpakrepo
-    ```
-    
-2. **Install the Required Runtime**: Install the required runtime by running:
-    
-    ```
-    sudo flatpak install flathub org.freedesktop.Platform//22.08
-    ```
-
-3. **Get the Installer** Download the most recent Pied Flatpak installer from
-  the [Pied website](https://pied.mikeasoft.com/).  
-   
-4. **Install the Application**: Install `com.mikeasoft.pied` using the
-  following command:
-    
-    ```
-    sudo flatpak install ~/Downloads/com.mikeasoft.pied.flatpak
-    ```
-
 Binary release (Linux)
 ----------------------
 

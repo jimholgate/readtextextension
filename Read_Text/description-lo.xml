@@ -3,7 +3,7 @@
 	xmlns="http://openoffice.org/extensions/description/2006"
 	xmlns:d="http://openoffice.org/extensions/description/2006"
 	xmlns:xlink="http://www.w3.org/1999/xlink">
-	<version value="0.8.86" />
+	<version value="0.8.88" />
 	<identifier value="ca.bc.vancouver.holgate.james.readtextextension" />
 	<display-name>
 		<name lang="en">Read Text</name>

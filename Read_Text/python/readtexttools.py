@@ -1346,6 +1346,13 @@ def local_host_pop(
         _local_server = check_dialog.MyServer()
     except OSError:
         return False
+    # You cannot act on a message with a URL in this popup menu, so we
+    # only provide general information. Specifically, if you are using
+    # a sandboxed application, then you might need to use a http based
+    # speech synthesis service like `mimic3-server` or `piper-server`.
+    if "https://" in msg:
+        msg = translate_ui_element(lang_region, "Download a compatible voice model")
+        msg_h1 = translate_ui_element(lang_region, "No voice model found")
     _xml_transform = XmlTransform()
     if _local_server.is_valid_url(""):
         local_url = _local_server.host_and_port
@@ -2084,7 +2091,10 @@ def do_gst_parse_launch(_pipe=""):  # -> bool
                         print("{0} {1}".format(gst_l, _pipe))
                         if len(filesink_location) != 0:
                             try:
-                                return os.path.getsize(os.path.realpath(filesink_location)) != 0
+                                return (
+                                    os.path.getsize(os.path.realpath(filesink_location))
+                                    != 0
+                                )
                             except FileNotFoundError:
                                 return False
                         return True
@@ -2843,7 +2853,9 @@ class WinMediaPlay(object):
         if _denominator == 0:
             self.rest = sound_length_seconds(file_path)
         else:
-            self.rest = int(os.path.getsize(os.path.realpath(file_path)) / _denominator) + 1
+            self.rest = (
+                int(os.path.getsize(os.path.realpath(file_path)) / _denominator) + 1
+            )
         return self.rest != 0
 
     def _windowsmedia(self, file_path=""):  # -> bool

@@ -1838,14 +1838,6 @@ Function WinSpeechArgument() As String
 	&apos;OOo for Windows uses these commands if wscript.exe exists and works.
 	Dim s1 As String : s1 = &quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot; /language:&quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 	On Error GoTo WinSpeechArgumentErr
-	If fbScriptForgePythonOK(0) Then
-		&apos; Skip running SAPI query to reduce latency.
-		&apos; ScriptForge can run on Windows versions (10+) that allow users to install
-		&apos; SAPI voices in other languages in Home and Special Editions of Windows.
-		&apos; https://prod.support.services.microsoft.com/en-us/windows/appendix-a-supported-languages-and-voices-4486e345-7730-53da-fcfe-55cc64300f01
-		WinSpeechArgument = s1
-		Exit Function
-	End If
 	Select Case fsLang()
 		Case &quot;en-US&quot;
 		If Not fbWindowsHasAnInternationalVoice(False, &quot;united states&quot;) Then
@@ -2644,6 +2636,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 	Dim sLanguage As String : sLanguage = LCase(fsGetLanguage())
 	Dim sSpdToken As String : sSpdToken = &quot;&quot;
 	Dim sTheOsId As String : sTheOsId = fsTheOsId()
+	Dim bnetworkTTS As Boolean : bnetworkTTS = fbHaveNetworkTTS()
 
 	Select Case sGetOS
 		Case &quot;MACOS&quot;
@@ -2679,13 +2672,11 @@ Function fiDialog1CombosShowMyPythonChoices(_
 		ElseIf Not fbIsSandboxed() And Not bIsAppImage Then
 			sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
 		End If
-		Select Case sTheOsId
-		Case &quot;MACOS.EXPERIMENTAL&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;, _
-		&quot;POSIX.FLATPAK&quot;, &quot;POSIX.SNAP&quot;
+		If fbGetWebServiceOK(&quot;http://127.0.0.1:5000?text=0&quot;) Then
 			&apos; Enable the home network Rhasspy Piper Speech Synthesis Server Option
 			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --voice &quot;&quot;piper&quot;&quot; --url &quot;&quot;http://192.168.0.108:5000&quot;&quot;&quot;
 			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-		End Select
+		End If
 	End If
 	Select Case sGetOS
 		Case &quot;WINDOWS&quot;  &apos; Show examples
@@ -2700,28 +2691,27 @@ Function fiDialog1CombosShowMyPythonChoices(_
 		&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
 	End If
-	If fbHaveNetworkTTS() or sTheOsId = &quot;POSIX.FLATPAK&quot; or _
+		If bnetworkTTS or sTheOsId = &quot;POSIX.FLATPAK&quot; or _
 	sTheOsId = &quot;POSIX.SNAP&quot; or sTheOsId = &quot;POSIX.EXPERIMENTAL&quot; Then
-		If sGetOS = &quot;POSIX&quot; Then
-			&apos; Include settings for [mimic3](https://github.com/rhasspy/mimic3)
-			If bEnableLocalHostRate Then
-				ReDim _opts : _opts = Array(&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
-			Else
-				&apos; NOTE: Some tts models ignore gender; consider using neutral terms like &quot;VOICE1&quot;
-				&apos; The disadvantage is that the labeling system would not match `speech-dispatcher`
-				ReDim _opts : _opts = Array(&quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;,_
-				&quot;FEMALE6&quot;, &quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
-			End If
-			
-			For Each _opt in _opts
-				If bEnableLocalHostRate Then
-					s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp; _opt &amp; &quot;&quot;&quot;&quot;
-					s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-				End If
-				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;&quot; &amp; _opt &amp; &quot;&quot;&quot;&quot;
-				s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-			Next
+		&apos; Include settings for [mimic3](https://github.com/rhasspy/mimic3)
+		If bEnableLocalHostRate Then
+			ReDim _opts : _opts = Array(&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
+		Else
+			&apos; NOTE: Some tts models ignore gender; consider using neutral terms like &quot;VOICE1&quot;
+			&apos; The disadvantage is that the labeling system would not match `speech-dispatcher`
+			ReDim _opts : _opts = Array(&quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;,_
+			&quot;FEMALE6&quot;, &quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;)
 		End If
+	End If
+	If bnetworkTTS Then
+		For Each _opt in _opts
+			If bEnableLocalHostRate Then
+				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;&quot; &amp; _opt &amp; &quot;&quot;&quot;&quot;
+				s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+			End If
+			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;&quot; &amp; _opt &amp; &quot;&quot;&quot;&quot;
+			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+		Next
 		If bEnableLocalHostRate Then
 			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot;&quot;
 			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
@@ -2768,7 +2758,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 			Not(fbHaveEspeak()) or Len(fsGetPipLibPath(&quot;speechd&quot;, False)) &lt;&gt; 0 Then
 			Select Case sGetOS
 				Case &quot;POSIX&quot;
-				If fbHaveNetworkTTS() Then
+				If bnetworkTTS Then
 					ReDim _opts : _opts = Array(_
 					&quot;MALE3&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
 					&quot;CHILD_MALE&quot;, &quot;CHILD_FEMALE&quot;, &quot;AUTO&quot;)
@@ -2780,7 +2770,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 				Case &quot;MACOS&quot;
 				Select Case FileExists(&quot;/usr/bin/python3&quot;)
 					Case True
-					If fbHaveNetworkTTS() Then
+					If bnetworkTTS Then
 						ReDim _opts : _opts = Array(_
 						&quot;MALE8&quot;, &quot;MALE7&quot;, &quot;MALE6&quot;, &quot;MALE5&quot;, &quot;MALE4&quot;, &quot;MALE3&quot;,_
 						&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;FEMALE8&quot;, &quot;FEMALE7&quot;, &quot;FEMALE6&quot;,_
@@ -2794,7 +2784,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 					End If			
 					Case Else
 					If sLanguage = &quot;en&quot; Then
-						If fbHaveNetworkTTS() Then
+						If bnetworkTTS Then
 							ReDim _opts : _opts = Array(_
 							&quot;FEMALE5&quot;, &quot;FEMALE4&quot;, &quot;FEMALE3&quot;, &quot;FEMALE2&quot;, &quot;FEMALE1&quot;,_
 							&quot;MALE2&quot;, &quot;MALE1&quot;, &quot;AUTO&quot;)
@@ -2804,7 +2794,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 							&quot;MALE2&quot;, &quot;MALE1&quot;)
 						End If
 					Else
-						If fbHaveNetworkTTS() Then
+						If bnetworkTTS Then
 							ReDim _opts : _opts = Array(_
 							&quot;FEMALE1&quot;, &quot;MALE2&quot;, &quot;MALE1&quot;, &quot;AUTO&quot;)
 						Else
@@ -7388,8 +7378,7 @@ Function fbHavePyQrCode() As Boolean
 		&quot;/usr/lib/python3/dist-packages/qrcode/release.py&quot;, _
 		_home &amp; &quot;/.local/bin/qr&quot;)	
 	End Select
-	If FileExists(fsNetworkTtsDoc()) And _
-	Len(fsContainerResourcePath(&quot;python&quot;)) = 0 And _
+	If Len(fsContainerResourcePath(&quot;python&quot;)) = 0 And _
 	Len(fsContainerResourcePath(&quot;python3&quot;)) = 0 Then
 		For x = Lbound(Tokens) To Ubound(Tokens)
 			If FileExists(Tokens(x)) Then
@@ -7613,12 +7602,15 @@ End Function
 
 
 Function gttsResourceCheck()
-	Dim home$ : home = Environ(&quot;HOME&quot;)
-	If FileExists(home &amp; &quot;/.local/pipx/venvs/gtts/bin/gtts-cli&quot;) Then
-		gttsResourceCheck = fsFullPathOf(&quot;gtts/Config.json&quot;)
-	Else
-		gttsResourceCheck = home &amp; &quot;/.local/bin/gtts-cli&quot;
-	End If
+	gttsResourceCheck = &quot;&quot;
+	Select Case fsTheOsId()
+	Case &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;POSIX.FLATPAK&quot;
+		&apos; pass
+	Case Else
+		If fbPySupportFStrings Then
+			gttsResourceCheck = Environ(&quot;HOME&quot;) &amp; &quot;/.local/bin/gtts-cli&quot;
+		End If
+	End Select
 End Function
 
 
@@ -7627,8 +7619,6 @@ Function fbHaveNetworkTTS() As Boolean
 	&apos; If you are not running libreoffice from normal home directory, then
 	&apos; the script disables network speech because container versions of
 	&apos; the application do not necessarily include the required libraries.
-	&apos;
-	&apos; Install `gtts` with `pip3 install python3-gtts-token python3-gtts
 	fbHaveNetworkTTS = False
 	If Not fbPySupportFStrings() Then
 		Exit Function
@@ -7637,7 +7627,6 @@ Function fbHaveNetworkTTS() As Boolean
 		fbHaveNetworkTTS = True
 		Exit Function
 	End If
-	fbHaveNetworkTTS = Len(fsGetPipLibPath(&quot;gtts&quot;, True)) &lt;&gt; 0
 	If fbHaveNetworkTTS Then
 		Exit Function
 	End If
@@ -7646,7 +7635,6 @@ Function fbHaveNetworkTTS() As Boolean
 		Exit Function
 	End If
 	Dim x# : x = 0
-	Dim home$ : home = Environ(&quot;HOME&quot;)
 	Dim Tokens : Tokens = Array(_
 	gttsResourceCheck(), _
 	AwsBoto3Json(), _
@@ -7654,15 +7642,14 @@ Function fbHaveNetworkTTS() As Boolean
 	GoogleApisJson(), _
 	ibmWatsonJson(), _
 	msAzureJson())
-	Select Case home
+	Select Case Environ(&quot;HOME&quot;)
 		Case Environ(&quot;PWD&quot;)
-		If FileExists(fsNetworkTtsDoc()) And _
-		Len(fsContainerResourcePath(&quot;python&quot;)) = 0 And _
+		If Len(fsContainerResourcePath(&quot;python&quot;)) = 0 And _
 		Len(fsContainerResourcePath(&quot;python3&quot;)) = 0 Then
 			For x = Lbound(Tokens) To Ubound(Tokens)
 				If FileExists(Tokens(x)) Then
 					fbHaveNetworkTTS = True
-					Exit For
+					Exit Function
 				End If
 			Next
 		End If

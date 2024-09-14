@@ -219,13 +219,7 @@ Using a *container* version of an office application could restrict your
 computer's ability to run system python libraries.
 """
         )
-        # Run `main()` to show usage alternatives.
-        USE_SPEECHD = False
-    try:
-        if USE_SPEECHD:
-            import speechd_py as speechd
-    except ImportError:
-        USE_SPEECHD = False
+    USE_SPEECHD = False
 
 NET_SERVICE_LIST = netcommon.NET_SERVICE_LIST
 

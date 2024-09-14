@@ -616,7 +616,7 @@ End Function
 
 
 Function fsGetWebService(_
-		ByVal _uri) As String
+		ByVal _uri As String)
 	fsGetWebService = &quot;&quot;
 	&apos; Get web text that shows MaryTTS voices
 	&apos; =WEBSERVICE(&quot;http://0.0.0.0:59125/voices&quot;)
@@ -630,6 +630,18 @@ Function fsGetWebService(_
 	Exit Function
 	fsGetWebServiceErr:
 	fsGetWebService = &quot;&quot;
+End Function
+
+
+Function fbGetWebServiceOK(_URL As String) As Boolean
+	&apos; AKA Ping; Use a trusted source that returns a result quickly.
+	&apos; i. e.: Check if piper-tts server is on the local network:
+	&apos; http://127.0.0.1:5000?text=0
+	On Error GoTo fbGetWebServiceOKErr
+	fbGetWebServiceOK = Len(fsGetWebService(_URL)) &lt;&gt; 0
+	Exit Function
+	fbGetWebServiceOKErr:
+	fbGetWebServiceOK = False
 End Function
 
 
@@ -1386,7 +1398,7 @@ Sub AboutAddOn( _
 	Dim sA As String
 	Dim sC As String
 	Dim sE As String
-	Dim file_spec As String : file_spec = fsTTSScriptVBS()
+	Dim file_spec As String : file_spec = &quot;&quot;
 	Dim title_special As String : title_special = &quot;&quot;
 	Dim msgs() As Variant
 	Dim errorCode As Integer
@@ -1398,7 +1410,7 @@ Sub AboutAddOn( _
 	s3 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
 	Dim s4$
 	s4 = &quot;&quot;
-	Dim TextField$ : TextField = &quot;_text_field&quot;
+	Dim TextField As String : TextField = &quot;_text_field&quot;
 	If fbExperimentalMode() Then
 		title_special = &quot; - &quot; &amp; fsLookUpTerm2(&quot;s_enable_experimental_features&quot;, s1)
 	End If	
@@ -1429,7 +1441,6 @@ Sub AboutAddOn( _
 		.GetControl(&quot;ImageControl2&quot;).model.ImageURL = fsSpeakerLogo()
 		.GetControl(&quot;ImageControl3&quot;).model.helpText = Left(fsGetTextSelection(False, False),99)
 		.GetControl(&quot;ImageControl3&quot;).model.ImageURL = fsSelectionLogo()
-
 		If fbIsWin64Program(&quot;&quot;) Then
 			&apos; 2022 - If the clipboard is empty, then the program
 			&apos; might crash in Windows.
@@ -1491,7 +1502,6 @@ Sub AboutAddOn( _
 			sC = replaceLocalTokensWithStr(sC)
 			sC = replacePublicTokensWithStr(sC)
 			.GetControl(&quot;TextField3&quot;).model.Text = &quot;&quot;&quot;&quot; &amp; sE &amp; &quot;&quot;&quot; &quot; &amp; sC
-			.GetControl(&quot;TextField2&quot;).model.helpText = fsAboutScriptHint(file_spec)
 			If Len(myText) &lt;&gt; 0 Then
 				TextField = myText
 			ElseIf InStr(sA, &quot;(TTS_WSCRIPT_VBS)&quot;) &lt;&gt; 0 Then
@@ -1560,4 +1570,5 @@ Sub AboutAddOn( _
 		.Execute()
 	End With
 End Sub
+
 </script:module>

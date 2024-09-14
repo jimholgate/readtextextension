@@ -8,7 +8,7 @@
         "Python error": "خطأ `python`",
         "Read Text": " اقرأ النص",
         "Stop": "أوقف",
-        "The Piper_TTS client casnnot find a compatible voice model for your language.": " العميل Piper_TTS لا يجد نموذج صوتي متوافق",
+        "The Piper_TTS client cannot find a compatible voice model for your language.": " العميل Piper_TTS لا يجد نموذج صوتي متوافق",
         "The `Piper_TTS` client failed to connect.": "فشل `Piper_TTS` في الاتصال.",
         "`gtts` failed to connect.": "فشل `gtts` في الاتصال.",
         "`qrcode` missing. `pip3 install qrcode[pil]`": "`qrcode` مفقود. `تثبيت pip3 qrcode[pil]`"
