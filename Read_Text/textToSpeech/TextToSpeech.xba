@@ -125,7 +125,6 @@ Private i_CaReadTextExtensionPiperTestResult As Integer
 Private s_CaReadTextExtensionCurrentSessionCookie As String
 Private s_CaReadTextExtensionCurrentAnonymousKey As String
 Private s_CaReadTextExtensionGetOS As String
-Private i_CaReadTextExtensionScriptForge As String
 Private f_CaReadTextExtensionCurrentConfig As Variant
 Private UpdatePoSettingsDone As Integer
 Private mMyTranslationId(0) As Variant

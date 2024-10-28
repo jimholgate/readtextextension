@@ -102,7 +102,7 @@ def picoread(
     _title="",
     _artist="",
     _dimensions="600x600",
-):
+):  # -> bool
     """
     _text - Actual text to speak. The file must be written as utf-8.
     _language - Supported two or four letter language code - defaults to US English
@@ -114,6 +114,7 @@ def picoread(
     _artist - Artist or Author
     _dimensions - Dimensions to scale photo '600x600'
     """
+    picoread = False
     _out_file = ""
     if _language[:2].lower() == "de":
         _lang = "de-DE"
@@ -154,7 +155,9 @@ def picoread(
     if os.path.isfile(_out_file):
         os.remove(_out_file)
     try:
-        if "nt" in os.name.lower():
+        if os.name == "nt":
+            if readtexttools.is_container_instance():
+                return False
             _command = readtexttools.get_nt_path("opt/picosh.exe")
             if "de" in _lang.lower():
                 _os_command = '{0} -v de-DE_gl0 "{1}" "{2}"'.format(
@@ -170,7 +173,7 @@ def picoread(
         if readtexttools.my_os_system(_os_command):
             if os.path.getsize(os.path.realpath(_work_file)) == 0:
                 return False
-            return readtexttools.process_wav_media(
+            return bool(readtexttools.process_wav_media(
                 _title,
                 _work_file,
                 _image,
@@ -179,11 +182,11 @@ def picoread(
                 _visible,
                 _artist,
                 _dimensions,
-            )
+            ))
     except IOError:
         print("I was unable to read!")
         usage()
-        return False
+    return False
 
 
 def main():  # -> NoReturn

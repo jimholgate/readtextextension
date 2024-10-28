@@ -500,7 +500,7 @@ class RhVoiceClass(object):
 
 def main():  # -> None
     """Use rhvoice speech synthesis for supported languages."""
-    if not sys.version_info >= (2, 7) or not os.name in ["posix"]:
+    if not sys.version_info >= (2, 7) or not os.name == "posix":
         print("Your system does not support the rhvoice python tool.")
         usage()
         sys.exit(0)

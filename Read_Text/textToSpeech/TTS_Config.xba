@@ -785,7 +785,6 @@ Function EditJsonPhonemeTable() As String
 		_po_dir = MacOSSpeechAppInfo().json_dir
 		Case &quot;WINDOWS&quot;, &quot;WINDOWS.WINE&quot;, &quot;WINDOWS.NOSCRIPT&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;
 		_po_dir = WindowsSpeechAppInfo().json_dir
-		fbHaveItunes()
 		Case Else
 		_po_dir = &quot;default&quot;
 	End Select

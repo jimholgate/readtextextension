@@ -2361,7 +2361,7 @@ class ImportedMetaData(object):
             test_text = test_text.replace(item, "".join(["\u005C", item]))
         return test_text
 
-    def execute_command(self, a_command="", safer=True):
+    def execute_command(self, a_command="", safer=True):  # -> str
         """
         This is similar to `os.system(a_command)`, but we can get output
         from program commands.
@@ -2415,6 +2415,7 @@ class ImportedMetaData(object):
                     return ""
         except (OSError, subprocess.CalledProcessError):
             return ""
+        return ""
 
     def set_time_meta(self, file_path=""):  # -> str
         """Calculate the number of seconds of a local sound file. Return

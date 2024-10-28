@@ -1,5 +1,5 @@
 {
-    "en-CA_00001":{"g":"Hz","p":"Hertz"},
+    "en-CA_00001":{"g":"Hz.","p":"Hertz"},
     "en-CA_00002":{"g":"Ms.","p":"miz"},
     "en-CA_00003":{"g":"Z?","p":"zed?"},
     "en-CA_00004":{"g":" Z.","p":" zed."},
@@ -77,5 +77,5 @@
     "en-CA_00076":{"g":"Read Text Extension","p":"reed text extension"},
     "en-CA_00077":{"g":"Read text extension","p":"reed text extension"},
     "en-CA_99998":{"g":"$[LOCALE]","p":"en-CA"},
-    "en-CA_99999":{"g":"$[REVISION]","p":"2024-09-15_14:54:37"}
+    "en-CA_99999":{"g":"$[REVISION]","p":"2024-10-28_14:43:37"}
 }

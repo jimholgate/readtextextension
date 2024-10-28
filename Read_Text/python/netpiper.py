@@ -23,7 +23,7 @@ class RhasspyPiperClass(object):
     """On 2023-12-21 synesthesiam (Michael Hansen) committed
     <https://github.com/rhasspy/piper/commit/2fa4c2c13933c1f6b8d87e34d12788ca8e6d073b>
     See: https://raw.githubusercontent.com/rhasspy/piper/master/src/python_run/piper/http_server.py
-    See:https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.md
+    See: https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.md
     See: https://www.youtube.com/watch?v=pLR5AsbCMHs
 
     `(venv)`

@@ -129,7 +129,7 @@ Pied on supported architectures using a series of commands in a `bash` terminal.
 2. **Install the Required Runtime**: Install the required runtime by running:
     
     ```
-    sudo flatpak install flathub org.freedesktop.Platform//22.08
+    sudo flatpak install flathub org.freedesktop.Platform//24.08
     ```
 
 3. **Get the Installer**: Download the most recent Pied Flatpak installer from
@@ -141,6 +141,14 @@ Pied on supported architectures using a series of commands in a `bash` terminal.
     ```
     sudo flatpak install ~/Downloads/com.mikeasoft.pied.flatpak
     ```
+
+### Can I install Pied locally without using `sudo`?
+
+1. Download the latest Pied archive file from the [Pied Github release
+   page](https://github.com/Elleo/pied/releases) (For example, 
+   `pied-0.2.1-x86_64.tar.gz`) and extract it into a local directory.
+2. Run the `pied` program by double-clicking the `pied` program using 
+   the Linux distributions **Files** browser.
 
 Binary release (Linux)
 ----------------------
@@ -424,6 +432,7 @@ class PiperTTSClass(object):
                     f"~/.local/share/pied/common/{_app}/{_app}",
                     f"~/snap/pied/common/{_app}/{_app}",
                     f"~/.var/app/com.mikeasoft.pied/data/pied/piper/piper",
+                    f"~/.local/share/pied/piper/piper",
                     f"/usr/local/lib/piper/{_app}",
                     f"/usr/local/share/piper/{_app}",
                     f"/usr/lib/piper/{_app}",
@@ -473,6 +482,7 @@ class PiperTTSClass(object):
             f"~/{self.app_data}/share/pied/common/models",
             "~/snap/pied/common/models",
             "~/.var/app/com.mikeasoft.pied/data/pied/models",
+            "~/.local/share/pied/models",
             "~/piper-voices",
             "/opt/piper-voices",
             "/opt/piper-tts/piper-voices",
@@ -491,6 +501,7 @@ class PiperTTSClass(object):
             f"~/{self.app_data}/share/pied/piper/espeak-ng-data",
             "~/snap/pied/common/piper/espeak-ng-data",
             "~/.var/app/com.mikeasoft.pied/data/pied/piper/espeak-ng-data",
+            "~/.local/share/pied/piper/espeak-ng-data",
             "~/espeak-ng-data",
             "~/Downloads/espeak-ng-data",
             "/opt/piper-tts/piper-tts/piper/espeak-ng-data",
@@ -796,7 +807,7 @@ not work with the python version.
         [Pied](https://pied.mikeasoft.com/) installer app might not store
         MODEL_CARD files in a standardized directory, so this client tries
         to download them for your reference into the client directory."""
-        if not os.name == "posix" or bool(all_dir_list) == False:
+        if not os.name == "posix" or not bool(all_dir_list):
             return False
         _dest_dir = ""
         retval = False

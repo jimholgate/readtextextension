@@ -2556,6 +2556,7 @@ Function fsPiperPath()
 	Dim alt_paths As Variant : alt_paths = Array(_
 		&quot;/snap/pied/common/piper/piper&quot;, _
 		&quot;/.var/app/com.mikeasoft.pied/data/pied/piper/piper&quot;, _
+		&quot;/.local/share/pied/piper/piper&quot;, _
 	)
 	_apps = Array(&quot;/piper-cli&quot;, &quot;/piper&quot;)
 	On Local Error GoTo fsPiperPathErr

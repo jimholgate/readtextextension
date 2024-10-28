@@ -533,7 +533,7 @@ class ReadFestivalClass(object):
         if not bool(_content):
             # Empty string - nothing to read.
             return True
-        if "nt" in os.name.lower():
+        if os.name == "nt":
             _app = readtexttools.get_nt_path("festival/festival.exe")
             if not bool(_app):
                 return False

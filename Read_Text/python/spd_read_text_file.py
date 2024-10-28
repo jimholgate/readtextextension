@@ -390,7 +390,7 @@ def guess_time(second_string, word_rate, _file_path, _language):  # -> int
         _command = "/usr/bin/espeak"
         if os.path.isfile("/usr/bin/espeak-ng"):
             _command = "/usr/bin/espeak-ng"
-        if "nt" in os.name.lower():
+        if os.name == "nt":
             win_subdir = "eSpeak/command_line/espeak.exe"
             _command = readtexttools.get_nt_path(win_subdir)
         if os.path.isfile(_command):
@@ -2186,7 +2186,7 @@ def main():
                             ),
                         )
         sys.exit(0)
-    elif os.name in ["posix"]:
+    elif os.name == "posix":
         if not USE_SPEECHD:
             print(
                 """The `speechd` library is not compatible with your application
