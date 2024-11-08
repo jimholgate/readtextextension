@@ -126,11 +126,27 @@ Private s_CaReadTextExtensionCurrentSessionCookie As String
 Private s_CaReadTextExtensionCurrentAnonymousKey As String
 Private s_CaReadTextExtensionGetOS As String
 Private f_CaReadTextExtensionCurrentConfig As Variant
+Private i_CheckInitialState As Integer 
 Private UpdatePoSettingsDone As Integer
 Private mMyTranslationId(0) As Variant
 Private mMyTranslationIdPlur(0) As Variant
 Private mMyTranslationStr(0,0) As Variant
 Private Config As Variant
+
+
+Sub CheckInitialState()
+	Dim s_item As String
+	Select Case i_CheckInitialState
+	Case 1
+	&apos; pass
+	Case Else
+	&apos; Perform tasks on initial start
+	For Each s_item in Array(&quot;lock&quot;, &quot;net_speech&quot;, &quot;bat&quot;)
+		fbRemoveFile(fsMyTempLock(s_item))
+	Next
+	i_CheckInitialState = 1
+	End Select
+End Sub
 
 
 Function fsAboutScriptHint(file_spec)
@@ -280,6 +296,7 @@ Sub ReadTextAloud()
 	Dim locklist As Variant : locklist = Array(&quot;lock&quot;)
 	Dim LockItem As String : LockItem = &quot;&quot;
 	Dim bDone As Boolean : bDone = False
+	CheckInitialState
 	Select Case fsTheOsId()
 	Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;
 		locklist = Array(&quot;lock&quot;, &quot;net_speech&quot;)
@@ -343,6 +360,7 @@ End Sub
 
 Sub SetupReadTextAloud
 &apos; Tools - Add-ons - Read Selection...
+	CheckInitialState
 	Select Case getGUIType()
 	Case 1
 	&apos; Some versions of Windows will disable `wscript.exe`. In this case the
@@ -366,8 +384,8 @@ Sub ReadClipBoard
 	s1 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
 	Dim s2$
 	s2 = &quot;&quot;
-	
 	On Error Goto ReadClipBoardErr
+	CheckInitialState
 	ClearWorkingCountryLanguage
 	If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 		resetSpeechDispatcher(True)
