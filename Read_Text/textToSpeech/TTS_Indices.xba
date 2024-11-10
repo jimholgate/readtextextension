@@ -122,25 +122,25 @@
 &apos;&apos; extension looks to read and write temporary files.
 &apos;&apos;
 Option Explicit
-Private pi_anonymous_key_string As Integer
-Private pi_display_info_integer As Integer
-Private pi_external_options_string As Integer
-Private pi_use_external_boolean As Integer
-Private pi_use_html_boolean As Integer
-Private pi_html_string As Integer
-Private pi_use_experimental_boolean As Integer
-Private pi_experimental_options_string As Integer
-Private pi_external_path_string As Integer
-Private pi_experimental_path_string As Integer
-Private pi_use_smart_select_integer As Integer
-Private pi_display_language_string As Integer
+Global pi_anonymous_key_string As Integer
+Global pi_display_info_integer As Integer
+Global pi_external_options_string As Integer
+Global pi_use_external_boolean As Integer
+Global pi_use_html_boolean As Integer
+Global pi_html_string As Integer
+Global pi_use_experimental_boolean As Integer
+Global pi_experimental_options_string As Integer
+Global pi_external_path_string As Integer
+Global pi_experimental_path_string As Integer
+Global pi_use_smart_select_integer As Integer
+Global pi_display_language_string As Integer
 
 
 Function fvExtensionKeys() As Variant
 	&apos; | --------------------------------------|
 	&apos; | This is a lookup table.               |
 	&apos; | --------------------------------------|
-	&apos; | The Indices | Key Strings | Private   |
+	&apos; | The Indices | Key Strings | Global   |
 	&apos; | --------------------------------------|	
 	fvExtensionKeys = Array(_
 		Array(0, &quot;dialog1.anonymous.key.string&quot;, &quot;pi_anonymous_key_string&quot;), _
@@ -206,7 +206,7 @@ Sub DevRepairConfigPrivates()
 		ReDim Preserve DevPrivate(x)
 		DevPrivate(Ubound(DevPrivate)) = Replace(Replace(fsIntegerToKey(x), Prefix, &quot;pi_&quot;), &quot;.&quot;, &quot;_&quot;)
 		Item = DevPrivate(Ubound(DevPrivate))
-		Story = Story &amp; &quot;Private &quot; &amp; Item &amp; &quot; As Integer&quot; &amp; Chr(10)
+		Story = Story &amp; &quot;Global &quot; &amp; Item &amp; &quot; As Integer&quot; &amp; Chr(10)
 	Next
 
 	Story = Story &amp; Join(Array(_
@@ -216,7 +216,7 @@ Sub DevRepairConfigPrivates()
 		&quot;	&apos; | --------------------------------------|&quot;, _
 		&quot;	&apos; | This is a lookup table.               |&quot;, _
 		&quot;	&apos; | --------------------------------------|&quot;, _
-		&quot;	&apos; | The Indices | Key Strings | Private   |&quot;, _
+		&quot;	&apos; | The Indices | Key Strings | Global   |&quot;, _
 		&quot;	&apos; | --------------------------------------|	&quot;, _
 		&quot;	fvExtensionKeys = Array(_&quot; _
 	), Chr(10))

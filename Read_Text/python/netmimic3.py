@@ -544,6 +544,18 @@ a local URL that you specify.
         self.accept_voice.extend(netcommon.spd_voice_list(0, 200, ["female", "male"]))
         for _idiom in [_lang1, _lang2]:
             for _item in self.data:
+                testbase = _item["location"]
+                if testbase.startswith("http"):
+                    # not installed
+                    continue
+                test_onnx = os.path.expanduser(f"{testbase}{os.sep}generator.onnx".replace("/home/mimic3/", "~/"))
+                if os.path.isfile(test_onnx):
+                    if os.path.getsize(os.path.realpath(test_onnx)) < 1000:
+                        # The file is a placeholder, not a real onnx file. On
+                        # <https://huggingface.co/mukowaty/mimic3-voices/>, you can get
+                        # the generator.onnx file by clicking the download symbol to the
+                        # right of "LFS". An onnx file has a size of several MegaBytes.
+                        continue
                 if bool(_item["speakers"]):
                     _voice_ids = _item["speakers"]
                     _speaker_prefix = "#"
