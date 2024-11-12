@@ -499,9 +499,6 @@ Function fvTts_config_createDefaultConfig( _
 			ElseIf Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0 Then
 				Config(pi_external_options_string) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or Len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
-				Config(pi_external_options_string) = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 And fsGetLanguage() = &quot;ja&quot; Then
 				&apos; Japanese
 				Config(pi_external_options_string) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
@@ -510,6 +507,9 @@ Function fvTts_config_createDefaultConfig( _
 				Config(pi_external_options_string) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --rate 100% --voice AUTO0#0 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			ElseIf Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or Len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
+				Config(pi_external_options_string) = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
 			ElseIf fbHaveEspeak() Then
 				Config(pi_external_options_string) = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;

@@ -36,11 +36,13 @@
     "fr_00035":{"g":"c. à ","p":"cuillerée à "},
     "fr_00036":{"g":"a/s de","p":"aux soins de"},
     "fr_00037":{"g":"°F","p":"degrés fahrenheit"},
-    "fr_00038":{"g":"TPS","p":"[te-pe-ezs\u0021]"},
-    "fr_00039":{"g":"©","p":"Tous droits réservés"},
-    "fr_00040":{"g":"SAQ","p":"société des alcools du québec"},
-    "fr_00041":{"g":"Read Text Extension","p":"reed text extension"},
-    "fr_00042":{"g":"Read text extension","p":"reed text extension"},
+    "fr_00038":{"g":" TPS","p":" [te-pe-ezs\u0021]"},
+    "fr_00039":{"g":"Vancouver","p":"vankou-vert"},
+    "fr_00040":{"g":"©","p":"Tous droits réservés"},
+    "fr_00041":{"g":" SAQ","p":" société des alcools du québec"},
+    "fr_00042":{"g":"Read Text Extension","p":"reed text extension"},
+    "fr_00043":{"g":"Read text extension","p":"reed text extension"},
     "fr_99998":{"g":"$[LOCALE]","p":"fr"},
-    "fr_99999":{"g":"$[REVISION]","p":"2024-09-09_11:20:19"}
+    "fr_99999":{"g":"$[REVISION]","p":"2024-11-12_14:34:31"}
 }
+
