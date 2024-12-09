@@ -397,11 +397,11 @@ msgid "Default"
 msgstr "Standaard"
 
 # src/orca/orca-setup.ui:1047
-msgid "Volume:"
+msgid "Volume"
 msgstr "Volume"
 
 # src/orca/orca-setup.ui:1095
-msgid "Pitch:"
+msgid "Pitch"
 msgstr "Hauteur"
 
 # src/orca/orca-setup.ui:1126
