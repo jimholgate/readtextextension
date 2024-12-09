@@ -351,3 +351,30 @@ msgstr "Skipta út"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Finna"
+
+# src/orca/guilabels.py:236
+msgid "Default"
+msgstr "Sjálfgefið"
+
+# src/orca/guilabels.py:671
+# src/orca/orca-setup.ui.h:1
+# src/orca/orca-setup.ui.h:37
+msgid "Volume"
+msgstr "Hljóðstyrkur"
+
+# src/orca/orca-setup.ui.h:38
+msgid "Pitch"
+msgstr "Tónhæð"
+
+# src/orca/orca-setup.ui.h:39
+msgid "Rate"
+msgstr "Hraði"
+
+# src/orca/orca-setup.ui.h:40
+msgid "Person"
+msgstr "Einstaklingur"
+
+# src/orca/orca-setup.ui.h:54
+msgid "Voice"
+msgstr "Rödd"
+

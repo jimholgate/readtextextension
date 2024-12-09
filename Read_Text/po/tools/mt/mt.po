@@ -323,18 +323,47 @@ msgctxt ""
 msgid "Reset"
 msgstr "Irrisettja"
 
-# help Enable experimental features
+#: help Enable experimental features
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Attivazzjoni ta'karatteristiċi sperimentali"
 
 #: sc/inc/globstr.hrc:53
-msgctxt "STR_UNDO_REPLACE"
+msgctxt "STRUNDOREPLACE"
 msgid "Replace"
 msgstr "Ibdel"
 
 #:
-msgctxt "STR_UNDO_REPLACE"
+msgctxt "STRUNDOREPLACE"
 msgid "Find"
 msgstr "Sib"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Default"
+
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Volum"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Ton"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Rata"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Persuna"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Lingwa"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Leħen"
+
 

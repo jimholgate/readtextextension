@@ -357,3 +357,34 @@ msgstr "Aizstāt"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Atrast"
+
+# src/orca/guilabels.py:275
+msgid "Default"
+msgstr "Noklusējuma"
+
+# src/orca/guilabels.py:851
+# src/orca/orca-setup.ui:29
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Skaļums"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Placis"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Temps"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Persona"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Valoda"
+
+# src/orca/orca-setup.ui:1420
+msgid "Voice"
+msgstr "Balss"
+

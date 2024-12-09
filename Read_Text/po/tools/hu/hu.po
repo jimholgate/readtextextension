@@ -356,3 +356,33 @@ msgstr "Csere"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Keresés"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Alapértelmezett"
+
+# src/orca/guilabels.py:911
+# src/orca/orca-setup.ui:29
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Hangerő"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Hangmagasság"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Sebesség"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Személy"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Nyelv"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Hang"

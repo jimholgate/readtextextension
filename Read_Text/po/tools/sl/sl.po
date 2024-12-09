@@ -357,3 +357,33 @@ msgstr "Zamenjaj"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Najdi"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Privzeto"
+
+# src/orca/guilabels.py:911
+# src/orca/orca-setup.ui:29
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Glasnost"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Višina"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Hitrost"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Oseba"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Jezik"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Glas"

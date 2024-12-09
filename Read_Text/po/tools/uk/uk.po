@@ -357,3 +357,33 @@ msgstr "Замінити"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Знайти"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Типово"
+
+# src/orca/guilabels.py:907
+# src/orca/orca-setup.ui:29
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Гучність"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Висота тону"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Темп"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Особа"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Мова"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Голос"

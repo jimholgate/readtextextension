@@ -357,3 +357,31 @@ msgstr "Ionadaigh"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Faigh"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Réamhshocrú"
+
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Toirt"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Tonn"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Ráta"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Duine"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Teanga"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Guth"

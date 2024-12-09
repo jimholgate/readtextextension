@@ -362,3 +362,33 @@ msgstr "Înlocuiește"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Găsi"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Implicit"
+
+# src/orca/guilabels.py:907
+# src/orca/orca-setup.ui:29
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Volum"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Înălțime"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Rată"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Persoană"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Limbă"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Voce"

@@ -391,3 +391,25 @@ msgstr "실험 기능의 활성화"
 msgctxt "STR_UNDO_REPLACE"
 msgid "Replace"
 msgstr "바꾸기"
+
+# ../src/orca/orcaguiprefs.py:429
+msgid "Default"
+msgstr "기본값"
+
+# ../src/orca/orca-setup.glade.h:113
+msgid "Pitch"
+msgstr "음 높이"
+
+# ../src/orca/orca-setup.glade.h:147
+msgid "Volume"
+msgstr "볼륨"
+
+# ../src/orca/orca-setup.glade.h:167
+msgid "Person"
+msgstr "사람"
+
+# ../src/orca/orca-setup.glade.h:170
+msgid "Rate"
+msgstr "속도"
+
+

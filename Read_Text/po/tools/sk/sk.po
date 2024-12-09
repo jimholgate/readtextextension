@@ -356,3 +356,30 @@ msgstr "Nahradiť"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Nájsť"
+
+
+# ../src/orca/guilabels.py:260
+msgid "Default"
+msgstr "Predvolené"
+
+# ../src/orca/guilabels.py:700
+# ../src/orca/orca-setup.ui.h:1
+# ../src/orca/orca-setup.ui.h:69
+msgid "Volume"
+msgstr "Hlasitosť"
+
+# ../src/orca/orca-setup.ui.h:70
+msgid "Pitch"
+msgstr "Výška"
+
+# ../src/orca/orca-setup.ui.h:71
+msgid "Rate"
+msgstr "Tempo"
+
+# ../src/orca/orca-setup.ui.h:72
+msgid "Person"
+msgstr "Osoba"
+
+# ../src/orca/orca-setup.ui.h:88
+msgid "Voice"
+msgstr "Hlas"

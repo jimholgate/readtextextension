@@ -181,3 +181,28 @@ msgstr "बदलें"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "खोजो"
+
+# ../src/orca/orcaguiprefs.py:680
+msgid "Default"
+msgstr "डिफ़ॉल्ट"
+
+# ../src/orca/orca-setup.ui.h:1
+# ../src/orca/orca-setup.ui.h:27
+msgid "Volume"
+msgstr "आयतन"
+
+# ../src/orca/orca-setup.ui.h:28
+msgid "Pitch"
+msgstr "पिच"
+
+# ../src/orca/orca-setup.ui.h:29
+msgid "Rate"
+msgstr "दरः"
+
+# ../src/orca/orca-setup.ui.h:30
+msgid "Person"
+msgstr "व्यक्ति"
+
+# ../src/orca/orca-setup.ui.h:44
+msgid "Voice"
+msgstr "आवाज़"

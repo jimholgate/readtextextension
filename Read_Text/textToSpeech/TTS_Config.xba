@@ -845,7 +845,7 @@ Function EditJsonPhonemeTable() As String
 	If Instr(_json_display, &quot;{&quot;) = 0 Or Instr(_json_display, &quot;}&quot;) = 0 Then
 		_json_display = fsDefaultJson(_select_lang)
 	End If
-	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
+	fbTestDialogLoaded(&quot;textToSpeech&quot;)
 	is_unique = Instr(_json_display, &quot;{&quot;&quot;g&quot;&quot;:&quot;&quot;&quot; &amp; _grapheme &amp; &quot;&quot;&quot;,&quot;&quot;&quot;) = 0
 	If Instr(_json_display, CR) = 0 and Instr(_json_display, Chr(10)) &lt;&gt; 0 Then
 		CR = Chr(10)
@@ -1061,7 +1061,7 @@ Sub ConfigureReadTextAloud()
 	&apos; Open up the dialog
 	CheckUnixSpeech()
 	ClearWorkingCountryLanguage()
-	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
+	fbTestDialogLoaded(&quot;textToSpeech&quot;)
 	f_dlgSpeechSetup = CreateUnoDialog(DialogLibraries.textToSpeech.Dialog1)
 	Select Case fsTheOsId()
 		Case &quot;MACOS&quot;
@@ -1414,7 +1414,7 @@ Sub AboutAddOn( _
 		title_special = &quot; - &quot; &amp; fsLookUpTerm2(&quot;s_enable_experimental_features&quot;, s1)
 	End If	
 	&apos; Open up the dialog
-	DialogLibraries.LoadLibrary(&quot;textToSpeech&quot;)
+	fbTestDialogLoaded(&quot;textToSpeech&quot;)
 	f_dlgAboutReadSelection = CreateUnoDialog(DialogLibraries.textToSpeech.Dialog3)
 	With f_dlgAboutReadSelection
 		&apos;Update the labels And button with your language

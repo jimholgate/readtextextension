@@ -211,7 +211,7 @@ except (AttributeError, ImportError, SyntaxError):
 USE_SPEECHD = True
 try:
     import speechd
-except ImportError:
+except (ImportError, ModuleNotFoundError):
     if readtexttools.using_container(False):
         print(
             """

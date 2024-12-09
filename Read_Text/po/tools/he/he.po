@@ -181,3 +181,34 @@ msgstr "החלפה"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "למצוא"
+
+# src/orca/guilabels.py:275
+msgid "Default"
+msgstr "בררת מחדל"
+
+# src/orca/guilabels.py:851
+# src/orca/orca-setup.ui:29
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "עוצמת קול"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "גובה צליל"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "קצב"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "אישיות"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "שפה"
+
+# src/orca/orca-setup.ui:1420
+msgid "Voice"
+msgstr "קול"
+

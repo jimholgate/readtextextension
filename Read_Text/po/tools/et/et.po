@@ -356,3 +356,31 @@ msgstr "Asenda"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Otsitav"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Vaikimisi"
+
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Helitugevus"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Kõrgus"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Kiirus"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Isik"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Keel"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Hääl"

@@ -348,7 +348,7 @@ msgctxt "tocindexpage|open"
 msgid "Open"
 msgstr "Otwórz"
 
-# help Enable experimental features
+#: help Enable experimental features
 msgctxt ""
 msgid "Enable experimental features"
 msgstr "Włącz funkcje eksperymentalne"
@@ -362,4 +362,35 @@ msgstr "Zamień"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Znajdź"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Domyślne"
+
+# src/orca/guilabels.py:907
+# src/orca/orca-setup.ui:29
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Głośność"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Wysokość"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Tempo"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Osoba"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Język"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Głos"
+
 

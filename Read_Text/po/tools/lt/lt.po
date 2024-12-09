@@ -357,3 +357,33 @@ msgstr "Pakeisti"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Rasti"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Numatytasis"
+
+# src/orca/guilabels.py:907
+# src/orca/orca-setup.ui:29
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Garsumas"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Aukštumas"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Dažnis"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Asmuo"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Kalba"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Balsas"

@@ -240,6 +240,18 @@ Function fbReadOnlyCode() As Boolean
 End Function
 
 
+Function fbTestDialogLoaded(_library As String) As Boolean
+	fbTestDialogLoaded = False 
+	On Error GoTo fbTestDialogLoadedErr
+	If Not GlobalScope.DialogLibraries.isLibraryLoaded(_library) Then
+		GlobalScope.DialogLibraries.LoadLibrary(_Library)
+	End If
+		fbTestDialogLoaded = True
+	Exit Function
+	fbTestDialogLoadedErr:
+End Function
+
+
 Function fbTestLibraryLoaded(_library As String) As Boolean
 	fbTestLibraryLoaded = False 
 	On Error GoTo fbTestLibraryLoadedErr

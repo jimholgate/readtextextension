@@ -356,3 +356,31 @@ msgstr "取代"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "尋找"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "預設"
+
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "音量"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "音調"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "速率"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "人物"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "語言"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "聲音"

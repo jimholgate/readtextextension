@@ -328,7 +328,7 @@ msgid "Enable experimental features"
 msgstr "Pag-activate ng mga pang-eksperimentong tampok"
 
 #: sd/inc/strings.hrc:31
-msgctxt "STR_UNDO_REPLACE"
+msgctxt "STRUNDOREPLACE"
 msgid "Replace"
 msgstr "Palitan"
 
@@ -336,3 +336,31 @@ msgstr "Palitan"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Hanapin"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Default"
+
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Dami"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Tono"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Bilis"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Tao"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Wika"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Boses"

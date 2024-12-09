@@ -357,7 +357,27 @@ msgctxt "findreplace|find"
 msgid "Find"
 msgstr "検索"
 
-#: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
-msgctxt "findreplace|find"
-msgid "Find"
-msgstr "찾다"
+# ../src/orca/orcaguiprefs.py:677
+msgid "Default"
+msgstr "デフォルト"
+
+# ../src/orca/orca-setup.ui.h:1
+# ../src/orca/orca-setup.ui.h:30
+msgid "Volume"
+msgstr "音量"
+
+# ../src/orca/orca-setup.ui.h:31
+msgid "Pitch"
+msgstr "音声の高さ"
+
+# ../src/orca/orca-setup.ui.h:32
+msgid "Rate"
+msgstr "読み上げの速度"
+
+# ../src/orca/orca-setup.ui.h:33
+msgid "Person"
+msgstr "音声の人物"
+
+# ../src/orca/orca-setup.ui.h:47
+msgid "Voice"
+msgstr "声"

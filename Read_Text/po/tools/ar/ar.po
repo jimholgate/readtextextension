@@ -56,3 +56,28 @@ msgstr "استبدل"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "جِد"
+
+# ../src/orca/orcaguiprefs.py:676
+msgid "Default"
+msgstr "افتراضي"
+
+# ../src/orca/orca-setup.ui.h:1
+# ../src/orca/orca-setup.ui.h:27
+msgid "Volume"
+msgstr "شدة الصوت "
+
+# ../src/orca/orca-setup.ui.h:28
+msgid "Pitch"
+msgstr "درجة"
+
+# ../src/orca/orca-setup.ui.h:29
+msgid "Rate"
+msgstr "معدل"
+
+# ../src/orca/orca-setup.ui.h:30
+msgid "Person"
+msgstr "شخص"
+
+# ../src/orca/orca-setup.ui.h:44
+msgid "Voice"
+msgstr "الصوت"

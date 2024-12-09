@@ -409,3 +409,33 @@ msgstr "Ersetzen"
 msgctxt "findreplace|find"
 msgid "Find"
 msgstr "Suchen"
+
+# src/orca/guilabels.py:331
+msgid "Default"
+msgstr "Vorgabe"
+
+# src/orca/guilabels.py:907
+# src/orca/orca-setup.ui:29
+# src/orca/orca-setup.ui:1047
+msgid "Volume"
+msgstr "Lautstärke"
+
+# src/orca/orca-setup.ui:1095
+msgid "Pitch"
+msgstr "Tonhöhe"
+
+# src/orca/orca-setup.ui:1126
+msgid "Rate"
+msgstr "Geschwindigkeit"
+
+# src/orca/orca-setup.ui:1152
+msgid "Person"
+msgstr "Person"
+
+# src/orca/orca-setup.ui:1178
+msgid "Language"
+msgstr "Sprache"
+
+# src/orca/orca-setup.ui:1404
+msgid "Voice"
+msgstr "Stimme"
