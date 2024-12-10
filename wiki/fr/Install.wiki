@@ -2,7 +2,6 @@
 
 = Installation =
 
-* Obtenez la version la plus récente de l’extension au site [https://extensions.openoffice.org/en/project/read-text OpenOffice.org]
-  ou le site [https://extensions.libreoffice.org/en/extensions/show/read-text LibreOffice.org]
+* Obtenez la version la plus récente de l’extension au site [https://extensions.openoffice.org/en/project/read-text OpenOffice.org] ou le site [https://extensions.libreoffice.org/en/extensions/show/read-text LibreOffice.org]
 * Ouvrez l'extension. Approuver la licence. 
 * Redémarrez LibreOffice ou OpenOffice.org
