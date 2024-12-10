@@ -63,7 +63,7 @@ class OpenTTSClass(object):
             "https://github.com/synesthesiam/opentts#open-text-to-speech-server"
         )
         self.voice = ""
-        self.voice_id = ""  # larynx and  glow-speak use AI.
+        self.voice_id = ""  # Larynx and  glow-speak use AI.
         # This subset of models omits espeak and festival.
         # In June, 2023, the OpenTTS speech engines that support languages
         # other than English include nanotts and marytts.

@@ -418,7 +418,7 @@ There was an error loading the `{0}` spacy pipeline:
         return True
 
     def rate_to_rhasspy_length_scale(self, _speech_rate=160):  # -> list
-        """Look up the Larynx or Mimic3 length scale appropriate for requested
+        """Look up a Rhasspy or Mimic3 length scale appropriate for requested
         `_speech rate`. Rates have discreet steps. In English, a common speech
         rate is about 160 words per minute, but individuals vary widely. Some
         voices do not sound good with an altered rate."""

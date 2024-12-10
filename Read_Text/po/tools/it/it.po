@@ -381,7 +381,7 @@ msgctxt ""
 "[mimic3-server](https://github.com/rhasspy/mimic3)."
 msgstr ""
 "Aiuto per snap? Read Text utilizza uno strumento vocale come "
-"[larynx-server] (https://github.com/rhasspy/larynx)"
+"[mimic3-server](https://github.com/rhasspy/mimic3)."
 
 #: sw/inc/strings.hrc:30 (it)
 msgctxt "STR_RESET_LABEL"

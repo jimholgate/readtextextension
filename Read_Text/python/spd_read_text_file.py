@@ -2190,7 +2190,7 @@ def main():
         if not USE_SPEECHD:
             print(
                 """The `speechd` library is not compatible with your application
-or platform. Try a networked speech tool like `larynx-server` or `docker-marytts`."""
+or platform. Try a networked speech tool like mimic-server` or `docker-marytts`."""
             )
             if i_rate == 0:
                 _word_rate = 160
