@@ -6,33 +6,37 @@
 
 Lorsque vous avez besoin de ces valeurs variables dans une commande ou dans un script vous pouvez utiliser une option appropriée. La valeur entre parenthèses serait remplacé par la chaîne approprié.
 
-* La date actuelle (DATE) 
-* Jour de la semaine (WEEKDAY) 
-* Heure actuelle (TIME) 
-* Heure actuelle reformaté pour que vous puissiez l'utiliser dans un fichier (NOW) 
-* Nom de fichier temporaire contenant la sélection de texte (TMP) 
-* Nom de l'auteur (AUTHOR) 
-* Nom du document (TITLE) 
-* Gallerie de son (SOUND_GALLERY) 
-* Un script Windows Visual Basic qui utilise la synthese vocale du système (TTS_WSCRIPT_VBS)
-* Un script Python qui encode le texte sélectionné dans un image PNG pour les appareils mobiles (CREATE_QR_LABEL_PY) 
-* Un script Python qui exécute une commande du système d'exploitation (OS_PY) 
-* Un script Python qui utilise espeak (ESPEAK_READ_TEXT_PY) 
-* Un script Python qui utilise festival text2wave (FESTIVAL_READ_TEXT_PY) 
-* Un script Python qui utilise pico (PICO_READ_TEXT_PY) 
-* Un script Python qui utilise speech-dispatcher (SPD_READ_TEXT_PY) 
-* Directoire de travail (HOME) 
-* Code langue de l'application - en pour l'anglais; fr pour le français, etc (LANGUAGE_CODE) 
-* Code national de l'application - CA pour Canada; FR pour France, etc. (COUNTRY_CODE) 
-* Code régional de l'application - fr-CA pour Canada; fr-FR pour France, etc. (LANGUAGE_COUNTRY_CODE) 
-* Code langue de la sélection - en pour l'anglais; fr pour le français, etc. (SELECTION_LANGUAGE_CODE) 
-* Code national de la sélection - CA pour Canada; FR pour France, etc. (SELECTION_COUNTRY_CODE) 
-* Code régional de la sélection - fr-CA pour Canada; fr-FR pour France, etc. (SELECTION_LANGUAGE_COUNTRY_CODE) 
-* Le premier mot du texte sélectionné codées pour URL (OOO_WEBTEXTDEFINITION)
-* Les 99 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXTSMALL) 
-* Les 249 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT250) 
-* Les 999 premières lettres du texte sélectionné codées pour URL (OOO_WEBTEXT) 
-* Les 9999 premiers caractères du texte sélectionné codées pour URL (OOO_WEBTEXTBIG)
-* Le témoin de session (SESSION_ID)
-* Un identifiant à usage unique (UNIQUE_ID)
-* Un identifiant anonyme pour l'utilisateur actuel (USER_ID)
+* '''(AUTHOR)''' : Nom de l’auteur
+* '''(COUNTRY_CODE)''' : Votre pays
+* '''(CREATE_QR_LABEL_PY)''' : Un script Python pour créer un code QR
+* '''(DATE)''' : La date actuelle
+* '''(ESPEAK_READ_TEXT_PY)''' : Un script Python
+* '''(FESTIVAL_READ_TEXT_PY)''' : Un script Python
+* '''(HOME)''' : Votre répertoire d’accueil
+* '''(LANGUAGE_CODE)''' : Votre code de langue
+* '''(LANGUAGE_COUNTRY_CODE)''' : Votre pays et langue
+* '''(NETWORK_READ_TEXT_PY)''' : Un script Python
+* '''(NOW)''' : Heure actuelle reformatée pour que vous puissiez l’utiliser dans un nom de fichier
+* '''(OOO_WEBTEXT)''' : Les premières 9999 lettres du texte sélectionné encodées dans une URL
+* '''(OOO_WEBTEXT250)''' : Les premières 249 lettres du texte sélectionné encodées dans une URL
+* '''(OOO_WEBTEXTBIG)''' : Les premières 9999 lettres du texte sélectionné encodées dans une URL
+* '''(OOO_WEBTEXTSMALL)''' : Les premières 99 lettres du texte sélectionné encodées dans une URL
+* '''(OPENJTALK_READ_TEXT_PY)''' : Un programme Python * `(Japonais)
+* '''(PICO_READ_TEXT_PY)''' : Un script Python
+* '''(PIPER_READ_TEXT_PY)''' : Un script Python
+* '''(RESET_ALL)''' : Retour aux paramètres par défaut
+* '''(RHVOICE_READ_TEXT_PY)''' : Un script Python
+* '''(SAY_APPLESCRIPT)''' : Un script de synthèse vocale pour la plateforme MacOS
+* '''(SELECTION_COUNTRY_CODE)''' : Le pays du texte sélectionné
+* '''(SELECTION_LANGUAGE_CODE)''' : La langue du texte sélectionné
+* '''(SELECTION_LANGUAGE_COUNTRY_CODE)''' : Le code régional du texte sélectionné
+* '''(SESSION_ID)''' : L’identifiant de session
+* '''(SOUND_GALLERY)''' : Chemin d’accès au fichier de la galerie de sons de l’application
+* '''(SPD_READ_TEXT_PY)''' : Un script de synthèse vocale pour la plateforme Posix
+* '''(TIME)''' : Heure parlée actuelle dans la région
+* '''(TITLE)''' : Nom du document
+* '''(TMP)''' : Chemin d’accès complet et nom de fichier temporaire contenant le texte sélectionné
+* '''(TTS_WSCRIPT_VBS)''' : Un script de synthèse vocale pour la plateforme Windows
+* '''(UNIQUE_ID)''' : Un identifiant utilisateur à usage unique
+* '''(USER_ID)''' : Un identifiant utilisateur anonyme
+* '''(WEEKDAY)''' : Jour actuel de la semaine tel qu’il est prononcé dans la région

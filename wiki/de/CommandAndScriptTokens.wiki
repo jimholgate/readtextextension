@@ -6,33 +6,37 @@
 
 Verwenden Sie das passende Token, wenn Sie diese Werte in einem Befehl oder Script benötigen. Bei Ausführung wird der Wert in Klammern durch die jeweils benötigte Zeichenkette ersetzt.
 
-* Aktuelles Datum in Landessprache (DATE) 
-* Current Aktueller Wochentag in Landessprache (WEEKDAY) 
-* Aktuelle Uhrzeit in Landessprache (TIME) 
-* Aktuelle Uhrzeit, umformatiert zur Nutzung im Dateinamen (NOW) 
-* Vollständige Pfadangabe und temporäre Datei mit markiertem Text (TMP) 
-* Name des Verfassers (AUTHOR) 
-* Name des Dokuments (TITLE)
-* Pfad zur Sound-Galerie (SOUND_GALLERY) 
-* Pfad zu einem Python-Script, das Text als PNG-Bild für Mobilgeräte codiert (CREATE_QR_LABEL_PY) 
-* Pfad zu einem Python-Script, das einen Betriebssystem-Shell-Befehl ausführt (OS_PY) 
-* Pfad zu einem Windows Script für das Vorlesen mittels Sprachausgabe (TTS_WSCRIPT_VBS)
-* Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe (ESPEAK_READ_TEXT_PY) 
-* Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe (FESTIVAL_READ_TEXT_PY) 
-* Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe (PICO_READ_TEXT_PY) 
-* Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe (SPD_READ_TEXT_PY) 
-* Arbeitsverzeichnis - Dokumente, Eigene Dokumente o.ä. (HOME) 
-* Anwendungs-Sprachcode - de für Deutsch, fr für Französisch usw. (LANGUAGE_CODE) 
-* Anwendungs-Ländercode - DE für Deutsch, FR für Französisch, usw. (COUNTRY_CODE) 
-* Anwendungs-Regionalcode- fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw. (LANGUAGE_COUNTRY_CODE) 
-* Sprachcode-Auswahl - de für Deutsch, fr für Französisch usw. (SELECTION_LANGUAGE_CODE) 
-* Ländercode.Auswahl - DE für Deutsch, FR für Französisch, usw. (SELECTION_COUNTRY_CODE) 
-* Regionalcode-Auswahl - fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw. (SELECTION_LANGUAGE_COUNTRY_CODE) 
-* Das erste Wort des markierten Textes, für die URL codiert (OOO_WEBTEXTDEFINITION)
-* Die ersten 99 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXTSMALL) 
-* Die ersten 249 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXT250) 
-* Die ersten 999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXT) 
-* Die ersten 9999 Buchstaben des markierten Textes, für die URL codiert (OOO_WEBTEXTBIG)
-* Das Sitzungscookie (SESSION_ID)
-* Ein Einmal-Cookie (UNIQUE_ID)
-* Eine anonyme Kennung für den aktuellen Benutzer (USER_ID)
+* '''(AUTHOR)''': Name des Verfassers
+* '''(COUNTRY_CODE)''': Anwendungs-Ländercode - DE für Deutsch, FR für Französisch, usw.
+* '''(CREATE_QR_LABEL_PY)''': Pfad zu einem Python-Script, das Text als PNG-Bild für Mobilgeräte codiert
+* '''(DATE)''': Aktuelles Datum in Landessprache
+* '''(ESPEAK_READ_TEXT_PY)''': Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe
+* '''(FESTIVAL_READ_TEXT_PY)''': Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe
+* '''(HOME)''': Arbeitsverzeichnis - Dokumente, Eigene Dokumente o.ä.
+* '''(LANGUAGE_CODE)''': Anwendungs-Sprachcode - de für Deutsch, fr für Französisch usw.
+* '''(LANGUAGE_COUNTRY_CODE)''': Anwendungs-Regionalcode- fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw.
+* '''(NETWORK_READ_TEXT_PY)''': Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe
+* '''(NOW)''': Aktuelle Uhrzeit, umformatiert zur Nutzung im Dateinamen
+* '''(OOO_WEBTEXT)''': Die ersten 999 Buchstaben des markierten Textes, für die URL codiert
+* '''(OOO_WEBTEXT250)''': Die ersten 249 Buchstaben des markierten Textes, für die URL codiert
+* '''(OOO_WEBTEXTBIG)''': Die ersten 9999 Buchstaben des markierten Textes, für die URL codiert
+* '''(OOO_WEBTEXTSMALL)''': Die ersten 99 Buchstaben des markierten Textes, für die URL codiert
+* '''(OPENJTALK_READ_TEXT_PY)''': Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe
+* '''(PICO_READ_TEXT_PY)''': Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe
+* '''(PIPER_READ_TEXT_PY)''': Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe
+* '''(RESET_ALL)''': Alle Einstellungen zurücksetzen
+* '''(RHVOICE_READ_TEXT_PY)''': Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe
+* '''(SAY_APPLESCRIPT)''': Pfad zu einem Apple-Script für das Vorlesen mittels Sprachausgabe
+* '''(SELECTION_COUNTRY_CODE)''': Ländercode.Auswahl - DE für Deutsch, FR für Französisch, usw.
+* '''(SELECTION_LANGUAGE_CODE)''': Sprachcode-Auswahl - de für Deutsch, fr für Französisch usw.
+* '''(SELECTION_LANGUAGE_COUNTRY_CODE)''': Regionalcode-Auswahl - fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw.
+* '''(SESSION_ID)''': Das Sitzungscookie
+* '''(SOUND_GALLERY)''': Pfad zur Sound-Galerie
+* '''(SPD_READ_TEXT_PY)''': Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe
+* '''(TIME)''': Aktuelle Uhrzeit in Landessprache
+* '''(TITLE)''': Name des Dokuments
+* '''(TMP)''': Vollständige Pfadangabe und temporäre Datei mit markiertem Text
+* '''(UNIQUE_ID)''': Ein Einmal-Cookie
+* '''(USER_ID)''': Eine anonyme Kennung für den aktuellen Benutzer
+* '''(TTS_WSCRIPT_VBS)''': Pfad zu einem Windows-Script für das Vorlesen mittels Sprachausgabe
+* '''(WEEKDAY)''': Aktueller Wochentag, wie er in der Region gesprochen wird

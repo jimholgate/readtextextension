@@ -6,33 +6,37 @@
 
 Jos komentojonoissa tai parametreissä tarvitaan muuttujia, tulee käyttää sopivaa merkkijonoa. Suorituksen aikana suluissa esitetty arvo korvataan tarvittavalla todellisella arvolla.
 
-* Nykyinen päivämäärä aluekohtaisessa esitysmuodossa (DATE) 
-* Nykyinen viikonpäivä aluekohtaisessa esitysmuodossa (WEEKDAY) 
-* Nykyinen aika aluekohtaisessa esitysmuodossa (TIME) 
-* Nykyinen aika muodossa joka kelpaa lisättäväksi tiedostonimeen (NOW) 
-* Valitun tekstin sisältävä tilapäinen tiedosto polkuineen (TMP) 
-* Tekijän nimi (AUTHOR) 
-* Asiakirjan nimi (TITLE) 
-* Ohjelman LibreOffice äänikirjaston polku (SOUND_GALLERY) 
-* PNG-kuvien koodaamisessa mobiilisovelluksille käytettävän Python-komentojonon polku (CREATE_QR_LABEL_PY) 
-* Järjestelmän komentotulkin suorittamiseen käytettävän Python-komentojonon polku (OS_PY) 
-* Espeak-sovelluksen suorittamiseen käytettävän Python-komentojonon polku (ESPEAK_READ_TEXT_PY) 
-* Festival-sovelluksen suorittamiseen käytettävän Python-komentojonon polku (FESTIVAL_READ_TEXT_PY) 
-* Pico-sovelluksen suorittamiseen käytettävän Python-komentojonon polku (PICO_READ_TEXT_PY) 
-* Speech-dispatcher -sovelluksen suorittamiseen käytettävän Python-komentojonon polku (SPD_READ_TEXT_PY) 
-* Työkansio. Käytetään myös nimiä Tiedostot, Omat tiedostot tai kotikansio (HOME) 
-* Sovelluksen kielikoodi: en = englanti, fi = suomi jne. (LANGUAGE_CODE) 
-* Sovelluksen maakoodi: US = U.S.A, FI = Suomi jne. (COUNTRY_CODE) 
-* Sovelluksen aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne. (LANGUAGE_COUNTRY_CODE) 
-* Valinnan kielikoodi: en = englanti, fi = suomi jne. (SELECTION_LANGUAGE_CODE) 
-* Valinnan maakoodi: US = U.S.A, FI = Suomi jne. (SELECTION_COUNTRY_CODE) 
-* Valinnan aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne. (SELECTION_LANGUAGE_COUNTRY_CODE) 
-* Ensimmäinen sana  (OOO_WEBDEFINITION) 
-* Valitun tekstin 99 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTSMALL) 
-* Valitun tekstin 249 lensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT250) 
-* Valitun tekstin 999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXT) 
-* Valitun tekstin 9999 ensimmäistä merkkiä koodattuna URL-osoitteeksi (OOO_WEBTEXTBIG)
-* Istuntoeväste (SESSION_ID)
-* Kertakäyttöinen eväste (UNIQUE_ID)
-* Nykyisen käyttäjän anonyymi tunniste (USER_ID)
-
+* '''(AUTHOR)''' - Tekijän nimi
+* '''(COUNTRY_CODE)''' - Sovelluksen maakoodi: US = U.S.A, FI = Suomi jne.
+* '''(CREATE_QR_LABEL_PY)''' - PNG-kuvien koodaamisessa mobiilisovelluksille käytettävän Python-komentojonon polku
+* '''(DATE)''' - Nykyinen päivämäärä aluekohtaisessa esitysmuodossa
+* '''(ESPEAK_READ_TEXT_PY)''' - Espeak-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+* '''(FESTIVAL_READ_TEXT_PY)''' - Festival-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+* '''(HOME)''' - Työkansio. Käytetään myös nimiä Tiedostot, Omat tiedostot tai kotikansio
+* '''(LANGUAGE_CODE)''' - Sovelluksen kielikoodi: en = englanti, fi = suomi jne.
+* '''(LANGUAGE_COUNTRY_CODE)''' - Sovelluksen aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne.
+* '''(NETWORK_READ_TEXT_PY)''' - Verkkoasetukset-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+* '''(NOW)''' - Nykyinen aika muodossa joka kelpaa lisättäväksi tiedostonimeen
+* '''(OOO_WEBTEXT)''' - Valitun tekstin 999 ensimmäistä merkkiä koodattuna URL-osoitteeksi
+* '''(OOO_WEBTEXT250)''' - Valitun tekstin 249 lensimmäistä merkkiä koodattuna URL-osoitteeksi
+* '''(OOO_WEBTEXTBIG)''' - Valitun tekstin 9999 ensimmäistä merkkiä koodattuna URL-osoitteeksi
+* '''(OOO_WEBTEXTSMALL)''' - Valitun tekstin 99 ensimmäistä merkkiä koodattuna URL-osoitteeksi
+* '''(OPENJTALK_READ_TEXT_PY)''' - Japanin kieli-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+* '''(PICO_READ_TEXT_PY)''' - Pico-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+* '''(PIPER_READ_TEXT_PY)''' - Piper-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+* '''(RESET_ALL)''' - Nollaa kaikki asetukset
+* '''(RHVOICE_READ_TEXT_PY)''' - Rhvoice-sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+* '''(SAY_APPLESCRIPT)''' - Apple-sovelluksen suorittamiseen käytettävän Osascript-komentojonon polku
+* '''(SELECTION_COUNTRY_CODE)''' - Valinnan maakoodi: US = U.S.A, FI = Suomi jne.
+* '''(SELECTION_LANGUAGE_CODE)''' - Valinnan kielikoodi: en = englanti, fi = suomi jne.
+* '''(SELECTION_LANGUAGE_COUNTRY_CODE)''' - Valinnan aluekoodi: fr-CA = Kanadan ranska, pt-BR = Brasilian portugali jne.
+* '''(SESSION_ID)''' - Istuntoeväste
+* '''(SOUND_GALLERY)''' - Ohjelman %PRODUCTNAME äänikirjaston polku
+* '''(SPD_READ_TEXT_PY)''' - Speech-dispatcher -sovelluksen suorittamiseen käytettävän Python-komentojonon polku
+* '''(TIME)''' - Nykyinen aika aluekohtaisessa esitysmuodossa
+* '''(TITLE)''' - Asiakirjan nimi
+* '''(TMP)''' - Valitun tekstin sisältävä tilapäinen tiedosto polkuineen
+* '''(TTS_WSCRIPT_VBS)''' - Järjestelmä-äänien lukemisessa käytettävän Windows Script:n polku
+* '''(UNIQUE_ID)''' - Kertakäyttöinen eväste
+* '''(USER_ID)''' - Nykyisen käyttäjän anonyymi tunniste
+* '''(WEEKDAY)''' - Nykyinen viikonpäivä aluekohtaisessa esitysmuodossa
