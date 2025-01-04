@@ -105,20 +105,7 @@
    </dlg:menupopup>
    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateLabels?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:combobox>
-  <dlg:combobox dlg:id="ComboBox4" dlg:tab-index="10" dlg:left="16" dlg:top="139" dlg:width="240" dlg:height="14" dlg:page="-6" dlg:value="_combobox4" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true" dlg:linecount="-43">
-   <dlg:menupopup>
-    <dlg:menuitem dlg:value="https://quickchart.io/qr?size=350&amp;text=(OOO_WEBTEXT)"/>
-    <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)"/>
-    <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)"/>
-    <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)"/>
-    <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=en&amp;text=(OOO_WEBTEXT)"/>
-    <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=es&amp;text=(OOO_WEBTEXT)"/>
-    <dlg:menuitem dlg:value="https://translate.google.com/?sl=auto&amp;tl=fr&amp;text=(OOO_WEBTEXT)"/>
-    <dlg:menuitem dlg:value="https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)"/>
-    <dlg:menuitem dlg:value="https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)"/>
-    <dlg:menuitem dlg:value="https://www.hotbot.com/web?q=(OOO_WEBTEXTSMALL)"/>
-   </dlg:menupopup>
-  </dlg:combobox>
+  <dlg:combobox dlg:id="ComboBox4" dlg:tab-index="10" dlg:left="16" dlg:top="139" dlg:width="240" dlg:height="14" dlg:page="-6" dlg:value="_combobox4" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true" dlg:linecount="-43"/>
   <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="12" dlg:left="13" dlg:top="200" dlg:width="84" dlg:height="10" dlg:value="CheckBox2" dlg:checked="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.UseAlwaysShow_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:checkbox>

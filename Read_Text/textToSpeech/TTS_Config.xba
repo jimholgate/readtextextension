@@ -1140,7 +1140,7 @@ Sub ConfigureReadTextAloud()
 		End If
 		ttsUpdateLabels()
 		ttsUpdateCombo1()
-		
+		FillComboBox4UrlList(f_dlgSpeechSetup)
 		&apos;Default choices are for custom scripts or apps - Win, Mac, Linux, Unix etc.
 		
 		ttsUpdateDisplay()

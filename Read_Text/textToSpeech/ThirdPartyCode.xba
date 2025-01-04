@@ -387,6 +387,20 @@ Function fbUpdateLexiconFile(_
 End Function
 
 
+Function GoogleTranslateDefault()
+	Dim s1 As String : s1 = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+	GoogleTranslateDefault = s1
+	On Local Error GoTo GoogleTranslateDefaultErr
+	Dim a1 As Variant : a1 =  faDialog1ComboBox4Array(s1, fsDocLanguage() &amp; &quot;-&quot; &amp; fsDocCountry())
+	If Len(a1(0)) &lt;&gt; 0 Then
+		GoogleTranslateDefault = a1(0)
+	End If
+	Exit Function
+	GoogleTranslateDefaultErr:
+	GoogleTranslateDefault = s1
+End Function
+
+
 Function fvTts_config_createDefaultConfig( _
 	msgs() As Variant, _
 	errorCode As Integer) As Variant
@@ -426,7 +440,7 @@ Function fvTts_config_createDefaultConfig( _
 		Config(pi_use_external_boolean) = True
 		Config(pi_use_html_boolean) = False
 		Config(pi_use_smart_select_integer) = 0
-		Config(pi_html_string) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+		Config(pi_html_string) = GoogleTranslateDefault()
 		If bUsingWine Then
 			&apos; Don&apos;t attempt SAPI speech by default using Wine for Posix.
 			Config(pi_external_path_string) = ConvertFromURL(BundlePyPath())
@@ -479,7 +493,7 @@ Function fvTts_config_createDefaultConfig( _
 		Config(pi_use_html_boolean) = False
 		Config(pi_use_smart_select_integer) = 0
 		If Len(fsLocalHostSpeech()) = 0 Then
-			Config(pi_html_string) = &quot;https://translate.google.com/?&amp;langpair=auto|(LANGUAGE_CODE)&amp;tbb=1&amp;ie=&amp;hl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;
+			Config(pi_html_string) = GoogleTranslateDefault()
 		Else
 			Config(pi_html_string) = fsLocalHostSpeech()
 		End If
@@ -599,6 +613,7 @@ Sub tts_config_writeFile( _
 	Config() As Variant,ByVal configFilePath As String)
 	&apos; Writes a configuration file from an array.
 	&apos; This function updated 2013-08-29 - always write as UTF-8
+	On Local Error Goto tts_config_writeFileErr
 	Dim sA As String
 	Dim CR As String
 	Dim ExternalCommand As String
@@ -658,6 +673,9 @@ Sub tts_config_writeFile( _
 	&quot;dialog1.use.smart.select.integer=&quot;, Config(pi_use_smart_select_integer), CR, _
 	&quot;dialog1.display.language.string=&quot;, Config(pi_display_language_string), CR), &quot;&quot;)
 	CreateFile(configFilePath, sA, &quot;&quot;)
+	Exit Sub
+	tts_config_writeFileErr:
+	ResetAll()
 End Sub
 
 
@@ -673,6 +691,7 @@ Sub tts_config_parseFile( _
 	&apos;                   from the file.
 	&apos; errorCode (in out) The Error parameter.
 	&apos;
+	On Local Error GoTo tts_config_parseFileErr
 	Dim sA As String : sA = &quot;&quot;
 	Dim CR As String : CR = Chr(13)
 	Dim CR2 As String : CR2 = Chr(10)
@@ -767,6 +786,9 @@ Sub tts_config_parseFile( _
 		End If
 	Loop
 	f_CaReadTextExtensionCurrentConfig = Config
+	Exit Sub
+	tts_config_parseFileErr:
+	ResetAll()
 End Sub
 
 
