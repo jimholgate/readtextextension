@@ -52,7 +52,7 @@ See the manual page for `pico2wave` for more detailed information
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2024 James Holgate
+Copyright (c) 2011 - 2025 James Holgate
 
 """
 

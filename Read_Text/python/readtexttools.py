@@ -45,7 +45,7 @@ Currently, python3 is *required* for `speech-dispatcher`.  Python2 requires the
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2011 - 2024 James Holgate
+Copyright (c) 2011 - 2025 James Holgate
 """
 
 

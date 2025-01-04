@@ -4,13 +4,13 @@ Después de instalar esta extensión, cerrar la aplicación, a continuación, re
 
 Derechos de autor y de licencia
 
-(c) 2011-2024 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+(c) 2011-2025 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 
 <http://www.viti.es/gnu/licenses/gpl.html>
 
 Copyright and License 
 
-* (c) 2011-2024 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+* (c) 2011-2025 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 * "Bubble" icon (c) 2013 icomoon.io Creative Commons 2.5 (Attribution) license.
 * "python-speech-d" (c) Copyright: 2001-2010, Brailcom, o.p.s. 2009, Marco Skambraks marco@openblinux.de 2009, Rui Batista rui.batista@ist.utl.pt License: LGPL-2.1<https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
 

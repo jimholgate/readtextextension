@@ -695,7 +695,7 @@ Function fsZzxToEnglish( _
 	Dim LookUpList As Variant : LookUpList = Array(_
 	Array(&quot;s_about&quot;, &quot;About&quot;), _
 	Array(&quot;s_always-show-this-dialog&quot;, &quot;Always show this dialog&quot;), _
-	Array(&quot;s_c-james-holgate&quot;, &quot;© 2008-2024 James Holgate&quot;), _
+	Array(&quot;s_c-james-holgate&quot;, &quot;© 2008-2025 James Holgate&quot;), _
 	Array(&quot;s_cancel&quot;, &quot;Cancel&quot;), _
 	Array(&quot;s_command-line-options&quot;, &quot;Command line options&quot;), _
 	Array(&quot;s_command&quot;, &quot;Command&quot;), _
@@ -764,7 +764,7 @@ Function fsZzxToEnglish( _
 	Array(&quot;s_title&quot;, &quot;Title&quot;), _
 	Array(&quot;s_track&quot;, &quot;Track&quot;), _
 	Array(&quot;s_year&quot;, &quot;Year&quot;), _
-	Array(&quot;s_mdsample&quot;, &quot;Read Text – Speech\n=========\n\n&gt;_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2024 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`&quot;), _
+	Array(&quot;s_mdsample&quot;, &quot;Read Text – Speech\n=========\n\n&gt;_Open a document and select some text. Choose “Tools – Add-ons – Impress-View” to run the show._\n\nImpress – View (Present selection)\n--------------\n\n- Open a document and select some text.\n- Choose “Tools – Add-ons – Impress-View” to run the show.\n\n`© 2025 James Holgate.  [cc by 4.0](http://creativecommons.ca/licenses)`&quot;), _
 	)
 	Dim i As Integer : i = 0
 	Dim bSemiColon As Boolean : bSemiColon = False

@@ -4,7 +4,7 @@ Après l'installation de cette extension, fermez l'application, puis redémarrez
 
 Copyright et licence
 
-* (c) 2011-2024 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+* (c) 2011-2025 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 * "Bubble" icon (c) 2013 icomoon.io Creative Commons 2.5 (Attribution) license.
 * "python-speech-d" (c) Copyright: 2001-2010, Brailcom, o.p.s. 2009, Marco Skambraks marco@openblinux.de 2009, Rui Batista rui.batista@ist.utl.pt License: LGPL-2.1
 <http://www.linux-france.org/article/these/gpl.html>
@@ -15,7 +15,7 @@ After installing this extension, close the application then restart it.
 
  Copyright and License 
 
-(c) 2011-2024 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
+(c) 2011-2025 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 
 "Google", "Google Cloud", "Google Translate" and the stylized "G" logo are
 trademarks of Google Inc.

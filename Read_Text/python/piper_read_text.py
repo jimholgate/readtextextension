@@ -283,7 +283,7 @@ click *Apply*.
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
-Copyright (c) 2024 James Holgate
+Copyright (c) 2025 James Holgate
 """
 
 
@@ -2319,4 +2319,4 @@ if __name__ == "__main__":
 # strings like '`eye`, `bye`, `no`, `No`, `null`, `nil`, `None`, `don't` and
 # `False`.
 #
-# Copyright (c) 2024 James Holgate
+# Copyright (c) 2025 James Holgate
