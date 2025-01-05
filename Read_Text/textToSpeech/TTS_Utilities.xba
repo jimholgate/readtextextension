@@ -3162,9 +3162,6 @@ Function fspyOutOptions( _
 			fbHaveFfmpeg()) And Not(fbHaveVLC()) Then
 				&apos; The Python gstreamer library might not be available, so
 				&apos; propose saving audio formats that your apps support.
-				
-				&apos; xxxxxxxxyyyyyyy
-
 				If fbHaveLame() Then
 					s1 = s1 &amp; CR &amp; s4 &amp; _
 					&quot; --image &quot;&quot;(POSTER_IMG)&quot;&quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).mp3&quot;&quot;&quot; &amp; _
@@ -5313,7 +5310,7 @@ Function faDialog1ComboBox4Array(_
 		&quot;https://swisscows.com/web?query=(OOO_WEBTEXTSMALL)&quot;, _
 		&quot;https://quickchart.io/qr?size=350&amp;text=(OOO_WEBTEXT)&quot;), _
 		 &quot;\n&quot; _
-		), fsDisplayLanguage(), &quot;tools&quot;)
+		), local_lang, &quot;tools&quot;, 1) &apos; msgid to msgstr
 		
 	End If
 	Dim gdomain As String: gdomain = langToGoogleDomain(local_lang)
