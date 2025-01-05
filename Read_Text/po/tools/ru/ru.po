@@ -402,7 +402,8 @@ msgstr ""
 "https://translate.google.com/?sl=auto&tl=en&text=(OOO_WEBTEXT)\n"
 "https://translate.google.com/?sl=auto&tl=(SELECTION_LANGUAGE_CODE)&q=(OOO_WEBTEXTSMALL)\n"
 "https://translate.google.com/?sl=auto&tl=(LANGUAGE_CODE)&text=(OOO_WEBTEXTSMALL)\n"
-"https://translate.google.com/?sl=auto&tl=(LANGUAGE_CODE)&text=(OOO_WEBTEXT)"
+"https://translate.google.com/?sl=auto&tl=(LANGUAGE_CODE)&text=(OOO_WEBTEXT)\n"
+"https://search.lycos.co.uk/web/?q=(OOO_WEBTEXT)"
 
 #: sw/inc/strings.hrc:30 (ru)
 msgctxt "STR_RESET_LABEL"

@@ -5290,9 +5290,12 @@ Function faDialog1ComboBox4Array(_
 	&apos; You can localize the `s1` string to use a regional list
 	&apos; of websites. See example: `zh.po` in December, 2024.
 	If Len(local_lang) = 0 Then
-		&apos; We default to the document language and region so that
-		&apos; translations correctly handle the text.
 		local_lang = fsDocLanguage() &amp; &quot;-&quot; &amp; fsDocCountry()
+	End If
+	Dim sDisplayLanguage As String : sDisplayLanguage = fsDisplayLanguage()
+	Dim iEnglish As Integer : iEnglish = -1
+	If Left(sDisplayLanguage, 2) = &quot;en&quot; Then
+		iEnglish = -2
 	End If
 	If Len(s1) = 0 Then
 		s1 = _(Join(_
@@ -5310,7 +5313,7 @@ Function faDialog1ComboBox4Array(_
 		&quot;https://swisscows.com/web?query=(OOO_WEBTEXTSMALL)&quot;, _
 		&quot;https://quickchart.io/qr?size=350&amp;text=(OOO_WEBTEXT)&quot;), _
 		 &quot;\n&quot; _
-		), local_lang, &quot;tools&quot;, 1) &apos; msgid to msgstr
+		), sDisplayLanguage, &quot;tools&quot;, iEnglish) &apos; msgid to msgstr
 		
 	End If
 	Dim gdomain As String: gdomain = langToGoogleDomain(local_lang)
