@@ -1813,9 +1813,7 @@ End Function
 
 
 Function WinSpeechProgramPath() As String
-	&apos; 2023-07-22
-	&apos; Always default to wscript.
-	&apos; The dialog shows all compatible SAPI5 voices
+	&apos; The dialog shows compatible SAPI5 voices
 	&apos; SAPI5 can&apos;t use Microsoft Speech Server voices
 	WinSpeechProgramPath = &quot;&quot;
 	Dim sub_path As Variant : sub_path = faWindowsTestArray()
@@ -5779,7 +5777,7 @@ Sub MsgSpeak( _
 	Else
 		Select Case fsTheOsId()
 			Case &quot;WINDOWS&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;
-			If Not FileExists(sFile) or Len(WinSpeechProgramPath()) = 0 Then
+			If Not FileExists(sFile) Then
 				fsNetSAPI5WindowsSpeech(strA, _
 				fsSelectionLanguageAndRegion(False))
 				Config(pi_display_info_integer) = 0

@@ -441,7 +441,10 @@ Function fvTts_config_createDefaultConfig( _
 		Config(pi_use_html_boolean) = False
 		Config(pi_use_smart_select_integer) = 0
 		Config(pi_html_string) = GoogleTranslateDefault()
-		If bUsingWine Then
+		If Len(WinSpeechProgramPath()) = 0 Then
+			Config(pi_external_path_string) = ConvertFromURL(BundlePyPath())
+			Config(pi_external_options_string) = &quot;(RESET_ALL)&quot;
+		ElseIf bUsingWine Then
 			&apos; Don&apos;t attempt SAPI speech by default using Wine for Posix.
 			Config(pi_external_path_string) = ConvertFromURL(BundlePyPath())
 			Config(pi_experimental_path_string) = Config(pi_external_path_string)
@@ -454,11 +457,7 @@ Function fvTts_config_createDefaultConfig( _
 				Config(pi_experimental_options_string) = pyFallBack
 			End If
 		Else
-			If Len(WinSpeechProgramPath()) = 0 Then
-				Config(pi_external_path_string) = &quot;wscript.exe&quot;
-			Else
-				Config(pi_external_path_string) = WinSpeechProgramPath()
-			End If
+			Config(pi_external_path_string) = WinSpeechProgramPath()
 			Config(pi_external_options_string) = WinSpeechArgument()		
 		End If
 		Config(pi_display_info_integer) = 0
