@@ -783,7 +783,7 @@ Function EditJsonPhonemeTable() As String
 	Select Case fsTheOsId()
 		Case &quot;MACOS&quot;, &quot;MACOS.EXPERIMENTAL&quot;
 		_po_dir = MacOSSpeechAppInfo().json_dir
-		Case &quot;WINDOWS&quot;, &quot;WINDOWS.WINE&quot;, &quot;WINDOWS.NOSCRIPT&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;
+		Case &quot;WINDOWS&quot;, &quot;WINDOWS.NOSCRIPT&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;
 		_po_dir = WindowsSpeechAppInfo().json_dir
 		Case Else
 		_po_dir = &quot;default&quot;
@@ -1084,15 +1084,11 @@ Sub ConfigureReadTextAloud()
 		End If
 		Case &quot;POSIX.APPIMAGE&quot;
 			bHideExports = True
-			&apos;If Len(Config(pi_external_options_string)) = 0 Then
-			&apos;	Config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
-			&apos;	print Config(pi_external_options_string)
-			&apos;End If
 	End Select
 	b_CaReadTextExtensionHideExports = bHideExports
 	With f_dlgSpeechSetup
 		If fbHelpIsInstalled() Then
-			.model.HelpURL = fsAppSignature &amp; &quot;/set_up.xhp&quot;
+			.model.HelpURL = fsAppSignature() &amp; &quot;/set_up.xhp&quot;
 		Else
 			.model.HelpURL = &quot;&quot;
 		End If

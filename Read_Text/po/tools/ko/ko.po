@@ -84,8 +84,8 @@ msgstr "스크립트"
 
 #: template.src
 msgctxt ""
-msgid "© 2008-2015 James Holgate"
-msgstr "© 2008-2015 James Holgate"
+msgid "© 2008-2025 James Holgate"
+msgstr "© 2008-2025 James Holgate"
 
 #: template.src
 msgctxt ""

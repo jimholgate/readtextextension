@@ -913,7 +913,7 @@ Function fbWineSpdSay(ByVal _msg As String, ByVal _language As String) As Boolea
 					Case 0, 1
 						wait 2000 * duration
 					Case Else
-						wait duration * (800 + 360 * (Ubound(Split(item, &quot; &quot;)) - 1))
+						wait duration * (1000 + 390 * (Ubound(Split(item, &quot; &quot;)) - 1))
 					End Select
 				End If
 			Next

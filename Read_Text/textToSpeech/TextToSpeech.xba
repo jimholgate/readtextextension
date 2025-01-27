@@ -373,14 +373,11 @@ End Sub
 Sub SetupReadTextAloud
 &apos; Tools - Add-ons - Read Selection...
 	CheckInitialState
-	Select Case getGUIType()
-	Case 1
 	&apos; Some versions of Windows omit or disable `wscript.exe`. In this case, use
 	&apos; `(RESET_ALL)` to enable the built-in office NET scripting environment to
 	&apos; read the selected text aloud. Enable wscript.exe Visual Basic Script (vbs) if
 	&apos; it is available as a Windows add-in. Systems that include wscript.exe
 	&apos; are able use Windows SAPI to save audio files and use different SAPI voices.
-	End Select
 	ConfigureReadTextAloud()
 End Sub
 

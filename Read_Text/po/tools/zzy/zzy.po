@@ -84,7 +84,7 @@ msgstr "s_script"
 
 #: template.src
 msgctxt ""
-msgid "© 2008-2015 James Holgate"
+msgid "© 2008-2025 James Holgate"
 msgstr "s_c-james-holgate"
 
 #: template.src

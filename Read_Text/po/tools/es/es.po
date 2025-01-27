@@ -84,8 +84,8 @@ msgstr "Script"
 
 #: template.src
 msgctxt ""
-msgid "© 2008-2015 James Holgate"
-msgstr "© 2008-2015 James Holgate"
+msgid "© 2008-2025 James Holgate"
+msgstr "© 2008-2025 James Holgate"
 
 #: template.src
 msgctxt ""
@@ -413,8 +413,8 @@ msgstr ""
 "https://search.worldcat.org/search?q=(OOO_WEBTEXTSMALL)\n"
 "https://scholar.google.com/scholar?q=(OOO_WEBTEXTSMALL)\n"
 "https://quickchart.io/qr?size=350&text=(OOO_WEBTEXT)\n"
-"https://ipv4.google.com/?q=site%3Aes.wikipedia.org+(OOO_WEBTEXTSMALL)&gws_rd=ssl&pws=0\n"
-"https://ipv4.google.com/?q=(OOO_WEBTEXTSMALL)&gws_rd=ssl&pws=0"
+"https://ipv4.google.com/?q=site%3Aes.wikipedia.org+(OOO_WEBTEXTSMALL)&gws_rd=ssl&pws=0&udm=14\n"
+"https://ipv4.google.com/?q=(OOO_WEBTEXTSMALL)&gws_rd=ssl&pws=0&udm=14"
 
 #: sw/inc/strings.hrc:30 (es)
 msgctxt "STR_RESET_LABEL"
