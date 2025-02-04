@@ -258,7 +258,7 @@
 &apos;&apos;        -p 59125:59125 \
 &apos;&apos;        --restart=always \
 &apos;&apos;        -v &quot;${_HOME}/.local/share/mycroft/mimic3:/home/mimic3/.local/share/mycroft/mimic3&quot; \
-&apos;&apos;        &apos;mycroftai/mimic3&apos;
+&apos;&apos;        &apos;docker.io/mycroftai/mimic3&apos;
 &apos;&apos; 
 &apos;&apos; You can find out more about Mimic3 TTS at the `mimic3` website.
 &apos;&apos; 
@@ -4944,8 +4944,10 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
 		a1 = Array(&quot;425&quot;, &quot;Estonian&quot;, &quot;et-EE&quot;, &quot;ee&quot;)
 	Case &quot;fa&quot;, &quot;fa-ir&quot;, &quot;farsi&quot;
 		a1 = Array(&quot;1000&quot;, &quot;Farsi&quot;, &quot;fa-IR&quot;, &quot;com&quot;)
-	Case &quot;fi&quot;, &quot;fi-fi&quot;, &quot;finnish&quot;, &quot;40b&quot;
-		a1 = Array(&quot;40b&quot;, &quot;Finnish&quot;, &quot;fi-FI&quot;, &quot;fi&quot;)
+	Case &quot;fi&quot;, &quot;finnish&quot;, &quot;40b&quot;
+		a1 = Array(&quot;40b&quot;, &quot;Finnish&quot;, &quot;fi&quot;, &quot;fi&quot;)
+	Case &quot;fi-fi&quot;, &quot;finnish (finland)&quot;, &quot;40b&quot;
+		a1 = Array(&quot;40b&quot;, &quot;Finnish (Finland)&quot;, &quot;fi-FI&quot;, &quot;fi&quot;)
 	Case &quot;fj&quot;, &quot;fj-fj&quot;, &quot;fijian&quot;
 		a1 = Array(&quot;1000&quot;, &quot;Fijian&quot;, &quot;fj-FJ&quot;, &quot;com&quot;)
 	Case &quot;fu&quot;, &quot;fu-it&quot;, &quot;friulian&quot;

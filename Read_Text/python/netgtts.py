@@ -150,6 +150,7 @@ class GoogleTranslateClass(object):
         _slow = False
         _lang_check = True
         _lang = _iso_lang
+        _msg = ""
         _error_icon = readtexttools.net_error_icon()
         _version = self.version()
         _env_lang = readtexttools.default_lang()
@@ -257,6 +258,13 @@ class GoogleTranslateClass(object):
             if os.path.isfile(_media_work):
                 readtexttools.pop_message(
                     f"`gtts-{_version}`", _msg, 5000, _provider_logo, 0
+                )
+                print(
+                    f"""# {_provider} Translate\u2122"
+
+* gtts-{_version}
+* <{_msg}>
+"""
                 )
         except gtts.tts.gTTSError:
             readtexttools.pop_message(

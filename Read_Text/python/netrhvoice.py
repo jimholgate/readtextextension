@@ -1,13 +1,47 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8-*-
-r"""Module supporting Docker rhvoice-rest speech synthesis.
+r"""Module supporting Podman or Docker rhvoice-rest speech synthesis.
 
-    docker pull aculeasis/rhvoice-rest:latest
-    docker run -d \
+You can install podman using the the [instructions][1] for Linux,
+Windows and MacOS at the podman.io site.
+
+Update and upgrade your system, then install podman. In a terminal
+window, enter:
+
+    podman pull ghcr.io/aculeasis/rhvoice-rest:latest
+    podman run -d \
       --name=rhvoice-rest \
       -p 8080:8080 \
       --restart unless-stopped \
-      aculeasis/rhvoice-rest:latest
+      ghcr.io/aculeasis/rhvoice-rest:latest
+
+If you use Docker, replace "podman" with "docker" in the code example.
+
+This code example includes the full container source path for
+Podman because the default Podman settings do not specify using 
+ghcr.io in the repository list. It generates an error message
+because Podman could not verify the code and licenses, but the
+installation still works:
+
+> Error: short-name "aculeasis/rhvoice-rest:latest" did not resolve
+> to an alias and no unqualified-search registries are defined in 
+> "/etc/containers/registries.conf"
+
+Podman can be more secure than Docker since it does not need a central
+service running as a root user. This reduces the risk of system-wide
+corruption. Podman does not include `aculeasis/rhvoice-rest` in the
+podman.io repositories that Red Hat and Fedora use by default.
+
+See:
+
+1. [**Docker Security: Best Practices & Concerns Explained**][2]
+2. [**Podman vs Docker: What are the differences?**][3]
+3. [**Commit May 30, 2024**][4]: `ghcr.io` replaces `docker.io`.
+
+[1]: https://podman.io/docs/installation
+[2]: https://cyberpanel.net/blog/docker-security-best-practices
+[3]: https://www.imaginarycloud.com/blog/podman-vs-docker
+[4]: https://github.com/Aculeasis/rhvoice-rest/commit/d0f37b68f2d729fc291cc824e92da5be22fda231
 """
 
 
@@ -99,6 +133,7 @@ class RhvoiceLocalHost(object):
             "rhvoice",
             "localhost",
             "docker",
+            "podman",
             "local_server",
         ]
         self.ok = False

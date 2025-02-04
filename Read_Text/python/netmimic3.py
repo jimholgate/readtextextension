@@ -21,7 +21,7 @@ import readtexttools
 
 
 class Mimic3Class(object):
-    """MyCroft AI Mimic TTS
+    r"""MyCroft AI Mimic TTS
 ====================
 
 "A fast local neural text to speech engine for Mycroft"
@@ -30,6 +30,10 @@ Check the release status of the API for Mimic before using it. By default the
 application shares the same address and port as MaryTTS so do not run them at
 the same time using the same URL and port.
 
+When using tthe mimic3 application with Docker running with root super user
+permissions, the web page interface could enable restricted users to download
+files to a local directory.
+
     mkdir -p "${HOME}/.local/share/mycroft/mimic3"
     chmod a+rwx "${HOME}/.local/share/mycroft/mimic3"
     docker run \
@@ -37,14 +41,15 @@ the same time using the same URL and port.
         -p 59125:59125 \
         --restart=always \
         -v "${HOME}/.local/share/mycroft/mimic3:/home/mimic3/.local/share/mycroft/mimic3" \
-        'mycroftai/mimic3'
+        'docker.io/mycroftai/mimic3'
 
 To automatically start the daemon, set the Docker container restart policy to
 "always", otherwise omit the option.
 
 * [Local host](http://0.0.0.0:59125)
 * [Mimic3 TTS](https://mycroft-ai.gitbook.io/docs/mycroft-technologies/mimic-tts/mimic-3)
-* [GitHub](https://github.com/MycroftAI/mimic3)"""
+* [GitHub](https://github.com/MycroftAI/mimic3) 
+"""
 
     def __init__(self) -> None:
         """Initialize data."""

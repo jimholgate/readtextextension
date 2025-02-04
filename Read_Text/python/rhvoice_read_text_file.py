@@ -1,23 +1,27 @@
 ﻿#!/usr/bin/env python
 # -*- coding: UTF-8-*-
-"""
+r"""
 Reads a text file using the rhvoice platform and a media player. Olga
 Yakovleva created RHVoice in 2011. It now includes several languages.
 
-Install
--------
+Install on Debian
+-----------------
 
 ### LibreOffice
 
 To enable rhvoice in Ubuntu 22.04, or Debian 12 use:
 
-    sudo apt install libportaudio2 librhvoice-audio2 \\
-    librhvoice5 rhvoice-english \\
+    sudo apt install libportaudio2 librhvoice-audio2 \
+    librhvoice5 rhvoice-english \
     speech-dispatcher-rhvoice rhvoice
 
 Python 3 supports `speech-dispatcher`, and `docker rhvoice-rest`.
-The `speech-dispatcher` framework is recommended because you can
-set it up to use different speech platforms for different languages.
+
+For versions of LibreOffice installed using the platform's `apt-get` tool,
+`speech-dispatcher` can use include rhvoice languages seamlessly with other
+speech platforms for other languages. If you use a flatpak or an AppImage
+version of LibreOffice, then you must use `docker rhvoice-rest` with a
+network server container like podman.io or docker.io.
 
 Use a dialog choice that includes `(SPD_READ_TEXT_PY)`
 
@@ -25,11 +29,12 @@ Use a dialog choice that includes `(SPD_READ_TEXT_PY)`
 
 To enable rhvoice in Ubuntu 22.04, or Debian 12 use:
 
-    sudo apt install libportaudio2 librhvoice-audio2 \\
-    librhvoice5 rhvoice-english
+    sudo apt install libportaudio2 librhvoice-audio2 \
+    librhvoice5 rhvoice-english rhvoice
 
 This client does not support `speech-dispatcher` when using python 2.7. It
-relies on `RHVoice-test`, a test application that has been depreciated.
+relies on `RHVoice-test`, a test application from the [rhvoice][1] package
+from the [non-free][2] archive.
 
 Use a dialog choice that includes `(RHVOICE_READ_TEXT_PY)`
 
@@ -47,16 +52,24 @@ To add languages, add the appropriate packages. For example,
     sudo apt install rhvoice-tatar
     sudo apt install rhvoice-ukrainian
 
-### Other platforms
+### Container platforms
 
-To install rhvoice on other linux platforms that use python 3, you can use a
-docker image like <https://hub.docker.com/r/aculeasis/rhvoice-rest>.
+The rhvoice-rest container works using a locally hosted speech server,
+
+To install rhvoice on linux platforms that use a compatible version of python3
+you can use a docker image with the docker.io or podman.io containers.
 
 Use a dialog choice that includes `(NETWORK_READ_TEXT_PY)`
 
-The available voices vary according to the specific docker image.
+The available voices vary according to the specific docker image. For specific
+instructions to use it with Read Text Extension, check the instructions at the
+top of the Read Text `netrhvoice.py` page on GitHub:
 
-<https://github.com/RHVoice/RHVoice>
+* <https://github.com/jimholgate/readtextextension/blob/master/Read_Text/python/netrhvoice.py>
+* <https://github.com/RHVoice/RHVoice>
+
+[1]: https://packages.debian.org/search?keywords=rhvoice
+[2]: https://www.debian.org/doc/debian-policy/ch-archive.html#the-non-free-archive-area
 """
 
 

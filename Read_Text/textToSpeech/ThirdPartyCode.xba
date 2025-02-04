@@ -414,6 +414,9 @@ Function fvTts_config_createDefaultConfig( _
 	Config(pi_anonymous_key_string) = fsGetFirstKey(Config)
 	Dim bPiperOk As Boolean : bPiperOk = fbPiperTtsOk(&quot;&quot;)
 	Dim bUsingWine As Boolean : bUsingWine = False
+	Dim sGetLanguage As String : sGetLanguage = fsGetLanguage()
+	Dim sLocalHostSpeech As String : sLocalHostSpeech = &quot;&quot;
+	Dim Item As Variant
 	&apos; Create default values for variables
 
 	Dim pyFallBack As String : pyFallBack = &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://quickchart.io/qr?size=350&amp;text=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
@@ -461,7 +464,7 @@ Function fvTts_config_createDefaultConfig( _
 			Config(pi_external_options_string) = WinSpeechArgument()		
 		End If
 		Config(pi_display_info_integer) = 0
-		Config(pi_display_language_string) = fsGetLanguage()
+		Config(pi_display_language_string) = sGetLanguage
 		Case Else
 		&apos; Posix or MacOS
 		If bPiperOk Then
@@ -481,7 +484,7 @@ Function fvTts_config_createDefaultConfig( _
 			ElseIf fbIsLibreOffice() Then
 				Config(pi_use_experimental_boolean) = False
 				Config(pi_experimental_path_string) = PosixPythonPath()
-				Config(pi_experimental_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				Config(pi_experimental_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
 			Else
 				Config(pi_use_experimental_boolean) = False
 				Config(pi_experimental_path_string) = PosixPythonPath()
@@ -512,7 +515,7 @@ Function fvTts_config_createDefaultConfig( _
 			ElseIf Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0 Then
 				Config(pi_external_options_string) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 And fsGetLanguage() = &quot;ja&quot; Then
+			ElseIf Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 And sGetLanguage = &quot;ja&quot; Then
 				&apos; Japanese
 				Config(pi_external_options_string) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
@@ -526,11 +529,22 @@ Function fvTts_config_createDefaultConfig( _
 			ElseIf fbHaveEspeak() Then
 				Config(pi_external_options_string) = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf fbIsLibreOffice() Then
-				Config(pi_external_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
-				&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot; &amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+			ElseIf fbPySupportFStrings() Then
+					Config(pi_external_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
+					&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot; &amp; _
+					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				&apos; Mimic3 and MaryTTS servers include an English voice model by default.
+				&apos; Piper server uses the system language. Rhvoice-Rest and OpenTTS include
+				&apos; multiple voice models by default.
+				sLocalHostSpeech = fsLocalHostSpeech()
+				For Each Item in SpeechHostInfoList()
+					If InStr(Item.langs, sGetLanguage) &lt;&gt; 0 And Instr(sLocalHostSpeech, Item.url) = 1 Then
+						Config(pi_external_options_string) =  &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+					&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
+						Exit For
+					End If		
+				Next
 			Else
 				Config(pi_external_options_string) = pyFallBack
 			End If

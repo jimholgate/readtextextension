@@ -2246,8 +2246,10 @@ Function fsIsoToHumanReadable(sA, iForceEnglish)
 		a1 = Array("425", "Estonian", "et-EE")
 	Case "fa", "fa-ir", "farsi"
 		a1 = Array("1000", "Farsi", "fa-IR")
-	Case "fi", "fi-fi", "finnish", "40b"
-		a1 = Array("40b", "Finnish", "fi-FI")
+	Case "fi", "finnish", "40b"
+		a1 = Array("40b", "Finnish", "fi")
+	Case "fi-fi", "finnish (finland)", "40b"
+		a1 = Array("40b", "Finnish (Finland)", "fi-FI")
 	Case "fj", "fj-fj", "fijian"
 		a1 = Array("1000", "Fijian", "fj-FJ")
 	Case "fu", "fu-it", "friulian"

@@ -1,8 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
-"""Module supporting Docker OpenTTS speech synthesis"""
+r"""Run an OpenTTS speech synthesis using a Linux container. (Jan 28, 2024)
 
+[Install Podman][1].
 
+    podman run -it -p 5500:5500 --name=open-voice --restart unless-stopped \
+        docker.io/synesthesiam/opentts:es --no-espeak
+
+Replace `es` (Spanish) with the two letter code language that you want the
+server to read aloud. This container includes over 1.28 GB of resources.
+
+[OpenTTS on GitHub][2]
+
+[1]: https://podman.io/docs/installation
+[2]: https://github.com/synesthesiam/opentts#open-text-to-speech-server
+"""
+ 
 import os
 import sys
 import tempfile
@@ -19,7 +32,7 @@ except ImportError:
 
 
 class OpenTTSClass(object):
-    """OpenTTS is a text to speech local host voice server. This client
+    r"""OpenTTS is a text to speech local host voice server. This client
     does not support pitch or speed. Not all speech engines support
     all genders; therefore, sometimes the gender will be ignored.
 
@@ -35,11 +48,11 @@ class OpenTTSClass(object):
     The [docker container](https://hub.docker.com/r/synesthesiam/opentts)
     allows you to install specific languages.
 
-    `docker run -it -p 5500:5500 synesthesiam/opentts:<LANGUAGE>`
+    `docker run -it -p 5500:5500 docker.io/synesthesiam/opentts:<LANGUAGE>`
 
     Excluding `espeak` (robotic voices) removes support for some languages:
 
-    `docker run -it -p 5500:5500 synesthesiam/opentts:<LANGUAGE> --no-espeak`
+    `docker run -it -p 5500:5500 docker.io/synesthesiam/opentts:<LANGUAGE> --no-espeak`
 
     [OpenTTS local host](http://0.0.0.0:5500)
 

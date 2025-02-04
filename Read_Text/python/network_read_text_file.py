@@ -35,14 +35,15 @@ There may be acceptable use policies, limits or costs.
   or snap, some functions might not work because the application
   does not have permission to execute them.
 * On some systems, you might need to install additional software
-  libraries like `bs4`, `spacy`, `docker.io` `python3-requests`
+  libraries like `bs4`, `spacy`, `docker.io`, `podman`, `python3-requests`
   and `ffmpeg` to ensure that libraries are available to download
   and process files.
 
-Docker
-------
+Containers
+----------
 
-You can install some text to speech local host tools using docker.io.
+You can install some text to speech local host tools using docker.io or,
+in some cases, podman.
 
 If Read Text Extension documentation does not specifically state that it
 supports a docker image, check if the docker image has a `maryTTS`
@@ -54,10 +55,12 @@ audio files over a local web service.
 Mimic 3
 -------
 
+*Nov 5, 2022*
+
 "A fast local neural text to speech engine for Mycroft"
 
-Mycroft Mimic3 is a fast text to speech tool that includes very high quality
-voice assets.
+[Mycroft Mimic3](https://github.com/MycroftAI/mimic3) is a fast text to
+speech tool that includes very high quality voice assets.
 
 Mimic 3 covers a lot of languages. The locally hosted web page has a Feedback
 button that encourages users to comment on how the pronunciation could be
@@ -100,6 +103,8 @@ by the distribution.
 Rhasspy Piper
 -------------
 
+*Dec 21, 2023*
+
 [Rhasspy Piper](https://github.com/rhasspy/piper) is a fast, local
 neural text to speech system. A local network server version of
 Rhasspy Piper can serve a single voice model to different devices
@@ -126,12 +131,21 @@ See also: <https://www.youtube.com/watch?v=pLR5AsbCMHs>
 Rhvoice
 -------
 
+*May 30, 2024*
+
 [Rhvoice-rest](https://hub.docker.com/r/aculeasis/rhvoice-rest) is
 a docker image container that can read English, Esperanto, Georgian,
-Kyrgyz, Macedonian, Portuguese, Russian, Tatar and Ukrainian.
+Kyrgyz, Macedonian, Portuguese, Russian, Tatar and Ukrainian using
+docker.io or podman.io.
+
+See also:
+
+[Install Rhvoice](https://github.com/jimholgate/readtextextension/blob/master/Read_Text/python/netrhvoice.py)
 
 MaryTTS
 -------
+
+*May 22, 2020*
 
 [MaryTTS](http://mary.dfki.de/) (Modular Architecture for Research in Synthesis)
 is an open-source, multilingual Text-to-Speech Synthesis platform written in Java.
@@ -139,11 +153,7 @@ It can turn text into speech in many different languages. It runs on a `localhos
 web resource on your computer using a Docker container. Using MaryTTS does not
 require an on-line connection.
 
-You can make it sound like you by recording your voice and using MaryTTS [Import
-Tools](https://github.com/marytts/marytts-wiki/blob/master/VoiceImportToolsTutorial.md)
-to create a personalized voice.
-
-The Rhsspy MaryTTS docker image is an easy-to install web application that
+The Rhasspy MaryTTS docker image is an easy-to install web application that
 includes voices in several languages by default, including,
 
 * English
@@ -155,8 +165,12 @@ includes voices in several languages by default, including,
 * Telugu
 * Turkish
 
-
 See also:
+
+[Install MaryTTS](https://github.com/jimholgate/readtextextension/blob/master/Read_Text/python/netmary.py)
+
+Additional Resources
+--------------------
 
 * [Adding-voices](https://rhasspy.readthedocs.io/en/v2.4.20/text-to-speech/#adding-voices)
 * [Docker Docs](https://docs.docker.com/desktop/install/linux-install/)
@@ -175,10 +189,8 @@ try:
     import netgtts
 except (AttributeError, ImportError, SyntaxError):
     pass
-
 try:
     import requests
-
     REQUESTS_OK = True
 except (AttributeError, ImportError):
     REQUESTS_OK = False

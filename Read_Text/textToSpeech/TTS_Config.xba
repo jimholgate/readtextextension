@@ -244,6 +244,7 @@ Type SpeechHostInfo
 	about as String
 	key as String
 	label as String
+	langs as String
 	token as String
 	url as String
 	url_info as String
@@ -260,6 +261,7 @@ Function MaryTtsSpeechHostInfo()
 		.about = &quot;MaryTTS 5.2 text to speech server with 19 voices for 8 languages&quot;
 		.key = &quot;Mary TTS server&quot;
 		.label = &quot;marytts-server&quot;
+		.langs = &quot;en&quot;  &apos; Omit languages because compatible hosts might not include them
 		.token = &quot;&quot;
 		.url = &quot;http://0.0.0.0:59125&quot;
 		.url_info = &quot;/version&quot;
@@ -283,6 +285,7 @@ Function MimicSpeechHostInfo()
 		.about = &quot;Mimic is a fast local neural text to speech engine for Mycroft&quot;
 		.key = &quot;en_UK/apope_low en_UK NA vits&quot;
 		.label = &quot;mimic3-server&quot;
+		.langs = &quot;en&quot;  &apos; Omit languages because Mimic3 might not include them
 		.token = &quot;&quot;
 		.url = &quot;http://0.0.0.0:59125&quot;
 		.url_info = &quot;/voices&quot;
@@ -301,6 +304,7 @@ Function OpenttsSpeechHostInfo()
 		.about = &quot;OpenTTS server supports multiple text to speech systems and voices.&quot;
 		.key = &quot;OpenTTS&quot;
 		.label = &quot;opentts-server&quot;
+		.langs = &quot;de,en,es,fr,it&quot;  &apos; Omit espeak languages because server might not include them
 		.token = &quot;&quot;
 		.url = &quot;http://0.0.0.0:5500&quot;
 		.url_info = &quot;/&quot;
@@ -338,6 +342,7 @@ Function PiperSpeechHostInfo()
 		&quot;&quot;)
 		.key = &quot;PiperTTS&quot;
 		.label = &quot;piper-server&quot;
+		.langs = Left(fsLang(), 2)
 		.token = &quot;&quot;
 		.url = &quot;http://127.0.0.1:5000&quot;  &apos; The server uses 1 voice model.
 		.url_info = &quot;?text=0&quot;  &apos; No UI, check for Error, not content.
@@ -357,6 +362,7 @@ Function RhvoiceSpeechHostInfo()
 		&quot; Macedonian, Portuguese, Russian, Tatar and Ukrainian&quot;),&quot;&quot;)
 		.key = &quot;rhvoice_wrapper_library_version&quot;
 		.label = &quot;rhvoice-rest&quot;
+		.langs = &quot;en,eo,ky,mk,pl,pt,ru,sq,tt,ua,uk&quot;
 		.token = &quot;&quot;
 		.url = &quot;http://0.0.0.0:8080&quot;
 		.url_info = &quot;/info&quot;
@@ -378,6 +384,7 @@ Function MacOSSpeechAppInfo()
 			.key = &quot;&quot;
 			.label = &quot;macos-say&quot;
 			.token = &quot;&quot;
+			.langs = &quot;en&quot;
 			.url = fsMyURL() &amp; &quot;/po/macos_say&quot;
 			.url_info = &quot;/en-US_lexicon.json&quot;
 			.json_dir = &quot;macos_say&quot;
@@ -401,6 +408,7 @@ Function PosixFestivalSpeechAppInfo()
 		.about = &quot;Festival is a speech synthesiser developed in 1995 at the University of Edinburgh.&quot;
 		.key = &quot;&quot;
 		.label = &quot;festival-tts&quot;
+		.langs = &quot;en&quot;
 		.token = &quot;(FESTIVAL_READ_TEXT_PY)&quot;
 		.url = fsMyURL() &amp; &quot;/po/festival&quot;
 		.url_info = &quot;/en-US_lexicon.json&quot;
@@ -424,6 +432,7 @@ Function PosixPiperTtsSpeechAppInfo()
 		.about = &quot;Piper TTS is a fast, private local neural text to speech engine.&quot;
 		.key = &quot;&quot;
 		.label = &quot;piper-tts&quot;
+		.langs = &quot;en&quot;
 		.token = &quot;(PIPER_READ_TEXT_PY)&quot;
 		.url = fsMyURL() &amp; &quot;/po/default&quot;
 		.url_info = &quot;/en-US_lexicon.json&quot;
@@ -445,6 +454,7 @@ Function PosixRhvoiceSpeechAppInfo()
 		.about = &quot;Olga Yakovleva created RHVoice in 2011. It now includes several languages.&quot;
 		.key = &quot;{&quot;
 		.label = &quot;rhvoice&quot;
+		.langs = &quot;ru&quot;
 		.token = &quot;(RHVOICE_READ_TEXT_PY)&quot;
 		.url = fsMyURL() &amp; &quot;/po/rhvoice&quot;
 		.url_info = &quot;/en-US_lexicon.json&quot;
@@ -463,6 +473,7 @@ Function PosixSvoxPicoSpeechAppInfo()
 		.about = &quot;SVOX Pico is a compact speech synthesiser with low latency.&quot;
 		.key = &quot;&quot;
 		.label = &quot;svox-pico&quot;
+		.langs = &quot;de,en,es,fr,it&quot;
 		.token = &quot;(PICO_READ_TEXT_PY)&quot;
 		.url = fsMyURL() &amp; &quot;/po/svox_pico&quot;
 		.url_info = &quot;/en-US_lexicon.json&quot;

@@ -1,16 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8-*-
-"""Support MaryTTS speech synthesis using a Docker image. This image
+r"""Support MaryTTS speech synthesis using a Docker image. This image
 features a collection of hidden semi-Markov model (HSMM) voices for
 various languages. Latency is low and the models are compact. This
 tool uses the same web address as Mimic3 by default, so you can't
 run the two localhost servers together using the defaults.
 
-    docker run -it -p 59125:59125 synesthesiam/marytts:latest \
-        --voice cmu-bdl-hsmm --voice upmc-pierre-hsmm
+Install podman using the instructions at the [podman.io][1] website.
+
+    podman run -it -p 59125:59125 docker.io/synesthesiam/marytts:5.2 \
+        --name=marytts-voice --restart unless-stopped \
+            --voice cmu-bdl-hsmm --voice upmc-pierre-hsmm
+
     xdg-open http://0.0.0.0:59125
 
-[MaryTSS](https://github.com/synesthesiam/docker-marytts)
+If you use Docker, replace "podman" with "docker" in the code example.
+
+Podman can be more secure than Docker since it does not need a central
+service running as a root user. This reduces the risk of system-wide
+corruption.
+
+* [MaryTSS on GitHub][2]
+* [Available Voice Models][3]
+
+[1]: https://podman.io/docs/installation
+[2]: https://github.com/synesthesiam/docker-marytts
+[3]: https://github.com/synesthesiam/docker-marytts?tab=readme-ov-file#voices
 """
 
 
