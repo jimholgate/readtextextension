@@ -1634,18 +1634,21 @@ Function SayIt(s1, sRate, sVoice)
 			Usage "FAILED Sapi.SpVoice creation. SAPI ne pouvait pas cr&#233;er une voix."
 			Exit Function
 		Else
-			n=0
-			While n<Sapi.GetVoices.Count
-				If InStr(LCase(Sapi.GetVoices.Item(n).GetDescription), _
-						LCase(sVoice)) > 0 Then
+			For n = 0 To Sapi.GetVoices.Count - 1
+				If InStr(LCase(Sapi.GetVoices.Item(n).GetDescription), LCase(sVoice)) <> 0 Then
 					Set Sapi.Voice = Sapi.GetVoices.Item(n)
-					n=Sapi.GetVoices.Count
-				Else
-					n=n+1
+					Exit For
 				End If
-			Wend
+			Next
 			Sapi.Rate=Int(sRate)
+			REM " The Windows `WinSVSFlagsAsync` Flag tells the Speech"
+			REM " Application Program Interface (SAPI) to return control"
+			REM " immediately. This allows the program to toggle the"
+			REM " Windows SAPI voices off immediately."
+			REM ""
+			REM "`1` is `WinSVSFlagsAsync`"
 			Sapi.Speak "", 1
+			REM "`3` is `WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak`"
 			Sapi.Speak s1, 3
 			Do
 				WScript.Sleep 100

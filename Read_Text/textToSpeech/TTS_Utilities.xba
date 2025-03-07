@@ -2630,6 +2630,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 	Dim _opt As String : _opt = &quot;&quot;
 	Dim _opts As Variant : _opts = Array()
 	Dim a1 As Variant
+	Dim a2 As Variant
 	Dim bEnableLocalHostRate As Boolean : bEnableLocalHostRate = True
 	Dim bEnableRate As Boolean : bEnableRate = True
 	Dim bIsAppImage As Boolean : bIsAppImage = False
@@ -2643,6 +2644,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 	Dim oComboBox As Variant
 	Dim player7 As String : player7 = &quot;&quot;
 	Dim s1 As String : s1 = &quot;&quot;
+	Dim s2 As String : s2 = &quot;&quot;
 	Dim s3 As String : s3 = &quot;&quot;
 	Dim s4 As String : s4 = &quot;&quot;
 	Dim sGetOS As String : sGetOS = fsGetOS()
@@ -2685,11 +2687,15 @@ Function fiDialog1CombosShowMyPythonChoices(_
 		ElseIf Not fbIsSandboxed() And Not bIsAppImage Then
 			sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
 		End If
-		If fbGetWebServiceOK(&quot;http://127.0.0.1:5000?text=0&quot;) Then
-			&apos; Enable the home network Rhasspy Piper Speech Synthesis Server Option
-			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --voice &quot;&quot;piper&quot;&quot; --url &quot;&quot;http://192.168.0.108:5000&quot;&quot;&quot;
+
+		Select Case Len(fsLocalHostSpeech())
+			Case 0
+			&apos; pass
+			Case Else
+			&apos; Enable a home network Speech Synthesis Server Option
+			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; 
 			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
-		End If
+		End Select
 	End If
 	Select Case sGetOS
 		Case &quot;WINDOWS&quot;  &apos; Show examples
@@ -2704,7 +2710,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 		&quot;-m webbrowser -t &quot;&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;&quot;&quot; &amp; CR &amp; _
 		&quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
 	End If
-		If bnetworkTTS or sTheOsId = &quot;POSIX.FLATPAK&quot; or _
+	If bnetworkTTS or sTheOsId = &quot;POSIX.FLATPAK&quot; or _
 	sTheOsId = &quot;POSIX.SNAP&quot; or sTheOsId = &quot;POSIX.EXPERIMENTAL&quot; Then
 		&apos; Include settings for [mimic3](https://github.com/rhasspy/mimic3)
 		If bEnableLocalHostRate Then
@@ -3818,6 +3824,7 @@ Sub ttsActuate( _
 	media_list = &quot;.3gp,.aac,.aif,.aiff,.alsa,.ape,.asf,.au,.avi,.caf,.dts,.flac,&quot; &amp; _
 		&quot;.m4a,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.oma,.opus,.riff,.rm,.smp,.snd,.sou,.spx,&quot; &amp; _
 		&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;
+	Dim sExtensionSettingsIni As String : sExtensionSettingsIni = fsExtensionSettingsIni()
 &apos; Temporary Files
 	On Error Goto errorHandler
 	&apos;Choose what to speak
@@ -3839,6 +3846,27 @@ Sub ttsActuate( _
 	&apos;Get rid of the old files containing a script And/or plain text of selected String
 	resetSpeech
 	sArtLook = Config(5)
+	If Len(Config(pi_external_path_string)) = 0 Then
+		&apos; The office program failed to save or read the current settings file correctly,
+		&apos; so check the file, and use the defaults if we fail again.
+		If UboundCurrentConfigItems() &lt;&gt; -1 Then
+			&apos; Update `Config`
+			Config() = f_CaReadTextExtensionCurrentConfig
+		ElseIf FileExists(sExtensionSettingsIni) Then
+			&apos; Use the last saved configuration file
+			tts_config_parseFile(sExtensionSettingsIni, Config(), errorCode)
+		End If
+		If UboundCurrentConfigItems() = - 1 Then
+			&apos; Use the extension defaults
+			Config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
+		End If
+		If Ubound(Config) &lt;&gt; UboundCurrentConfigItems() Then
+			Config() = f_CaReadTextExtensionCurrentConfig
+		End If
+		If Ubound(Config) &lt;&gt; Ubound(fvExtensionKeys()) Then
+			Config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
+		End If
+	End If
 	
 	If fbCreatingMediaFile(media_list) Then
 		&apos; Get current track, then increment it by one to a maximum value of 255.
@@ -4040,7 +4068,7 @@ Sub ttsActuate( _
 		sCommand = replacePublicTokensWithStr(sCommand)
 		sCommand = replaceWebTokensWithStr(sCommand, sTextToSpeak) &apos;for online content with media player
 		fbCreateMissingMediaDirectory(sCommand)
-	Else &apos;if Config(pi_use_html_boolean) then
+	Elseif Config(pi_use_html_boolean) then
 		&apos;Translate And read with web tools
 		i_CaReadTextExtensionLastSpokenTrack = 0
 		sCommand = Config(pi_html_string)
@@ -4053,9 +4081,17 @@ Sub ttsActuate( _
 			End If
 			webHelp(sCommand)
 		Else
-			ErrorDisplay()
+			ErrorDisplay(&quot;ttsActuate: 4061&quot;)
 		End If
 		oBar.End()
+		Exit Sub
+	Else
+		&apos; The script failed to parse the configuration, so reset the extension
+		&apos; and read the text aloud.
+		oBar.End()
+		ResetAll()
+		CheckInitialState()
+		ReadTextAloud()
 		Exit Sub
 	End If
 	If FileExists(sProgram) Then
@@ -4072,8 +4108,7 @@ Sub ttsActuate( _
 				bWait = True
 			End If
 		End If
-		
-		If sCommand &lt;&gt; &quot;&quot; Then
+		If Len(sCommand) &lt;&gt; 0 Then
 			Select Case getGUIType()
 				Case 1 &apos; WINDOWS
 				If fbPySupportFStrings() And InStr(sProgram, &quot;\python&quot;) &lt;&gt; 0 And _
@@ -4133,9 +4168,7 @@ Sub ttsActuate( _
 	oBar.End()
 	Exit Sub
 	ErrorHandler:
-	
-	MsgBox(fsLookUpTerm( &quot;s_string-cannot-be-analyzed&quot;), 48, _
-	fsLookUpTerm( &quot;s_read-text&quot;))
+	ErrorDisplay(&quot;4140&quot;)
 	ResetAll()
 End Sub
 
@@ -4527,9 +4560,7 @@ Function fsPathSettings( _
 			If ListIndex &lt;= MaxIndex Then
 				sPath = PathList(ListIndex)
 			Else
-				MsgBox(fsLookUpTerm(&quot;s_string-cannot-be-analyzed&quot;), _
-				48, _
-				fsLookUpTerm(&quot;s_read-text&quot;))
+				ErrorDisplay(&quot;4132&quot;)
 			End If
 		End If
 	End If
@@ -7710,25 +7741,33 @@ End Function
 
 
 Function fbHaveNetworkTTS() As Boolean
+	&apos; This returns `True` if we can find resources that would indicate
+	&apos; that the host application has access to a known network server.
 	&apos; See: &lt;https://github.com/pndurette/gTTS&gt;
 	&apos; If you are not running libreoffice from normal home directory, then
 	&apos; the script disables network speech because container versions of
 	&apos; the application do not necessarily include the required libraries.
 	fbHaveNetworkTTS = False
+	Dim Item As String
 	If Not fbPySupportFStrings() Then
 		Exit Function
 	End If
-	If fbInPaths(&quot;docker-init&quot;) And fsGetOs() = &quot;POSIX&quot; Then
-		fbHaveNetworkTTS = True
-		Exit Function
-	End If
-	If fbHaveNetworkTTS Then
-		Exit Function
-	End If
-	If fbInPaths(&quot;mimic3-server&quot;) Then
-		fbHaveNetworkTTS = True
-		Exit Function
-	End If
+	Select Case fsGetOS()
+		Case &quot;POSIX&quot;
+		For Each Item in Array(&quot;docker-init&quot;, &quot;mimic3-server&quot;)
+			If fbInPaths(Item) Then
+				fbHaveNetworkTTS = True
+				Exit Function			
+			End If
+		Next
+		Case Else
+		For Each Item in Array(&quot;mimic3-server&quot;)
+			If fbInPaths(Item) Then
+				fbHaveNetworkTTS = True
+				Exit Function			
+			End If
+		Next
+	End Select
 	Dim x# : x = 0
 	Dim Tokens : Tokens = Array(_
 	gttsResourceCheck(), _

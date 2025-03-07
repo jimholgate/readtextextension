@@ -444,6 +444,18 @@ To automatically start the daemon, set the Docker container restart policy to
         self.add_pause = _common.add_pause
         self.voice_name = ""
 
+    def fix_all_caps(
+        self, _text: str = "", _checklist: str = " AEIOUYÀÂÄÁÉÈÊËÍÎÏÓÔÖÚÛÜŸ"
+    ) -> str:
+        """
+        By default, mimic3 spells out upper case words. If the `_text` looks like
+        it has only caps and it includes an item in the `_checklist`, then return
+        the string in lower case with the first letter capitalized.
+        """
+        if _text.isupper() and any(_item in _text for _item in _checklist):
+            return _text.lower().capitalize()
+        return _text
+
     def spd_voice_to_mimic3_voice(
         self, _search="female1", _iso_lang="en-US", _alt_local_url=""
     ) -> str:
@@ -718,7 +730,6 @@ a local URL that you specify.
         _text = readtexttools.local_pronunciation(
             _iso_lang, _text, self.local_dir, "MIMIC3_USER_DIRECTORY", False
         )[0].strip()
-
         readtexttools.lock_my_lock(self.locker)
         _tries = 0
         _no = "0" * 10
@@ -747,6 +758,7 @@ a local URL that you specify.
             _ssml = "false"
             if readtexttools.lax_bool(ssml):
                 _ssml = "true"
+            _item = self.fix_all_caps(_item)
             _done = self.try_url_lib(
                 _voice,
                 _item.strip(),

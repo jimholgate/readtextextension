@@ -118,11 +118,11 @@ Option Explicit
 Global i_CaReadTextExtensionPiperTestResult As Integer
 Global i_CaReadTextExtensionWinItunesVersion As Integer
 Global i_CheckInitialState As Integer
+Global f_CaReadTextExtensionCurrentConfig As Variant
+Global Config As Variant
 Global s_CaReadTextExtensionCurrentSessionCookie As String
 Global s_CaReadTextExtensionGetOS As String
 Private b_CaReadTextExtensionHideExports As Boolean
-Private Config As Variant
-Private f_CaReadTextExtensionCurrentConfig As Variant
 Private i_CaReadTextExtensionLastSpokenTrack As Integer
 Private mMyTranslationId(0) As Variant
 Private mMyTranslationIdPlur(0) As Variant
@@ -133,9 +133,10 @@ Private s_CaReadTextExtensionLocalHostSpeechURI As String
 Private s_CaReadTextExtensionWorkingCountryLanguage As String
 Private UpdatePoSettingsDone As Integer
 
-
 Sub CheckInitialState()
 	Dim s_item As String
+	&apos; Check status.
+	&apos; Remove temporary service files upon a restart or a crash.
 	Select Case i_CheckInitialState
 	Case 1
 	&apos; pass
@@ -144,7 +145,9 @@ Sub CheckInitialState()
 	For Each s_item in Array(&quot;lock&quot;, &quot;net_speech&quot;, &quot;bat&quot;)
 		fbRemoveFile(fsMyTempLock(s_item))
 	Next
-	i_CheckInitialState = 1
+	If Len(fsTheOsId()) &lt;&gt; 0 Then
+		i_CheckInitialState = 1
+	End If
 	End Select
 End Sub
 
@@ -308,6 +311,7 @@ Sub ReadTextAloud()
 	Dim locklist As Variant : locklist = Array(&quot;lock&quot;)
 	Dim LockItem As String : LockItem = &quot;&quot;
 	Dim bDone As Boolean : bDone = False
+	Dim sSelection As String : sSelection = fsGetTextSelection(False, True)
 	CheckInitialState
 	Select Case fsTheOsId()
 	Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;
@@ -315,14 +319,14 @@ Sub ReadTextAloud()
 		&apos; Don&apos;t show the dialog on first run.
 		&apos; Load default settings.
 		If Not FileExists(sFile) and fbDefaultToSpeechDispatcher() Then
-			MsgSpeak(fsGetTextSelection(False, True))
+			MsgSpeak(sSelection)
 			Exit Sub
 		End If
 	Case &quot;WINDOWS&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;, &quot;WINDOWS.NOSCRIPT&quot;
 		If Not FileExists(sFile) Then
 				&apos; Don&apos;t show the dialog on first run.
 				fsNetSAPI5WindowsSpeech(_
-			fsGetTextSelection(False, True), _
+				sSelection, _
 				fsSelectionLanguageAndRegion(False), _
 			)
 				Exit Sub
@@ -332,7 +336,7 @@ Sub ReadTextAloud()
 		&apos; Don&apos;t show the dialog on first run.
 		&apos; Load default settings.
 		If Not FileExists(sFile) Then
-			MsgSpeak(fsGetTextSelection(False, True))
+			MsgSpeak(sSelection)
 			Exit Sub
 		End If
 	End Select
@@ -461,7 +465,7 @@ Function UboundCurrentConfigItems() As Integer
 	&apos; The value of Ubound corresponds to the highest legal value for `x`
 	&apos; in a statement like `For x = 0 to UboundCurrentConfigItems()`
 	&apos; If the `f_CaReadTextExtensionCurrentConfig` variant is not initiated,
-	&apos; then it returns a value of `1`, so `UboundCurrentConfigItems - 1`
+	&apos; then it returns a value of `1`, so `UboundCurrentConfigItems + 1`
 	&apos; represents the count of the items.
 	On Error GoTo UboundCurrentConfigItemsErr
 	UboundCurrentConfigItems = ubound(f_CaReadTextExtensionCurrentConfig)

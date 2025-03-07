@@ -899,10 +899,12 @@ Function fsSampleMd(ByVal hl) As String
 End Function
 
 
-Sub ErrorDisplay()
+Sub ErrorDisplay(head As String)
 	&apos; Error message
-	MsgBox(fsLookUpTerm(&quot;s_string-cannot-be-analyzed&quot;), 48, _
-	fsLookUpTerm(&quot;s_read-text&quot;))
+	If Len(head) = 0 Then
+		head = fsLookUpTerm(&quot;s_read-text&quot;)
+	End If
+	MsgBox(fsLookUpTerm(&quot;s_string-cannot-be-analyzed&quot;), 48, head)
 End Sub
 
 
@@ -1406,7 +1408,16 @@ Function fsGetOs()
 	&apos; `getGUIType()` is much faster than `fsGetOS()` or
 	&apos; `fsTheOsId()` so use it for determining how to handle
 	&apos; `os.path`, `os.sep`, etc.
+	On Local Error GoTo fsGetOsErr
+	Select Case getGUIType()
+		Case 1
+		fsGetOs = &quot;WINDOWS&quot;
+		Case Else
 		fsGetOs = Split(fsTheOsId(), &quot;.&quot;)(0)
+	End Select
+	Exit Function
+	fsGetOsErr:
+	fsGetOs = &quot;POSIX&quot;
 End Function
 
 

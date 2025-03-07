@@ -21,8 +21,9 @@ Function fbTts_util_stringToBoolean( _
 	b = False
 	Dim v As String
 	v = Trim(value)
-	If StrComp(v,&quot;True&quot;,0) = 0 _
-		Or StrComp(v,&quot;yes&quot;,0) = 0 _
+	If StrComp(v,&quot;True&quot;, 0) = 0 _
+		Or StrComp(v,&quot;yes&quot;, 0) = 0 _
+		Or StrComp(v,&quot;1&quot;, 0) = 0 _
 		Or val(v) &lt;&gt; 0 Then
 		b = True
 	End If
@@ -580,48 +581,6 @@ Function fvTts_config_createDefaultConfig( _
 End Function
 
 
-Sub tts_config_parseLine( _
-	ByVal l As String, _
-	key As String, _
-	value As String)
-	&apos; Parses one line from the configuration file.
-	&apos;
-	&apos; Parameters:
-	&apos; l (in) line of input to parse
-	&apos; key (out) Place to put the key; &quot;&quot; if comment.
-	&apos; value (out) Place to put the value; &quot;&quot; if none.
-	&apos;
-	&apos; if the line is a comment line then the key will
-	&apos; be &quot;&quot;.
-	&apos;
-	Dim iEq As Integer
-	
-	&apos; Initialise return values
-	key = &quot;&quot;
-	value = &quot;&quot;
-	
-	&apos; Is this an empty line?
-	If Len(Trim(l)) = 0 Then
-		&apos; Empty - ignore
-		
-		&apos; Is this a comment line?
-	ElseIf Left(Trim(l),1) = &quot;#&quot; Then
-		&apos; Comment
-		
-	Else
-		&apos; Parse into key=value
-		iEq = InStr(l, &quot;=&quot;)
-		If iEq = 0 Then
-			&apos; not found - assume whole thing is key
-			key = l
-		Else
-			key = Left(l, iEq - 1)
-			value = Mid(l, iEq + 1)
-		End If
-	End If
-End Sub
-
-
 Sub tts_config_writeFile( _
 	Config() As Variant,ByVal configFilePath As String)
 	&apos; Writes a configuration file from an array.
@@ -693,115 +652,102 @@ End Sub
 
 
 Sub tts_config_parseFile( _
-	ByVal configFilePath As String, _
-	Config() As Variant, _
-	errorCode As Integer)
-	&apos; Parses the configuration file into an array.
-	&apos;
-	&apos; Parameters:
-	&apos; configFilePath (in) The path to the configuration file
-	&apos; Config() (in out) The configuration settings to update with settings
-	&apos;                   from the file.
-	&apos; errorCode (in out) The Error parameter.
-	&apos;
-	On Local Error GoTo tts_config_parseFileErr
-	Dim sA As String : sA = &quot;&quot;
-	Dim CR As String : CR = Chr(13)
-	Dim CR2 As String : CR2 = Chr(10)
-	Dim l As String : l = &quot;&quot;
-	Dim key As String : key = &quot;&quot;
-	Dim value As String : value = &quot;&quot;
-	Dim msgs() As Variant
-	Dim iLimit As Integer : iLimit = 0
-	
+    ByVal configFilePath As String, _
+    Config() As Variant, _
+    errorCode As Integer)
+    &apos; Parses the configuration file into an array.
+    &apos;
+    &apos; Parameters:
+    &apos; configFilePath (in) The path to the configuration file
+    &apos; Config() (in out) The configuration settings to update with settings
+    &apos;                   from the file.
+    &apos; errorCode (in out) The Error parameter.
+    &apos;
+    On Local Error GoTo tts_config_parseFileErr
+    Dim sA As String
+    Dim CR As String : CR = Chr(13)
+    Dim CR2 As String : CR2 = Chr(10)
+    Dim key As String
+    Dim value As String
+    Dim msgs() As Variant
+    Dim _items As Variant
+    Dim _item As String
+    Dim _pair As Variant
 
-	If Not FileExists(configFilePath) Then
-		&apos; Use defaults
-		Config = fvTts_config_createDefaultConfig( _
-		msgs(), _
-		errorCode)
-		Exit Sub
-	End If
-	sA = getLimitedTextFromFile(configFilePath)
+    If Not FileExists(configFilePath) Then
+        &apos; Use defaults
+        Config = fvTts_config_createDefaultConfig(msgs(), errorCode)
+        Exit Sub
+    End If
 
-	If InStr(sA, &quot;dialog1.&quot;) = 0 Then
-		&apos; Use defaults: wrong keys or could not read the file.
-		Config = fvTts_config_createDefaultConfig( _
-		msgs(), _
-		errorCode)
-		Exit Sub
-	End If
-	If InStr(sA, CR2) &lt; InStr(sA, CR) Then
-		&apos; choose character return or line feed
-		CR = CR2
-	End If
-	l = sA
-	Do While Len(l) &gt; 0
-		l = fsSuperTrim(Left(sA, InStr(sA, CR)), &quot;&quot;)
-		sA = fsSuperTrim(Mid(sA, InStr(sA, CR) + 1 ), &quot;&quot;)
-		tts_config_parseLine(l, key, value)
-		If Len(key) &gt; 0 Then
-			Select Case LCase(key)
-				Case &quot;dialog1.use.experimental.boolean&quot;
-				Config(pi_use_experimental_boolean) = fbTts_util_stringToBoolean(value)
-				Case &quot;dialog1.experimental.path.string&quot;
-				Config(pi_experimental_path_string) = value
-				Case &quot;dialog1.experimental.options.string&quot;
-				Config(pi_experimental_options_string) = value
-				Case &quot;dialog1.use.external.boolean&quot;
-				Config(pi_use_external_boolean) = fbTts_util_stringToBoolean(value)
-				Case &quot;dialog1.external.path.string&quot;
-				Select Case fsTheOsId()
-					Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
-					If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
-						&apos; Since users sometimes use both containers and native
-						&apos; apps, we update the location of the python to use.
-						&apos; For example, AppImage programs usually create a mount
-						&apos; point in the `/tmp/` temporary that includes a version of
-						&apos; python that might be incompatible with the system python.
-						Config(pi_external_path_string) = ConvertFromUrl(BundlePyPath())
-					Else
-						Config(pi_external_path_string) = value
-					End If
-					Case Else
-					Config(pi_external_path_string) = value
-					End Select
-				Case &quot;dialog1.external.options.string&quot;
-				Config(pi_external_options_string) = value
-				Select Case fsTheOsId()
-					Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
-					If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
-						&apos; The path to python can vary by version and by session, so
-						&apos; force a refresh.
-						Config(pi_external_options_string) = &quot;&quot;
-					End If
-				End Select
-				
-				Case &quot;dialog1.use.html.boolean&quot;
-				Config(pi_use_html_boolean) = fbTts_util_stringToBoolean(value)
-				
-				Case &quot;dialog1.html.string&quot;
-				Config(pi_html_string) = value
+    sA = getLimitedTextFromFile(configFilePath)
+    
+    If InStr(sA, &quot;dialog1.&quot;) = 0 Then
+        &apos; Use defaults: wrong keys or could not read the file.
+        Config = fvTts_config_createDefaultConfig(msgs(), errorCode)
+        Exit Sub
+    End If
 
-				Case &quot;dialog1.anonymous.key.string&quot;
-				Config(pi_anonymous_key_string) = value
-
-				Case &quot;dialog1.display.info.integer&quot;
-				Config(pi_display_info_integer) = fiStringToInteger(value)
-				
-				Case &quot;dialog1.display.language.string&quot;
-				Config(pi_display_language_string) = value
-				
-				Case &quot;dialog1.use.smart.select.integer&quot;
-				Config(pi_use_smart_select_integer) = value
-				Case Else
-			End Select
-		End If
-	Loop
-	f_CaReadTextExtensionCurrentConfig = Config
-	Exit Sub
-	tts_config_parseFileErr:
-	ResetAll()
+    _items = Split(sA, CR)
+    If UBound(_items) = 0 Then
+        _items = Split(sA, CR2)
+    End If
+    For Each _item In _items
+    	If Instr(_item, &quot;=&quot;) = 0 Or Instr(_item, &quot;#&quot;) = 1 Then
+    		GoTo ContinueParsing
+    	End If
+        _pair = Split(_item, &quot;=&quot;)
+        key = Trim(_pair(LBound(_pair)))
+        value = Trim(_pair(UBound(_pair)))
+        If Len(key) &lt;&gt; 0 And Len(value) &lt;&gt; 0 Then
+            Select Case key
+                Case &quot;dialog1.use.experimental.boolean&quot;
+                    Config(pi_use_experimental_boolean) = fbTts_util_stringToBoolean(value)
+                Case &quot;dialog1.experimental.path.string&quot;
+                    Config(pi_experimental_path_string) = value
+                Case &quot;dialog1.experimental.options.string&quot;
+                    Config(pi_experimental_options_string) = value
+                Case &quot;dialog1.use.external.boolean&quot;
+                    Config(pi_use_external_boolean) = fbTts_util_stringToBoolean(value)
+                Case &quot;dialog1.external.path.string&quot;
+                    Select Case fsTheOsId()
+                        Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
+                            If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
+                                Config(pi_external_path_string) = ConvertFromUrl(BundlePyPath())
+                            Else
+                                Config(pi_external_path_string) = value
+                            End If
+                        Case Else
+                            Config(pi_external_path_string) = value
+                    End Select
+                Case &quot;dialog1.external.options.string&quot;
+                    Config(pi_external_options_string) = value
+                    Select Case fsTheOsId()
+                        Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
+                            If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
+                                Config(pi_external_options_string) = &quot;&quot;
+                            End If
+                    End Select
+                Case &quot;dialog1.use.html.boolean&quot;
+                    Config(pi_use_html_boolean) = fbTts_util_stringToBoolean(value)
+                Case &quot;dialog1.html.string&quot;
+                    Config(pi_html_string) = value
+                Case &quot;dialog1.anonymous.key.string&quot;
+                    Config(pi_anonymous_key_string) = value
+                Case &quot;dialog1.display.info.integer&quot;
+                    Config(pi_display_info_integer) = fiStringToInteger(value)
+                Case &quot;dialog1.display.language.string&quot;
+                    Config(pi_display_language_string) = value
+                Case &quot;dialog1.use.smart.select.integer&quot;
+                    Config(pi_use_smart_select_integer) = value
+            End Select
+        End If
+        ContinueParsing:
+    Next
+    f_CaReadTextExtensionCurrentConfig = Config
+    Exit Sub
+tts_config_parseFileErr:
+    ResetAll()
 End Sub
 
 

@@ -644,6 +644,11 @@ Function fsGetWebService(_
 End Function
 
 
+Function fbMimicOrMaryttsOk() As Boolean
+	fbMimicOrMaryttsOk = fbGetWebServiceOK(&quot;http://0.0.0.0:59125&quot;)
+End Function
+
+
 Function fbGetWebServiceOK(_URL As String) As Boolean
 	&apos; AKA Ping; Use a trusted source that returns a result quickly.
 	&apos; i. e.: Check if piper-tts server is on the local network:
@@ -1395,6 +1400,17 @@ Sub aboutReadTextDialog()
 	AboutAddOn(&quot;&quot;)
 End Sub
 
+Function fbCheckFestivalDialog1(Config As Variant) As Boolean
+	fbCheckFestivalDialog1 = False
+	On Local Error GoTo fbCheckFestivalDialog1Err	
+	If Config(pi_use_experimental_boolean) And Instr(LCase(Config(pi_experimental_path_string)), &quot;festival&quot;) &lt;&gt; 0 Then
+		fbCheckFestivalDialog1 = True
+	End If
+	Exit Function
+	fbCheckFestivalDialog1Err:
+	fbCheckFestivalDialog1 = False
+End Function
+
 
 Sub AboutAddOn( _
 	myText As String)
@@ -1489,7 +1505,8 @@ Sub AboutAddOn( _
 		.GetControl(&quot;Label1&quot;).model.helpText = Left(fsGetTextSelection(False, False),99)
 		.GetControl(&quot;Label1&quot;).model.Label = Len(fsGetTextSelection(False, False))
 		&apos;Change the text in the information text boxes&apos;
-		If Config(pi_use_experimental_boolean) And Instr(LCase(Config(pi_experimental_path_string)), &quot;festival&quot;) &lt;&gt; 0 Then
+		
+		If fbCheckFestivalDialog1(Config) Then
 			.GetControl(&quot;TextField3&quot;).model.Text = Config(pi_experimental_path_string) &amp; &quot; &quot; &amp; _
 			&quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsFestivalScriptName()) &amp; &quot;&quot;&quot;&quot;
 			sA = replaceLocalTokensWithStr(Config(pi_experimental_options_string))
