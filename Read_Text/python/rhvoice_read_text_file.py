@@ -572,6 +572,8 @@ def main():  # -> None
             _audible = a
         elif o in ("-l", "--language"):
             _iso_lang = a
+            if _iso_lang.startswith("zxx"):
+                _iso_lang = "en-US"
         elif o in ("-r", "--rate"):
             _percent_rate = a
             _speech_rate = _percent_rate

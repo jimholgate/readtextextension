@@ -705,6 +705,8 @@ def main():  # -> NoReturn
             _audible = a
         elif o in ("-l", "--language"):
             _lang = a
+            if _lang.startswith("zxx"):
+                _lang = "en-US"
         elif o in ("-r", "--rate"):
             _rate_percent = a
             _irate = _espeak_rate(_rate_percent)

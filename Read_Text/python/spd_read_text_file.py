@@ -2088,6 +2088,8 @@ def main():
             # 2 letters lowercase - fr Français, de Deutsch...
             concise_lang = "".join([a.lower(), "-"]).split("-")[0]
             _language = a
+            if _language.startswith("zxx"):
+                _language = "en-US"
         elif o in ("-v", "--voice"):
             # MALE1, MALE2 ...
             _voice = a

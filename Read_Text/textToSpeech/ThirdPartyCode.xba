@@ -652,102 +652,113 @@ End Sub
 
 
 Sub tts_config_parseFile( _
-    ByVal configFilePath As String, _
-    Config() As Variant, _
-    errorCode As Integer)
-    &apos; Parses the configuration file into an array.
-    &apos;
-    &apos; Parameters:
-    &apos; configFilePath (in) The path to the configuration file
-    &apos; Config() (in out) The configuration settings to update with settings
-    &apos;                   from the file.
-    &apos; errorCode (in out) The Error parameter.
-    &apos;
-    On Local Error GoTo tts_config_parseFileErr
-    Dim sA As String
-    Dim CR As String : CR = Chr(13)
-    Dim CR2 As String : CR2 = Chr(10)
-    Dim key As String
-    Dim value As String
-    Dim msgs() As Variant
-    Dim _items As Variant
-    Dim _item As String
-    Dim _pair As Variant
+	ByVal configFilePath As String, _
+	Config() As Variant, _
+	errorCode As Integer)
+	&apos; Parses the configuration file into an array.
+	&apos;
+	&apos; Parameters:
+	&apos; configFilePath (in) The path to the configuration file
+	&apos; Config() (in out) The configuration settings to update with settings
+	&apos;				   from the file.
+	&apos; errorCode (in out) The Error parameter.
+	&apos;
+   On Local Error GoTo tts_config_parseFileErr
+	Dim sA As String
+	Dim CR As String : CR = Chr(13)
+	Dim CR2 As String : CR2 = Chr(10)
+	Dim key As String
+	Dim value As String
+	Dim msgs() As Variant
+	Dim _items As Variant
+	Dim _item As String
+	Dim _pair As Variant
+	Dim x As Integer
 
-    If Not FileExists(configFilePath) Then
-        &apos; Use defaults
-        Config = fvTts_config_createDefaultConfig(msgs(), errorCode)
-        Exit Sub
-    End If
+	If Not FileExists(configFilePath) Then
+		&apos; Use defaults
+		Config = fvTts_config_createDefaultConfig(msgs(), errorCode)
+		Exit Sub
+	End If
 
-    sA = getLimitedTextFromFile(configFilePath)
-    
-    If InStr(sA, &quot;dialog1.&quot;) = 0 Then
-        &apos; Use defaults: wrong keys or could not read the file.
-        Config = fvTts_config_createDefaultConfig(msgs(), errorCode)
-        Exit Sub
-    End If
+	sA = getLimitedTextFromFile(configFilePath)
+	
+	If InStr(sA, &quot;dialog1.&quot;) = 0 Then
+		&apos; Use defaults: wrong keys or could not read the file.
+		Config = fvTts_config_createDefaultConfig(msgs(), errorCode)
+		Exit Sub
+	End If
 
-    _items = Split(sA, CR)
-    If UBound(_items) = 0 Then
-        _items = Split(sA, CR2)
-    End If
-    For Each _item In _items
-    	If Instr(_item, &quot;=&quot;) = 0 Or Instr(_item, &quot;#&quot;) = 1 Then
-    		GoTo ContinueParsing
-    	End If
-        _pair = Split(_item, &quot;=&quot;)
-        key = Trim(_pair(LBound(_pair)))
-        value = Trim(_pair(UBound(_pair)))
-        If Len(key) &lt;&gt; 0 And Len(value) &lt;&gt; 0 Then
-            Select Case key
-                Case &quot;dialog1.use.experimental.boolean&quot;
-                    Config(pi_use_experimental_boolean) = fbTts_util_stringToBoolean(value)
-                Case &quot;dialog1.experimental.path.string&quot;
-                    Config(pi_experimental_path_string) = value
-                Case &quot;dialog1.experimental.options.string&quot;
-                    Config(pi_experimental_options_string) = value
-                Case &quot;dialog1.use.external.boolean&quot;
-                    Config(pi_use_external_boolean) = fbTts_util_stringToBoolean(value)
-                Case &quot;dialog1.external.path.string&quot;
-                    Select Case fsTheOsId()
-                        Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
-                            If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
-                                Config(pi_external_path_string) = ConvertFromUrl(BundlePyPath())
-                            Else
-                                Config(pi_external_path_string) = value
-                            End If
-                        Case Else
-                            Config(pi_external_path_string) = value
-                    End Select
-                Case &quot;dialog1.external.options.string&quot;
-                    Config(pi_external_options_string) = value
-                    Select Case fsTheOsId()
-                        Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
-                            If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
-                                Config(pi_external_options_string) = &quot;&quot;
-                            End If
-                    End Select
-                Case &quot;dialog1.use.html.boolean&quot;
-                    Config(pi_use_html_boolean) = fbTts_util_stringToBoolean(value)
-                Case &quot;dialog1.html.string&quot;
-                    Config(pi_html_string) = value
-                Case &quot;dialog1.anonymous.key.string&quot;
-                    Config(pi_anonymous_key_string) = value
-                Case &quot;dialog1.display.info.integer&quot;
-                    Config(pi_display_info_integer) = fiStringToInteger(value)
-                Case &quot;dialog1.display.language.string&quot;
-                    Config(pi_display_language_string) = value
-                Case &quot;dialog1.use.smart.select.integer&quot;
-                    Config(pi_use_smart_select_integer) = value
-            End Select
-        End If
-        ContinueParsing:
-    Next
-    f_CaReadTextExtensionCurrentConfig = Config
-    Exit Sub
+	_items = Split(sA, CR)
+	If UBound(_items) = 0 Then
+		_items = Split(sA, CR2)
+	End If
+	For Each _item In _items
+		If Instr(_item, &quot;=&quot;) = 0 Or Instr(_item, &quot;#&quot;) = 1 Then
+			GoTo ContinueParsing
+		End If
+		_pair = Split(_item, &quot;=&quot;)
+		key = Trim(_pair(LBound(_pair)))
+		value = &quot;&quot;
+		If Ubound(_pair) &lt;&gt; 0 Then
+			For x = 1 To Ubound(_pair)
+				Select Case x
+					Case Ubound(_pair)
+					value = value &amp; _pair(x)
+					Case Else
+					value = value &amp; _pair(x) &amp; &quot;=&quot;
+				End Select 
+			Next	
+		End If
+		If Len(key) &lt;&gt; 0 And Len(value) &lt;&gt; 0 Then
+			Select Case key
+				Case &quot;dialog1.use.experimental.boolean&quot;
+					Config(pi_use_experimental_boolean) = fbTts_util_stringToBoolean(value)
+				Case &quot;dialog1.experimental.path.string&quot;
+					Config(pi_experimental_path_string) = value
+				Case &quot;dialog1.experimental.options.string&quot;
+					Config(pi_experimental_options_string) = value
+				Case &quot;dialog1.use.external.boolean&quot;
+					Config(pi_use_external_boolean) = fbTts_util_stringToBoolean(value)
+				Case &quot;dialog1.external.path.string&quot;
+					Select Case fsTheOsId()
+						Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
+							If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
+								Config(pi_external_path_string) = ConvertFromUrl(BundlePyPath())
+							Else
+								Config(pi_external_path_string) = value
+							End If
+						Case Else
+							Config(pi_external_path_string) = value
+					End Select
+				Case &quot;dialog1.external.options.string&quot;
+					Config(pi_external_options_string) = value
+					Select Case fsTheOsId()
+						Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
+							If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
+								Config(pi_external_options_string) = &quot;&quot;
+							End If
+					End Select
+				Case &quot;dialog1.use.html.boolean&quot;
+					Config(pi_use_html_boolean) = fbTts_util_stringToBoolean(value)
+				Case &quot;dialog1.html.string&quot;
+					Config(pi_html_string) = value
+				Case &quot;dialog1.anonymous.key.string&quot;
+					Config(pi_anonymous_key_string) = value
+				Case &quot;dialog1.display.info.integer&quot;
+					Config(pi_display_info_integer) = fiStringToInteger(value)
+				Case &quot;dialog1.display.language.string&quot;
+					Config(pi_display_language_string) = value
+				Case &quot;dialog1.use.smart.select.integer&quot;
+					Config(pi_use_smart_select_integer) = value
+			End Select
+		End If
+		ContinueParsing:
+	Next
+	f_CaReadTextExtensionCurrentConfig = Config
+	Exit Sub
 tts_config_parseFileErr:
-    ResetAll()
+	ResetAll()
 End Sub
 
 

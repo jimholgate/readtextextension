@@ -247,6 +247,8 @@ def main():  # -> NoReturn
             _audible = a
         elif o in ("-l", "--language"):
             _language = a
+            if _language.startswith("zxx"):
+                _language = "en-US"
         elif o in ("-r", "--rate"):
             _rate = a
         elif o in ("-p", "--pitch"):
