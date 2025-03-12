@@ -249,6 +249,11 @@ def main():  # -> NoReturn
             _language = a
             if _language.startswith("zxx"):
                 _language = "en-US"
+                default_lang = readtexttools.default_lang()
+                if default_lang.split("_")[0] in [
+                    "de", "en", "es", "fr", "it"
+                ]:
+                    _language = default_lang.replace("_", "-")
         elif o in ("-r", "--rate"):
             _rate = a
         elif o in ("-p", "--pitch"):

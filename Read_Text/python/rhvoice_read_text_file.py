@@ -574,6 +574,10 @@ def main():  # -> None
             _iso_lang = a
             if _iso_lang.startswith("zxx"):
                 _iso_lang = "en-US"
+                default_lang = readtexttools.default_lang().replace("_", "-")
+                _voice = _rhvoice_cl.language_to_voice(_iso_lang)
+                if _rhvoice_cl.voice_available(_voice):
+                    _iso_lang = default_lang
         elif o in ("-r", "--rate"):
             _percent_rate = a
             _speech_rate = _percent_rate

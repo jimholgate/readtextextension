@@ -707,6 +707,9 @@ def main():  # -> NoReturn
             _lang = a
             if _lang.startswith("zxx"):
                 _lang = "en-US"
+                default_lang = readtexttools.default_lang().replace("_", "-")
+                if default_lang in espk_languages():
+                    _lang = default_lang
         elif o in ("-r", "--rate"):
             _rate_percent = a
             _irate = _espeak_rate(_rate_percent)

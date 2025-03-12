@@ -2226,6 +2226,9 @@ def main() -> None:
             _iso_lang = a
             if _iso_lang.startswith("zxx"):
                 _iso_lang = "en-US"
+                default_lang = readtexttools.default_lang().replace("_", "-")
+                if _piper_tts.language_supported(default_lang):
+                    _iso_lang = default_lang
         elif o in ("-c", "--config"):
             if a.startswith("~"):
                 a = os.path.expanduser(a)
@@ -2278,7 +2281,7 @@ voice model resources."""
                 os.path.remove(_piper_tts.app_locker)
             else:
                 readtexttools.pop_message(
-                    _piper_tts.help_heading,
+                    f"{_piper_tts.help_heading} ({_iso_lang})",
                     "The Piper_TTS client cannot find a compatible voice model for your language.",
                     5000,
                     _piper_tts.help_icon,
