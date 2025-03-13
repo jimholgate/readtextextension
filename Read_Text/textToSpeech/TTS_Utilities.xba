@@ -692,7 +692,6 @@ Function isFlatPak() As Boolean
 			Exit Function
 		End If
 	Next
-	&apos;isFlatPak = instr(Environ(&quot;PATH&quot;), &quot;/app/bin:/usr/bin&quot;) &lt;&gt; 0 
 End Function
 
 

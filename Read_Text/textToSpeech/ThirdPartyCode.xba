@@ -97,24 +97,6 @@ Function fsLinux64PythonLib() As String
 End Function
 
 
-Function fbCheckPythonJson(_cmd) As Boolean
-	&apos; For some local users, the system python3 is unavailable or incomplete.
-	&apos; &lt;https://github.com/urllib3/urllib3/issues/3020#issuecomment-1539843879&gt;
-	&apos; Try importing a library and see if there is an error.
-	fbCheckPythonJson = False
-	If Len(_cmd) = 0 Then
-		_cmd = &quot;import json&quot;
-	End If
-	On Error GoTo fbCheckPythonJsonErr
-	If Shell(&quot;python3&quot;, 0, &quot;-c &quot;&quot;&quot; &amp; _cmd &amp; &quot;&quot;&quot;&quot;) = 0 Then
-		fbCheckPython3Ok = True
-	End If
-	Exit Function
-	fbCheckPythonJsonErr:
-	fbCheckPythonJson = False
-End Function
-
-
 Function fbCheckPython3Ok(_cmd) As Boolean
 	&apos; For some local users, the system python3 is unavailable or incomplete.
 	&apos; &lt;https://github.com/urllib3/urllib3/issues/3020#issuecomment-1539843879&gt;
