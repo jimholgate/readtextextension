@@ -51,14 +51,9 @@ Copyright (c) 2011 - 2025 James Holgate
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import codecs
-import glob
-import locale
 import math
-import mimetypes
 import os
 import sys
-import tempfile
-import threading
 import time
 import unicodedata
 
@@ -69,11 +64,26 @@ except ImportError:
 
 try:
     import getopt
+except (ImportError, AssertionError, AttributeError):
+    pass
+
+try:
+    import glob
 except (ImportError, AssertionError):
     pass
 
 try:
     import json
+except (ImportError, AssertionError):
+    pass
+
+try:
+    import locale
+except (ImportError, AssertionError):
+    pass
+
+try:
+    import mimetypes
 except (ImportError, AssertionError):
     pass
 
@@ -94,7 +104,17 @@ except (ImportError, AssertionError):
 
 try:
     import subprocess
+except (AttributeError, ImportError, AssertionError):
+    pass
+
+try:
+    import tempfile
 except (ImportError, AssertionError):
+    pass
+
+try:
+    import threading
+except (AttributeError, ImportError, AssertionError):
     pass
 
 try:
@@ -130,11 +150,13 @@ except (ImportError, AssertionError):
 try:
     from urllib import quote
 except ImportError:
-    from urllib.parse import quote
+    try:
+        from urllib.parse import quote
+    except (ImportError, AssertionError):
+        pass
 
 try:
     import gi
-
     gi.require_version("Gst", "1.0")
     from gi.repository import Gst
 except (ImportError, ValueError, AssertionError):
@@ -142,8 +164,14 @@ except (ImportError, ValueError, AssertionError):
 
 try:
     from html.parser import HTMLParser
+except AssertionError:
+    pass
 except ImportError:
-    from HTMLParser import HTMLParser
+    try:
+        from HTMLParser import HTMLParser
+    except NameError:
+        pass
+
 
 try:
     import pathlib
@@ -457,22 +485,24 @@ class XmlTransform(object):
             test_text = test_text.replace(pair[0], pair[1])
         return test_text
 
+try:
+    class ClassRemoveXML(HTMLParser):
+        """Remove XML using python HTML parsing."""
 
-class ClassRemoveXML(HTMLParser):
-    """Remove XML using python HTML parsing."""
+        def __init__(self):
+            self.reset()
+            self.fed = []
+            self.convert_charrefs = []
 
-    def __init__(self):
-        self.reset()
-        self.fed = []
-        self.convert_charrefs = []
+        def handle_data(self, d):
+            """Handle string data."""
+            self.fed.append(d)
 
-    def handle_data(self, d):
-        """Handle string data."""
-        self.fed.append(d)
-
-    def get_fed_data(self):
-        """Return fed data."""
-        return "".join(self.fed)
+        def get_fed_data(self):
+            """Return fed data."""
+            return "".join(self.fed)
+except NameError:
+    pass
 
 
 def safechars(_test_string="", _allowed="1234567890,"):  # -> string

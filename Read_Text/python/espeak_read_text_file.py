@@ -81,12 +81,16 @@ Copyright (c) 2011 - 2025 James Holgate
 
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-import getopt
 import math
 import os
 import sys
 import readtexttools
 import find_replace_phonemes
+
+try:
+    import getopt
+except (ImportError, AssertionError, AttributeError):
+    exit()
 
 
 def usage():

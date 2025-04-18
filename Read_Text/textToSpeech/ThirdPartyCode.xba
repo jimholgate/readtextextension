@@ -464,7 +464,7 @@ Function fvTts_config_createDefaultConfig( _
 				Config(pi_use_experimental_boolean) = False
 				Config(pi_experimental_path_string) = &quot;/usr/bin/festival&quot;
 				Config(pi_experimental_options_string) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
-			ElseIf fbIsLibreOffice() Then
+			ElseIf fbIsLibreOffice() Or FileExists(&quot;/usr/bin/spd-say&quot;) Then
 				Config(pi_use_experimental_boolean) = False
 				Config(pi_experimental_path_string) = PosixPythonPath()
 				Config(pi_experimental_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			

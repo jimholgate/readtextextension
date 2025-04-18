@@ -28,7 +28,7 @@ For local python scripts to work with MacOS, you might need to install
 additional software. The specific details depend on the version of
 MacOS that you are using.
 
-One way to see if python3 is ready to go on your device is to run 
+One way to see if python3 is ready to go on your device is to run
 `python3 --version` in a terminal. If the program shows you a version
 number, you are ready to use python3. Otherwise follow the python
 website's instructions to install and set up the required software.
@@ -193,7 +193,6 @@ Copyright (c) 2010 - 2025 James Holgate
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import codecs
-import getopt
 import os
 import sys
 import time
@@ -204,6 +203,26 @@ import openjtalk_read_text_file
 import readtexttools
 
 try:
+    import getopt
+except (ImportError, AssertionError, AttributeError):
+    # Installing the MacOS Xcode application or an incompatible Python version
+    # might cause an `AssertionError` because one or more libraries in the
+    # python path fail an integrity check. For example, `getopt` depends on
+    # `re`.
+    print(
+        """
+ERROR:
+=====
+
+The `python{0}.{1}` libraries in your system path are not compatible with this
+application.
+""".format(
+            str(sys.version_info.major), str(sys.version_info.minor)
+        )
+    )
+    print(sys.path)
+    exit()
+try:
     import rhvoice_read_text_file
 except (AttributeError, ImportError, SyntaxError):
     pass
@@ -211,7 +230,7 @@ except (AttributeError, ImportError, SyntaxError):
 USE_SPEECHD = True
 try:
     import speechd
-except (ImportError, ModuleNotFoundError):
+except:  # (ImportError, ModuleNotFoundError):
     if readtexttools.using_container(False):
         print(
             """
@@ -358,13 +377,14 @@ def hard_reset(sd="speech-dispatcher"):  # -> bool
     """kill posix process"""
     if not readtexttools.have_posix_app(sd, False):
         return False
+    readtexttools.killall_process(sd)
     if not readtexttools.have_posix_app("killall", False):
         return False
     whoami = get_whoami()
     command = """killall {}""".format(sd)
     if whoami:
         command = """killall -q -u {} {}""".format(whoami, sd)
-    return readtexttools.my_os_system(command)
+    return readtexttools.my_os_system(command) == 0
 
 
 def usage():  # -> None
@@ -463,11 +483,19 @@ class SpdFormats(object):
         self.xml_tool = readtexttools.XmlTransform()
         self.json_tools = readtexttools.JsonTools()
         self.imported_meta = readtexttools.ImportedMetaData()
-        self.client_id = get_whoami()
+        # The fallback id is a unique string from this file's path like
+        # `lu207146ntk1.tmp_` that does not tell an external program
+        # your account's name.
+        self.client_id = (
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+            .split(os.sep)
+            .pop()
+        )
         self.client = None
         # Speech dispatcher and network tools do not have all
         # voices for all languages, so a tool might substitute
         # a missing voice for one that it does have.
+        self.sd_rate = 0
         self.rate_scales = [
             (320, 289, "---------|", 100),
             (288, 195, "--------|-", 35),
@@ -711,7 +739,7 @@ class SpdFormats(object):
             self.client.close()
             readtexttools.unlock_my_lock()
             return False
-        concise_lang = "".join([language.lower(), "-"]).split("-")[0].split("_")[0]
+        concise_lang = language.split("-")[0].split("_")[0].lower()
         _txt = readtexttools.strip_xml(_txt)
         _txt = readtexttools.strip_mojibake(concise_lang, _txt)
         _txt = readtexttools.local_pronunciation(
@@ -1227,10 +1255,12 @@ class SayFormats(object):
         # Modify default word rate for a voice using last column in
         # the spd_table
         self.json_string = ""
+        self.uname_major_ver = 0
         try:
-            self.uname_major_ver = int(os.uname().release.split(".")[0])
-        except [AttributeError, IndexError, ValueError]:
-            self.uname_major_ver = 0
+            if sys.version_info >= (3, 6):
+                self.uname_major_ver = int(os.uname().release.split(".")[0])
+        except [IndexError, ValueError]:
+            pass
         self.word_rate = 0
         self.app = ""
         self.lock = readtexttools.get_my_lock("lock")
@@ -2024,21 +2054,260 @@ class SayFormats(object):
             s1 = ""
         return s1
 
+    def spd_main_fallback(
+        self,
+        _file_spec="",
+        _client_id="",
+        _output_module="",
+        _output="",
+        _language="en",
+        _voice="MALE1",
+        _rate="100%",
+        _visible=False,
+    ):  # -> bool
+        """The fallback Posix system speech tool requires `spd-say`. It is
+        part of the debian 12 `speech-dispatcher` package. To enable setting
+        the speech rate using he `pied` generated `speech-dispatcher` settings
+        for `piper-tts`, you must install the `sox` command line utility.
+        """
+        _spd_formats = SpdFormats()
+        if _rate in ["100%", "100", "", 100, 0, False]:
+            _sd_rate = ""
+        else:
+            _sd_rate = "-r {0} ".format(_spd_formats.percent_to_spd(_rate * 160))
+        _module = ""
+        _type = "-t {0} ".format(_voice)
+        if _voice in ["", "MALE1"]:
+            _type = ""
+        if len(_output_module) != 0:
+            _module = "-m {_output_module} ".format(_output_module)
+        _command = '''sed -e 's/^!-!/ !-!/g' - | \\
+spd-say -w -e -l {0} {1} {2}{3} < "{4}"'''.format(
+            _language, _module, _sd_rate, _type, _file_spec
+        )
+        if os.path.isfile(readtexttools.get_my_lock("lock")):
+            _command = "spd-say -C"
+            readtexttools.unlock_my_lock()
+        else:
+            readtexttools.lock_my_lock()
+        if _visible:
+            print(_command)
+        _result = os.system(_command)
+        # `time.sleep(1)` is blocking the thread to avoid a duplicate
+        # system `spd-say` execution process:
+        time.sleep(1)
+        hard_reset("sed")
+        hard_reset("spd-say")
+        readtexttools.unlock_my_lock()
+        return _result == 0
+
+    def prefer_spd_say(self, _visible=False):  # -> boolean
+        """Use criteria to choose `spd-say`. The Linux python `speechd`
+        library sometimes times out with long paragraphs when you use
+        `pied` to set up `piper-tts` with the `speech-dispatcher`
+        daemon. In this case it is better to use the `spd-say` command
+        line by setting `--visible True` in the command line."""
+        if not os.path.isfile("/usr/bin/spd-say"):
+            return False
+        if not USE_SPEECHD:
+            # Python could not import `speechd` 
+            return True
+        if _visible:
+            return True
+        return False
+
+    def spd_main(
+        self,
+        _file_spec="",
+        _client_id="",
+        _output_module="",
+        _output="",
+        _language="en",
+        _voice="MALE1",
+        _rate="100%",
+        _visible=False,
+    ):
+        """Posix system speech tool"""
+        _spd_formats = SpdFormats()
+        _imported_metadata = readtexttools.ImportedMetaData()
+        sd_rate = _spd_formats.percent_to_spd(_rate)
+        _is_dev = self.debug != 0
+        _word_rate = 160
+        i_rate = 0
+        try:
+            if _rate.endswith("%"):
+                _rate = int(readtexttools.remove_unsafe_chars(_rate))
+                i_rate = _rate * 0.01
+                _word_rate = netcommon.speech_wpm(_rate)
+            else:
+                i_rate = int(readtexttools.remove_unsafe_chars(_rate))
+        except ValueError:
+            i_rate = 0
+        if not os.path.isfile(_file_spec):
+            return False
+        _spd_formats.revise_client_id(_client_id)
+
+        if os.path.isfile("/usr/bin/say"):
+            if os.path.isfile(readtexttools.get_my_lock("lock")):
+                hard_reset("say")
+                readtexttools.unlock_my_lock()
+                exit()
+            if not bool(i_rate) and bool(_voice):
+                # Enable a custom rate for each voice
+                i_rate = 1
+            _say_formats = SayFormats()
+            mac_reader = self.voice(_language)
+            _voice = self.spd_voice_to_say_voice(_voice, _language)
+            if not _voice.lower() == mac_reader.lower():
+                for line in self._a1:
+                    if line.startswith("{} ".format(_voice)):
+                        mac_reader = _voice
+                        break
+            _message_old = _imported_metadata.meta_from_file(_file_spec).strip()
+            _message = readtexttools.local_pronunciation(
+                _language,
+                _message_old,
+                "macos_say",
+                "MACOS_SAY_USER_DIRECTORY",
+                _is_dev,
+            )[0].strip()
+            if len(_message) != 0:
+                # Found misspoken words or phrases. MacOS does not support all phonetic
+                # codes, so you need to approximate the correct sound using similar words
+                # in the json document. See:
+                # * <https://www.internationalphoneticalphabet.org/ipa-chart-audio/index.html>
+                # * <https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-ssml-phonetic-sets>
+                if not _message == _message_old:
+                    os.remove(_file_spec)
+                    readtexttools.write_plain_text_file(_file_spec, _message, "utf-8")
+            if len(_output) == 0 and not _visible:
+                resultat = self.say_aloud(_file_spec, mac_reader, _voice, i_rate)
+
+                if not resultat:
+                    readtexttools.unlock_my_lock()
+                    if _voice.upper() in NET_SERVICE_LIST:
+                        if not net_play(_file_spec, _language, i_rate, _voice):
+                            print(network_read_text_file.network_problem(_voice))
+            else:
+                _audible = _visible
+                if not self.save_audio(
+                    _file_spec, mac_reader, i_rate, _output, _audible, _visible
+                ):
+                    if len(_language) != 0:
+                        try:
+                            _ext = os.path.splitext(_output)[1]
+                        except IndexError:
+                            _ext = ""
+                        if _voice.upper() in NET_SERVICE_LIST:
+                            if not network_read_text_file.network_main(
+                                _file_spec,
+                                _language,
+                                _visible,
+                                _audible,
+                                _output,
+                                "",
+                                "",
+                                "",
+                                "600x600",
+                                i_rate,
+                                _voice,
+                                "",
+                            ):
+                                readtexttools.pop_message(
+                                    "Network : Spoken content",
+                                    "No `{}` voice\n{}: No `{}` audio exported.".format(
+                                        _language, _voice, _ext
+                                    ),
+                                )
+                        else:
+                            readtexttools.pop_message(
+                                "Accessibility : Spoken content",
+                                "No `{}` voice\nNo `{}` audio exported.".format(
+                                    _language, _ext
+                                ),
+                            )
+            sys.exit(0)
+        elif os.name == "posix":
+            if self.prefer_spd_say(_visible):
+                if self.spd_main_fallback(
+                    _file_spec,
+                    _client_id,
+                    _output_module,
+                    _output,
+                    _language,
+                    _voice,
+                    _rate,
+                    _visible,
+                ):
+                    return True
+                print(
+                    """The `speechd` library is not compatible with your application
+    or platform. Try a networked speech tool like `mimic-server` or `docker-marytts`."""
+                )
+                if i_rate == 0:
+                    _word_rate = 160
+                if not network_read_text_file.network_main(
+                    _file_spec,
+                    _language,
+                    "false",
+                    "false",
+                    _output,
+                    "",
+                    "",
+                    "",
+                    "600x600",
+                    _word_rate,
+                    _voice,
+                    "",
+                ):
+                    _web_message = _imported_metadata.meta_from_file(_file_spec).strip()
+                    _max_message_len = 4999
+                    if len(_web_message) > _max_message_len:
+                        for punct in ["\n", "\t", "?", "!", ".", ",", ";", ":", " "]:
+                            if punct in _web_message:
+                                _web_message = _web_message.split(punct)[0]
+                                if not len(_web_message) > _max_message_len:
+                                    break
+                    if len(_web_message) > _max_message_len:
+                        exit(0)
+                    readtexttools.web_info_translate(_web_message, _language)
+                sys.exit(0)
+
+            if not _spd_formats.spd_ok:
+                print("The `speechd` python 3 library is required.")
+                usage()
+                sys.exit(0)
+            if not _spd_formats.set_up():
+                print(
+                    """The python 3 `speechd` setup failed. Check for a system update and
+    restart your computer."""
+                )
+                usage()
+                sys.exit(0)
+            _testing = False
+            if not _spd_formats.speak_spd(
+                _output_module, _language, _voice, sd_rate, _file_spec
+            ):
+                # Error - Try resetting `speechd`
+                hard_reset("speech-dispatcher")
+        return True
+
 
 def main():
     """Command line speech-dispatcher tool. Some implimentations of python
     require the long command line switch"""
-    _is_dev = False
     _imported_metadata = readtexttools.ImportedMetaData()
     _spd_formats = SpdFormats()
+    _say_formats = SayFormats()
     _file_spec = sys.argv[-1]
     _txt = ""
+    _client_id = ""
     i_rate = 0
-    sd_rate = 0
     _word_rate = 160
     _language = ""
     _output = ""
     _output_module = ""
+    _rate = "100%"
     _visible = False
     _voice = "MALE1"
     verbose_language = readtexttools.default_lang()
@@ -2049,7 +2318,6 @@ def main():
                 break
     if not _language:
         _language = "en"
-    concise_lang = _language[:2].lower()
 
     if not os.path.isfile(_file_spec):
         print("I was unable to find the text file you specified!")
@@ -2079,14 +2347,13 @@ def main():
         sys.exit(2)
     for o, a in opts:
         if o in ("-c", "--client_id"):
-            _spd_formats.revise_client_id(a)
+            _client_id = a
         elif o in ("-m", "--output_module"):
             _output_module = a
         elif o in ("-o", "--output"):
             _output = a
         elif o in ("-l", "--language"):
             # 2 letters lowercase - fr Français, de Deutsch...
-            concise_lang = "".join([a.lower(), "-"]).split("-")[0]
             _language = a
             if _language.startswith("zxx"):
                 _language = "en-US"
@@ -2094,153 +2361,24 @@ def main():
             # MALE1, MALE2 ...
             _voice = a
         elif o in ("-r", "--rate"):
-            try:
-                if a.endswith("%"):
-                    _rate = int(readtexttools.remove_unsafe_chars(a))
-                    i_rate = _rate * 0.01
-                    sd_rate = _spd_formats.percent_to_spd(_rate)
-                    _word_rate = netcommon.speech_wpm(a)
-                else:
-                    i_rate = int(readtexttools.remove_unsafe_chars(a))
-            except ValueError:
-                i_rate = 0
+            _rate = o
         elif o in ("-i", "--visible"):
-            if a.lower() in ["true"]:
-                _visible = True
+            _visible = readtexttools.lax_bool(a)
         elif o in ("-h", "--help"):
             usage()
             sys.exit()
         else:
             assert False, "unhandled option"
-    if os.path.isfile("/usr/bin/say"):
-        if os.path.isfile(readtexttools.get_my_lock("lock")):
-            hard_reset("say")
-            readtexttools.unlock_my_lock()
-            exit()
-        if not bool(i_rate) and bool(_voice):
-            # Enable a custom rate for each voice
-            i_rate = 1
-        _say_formats = SayFormats()
-        mac_reader = _say_formats.voice(_language)
-        _voice = _say_formats.spd_voice_to_say_voice(_voice, _language)
-        if not _voice.lower() == mac_reader.lower():
-            for line in _say_formats._a1:
-                if line.startswith("{} ".format(_voice)):
-                    mac_reader = _voice
-                    break
-        _message_old = _imported_metadata.meta_from_file(_file_spec).strip()
-        _message = readtexttools.local_pronunciation(
-            _language, _message_old, "macos_say", "MACOS_SAY_USER_DIRECTORY", _is_dev
-        )[0].strip()
-        if len(_message) != 0:
-            # Found misspoken words or phrases. MacOS does not support all phonetic
-            # codes, so you need to approximate the correct sound using similar words
-            # in the json document. See:
-            # * <https://www.internationalphoneticalphabet.org/ipa-chart-audio/index.html>
-            # * <https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-ssml-phonetic-sets>
-            if not _message == _message_old:
-                os.remove(_file_spec)
-                readtexttools.write_plain_text_file(_file_spec, _message, "utf-8")
-        if len(_output) == 0 and not _visible:
-            resultat = _say_formats.say_aloud(_file_spec, mac_reader, _voice, i_rate)
-
-            if not resultat:
-                readtexttools.unlock_my_lock()
-                if _voice.upper() in NET_SERVICE_LIST:
-                    if not net_play(_file_spec, _language, i_rate, _voice):
-                        print(network_read_text_file.network_problem(_voice))
-        else:
-            _audible = _visible
-            if not _say_formats.save_audio(
-                _file_spec, mac_reader, i_rate, _output, _audible, _visible
-            ):
-                if len(_language) != 0:
-                    try:
-                        _ext = os.path.splitext(_output)[1]
-                    except IndexError:
-                        _ext = ""
-                    if _voice.upper() in NET_SERVICE_LIST:
-                        if not network_read_text_file.network_main(
-                            _file_spec,
-                            _language,
-                            _visible,
-                            _audible,
-                            _output,
-                            "",
-                            "",
-                            "",
-                            "600x600",
-                            i_rate,
-                            _voice,
-                            "",
-                        ):
-                            readtexttools.pop_message(
-                                "Network : Spoken content",
-                                "No `{}` voice\n{}: No `{}` audio exported.".format(
-                                    _language, _voice, _ext
-                                ),
-                            )
-                    else:
-                        readtexttools.pop_message(
-                            "Accessibility : Spoken content",
-                            "No `{}` voice\nNo `{}` audio exported.".format(
-                                _language, _ext
-                            ),
-                        )
-        sys.exit(0)
-    elif os.name == "posix":
-        if not USE_SPEECHD:
-            print(
-                """The `speechd` library is not compatible with your application
-or platform. Try a networked speech tool like `mimic-server` or `docker-marytts`."""
-            )
-            if i_rate == 0:
-                _word_rate = 160
-            if not network_read_text_file.network_main(
-                _file_spec,
-                _language,
-                "false",
-                "false",
-                _output,
-                "",
-                "",
-                "",
-                "600x600",
-                _word_rate,
-                _voice,
-                "",
-            ):
-                _web_message = _imported_metadata.meta_from_file(_file_spec).strip()
-                _max_message_len = 4999
-                if len(_web_message) > _max_message_len:
-                    for punct in ["\n", "\t", "?", "!", ".", ",", ";", ":", " "]:
-                        if punct in _web_message:
-                            _web_message = _web_message.split(punct)[0]
-                            if not len(_web_message) > _max_message_len:
-                                break
-                if len(_web_message) > _max_message_len:
-                    exit(0)
-                readtexttools.web_info_translate(_web_message, _language)
-            sys.exit(0)
-
-        if not _spd_formats.spd_ok:
-            print("The `speechd` python 3 library is required.")
-            usage()
-            sys.exit(0)
-        if not _spd_formats.set_up():
-            print(
-                """The python 3 `speechd` setup failed. Check for a system update and
-restart your computer."""
-            )
-            usage()
-            sys.exit(0)
-        _testing = False
-        if not _spd_formats.speak_spd(
-            _output_module, _language, _voice, sd_rate, _file_spec
-        ):
-            # Error - Try resetting `speechd`
-            hard_reset("speech-dispatcher")
-    sys.exit(0)
+    _say_formats.spd_main(
+        _file_spec,
+        _client_id,
+        _output_module,
+        _output,
+        _language,
+        _voice,
+        _rate,
+        _visible,
+    )
 
 
 if __name__ == "__main__":

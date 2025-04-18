@@ -13,6 +13,7 @@ Copyright and License
 * (c) 2011-2025 James Holgate Vancouver, CANADA (readtextextension (a) outlook.com)
 * "Bubble" icon (c) 2013 icomoon.io Creative Commons 2.5 (Attribution) license.
 * "python-speech-d" (c) Copyright: 2001-2010, Brailcom, o.p.s. 2009, Marco Skambraks marco@openblinux.de 2009, Rui Batista rui.batista@ist.utl.pt License: LGPL-2.1<https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+* "PicoSvoxOOo" lexicon excerpts (c) Copyright 2013, Marie-Pierre Beauregare/ LGPL-2.1
 
 This is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. This script is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 

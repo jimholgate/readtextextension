@@ -31,19 +31,17 @@ corruption.
 
 import os
 import sys
-import tempfile
 
 try:
     import requests
-
     REQUESTS_OK = True
 except (AttributeError, ImportError):
     REQUESTS_OK = False
 try:
     import urllib
-
+    import tempfile
     BASICS_OK = True
-except ImportError:
+except (AssertionError, ImportError):
     BASICS_OK = False
 
 import netcommon

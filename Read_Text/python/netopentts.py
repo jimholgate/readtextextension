@@ -18,16 +18,15 @@ server to read aloud. This container includes over 1.28 GB of resources.
  
 import os
 import sys
-import tempfile
 import netcommon
 import readtexttools
 
 try:
     import urllib
     import json
-
+    import tempfile
     BASICS_OK = True
-except ImportError:
+except (ImportError, AssertionError):
     BASICS_OK = False
 
 

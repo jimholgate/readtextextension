@@ -16,13 +16,14 @@ Hidden Markov Model (HMM) algorithms.
 
 Install `pico2wave` using a package manager to install the following packages:
 
-        libttspico0
-        libttspico-utils
-        libttspico-data
+    libttspico0
+    libttspico-utils
+    libttspico-data
 
 Due to license restrictions,the packages are formally part of Debian's
 non-free category rather than Debian proper ("main"). The packages are also
-available in Ubuntu's multiverse repository.
+available in Ubuntu's multiverse repository, and might be available in third
+party repositories on other Linux platforms.
 
 For systems that can not use `apt` package manager, see the `picotts-install.sh`
 shell script at <https://github.com/stevenmirabito/asterisk-picotts/>.
@@ -58,7 +59,10 @@ Copyright (c) 2011 - 2025 James Holgate
 
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-import getopt
+try:
+    import getopt
+except (ImportError, AssertionError, AttributeError):
+    exit()
 import os
 import sys
 import readtexttools

@@ -181,9 +181,13 @@ Additional Resources
 
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-import getopt
 import os
 import sys
+
+try:
+    import getopt
+except (ImportError, AssertionError, AttributeError):
+    exit()
 
 try:
     import netgtts
@@ -503,6 +507,7 @@ def network_main(
             return True
     except NameError:
         pass
+    _g_class_ok = True
     try:
         _gtts_class = netgtts.GoogleTranslateClass()
         if (
@@ -524,21 +529,25 @@ def network_main(
             )
             return True
     except NameError:
-        pass
+        _g_class_ok = False
     # Just display a translation link.
-    _gtts_class.read(
-        _text,
-        _iso_lang,
-        _visible,
-        _audible,
-        _media_out,
-        _icon,
-        clip_title,
-        _post_processes[0],
-        _info,
-        _size,
-        _speech_rate,
-    )
+    if _g_class_ok:
+        try:
+            _gtts_class.read(
+                _text,
+                _iso_lang,
+                _visible,
+                _audible,
+                _media_out,
+                _icon,
+                clip_title,
+                _post_processes[0],
+                _info,
+                _size,
+                _speech_rate,
+            )
+        except UnboundLocalError:
+            pass 
 
     print(
         "No working network server was found, or the requested voice is unavailable.\n"

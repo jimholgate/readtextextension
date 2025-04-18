@@ -60,16 +60,16 @@ See the manual page for `qrencode` for more detailed information.
 Copyright (c) 2010 - 2025 James Holgate
 """
 
-import getopt
-import codecs
 import os
 import sys
 import readtexttools
 from urllib.parse import quote
 
 try:
+    import codecs
+    import getopt
     import webbrowser
-except ImportError:
+except (ImportError, AssertionError, AttributeError):
     pass
 try:
     from qrcode.image.pil import PilImage
@@ -98,7 +98,10 @@ needs to create a QR code. Try
 
 def usage():  # -> None
     """Show help text"""
-    sA = os.path.split(sys.argv[0])[1]
+    try:
+        sA = os.path(sys.argv[0])[1]
+    except TypeError:
+        sA = "create_qr_label.py"
     print(
         """QR Code
 =======

@@ -47,14 +47,14 @@ See:
 
 import os
 import sys
-import tempfile
 
 try:
     import urllib
     import json
+    import tempfile
 
     BASICS_OK = True
-except ImportError:
+except (ImportError, AssertionError):
     BASICS_OK = False
 import netcommon
 import readtexttools

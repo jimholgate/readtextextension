@@ -7,14 +7,13 @@ run the two localhost servers together using the defaults."""
 
 import os
 import sys
-import tempfile
 
 try:
     import urllib
     import json
-
+    import tempfile
     BASICS_OK = True
-except ImportError:
+except (ImportError, AssertionError):
     BASICS_OK = False
 import netcommon
 import readtexttools
@@ -445,7 +444,7 @@ To automatically start the daemon, set the Docker container restart policy to
         self.voice_name = ""
 
     def fix_all_caps(
-        self, _text: str = "", _checklist: str = " AEIOUYÀÂÄÁÉÈÊËÍÎÏÓÔÖÚÛÜŸ"
+        self, _text: str = "", _checklist: str = " AEIOUYÀÂÄÁÉÈÊËÍÎÏÓÔÖÚÛÜŸÅÆØŮĄĘ"
     ) -> str:
         """
         By default, mimic3 spells out upper case words. If the `_text` looks like

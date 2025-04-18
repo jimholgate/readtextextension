@@ -5,9 +5,17 @@
 import importlib
 import math
 import os
-import re
-import platform
 import time
+
+try:
+    import platform
+except AssertionError:
+    pass
+
+try:
+    import re
+except AssertionError:
+    pass
 
 try:
     import socket

@@ -288,18 +288,26 @@ Copyright (c) 2025 James Holgate
 
 
 import codecs
-import locale
 import os
 import random
 import stat
 import sys
 import time
-import getopt
 import urllib
 import warnings
 
 try:
+    import getopt
+except (ImportError, AssertionError, AttributeError):
+    exit()
+
+try:
     import json
+except (ImportError, AssertionError):
+    pass
+
+try:
+    import locale
 except (ImportError, AssertionError):
     pass
 
@@ -346,6 +354,7 @@ class PiperTTSClass(object):
             _meta = readtexttools.ImportedMetaData()
             self.machine = _meta.execute_command("uname -m")
         self.app_data = ".local"
+        self.last_onnx_md5 = ""
         self.piper_minimum_dictionary = {
             "GB-jenny_dioco-medium": {
                 "key": "en_GB-jenny_dioco-medium",
@@ -431,7 +440,7 @@ class PiperTTSClass(object):
                     f"~/.local/share/piper-tts/{_app}/{_app}",
                     f"~/.local/share/pied/common/{_app}/{_app}",
                     f"~/snap/pied/common/{_app}/{_app}",
-                    f"~/.var/app/com.mikeasoft.pied/data/pied/piper/piper",
+                    f"~/.var/app/com.mikeasoft.pied/data/pied/piper/{_app}",
                     f"~/.local/share/pied/piper/piper",
                     f"/usr/local/lib/piper/{_app}",
                     f"/usr/local/share/piper/{_app}",
@@ -474,6 +483,7 @@ class PiperTTSClass(object):
         self.pied_voice_dir_list = [
             "~/snap/pied/common/models",
             "~/.var/app/com.mikeasoft.pied/data/pied/models",
+            f"~/{self.app_data}/share/pied/common/models",
         ]
         self.piper_voice_dir_list = [
             f"~/{self.app_data}/share/piper-tts/piper-voices",
@@ -750,54 +760,46 @@ not work with the python version.
             pass
         return ""
 
-    def language_supported(self, iso_lang: str = "en-GB", vox: str = "auto") -> bool:
-        """Check to see if the language is available"""
-        model_test = vox.split("#")[0]
-        if model_test.startswith("~"):
-            model_test = os.path.expanduser(model_test)
-        if os.path.isfile(f"{model_test}.json"):
-            if os.path.isfile(model_test):
-                # August 31, 2024: the smallest valid onnx file is 20628813 bytes
-                if os.path.getsize(os.path.realpath(model_test)) > 10000000:
-                    self.use_specific_onnx_path = model_test
-                    self.lang = iso_lang
-                    file_name = os.path.split(model_test)[1]
-                    if "-" in file_name:
-                        self.concise_lang = file_name.split("_")[0]
-                    if "#" in vox:
-                        self.use_specific_onnx_voice_no = int(
-                            "".join(
-                                [
-                                    "0",
-                                    readtexttools.safechars(
-                                        vox.split("#")[1], "1234567890"
-                                    ),
-                                ]
-                            )
-                        )
-                    self.ok = True
-                    return self.ok
-            return False
-        if len(self.espeak_ng_dir) == 0:
-            return False
-        if len(self.piper_voice_dir) == 0:
-            return False
-        self.voice = int(
-            "".join(["0", readtexttools.safechars(vox.split("#")[0], "1234567890")])
-        )
-        self.voice_name = vox
-        self.concise_lang = iso_lang.split("_")[0].split("-")[0]
-        self.lang = iso_lang.replace("-", "_")
-        _dir_list = os.listdir(self.piper_voice_dir)
-
-        self.ok = False
-        if self.concise_lang in _dir_list:
-            if any(
-                self.concise_lang.startswith(_ignore) for _ignore in ["_script", "~"]
-            ):
-                return self.ok
-        self.ok = any(_file.startswith(self.concise_lang) for _file in _dir_list)
-        return self.ok
+    def get_md5_from_voices_json(self, _query: str = "en_GB-jenny_dioco-medium") -> str:
+        """
+        Returns the expected MD5 sum of a voice ONNX
+        package from `voices.json` based on a query term.
+        """
+        if os.sep in _query:
+            _query = os.path.splitext(os.path.basename(_query))[0]
+        if len(_query) == 0:
+            return ""
+        if not os.path.isfile(self.json_file):
+            return ""
+        try:
+            with codecs.open(
+                self.json_file, mode="r", encoding="utf-8", errors="replace"
+            ) as file_obj:
+                data = json.load(file_obj)
+        except (PermissionError, FileNotFoundError, json.JSONDecodeError):
+            return ""
+        for item in data.values():
+            _alias = "-".join([item["name"], item["quality"]])
+            if item["aliases"]:
+                _alias = item["aliases"][0]
+            for field in [item["key"], _alias, item["name"]]:
+                if _query == field:
+                    # Construct the ONNX path and fetch the MD5 digest
+                    _onnx_path = "/".join(
+                        [
+                            item["language"]["family"],
+                            item["language"]["code"],
+                            item["name"],
+                            item["quality"],
+                        ]
+                    )
+                    _onnx_file = f"{item['key']}.onnx"
+                    return (
+                        item["files"]
+                        .get(f"{_onnx_path}/{_onnx_file}", {})
+                        .get("md5_digest", "")
+                    )
+        return ""
 
     def link_home_dir_list(self, all_dir_list=None, _iso_lang: str = "en-US") -> bool:
         """Where onnx.json files exist in a posix home directory and files
@@ -813,25 +815,28 @@ not work with the python version.
         retval = False
         _env_lang = _iso_lang.replace("-", "_")
         _concise_lang = _env_lang.split("_")[0]
-        for _lang in [
-            _env_lang,
-            _concise_lang,
-        ]:
-            for _a_dir in all_dir_list:
-                if not os.path.exists(_a_dir):
-                    continue
-                try:
-                    files = os.listdir(_a_dir)
-                    for _file in files:
-
-                        if _file.startswith(_lang):
-                            if _file.endswith(".onnx"):
-                                _file, _ext = os.path.splitext(_file)
-                                self.pied_list.append(os.path.join(_a_dir, _file))
-                except FileNotFoundError:
-                    _file = ""
-        if not bool(self.pied_list):
+        try:
+            for _lang in [
+                _env_lang,
+                _concise_lang,
+            ]:
+                for _a_dir in all_dir_list:
+                    if not os.path.exists(_a_dir):
+                        continue
+                    try:
+                        files = os.listdir(_a_dir)
+                        for _file in files:
+                            if _file.startswith(_lang):
+                                if _file.endswith(".onnx"):
+                                    _file, _ext = os.path.splitext(_file)
+                                    self.pied_list.append(os.path.join(_a_dir, _file))
+                    except FileNotFoundError:
+                        _file = ""
+            if not bool(self.pied_list):
+                return False
+        except TypeError:
             return False
+
         _data = None
         _json_file = self.json_file
         if os.path.exists(_json_file):
@@ -948,6 +953,84 @@ Consider deleting it and downloading it again."""
             except (KeyError, SyntaxError):
                 return False
         return retval
+
+    def language_supported(self, iso_lang: str = "en-GB", vox: str = "auto") -> bool:
+        """Check to see if the language is available"""
+        if len(self.espeak_ng_dir) == 0:
+            return False
+        if len(self.piper_voice_dir) == 0:
+            return False
+        model_test = vox.split("#")[0]
+        if model_test.startswith("~"):
+            model_test = os.path.expanduser(model_test)
+        if os.path.isfile(f"{model_test}.json"):
+            if os.path.isfile(model_test):
+                if build_extension.calculate_md5(
+                    os.path.realpath(model_test)
+                ) == self.get_md5_from_voices_json(model_test):
+                    self.use_specific_onnx_path = model_test
+                    self.lang = iso_lang
+                    file_name = os.path.split(model_test)[1]
+                    if "-" in file_name:
+                        self.concise_lang = file_name.split("_")[0]
+                    if "#" in vox:
+                        self.use_specific_onnx_voice_no = int(
+                            "".join(
+                                [
+                                    "0",
+                                    readtexttools.safechars(
+                                        vox.split("#")[1], "1234567890"
+                                    ),
+                                ]
+                            )
+                        )
+                    self.ok = True
+                    return self.ok
+            return False
+        self.voice = int(
+            "".join(["0", readtexttools.safechars(vox.split("#")[0], "1234567890")])
+        )
+        self.voice_name = vox
+        self.concise_lang = iso_lang.split("_")[0].split("-")[0]
+        self.lang = iso_lang.replace("-", "_")
+        _dir_list = os.listdir(self.piper_voice_dir)
+        if self.concise_lang in _dir_list:
+            if any(
+                self.concise_lang.startswith(_ignore)
+                for _ignore in ["_script", "~", "."]
+            ):
+                return self.ok
+        retval = False
+        if any(_dir.startswith(self.concise_lang) for _dir in _dir_list):
+            retval = True
+            if self.pied_and_piper_directories_exist():
+                pied_model_path = self.pied_model_path()
+                for file_name in os.listdir(pied_model_path):
+                    for _test in [self.voice_name, self.lang, self.concise_lang]:
+                        if file_name.startswith(_test) and file_name.endswith(".onnx"):
+                            model_test = os.path.join(pied_model_path, file_name)
+                            if build_extension.calculate_md5(
+                                os.path.realpath(model_test)
+                            ) == self.get_md5_from_voices_json(model_test):
+                                all_dir_list = [self.pied_model_path()]
+                                self.ok = True
+                                self.link_home_dir_list(all_dir_list, self.lang)
+                                if not os.path.isfile(self.json_file):
+                                    print(
+                                        f"""Failed to link `{file_name}` to `{self.piper_voice_dir}`
+ 
+        
+The extension needs to download the current `voices.json` data
+for currently supported models, including data to check the
+integrity of each model.
+
+You can force the application to download it by using a command
+that includes the `--update True` option.
+
+    "(PIPER_READ_TEXT_PY)" --update True --language (SELECTION_LANGUAGE_COUNTRY_CODE) "(TMP)" """
+                                    )
+        self.ok = retval
+        return self.ok
 
     def model_path_list(
         self, iso_lang: str = "en-GB", _vox: str = "", extension: str = "onnx"
@@ -1280,15 +1363,32 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         _count = 1
         _extensions = ["MODEL_CARD", ".onnx.json", ".onnx"]
         s_count_total = str(len(_extensions))
+        pied_model_path = self.pied_model_path()
         for _end in _extensions:
+            pied_test = ""
             try:
                 if "." in _end:
                     piper_file = f"{lang_locale}-{name}-{quality}{_end}"
+                    if os.path.isfile(os.path.join(pied_model_path, piper_file)):
+                        pied_test = os.path.join(pied_model_path, piper_file)
                 else:
                     piper_file = _end
+                    pied_test = ""
                 home_file = os.path.join(
                     self.piper_voice_dir, lang, lang_locale, name, quality, piper_file
                 )
+                if self.get_md5_from_voices_json(
+                    pied_test
+                ) == build_extension.calculate_md5(pied_test):
+                    # Create a symbolic link to a file downloaded using the
+                    # `pied`` piper-tts configuration program.
+                    try:
+                        os.symlink(pied_test, home_file)
+                        if os.path.islink(home_file):
+                            continue
+                    except:
+                        pass
+
                 _rname = urllib.parse.quote(name)
                 _rpiper_file = urllib.parse.quote(piper_file)
                 remote_file = f"{home}{lang}/{lang_locale}/{_rname}/{quality}/{_rpiper_file}?download=true"
@@ -2105,15 +2205,203 @@ Links
     """
         return self.instructions
 
-    def test_for_pied_linkage(self) -> bool:
-        """If a pied directory exists, and the local directory has not been
-        configured, then return `True`."""
-        if len(self.pied_model_path()) != 0:
-            if not os.path.isdir(
-                os.path.join(os.path.expanduser(self.piper_voice_dir_list[0]), "ar")
-            ):
-                return True
+    def pied_and_piper_directories_exist(self) -> bool:
+        """If a pied directory exists, and a local piper directory has been
+        configured, then return `True`. The `voices.json` file has data that
+        reflects the current status of the current voice model repository,
+        whereas the pied program reflects the status at the time of the
+        application's most recent update."""
+        if len(self.pied_model_path()) == 0:
+            return False
+        if os.path.isdir(self.piper_voice_dir):
+            return any(
+                file_name == "_scripts"
+                for file_name in os.listdir(self.piper_voice_dir)
+            )
         return False
+
+    def get_checked_pied_onnx(self, _lang: str = "en-GB") -> str:
+        """Given an iso language description, check for a suitable onnx
+        file in a local pied resource directory. Return a usable
+        file path if it checks out as valid or `""` if it does not."""
+        if len(self.pied_model_path()) == 0:
+            return ""
+        if len(_lang) < 2:
+            return ""
+        _iso_lang = _lang.split(".")[0]
+        for _pair in [
+            ["-", "_"],
+            ["en_UK", "en_GB"],
+            ["uk_UK", "uk_UA"],
+        ]:
+            _iso_lang = _iso_lang.replace(_pair[0], _pair[1])
+        pied_model_path = self.pied_model_path()
+        for _test in [_iso_lang, _iso_lang.split("_")[0]]:
+            for file_name in os.listdir(pied_model_path):
+                if file_name.startswith(_test) and file_name.endswith(".onnx"):
+                    _found_file = os.path.join(pied_model_path, file_name)
+                    if os.path.isfile(_found_file):
+                        if not os.path.islink(_found_file):
+                            if self.get_md5_from_voices_json(
+                                _found_file
+                            ) == build_extension.calculate_md5(_found_file):
+                                return _found_file
+        return ""
+
+    def do_update(self) -> bool:
+        """"""
+        _backup = f"{self.json_file}.bak"
+        _update_msg = self.sample_webpage
+        if os.name == "nt":
+            _update_msg = "Download a compatible voice model"
+        if not os.path.isfile(self.app_locker):
+            readtexttools.pop_message(
+                self.help_heading,
+                _update_msg,
+                6000,
+                self.help_icon,
+                1,
+                self.concise_lang,
+            )
+        # `True`, `Yes`, `1`, `-1`
+        good_response = False
+        _dir = self.piper_voice_dir
+        if not os.path.isdir(_dir):
+            try:
+                os.makedirs(_dir)
+                self.pretty_json_write(
+                    self.piper_minimum_dictionary,
+                    self.json_file,
+                    "en-GB",
+                )
+            except (OSError, PermissionError):
+                print("Failed to create a `Piper_TTS` client directory.")
+                exit()
+            self.common.set_urllib_timeout(4)
+        for json_url in [
+            self.json_url,
+            self.json_url_alt,
+            self.json_url_wyoming,
+        ]:
+            try:
+                response = urllib.request.urlopen(json_url)
+                if os.path.isfile(self.json_file):
+                    if os.path.isfile(_backup):
+                        os.remove(_backup)
+                    os.rename(self.json_file, _backup)
+                self.update_request = True
+                self.json_url = json_url
+                good_response = True
+                break
+            except (TimeoutError, ValueError, urllib.error.URLError):
+                print(
+                    f"""The `Piper_TTS` client failed to connect.
+    <{json_url}>"""
+                )
+                return False
+            except OSError as e:
+                print(
+                    f"""OSError downloading `{self.json_file}`: {e}
+    <{json_url}>"""
+                )
+                return False
+            except Exception:
+                print(f"Error resolving `{json_url}`")
+                return False
+        if os.path.isfile(_backup):
+            if not os.path.isfile(self.json_file):
+                os.rename(_backup, self.json_file)
+        if not good_response:
+            if not os.path.isfile(self.app_locker):
+                readtexttools.pop_message(
+                    self.help_heading,
+                    "The `Piper_TTS` client failed to connect.",
+                    8000,
+                    self.help_icon,
+                    2,
+                    self.concise_lang,
+                )
+            return False
+        return True
+
+    def piper_main(
+        self,
+        _text_file_in: str = "",
+        _do_update: bool = False,
+        _iso_lang: str = "en-US",
+        _config: str = "",
+        _player: int = 0,
+        _percent_rate: str = "100%",
+        _voice: str = "AUTO0#0",
+    ) -> bool:
+        """Execute Piper TTS speech synthesis for supported languages
+        and return `True` if successful."""
+        all_dir_list = [self.piper_voice_dir]
+        if _do_update:
+            self.do_update()
+        if len(_iso_lang) == 0:
+            if "_" in _voice and len(_voice.split("-")) == 3:
+                _iso_lang = _voice.split("-", maxsplit=1)[0].replace("_", "-")
+            else:
+                _iso_lang = "en-US"
+        if not os.path.isfile(self.json_file):
+            self.model_path_list(self.lang, self.model, ".onnx")
+        for _a_dir in all_dir_list:
+            if os.path.isfile(os.path.join(_a_dir, "voices.json")):
+                _use_dir = _a_dir
+                break
+        if self.link_home_dir_list(all_dir_list, _iso_lang):
+            print(
+                """The Piper TTS client linked to newly installed Piper
+    voice model resources."""
+            )
+        if len(_use_dir) == 0 or self.update_request:
+            update_pop_msg = os.name == "posix"
+            if os.path.isfile(self.app_locker):
+                update_pop_msg = False
+            update_sub_dirs = True
+            self.update_local_model_dir(
+                _use_dir, _voice, update_sub_dirs, update_pop_msg
+            )
+        if not self.language_supported(_iso_lang, _voice):
+            if not self.update_request:
+                if os.path.isfile(self.app_locker):
+                    os.path.remove(self.app_locker)
+                else:
+                    readtexttools.pop_message(
+                        f"{self.help_heading} ({_iso_lang})",
+                        "The Piper_TTS client cannot find a compatible voice model for your language.",
+                        5000,
+                        self.help_icon,
+                        1,
+                        self.py_locale(),
+                    )
+                return False
+        if _text_file_in.startswith("~"):
+            _text_file_in = os.path.expanduser(_text_file_in)
+        if not os.path.isfile(_text_file_in):
+            return False
+        if sys.argv[-1] == sys.argv[0]:
+            self.usage()
+            return False
+        find_replace_phonemes.fix_up_text_file(
+            _text_file_in,
+            "",
+            _iso_lang,
+            self.local_dir,
+            "PIPER_USER_DIRECTORY",
+            False,
+        )
+        self.read(
+            _text_file_in,
+            _iso_lang,
+            _config,
+            netcommon.speech_wpm(_percent_rate),
+            _player,
+        )
+        if self.debug != 0:
+            print(self.load_instructions(True))
+        return True
 
 
 def main() -> None:
@@ -2123,21 +2411,13 @@ def main() -> None:
         print("Your system does not support the piper python tool.")
         _piper_tts.usage()
         sys.exit(0)
-    _dir = _piper_tts.piper_voice_dir
-    all_dir_list = [_dir]
-    for _item in _piper_tts.piper_voice_dir_list:
-        _expanded_dir = os.path.expanduser(_item)
-        if os.path.isdir(_expanded_dir):
-            if not _expanded_dir in all_dir_list:
-                all_dir_list.append(_expanded_dir)
+    _do_update = False
     _percent_rate = "100%"
     _iso_lang = ""
     _config = ""  # model json path (defaults to onnx path + .json suffix)
     _voice = "AUTO0#0"
-    _backup = f"{_piper_tts.json_file}.bak"
-    _use_dir = ""
+    # _use_dir = ""
     _player = 0
-    _update_selected = False
     if os.name == "nt":
         _player = 0
     _text_file_in = sys.argv[-1]
@@ -2155,73 +2435,7 @@ def main() -> None:
     for o, a in opts:
         if o in ("-u, --update"):
             if readtexttools.lax_bool(a):
-                _update_selected = True
-                _update_msg = _piper_tts.sample_webpage
-                if os.name == "nt":
-                    _update_msg = "Download a compatible voice model"
-                if not os.path.isfile(_piper_tts.app_locker):
-                    readtexttools.pop_message(
-                        _piper_tts.help_heading,
-                        _update_msg,
-                        6000,
-                        _piper_tts.help_icon,
-                        1,
-                        _piper_tts.concise_lang,
-                    )
-                # `True`, `Yes`, `1`, `-1`
-                good_response = False
-                if not os.path.isdir(_dir):
-                    try:
-                        os.makedirs(_dir)
-                        _piper_tts.pretty_json_write(
-                            _piper_tts.piper_minimum_dictionary,
-                            _piper_tts.json_file,
-                            "en-GB",
-                        )
-                    except (OSError, PermissionError):
-                        print("Failed to create a `Piper_TTS` client directory.")
-                        exit()
-                    _piper_tts.common.set_urllib_timeout(4)
-                for json_url in [
-                    _piper_tts.json_url,
-                    _piper_tts.json_url_alt,
-                    _piper_tts.json_url_wyoming,
-                ]:
-                    try:
-                        response = urllib.request.urlopen(json_url)
-                        if os.path.isfile(_piper_tts.json_file):
-                            if os.path.isfile(_backup):
-                                os.remove(_backup)
-                            os.rename(_piper_tts.json_file, _backup)
-                        _piper_tts.update_request = True
-                        _piper_tts.json_url = json_url
-                        good_response = True
-                        break
-                    except (TimeoutError, ValueError, urllib.error.URLError):
-                        print(
-                            f"""The `Piper_TTS` client failed to connect.
-    <{json_url}>"""
-                        )
-                    except OSError as e:
-                        print(
-                            f"""OSError downloading `{_piper_tts.json_file}`: {e}
-    <{json_url}>"""
-                        )
-                    except Exception:
-                        print(f"Error resolving `{json_url}`")
-                if os.path.isfile(_backup):
-                    if not os.path.isfile(_piper_tts.json_file):
-                        os.rename(_backup, _piper_tts.json_file)
-                if not good_response:
-                    if not os.path.isfile(_piper_tts.app_locker):
-                        readtexttools.pop_message(
-                            _piper_tts.help_heading,
-                            "The `Piper_TTS` client failed to connect.",
-                            8000,
-                            _piper_tts.help_icon,
-                            2,
-                            _piper_tts.concise_lang,
-                        )
+                _do_update = True
         elif o in ("-l", "--language"):
             _iso_lang = a
             if _iso_lang.startswith("zxx"):
@@ -2251,65 +2465,9 @@ def main() -> None:
             sys.exit(0)
         else:
             assert False, "unhandled option"
-    if len(_iso_lang) == 0:
-        if "_" in _voice and len(_voice.split("-")) == 3:
-            _iso_lang = _voice.split("-", maxsplit=1)[0].replace("_", "-")
-        else:
-            _iso_lang = "en-US"
-    if not os.path.isfile(_piper_tts.json_file):
-        _piper_tts.model_path_list(_piper_tts.lang, _piper_tts.model, ".onnx")
-    for _a_dir in all_dir_list:
-        if os.path.isfile(os.path.join(_a_dir, "voices.json")):
-            _use_dir = _a_dir
-            break
-    if _piper_tts.link_home_dir_list(all_dir_list, _iso_lang):
-        print(
-            """The Piper TTS client linked to newly installed Piper
-voice model resources."""
-        )
-    if len(_use_dir) == 0 or _piper_tts.update_request:
-        update_pop_msg = os.name == "posix"
-        if os.path.isfile(_piper_tts.app_locker):
-            update_pop_msg = False
-        update_sub_dirs = True
-        _piper_tts.update_local_model_dir(
-            _use_dir, _voice, update_sub_dirs, update_pop_msg
-        )
-    if not _piper_tts.language_supported(_iso_lang, _voice):
-        if not _piper_tts.update_request:
-            if os.path.isfile(_piper_tts.app_locker):
-                os.path.remove(_piper_tts.app_locker)
-            else:
-                readtexttools.pop_message(
-                    f"{_piper_tts.help_heading} ({_iso_lang})",
-                    "The Piper_TTS client cannot find a compatible voice model for your language.",
-                    5000,
-                    _piper_tts.help_icon,
-                    1,
-                    _piper_tts.py_locale(),
-                )
-            sys.exit(0)
-    if _text_file_in.startswith("~"):
-        _text_file_in = os.path.expanduser(_text_file_in)
-    if not os.path.isfile(_text_file_in):
-        sys.exit(0)
-    if sys.argv[-1] == sys.argv[0]:
-        _piper_tts.usage()
-        sys.exit(0)
-    find_replace_phonemes.fix_up_text_file(
-        _text_file_in,
-        "",
-        _iso_lang,
-        _piper_tts.local_dir,
-        "PIPER_USER_DIRECTORY",
-        False,
+    _piper_tts.piper_main(
+        _text_file_in, _do_update, _iso_lang, _config, _player, _percent_rate, _voice
     )
-    _piper_tts.read(
-        _text_file_in, _iso_lang, _config, netcommon.speech_wpm(_percent_rate), _player
-    )
-    if _piper_tts.debug != 0:
-        print(_piper_tts.load_instructions(True))
-    sys.exit(0)
 
 
 if __name__ == "__main__":

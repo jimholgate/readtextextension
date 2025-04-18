@@ -6,13 +6,12 @@ server](https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.
 """
 
 import os
-import tempfile
 
 try:
     import urllib
-
+    import tempfile
     BASICS_OK = True
-except ImportError:
+except (ImportError, AssertionError):
     BASICS_OK = False
 import netcommon
 import readtexttools

@@ -1,9 +1,13 @@
 """A useful library for handling multiple languages. Run to check JSON
 translation code. Run with `--help` to see more options."""
 
-import json
 import os
-import argparse
+
+try:
+    import argparse
+    import json
+except (ImportError, AssertionError):
+    exit()
 
 
 class Translator:

@@ -8,6 +8,7 @@ Copyright et licence
 * "Bubble" icon (c) 2013 icomoon.io Creative Commons 2.5 (Attribution) license.
 * "python-speech-d" (c) Copyright: 2001-2010, Brailcom, o.p.s. 2009, Marco Skambraks marco@openblinux.de 2009, Rui Batista rui.batista@ist.utl.pt License: LGPL-2.1
 <http://www.linux-france.org/article/these/gpl.html>
+* "PicoSvoxOOo" lexicon excerpts (c) Copyright 2013, Marie-Pierre Beauregare/ LGPL-2.1
 
 Use 
 
