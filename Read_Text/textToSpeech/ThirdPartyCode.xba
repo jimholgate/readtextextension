@@ -400,6 +400,7 @@ Function fvTts_config_createDefaultConfig( _
 	Dim sGetLanguage As String : sGetLanguage = fsGetLanguage()
 	Dim sLocalHostSpeech As String : sLocalHostSpeech = &quot;&quot;
 	Dim Item As Variant
+	Dim bHaveNetworkTTS As Boolean : bHaveNetworkTTS = fbHaveNetworkTTS()
 	&apos; Create default values for variables
 
 	Dim pyFallBack As String : pyFallBack = &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://quickchart.io/qr?size=350&amp;text=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
@@ -489,54 +490,65 @@ Function fvTts_config_createDefaultConfig( _
 			Else
 				Config(pi_external_path_string) = &quot;/usr/bin/python&quot;
 			End If
-			If fsTheOsId() = &quot;POSIX.SNAP&quot; Then
-				Config(pi_external_options_string) = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;FEMALE1&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf fbIsSandboxed() Then
-				Config(pi_external_options_string) = &quot;-m webbrowser -t &quot; &amp; _
-				&quot;&quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
-			ElseIf Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0 Then
-				Config(pi_external_options_string) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 And sGetLanguage = &quot;ja&quot; Then
-				&apos; Japanese
-				Config(pi_external_options_string) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf bPiperOk Then
-				Config(pi_external_options_string) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				&quot; --rate 100% --voice AUTO0#0 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; _
-				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or Len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
-				Config(pi_external_options_string) = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf fbHaveEspeak() Then
-				Config(pi_external_options_string) = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
-				&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
-			ElseIf fbPySupportFStrings() Then
-					Config(pi_external_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
-					&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot; &amp; _
-					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-				&apos; Mimic3 and MaryTTS servers include an English voice model by default.
-				&apos; Piper server uses the system language. Rhvoice-Rest and OpenTTS include
-				&apos; multiple voice models by default.
-				sLocalHostSpeech = fsLocalHostSpeech()
-				For Each Item in SpeechHostInfoList()
-					If InStr(Item.langs, sGetLanguage) &lt;&gt; 0 And Instr(sLocalHostSpeech, Item.url) = 1 Then
-						Config(pi_external_options_string) =  &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+			Select Case fsTheOsId()
+				Case &quot;POSIX.SNAP&quot;, &quot;POSIX.FLATPAK&quot;
+				If bHaveNetworkTTS Then
+					Config(pi_external_options_string) = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+						&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;FEMALE1&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				Else
+					Config(pi_external_options_string) = pyFallBack
+				End If
+				Case Else
+				If fbIsSandboxed() Then
+					Config(pi_external_options_string) = &quot;-m webbrowser -t &quot; &amp; _
+					&quot;&quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
+				ElseIf Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0 Then
+					Config(pi_external_options_string) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 					&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
-						Exit For
-					End If		
-				Next
-			Else
-				Config(pi_external_options_string) = pyFallBack
-			End If
+				ElseIf Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 And sGetLanguage = &quot;ja&quot; Then
+					&apos; Japanese
+					Config(pi_external_options_string) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+					&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
+				ElseIf bPiperOk Then
+					Config(pi_external_options_string) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+					&quot; --rate 100% --voice AUTO0#0 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; _
+					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				ElseIf Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or Len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
+					Config(pi_external_options_string) = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+					&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
+				ElseIf fbHaveEspeak() Then
+					Config(pi_external_options_string) = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+					&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
+				ElseIf fbPySupportFStrings() Then
+						Config(pi_external_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
+						&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot; &amp; _
+						&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+					&apos; Mimic3 and MaryTTS servers include an English voice model by default.
+					&apos; Piper server uses the system language. Rhvoice-Rest and OpenTTS include
+					&apos; multiple voice models by default.
+					sLocalHostSpeech = fsLocalHostSpeech()
+					For Each Item in SpeechHostInfoList()
+						If InStr(Item.langs, sGetLanguage) &lt;&gt; 0 And Instr(sLocalHostSpeech, Item.url) = 1 Then
+							Config(pi_external_options_string) =  &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
+						&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
+							Exit For
+						End If		
+					Next
+				Else
+					If bHaveNetworkTTS Then
+						Config(pi_external_options_string) = Config(pi_external_options_string)
+					Else
+						Config(pi_external_options_string) = pyFallBack
+					End If
+				End If
+			End Select
 		Elseif fbIsLibreOffice() Then
 			&apos;Mac (MacOS)
 			If fbOsaScriptOk(&quot;&quot;) And fbHaveItunes() Then
 				Config(pi_external_path_string) = AppleScriptPath()
 				Config(pi_external_options_string) = &quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
-			ElseIf fbHaveNetworkTTS() Then
+			ElseIf bHaveNetworkTTS Then
 				Config(pi_external_path_string) = PosixPythonPath()
 				Config(pi_external_options_string) =  &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _

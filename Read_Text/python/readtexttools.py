@@ -157,6 +157,7 @@ except ImportError:
 
 try:
     import gi
+
     gi.require_version("Gst", "1.0")
     from gi.repository import Gst
 except (ImportError, ValueError, AssertionError):
@@ -485,7 +486,9 @@ class XmlTransform(object):
             test_text = test_text.replace(pair[0], pair[1])
         return test_text
 
+
 try:
+
     class ClassRemoveXML(HTMLParser):
         """Remove XML using python HTML parsing."""
 
@@ -501,6 +504,7 @@ try:
         def get_fed_data(self):
             """Return fed data."""
             return "".join(self.fed)
+
 except NameError:
     pass
 
@@ -2345,11 +2349,11 @@ class ImportedMetaData(object):
         try:
             self.safe_gst_pipe = str.maketrans(
                 {
-                    " ": "\u005C ",
-                    '"': '\u005C"',
-                    "'": "\u005C'",
-                    ":": "\u005C:",
-                    "!": "\u005C!",
+                    " ": "\u005c ",
+                    '"': '\u005c"',
+                    "'": "\u005c'",
+                    ":": "\u005c:",
+                    "!": "\u005c!",
                 }
             )
         except AttributeError:
@@ -2388,7 +2392,7 @@ class ImportedMetaData(object):
         if self.safe_gst_pipe:
             return str(test_text.translate(self.safe_gst_pipe))
         for item in """ "':!""":
-            test_text = test_text.replace(item, "".join(["\u005C", item]))
+            test_text = test_text.replace(item, "".join(["\u005c", item]))
         return test_text
 
     def execute_command(self, a_command="", safer=True):  # -> str
@@ -3504,11 +3508,11 @@ def clean_str(test_text="", beautify_quotes=True):  # -> str
     _text = test_text
     try:
         if beautify_quotes:
-            for quot in [[" '", " \u2018"], [' "', " \u201C"]]:
+            for quot in [[" '", " \u2018"], [' "', " \u201c"]]:
                 _text = _text.replace(quot[0], quot[1])
         try:
             if beautify_quotes:
-                trans_quot = str.maketrans({"'": "\u2019", '"': "\u201D"})
+                trans_quot = str.maketrans({"'": "\u2019", '"': "\u201d"})
                 _text = str(_text.translate(trans_quot))
             trans_essentials = str.maketrans(
                 {"\n": " ", "\f": "", "\r": "", "\t": "", '"': " "}
@@ -3516,7 +3520,7 @@ def clean_str(test_text="", beautify_quotes=True):  # -> str
             return str(_text.translate(trans_essentials))
         except (AttributeError, NameError):
             if beautify_quotes:
-                for quot in [["'", "\u2019"], ['"', "\u201D"]]:
+                for quot in [["'", "\u2019"], ['"', "\u201d"]]:
                     _text = _text.replace(quot[0], quot[1])
             for pair1 in [["\n", " "], ["\f", ""], ["\r", ""], ["\t", " "], ['"', " "]]:
                 _text = _text.replace(pair1[0], pair1[1])
@@ -4096,6 +4100,14 @@ def pipewire_supported():  # -> bool
     # Check that the distribution works with .mp3 before adding to the list.
     if os.name != "posix":
         return False
+    if "/app/bin:/usr/bin" in os.environ["PATH"]:
+        # 2025.05.18
+        # LibreOffice (Flatpak) Version: 25.2.2.2 (X86_64) / LibreOffice Community
+        # ...
+        # Flatpak
+        # ...
+        # error: pw_context_connect() failed: Host is down
+        return False
     _ed_ver = ["0", "3", "48"]
     _meta = ImportedMetaData()
     try:
@@ -4145,9 +4157,6 @@ class PosixAudioPlayers(object):
         self.command_get = 2
         self.universal_play = 3  # verified to play compressed formats
         self.found_player = "Unknown player"
-        first_player = ["afplay", "afplay", '"%(file_path)s"', True]  # Darwin
-        if pipewire_supported():
-            first_player = ["pipewire-bin", "pw-cat", '-p "%(file_path)s"', True]
         _ffplay_out = "".join(
             [
                 " -window_title",
@@ -4159,11 +4168,22 @@ class PosixAudioPlayers(object):
                 """ -autoexit -x 640 -y 24 -autoexit -hide_banner -loglevel info -nostats "%(file_path)s" """,
             ]
         )
+        first_player = [
+            "ffmpeg",
+            "ffplay",
+            _ffplay_out,
+            True,
+        ]  # Flatpak plays most formats
+        if os.path.isfile("/usr/bin/afplay"):
+            first_player = ["afplay", "afplay", '"%(file_path)s"', True]  # Darwin
+        if pipewire_supported():
+            first_player = ["pipewire-bin", "pw-cat", '-p "%(file_path)s"', True]
         _vlc_out = """ --meta-title "[ > ] vlc" --audio-visual visualizer --effect-list spectrometer %(uri_path)s vlc://quit """
         try:
             # If system command `killall` is available, then hide the player window UI.
             if os.system("command -v killall > /dev/null") == 0:
-                _ffplay_out = """ -autoexit -hide_banner -loglevel info -nostats -nodisp "%(file_path)s" """
+                if not "/app/bin:/usr/bin" in os.environ["PATH"]:
+                    _ffplay_out = """ -autoexit -hide_banner -loglevel info -nostats -nodisp "%(file_path)s" """
                 _vlc_out = " --intf dummy %(uri_path)s vlc://quit "
         except (OSError, TypeError):
             pass

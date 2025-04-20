@@ -760,9 +760,11 @@ not work with the python version.
             pass
         return ""
 
-    def get_md5_from_voices_json(self, _query: str = "en_GB-jenny_dioco-medium") -> str:
+    def onnx_file_data_from_voices_json(
+        self, _query: str = "en_GB-jenny_dioco-medium", file_data: str = "md5_digest"
+    ) -> str:
         """
-        Returns the expected MD5 sum of a voice ONNX
+        Returns the expected `md5_digest` or `size_bytes` of a voice data
         package from `voices.json` based on a query term.
         """
         if os.sep in _query:
@@ -771,6 +773,8 @@ not work with the python version.
             return ""
         if not os.path.isfile(self.json_file):
             return ""
+        if not file_data in ["md5_digest", "size_bytes"]:
+            file_data = "md5_digest"
         try:
             with codecs.open(
                 self.json_file, mode="r", encoding="utf-8", errors="replace"
@@ -797,7 +801,7 @@ not work with the python version.
                     return (
                         item["files"]
                         .get(f"{_onnx_path}/{_onnx_file}", {})
-                        .get("md5_digest", "")
+                        .get(file_data, "")
                     )
         return ""
 
@@ -965,27 +969,32 @@ Consider deleting it and downloading it again."""
             model_test = os.path.expanduser(model_test)
         if os.path.isfile(f"{model_test}.json"):
             if os.path.isfile(model_test):
-                if build_extension.calculate_md5(
+                # Check if the real size is smaller than the expected size,
+                # i. e.: Check the `onnx` file is corrupt or if it is a text
+                # file placeholder.
+                if os.path.getsize(
                     os.path.realpath(model_test)
-                ) == self.get_md5_from_voices_json(model_test):
-                    self.use_specific_onnx_path = model_test
-                    self.lang = iso_lang
-                    file_name = os.path.split(model_test)[1]
-                    if "-" in file_name:
-                        self.concise_lang = file_name.split("_")[0]
-                    if "#" in vox:
-                        self.use_specific_onnx_voice_no = int(
-                            "".join(
-                                [
-                                    "0",
-                                    readtexttools.safechars(
-                                        vox.split("#")[1], "1234567890"
-                                    ),
-                                ]
-                            )
-                        )
-                    self.ok = True
+                ) < self.onnx_file_data_from_voices_json(model_test, "size_bytes"):
+                    self.ok = False
                     return self.ok
+                self.use_specific_onnx_path = model_test
+                self.lang = iso_lang
+                file_name = os.path.split(model_test)[1]
+                if "-" in file_name:
+                    self.concise_lang = file_name.split("_")[0]
+                if "#" in vox:
+                    self.use_specific_onnx_voice_no = int(
+                        "".join(
+                            [
+                                "0",
+                                readtexttools.safechars(
+                                    vox.split("#")[1], "1234567890"
+                                ),
+                            ]
+                        )
+                    )
+                self.ok = True
+                return self.ok
             return False
         self.voice = int(
             "".join(["0", readtexttools.safechars(vox.split("#")[0], "1234567890")])
@@ -1011,7 +1020,9 @@ Consider deleting it and downloading it again."""
                             model_test = os.path.join(pied_model_path, file_name)
                             if build_extension.calculate_md5(
                                 os.path.realpath(model_test)
-                            ) == self.get_md5_from_voices_json(model_test):
+                            ) == self.onnx_file_data_from_voices_json(
+                                model_test, "md5_digest"
+                            ):
                                 all_dir_list = [self.pied_model_path()]
                                 self.ok = True
                                 self.link_home_dir_list(all_dir_list, self.lang)
@@ -1377,8 +1388,8 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
                 home_file = os.path.join(
                     self.piper_voice_dir, lang, lang_locale, name, quality, piper_file
                 )
-                if self.get_md5_from_voices_json(
-                    pied_test
+                if self.onnx_file_data_from_voices_json(
+                    pied_test, "md5_digest"
                 ) == build_extension.calculate_md5(pied_test):
                     # Create a symbolic link to a file downloaded using the
                     # `pied`` piper-tts configuration program.
@@ -2242,8 +2253,8 @@ Links
                     _found_file = os.path.join(pied_model_path, file_name)
                     if os.path.isfile(_found_file):
                         if not os.path.islink(_found_file):
-                            if self.get_md5_from_voices_json(
-                                _found_file
+                            if self.onnx_file_data_from_voices_json(
+                                _found_file, "md5_digest"
                             ) == build_extension.calculate_md5(_found_file):
                                 return _found_file
         return ""

@@ -230,8 +230,17 @@ except (AttributeError, ImportError, SyntaxError):
 USE_SPEECHD = True
 try:
     import speechd
-except:  # (ImportError, ModuleNotFoundError):
+except Exception:  # (ImportError, ModuleNotFoundError):
     if readtexttools.using_container(False):
+        _language = readtexttools.default_lang()
+        readtexttools.pop_message(
+            "speechd ({0})".format(_language),
+            "No voice model found",
+            8000,
+            "",
+            2,
+            _language,
+        )
         print(
             """
 Using a *container* version of an office application could restrict your
@@ -2110,7 +2119,7 @@ spd-say -w -e -l {0} {1} {2}{3} < "{4}"'''.format(
         if not os.path.isfile("/usr/bin/spd-say"):
             return False
         if not USE_SPEECHD:
-            # Python could not import `speechd` 
+            # Python could not import `speechd`
             return True
         if _visible:
             return True

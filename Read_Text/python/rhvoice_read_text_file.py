@@ -74,6 +74,7 @@ top of the Read Text `netrhvoice.py` page on GitHub:
 
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 try:
     import getopt
 except (ImportError, AssertionError, AttributeError):

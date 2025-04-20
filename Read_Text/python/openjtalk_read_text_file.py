@@ -60,6 +60,7 @@ try:
 except (ImportError, AssertionError, AttributeError):
     exit()
 
+
 def usage():
     """
     Command line help

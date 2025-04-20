@@ -660,15 +660,18 @@ Function isSnap() As Boolean
 End Function
 
 
-Function isOldSnap() As Boolean
+Function isOldSnap(ByVal _test) As Boolean
 	&apos; Test python `speechd` library to see if `speech-dispatcher` is available
 	&apos; to check that &quot;(SPD_READ_TEXT_PY)&quot; --client_id &quot;(SESSION_ID)&quot; &quot;(TMP)&quot;
 	&apos; will work. TODO:
-	isOldSnap = (fsTheOsId() = &quot;POSIX.SNAP&quot;)
+	If Len(_test) = 0 Then
+		_test = &quot;POSIX.SNAP&quot;
+	End If
+	isOldSnap = (fsTheOsId() = _test)
 	Dim _cmd As String : _cmd = &quot;import speechd&quot;
 	If isOldSnap Then
 		On Error GoTo isOldSnapErr
-		If Shell(&quot;python3&quot;, 0, &quot;-c &quot;&quot;&quot; &amp; _cmd &amp; &quot;&quot;&quot;&quot;) = 0 Then
+		If Shell(&quot;/usr/bin/python3&quot;, 0, &quot;-c &quot;&quot;&quot; &amp; _cmd &amp; &quot;&quot;&quot;&quot;) = 0 Then
 			isOldSnap = False
 		End If	
 	End If
@@ -7351,7 +7354,7 @@ Sub CheckUnixSpeech()
 
 	If getGUIType() = 4 Then  &apos; POSIX
 		If Not(FileExists(fsExtensionSettingsIni())) Then
-			If isOldSnap() or fsTheOsId() = &quot;POSIX.SNAP&quot; Then
+			If isOldSnap(&quot;&quot;) or fsTheOsId() = &quot;POSIX.SNAP&quot; Then
 				&apos; Translate this message for your language
 				If (MsgBox(_(_
 				&quot;Get on-line help for snap? Read Text uses a http speech daemon like [mimic3-server](https://github.com/rhasspy/mimic3).&quot;,_

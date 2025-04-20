@@ -10,6 +10,7 @@ import os
 try:
     import urllib
     import tempfile
+
     BASICS_OK = True
 except (ImportError, AssertionError):
     BASICS_OK = False

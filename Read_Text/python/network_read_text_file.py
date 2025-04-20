@@ -51,7 +51,7 @@ compatibility mode. The compatibility mode allows the speech synthesis
 image to use the maryTTS address and port and the maryTTS Application
 Program Interface (API) to list installed voices and to produce spoken
 audio files over a local web service.
-  
+
 Mimic 3
 -------
 
@@ -64,14 +64,14 @@ speech tool that includes very high quality voice assets.
 
 Mimic 3 covers a lot of languages. The locally hosted web page has a Feedback
 button that encourages users to comment on how the pronunciation could be
-improved. 
+improved.
 
 If your computer architecture supports Mimic 3, you can use Mimic TTS with
 speech-dispatcher or as a localhost web server with this application. When
 installed from an apt archive, or a from compiled code, you can start the
 local web server at startup using a command to initiate `mimic3-server`.
 
-If you use a docker image, you can get the computer to start the mimic 
+If you use a docker image, you can get the computer to start the mimic
 localhost web server on startup by setting the Docker container restart policy
 to "always".
 
@@ -195,6 +195,7 @@ except (AttributeError, ImportError, SyntaxError):
     pass
 try:
     import requests
+
     REQUESTS_OK = True
 except (AttributeError, ImportError):
     REQUESTS_OK = False
@@ -547,7 +548,7 @@ def network_main(
                 _speech_rate,
             )
         except UnboundLocalError:
-            pass 
+            pass
 
     print(
         "No working network server was found, or the requested voice is unavailable.\n"

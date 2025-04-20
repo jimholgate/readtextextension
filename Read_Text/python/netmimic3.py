@@ -12,6 +12,7 @@ try:
     import urllib
     import json
     import tempfile
+
     BASICS_OK = True
 except (ImportError, AssertionError):
     BASICS_OK = False
@@ -564,7 +565,9 @@ a local URL that you specify.
                 if testbase.startswith("http"):
                     # not installed
                     continue
-                test_onnx = os.path.expanduser(f"{testbase}{os.sep}generator.onnx".replace("/home/mimic3/", "~/"))
+                test_onnx = os.path.expanduser(
+                    f"{testbase}{os.sep}generator.onnx".replace("/home/mimic3/", "~/")
+                )
                 if os.path.isfile(test_onnx):
                     if os.path.getsize(os.path.realpath(test_onnx)) < 1000:
                         # The file is a placeholder, not a real onnx file. On

@@ -15,7 +15,7 @@ server to read aloud. This container includes over 1.28 GB of resources.
 [1]: https://podman.io/docs/installation
 [2]: https://github.com/synesthesiam/opentts#open-text-to-speech-server
 """
- 
+
 import os
 import sys
 import netcommon
@@ -25,6 +25,7 @@ try:
     import urllib
     import json
     import tempfile
+
     BASICS_OK = True
 except (ImportError, AssertionError):
     BASICS_OK = False

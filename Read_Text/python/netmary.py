@@ -34,12 +34,14 @@ import sys
 
 try:
     import requests
+
     REQUESTS_OK = True
 except (AttributeError, ImportError):
     REQUESTS_OK = False
 try:
     import urllib
     import tempfile
+
     BASICS_OK = True
 except (AssertionError, ImportError):
     BASICS_OK = False

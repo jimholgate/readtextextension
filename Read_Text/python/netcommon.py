@@ -161,10 +161,10 @@ class LocalCommons(object):
             "\n",
             "\r",
             "\u2026",
-            "\u201C",
+            "\u201c",
             "\u2014",
             "\u2013",
-            "\u00A0",
+            "\u00a0",
         ]
         self.rhasspy_fm = [
             "eva_k",
@@ -244,11 +244,11 @@ class LocalCommons(object):
                     "\n": ";\n",
                     "\r": ";\r",
                     "(": " ( ",
-                    "\u201C": "\u201C;",
+                    "\u201c": "\u201c;",
                     "\u2026": "\u2026;",
                     "\u2014": "\u2014;",
                     "\u2013": "\u2013;",
-                    "\u00A0": " ",
+                    "\u00a0": " ",
                 }
             )
         except AttributeError:

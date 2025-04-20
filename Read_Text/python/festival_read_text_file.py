@@ -47,7 +47,7 @@ Small footprint English
 Other supported languages and voices
 
     sudo apt install festival <name_of_voice_package>
-    
+
 If you install rhvoice with apt-get or your normal package manager
 then some voices installed in the festival directory might not be
 compatible with festival. Using the `rhvoice-rest` docker image with
@@ -97,6 +97,7 @@ Copyright (c) 2011 - 2025 James Holgate
 
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 try:
     import getopt
 except (ImportError, AssertionError, AttributeError):
@@ -162,7 +163,7 @@ class ReadFestivalClass(object):
             self.player = readtexttools.get_nt_path("festival/festival.exe")
         elif readtexttools.have_posix_app("festival", False):
             self.player = "festival"
-        self.replacements = """?!\uFF1F\uFF01.,¡()[]¿…‥،;:—。，、：\n"""
+        self.replacements = """?!\uff1f\uff01.,¡()[]¿…‥،;:—。，、：\n"""
         self._divider = "\u2424"
         self.lock = readtexttools.get_my_lock("lock")
         self.script = readtexttools.get_my_lock("festival.scr")
@@ -174,8 +175,8 @@ class ReadFestivalClass(object):
                 {
                     "?": "?\u2424",
                     "!": "!\u2424",
-                    "\uFF1F": "\uFF1F\u2424",
-                    "\uFF01": "\uFF01\u2424",
+                    "\uff1f": "\uff1f\u2424",
+                    "\uff01": "\uff01\u2424",
                     ".": ".\u2424",
                     # u",": u",\u2424",
                     "¡": "¡\u2424",
@@ -191,9 +192,9 @@ class ReadFestivalClass(object):
                     ":": ":\u2424",
                     "—": "—\u2424",
                     "。": "。\u2424",
-                    "\uFF0C": "\uFF0C\u2424",
+                    "\uff0c": "\uff0c\u2424",
                     "、": "、\u2424",
-                    "\uFF1A": "\uFF1A\u2424",
+                    "\uff1a": "\uff1a\u2424",
                     "\n": "\n\u2424",
                 }
             )

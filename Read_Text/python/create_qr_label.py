@@ -30,7 +30,7 @@ Europe.
 
 * [python qrcode](https://pypi.org/project/qrcode/)
 * [zbar](http://zbar.sourceforge.net/)
-* [QuickChart.io](https://github.com/typpo/quickchart) code uses the 
+* [QuickChart.io](https://github.com/typpo/quickchart) code uses the
 GNU Affero General Public License v3.0 license, which is displayed at
 [GitHub](https://raw.githubusercontent.com/typpo/quickchart/master/LICENSE).
 

@@ -6,10 +6,12 @@
 import os
 import sys
 import readtexttools
+
 try:
     import getopt
 except (ImportError, AssertionError, AttributeError):
     exit()
+
 
 def usage():  # -> None
     """Show usage"""

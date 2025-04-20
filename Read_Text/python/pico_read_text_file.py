@@ -59,6 +59,7 @@ Copyright (c) 2011 - 2025 James Holgate
 
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 try:
     import getopt
 except (ImportError, AssertionError, AttributeError):
@@ -177,16 +178,18 @@ def picoread(
         if readtexttools.my_os_system(_os_command):
             if os.path.getsize(os.path.realpath(_work_file)) == 0:
                 return False
-            return bool(readtexttools.process_wav_media(
-                _title,
-                _work_file,
-                _image,
-                _out_file,
-                _audible,
-                _visible,
-                _artist,
-                _dimensions,
-            ))
+            return bool(
+                readtexttools.process_wav_media(
+                    _title,
+                    _work_file,
+                    _image,
+                    _out_file,
+                    _audible,
+                    _visible,
+                    _artist,
+                    _dimensions,
+                )
+            )
     except IOError:
         print("I was unable to read!")
         usage()
@@ -254,9 +257,7 @@ def main():  # -> NoReturn
             if _language.startswith("zxx"):
                 _language = "en-US"
                 default_lang = readtexttools.default_lang()
-                if default_lang.split("_")[0] in [
-                    "de", "en", "es", "fr", "it"
-                ]:
+                if default_lang.split("_")[0] in ["de", "en", "es", "fr", "it"]:
                     _language = default_lang.replace("_", "-")
         elif o in ("-r", "--rate"):
             _rate = a
