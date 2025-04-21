@@ -116,6 +116,7 @@ Option Explicit
 &apos;&apos;   [9]: https://raw.githubusercontent.com/jimholgate/readtextextension/master/Read_Text/registration/LICENSE?raw=true
 
 Global i_CaReadTextExtensionPiperTestResult As Integer
+Global i_CaReadTextExtensionSpdSayTestResult As Integer
 Global i_CaReadTextExtensionWinItunesVersion As Integer
 Global i_CheckInitialState As Integer
 Global f_CaReadTextExtensionCurrentConfig As Variant

@@ -2683,13 +2683,18 @@ Function fiDialog1CombosShowMyPythonChoices(_
 		getControl = &quot;ComboBox2&quot;
 	End If
 
-	If fbIsLibreOffice() Or FileExists(&quot;/usr/bin/spd-say&quot;) Then
-		If sTheOsId = &quot;POSIX.FLATPAK&quot; Then
-			sSpdToken = &quot;&quot;
-		ElseIf Not fbIsSandboxed() Then
+	If fbIsLibreOffice() Or fbSpdSayOk() Then
+		sSpdToken = &quot;&quot;
+		Select Case sTheOsId
+			Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;
 			sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
-		End If
-
+			Case &quot;POSIX.ANDROID&quot;, &quot;POSIX.SNAP&quot;
+			&apos; pass
+			Case Else
+			if fbSpdSayOk() Then
+				sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
+			End If
+		End Select
 		Select Case Len(fsLocalHostSpeech())
 			Case 0
 			&apos; pass
@@ -2923,7 +2928,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 		s4 = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; --language ja-JP&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 	End If
-	If Len(fsFindAppPath(&quot;spd-say&quot;)) &lt;&gt; 0 Then
+	If fbSpdSayOk() Then
 		Select Case fsTheOsId()
 			Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;
 			&apos; Exclude AppImage, Flatpak and Snap
@@ -8237,8 +8242,7 @@ Sub resetSpeechDispatcher( _
 		End If
 
     	Case Else  &apos; UNIX
-		If FileExists(&quot;/usr/bin/spd-say&quot;) Or _
-			FileExists(&quot;/usr/local/bin/spd-say&quot;) Then
+		If fbSpdSayOk() Then
 			If bAll Then
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet speech-dispatcher&quot;, True)
 			Else
