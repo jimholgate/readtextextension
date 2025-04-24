@@ -196,14 +196,10 @@ End Function
 
 Function fbOsaScriptOk(_command) As Boolean
 	&apos; Return `True` if MacOS `osascript` is executable
-	On Error Goto fbOsaScriptOkErr
 	If Len(_command) = 0 Then
 		_command = &quot;-e &apos;set checked to &quot;&quot;osascript ok&quot;&quot;&apos;&quot;
 	End If
-	fbOsaScriptOk = Shell(&quot;osascript&quot;, 0, _command) = 0
-	Exit Function
-	fbOsaScriptOkErr:
-	fbOsaScriptOk = False
+	fbPosixProgramOK(&quot;osascript&quot;, _command)
 End Function
 
 
@@ -333,13 +329,34 @@ Function PiperLocalSuggestion(_lang As String, _high As Boolean) As String
 End Function
 
 
-Function fbSpdSayOk() As Boolean
-	&apos; Return `True` if `spd-say` is executable
-	On Error Goto fbSpdSayOkErr
-	fbSpdSayOk = False
+Function fiPosixProgram023(_command As String, _challenge As String) As Integer
+	&apos; Return `3` if `os.sys(f&quot;{command} {_challenge}) == 0`
+	On Error Goto fiPosixProgram023Err
+	fiPosixProgram023= 0
 	If getGUIType() = 1 Then
 		Exit Function
 	End If
+	If Shell(_command, 0, _challenge) = 0 Then
+		fiPosixProgram023 = 3
+	Else
+		fiPosixProgram023= 2
+	End If
+	Exit Function
+	fiPosixProgram023Err:
+	fiPosixProgram023= 2
+End Function
+
+
+Function fbPosixProgramOK(_command As String, _challenge As String) As Boolean
+	&apos; Handles local error for command ` If Shell(_command, 0, _challenge) = 0 Then ...
+	&apos; Usage:  If fiPosixProgramOK(&quot;pico2wave&quot;, &quot;--usage &gt; /dev/null&quot;) Then
+	fbPosixProgramOK = fiPosixProgram023(_command, _challenge) = 3
+End Function
+
+
+Function fbSpdSayOk() As Boolean
+	&apos; Return `True` if `spd-say` is executable
+	fbSpdSayOk = False
 	Select Case i_CaReadTextExtensionSpdSayTestResult
 		&apos; Only test once per session.
 		&apos; Did test complete?
@@ -350,16 +367,8 @@ Function fbSpdSayOk() As Boolean
 		fbSpdSayOk = True
 		Exit Function
 	End Select
-	If Shell(&quot;spd-say&quot;, 0, &quot;-v &gt; /dev/null&quot;) = 0 Then
-		i_CaReadTextExtensionSpdSayTestResult = 3
-		fbSpdSayOk = True
-	Else
-		i_CaReadTextExtensionSpdSayTestResult = 2
-	End If
-	Exit Function
-	fbSpdSayOkErr:
-	i_CaReadTextExtensionSpdSayTestResult = 2
-	fbSpdSayOk = False
+	i_CaReadTextExtensionSpdSayTestResult = fiPosixProgram023(&quot;spd-say&quot;, &quot;-v &gt; /dev/null&quot;)
+	fbSpdSayOk = (i_CaReadTextExtensionSpdSayTestResult = 3)
 End Function
 
 
@@ -543,10 +552,10 @@ Function fvTts_config_createDefaultConfig( _
 				If fbIsSandboxed() Then
 					Config(pi_external_options_string) = &quot;-m webbrowser -t &quot; &amp; _
 					&quot;&quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
-				ElseIf Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0 Then
+				ElseIf fbPosixProgramOK(&quot;pico2wave&quot;, &quot; --usage &gt; /dev/null&quot;) Then
 					Config(pi_external_options_string) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 					&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
-				ElseIf Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 And sGetLanguage = &quot;ja&quot; Then
+				ElseIf fbPosixProgramOK(&quot;open_jtalk&quot;, &quot; &gt; /dev/null&quot;) And sGetLanguage = &quot;ja&quot; Then
 					&apos; Japanese
 					Config(pi_external_options_string) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 					&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
@@ -554,7 +563,7 @@ Function fvTts_config_createDefaultConfig( _
 					Config(pi_external_options_string) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 					&quot; --rate 100% --voice AUTO0#0 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; _
 					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
-				ElseIf Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or Len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
+				ElseIf Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or fbPosixProgramOK(&quot;flite&quot;, &quot;-? &gt; /dev/null&quot;) Then
 					Config(pi_external_options_string) = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 					&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
 				ElseIf fbHaveEspeak() Then

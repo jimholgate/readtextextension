@@ -2900,7 +2900,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 			s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --eval &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot;
 			s1 = s1 &amp; fspyOutOptions(oDialog, s4, bEnableRate)
 		End Select
-	ElseIf len(fsFindAppPath(&quot;flite&quot;)) &lt;&gt; 0 Then
+	ElseIf fbPosixProgramOK(&quot;flite&quot;, &quot;-? &gt; /dev/null&quot;) Then
 		s4 = &quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;
 		s1 = s1 &amp; fspyPlayOption(oDialog, s4)	
 	End If
@@ -2918,13 +2918,13 @@ Function fiDialog1CombosShowMyPythonChoices(_
 		s4 = &quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &apos; &amp; &quot; --rate 100% --pitch 100% &quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
 	End If
-	If Len(fsFindAppPath(&quot;pico2wave&quot;)) &lt;&gt; 0  Then
+	If fbPosixProgramOK(&quot;pico2wave&quot;, &quot; --usage &gt; /dev/null&quot;) Then
 		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --visible True --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
 	End If
-	If Len(fsFindAppPath(&quot;open_jtalk&quot;)) &lt;&gt; 0 Then
+	If fbPosixProgramOK(&quot;open_jtalk&quot;, &quot; &gt; /dev/null&quot;) Then
 		s4 = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; --language ja-JP&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 	End If
@@ -3416,7 +3416,9 @@ Function fsAppImageResourcePath( _
 	ps_appimageresourcepath = &quot; &quot;
 	fsAppImageResourcePath = &quot;&quot;
 End Function
-
+sub xxxx
+	print ConvertFromUrl(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
+end sub
 
 Function fsContainerResourcePath( _
 	ByVal sApp As String) As String
@@ -7304,12 +7306,13 @@ Function fbCheckPosixSpeech() As Boolean
 	fbCheckPosixSpeech = False
 	Dim Apps As Variant : Apps = Array(&quot;festival&quot;, &quot;flite&quot;, &quot;open_jtalk&quot;, _
 	&quot;pico2wave&quot;, &quot;piper&quot;, &quot;RHVoice-test&quot;, &quot;spd-say&quot;)
-	Dim osId As String : osId = fsTheOsId()
+	Dim osId As String
 
 	Select Case getGUIType()
 		Case 1  &apos; WINDOWS
 			fbCheckPosixSpeech = False
 		Case Else
+			osId = fsTheOsId()
 			fbCheckPosixSpeech = CheckPosixSpeech(osId, Apps)
 	End Select
 End Function
@@ -7382,7 +7385,7 @@ Sub zzz_print_available_apps
 	&quot;pico2wave&quot;, &quot;piper&quot;, &quot;RHVoice-test&quot;, &quot;spd-say&quot;, &quot;ffmpeg&quot;, _
 	&quot;say&quot;, &quot;open&quot;, &quot;xdg-open&quot;, &quot;gnome-open&quot;, &quot;osascript&quot;, &quot;vlc&quot;, _
 	&quot;python3&quot;)
-		If Len(fsFindAppPath(Item)) &lt;&gt; 0 Then
+		If fbPosixProgramOK(Item, &quot;--version &gt; /dev/null&quot;) Then
 			print fsFindAppPath(Item)
 		End If
 	Next
@@ -7408,7 +7411,7 @@ Function fbHaveEspeak() As Boolean
 		Exit Function
 	End Select
 	Dim _item As String : _item = &quot;&quot;
-	Dim ErrLevel As Integer
+	Dim _level As Integer
 	Dim a1 : a1 = Array(&quot;espeak-ng&quot;, &quot;speak-ng&quot;, &quot;espeak&quot;)
 	For Each _item in a1
 		If Len(fsFindAppPath(_item)) &lt;&gt; 0 Then
@@ -7419,20 +7422,21 @@ Function fbHaveEspeak() As Boolean
 	Select Case getGUIType()
 		Case 1  &apos; WINDOWS
 		If FileExists(fsProgramDirectoryx86() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Or _
-				FileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
+		FileExists(fsProgramDirectory() &amp; &quot;eSpeak\command_line\espeak.exe&quot;) Then
 			fbHaveEspeak = True
 		End If
 		Case Else
-		On Error GoTo fbHaveEspeakErr
-		ErrLevel = shell(&quot;espeak-ng&quot;, 0, &quot; --version&quot;)
-		If ErrLevel = 0 Then
-			fbHaveEspeak = True
-		End If
+		For Each _item in a1
+			If fbPosixProgramOK(_item, 0, &quot; --version &gt; /dev/null&quot;) Then
+				fbHaveEspeak = True
+				Exit Function
+			End If
+		Next
 	End Select
-	Exit Function
-	fbHaveEspeakErr:
-	fbHaveEspeak = False
 End Function
+sub xx
+print fsMyPipeWire()
+end sub
 
 Function fbHaveFfmpeg() As Boolean
 	fbHaveFfmpeg = Not (Len(fsMyFfmpeg()) = 0)
@@ -7740,7 +7744,7 @@ Function gttsResourceCheck()
 	Case &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;POSIX.FLATPAK&quot;
 		&apos; pass
 	Case Else
-		If fbPySupportFStrings Then
+		If fbPySupportFStrings() Then
 			gttsResourceCheck = Environ(&quot;HOME&quot;) &amp; &quot;/.local/bin/gtts-cli&quot;
 		End If
 	End Select
@@ -10478,6 +10482,7 @@ Function BundlePyPath()
 	BundlePyPathErr:
 	BundlePyPath = &quot;&quot;
 End Function
+
 
 Function fsWinLocaleStr(_
 		Optional ByVal sNode) As String

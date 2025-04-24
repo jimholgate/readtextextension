@@ -271,15 +271,7 @@ End Function
 Function fbHaveSnap() As Boolean
 	&apos; By default, Snap Ubuntu installations run in strict containment mode and
 	&apos; therefore might not be able to access certain paths, programs, data etc.
-	fbHaveSnap = False
-	On Local Error GoTo fbHaveSnapErr
-	Select Case getGUIType()
-	Case 4
-		fbHaveSnap = shell(&quot;snap&quot;, 0, &quot; --version &gt; /dev/null&quot;) = 0
-	End Select
-	Exit Function
-	fbHaveSnapErr:
-	fbHaveSnap = False
+	fbHaveSnap = fbPosixProgramOK(&quot;snap&quot;, &quot; --version &gt; /dev/null&quot;)
 End Function
 
 
@@ -298,7 +290,12 @@ End Function
 
 
 Function fbPySupportFStrings() As Boolean
-	&apos; Supports strings with fields using `f(&quot;Version {solar_version}&quot;)`
+	&apos; Supports fast f string handling
+	&apos; ```
+	&apos; Shell(ConvertFromURL(_
+	&apos; BundlePyPath(_
+	&apos; )), 0, &quot;-c &quot;&quot;import sys;f1 = (f&apos;{sys.executable} {sys.version}&apos;)&quot;&quot;&quot;)
+	&apos; ```
 	fbPySupportFStrings = GetSolarVersion() &gt; 60406
 End Function
 
