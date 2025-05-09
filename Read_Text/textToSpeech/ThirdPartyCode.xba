@@ -252,7 +252,71 @@ Function fbPiperTtsOk(_command) As Boolean
 End Function
 
 
-Function PiperLocalSuggestion(_lang As String, _high As Boolean) As String
+Function PiperModelFile()
+	&apos; returns the path to the piper `voices.json` catalog
+	&apos; of available voices, if available, otherwise return
+	&apos; `&quot;&quot;`
+	PiperModelFile = &quot;&quot;
+	Dim _item As String : _item = &quot;&quot;
+	Dim _home As String
+	Dim _paths As Variant
+	Select Case getGUIType()
+		Case 1 &apos; WINDOWS
+		_home = converttourl(Environ(&quot;APPDATA&quot;))
+		_paths = Array(_
+		&quot;/piper-tts/piper-voices/models.txt&quot;, _
+		&quot;/piper/piper-voices/models.txt&quot;, _
+		)
+		Case Else
+		_home = Environ(&quot;HOME&quot;)
+		_paths = Array(_
+		&quot;/.local/share/piper-tts/piper-voices/models.txt&quot;, _
+		&quot;/.local/share/piper/piper-voices/models.txt&quot;, _
+		)
+	End Select
+	For Each _item in _paths
+		If FileExists(_home &amp; _item) Then
+			PiperModelFile = _home &amp; _item
+			Exit Function
+		End If
+	Next
+End Function
+
+
+Function CheckPiperModel(byVal _lang) As String
+	&apos; Return the first available compatible model string, or if there
+	&apos; is not a compatible model, then return `&quot;&quot;`.
+	CheckPiperModel = &quot;&quot;
+	Dim _model_file As String : _model_file = PiperModelFile()
+	Dim _item As String : _item = &quot;&quot;
+	Dim _search As String : _search = &quot;&quot;
+	Dim _contents As String : _contents = &quot;&quot;
+	Dim langs As Variant
+	If Len(_model_file) = 0 Then
+		Exit Function
+	End If
+	langs = Array(_
+	fsReplaceText(_lang, &quot;-&quot;, &quot;_&quot;,), _
+	Split(_lang, &quot;-&quot;)(0), _
+	Split(_lang, &quot;_&quot;)(0))
+	_contents = getTextFromFile(_model_file, &quot;UTF-8&quot;, 0)
+	For Each _search in langs
+		If Instr(_contents, _search) &lt;&gt; 0 Then
+			For Each _item in Split(_contents, Chr(13))
+				Select Case Instr(_item, _search)
+					Case 1
+					CheckPiperModel = Trim(_item)
+					Exit Function
+				End Select	
+			Next
+		End If
+	Next
+	CheckPiperModelErr:
+	CheckPiperModel = &quot;&quot;
+End Function
+
+
+Function PiperLocalSuggestion(ByVal _lang As String, ByVal _high As Boolean) As String
 	&apos; Return a selection from a curated list of voice models. If `_high` is
 	&apos; `True`, then return a high quality voice model.
 	&apos;
@@ -260,14 +324,14 @@ Function PiperLocalSuggestion(_lang As String, _high As Boolean) As String
 	If Len(_lang) = 0 Then
 		_lang = fsSelectionLanguageAndRegion(False)
 	End If
-	PiperLocalSuggestion = &quot;en_GB-jenny_dioco-medium&quot;
+	PiperLocalSuggestion = &quot;&quot;
 	Dim models As Variant
+	Dim found_model As String : found_model = &quot;&quot;
 	If _high Then
-		PiperLocalSuggestion = &quot;en_US-lessac-high&quot;
+		PiperLocalSuggestion = &quot;en_US-lessac-high#0&quot;
 		models = Array(_
 		Array(&quot;de_DE&quot;, &quot;de_DE-thorsten-high#0&quot;),_
 		Array(&quot;en_GB&quot;, &quot;en_GB-cori-high#0&quot;),_
-		Array(&quot;en_US&quot;, &quot;en_US-lessac-high#0&quot;),_
 		Array(&quot;es_MX&quot;, &quot;es_MX-claude-high#0&quot;),_
 		Array(&quot;kk_KZ&quot;, &quot;kk_KZ-issai-high#0&quot;),_
 		)
@@ -276,7 +340,6 @@ Function PiperLocalSuggestion(_lang As String, _high As Boolean) As String
 		Array(&quot;ar_JO&quot;, &quot;ar_JO-kareem-medium#0&quot;),_
 		Array(&quot;ca_ES&quot;, &quot;ca_ES-upc_ona-medium#0&quot;),_
 		Array(&quot;cs_CZ&quot;, &quot;cs_CZ-jirka-medium#0&quot;),_
-		Array(&quot;da_DK&quot;, &quot;da_DK-talesyntese-medium#0&quot;),_
 		Array(&quot;de_DE&quot;, &quot;de_DE-thorsten-medium#0&quot;),_
 		Array(&quot;en_CA&quot;, &quot;en_US-arctic-medium#8&quot;),_
 		Array(&quot;en_GB&quot;, &quot;en_GB-vctk-medium#64&quot;),_
@@ -287,30 +350,16 @@ Function PiperLocalSuggestion(_lang As String, _high As Boolean) As String
 		Array(&quot;fa_IR&quot;, &quot;fa_IR-gyro-medium#0&quot;),_
 		Array(&quot;fi_FI&quot;, &quot;fi_FI-harri-medium#0&quot;),_
 		Array(&quot;fr_FR&quot;, &quot;fr_FR-upmc-medium#0&quot;),_
-		Array(&quot;hu_HU&quot;, &quot;hu_HU-anna-medium#0&quot;),_
-		Array(&quot;is_IS&quot;, &quot;is_IS-bui-medium#0&quot;),_
-		Array(&quot;it_IT&quot;, &quot;it_IT-riccardo-x_low#0&quot;),_
-		Array(&quot;ka_GE&quot;, &quot;ka_GE-natia-medium#0&quot;),_
-		Array(&quot;lb_LU&quot;, &quot;lb_LU-marylux-medium#0&quot;),_
-		Array(&quot;ne_NP&quot;, &quot;ne_NP-google-medium#0&quot;),_
-		Array(&quot;nl_BE&quot;, &quot;nl_BE-nathalie-medium#0&quot;),_
-		Array(&quot;no_NO&quot;, &quot;no_NO-talesyntese-medium#0&quot;),_
 		Array(&quot;pl_PL&quot;, &quot;pl_PL-darkman-medium#0&quot;),_
 		Array(&quot;pt_BR&quot;, &quot;pt_BR-faber-medium#0&quot;),_
 		Array(&quot;pt_PT&quot;, &quot;pt_PT-tugão-medium#0&quot;),_
-		Array(&quot;ro_RO&quot;, &quot;ro_RO-mihai-medium#0&quot;),_
 		Array(&quot;ru_RU&quot;, &quot;ru_RU-dmitri-medium#0&quot;),_
-		Array(&quot;sk_SK&quot;, &quot;sk_SK-lili-medium#0&quot;),_
-		Array(&quot;sl_SI&quot;, &quot;sl_SI-artur-medium#0&quot;),_
-		Array(&quot;sr_RS&quot;, &quot;sr_RS-serbski_institut-medium#0&quot;),_
 		Array(&quot;sv_SE&quot;, &quot;sv_SE-nst-medium#0&quot;),_
-		Array(&quot;sw_CD&quot;, &quot;sw_CD-lanfrica-medium#0&quot;),_
-		Array(&quot;tr_TR&quot;, &quot;tr_TR-dfki-medium#0&quot;),_
 		Array(&quot;uk_CA&quot;, &quot;uk_UA-ukrainian_tts-medium#0&quot;),_
 		Array(&quot;uk_RU&quot;, &quot;uk_UA-ukrainian_tts-medium#1&quot;),_
 		Array(&quot;uk_UA&quot;, &quot;uk_UA-ukrainian_tts-medium#2&quot;),_
 		Array(&quot;vi_VN&quot;, &quot;vi_VN-vais1000-medium#0&quot;),_
-		Array(&quot;zh_CN&quot;, &quot;zh_CN-huayan-medium#0&quot;))
+		)
 	End If
 	Dim langs As Variant : langs = Array(_
 	fsReplaceText(_lang, &quot;-&quot;, &quot;_&quot;,), _
@@ -326,6 +375,16 @@ Function PiperLocalSuggestion(_lang As String, _high As Boolean) As String
 			End If
 		Next
 	Next
+	Select Case Instr(PiperLocalSuggestion, &quot;-&quot;)
+	Case 0
+		found_model = CheckPiperModel(_lang)
+		Select Case Len(found_model)
+			Case 0
+			PiperLocalSuggestion = &quot;en_GB-jenny_dioco-medium#0&quot;
+			Case Else
+			PiperLocalSuggestion = found_model &amp; &quot;#0&quot;
+		End Select
+	End Select
 End Function
 
 

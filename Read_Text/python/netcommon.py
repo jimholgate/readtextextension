@@ -308,7 +308,7 @@ you use.
         """This is a fallback method to split `_text` into a list using ASCII
         or Asian punctuation if the `spacy` library is not available."""
         if _text:
-            _text = re.sub(r"([.?!`—;:．！？。︁︒]) ", r"\1\n", _text)
+            _text = re.sub(r"([.?!`—;:．！？—–。︁︒]) ", r"\1\n", _text)
             return _text.splitlines()
         return []
 

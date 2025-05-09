@@ -558,6 +558,7 @@ class PiperTTSClass(object):
             if os.path.isdir(new_dir):
                 self.piper_voice_dir = new_dir
         self.json_file = os.path.join(self.piper_voice_dir, "voices.json")
+        self.model_file = os.path.join(self.piper_voice_dir, "models.txt")
         self.md5sum = ""
         self.espeak_ng_dir = ""
         for espeak_ng_dir in espeak_ng_data_list:
@@ -1163,6 +1164,7 @@ voice models, then the generic json configuration will not recognize them.
                                         > 1000
                                     ):
                                         _found_models.append(self.j_path)
+                self._update_model_doc()
             except IndexError:
                 pass
 
@@ -1271,6 +1273,40 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
                 except AttributeError:
                     pass
         return default_locale
+
+    def _update_model_doc(self) -> bool:
+        """
+        Updates the model file with new content from `self.j_key_list`.
+        Returns `True` if the update was successful, `False` otherwise.
+        """
+        try:
+            _new_model_content = (
+                "\n".join(map(str, self.j_key_list)).strip() if self.j_key_list else ""
+            )
+            _old_model_content = ""
+            if _new_model_content:
+                if os.path.isfile(self.model_file):
+                    try:
+                        with codecs.open(
+                            self.model_file, "r", encoding="utf-8"
+                        ) as file_read:
+                            _old_model_content = file_read.read().strip()
+                    except Exception as e:
+                        print(f"Error reading file: {e}")
+                        return False
+                if _new_model_content != _old_model_content:
+                    try:
+                        with codecs.open(
+                            self.model_file, "w", encoding="utf-8"
+                        ) as file_write:
+                            file_write.write(_new_model_content)
+                    except Exception as e:
+                        print(f"Error writing file: {e}")
+                        return False  # Failed to write new content
+            return True
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return False
 
     def _model_voice_info(self, _model: str = "") -> int:
         """Get current info from  the `_model.json` file such as the
@@ -1599,9 +1635,12 @@ remote_file = {remote_file}
     ) -> bool:
         """Read speech aloud"""
         _extension_table = readtexttools.ExtensionTable()
+        _meta = readtexttools.ImportedMetaData()
+
         _length_scale = self.length_scale  # Fallback rate
         if _speech_rate != 160:
             _length_scale = self.common.rate_to_rhasspy_length_scale(_speech_rate)[0]
+            self.length_scale = _length_scale
         if not self.ok:
             return False
         _espeak_data = _extension_table.add_quotes_if_needed(self.espeak_ng_dir)
@@ -1815,6 +1854,8 @@ Piper TTS
             else:
                 print(self.j_key_list)
                 print(_command)
+
+            self._update_model_doc()
             if os.name in ["posix"]:
                 _response = os.system(_command)
             elif os.name in ["nt"]:
@@ -1822,7 +1863,6 @@ Piper TTS
                     _response = os.system(_command)
                 else:
                     _json_tools = readtexttools.JsonTools()
-                    _meta = readtexttools.ImportedMetaData()
                     _content = _meta.meta_from_file(
                         _text_file, True, "backslashreplace"
                     )
@@ -2335,6 +2375,16 @@ Links
             return False
         return True
 
+    def is_macos(self):
+        """Is this a MacOS computer?"""
+        try:
+            if os.name == "posix":
+                if os.uname().sysname.lower() in ["darwin"]:
+                    return True
+        except AttributeError:
+            pass
+        return False
+
     def piper_main(
         self,
         _text_file_in: str = "",
@@ -2361,6 +2411,8 @@ Links
             if os.path.isfile(os.path.join(_a_dir, "voices.json")):
                 _use_dir = _a_dir
                 break
+        if not os.path.isfile(self.model_file):
+            self._update_model_doc()
         if self.link_home_dir_list(all_dir_list, _iso_lang):
             print(
                 """The Piper TTS client linked to newly installed Piper
@@ -2378,7 +2430,7 @@ Links
             if not self.update_request:
                 if os.path.isfile(self.app_locker):
                     os.path.remove(self.app_locker)
-                else:
+                elif not self.is_macos():
                     readtexttools.pop_message(
                         f"{self.help_heading} ({_iso_lang})",
                         "The Piper_TTS client cannot find a compatible voice model for your language.",

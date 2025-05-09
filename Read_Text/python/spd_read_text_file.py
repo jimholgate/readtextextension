@@ -1,13 +1,14 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+About
+=====
+
 This Posix Speech Toolkit enables multilingual speech on Posix operating
 systems like MacOS and Linux. It includes tools to configure Speech Dispatcher
 and Python scripts to enable text-to-speech conversion. It is possible to use
 an online speech synthesizer in case the built-in speech synthesizer does not
 support the requested language.
-
------
 
 Posix Speech Toolkit
 ====================
@@ -19,61 +20,17 @@ Some voice tools might not be able to change the prosody, age or gender of
 all voices in all languages. If your computer does not have a matching
 voice region or style, it will try to find a close substitute.
 
-MacOS
-=====
-
-### Check python 3
-
-For local python scripts to work with MacOS, you might need to install
-additional software. The specific details depend on the version of
-MacOS that you are using.
-
-One way to see if python3 is ready to go on your device is to run
-`python3 --version` in a terminal. If the program shows you a version
-number, you are ready to use python3. Otherwise follow the python
-website's instructions to install and set up the required software.
-
-+ Getting started? See: [Overview](https://docs.python.org/3/using/mac.html)
-+ Recently updated the system or python?  For each local library, run pip3.
-  i.e.: `pip3 install --upgrade Pillow qrcode`
-+ Still not working? Rename or remove your local python library
-  i.e.: `mv ~/Library/Python/3.x/ ~/Library/Python/3.x_old/`. Reinstall any
-  required libraries. i.e.: `pip3 install Pillow qrcode`
-+ Still not working? See: [venv](https://docs.python.org/3/tutorial/venv.html)
-
-### Optional voices
-
-Apple makes several languages available with "Enhanced" versions of
-voices that sound better than the default voices.
-
-*System Settings - Accessibility - Spoken Content - System speech language*
-
-### Menu options
-
-External program:
-
-    /usr/bin/python3
-
-Command line options (default voice):
-
-    "(SPD_READ_TEXT_PY)" "(TMP)"
-
-or (specific language):
-
-    "(SPD_READ_TEXT_PY)" --language "(SELECTION_LANGUAGE_CODE)" "(TMP)"
-
-or (specific voice):
-
-    "(SPD_READ_TEXT_PY)" --voice "Alex" "(TMP)"
-
 Linux
 =====
 
+ * `pied` - A graphical tool for installing and managing high quality
+    speech models and the `piper` speech synthesis program using a modern
+    user interface.
  * `spd-conf` - A tool for configuration of Speech Dispatcher and problem
-    diagnostics
+    diagnostics.
  * `spd-say` - send text-to-speech output request to speech-dispatcher
  * `speech-dispatcher` - server process managing speech requests in Speech
-    Dispatcher
+    Dispatcher.
 
 Read Selection... Dialog setup
 ------------------------------
@@ -86,16 +43,33 @@ Command line options (default voice):
 
         "(SPD_READ_TEXT_PY)" "(TMP)"
 
-or (specific language):
+Command line for using a specific language:
 
     "(SPD_READ_TEXT_PY)" --language "(SELECTION_LANGUAGE_CODE)" --voice "MALE1" "(TMP)"
+
+If you have installed piper onnx voice models for different regions, then you
+can update the local `speech-dispatcher` settings file to use an appropriate
+locally installed piper voice model for the currently selected text on
+supported platforms.
+
+     "(SPD_READ_TEXT_PY)" --update_local True --language "(SELECTION_LANGUAGE_CODE)" "(TMP)"
+
+This changes the settings for *any* application that uses the global
+`speech-dispatcher` settings because the extension replaces the local
+settings file that `pied` creates. However, if you use
+
+    `"(PIPER_READ_TEXT_PY)" --language (SELECTION_LANGUAGE_CODE) "(TMP)"`
+
+in the extension's main menu, then the extension will apply the settings
+when the office application is in use but it will leave the `pied` local
+`speech-dispatcher` settings alone.
 
 Installation
 ------------
 
 Many Linux distributions include speech dispatcher by default. If it is not
-installed, you can install it using your normal package manager. For Debian
-and Ubuntu, use:
+installed, you can install it using your normal package manager. For Debian.
+Mint and Ubuntu, use:
 
     sudo apt-get install speech-dispatcher python3-speechd
     info spd-say
@@ -156,6 +130,53 @@ You can resolve many problems by testing and updating your local
 Some languages might sound better if you change the `speech-dispatcher`
 defaults.
 
+MacOS
+=====
+
+### Check python 3
+
+For local python scripts to work with MacOS, you might need to install
+additional software. The specific details depend on the version of
+MacOS that you are using.
+
+One way to see if python3 is ready to go on your device is to run
+`python3 --version` in a terminal. If the program shows you a version
+number, you are ready to use python3. Otherwise follow the python
+website's instructions to install and set up the required software.
+
++ Getting started? See: [Overview](https://docs.python.org/3/using/mac.html)
++ Recently updated the system or python?  For each local library, run pip3.
+  i.e.: `pip3 install --upgrade Pillow qrcode`
++ Still not working? Rename or remove your local python library
+  i.e.: `mv ~/Library/Python/3.x/ ~/Library/Python/3.x_old/`. Reinstall any
+  required libraries. i.e.: `pip3 install Pillow qrcode`
++ Still not working? See: [venv](https://docs.python.org/3/tutorial/venv.html)
+
+### Optional voices
+
+Apple makes several languages available with "Enhanced" versions of
+voices that sound better than the default voices.
+
+*System Settings - Accessibility - Spoken Content - System speech language*
+
+### Menu options
+
+External program:
+
+    /usr/bin/python3
+
+Command line options (default voice):
+
+    "(SPD_READ_TEXT_PY)" "(TMP)"
+
+or (specific language):
+
+    "(SPD_READ_TEXT_PY)" --language "(SELECTION_LANGUAGE_CODE)" "(TMP)"
+
+or (specific voice):
+
+    "(SPD_READ_TEXT_PY)" --voice "Alex" "(TMP)"
+
 Auto
 ====
 
@@ -201,6 +222,11 @@ import netcommon
 import network_read_text_file
 import openjtalk_read_text_file
 import readtexttools
+
+try:
+    import spd_say_set
+except (SyntaxError, ImportError, AssertionError, AttributeError):
+    pass
 
 try:
     import getopt
@@ -307,21 +333,22 @@ Google personnel.
 Posix speech
 ============
 
-Reads a text file using `{}` -- a Posix system text to speech tool.
+Reads a text file using `{0}` -- a Posix system text to speech tool.
 
-{}
+{1}
 Usage
 -----
 
-    spd_read_text_file.py {}[--language="xx"] \\ 
-       [--voice="xx"] [--rate="nn"] input.txt 
-{} 
+    spd_read_text_file.py {2}[--language="xx"] \\ 
+        [--voice="xx"] [--rate="nn"] \\
+        [--update_local "en_GB"] input.txt 
+{3} 
 
 Use a specific language - en, fr, es...
     spd_read_text_file.py --language "fr" "TextFile.txt" 
 
-Use a specific voice - {}
-    spd_read_text_file.py --voice "{}" "TextFile.txt" 
+Use a specific voice - {4}
+    spd_read_text_file.py --voice "{5}" "TextFile.txt" 
 
 To say the text slower - minimum -100
     spd_read_text_file.py --rate "-20" "TextFile.txt" 
@@ -329,7 +356,12 @@ To say the text slower - minimum -100
 To say the text faster - maximum 100
     spd_read_text_file.py --rate "20" "TextFile.txt"
 
-[More]({})""".format(
+To update the local `piper.conf` file to use a `pied` compatible
+`piper` onnx file if it is available and compatible with the
+application and the platform.
+    spd_read_text_file.py --update_local "en_GB" "TextFile.txt"
+
+[More]({6})""".format(
         player,
         gtts_data_source,
         module_option,
@@ -561,9 +593,9 @@ class SpdFormats(object):
             _percent_int = int(_percent_int)
         except (AttributeError, ValueError):
             return 0
-        for low, high, bar, value in self.rate_scales:
+        for low, high, _bar, value in self.rate_scales:
             if low >= _percent_int >= high:
-                print("speech rate : -100 [{bar}] 100".format(bar=bar))
+                print("speech rate : -100 [{_bar}] 100".format(_bar=_bar))
                 return value
         return 0
 
@@ -686,7 +718,7 @@ class SpdFormats(object):
                     hard_reset("speech-dispatcher")
                     readtexttools.unlock_my_lock()
                     return True
-                elif not self.is_a_supported_language(
+                if not self.is_a_supported_language(
                     language, not os.path.isfile("/usr/bin/spd-say")
                 ):
                     self.client.close()
@@ -1148,7 +1180,8 @@ class SpdFormats(object):
         return None
 
     def list_synthesis_voices(self, _language=""):  # -> (tuple | None)
-        """List synthesis voices. i. e.: ('Alan', 'southern_english_male', 'northern_english_male', 'Slt',...)"""
+        """List synthesis voices. i. e.: ('Alan', 'southern_english_male',
+        'northern_english_male', 'Slt',...)"""
         string_list = ""
         if bool(self.client):
             for _item in self.client.list_synthesis_voices():
@@ -2068,7 +2101,6 @@ class SayFormats(object):
         _file_spec="",
         _client_id="",
         _output_module="",
-        _output="",
         _language="en",
         _voice="MALE1",
         _rate="100%",
@@ -2080,19 +2112,22 @@ class SayFormats(object):
         for `piper-tts`, you must install the `sox` command line utility.
         """
         _spd_formats = SpdFormats()
-        if _rate in ["100%", "100", "", 100, 0, False]:
-            _sd_rate = ""
-        else:
-            _sd_rate = "-r {0} ".format(_spd_formats.percent_to_spd(_rate * 160))
+        _connection_name = ""
         _module = ""
-        _type = "-t {0} ".format(_voice)
-        if _voice in ["", "MALE1"]:
-            _type = ""
+        _sd_rate = ""
+        _type = ""
+
+        if not _rate in ["100%", "100", "", 100, 0, False]:
+            _sd_rate = "-r {0} ".format(_spd_formats.percent_to_spd(_rate * 160))
+        if not _voice in ["", "MALE1"]:
+            _type = "-t {0} ".format(_voice)
+        if len(_client_id) == 0:
+            _connection_name = " -n {0}".format(_client_id)
         if len(_output_module) != 0:
             _module = "-m {_output_module} ".format(_output_module)
         _command = '''sed -e 's/^!-!/ !-!/g' - | \\
-spd-say -w -e -l {0} {1} {2}{3} < "{4}"'''.format(
-            _language, _module, _sd_rate, _type, _file_spec
+spd-say -w -e -l {0} {1} {2}{3}{4} < "{5}"'''.format(
+            _language, _module, _sd_rate, _type, _connection_name, _file_spec
         )
         if os.path.isfile(readtexttools.get_my_lock("lock")):
             _command = "spd-say -C"
@@ -2100,22 +2135,38 @@ spd-say -w -e -l {0} {1} {2}{3} < "{4}"'''.format(
         else:
             readtexttools.lock_my_lock()
         if _visible:
-            print(_command)
+            _localcommons = netcommon.LocalCommons()
+            if _localcommons.debug == 0:
+                print(75 * "-")
+            else:
+                print(_command)
         _result = os.system(_command)
         # `time.sleep(1)` is blocking the thread to avoid a duplicate
         # system `spd-say` execution process:
         time.sleep(1)
-        hard_reset("sed")
-        hard_reset("spd-say")
+        if "spd-say -C" not in _command:
+            for item in ["sed", "spd-say"]:
+                hard_reset(item)
         readtexttools.unlock_my_lock()
         return _result == 0
 
     def prefer_spd_say(self, _visible=False):  # -> boolean
         """Use criteria to choose `spd-say`. The Linux python `speechd`
-        library sometimes times out with long paragraphs when you use
-        `pied` to set up `piper-tts` with the `speech-dispatcher`
-        daemon. In this case it is better to use the `spd-say` command
-        line by setting `--visible True` in the command line."""
+        library is installed by default on many distributions, so making
+        it available ensures that the extension works on new installations.
+        
+        If you use the default speechd library using third party speech
+        models like `libttspico-utils` or `piper-tts` with the python
+        speechd library, the speech might occasionally stop before it
+        should. This does not happen if the extensions uses the `spd-say`
+        program.
+        
+        You can manually force the extension to use `spd-say` in the main
+        menu of the extension using `"(SPD_READ_TEXT_PY)" --visible True ...`
+        which enables checking the strings while the application is reading
+        text aloud in a command terminal running the application. This
+        routine determines if it `spd-say` is available and appropriate.
+        """
         if not os.path.isfile("/usr/bin/spd-say"):
             return False
         if not USE_SPEECHD:
@@ -2123,7 +2174,13 @@ spd-say -w -e -l {0} {1} {2}{3} < "{4}"'''.format(
             return True
         if _visible:
             return True
-        return False
+        _meta = readtexttools.ImportedMetaData()
+        for _default in ["espeak-ng", "espeak", "speak-ng"]:
+            _result = _meta.execute_command("{0} -O".format(_default))
+            if """OUTPUT MODULES
+{0}""".format(_default) in _result:
+                return False            
+        return True
 
     def spd_main(
         self,
@@ -2134,6 +2191,7 @@ spd-say -w -e -l {0} {1} {2}{3} < "{4}"'''.format(
         _language="en",
         _voice="MALE1",
         _rate="100%",
+        _update_local=False,
         _visible=False,
     ):
         """Posix system speech tool"""
@@ -2164,7 +2222,6 @@ spd-say -w -e -l {0} {1} {2}{3} < "{4}"'''.format(
             if not bool(i_rate) and bool(_voice):
                 # Enable a custom rate for each voice
                 i_rate = 1
-            _say_formats = SayFormats()
             mac_reader = self.voice(_language)
             _voice = self.spd_voice_to_say_voice(_voice, _language)
             if not _voice.lower() == mac_reader.lower():
@@ -2237,12 +2294,35 @@ spd-say -w -e -l {0} {1} {2}{3} < "{4}"'''.format(
                             )
             sys.exit(0)
         elif os.name == "posix":
+            if _update_local:
+                if sys.version_info >= (3, 6):
+                    print(
+                        """You have requested an update to local `speech dispatcher` settings with
+`python {0}.{1}`.
+
+This could change local `{2}` voice model characteristics of other
+applications that use speech synthesis like Firefox and Thoriums Reader.
+
+You can revert or edit speech settings using a settings editor like **Pied**
+or the `spd-config` program using the terminal.""".format(
+                            sys.version_info.major, sys.version_info.minor, _language
+                        )
+                    )
+                else:
+                    _update_local = False
+            if _update_local:
+                _spd_set = spd_say_set.SpdSetter()
+                if not _spd_set.edit_piper_conf(_language, _visible):
+                    print(
+                        """NOTE: Missing or unavailable speech resources
+no change to local settings.
+"""
+                    )
             if self.prefer_spd_say(_visible):
                 if self.spd_main_fallback(
                     _file_spec,
                     _client_id,
                     _output_module,
-                    _output,
                     _language,
                     _voice,
                     _rate,
@@ -2317,8 +2397,10 @@ def main():
     _output = ""
     _output_module = ""
     _rate = "100%"
+    _update_local = False
     _visible = False
     _voice = "MALE1"
+
     verbose_language = readtexttools.default_lang()
     if verbose_language:
         for splitter in ["_", ":"]:
@@ -2338,12 +2420,13 @@ def main():
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "cmolvrih",
+            "cmoluvrih",
             [
                 "client_id=",
                 "output_module=",
                 "output=",
                 "language=",
+                "update_local=",
                 "voice=",
                 "rate=",
                 "visible=",
@@ -2366,6 +2449,8 @@ def main():
             _language = a
             if _language.startswith("zxx"):
                 _language = "en-US"
+        elif o in ("-u", "--update_local"):
+            _update_local = readtexttools.lax_bool(a)
         elif o in ("-v", "--voice"):
             # MALE1, MALE2 ...
             _voice = a
@@ -2386,6 +2471,7 @@ def main():
         _language,
         _voice,
         _rate,
+        _update_local,
         _visible,
     )
 

@@ -1218,13 +1218,14 @@ Sub updateDialog1FileControlComboBox( _
 	bRefreshText, FileControl, ComboBox)
 	Dim _bin_python As String : _bin_python = &quot;program/python&quot;
 	Dim ClientId$ : ClientId = &quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot;
-	Select Case fsTheOsId()
+	Dim _spd_update$ : _spd_update$ = &quot;&quot;
+	Dim sTheOsId$ : sTheOsId = fsTheOsId()
+	Select Case sTheOsId
 		Case &quot;MACOS&quot;, &quot;WINDOWS&quot;, &quot;WINDOWS.WINE&quot;, &quot;WINDOWS.NOSCRIPT&quot;
 		ClientId = &quot;&quot;
 		Case &quot;POSIX.APPIMAGE&quot;
 		_bin_python = fsAppImageResourcePath(&quot;python&quot;)
-&apos;		Case &quot;POSIX.FLATPAK&quot;, &quot;POSIX.SNAP&quot;
-&apos;		_bin_python = ConvertFromUrl(BundlePyPath())
+		_spd_update = &quot; --update_local False&quot;
 		Case Else
 		_bin_python = &quot;/bin/python&quot;
 	End Select
@@ -1250,7 +1251,7 @@ Sub updateDialog1FileControlComboBox( _
 		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text), &quot;text2wave&quot;) &lt;&gt; 0 Then
 			dialog1Combo2ShowTEXT2WAVEChoices(f_dlgSpeechSetup)
 		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text), _bin_python) &lt;&gt; 0 Then
-			If fsTheOsId() = &quot;MACOS&quot; And fbIsLibreOffice() Then
+			If sTheOsId = &quot;MACOS&quot; And fbIsLibreOffice() Then
 				&apos; Must use LibreOffice python			
 				.GetControl(FileControl).Model.Text = PosixPythonPath()
 			End If
@@ -1258,7 +1259,7 @@ Sub updateDialog1FileControlComboBox( _
 		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;python.exe&quot;) &lt;&gt; 0 Then
 			fiDialog1CombosShowMyPythonChoices(f_dlgSpeechSetup, ComboBox, FileControl)
 		ElseIf InStr(LCase(.GetControl(FileControl).Model.Text),&quot;/bin/open&quot;) &lt;&gt; 0 And _
-			fsTheOsId() = &quot;MACOS&quot; Then
+			sTheOsId = &quot;MACOS&quot; Then
 			&apos;The system chooses an application to open the file or URL (See man: gnome-open and xdg-open)
 			&apos;There are some examples at https://ss64.com/MacOS/open.html and
 			&apos;https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man1/open.1.html
@@ -1270,7 +1271,7 @@ Sub updateDialog1FileControlComboBox( _
 			
 		End If
 		If bRefreshText And FileExists(.GetControl(FileControl).Model.Text) Then
-			If fsTheOsId() = &quot;MACOS&quot; And _
+			If sTheOsId = &quot;MACOS&quot; And _
 			fbIsLibreOffice() And _
 			.GetControl(FileControl).Model.Text = PosixPythonPath() Then
 				If fbHaveNetworkTTS() Then
@@ -1284,6 +1285,11 @@ Sub updateDialog1FileControlComboBox( _
 					ClientId &amp; _
 					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;	
 				End If
+			ElseIf sTheOsId = &quot;POSIX.APPIMAGE&quot; Then
+					.GetControl(ComboBox).Model.Text = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+					_spd_update &amp; &quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
+					ClientId &amp; _
+					&quot; &quot;&quot;(TMP)&quot;&quot;&quot;				
 			Else:
 				.GetControl( _
 				ComboBox).Model.Text = .GetControl( _

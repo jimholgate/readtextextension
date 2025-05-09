@@ -663,7 +663,7 @@ End Function
 Function isOldSnap(ByVal _test) As Boolean
 	&apos; Test python `speechd` library to see if `speech-dispatcher` is available
 	&apos; to check that &quot;(SPD_READ_TEXT_PY)&quot; --client_id &quot;(SESSION_ID)&quot; &quot;(TMP)&quot;
-	&apos; will work. TODO:
+	&apos; will work. 
 	If Len(_test) = 0 Then
 		_test = &quot;POSIX.SNAP&quot;
 	End If
@@ -2027,7 +2027,6 @@ Sub dialog1Combo2ShowSAPIChoices( _
 End Sub
 
 
-
 Function fsMacVoice( _
 	ByVal n, _
 	ByVal s2) As String
@@ -2535,7 +2534,7 @@ Sub FillComboBox4UrlList(oDialog)
 End Sub
 
 
-Function LocalLinuxPaths()
+Function LocalLinuxPaths() As Variant
 	Dim all_paths As String
 	Dim _home As String : _home = Environ(&quot;HOME&quot;)
 	all_paths = (Environ(&quot;PATH&quot;) &amp; &quot;:&quot; &amp; _home &amp; &quot;/.local/bin&quot; &amp;_
@@ -2545,14 +2544,17 @@ End Function
 
 
 Function SkipPiedCheck() As Boolean
-	&apos; Does a .local Piper settings file exist?
+	&apos; Does a .local Piper settings file exist? Are you using your main language?
 	Dim _home As String : _home = Environ(&quot;HOME&quot;)
 	SkipPiedCheck = False
 	If getGUIType() = 4 Then
 		If Instr(fsPiperPath(), &quot;pied&quot;) &lt;&gt; 0 Then
-			If FileExists(_home &amp; &quot;/.local/share/piper-tts/piper-voices/voices.json&quot;) Then
-				SkipPiedCheck = True
-			End If	
+			Select Case fsGetSetting(&quot;language&quot;)
+				Case fsDocLanguage(), fsSelectionLanguage()
+				If FileExists(_home &amp; &quot;/.local/share/piper-tts/piper-voices/voices.json&quot;) Then
+					SkipPiedCheck = True
+				End If
+			End Select
 		End If
 	End If
 End Function
@@ -2682,16 +2684,60 @@ Function fiDialog1CombosShowMyPythonChoices(_
 	If Len(getControl) = 0 Then
 		getControl = &quot;ComboBox2&quot;
 	End If
-
+	sSpdToken = &quot;&quot;
 	If fbIsLibreOffice() Or fbSpdSayOk() Then
-		sSpdToken = &quot;&quot;
 		Select Case sTheOsId
+			Case &quot;POSIX.APPIMAGE&quot;
+				If fbSpdSayOk() Then
+					&apos; Some Linux distributions like AlmaLinux 9.5 do not include
+					&apos; `spd-say` or `spd-conf` programs by default, so speech synthesis
+					&apos; relies on access to the python3 `speechd` library. This library
+					&apos; is usually not available to AppImage instances because system
+					&apos; python libraries fail with an `AssertionError` when using AppImages.
+					sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
+					If fbPySupportFStrings() Then
+						If fbPiperTtsOk(&quot;&quot;) Then
+							sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --update_local False&quot;
+						End If
+					End If
+				End If
 			Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;
 			sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
+				If fbPySupportFStrings() Then
+					If fbPiperTtsOk(&quot;&quot;) Then
+&apos;&apos;
+&apos;&apos; Note for Pied users
+&apos;&apos; -------------------
+&apos;&apos;
+&apos;&apos; Let&apos;s clarify a new option for `(SPD_READ_TEXT_PY)` in the main
+&apos;&apos; extension dialog on supported distributions of LibreOffice for Linux
+&apos;&apos; that appears if you use the [Pied](https://github.com/Elleo/pied)
+&apos;&apos; speech manager.
+&apos;&apos;
+&apos;&apos; If you use `--update_local True`, then when you change the text locale,
+&apos;&apos; the extension updates `~/.config/speech-dispatcher/modules/piper.conf`
+&apos;&apos; to use another speech synthesis model if it works correctly with the
+&apos;&apos; current language and locale. You can install models using a speech
+&apos;&apos; synthesis manager like Pied for Piper text-to-speech.
+&apos;&apos;
+&apos;&apos; Normally, Pied&apos;s speech configuration sets up the local user&apos;s system
+&apos;&apos; `speech-dispatcher` configuration to use one voice model regardless of
+&apos;&apos; the language of the text. This is a workaround that changes the speech
+&apos;&apos; model for all local applications that use Piper speech.
+&apos;&apos;
+&apos;&apos; You can have the extension use `(PIPER_READ_TEXT_PY)` to switch spoken
+&apos;&apos; languages only within the application. This option allows you to tune
+&apos;&apos; the playback speed by modifying the length of vowels to make slow
+&apos;&apos; speech more intelligible than just altering the playback speed and
+&apos;&apos; pitch of the audio.
+&apos;&apos;
+					sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --update_local False&quot;
+					End If
+				End If
 			Case &quot;POSIX.ANDROID&quot;, &quot;POSIX.SNAP&quot;
 			&apos; pass
 			Case Else
-			if fbSpdSayOk() Then
+			if fbSpdSayOk()Then
 				sSpdToken = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot;
 			End If
 		End Select
@@ -3416,9 +3462,7 @@ Function fsAppImageResourcePath( _
 	ps_appimageresourcepath = &quot; &quot;
 	fsAppImageResourcePath = &quot;&quot;
 End Function
-sub xxxx
-	print ConvertFromUrl(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
-end sub
+
 
 Function fsContainerResourcePath( _
 	ByVal sApp As String) As String
@@ -5343,16 +5387,14 @@ Function faDialog1ComboBox4Array(_
 		&quot;https://www.qwant.com/?q=(OOO_WEBTEXTSMALL)&quot;, _
 		&quot;https://www.hotbot.com/web?q=(OOO_WEBTEXTSMALL)&quot;, _
 		&quot;https://www.google.com/search?hl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;defl=(SELECTION_LANGUAGE_COUNTRY_CODE)&amp;q=define:(OOO_WEBTEXTDEFINITION)&quot;, _
-		&quot;https://www.dwds.de/wb/r/?q=(OOO_WEBTEXTDEFINITION)&quot;, _
 		&quot;https://translate.google.com/?sl=auto&amp;tl=fr&amp;text=(OOO_WEBTEXT)&quot;, _
 		&quot;https://translate.google.com/?sl=auto&amp;tl=es&amp;text=(OOO_WEBTEXT)&quot;, _
 		&quot;https://translate.google.com/?sl=auto&amp;tl=en&amp;text=(OOO_WEBTEXT)&quot;, _
 		&quot;https://translate.google.com/?sl=auto&amp;tl=(SELECTION_LANGUAGE_CODE)&amp;q=(OOO_WEBTEXTSMALL)&quot;, _
 		&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXTSMALL)&quot;, _
 		&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;, _
-		&quot;https://swisscows.com/web?query=(OOO_WEBTEXTSMALL)&quot;, _
 		&quot;https://quickchart.io/qr?size=350&amp;text=(OOO_WEBTEXT)&quot;), _
-		 &quot;\n&quot; _
+		&quot;\n&quot; _
 		), sDisplayLanguage, &quot;tools&quot;, iEnglish) &apos; msgid to msgstr
 		
 	End If
@@ -7434,9 +7476,7 @@ Function fbHaveEspeak() As Boolean
 		Next
 	End Select
 End Function
-sub xx
-print fsMyPipeWire()
-end sub
+
 
 Function fbHaveFfmpeg() As Boolean
 	fbHaveFfmpeg = Not (Len(fsMyFfmpeg()) = 0)
@@ -7988,15 +8028,20 @@ Function fsFindAppPath(sa As String) As String
 		converttourl(Environ(&quot;USERPROFILE&quot;) &amp; &quot;\opt\&quot;), _
 		converttourl(Environ(&quot;HOMEDRIVE&quot;) &amp; &quot;\opt\&quot;), _
 		converttourl(Environ(&quot;LOCALAPPDATA&quot;) &amp; &quot;\Programs\&quot;))
-		Case &quot;MACOS&quot;
-		a1 = Array( _
-		&quot;file:///Applications/&quot;, _
-		&quot;file:///usr/local/bin/&quot;, _
-		&quot;file:///usr/bin/&quot;)
 		Case Else
-		a1 = Array( _
-		&quot;file:///usr/local/bin/&quot;, _
-		&quot;file:///usr/bin/&quot;)
+		Select Case fsGetOs()
+		Case &quot;MACOS&quot;
+			a1 = Array( _
+			&quot;file:///Applications/&quot;, _
+			&quot;file:///usr/local/bin/&quot;, _
+			&quot;file:///usr/bin/&quot;)
+			Case &quot;POSIX&quot;
+			a1 = LocalLinuxPaths()
+			Case Else
+			a1 = Array( _
+			&quot;file:///usr/local/bin/&quot;, _
+			&quot;file:///usr/bin/&quot;)
+		End Select
 	End Select
 	If Len(sa) &gt; 0 Then
 		For n = LBound(a1) To UBound(a1)
