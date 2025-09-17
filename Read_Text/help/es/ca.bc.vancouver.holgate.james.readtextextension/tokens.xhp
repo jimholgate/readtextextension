@@ -58,8 +58,8 @@
                 desde la izquierda en la parte inferior del cuadro de diálogo. Este icono significa
                 “Propiedades de voz”.</listitem>
 
-            <listitem>En el campo <emph>Reemplazar</emph>, introduzca
-                una ortografía alternativa para la palabra.</listitem>
+            <listitem>En el campo <emph>Reemplazar</emph>, introduzca una ortografía alternativa
+                para la palabra.</listitem>
 
             <listitem>Haga clic en el botón <emph>Aplicar</emph> para guardar los cambios.</listitem>
 
@@ -69,89 +69,148 @@
         <paragraph>Con estos pasos, debería poder modificar la pronunciación de cualquier palabra en
             su texto.</paragraph>
 
+        <paragraph xml-lang="es_ES" role="heading" level="2">Gestionar modelo de voz</paragraph>
+
+
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog4.png"
+            id="img_dialog4_screenshot">
+            <alt xml-lang="es-ES" id="alt_dialog4_screenshot">Gestionar modelo de voz</alt>
+        </image>
+
+        <paragraph xml-lang="es-ES">Este diálogo está disponible para algunas arquitecturas de
+            computadora.</paragraph>
+
+        <list type="ordered" xml-lang="es-ES">
+
+            <listitem>Selecciona un modelo.</listitem>
+
+            <listitem>Haz clic en el icono del altavoz.</listitem>
+
+            <listitem>Haz clic en el botón <emph>OK</emph>.</listitem>
+
+            <listitem>Si el modelo está instalado, el menú principal ofrece establecerlo como modelo
+                predeterminado.</listitem>
+
+            <listitem>Si el modelo no está instalado, el menú principal ofrece una opción para
+                descargarlo.</listitem>
+
+        </list>
+
 
         <paragraph role="heading" level="2">Tokens</paragraph>
 
 
         <list>
 
-            <listitem><code>(AUTHOR)</code> Nombre del autor o de la autora</listitem>
+            <listitem>
+                <code>(AUTHOR)</code> Nombre del autor o de la autora</listitem>
 
-            <listitem><code>(COUNTRY_CODE)</code> Su país</listitem>
+            <listitem>
+                <code>(COUNTRY_CODE)</code> Su país</listitem>
 
-            <listitem><code>(CREATE_QR_LABEL_PY)</code> Un script en Python para crear un código QR</listitem>
+            <listitem>
+                <code>(CREATE_QR_LABEL_PY)</code> Un script en Python para crear un código QR</listitem>
 
-            <listitem><code>(DATE)</code> La fecha actuel</listitem>
+            <listitem>
+                <code>(DATE)</code> La fecha actuel</listitem>
 
-            <listitem><code>(ESPEAK_READ_TEXT_PY)</code> Un script en Python</listitem>
+            <listitem>
+                <code>(ESPEAK_READ_TEXT_PY)</code> Un script en Python</listitem>
 
-            <listitem><code>(FESTIVAL_READ_TEXT_PY)</code> Un script en Python</listitem>
+            <listitem>
+                <code>(FESTIVAL_READ_TEXT_PY)</code> Un script en Python</listitem>
 
-            <listitem><code>(HOME)</code> Su directorio de inicio</listitem>
+            <listitem>
+                <code>(HOME)</code> Su directorio de inicio</listitem>
 
-            <listitem><code>(LANGUAGE_CODE)</code> Su código de idioma</listitem>
+            <listitem>
+                <code>(LANGUAGE_CODE)</code> Su código de idioma</listitem>
 
-            <listitem><code>(LANGUAGE_COUNTRY_CODE)</code> Su país y su idioma</listitem>
+            <listitem>
+                <code>(LANGUAGE_COUNTRY_CODE)</code> Su país y su idioma</listitem>
 
-            <listitem><code>(NETWORK_READ_TEXT_PY)</code> Un script en Python</listitem>
+            <listitem>
+                <code>(NETWORK_READ_TEXT_PY)</code> Un script en Python</listitem>
 
-            <listitem><code>(NOW)</code> Hora actual reformateada para que puedas usarla en un
-                nombre de archivo</listitem>
+            <listitem>
+                <code>(NOW)</code> Hora actual reformateada para que puedas usarla en un nombre de
+                archivo</listitem>
 
-            <listitem><code>(OOO_WEBTEXT)</code> Las primeras 9999 letras del texto seleccionado
+            <listitem>
+                <code>(OOO_WEBTEXT)</code> Las primeras 9999 letras del texto seleccionado
                 codificadas para URL</listitem>
 
-            <listitem><code>(OOO_WEBTEXT250)</code> Las primeras 249 letras del texto seleccionado
+            <listitem>
+                <code>(OOO_WEBTEXT250)</code> Las primeras 249 letras del texto seleccionado
                 codificadas para URL</listitem>
 
-            <listitem><code>(OOO_WEBTEXTBIG)</code> Las primeras 9999 letras del texto seleccionado
+            <listitem>
+                <code>(OOO_WEBTEXTBIG)</code> Las primeras 9999 letras del texto seleccionado
                 codificadas para URL</listitem>
 
-            <listitem><code>(OOO_WEBTEXTSMALL)</code> Las primeras 99 letras del texto seleccionado
+            <listitem>
+                <code>(OOO_WEBTEXTSMALL)</code> Las primeras 99 letras del texto seleccionado
                 codificadas para URL</listitem>
 
-            <listitem><code>(OPENJTALK_READ_TEXT_PY)</code> Un programa en Python (japonés)</listitem>
+            <listitem>
+                <code>(OPENJTALK_READ_TEXT_PY)</code> Un programa en Python (japonés)</listitem>
 
-            <listitem><code>(PICO_READ_TEXT_PY)</code> Un script en Python</listitem>
+            <listitem>
+                <code>(PICO_READ_TEXT_PY)</code> Un script en Python</listitem>
 
-            <listitem><code>(PIPER_READ_TEXT_PY)</code> Un script en Python</listitem>
+            <listitem>
+                <code>(PIPER_READ_TEXT_PY)</code> Un script en Python</listitem>
 
-            <listitem><code>(RESET_ALL)</code> Volver a los ajustes predeterminados</listitem>
+            <listitem>
+                <code>(RESET_ALL)</code> Volver a los ajustes predeterminados</listitem>
 
-            <listitem><code>(RHVOICE_READ_TEXT_PY)</code> Un script en Python</listitem>
+            <listitem>
+                <code>(RHVOICE_READ_TEXT_PY)</code> Un script en Python</listitem>
 
-            <listitem><code>(SAY_APPLESCRIPT)</code> Un guión de síntesis de voz en plataforma MacOS</listitem>
+            <listitem>
+                <code>(SAY_APPLESCRIPT)</code> Un guión de síntesis de voz en plataforma MacOS</listitem>
 
-            <listitem><code>(SELECTION_COUNTRY_CODE)</code> El país del texto seleccionado</listitem>
+            <listitem>
+                <code>(SELECTION_COUNTRY_CODE)</code> El país del texto seleccionado</listitem>
 
-            <listitem><code>(SELECTION_LANGUAGE_CODE)</code> El idioma del texto seleccionado</listitem>
+            <listitem>
+                <code>(SELECTION_LANGUAGE_CODE)</code> El idioma del texto seleccionado</listitem>
 
-            <listitem><code>(SELECTION_LANGUAGE_COUNTRY_CODE)</code> El código regional del texto
+            <listitem>
+                <code>(SELECTION_LANGUAGE_COUNTRY_CODE)</code> El código regional del texto
                 seleccionado</listitem>
 
-            <listitem><code>(SESSION_ID)</code> El identificador de sesión</listitem>
+            <listitem>
+                <code>(SESSION_ID)</code> El identificador de sesión</listitem>
 
-            <listitem><code>(SOUND_GALLERY)</code> Ruta del archivo a la galería de sonidos de la
+            <listitem>
+                <code>(SOUND_GALLERY)</code> Ruta del archivo a la galería de sonidos de la
                 aplicación</listitem>
 
-            <listitem><code>(SPD_READ_TEXT_PY)</code> Un guión de síntesis de voz en plataforma
-                Posix</listitem>
+            <listitem>
+                <code>(SPD_READ_TEXT_PY)</code> Un guión de síntesis de voz en plataforma Posix</listitem>
 
-            <listitem><code>(TIME)</code> Hora actual hablada en la región</listitem>
+            <listitem>
+                <code>(TIME)</code> Hora actual hablada en la región</listitem>
 
-            <listitem><code>(TITLE)</code> Nombre del documento</listitem>
+            <listitem>
+                <code>(TITLE)</code> Nombre del documento</listitem>
 
-            <listitem><code>(TMP)</code> Nombre completo de la ruta y archivo temporal que contiene
-                el texto seleccionado</listitem>
+            <listitem>
+                <code>(TMP)</code> Nombre completo de la ruta y archivo temporal que contiene el
+                texto seleccionado</listitem>
 
-            <listitem><code>(TTS_WSCRIPT_VBS)</code> Un guión de síntesis de voz en plataforma
-                Windows</listitem>
+            <listitem>
+                <code>(TTS_WSCRIPT_VBS)</code> Un guión de síntesis de voz en plataforma Windows</listitem>
 
-            <listitem><code>(UNIQUE_ID)</code> Un identificador de usuario de un solo uso</listitem>
+            <listitem>
+                <code>(UNIQUE_ID)</code> Un identificador de usuario de un solo uso</listitem>
 
-            <listitem><code>(USER_ID)</code> Un identificador de usuario anónimo</listitem>
+            <listitem>
+                <code>(USER_ID)</code> Un identificador de usuario anónimo</listitem>
 
-            <listitem><code>(WEEKDAY)</code> Día actual de la semana tal como se habla en la región</listitem>
+            <listitem>
+                <code>(WEEKDAY)</code> Día actual de la semana tal como se habla en la región</listitem>
 
         </list>
 

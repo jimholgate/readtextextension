@@ -348,7 +348,7 @@ class ReadFestivalClass(object):
                 "sample": "Halō. Nēnu telugu vāṇini.",
                 "iso_code": "IN",
                 "lang1": "te",
-                "amp": "మరియు",
+                "amp": "\u0c2e\u0c30\u0c3f\u0c2f\u0c41",
                 "voices": ["telugu/telugu_NSK_diphone"],
             },
             {
@@ -384,7 +384,6 @@ class ReadFestivalClass(object):
         if not _test:
             return ""
         test_path = ""
-        path_stem = ""
         if os.name == "nt":
             voice_roots = [
                 os.path.join(os.getenv("ProgramFiles"), "Festival", "Voices"),
@@ -399,27 +398,26 @@ class ReadFestivalClass(object):
             for _path in _test:
                 test_path = os.path.join(_root, _path)
                 if os.path.isdir(test_path):
-                    path_stem = os.path.split(test_path)[1]
-                    return "(voice_{0})".format(path_stem)
+                    return "(voice_{0}".format(os.path.basename(test_path))
         return ""
 
-    def count_your_voices(self):  # -> int
-        """'Return a non-zero value only if a festival voice is installed."""
-        _count = 0
-        test_dir = "/usr/share/festival/voices"
-        _count = readtexttools.count_items_in_dir(test_dir)
-        if _count == 1:
-            test_dir = os.path.join(test_dir, os.listdir(test_dir)[0])
+        def count_your_voices(self):  # -> int
+            """'Return a non-zero value only if a festival voice is installed."""
+            _count = 0
+            test_dir = "/usr/share/festival/voices"
             _count = readtexttools.count_items_in_dir(test_dir)
-        return _count
+            if _count == 1:
+                test_dir = os.path.join(test_dir, os.listdir(test_dir)[0])
+                _count = readtexttools.count_items_in_dir(test_dir)
+            return _count
 
     def iso_lang_to_fest_lang(self, iso_lang="en-US"):  # -> str
         """Check if the library supports the language or voice.
-        If so, return festival's name of the language, otherwise return
-        `''`.
+        If so, return festival's name of the language, otherwise return `''`.
 
-        Update `self.voice_eval` to a known available voice in the
-        form `(voice_cmu_us_slt_arctic_hts)` if your system supports it."""
+        Update `self.voice_eval` to a known available voice in the form
+        `(voice_cmu_us_slt_arctic_hts)` if your system supports it."""
+
         test_lang = ""
         try:
             for sep in ["-", "_"]:
@@ -430,50 +428,33 @@ class ReadFestivalClass(object):
             return ""
         try:
             domain_table = self.domain_table
-            _tld = ""
-            _lang1 = ""
-            _region = ""
+            _tld, _lang1, _region = "", "", ""
             _voices = [""]
-            for i in range(len(domain_table)):
-                _region = "-".join(
-                    [domain_table[i]["lang1"], domain_table[i]["iso_code"]]
-                )
+
+            for entry in domain_table:
+                _region = "-".join([entry["lang1"], entry["iso_code"]])
                 if _region.strip() == iso_lang.strip():
-                    self.voice_eval = self.first_good_voice(domain_table[i]["voices"])
-                    if len(self.voice_eval) != 0:
-                        self.lang = domain_table[i]["lang1"]
-                        return self.domain_table[i]["package"]
-            for i in range(len(domain_table)):
-                if domain_table[i]["lang1"] == test_lang.lower():
-                    _tld = domain_table[i]["package"]
-                    _lang1 = domain_table[i]["lang1"]
-                    _region = "-".join([_lang1, domain_table[i]["iso_code"]])
-                    _voices = domain_table[i]["voices"]
+                    self.voice_eval = self.first_good_voice(entry["voices"])
+                    if self.voice_eval:
+                        self.lang = entry["lang1"]
+                        return entry["package"]
+            for entry in domain_table:
+                if entry["lang1"] == test_lang.lower():
+                    _tld, _lang1 = entry["package"], entry["lang1"]
+                    _region = "-".join([_lang1, entry["iso_code"]])
+                    _voices = entry["voices"]
                     break
             for _test in [iso_lang, test_lang]:
-                if len(_voices[0]) == 0:
-                    if len(_test) != 0:
-                        if not "-" in _test:
-                            return _test
-                elif _test.lower() == _region.lower():
-                    self.voice_eval = self.first_good_voice(domain_table[i]["voices"])
-                    self.lang = domain_table[i]["lang1"]
-                    return self.domain_table[i]["package"]
-                elif _test.lower() == _lang1:
-                    self.voice_eval = self.first_good_voice(domain_table[i]["voices"])
-                    self.lang = domain_table[i]["lang1"]
-                    return self.domain_table[i]["package"]
-                elif _test.lower() == _tld.lower():
-                    self.voice_eval = self.first_good_voice(domain_table[i]["voices"])
-                    self.lang = domain_table[i]["lang1"]
-                    return self.domain_table[i]["package"]
-                elif _test in _voices:
-                    self.voice_eval = self.first_good_voice(domain_table[i]["voices"])
-                    self.lang = domain_table[i]["lang1"]
-                    return _test
+                if not _voices[0]:
+                    if _test and "-" not in _test:
+                        return _test
+                elif _test.lower() in {_region.lower(), _lang1.lower(), _tld.lower()}:
+                    self.voice_eval = self.first_good_voice(entry["voices"])
+                    self.lang = entry["lang1"]
+                    return entry["package"]
                 elif _test.lower() in _voices:
-                    self.voice_eval = self.first_good_voice(domain_table[i]["voices"])
-                    self.lang = domain_table[i]["lang1"]
+                    self.voice_eval = self.first_good_voice(entry["voices"])
+                    self.lang = entry["lang1"]
                     return _test
         except NameError:
             self.lang = ""
@@ -534,7 +515,7 @@ class ReadFestivalClass(object):
             os.remove(_work_file)
         if os.path.isfile(_out_file):
             os.remove(_out_file)
-        if not bool(_content):
+        if not _content:
             # Empty string - nothing to read.
             return True
         if os.name == "nt":

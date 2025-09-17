@@ -2,11 +2,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: read-text 1.0\n"
-"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
-"/readtextextension-discuss\n"
 "POT-Creation-Date: 2015-08-15T12:42:58\n"
-"PO-Revision-Date: 2015-08-15 23:10-0700\n"
-"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"PO-Revision-Date: 2025-06-18 07:56-0800\n"
+"Last-Translator: James\n"
 "Language-Team: LANGUAGE\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -381,3 +379,71 @@ msgstr "音声の人物"
 # ../src/orca/orca-setup.ui.h:47
 msgid "Voice"
 msgstr "声"
+
+#: src/orca/guilabels.py:205
+msgid "Default Synthesizer"
+msgstr "デフォルトのシンセサイザー"
+
+#: src/orca/guilabels.py:931
+msgid "Speech Dispatcher"
+msgstr "読み上げディスパッチャー"
+
+#: ../src/orca/orca-setup.ui.h:116
+msgid "_Reset"
+msgstr "リセット(_R)"
+
+# ja.po Claude 3 Haiku
+msgid "Model"
+msgstr "モデル"
+
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "追加(_A)"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "削除(_D)"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "削除(_R)"
+
+#. A4N7i
+#: extensions/inc/stringarrays.hrc:184
+msgctxt "RID_RSC_ENUM_SCROLLBARS"
+msgid "None"
+msgstr "なし"
+
+#. Vmbbd
+#: extensions/inc/strings.hrc:30
+msgctxt "RID_STR_ENABLED"
+msgid "Enabled"
+msgstr "アクティブにする"
+
+#. Xk7cV
+#: extensions/uiconfig/sabpilot/ui/groupradioselectionpage.ui:49
+msgctxt "groupradioselectionpage|datasourcelabel"
+msgid "Data source"
+msgstr "データソース"
+
+#. D9AH2
+#: extensions/inc/strings.hrc:305
+msgctxt "RID_UPDATE_STR_DOWNLOADING"
+msgid "Downloading %PRODUCTNAME %NEXTVERSION..."
+msgstr "%PRODUCTNAME %NEXTVERSION をダウンロードしています..."
+
+#. MoGgC
+#: extensions/inc/strings.hrc:326
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOADING"
+msgid "Download of update in progress"
+msgstr "更新のダウンロードが進行中"
+
+#. RmhyN
+#: extensions/inc/strings.hrc:332
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOAD_AVAIL"
+msgid "Download of update completed"
+msgstr "更新のダウンロードが完了しました"

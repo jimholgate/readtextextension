@@ -2,11 +2,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: read-text 1.0\n"
-"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
-"/readtextextension-discuss\n"
 "POT-Creation-Date: 2015-08-15T12:42:58\n"
-"PO-Revision-Date: 2015-08-16 00:18-0700\n"
-"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"PO-Revision-Date: 2025-06-18 07:56-0800\n"
+"Last-Translator: James\n"
 "Language-Team: LANGUAGE\n"
 "Language: zzy\n"
 "MIME-Version: 1.0\n"
@@ -134,7 +132,7 @@ msgstr "s_touch-screen"
 
 #: template.src
 msgctxt ""
-msgid "Speech"
+msgid "Speech synthesis"
 msgstr "s_speech-synthesis"
 
 #: template.src
@@ -390,7 +388,7 @@ msgstr "s_open"
 # help Enable experimental features
 msgctxt ""
 msgid "Enable experimental features"
-msgstr "s_enable_experimental_features"
+msgstr "s_enable-experimental-features"
 
 #: sc/inc/globstr.hrc:53
 msgctxt "STR_UNDO_REPLACE"
@@ -431,3 +429,71 @@ msgstr "s_language"
 # src/orca/orca-setup.ui:1420
 msgid "Voice"
 msgstr "s_voice"
+
+#: src/orca/guilabels.py:205
+msgid "Default Synthesizer"
+msgstr "s_default-synthesizer"
+
+#: src/orca/guilabels.py:931
+msgid "Speech Dispatcher"
+msgstr "s_speech-dispatcher"
+
+#: ../src/orca/orca-setup.ui.h:116
+msgid "_Reset"
+msgstr "s_reset"
+
+# zh-tw.po Claude 3 Haiku
+msgctxt ""
+msgid "Model"
+msgstr "s_model"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "s_add"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "s_delete"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "s_remove"
+
+#. A4N7i
+#: extensions/inc/stringarrays.hrc:184
+msgctxt "RID_RSC_ENUM_SCROLLBARS"
+msgid "None"
+msgstr "s_none"
+
+#. Vmbbd
+#: extensions/inc/strings.hrc:30
+msgctxt "RID_STR_ENABLED"
+msgid "Enabled"
+msgstr "s_enabled"
+
+#. Xk7cV
+#: extensions/uiconfig/sabpilot/ui/groupradioselectionpage.ui:49
+msgctxt "groupradioselectionpage|datasourcelabel"
+msgid "Data source"
+msgstr "s_data-source"
+
+#. D9AH2
+#: extensions/inc/strings.hrc:305
+msgctxt "RID_UPDATE_STR_DOWNLOADING"
+msgid "Downloading %PRODUCTNAME %NEXTVERSION..."
+msgstr "s_downloading-productname-nextversion"
+
+#. MoGgC
+#: extensions/inc/strings.hrc:326
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOADING"
+msgid "Download of update in progress"
+msgstr "s_download-of-update-in-progress"
+
+#. RmhyN
+#: extensions/inc/strings.hrc:332
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOAD_AVAIL"
+msgid "Download of update completed"
+msgstr "s_download-of-update-completed"

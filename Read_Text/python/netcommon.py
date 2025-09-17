@@ -2,10 +2,18 @@
 # -*- coding: UTF-8-*-
 """Common tools for network and neural speech synthesis clients"""
 
-import importlib
+import io
 import math
 import os
+import string
+import subprocess
 import time
+import wave
+
+try:
+    import unicodedata
+except ImportError:
+    pass
 
 try:
     import platform
@@ -24,6 +32,24 @@ except ImportError:
 import sys
 import readtexttools
 
+if os.name != "nt":
+    import pwd
+    import grp
+
+try:
+    import shutil
+except (ImportError, AssertionError):
+    try:
+        from distutils.spawn import find_executable
+    except Exception as e:
+        print("Exception", e)
+
+if os.name == "nt":
+    try:
+        import winsound
+    except ImportError:
+        pass
+
 NET_SERVICE_LIST = [
     "AUTO",
     "NETWORK",
@@ -35,6 +61,81 @@ NET_SERVICE_LIST = [
     "RHVOICE",
     "TTS",
 ]
+
+
+def which(app_name):  # -> str
+    """Given a string that's the name of a program, returns the path if the
+    program is within one of the directories identified in the system `PATH`
+    collection, otherwise returns `""`."""
+    try:
+        retstr = shutil.which(app_name)
+        if retstr:
+            return str(retstr)
+        return ""
+
+    except NameError:
+        try:
+            retstr = find_executable(app_name)
+            if retstr:
+                return str(retstr)
+
+        except NameError:
+            pass
+
+    return ""
+
+
+def hardlink_or_copy(src, dst, overwrite=False, preserve_metadata=True):  # -> str
+    """
+    Try to create a hard link from dst → src on Windows/POSIX.
+    Falls back to copying when hard-linking isn't supported (e.g., cross-device).
+
+    Returns one of: "hardlink", "copy", "exists", or "skipped".
+    """
+    src = os.path.abspath(src)
+    dst = os.path.abspath(dst)
+
+    if not os.path.isfile(src):
+        raise FileNotFoundError("Source file not found: {}".format(src))
+
+    # Already exists?
+    if os.path.exists(dst):
+        try:
+            if os.path.samefile(src, dst):
+                return "skipped"  # already the same file
+        except Exception:
+            pass
+        if not overwrite:
+            return "exists"
+        os.unlink(dst)
+
+    os.makedirs(os.path.dirname(dst) or ".", exist_ok=True)
+
+    try:
+        if os.name == "nt":
+            # Check drive letters — must match
+            s_drive, _ = os.path.splitdrive(src)
+            d_drive, _ = os.path.splitdrive(dst)
+            if s_drive.lower() != d_drive.lower():
+                raise OSError("EXDEV: different drives")
+
+        os.link(src, dst)
+
+        # Verify same inode/device (or NTFS record)
+        s_stat, d_stat = os.stat(src), os.stat(dst)
+        if (s_stat.st_dev, s_stat.st_ino) != (d_stat.st_dev, d_stat.st_ino):
+            os.unlink(dst)
+            raise OSError("Hard link verification failed")
+
+        return "hardlink"
+
+    except Exception:
+        # Fallback: copy
+        if preserve_metadata:
+            shutil.copy2(src, dst)
+        else:
+            shutil.copyfile(src, dst)
+        return "copy"
 
 
 def have_gpu(_test="Radeon"):  # -> bool
@@ -50,9 +151,11 @@ def have_gpu(_test="Radeon"):  # -> bool
     )
 
 
-def spd_voice_list(_min=0, _max=100, _roots=["female", "male"]):  # -> list[str]
+def spd_voice_list(_min=0, _max=100, _roots=None):  # -> list[str]
     """Return a list in the form `['female0', 'male0', 'female1' ...]`"""
     retval = []
+    if not _roots:
+        _roots = ["female", "male"]
     for _digit in range(_min, _max + 1):
         for _root in _roots:
             retval.append("".join([_root, str(_digit)]))
@@ -107,6 +210,253 @@ def speech_wpm(_percent="100%"):  # -> int
     return _result
 
 
+class UserPermissions(object):
+    """Manage options according to the group that the user belongs to"""
+
+    def __init__(self):  # -> None
+        """Record tokens to minimize code execution"""
+        self.ok = False
+        self.ok_group = ""
+
+    def _is_member_of(self, groups_to_check):  # -> bool
+        """
+        Return True if the current user belongs to any of the groups
+        listed in groups_to_check (case-insensitive check).
+
+        Args:
+            groups_to_check (list): A list of group name strings
+                                    (e.g., ["sudo", "admin", "staff", "readtextadmin"]).
+
+        Returns:
+            bool: True if current user belongs to any listed group, False otherwise.
+        """
+        if os.name == "nt":
+            try:
+                import winreg
+
+                def can_you_install_via_store():
+                    """Check if store is disabled by machine or user policy."""
+                    policy_paths = [
+                        (
+                            winreg.HKEY_LOCAL_MACHINE,
+                            "\\".join(
+                                ["SOFTWARE", "Policies", "Microsoft", "WindowsStore"]
+                            ),
+                        ),
+                        (
+                            winreg.HKEY_CURRENT_USER,
+                            "\\".join(
+                                ["SOFTWARE", "Policies", "Microsoft", "WindowsStore"]
+                            ),
+                        ),
+                    ]
+
+                    for hive, path in policy_paths:
+                        try:
+                            with winreg.OpenKey(hive, path) as key:
+                                value, _ = winreg.QueryValueEx(
+                                    key, "RemoveWindowsStore"
+                                )
+                                if value == 1:
+                                    return False
+                        except (FileNotFoundError, OSError):
+                            # Key or value doesn't exist (policy not set)
+                            continue
+
+                    # Check if OS is a Windows Server edition
+                    try:
+                        with winreg.OpenKey(
+                            winreg.HKEY_LOCAL_MACHINE,
+                            "\\".join(
+                                [
+                                    "SOFTWARE",
+                                    "Microsoft",
+                                    "Windows NT",
+                                    "CurrentVersion",
+                                ]
+                            ),
+                        ) as key:
+                            product_name, _ = winreg.QueryValueEx(key, "ProductName")
+                            if "Server" in product_name:
+                                return False
+                    except (FileNotFoundError, OSError):
+                        # Couldn't determine OS type; assume client Windows
+                        pass
+
+                    return True
+
+                return can_you_install_via_store()
+
+            except (AssertionError, TypeError):
+                return False
+        else:
+            uid = os.getuid()
+            user_name = pwd.getpwuid(uid).pw_name
+            user_groups = [g.gr_name for g in grp.getgrall() if user_name in g.gr_mem]
+            # Also add the user's primary group.
+            primary_gid = os.getgid()
+            primary_group = grp.getgrgid(primary_gid).gr_name
+            user_groups.append(primary_group)
+            # Do a case-insensitive comparison.
+            user_groups = [x.lower() for x in user_groups]
+            for group in groups_to_check:
+                if group.lower() in user_groups:
+                    self.ok_group = group.lower()
+                    self.ok = True
+                    return True
+            self.ok = False
+            return False
+
+    def is_staff_or_admin(self):  # -> bool
+        """
+        Return True if the user is considered staff or an admin.
+
+        On Unix-like systems, perform this check based on membership in
+        one of the groups in the list ["sudo", "admin", "staff", "readtextadmin", "wheel"].
+        On Windows, fall back on the standard administrator check.
+
+        Returns:
+            bool: True if the user is in one of the designated groups
+            or is admin on Windows.
+        """
+        if self.ok:
+            return True
+        the_groups = ["sudo", "admin", "staff", "readtextadmin", "wheel"]
+        return self._is_member_of(the_groups)
+
+    def specific_staff_or_admin_group(self):  # -> str
+        """If a posix user is in `["sudo", "admin", "staff", "readtextadmin", "wheel"]`
+        return the name of the group, otherwise if a Windows user is  an
+        administrator, return `"nt_admin"`, otherwise return `""`."""
+        if self.ok:
+            if self.ok_group:
+                return self.ok_group
+        if self.is_staff_or_admin():
+            self.ok = True
+        return self.ok_group
+
+
+def get_wav_duration(path):  # -> float
+    """
+    Checks the specified audio file and returns its length in seconds.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the audio file to check. Should point to a .wav file
+        accessible from the local filesystem.
+
+    Returns
+    -------
+    float
+        Length of the file in seconds. A return value of `0.0` indicates that:
+            - the file does not exist,
+            - is not a valid .wav file, or
+            - could not be processed/read successfully.
+
+    Notes
+    -----
+    This function is intended for validation and quick diagnostics,
+    allowing callers to detect missing or unreadable files without
+    raising exceptions.
+    """
+    try:
+        with wave.open(path, "rb") as wf:
+            frames = wf.getnframes()
+            rate = wf.getframerate()
+            return frames / float(rate)
+    except Exception as e:
+        print("[!] Could not read WAV duration: ", e)
+        return 0.0
+
+
+def play_with_winsound(_media_work="", lock_path=""):  # -> bool
+    """    Play a WAV file asynchronously on Windows, with optional early stop control.
+
+    Parameters
+    ----------
+    _media_work : str, optional
+        Path to the .wav file to play. Must exist locally and be a valid WAV file.
+        Defaults to an empty string, which will cause the function to return False.
+    lock_path : str, optional
+        Path to a "lock file" whose continued existence allows playback to proceed.
+        If provided and the file is deleted during playback, the audio stops early.
+
+    Returns
+    -------
+    bool
+        True  – Playback worked successfully (and ran to completion or was stopped early).\\
+        False – Playback could not be started, or playback could not be stopped.
+    """
+    # NOTE: `future` and `threads` did not work in testing on Windows, so the script
+    # falls back to using a timer and an asynchronous call to winsound.
+    if os.name != "nt":
+        return False
+
+    if not os.path.isfile(str(lock_path)):
+        lock_path = readtexttools.get_my_lock()
+
+    _, _ext = os.path.splitext(_media_work)
+    if _ext.lower() != ".wav":
+        return False
+
+    try:
+        duration = get_wav_duration(_media_work)
+        if not duration:
+            return False
+        elapsed = 0.0
+        if os.path.exists(lock_path):
+            winsound.PlaySound(_media_work, winsound.SND_FILENAME | winsound.SND_ASYNC)
+            print(
+                "[>] Python `winsound` playing `{0}`".format(
+                    os.path.basename(_media_work)
+                )
+            )
+
+        while elapsed < duration:
+            time.sleep(0.2)
+            elapsed += 0.2
+            if lock_path and not os.path.exists(lock_path):
+                print(
+                    "[>] Python `winsound` stopping `{0}`".format(
+                        os.path.basename(_media_work)
+                    )
+                )
+                break
+
+        # Always purge at the end
+        winsound.PlaySound(None, winsound.SND_PURGE)
+        readtexttools.unlock_my_lock(lock_path)
+        return True
+
+    except Exception as e:
+        print("Exception:", e)
+        return False
+
+
+def is_voice_id_formatted_for_speechd(voice_id=""):  # -> bool
+    """
+    Returns `True` if the voice_id contains only letters (A-Za-z) and `_`. If
+    digits appear, they occur only at the end of the string.
+    Examples:
+        MALE1
+        CHILD_MALE
+        female2
+        Child_fEMALE
+    """
+    try:
+        # Pattern explanation:
+        #   ^[A-Za-z_]+      -> One or more letters or underscores at the start.
+        #   (?:[0-9]+)?$     -> Optionally, one or more digits at the very end,
+        #   and nothing else.
+        pattern = re.compile(r"^[A-Za-z_]+(?:[0-9]+)?$")
+        return pattern.fullmatch(voice_id) is not None
+    except Exception as e:
+        print("Exception in `re`; falling back to `set`: {0}".format(e))
+        allowed = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")
+        return all(char in allowed for char in voice_id)
+
+
 class LocalCommons(object):
     """Shared items for local speech servers"""
 
@@ -116,20 +466,31 @@ class LocalCommons(object):
         self.default_extension = ".wav"
         self.help_icon = "/usr/share/icons/HighContrast/32x32/apps/web-browser.png"
         self.length_scales = [
-            [320, 289, "---------|", 0.50],
-            [288, 257, "--------|-", 0.55],
-            [256, 225, "-------|--", 0.62],
-            [224, 193, "------|---", 0.71],
-            [192, 161, "-----|----", 0.83],
-            [160, 159, "-----|----", 1.00],
-            [158, 128, "---|-----", 1.15],
-            [127, 110, "---|-----", 1.25],
-            [109, 97, "---|-----", 1.50],
-            [96, 66, "--|------", 1.66],
-            [64, 33, "-|-------", 2.50],
-            [32, 0, "|--------", 5.00],
+            [320, 304, "---------|", 0.50],
+            [303, 289, "---------|", 0.525],
+            [288, 272, "--------|-", 0.55],
+            [271, 257, "--------|-", 0.585],
+            [256, 240, "-------|--", 0.62],
+            [239, 225, "-------|--", 0.665],
+            [224, 208, "------|---", 0.71],
+            [207, 193, "------|---", 0.77],
+            [192, 176, "-----|----", 0.83],
+            [175, 161, "-----|----", 0.915],
+            [160, 160, "-----|----", 1.00],  # default
+            [159, 143, "---|-----", 1.037],
+            [142, 128, "---|-----", 1.15],
+            [127, 118, "---|-----", 1.20],
+            [117, 110, "---|-----", 1.25],
+            [109, 103, "---|-----", 1.375],
+            [102, 97, "---|-----", 1.50],
+            [96, 81, "--|------", 1.58],
+            [80, 66, "--|------", 1.66],
+            [64, 49, "-|-------", 2.00],
+            [48, 33, "-|-------", 2.50],
+            [32, 16, "|--------", 3.75],
+            [15, 8, "|--------", 4.375],
+            [7, 0, "|--------", 5.00],
         ]
-        self.spacy_ok = False
         self.spd_fm = [
             "female1",
             "female2",
@@ -192,40 +553,6 @@ class LocalCommons(object):
             "nathalie",
             "hajdurova",
         ]
-        # Review English requirements at <https://spacy.io/models/en>.
-        self.spacy_dat = [
-            [["en"], "_core_web_sm"],
-            [
-                [
-                    "ca",
-                    "da",
-                    "de",
-                    "el",
-                    "es",
-                    "fi",
-                    "fr",
-                    "hr",
-                    "it",
-                    "ja",
-                    "ko",
-                    "lt",
-                    "mk",
-                    "nb",
-                    "nl",
-                    "pl",
-                    "pt",
-                    "ro",
-                    "ru",
-                    "sv",
-                    "uk",
-                    "zh",
-                ],
-                "_core_news_sm",
-            ],
-            [["xx"], "_ent_wiki_sm"],
-        ]
-        self.checked_spacy = False
-        self.displayed_spacy = False
         self.ai_developer_platforms = [
             "alma",
             "centos",
@@ -275,118 +602,17 @@ taken too long."""
             self.generic_problem = """The container application cannot load
 a sound file. It might be missing a required library or an operation might
 have taken too long."""
-
-    def _print_spacy_info(self, trained_pipeline="xx_ent_wiki_sm"):  # -> None
-        """Print fallback message and show basic instructions how to install
-        python3 spacy with `apt-get` for Linux."""
-        if not self.displayed_spacy:
-            self.displayed_spacy = True
-            print("""Falling back to `.splitlines()`""")
-            _installer = ""
-            for _app in ["apt-get", "apt", "dnf"]:
-                if os.path.isfile("/usr/bin/{0}".format(_app)):
-                    _installer = _app
-            if len(_installer) != 0:
-                print(
-                    """
-    sudo {0} install pipx
-    pipx install spacy
-    spacy download {1}
-    spacy validate
-
-Each time you use `pipx upgrade-all`, you should check the model package list
-to make sure that you are using the newest version of each `spacy` model that
-you use.
-
-* See: <https://pypi.org/project/spacy/>
-* Package list: <https://spacy.io/models/ca>""".format(
-                        _installer, trained_pipeline
-                    )
-                )
-
-    def _split_sentence(self, _text=""):  # -> list
-        """This is a fallback method to split `_text` into a list using ASCII
-        or Asian punctuation if the `spacy` library is not available."""
-        if _text:
-            _text = re.sub(r"([.?!`—;:．！？—–。︁︒]) ", r"\1\n", _text)
-            return _text.splitlines()
-        return []
-
-    def big_play_list(self, _text="", _lang_str="en", _verbose=True):  # -> list
-        """Split a long string of sentences or paragraphs into a list
-        using [spacy](https://spacy.io/) in a virtual environment if
-        it is available, otherwise split by sentence."""
-        try:
-            spacy = importlib.import_module("spacy")
-            self.spacy_ok = True
-        except (ImportError, ModuleNotFoundError, KeyError, TypeError):
-            try:
-                _local_pip = readtexttools.find_local_pip("spacy")
-                if len(_local_pip) != 0:
-                    sys.path.append(_local_pip)
-                    try:
-                        spacy = importlib.import_module("spacy")
-                        self.spacy_ok = True
-                    except (ImportError, ModuleNotFoundError, KeyError, TypeError):
-                        self.spacy_ok = False
-            except (ImportError, ModuleNotFoundError, KeyError, TypeError):
-                self.spacy_ok = False
-        spaceval = []
-        trained_pipeline = "xx_ent_wiki_sm"
-        for _item in self.spacy_dat:
-            if _lang_str in _item[0]:
-                trained_pipeline = "".join([_lang_str, _item[1]])
-                break
-        if not self.spacy_ok:
-            self._print_spacy_info(trained_pipeline)
-            return self._split_sentence(_text)
-        try:
-            nlp = spacy.load(trained_pipeline)
-            try:
-                # Required for `en_core_web_sm model` per sample code at
-                # <https://spacy.io/models> Accessed July 27, 2024.
-                _imported_module = importlib.import_module(trained_pipeline)
-            except (ImportError, ModuleNotFoundError, KeyError, TypeError):
-                _imported_module = None
-            if not bool(_imported_module):
-                return self._split_sentence(_text)
-            try:
-                # The `senter` component is ~10× faster than `parser` and
-                # more accurate than the rule-based sentencizer. Not all
-                # models include the `senter` component.
-                nlp.enable_pipe("senter")
-                nlp.disable_pipe("parser")
-            except AttributeError:
-                try:
-                    nlp.enable_pipe("parser")
-                except AttributeError:
-                    pass
-            doc = nlp(_text)
-            for item in doc.sents:
-                if len(item.text) != 0:
-                    spaceval.append(item.text)
-            self.checked_spacy = True
-        except Exception as e:
-            print(
-                """
-There was an error loading the `{0}` spacy pipeline:
-{1}\n""".format(
-                    trained_pipeline, e
-                )
-            )
-            self.checked_spacy = False
-            self.spacy_ok = False
-        if len(spaceval) == 0 and _verbose:
-            if not readtexttools.using_container(True):
-                self._print_spacy_info(trained_pipeline)
-            return self._split_sentence(_text)
-        return spaceval
+        self.last_lang = None
+        self.patterns = None
 
     def is_ai_developer_platform(self):  # -> bool
-        """Does the posix platform include options for docker, system
+        """Does the platform include options for docker, podman, system
         contributor or non-free components for some ai models?
         """
-        # i. e.: MacOS, Docker container or Ubuntu compatible?
+        # i. e.: Darwin, NT, Docker container, Debian or other modern
+        # enterprise compatible platform?
+        if os.name == "nt":
+            return True
         if os.name == "posix":
             try:
                 _uname_ver = platform.uname().version
@@ -394,26 +620,13 @@ There was an error loading the `{0}` spacy pipeline:
                 try:
                     _importmeta = readtexttools.ImportedMetaData()
                     _uname_ver = _importmeta.execute_command("uname -a")
-                except:
+                except Exception as e:
+                    print("Exception:  ", e)
                     return False
             for _item in self.ai_developer_platforms:
                 if _item.lower() in _uname_ver.lower():
                     return True
         return False
-
-    def verify_spacy(self, _lang="en"):  # -> bool
-        """spaCy is a free open-source library for Natural Language
-        Processing in Python.
-
-        Do a test run of the python `spacy` library, and check whether it
-        completes the task with no errors with the specified language
-        (`_lang`)."""
-        if self.checked_spacy:
-            return True
-        _verbose = self.is_ai_developer_platform()
-        if len(self.big_play_list("123.\n456", _lang, _verbose)) == 0:
-            return False
-        return self.checked_spacy
 
     def set_urllib_timeout(self, _ok_wait=4):  # -> bool
         """Try to set sockets timeout before transfering a file using
@@ -497,6 +710,11 @@ xml:lang="{0}">
             # In a loop, this would cause the voice to continue.
             if handle_unlock:
                 readtexttools.unlock_my_lock()
+
+            # if not readtexttools.lax_bool(_visible) and not len(_media_out) == 0:
+            #     if play_with_winsound(_media_work, readtexttools.get_my_lock()):
+            #         return True
+
             readtexttools.process_wav_media(
                 _info,
                 _media_work,
@@ -509,3 +727,75 @@ xml:lang="{0}">
             )
             return True
         return False
+
+    def flatpak_package_play_command(
+        self, app_signature="com.mikeasoft.pied"
+    ):  # -> str
+        """If your posix os has a flatpak package with a matching signature,
+        then return the command to run the application, otherwise return `""`
+
+        NOTE: If the extension is running in a Flatpak container, it will
+        not find the system `/usr/bin/flatpak` program because it only has
+        access to system resources included in the Flatpak container.
+        """
+        if len(app_signature.split(".")) < 2:
+            return ""
+        if not os.path.isfile("/usr/bin/flatpak"):
+            return ""
+        _imported_meta = readtexttools.ImportedMetaData()
+        if "\t{0}\t".format(app_signature) in _imported_meta.execute_command(
+            "flatpak list"
+        ):
+            return "flatpak run {0}".format(app_signature)
+        return ""
+
+    def winsound_purge(self):
+        """Stop playing a wave audio file."""
+        if not os.name == "nt":
+            return True
+        try:
+            winsound.PlaySound(None, winsound.SND_PURGE)
+            time.sleep(0.5)
+            return True
+        except Exception as e:
+            print("Exception:  ", e)
+            return False
+
+
+def get_host_ip():  # -> str
+    """Connect to a public IP (Google DNS) without sending data
+    to reliably determine the machine's IP address."""
+    _local_commons = LocalCommons()
+    _local_commons.set_urllib_timeout(2)
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        _local_commons.set_urllib_timeout(4)
+        return ip
+    except Exception:
+        _local_commons.set_urllib_timeout(4)
+        return "127.0.0.1"  # Fallback if offline
+
+
+def main():  # -> None
+    """Print Info"""
+    print(
+        """Common Network Tools
+====================
+
+* Common tools for network and neural speech synthesis clients
+* Access using class `LocalCommons()`
+
+{0}
+""".format(
+            os.path.abspath(__file__)
+        )
+    )
+    for _engine in NET_SERVICE_LIST:
+        print("* {0}".format(_engine))
+
+
+if __name__ == "__main__":
+    main()

@@ -2,11 +2,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: read-text 1.0\n"
-"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
-"/readtextextension-discuss\n"
 "POT-Creation-Date: 2015-08-15T12:53:51\n"
-"PO-Revision-Date: 2015-08-26 23:06-0700\n"
-"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"PO-Revision-Date: 2025-06-18 07:56-0800\n"
+"Last-Translator: James\n"
 "Language-Team: LANGUAGE\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -412,4 +410,68 @@ msgstr "사람"
 msgid "Rate"
 msgstr "속도"
 
+#: src/orca/guilabels.py:205
+msgid "Default Synthesizer"
+msgstr "음성 합성기"
 
+#: src/orca/guilabels.py:931
+msgid "Speech Dispatcher"
+msgstr "음성 사용하지 않음."
+
+# ko.po Claude 3 Haiku
+msgid "_Reset"
+msgstr "초기화"
+
+# ko.po Claude 3 Haiku
+msgid "Model"
+msgstr "모델"
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "추가(_A)"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "삭제(_D)"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "제거(_R)"
+
+#. A4N7i
+#: extensions/inc/stringarrays.hrc:184
+msgctxt "RID_RSC_ENUM_SCROLLBARS"
+msgid "None"
+msgstr "없음"
+
+#. Vmbbd
+#: extensions/inc/strings.hrc:30
+msgctxt "RID_STR_ENABLED"
+msgid "Enabled"
+msgstr "활성 상태"
+
+#. Xk7cV
+#: extensions/uiconfig/sabpilot/ui/groupradioselectionpage.ui:49
+msgctxt "groupradioselectionpage|datasourcelabel"
+msgid "Data source"
+msgstr "데이터 원본"
+
+#. D9AH2
+#: extensions/inc/strings.hrc:305
+msgctxt "RID_UPDATE_STR_DOWNLOADING"
+msgid "Downloading %PRODUCTNAME %NEXTVERSION..."
+msgstr "%PRODUCTNAME %NEXTVERSION 다운로드 중..."
+
+#. MoGgC
+#: extensions/inc/strings.hrc:326
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOADING"
+msgid "Download of update in progress"
+msgstr "업데이트 다운로드 중"
+
+#. RmhyN
+#: extensions/inc/strings.hrc:332
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOAD_AVAIL"
+msgid "Download of update completed"
+msgstr "업데이트 다운로드 완료됨"

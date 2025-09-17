@@ -43,10 +43,34 @@
             <listitem>Right-click on the wrench icon, which is the fourth icon from the left at the
                 bottom of the dialog box.</listitem>
 
-            <listitem>In the <emph>Replace</emph> box, enter an
-                alternative spelling for the word.</listitem>
+            <listitem>In the <emph>Replace</emph> box, enter an alternative spelling for the word.</listitem>
 
             <listitem>Select the <emph>Apply</emph> button.</listitem>
+
+        </list>
+
+        <paragraph xml-lang="en-US" role="heading" level="2">Manage a Speech Model</paragraph>
+
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog4.png"
+            id="img_dialog4_screenshot">
+            <alt xml-lang="en-US" id="alt_dialog4_screenshot">Manage a Speech Model</alt>
+        </image>
+
+        <paragraph xml-lang="en-US">This dialogue is available on some computers.</paragraph>
+
+        <list type="ordered" xml-lang="en-US">
+
+            <listitem>Select a model.</listitem>
+
+            <listitem>Click the loudspeaker icon.</listitem>
+
+            <listitem>Click the <emph>OK</emph> button.</listitem>
+
+            <listitem>If the model is installed, the main menu offers to set that model as the
+                default.</listitem>
+
+            <listitem>If the model is not installed, the main menu offers an option to download the
+                model.</listitem>
 
         </list>
 
@@ -54,82 +78,116 @@
 
         <list>
 
-            <listitem><code>(AUTHOR)</code>: Name of the author</listitem>
+            <listitem>
+                <code>(AUTHOR)</code>: Name of the author</listitem>
 
-            <listitem><code>(COUNTRY_CODE)</code>: Your country</listitem>
+            <listitem>
+                <code>(COUNTRY_CODE)</code>: Your country</listitem>
 
-            <listitem><code>(CREATE_QR_LABEL_PY)</code>: A Python script to create a QR code</listitem>
+            <listitem>
+                <code>(CREATE_QR_LABEL_PY)</code>: A Python script to create a QR code</listitem>
 
-            <listitem><code>(DATE)</code>: The current date</listitem>
+            <listitem>
+                <code>(DATE)</code>: The current date</listitem>
 
-            <listitem><code>(ESPEAK_READ_TEXT_PY)</code>: A Python script</listitem>
+            <listitem>
+                <code>(ESPEAK_READ_TEXT_PY)</code>: A Python script</listitem>
 
-            <listitem><code>(FESTIVAL_READ_TEXT_PY)</code>: A Python script</listitem>
+            <listitem>
+                <code>(FESTIVAL_READ_TEXT_PY)</code>: A Python script</listitem>
 
-            <listitem><code>(HOME)</code>: Your home directory</listitem>
+            <listitem>
+                <code>(HOME)</code>: Your home directory</listitem>
 
-            <listitem><code>(LANGUAGE_CODE)</code>: Your language code</listitem>
+            <listitem>
+                <code>(LANGUAGE_CODE)</code>: Your language code</listitem>
 
-            <listitem><code>(LANGUAGE_COUNTRY_CODE)</code>: Your country and language</listitem>
+            <listitem>
+                <code>(LANGUAGE_COUNTRY_CODE)</code>: Your country and language</listitem>
 
-            <listitem><code>(NETWORK_READ_TEXT_PY)</code>: A Python script</listitem>
+            <listitem>
+                <code>(NETWORK_READ_TEXT_PY)</code>: A Python script</listitem>
 
-            <listitem><code>(NOW)</code>: Current time reformatted so you can use it in a file name</listitem>
+            <listitem>
+                <code>(NOW)</code>: Current time reformatted so you can use it in a file name</listitem>
 
-            <listitem><code>(OOO_WEBTEXT)</code>: The first 9999 letters of the selected text
-                encoded as part of a URL</listitem>
+            <listitem>
+                <code>(OOO_WEBTEXT)</code>: The first 9999 letters of the selected text encoded as
+                part of a URL</listitem>
 
-            <listitem><code>(OOO_WEBTEXT250)</code>: The first 249 letters of the selected text
-                encoded as part of a URL</listitem>
+            <listitem>
+                <code>(OOO_WEBTEXT250)</code>: The first 249 letters of the selected text encoded as
+                part of a URL</listitem>
 
-            <listitem><code>(OOO_WEBTEXTBIG)</code>: The first 9999 letters of the selected text
-                encoded as part of a URL</listitem>
+            <listitem>
+                <code>(OOO_WEBTEXTBIG)</code>: The first 9999 letters of the selected text encoded
+                as part of a URL</listitem>
 
-            <listitem><code>(OOO_WEBTEXTSMALL)</code>: The first 99 letters of the selected text
-                encoded as part of a URL</listitem>
+            <listitem>
+                <code>(OOO_WEBTEXTSMALL)</code>: The first 99 letters of the selected text encoded
+                as part of a URL</listitem>
 
-            <listitem><code>(OPENJTALK_READ_TEXT_PY)</code>: A Python program (Japanese)</listitem>
+            <listitem>
+                <code>(OPENJTALK_READ_TEXT_PY)</code>: A Python program (Japanese)</listitem>
 
-            <listitem><code>(PICO_READ_TEXT_PY)</code>: A Python script</listitem>
+            <listitem>
+                <code>(PICO_READ_TEXT_PY)</code>: A Python script</listitem>
 
-            <listitem><code>(PIPER_READ_TEXT_PY)</code>: A Python script</listitem>
+            <listitem>
+                <code>(PIPER_READ_TEXT_PY)</code>: A Python script</listitem>
 
-            <listitem><code>(RESET_ALL)</code>: Return to default settings</listitem>
+            <listitem>
+                <code>(RESET_ALL)</code>: Return to default settings</listitem>
 
-            <listitem><code>(RHVOICE_READ_TEXT_PY)</code>: A Python script</listitem>
+            <listitem>
+                <code>(RHVOICE_READ_TEXT_PY)</code>: A Python script</listitem>
 
-            <listitem><code>(SAY_APPLESCRIPT)</code>: A MacOS platform voice synthesis script</listitem>
+            <listitem>
+                <code>(SAY_APPLESCRIPT)</code>: A MacOS platform voice synthesis script</listitem>
 
-            <listitem><code>(SELECTION_COUNTRY_CODE)</code>: The country of the selected text</listitem>
+            <listitem>
+                <code>(SELECTION_COUNTRY_CODE)</code>: The country of the selected text</listitem>
 
-            <listitem><code>(SELECTION_LANGUAGE_CODE)</code>: The language of the selected text</listitem>
+            <listitem>
+                <code>(SELECTION_LANGUAGE_CODE)</code>: The language of the selected text</listitem>
 
-            <listitem><code>(SELECTION_LANGUAGE_COUNTRY_CODE)</code>: The regional code of the
-                selected text</listitem>
+            <listitem>
+                <code>(SELECTION_LANGUAGE_COUNTRY_CODE)</code>: The regional code of the selected
+                text</listitem>
 
-            <listitem><code>(SESSION_ID)</code>: The session identifier</listitem>
+            <listitem>
+                <code>(SESSION_ID)</code>: The session identifier</listitem>
 
-            <listitem><code>(SOUND_GALLERY)</code>: File path to the application's sound gallery</listitem>
+            <listitem>
+                <code>(SOUND_GALLERY)</code>: File path to the application's sound gallery</listitem>
 
-            <listitem><code>(SPD_READ_TEXT_PY)</code>: A Posix platform voice synthesis script</listitem>
+            <listitem>
+                <code>(SPD_READ_TEXT_PY)</code>: A Posix platform voice synthesis script</listitem>
 
-            <listitem><code>(TIME)</code>: Current spoken time in the region</listitem>
+            <listitem>
+                <code>(TIME)</code>: Current spoken time in the region</listitem>
 
-            <listitem><code>(TITLE)</code>: Name of the document</listitem>
+            <listitem>
+                <code>(TITLE)</code>: Name of the document</listitem>
 
-            <listitem><code>(TMP)</code>: Full path and temporary file name containing the selected
-                text </listitem>
+            <listitem>
+                <code>(TMP)</code>: Full path and temporary file name containing the selected text </listitem>
 
-            <listitem><code>(TTS_WSCRIPT_VBS)</code>: A Windows platform voice synthesis script</listitem>
+            <listitem>
+                <code>(TTS_WSCRIPT_VBS)</code>: A Windows platform voice synthesis script</listitem>
 
-            <listitem><code>(UNIQUE_ID)</code>: A one-time use user identifier</listitem>
+            <listitem>
+                <code>(UNIQUE_ID)</code>: A one-time use user identifier</listitem>
 
-            <listitem><code>(USER_ID)</code>: An anonymous user identifier</listitem>
+            <listitem>
+                <code>(USER_ID)</code>: An anonymous user identifier</listitem>
 
-            <listitem><code>(WEEKDAY)</code>: Current day of the week as spoken in the region</listitem>
+            <listitem>
+                <code>(WEEKDAY)</code>: Current day of the week as spoken in the region</listitem>
 
         </list>
         <paragraph>When you need one of these values in a command or script, use the corresponding <code>
             token</code>. The value in parentheses is replaced by the requested string.</paragraph>
     </body>
 </helpdocument>
+                        

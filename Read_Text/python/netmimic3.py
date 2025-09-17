@@ -17,6 +17,7 @@ try:
 except (ImportError, AssertionError):
     BASICS_OK = False
 import netcommon
+import netsplit
 import readtexttools
 
 
@@ -83,7 +84,6 @@ To automatically start the daemon, set the Docker container restart policy to
             "docker",
             "local_server",
         ]
-        self.checked_spacy = False
         self.default_lang = _common.default_lang
         self.default_voice = "en_UK/apope_low"
         self.default_extension = _common.default_extension
@@ -457,36 +457,71 @@ To automatically start the daemon, set the Docker container restart policy to
         return _text
 
     def spd_voice_to_mimic3_voice(
-        self, _search="female1", _iso_lang="en-US", _alt_local_url=""
+        self, _iso_lang: str = "en-US", _alt_local_url: str = "", _vox: str = "female1"
     ) -> str:
-        """Assign a name like `en_UK/apope_low"` to a
-        spd_voice like `male0`"""
-        _search = _search.strip("'\" \n")
-        if len(self.full_names) == 0:
-            if not self.language_supported(_iso_lang, _alt_local_url, _search):
-                self.voice_id = ""
-                return self.voice_id
-        _vox_number = int(
-            "".join(["0", readtexttools.safechars(_search, "1234567890")])
-        )
-        _voice_count = 1
-        if _search in self.full_names:
-            self.voice_id = _search
-        elif _search.lower().startswith("female"):
-            self.voice_id = netcommon.index_number_to_list_item(
-                _vox_number, self.female_names
+        """Maps an SPD-Say voice string to a Mimic3-compatible voice ID.
+
+        Given a voice string, sets `self.voice_id` to a name like `en_UK/apope_low`
+        that is supported by Mimic3, or to an empty string if no match is found.
+        If the language is specified within the `_vox` argument, returns the first
+        matching voice string for that language.
+
+        Examples:
+            Dialog1 ComboBox2:
+            ```
+            "(NETWORK_READ_TEXT_PY)" --language --language "(SELECTION_LANGUAGE_COUNTRY_CODE)" --voice "mimic3/FEMALE1" "(TMP)"
+            "(NETWORK_READ_TEXT_PY)" --language "(SELECTION_LANGUAGE_COUNTRY_CODE)" --voice "mimic3/en_US/cmu-arctic_low#aup" "(TMP)"
+            ```
+            - In the first example, the player tries to find a voice for FEMALE1 in the specified language.
+            - In the second example, the player tries to find the exact voice, and falls back to the first available voice.
+
+        Args:
+            _iso_lang (str): Language and region code (e.g., `fr-FR`).
+            _alt_local_url (str): If not empty, use as an alternative to
+                `http://0.0.0.0:59125`.
+            _vox (str): Voice in `spd-say` format (`male1`, `female1`, etc.)
+                or a specific Mimic3 voice like `fr_FR/siwis_low`.
+
+        Returns:
+            str: The name of a Mimic3 model and voice if found, otherwise an empty string.
+        """
+
+        _vox = _vox.strip("'\" \n")
+        concise_lang = _iso_lang.lower().split("-")[0].split("_")[0]
+        _voice_count = 0
+
+        if _vox.startswith(concise_lang):
+            if _vox in self.male_list or _vox in self.female_list:
+                voice_id = _vox
+                self.voice_id = voice_id
+                _voice_count = len(self.full_names) + 1
+        if _voice_count == 0:
+            if len(self.full_names) == 0:
+                if not self.language_supported(_iso_lang, _alt_local_url, _vox):
+                    self.voice_id = ""
+                    return self.voice_id
+            _vox_number = int(
+                "".join(["0", readtexttools.safechars(_vox, "1234567890")])
             )
-            _voice_count = len(self.female_names) + 1
-        elif _search.lower().startswith("male"):
-            self.voice_id = netcommon.index_number_to_list_item(
-                _vox_number, self.male_names
-            )
-            _voice_count = len(self.male_names) + 1
-        else:
-            self.voice_id = netcommon.index_number_to_list_item(
-                _vox_number, self.full_names
-            )
-            _voice_count = len(self.full_names) + 1
+            _voice_count = 1
+            if _vox in self.full_names:
+                self.voice_id = _vox
+            elif "female" in _vox.lower():
+                self.voice_id = netcommon.index_number_to_list_item(
+                    _vox_number, self.female_names
+                )
+                _voice_count = len(self.female_names) + 1
+            elif "male" in _vox.lower():
+                self.voice_id = netcommon.index_number_to_list_item(
+                    _vox_number, self.male_names
+                )
+                _voice_count = len(self.male_names) + 1
+            else:
+                self.voice_id = netcommon.index_number_to_list_item(
+                    _vox_number, self.full_names
+                )
+                _voice_count = len(self.full_names) + 1
+
         _url = self.url
         voice_id = self.voice_id
         _help_url = self.help_url
@@ -497,7 +532,7 @@ To automatically start the daemon, set the Docker container restart policy to
 Mimic 3
 =======
 
-* Mapped Voice: `{_search}`
+* Mapped Voice: `{_vox}`
 * Available Locale: `{_mimic_lang}`
 * Mimic3 Voice: `{voice_id}`
 * Number of Voices: `{s_voice_count}`
@@ -509,14 +544,29 @@ Mimic 3
         return self.voice_id
 
     def language_supported(
-        self, iso_lang="en-US", alt_local_url="", vox="auto"
+        self, iso_lang: str = "en-US", alt_local_url: str = "", vox: str = "auto"
     ) -> bool:
-        """Is the language or voice supported?
-        + `iso_lang` can be in the form `en-US` or a voice like
-          `de_DE/thorsten_low`
-        + `alt_local_url` If you are connecting to a local network's
-           speech server using a different computer, you might need to use
-           a different url."""
+        """Check whether Mimic3 supports a given language or voice.
+
+        This method verifies whether the specified language code or voice
+        identifier is available. The language can be provided in standard
+        ISO format (e.g., `en-US`) or as a full voice string (e.g.,
+        `de_DE/thorsten_low`).
+
+        Args:
+            iso_lang (str): Language and region code, or a full voice identifier.
+            alt_local_url (str): Optional alternative URL for connecting to a
+                local network speech server from another computer.
+            vox (str): Voice name in spd-say or Mimic3 format. Use `"auto"` to
+                let the system choose a default voice.
+
+        Returns:
+            bool: True if the language or voice is supported, False otherwise.
+        """
+        # + `alt_local_url` If you are connecting to a local network's
+        #    speech server using a different computer, you might need to
+        #    use a different url.
+
         if alt_local_url.startswith("http"):
             self.url = alt_local_url
         if sys.version_info < (3, 8):
@@ -537,6 +587,8 @@ Mimic 3
         )
         # concise language
         _lang2 = iso_lang.lower().split("-")[0].split("_")[0]
+        _commons = netcommon.LocalCommons()
+        _commons.set_urllib_timeout(4)
         try:
             response = urllib.request.urlopen("".join([self.url, "/api/voices"]))
             data_response = response.read()
@@ -556,9 +608,18 @@ a local URL that you specify.
         except AttributeError:
             self.ok = False
             return False
+        except TimeoutError as e:
+            print("TimeoutError: (mimic3 urllib):  ", e)
+            self.ok = False
+            return False
+        except Exception as e:
+            print("Exception: (mimic3 urllib):  ", e)
+            self.ok = False
+            return False
         if len(self.data) == 0:
             return False
         self.accept_voice.extend(netcommon.spd_voice_list(0, 200, ["female", "male"]))
+
         for _idiom in [_lang1, _lang2]:
             for _item in self.data:
                 testbase = _item["location"]
@@ -714,7 +775,7 @@ a local URL that you specify.
                 readtexttools.unlock_my_lock(self.locker)
                 return True
         _voice = self.voice_id
-        self.checked_spacy = self.common.verify_spacy(_iso_lang.split("-")[0])
+
         if self.debug and 1:
             print(["`Mimic3Class` > ` `read`", "Request `_voice`: ", _voice])
             if bool(self.add_pause) and not ssml:
@@ -737,14 +798,10 @@ a local URL that you specify.
         _no = "0" * 10
         if ssml:
             _items = [_text]
-        elif self.common.is_ai_developer_platform():
-            _items = self.common.big_play_list(_text, _iso_lang.split("-")[0])
-        elif len(_text.splitlines()) == 1 or len(_text) < self.max_chars:
-            _items = [_text]
-        elif self.checked_spacy:
-            _items = self.common.big_play_list(_text, _iso_lang.split("-")[0])
         else:
-            _items = [_text]
+            _netsplitlocal = netsplit.LocalHandler()
+            _items = _netsplitlocal.create_play_list(_text, _iso_lang.split("-")[0])
+
         for _item in _items:
             if not os.path.isfile(readtexttools.get_my_lock(self.locker)):
                 print("[>] Stop!")

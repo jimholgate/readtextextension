@@ -2,11 +2,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: read-text 1.0\n"
-"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
-"/readtextextension-discuss\n"
 "POT-Creation-Date: 2015-08-15T12:42:58\n"
-"PO-Revision-Date: 2015-08-15 23:10-0700\n"
-"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"PO-Revision-Date: 2025-06-18 07:56-0800\n"
+"Last-Translator: James\n"
 "Language-Team: LANGUAGE\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
@@ -387,3 +385,69 @@ msgstr "Kalba"
 # src/orca/orca-setup.ui:1404
 msgid "Voice"
 msgstr "Balsas"
+
+#: src/orca/guilabels.py:205
+msgid "Default Synthesizer"
+msgstr "Sintezatorius pagal nutylėjimą"
+
+#: src/orca/guilabels.py:931
+msgid "Speech Dispatcher"
+msgstr "Speech Dispatcher"
+
+#: ../src/orca/orca-setup.ui.h:116
+msgid "_Reset"
+msgstr "_Atstatyti"
+
+# lt.po Claude 3 Haiku
+msgid "Model"
+msgstr "Modelis"
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "Pridėti"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "Šalinti"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "Šalinti"
+
+#. A4N7i
+#: extensions/inc/stringarrays.hrc:184
+msgctxt "RID_RSC_ENUM_SCROLLBARS"
+msgid "None"
+msgstr "Jokios"
+
+#. Vmbbd
+#: extensions/inc/strings.hrc:30
+msgctxt "RID_STR_ENABLED"
+msgid "Enabled"
+msgstr "Veiksnus"
+
+#. Xk7cV
+#: extensions/uiconfig/sabpilot/ui/groupradioselectionpage.ui:49
+msgctxt "groupradioselectionpage|datasourcelabel"
+msgid "Data source"
+msgstr "Duomenų šaltinis"
+
+#. D9AH2
+#: extensions/inc/strings.hrc:305
+msgctxt "RID_UPDATE_STR_DOWNLOADING"
+msgid "Downloading %PRODUCTNAME %NEXTVERSION..."
+msgstr "Siunčiama „%PRODUCTNAME %NEXTVERSION“..."
+
+#. MoGgC
+#: extensions/inc/strings.hrc:326
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOADING"
+msgid "Download of update in progress"
+msgstr "Siunčiamas naujinimas"
+
+#. RmhyN
+#: extensions/inc/strings.hrc:332
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOAD_AVAIL"
+msgid "Download of update completed"
+msgstr "Naujinimo siuntimas baigtas"

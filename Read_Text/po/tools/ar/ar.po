@@ -2,11 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: read-text 1.0\n"
-"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
-"/readtextextension-discuss\n"
-"POT-Creation-Date: 2015-08-15T12:42:57\n"
-"PO-Revision-Date: 2015-08-15 22:59-0700\n"
-"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"PO-Revision-Date: 2025-06-18 07:56-0800\n"
+"Last-Translator: James \n"
 "Language-Team: LANGUAGE\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -81,3 +78,70 @@ msgstr "شخص"
 # ../src/orca/orca-setup.ui.h:44
 msgid "Voice"
 msgstr "الصوت"
+
+#: src/orca/guilabels.py:205
+msgid "Default Synthesizer"
+msgstr "نظام النطق الإفتراضي"
+
+#: src/orca/guilabels.py:931
+msgid "Speech Dispatcher"
+msgstr "نظام النطق"
+
+#: ../src/orca/orca-setup.ui.h:116
+msgid "_Reset"
+msgstr "أعد _ضبط"
+
+# ar.po Claude 3 Haiku
+msgid "Model"
+msgstr "نموذج"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "أ_ضف"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "اح_ذف"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "أ_زِل"
+
+#. A4N7i
+#: extensions/inc/stringarrays.hrc:184
+msgctxt "RID_RSC_ENUM_SCROLLBARS"
+msgid "None"
+msgstr "بِلا"
+
+#. Vmbbd
+#: extensions/inc/strings.hrc:30
+msgctxt "RID_STR_ENABLED"
+msgid "Enabled"
+msgstr "تمكين"
+
+#. Xk7cV
+#: extensions/uiconfig/sabpilot/ui/groupradioselectionpage.ui:49
+msgctxt "groupradioselectionpage|datasourcelabel"
+msgid "Data source"
+msgstr "مصدر البيانات"
+
+#. D9AH2
+#: extensions/inc/strings.hrc:305
+msgctxt "RID_UPDATE_STR_DOWNLOADING"
+msgid "Downloading %PRODUCTNAME %NEXTVERSION..."
+msgstr "ينزّل %PRODUCTNAME %NEXTVERSION ..."
+
+#. MoGgC
+#: extensions/inc/strings.hrc:326
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOADING"
+msgid "Download of update in progress"
+msgstr "يجري تنزيل التحديث"
+
+#. RmhyN
+#: extensions/inc/strings.hrc:332
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOAD_AVAIL"
+msgid "Download of update completed"
+msgstr "اكتمل تنزيل التحديث"

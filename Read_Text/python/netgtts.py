@@ -10,26 +10,35 @@ trademarks of Google Inc.
 The contents of this resource are not affiliated with, sponsored by, or endorsed
 by Google nor does the documention represent the views or opinions of Google or
 Google personnel.
+
+This script looks for the `gtts` library in specific local directories, and so
+it will not work if the office application is in a sandbox or container. Test
+normal functioning with `gtts-cli 'hello world' | play -t mp3 -`
 """
 
 
 import os
+import subprocess
 import sys
+import shlex
 import netcommon
+import netsplit
 import readtexttools
+from importlib.metadata import version
 
 try:
     import gtts
 except (AttributeError, ImportError, ModuleNotFoundError):
     try:
-        if len(readtexttools.find_local_pip("gtts")) != 0:
-            sys.path.append(readtexttools.find_local_pip("gtts"))
+        _try_path = readtexttools.pip_dir_search("gtts", "", True, "")
+        if _try_path:
+            sys.path.append(_try_path)
             try:
                 import gtts
-            except:
-                pass
-    except:
-        pass
+            except Exception as e:
+                print("Exception (editing `sys.path`): ", e)
+    except Exception as e:
+        print("Exception (importing gtts): ", e)
 
 
 class GoogleTranslateClass(object):
@@ -67,115 +76,57 @@ class GoogleTranslateClass(object):
     def __init__(self):  # -> None
         """Initialize data"""
         self.ok = True
-        self.accept_voice = ["", "all", "auto", "child_female", "child_male", "gtts"]
+        self.accept_voice = [
+            "",
+            "all",
+            "auto",
+            "child_female",
+            "child_male",
+            "gtts",
+            "female",
+            "male",
+        ]
         self.translator = "Google"
         self.translator_domain = self.translator.lower()
         self.default_extension = ".mp3"
-        self.tested_version = 2.5  # May, 2024 - Ubuntu LTS 20.04 depreciated.
-
-    def version(self):  # -> string
-        """Returns the version in the form `nn.nn.nn`."""
-        try:
-            return gtts.version.__version__
-        except (AttributeError, NameError):
-            self.ok = False
-            return "0.0.0"
-
-    def check_version(self, minimum_version=0):  # -> bool
-        """Check for minimum version."""
-        if minimum_version == 0:
-            minimum_version = self.tested_version
-        if readtexttools.is_container_instance():
-            self.ok = False
-            return self.ok
-        if os.name == "nt":
-            # Require Windows Media Player play mp3 audio files.
-            _wmp = readtexttools.WinMediaPlay()
-            if len(_wmp.get_nt_path("Windows Media Player", "wmplayer.exe")) == 0:
-                self.ok = False
-                return self.ok
-        _test_version = self.version()
-        try:
-            self.ok = float(".".join(_test_version.split(".")[:2])) >= minimum_version
-        except (AttributeError, IndexError, ValueError):
-            self.ok = False
-        _commons = netcommon.LocalCommons()
-        self.accept_voice.extend(
-            netcommon.spd_voice_list(0, 100, ["female", "male", "auto"])
-        )
-        return self.ok
-
-    def read(
-        self,
-        _text="",
-        _iso_lang="en-US",
-        _visible="false",
-        _audible="true",
-        _out_path="",
-        _icon="",
-        _info="",
-        _post_process=None,
-        _writer="",
-        _size="600x600",
-        _speech_rate=160,
-    ):  # -> bool
-        """
-        Setup
-        -----
-
-        + See: <https://gtts.readthedocs.io/en/latest/>
-        + Package Manager: `sudo dnf install python3-pip` or `sudo apt install python3-pip`
-        + Pip Installer: `pip3 install gTTS gTTS-token` (*Not* `sudo`!)
-
-        + `_text` - Text to speak
-        + `_iso_lang` - Supported letter language code - defaults to English
-        + `_visible` - Use a graphic media player, or False for invisible player
-        + `_out_path` - Name of desired output media file
-        + `_audible` - If false, then don't play the sound file
-        + `_icon` - a .png or .jpg file if required.
-        + `_info` - Commentary or title for post processing
-        + `_post_process` - Get information, play file, or convert a file
-        + `_writer` - Artist or Author
-        + `_size` - Dimensions to scale photo '600x600'
-        + `_speech_rate` - Two speeds supported: 100% or above is Normal;
-           Any value less is Slow.
-        """
-        if len(_text) == 0:
-            return False
-        _tld = "com"
-        _region = "US"
-        _lang1 = "en"
-        _lang2 = "es"
-        _short_text = ""
-        _slow = False
-        _lang_check = True
-        _lang = _iso_lang
-        _msg = ""
-        _error_icon = readtexttools.net_error_icon()
-        _version = self.version()
-        _env_lang = readtexttools.default_lang()
-        _domain = self.translator_domain
-        _provider = self.translator
-        _provider_logo = (
-            f"/usr/share/icons/hicolor/scalable/apps/goa-account-{_domain}.svg)"
-        )
-        if not os.path.isfile(_provider_logo):
-            # Modified high contrast icon - GNU LESSER GENERAL PUBLIC LICENSE
-            # Version 3, 29 June 2007
-            # https://raw.githubusercontent.com/shgysk8zer0/adwaita-icons/master/LICENSE
-            _provider_logo = readtexttools.app_icon_image("goa-account-google_hc.svg")
-        for _dash in ["-", "_"]:
-            if _dash in _iso_lang:
-                _lang = _iso_lang.split(_dash)[0]
-                _region = _iso_lang.split(_dash)[1]
-                break
-        try:
-            if _speech_rate < 160:
-                _slow = True
-        except (NameError, TypeError):
-            self.ok = False
-
-        domain_table = [
+        self.tested_version = 2.5
+        self.version_string = ""
+        self.domain_table = [
+            {
+                "domain": "de",
+                "iso_code": "DE",
+                "lang1": "de",
+                "lang2": "en",
+                "comment": "Germany",
+            },
+            {
+                "domain": "co.uk",
+                "iso_code": "GB",
+                "lang1": "en",
+                "lang2": "pl",
+                "comment": "Great Britain",
+            },
+            {
+                "domain": "es",
+                "iso_code": "ES",
+                "lang1": "es",
+                "lang2": "en",
+                "comment": "Spain",
+            },
+            {
+                "domain": "fr",
+                "iso_code": "FR",
+                "lang1": "fr",
+                "lang2": "ar",
+                "comment": "France",
+            },
+            {
+                "domain": "com.hk",
+                "iso_code": "CN",
+                "lang1": "zh",
+                "lang2": "en",
+                "comment": "Mandarin (Simplified)",
+            },
             {
                 "domain": "ar",
                 "iso_code": "AR",
@@ -254,13 +205,6 @@ class GoogleTranslateClass(object):
                 "comment": "Czechia",
             },
             {
-                "domain": "de",
-                "iso_code": "DE",
-                "lang1": "de",
-                "lang2": "en",
-                "comment": "Germany",
-            },
-            {
                 "domain": "dk",
                 "iso_code": "DK",
                 "lang1": "da",
@@ -284,13 +228,6 @@ class GoogleTranslateClass(object):
             {
                 "domain": "es",
                 "iso_code": "ES",
-                "lang1": "es",
-                "lang2": "en",
-                "comment": "Spain",
-            },
-            {
-                "domain": "es",
-                "iso_code": "ES",
                 "lang1": "eu",
                 "lang2": "es",
                 "comment": "Spain",
@@ -308,13 +245,6 @@ class GoogleTranslateClass(object):
                 "lang1": "fi",
                 "lang2": "sv",
                 "comment": "Finland",
-            },
-            {
-                "domain": "fr",
-                "iso_code": "FR",
-                "lang1": "fr",
-                "lang2": "ar",
-                "comment": "France",
             },
             {
                 "domain": "gl",
@@ -422,7 +352,7 @@ class GoogleTranslateClass(object):
                 "comment": "Slovakia",
             },
             {
-                "domain": "us",
+                "domain": "com",
                 "iso_code": "US",
                 "lang1": "en",
                 "lang2": "es",
@@ -436,7 +366,7 @@ class GoogleTranslateClass(object):
                 "comment": "Costa Rica",
             },
             {
-                "domain": "co.hn",
+                "domain": ".hn",
                 "iso_code": "HN",
                 "lang1": "es",
                 "lang2": "en",
@@ -455,13 +385,6 @@ class GoogleTranslateClass(object):
                 "lang1": "en",
                 "lang2": "zh-CN",
                 "comment": "New Zealand",
-            },
-            {
-                "domain": "co.uk",
-                "iso_code": "GB",
-                "lang1": "en",
-                "lang2": "pl",
-                "comment": "Great Britain",
             },
             {
                 "domain": "co.za",
@@ -532,13 +455,6 @@ class GoogleTranslateClass(object):
                 "lang1": "es",
                 "lang2": "en",
                 "comment": "Guatemala",
-            },
-            {
-                "domain": "com.hk",
-                "iso_code": "CN",
-                "lang1": "zh",
-                "lang2": "en",
-                "comment": "Mandarin (Simplified)",
             },
             {
                 "domain": "com.hk",
@@ -646,7 +562,7 @@ class GoogleTranslateClass(object):
                 "comment": "Mandarin (Traditional)",
             },
             {
-                "domain": "com.ve",
+                "domain": "co.ve",
                 "iso_code": "VE",
                 "lang1": "es",
                 "lang2": "pt",
@@ -667,11 +583,202 @@ class GoogleTranslateClass(object):
                 "comment": "Uraguay",
             },
         ]
-        for i in range(len(domain_table)):
-            if domain_table[i]["iso_code"] == _region.upper():
-                _tld = domain_table[i]["domain"]
-                _lang1 = domain_table[i]["lang1"]
-                _lang2 = domain_table[i]["lang2"]
+        _common = netcommon.LocalCommons()
+        self.locker = _common.locker
+
+    def get_version(self):  # -> string
+        """Returns the version in the form `nn.nn.nn`."""
+        try:
+            return str(gtts.__init__.version)
+        except (AttributeError, NameError):
+            try:
+                cmd = shlex.split("gtts-cli --version")
+                result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                # Example output: "gtts-cli, version 2.5.4"
+                for token in result.stdout.split():
+                    if token[0].isdigit():
+                        self.version = token.strip()
+                        break
+            except Exception as e:
+                print("Exception (CLI fallback):", e)
+                self.version = "0.0.0"
+        return self.version
+
+    def check_version(self, minimum_version=0):  # -> bool
+        """Check for minimum version."""
+        if not minimum_version:
+            minimum_version = self.tested_version
+        if readtexttools.is_container_instance():
+            self.ok = False
+            return self.ok
+        if os.name == "nt":
+            # Require Windows Media Player play mp3 audio files.
+            _wmp = readtexttools.WinMediaPlay()
+            if not _wmp.app:
+                self.ok = False
+                return self.ok
+        _test_version = self.get_version()
+        try:
+            self.ok = float(".".join(_test_version.split(".")[:2])) >= minimum_version
+        except (AttributeError, IndexError, ValueError):
+            self.ok = False
+        _commons = netcommon.LocalCommons()
+        return self.ok
+
+    def stream(self, _text="", _iso_lang="en", _speech_rate=160):
+        """If python is incompatable, try the pipx command line."""
+        if not netcommon.which("gtts-cli"):
+            return False
+        if not _text:
+            return False
+
+        def gst_speak(_text="", _iso_lang="en", _speech_rate=160):
+            # Launch gtts-cli and pipe its output into GStreamer
+            if os.path.isfile(self.locker):
+                readtexttools.killall_process("gtts-cli")
+                readtexttools.unlock_my_lock(self.locker)
+                return True
+            _slower = ""
+            _top_level_domain = "com"
+            data = self.get_tld_data(_iso_lang)
+            _top_level_domain, _, _, _, _ = data
+            if int(_speech_rate) < 160:
+                _slower = " --slow"
+            gst_cmd = "gst-launch-1.0 fdsrc ! decodebin ! audioconvert ! audioresample ! autoaudiosink"
+            _lang = "en"
+            if self.language_supported(_iso_lang):
+                _lang = self.supported_language(_iso_lang)
+            readtexttools.lock_my_lock(self.locker)
+            _netsplitlocal = netsplit.LocalHandler()
+            _items = _netsplitlocal.create_play_list(_text, _iso_lang.split("-")[0])
+            for phrase in _items:
+                gtts_cmd = f'gtts-cli{_slower} --tld {_top_level_domain} --lang {_lang} "{phrase}" --output -'
+                with subprocess.Popen(
+                    shlex.split(gtts_cmd), stdout=subprocess.PIPE
+                ) as gtts_proc:
+                    subprocess.run(
+                        shlex.split(gst_cmd), stdin=gtts_proc.stdout, check=False
+                    )
+            readtexttools.unlock_my_lock(self.locker)
+            return True
+
+        return gst_speak(_text, _iso_lang, _speech_rate)
+
+    def get_tld_data(self, iso_lang="en-US"):  # -> list[str]
+        """
+        Returns TLD translation info based on ISO language code.
+
+        Priority:
+        1. Exact country and language match
+        2. First available entry with matching language
+        3. Fallback to 'en-US' or hardcoded default
+        """
+
+        def format_entry(entry):
+            return [
+                entry.get("domain", ""),
+                entry.get("iso_code", ""),
+                entry.get("lang1", ""),
+                entry.get("lang2", ""),
+                entry.get("comment", ""),
+            ]
+
+        parts = iso_lang.replace("_", "-").split("-")
+        lang = parts[0].lower()
+        country = parts[1].upper() if len(parts) > 1 else ""
+
+        # Priority 1: Exact match
+        for entry in self.domain_table:
+            if (
+                entry.get("lang1", "").lower() == lang
+                and entry.get("iso_code", "").upper() == country
+            ):
+                return format_entry(entry)
+
+        # Priority 2: Language match only
+        for entry in self.domain_table:
+            if entry.get("lang1", "").lower() == lang:
+                return format_entry(entry)
+
+        # Priority 3: Fallback to 'en-US'
+        for entry in self.domain_table:
+            if entry.get("iso_code", "").upper() == "US":
+                return format_entry(entry)
+
+        return ["com", "US", "en", "es", "United States of America"]
+
+    def read(
+        self,
+        _text="",
+        _iso_lang="en-US",
+        _visible="false",
+        _audible="true",
+        _out_path="",
+        _icon="",
+        _info="",
+        _post_process="process_mp3_media",
+        _writer="",
+        _size="600x600",
+        _speech_rate=160,
+    ):  # -> bool
+        """
+        Setup
+        -----
+
+        + See: <https://gtts.readthedocs.io/en/latest/>
+        + Package Manager: `sudo dnf install python3-pip` or `sudo apt install python3-pip`
+        + Pip Installer: `pip3 install gTTS gTTS-token` (*Not* `sudo`!)
+
+        + `_text` - Text to speak
+        + `_iso_lang` - Supported letter language code - defaults to English
+        + `_visible` - Use a graphic media player, or False for invisible player
+        + `_out_path` - Name of desired output media file
+        + `_audible` - If false, then don't play the sound file
+        + `_icon` - a .png or .jpg file if required.
+        + `_info` - Commentary or title for post processing
+        + `_post_process` - Get information, play file, or convert a file
+        + `_writer` - Artist or Author
+        + `_size` - Dimensions to scale photo '600x600'
+        + `_speech_rate` - Two speeds supported: 100% or above is Normal;
+           Any value less is Slow.
+        """
+        if len(_text) == 0:
+            return False
+        _tld = "com"
+        _region = "US"
+        _lang1 = "en"
+        _lang2 = "es"
+        _short_text = ""
+        _slow = False
+        _lang_check = True
+        _lang = _iso_lang
+        _msg = ""
+        _error_icon = readtexttools.net_error_icon()
+        _version = self.get_version()
+        _env_lang = readtexttools.default_lang()
+        _provider = self.translator
+        _provider_logo = f"/usr/share/icons/hicolor/scalable/apps/goa-account-{self.translator_domain}.svg)"
+        if not os.path.isfile(_provider_logo):
+            # Modified high contrast icon - GNU LESSER GENERAL PUBLIC LICENSE
+            # Version 3, 29 June 2007
+            # https://raw.githubusercontent.com/shgysk8zer0/adwaita-icons/master/LICENSE
+            _provider_logo = readtexttools.app_icon_image("goa-account-google_hc.svg")
+        for _dash in ["-", "_"]:
+            if _dash in _iso_lang:
+                _lang = _iso_lang.split(_dash)[0]
+                _region = _iso_lang.split(_dash)[1]
+                break
+        try:
+            if _speech_rate < 160:
+                _slow = True
+        except (NameError, TypeError):
+            self.ok = False
+
+        for entry in self.domain_table:
+            if entry["iso_code"] == _region.upper():
+                _tld = entry["domain"]
+                _lang1 = entry["lang1"]
+                _lang2 = entry["lang2"]
                 break
 
         _media_out = ""
@@ -692,7 +799,7 @@ class GoogleTranslateClass(object):
             os.remove(_media_work)
         if os.path.isfile(_media_out):
             os.remove(_media_out)
-        _max_words = 20
+        _max_words = 25
         _short_text = "%20".join(_text.replace("+", "%2B").split(" ")[:_max_words])
 
         for _punctuation in "\n.?!":
@@ -703,13 +810,14 @@ class GoogleTranslateClass(object):
             # Translate **to** default language
             _lang2 = _lang1
         if readtexttools.have_posix_app("osascript", False) or os.name == "nt":
-            _msg = f"https://translate.{_domain}.{_tld}"
+            _header = "Read Text"
+            _msg = "No voice model found"
         else:
-            _msg = f"`<https://translate.{_domain}.{_tld}?&langpair=auto|{_lang2}&tbb=1&ie=&hl={_env_lang}&text={_short_text}>"
+            _header = f"""{_provider} Translate\u2122"""
+            _msg = f"<https://translate.{self.translator_domain}.{_tld}?&langpair=auto|{_lang2}&tbb=1&ie=&hl={_env_lang}&text={_short_text}>"
         if not self.language_supported(_iso_lang):
-            # Fallback: display a link to translate using Google Translate.
             readtexttools.pop_message(
-                f"{_provider} Translate\u2122",
+                _header,
                 _msg,
                 5000,
                 _provider_logo,
@@ -723,11 +831,14 @@ class GoogleTranslateClass(object):
                 readtexttools.pop_message(
                     f"`gtts-{_version}`", _msg, 5000, _provider_logo, 0
                 )
+                heading1 = f"""{_provider} Translate\u2122"""
+                underline = len(heading1) * "="
                 print(
-                    f"""# {_provider} Translate\u2122"
+                    f"""{heading1}
+{underline}
 
 * gtts-{_version}
-* <{_msg}>
+* {_msg}
 """
                 )
         except gtts.tts.gTTSError:
@@ -740,10 +851,12 @@ class GoogleTranslateClass(object):
             )
             self.ok = False
             return False
-        except (AssertionError, NameError, ValueError, RuntimeError):
-            # gtts error. Consider using pip3 to check for an update.
+        except (
+            AssertionError, NameError, ValueError, RuntimeError
+        ):
+            # gtts error. Consider using pip3 or pipx for an update.
             readtexttools.pop_message(
-                f"{_provider} Translate\u2122",
+                f"""{_provider} Translate\u2122""",
                 _msg,
                 5000,
                 _provider_logo,
@@ -779,22 +892,48 @@ class GoogleTranslateClass(object):
         self.ok = False
         return False
 
-    def language_supported(self, iso_lang="ca-ES"):  # -> bool
-        """Check if the library supports the language."""
-        test_lang = ""
-        if len(iso_lang) == 0:
-            return False
-        try:
-            for sep in ["-", "_"]:
-                if sep in iso_lang:
-                    test_lang = iso_lang.split(sep)[0]
-                    break
-        except (AttributeError, NameError):
-            return False
+    def supported_language(self, iso_lang="ca-ES"):  # -> str
+        """Return the matched supported language code, or an empty string if unsupported."""
+        if not iso_lang:
+            return ""
+
+        test_lang = (
+            iso_lang.split("-")[0] if "-" in iso_lang else iso_lang.split("_")[0]
+        )
+
+        # Step 1: Try gtts library
         try:
             for _test in [iso_lang, test_lang]:
                 if _test in gtts.tts.tts_langs():
-                    return True
-        except NameError:
-            pass
+                    return _test
+        except Exception as e:
+            print("Exception (gtts library):", e)
+
+        # Step 2: CLI fallback
+        try:
+            cmd = shlex.split("gtts-cli --all")
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            supported_langs = []
+
+            for line in result.stdout.splitlines():
+                if ":" in line and "-" in line:
+                    lang_code = line.strip().split(":")[0].strip()
+                    supported_langs.append(lang_code)
+            for line in result.stdout.splitlines():
+                if ":" in line and "-" not in line:
+                    lang_code = line.strip().split(":")[0].strip()
+                    supported_langs.append(lang_code)
+            for _test in [iso_lang, test_lang]:
+                if _test in supported_langs:
+                    return _test
+        except Exception as e:
+            print("Exception (CLI fallback):", e)
+
+        return ""
+
+    def language_supported(self, iso_lang="ca-ES"):  # -> bool
+        """Check if the library supports the language."""
+
+        if self.supported_language(iso_lang):
+            return True
         return False

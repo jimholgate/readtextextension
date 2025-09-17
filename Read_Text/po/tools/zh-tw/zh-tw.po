@@ -2,11 +2,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: read-text 1.0\n"
-"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
-"/readtextextension-discuss\n"
 "POT-Creation-Date: 2015-08-15T12:42:58\n"
-"PO-Revision-Date: 2015-08-15 23:15-0700\n"
-"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"PO-Revision-Date: 2025-06-18 07:56-0800\n"
+"Last-Translator: James\n"
 "Language-Team: LANGUAGE\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
@@ -384,3 +382,20 @@ msgstr "語言"
 # src/orca/orca-setup.ui:1404
 msgid "Voice"
 msgstr "聲音"
+
+#: src/orca/guilabels.py:205
+msgid "Default Synthesizer"
+msgstr "預設語音合成器"
+
+#: src/orca/guilabels.py:931
+msgid "Speech Dispatcher"
+msgstr "Speech Dispatcher"
+
+#: ../src/orca/orca-setup.ui.h:184
+msgid "_Reset"
+msgstr "重設(_R)"
+
+# zh-tw.po Claude 3 Haiku
+msgctxt ""
+msgid "Model"
+msgstr "模型"

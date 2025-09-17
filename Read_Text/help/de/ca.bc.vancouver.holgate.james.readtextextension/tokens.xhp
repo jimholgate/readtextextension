@@ -1,81 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
 <helpdocument version="1.0">
-<meta>
-    <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp"
-    indexer="include" status="PUBLISH">
-<title xml-lang="de-DE">Erweiterte Funktionen</title>
-<filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
-</topic>
-<history>
-<created date="2024-04-28T17:42:10Z">James Holgate</created>
-<lastedited date="2024-05-29T05:56:00">
-    Update Dialog 2 label
+    <meta>
+        <topic id="readtextextension/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp"
+            indexer="include" status="PUBLISH">
+            <title xml-lang="de-DE">Erweiterte Funktionen</title>
+            <filename>/ca.bc.vancouver.holgate.james.readtextextension/tokens.xhp</filename>
+        </topic>
+        <history>
+            <created date="2024-04-28T17:42:10Z">James Holgate</created>
+            <lastedited date="2025-09-15T07:43:00">
+                Update Dialog 2 label
 </lastedited>
-</history>
-</meta>
-<body xml-lang="de-DE">
-<paragraph role="heading" level="1">Erweiterte Funktionen</paragraph>
-<image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
-id="img_dialog3_screenshot">
-<alt xml-lang="de-DE"
-id="alt_dialog3_screenshot">Info</alt>
-</image>
-<paragraph role="heading" level="2">Ändern Sie die Aussprache eines Wortes</paragraph>
-<image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog2.png"
-id="img_dialog2_screenshot">
-<alt xml-lang="de-DE"
-id="alt_dialog2_screenshot">Spracheigenschaften</alt>
-</image>
-<paragraph>Dieser Dialog wird in einigen Computersystemen nicht verwendet.</paragraph>
-<list type="ordered">
-<listitem>Wählen Sie im Editor das Wort aus.</listitem>
-<listitem>Wählen Sie <emph>Extras ▸ Plug-ins ▸ Markierten text vorleson</emph>.</listitem>
-<listitem>Wählen Sie die Schaltfläche <emph>Info...</emph></listitem>
-<listitem>Klicken Sie mit der rechten Maustaste auf das Schraubenschlüsselsymbol, das
-das vierte Symbol von links unten im Dialogfeld ist.</listitem>
-<listitem>Geben Sie im Feld <emph>Ersetzen</emph> eine alternative
-Schreibweise für das Wort ein.</listitem>
-<listitem>Wählen Sie die Schaltfläche <emph>Anwenden</emph>.</listitem>
-</list>
-<paragraph role="heading" level="2">Befehls- und Script-Tokens</paragraph>
-<paragraph>Verwenden Sie das passende Token, wenn Sie diese Werte in einem Befehl oder
-Script benötigen. Bei Ausführung wird der Wert in Klammern durch die jeweils benötigte
-Zeichenkette ersetzt.</paragraph>
-<list>
-<listitem><code>(AUTHOR)</code>: Name des Verfassers</listitem>
-<listitem><code>(COUNTRY_CODE)</code>: Anwendungs-Ländercode - DE für Deutsch, FR für Französisch, usw.</listitem>
-<listitem><code>(CREATE_QR_LABEL_PY)</code>: Pfad zu einem Python-Script, das Text als PNG-Bild für Mobilgeräte codiert</listitem>
-<listitem><code>(DATE)</code>: Aktuelles Datum in Landessprache</listitem>
-<listitem><code>(ESPEAK_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe</listitem>
-<listitem><code>(FESTIVAL_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe</listitem>
-<listitem><code>(HOME)</code>: Arbeitsverzeichnis - Dokumente, Eigene Dokumente o.ä.</listitem>
-<listitem><code>(LANGUAGE_CODE)</code>: Anwendungs-Sprachcode - de für Deutsch, fr für Französisch usw.</listitem>
-<listitem><code>(LANGUAGE_COUNTRY_CODE)</code>: Anwendungs-Regionalcode- fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw.</listitem>
-<listitem><code>(NETWORK_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe</listitem>
-<listitem><code>(NOW)</code>: Aktuelle Uhrzeit, umformatiert zur Nutzung im Dateinamen</listitem>
-<listitem><code>(OOO_WEBTEXT)</code>: Die ersten 999 Buchstaben des markierten Textes, für die URL codiert</listitem>
-<listitem><code>(OOO_WEBTEXT250)</code>: Die ersten 249 Buchstaben des markierten Textes, für die URL codiert</listitem>
-<listitem><code>(OOO_WEBTEXTBIG)</code>: Die ersten 9999 Buchstaben des markierten Textes, für die URL codiert</listitem>
-<listitem><code>(OOO_WEBTEXTSMALL)</code>: Die ersten 99 Buchstaben des markierten Textes, für die URL codiert</listitem>
-<listitem><code>(OPENJTALK_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe</listitem>
-<listitem><code>(PICO_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe</listitem>
-<listitem><code>(PIPER_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe</listitem>
-<listitem><code>(RESET_ALL)</code>: Alle Einstellungen zurücksetzen</listitem>
-<listitem><code>(RHVOICE_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe</listitem>
-<listitem><code>(SAY_APPLESCRIPT)</code>: Pfad zu einem Apple-Script für das Vorlesen mittels Sprachausgabe</listitem>
-<listitem><code>(SELECTION_COUNTRY_CODE)</code>: Ländercode.Auswahl - DE für Deutsch, FR für Französisch, usw.</listitem>
-<listitem><code>(SELECTION_LANGUAGE_CODE)</code>: Sprachcode-Auswahl - de für Deutsch, fr für Französisch usw.</listitem>
-<listitem><code>(SELECTION_LANGUAGE_COUNTRY_CODE)</code>: Regionalcode-Auswahl - fr-CA für Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw.</listitem>
-<listitem><code>(SESSION_ID)</code>: Das Sitzungscookie</listitem>
-<listitem><code>(SOUND_GALLERY)</code>: Pfad zur %PRODUCTNAME Sound-Galerie</listitem>
-<listitem><code>(SPD_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen mittels Sprachausgabe</listitem>
-<listitem><code>(TIME)</code>: Aktuelle Uhrzeit in Landessprache</listitem>
-<listitem><code>(TITLE)</code>: Name des Dokuments</listitem>
-<listitem><code>(TMP)</code>: Vollständige Pfadangabe und temporäre Datei mit markiertem Text</listitem>
-<listitem><code>(UNIQUE_ID)</code>: Ein Einmal-Cookie</listitem>
-<listitem><code>(USER_ID)</code>: Eine anonyme Kennung für den aktuellen Benutzer</listitem>
-<listitem><code>(TTS_WSCRIPT_VBS)</code>: Pfad zu einem Windows-Script für das Vorlesen mittels Sprachausgabe</listitem>
-<listitem><code>(WEEKDAY)</code>: Aktueller Wochentag, wie er in der Region gesprochen wird</listitem>
-</list>
-</body>
+        </history>
+    </meta>
+    <body xml-lang="de-DE">
+        <paragraph role="heading" level="1">Erweiterte Funktionen</paragraph>
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog3.png"
+            id="img_dialog3_screenshot">
+            <alt xml-lang="de-DE"
+                id="alt_dialog3_screenshot">Info</alt>
+        </image>
+        <paragraph role="heading" level="2">Ändern Sie die Aussprache eines Wortes</paragraph>
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog2.png"
+            id="img_dialog2_screenshot">
+            <alt xml-lang="de-DE"
+                id="alt_dialog2_screenshot">Spracheigenschaften</alt>
+        </image>
+        <paragraph>Dieser Dialog wird in einigen Computersystemen nicht verwendet.</paragraph>
+        <list type="ordered">
+            <listitem>Wählen Sie im Editor das Wort aus.</listitem>
+            <listitem>Wählen Sie <emph>Extras ▸ Plug-ins ▸ Markierten text vorleson</emph>.</listitem>
+            <listitem>Wählen Sie die Schaltfläche <emph>Info...</emph>
+            </listitem>
+            <listitem>Klicken Sie mit der rechten Maustaste auf das Schraubenschlüsselsymbol, das
+                das vierte Symbol von links unten im Dialogfeld ist.</listitem>
+            <listitem>Geben Sie im Feld <emph>Ersetzen</emph> eine alternative Schreibweise für das
+                Wort ein.</listitem>
+            <listitem>Wählen Sie die Schaltfläche <emph>Anwenden</emph>.</listitem>
+        </list>
+
+        <paragraph xml-lang="de-DE" role="heading" level="2">Sprachmodell verwalten</paragraph>
+
+        <image src="ca.bc.vancouver.holgate.james.readtextextension/img/Dialog4.png"
+            id="img_dialog4_screenshot">
+            <alt xml-lang="de-DE" id="alt_dialog4_screenshot">Sprachmodell verwalten</alt>
+        </image>
+
+        <paragraph xml-lang="de-DE">Dieser Dialog ist für bestimmte Computerarchitekturen verfügbar.</paragraph>
+
+        <list type="ordered" xml-lang="de-DE">
+
+            <listitem>Wähle ein Modell aus.</listitem>
+
+            <listitem>Klicke auf das Lautsprechersymbol.</listitem>
+
+            <listitem>Klicke auf die Schaltfläche <emph>Ok</emph>.</listitem>
+
+            <listitem>Wenn das Modell installiert ist, bietet das Hauptmenü an, es als
+                Standardmodell festzulegen.</listitem>
+
+            <listitem>Wenn das Modell nicht installiert ist, bietet das Hauptmenü eine Option zum
+                Herunterladen des Modells an.</listitem>
+
+        </list>
+
+        <paragraph role="heading" level="2">Befehls- und Script-Tokens</paragraph>
+        <paragraph>Verwenden Sie das passende Token, wenn Sie diese Werte in einem Befehl oder
+            Script benötigen. Bei Ausführung wird der Wert in Klammern durch die jeweils benötigte
+            Zeichenkette ersetzt.</paragraph>
+        <list>
+            <listitem>
+                <code>(AUTHOR)</code>: Name des Verfassers</listitem>
+            <listitem>
+                <code>(COUNTRY_CODE)</code>: Anwendungs-Ländercode - DE für Deutsch, FR für
+                Französisch, usw.</listitem>
+            <listitem>
+                <code>(CREATE_QR_LABEL_PY)</code>: Pfad zu einem Python-Script, das Text als
+                PNG-Bild für Mobilgeräte codiert</listitem>
+            <listitem>
+                <code>(DATE)</code>: Aktuelles Datum in Landessprache</listitem>
+            <listitem>
+                <code>(ESPEAK_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen
+                mittels Sprachausgabe</listitem>
+            <listitem>
+                <code>(FESTIVAL_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen
+                mittels Sprachausgabe</listitem>
+            <listitem>
+                <code>(HOME)</code>: Arbeitsverzeichnis - Dokumente, Eigene Dokumente o.ä.</listitem>
+            <listitem>
+                <code>(LANGUAGE_CODE)</code>: Anwendungs-Sprachcode - de für Deutsch, fr für
+                Französisch usw.</listitem>
+            <listitem>
+                <code>(LANGUAGE_COUNTRY_CODE)</code>: Anwendungs-Regionalcode- fr-CA für Französisch
+                in Kanada, en-GB für Englisch im Vereinigten Königreich, usw.</listitem>
+            <listitem>
+                <code>(NETWORK_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen
+                mittels Sprachausgabe</listitem>
+            <listitem>
+                <code>(NOW)</code>: Aktuelle Uhrzeit, umformatiert zur Nutzung im Dateinamen</listitem>
+            <listitem>
+                <code>(OOO_WEBTEXT)</code>: Die ersten 999 Buchstaben des markierten Textes, für die
+                URL codiert</listitem>
+            <listitem>
+                <code>(OOO_WEBTEXT250)</code>: Die ersten 249 Buchstaben des markierten Textes, für
+                die URL codiert</listitem>
+            <listitem>
+                <code>(OOO_WEBTEXTBIG)</code>: Die ersten 9999 Buchstaben des markierten Textes, für
+                die URL codiert</listitem>
+            <listitem>
+                <code>(OOO_WEBTEXTSMALL)</code>: Die ersten 99 Buchstaben des markierten Textes, für
+                die URL codiert</listitem>
+            <listitem>
+                <code>(OPENJTALK_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen
+                mittels Sprachausgabe</listitem>
+            <listitem>
+                <code>(PICO_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen
+                mittels Sprachausgabe</listitem>
+            <listitem>
+                <code>(PIPER_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen
+                mittels Sprachausgabe</listitem>
+            <listitem>
+                <code>(RESET_ALL)</code>: Alle Einstellungen zurücksetzen</listitem>
+            <listitem>
+                <code>(RHVOICE_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen
+                mittels Sprachausgabe</listitem>
+            <listitem>
+                <code>(SAY_APPLESCRIPT)</code>: Pfad zu einem Apple-Script für das Vorlesen mittels
+                Sprachausgabe</listitem>
+            <listitem>
+                <code>(SELECTION_COUNTRY_CODE)</code>: Ländercode.Auswahl - DE für Deutsch, FR für
+                Französisch, usw.</listitem>
+            <listitem>
+                <code>(SELECTION_LANGUAGE_CODE)</code>: Sprachcode-Auswahl - de für Deutsch, fr für
+                Französisch usw.</listitem>
+            <listitem>
+                <code>(SELECTION_LANGUAGE_COUNTRY_CODE)</code>: Regionalcode-Auswahl - fr-CA für
+                Französisch in Kanada, en-GB für Englisch im Vereinigten Königreich, usw.</listitem>
+            <listitem>
+                <code>(SESSION_ID)</code>: Das Sitzungscookie</listitem>
+            <listitem>
+                <code>(SOUND_GALLERY)</code>: Pfad zur %PRODUCTNAME Sound-Galerie</listitem>
+            <listitem>
+                <code>(SPD_READ_TEXT_PY)</code>: Pfad zu einem Python-Script für das Vorlesen
+                mittels Sprachausgabe</listitem>
+            <listitem>
+                <code>(TIME)</code>: Aktuelle Uhrzeit in Landessprache</listitem>
+            <listitem>
+                <code>(TITLE)</code>: Name des Dokuments</listitem>
+            <listitem>
+                <code>(TMP)</code>: Vollständige Pfadangabe und temporäre Datei mit markiertem Text</listitem>
+            <listitem>
+                <code>(UNIQUE_ID)</code>: Ein Einmal-Cookie</listitem>
+            <listitem>
+                <code>(USER_ID)</code>: Eine anonyme Kennung für den aktuellen Benutzer</listitem>
+            <listitem>
+                <code>(TTS_WSCRIPT_VBS)</code>: Pfad zu einem Windows-Script für das Vorlesen
+                mittels Sprachausgabe</listitem>
+            <listitem>
+                <code>(WEEKDAY)</code>: Aktueller Wochentag, wie er in der Region gesprochen wird</listitem>
+        </list>
+    </body>
 </helpdocument>

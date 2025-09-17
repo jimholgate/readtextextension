@@ -83,6 +83,7 @@ Copyright (c) 2011 - 2025 James Holgate
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import os
+import re
 import sys
 import readtexttools
 import find_replace_phonemes
@@ -91,6 +92,11 @@ try:
     import getopt
 except (ImportError, AssertionError, AttributeError):
     exit()
+
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 def usage():
@@ -356,7 +362,6 @@ def espkread(
     _out_file = ""
     _pitch = str(_ipitch)
     _rate = str(_irate)
-    _rate = "100"
     _concise_lang = _lang.split("-")[0].split("_")[0].lower()
     _app_name = espeak_path()
     _voice = ""
@@ -519,7 +524,7 @@ def espkread(
                     '"',
                     _app,
                     '" -b 1 -p ',
-                    _pitch,
+                    str(_pitch),
                     " -s ",
                     _rate,
                     " -v ",
@@ -587,69 +592,63 @@ def espkread(
         return 0
 
 
-def _espeak_rate(sA):
+def _espeak_rate(_percentage="100%"):  # -> int
     """
-    sA - rate expressed as a percentage.
-    Use '100%' for default rate of 160 words per minute (wpm).
+    _percentage - rate expressed as a percentage.
+    Use '100%' for default rate of 175 words per minute (wpm).
     Returns rate between 20 and 640.
     """
-    i1 = 0
-    i2 = 0
     _minval = 20
     _maxval = 640
-    _myval = 160
-    s1 = ""
+    _default_val = 175.00001
+    raw_percent = None
+    if _percentage:
+        if "%" in _percentage:
+            try:
+                # consider only the digits in `_percentage`
+                _percent = readtexttools.safechars(str(_percentage), "0123456789")
+                if not _percent:
+                    return int(_default_val)
+                raw_percent = int(_percent)
+            except Exception as e:
+                print("Exception:  ", e)
+    if not raw_percent:
+        return int(_default_val)
+    test_val = int(float(raw_percent) * (_default_val / 100))
+
+    if test_val > _maxval:
+        return _maxval
+    if test_val < _minval:
+        return _minval
+    return test_val
+
+
+def _espeak_pitch(value="100%"):
+    """
+    value - Pitch expressed as a percentage or a number string.
+    '100%' -> 50 (default value)
+    Range or return value: 0 to 100.
+    """
+    DEFAULT_PITCH = 50
+    MIN_PITCH = 0
+    MAX_PITCH = 100
 
     try:
-        if "%" in sA:
-            s1 = sA.replace("%", "")
-            i1 = float(s1) if "." in s1 else int(s1) / 100
-            i2 = math.ceil(i1 * _myval)
+        if isinstance(value, basestring) and value.endswith("%"):
+            percent = float(value.strip("%"))
+            pitch = int((percent / 100.0) * DEFAULT_PITCH + 0.9999)  # like math.ceil
         else:
-            i1 = float(sA) if "." in sA else int(sA)
-            i2 = math.ceil(i1)
-    except TypeError:
-        print("I was unable to determine espeak rate!")
-    if i2 <= _minval:
-        _myval = _minval
-    elif i2 >= _maxval:
-        _myval = _maxval
-    else:
-        _myval = i2
-    return _myval
-
-
-def _espeak_pitch(sA):
-    """
-    sA - Pitch expressed as a percentage.
-    Use '100%' for default Pitch of 50.
-    "aah" pitch: 0% = a1, 50% = b1, 100% = e2, 200% = d3#
-    Returns pitch value between 0 and 100.
-    """
-    i1 = 0
-    i2 = 0
-    _minval = 0
-    _maxval = 100
-    _myval = 50
-    s1 = ""
-
-    try:
-        if "%" in sA:
-            s1 = sA.replace("%", "")
-            i1 = float(s1) if "." in s1 else int(s1) / 100
-            i2 = math.ceil(i1 * _myval)
-        else:
-            i1 = float(sA) if "." in sA else int(sA)
-            i2 = math.ceil(i1)
-    except TypeError:
+            pitch = int(float(value) + 0.9999)
+    except (ValueError, TypeError):
         print("I was unable to determine espeak pitch!")
-    if i2 <= _minval:
-        _myval = _minval
-    elif i2 >= _maxval:
-        _myval = _maxval
-    else:
-        _myval = i2
-    return _myval
+        return DEFAULT_PITCH
+
+    # Clamp the range
+    if pitch < MIN_PITCH:
+        return MIN_PITCH
+    elif pitch > MAX_PITCH:
+        return MAX_PITCH
+    return pitch
 
 
 def main():  # -> NoReturn

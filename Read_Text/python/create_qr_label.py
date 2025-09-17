@@ -80,8 +80,9 @@ except ImportError:
 try:
     import qrcode
 except ImportError:
-    if len(readtexttools.find_local_pip("qrcode")) != 0:
-        sys.path.append(readtexttools.find_local_pip("qrcode"))
+    _try_path = readtexttools.pip_dir_search("qrcode", "", True, "")
+    if _try_path:
+        sys.path.append(_try_path)
         try:
             import qrcode
         except:

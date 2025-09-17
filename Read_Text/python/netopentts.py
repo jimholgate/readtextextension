@@ -19,6 +19,7 @@ server to read aloud. This container includes over 1.28 GB of resources.
 import os
 import sys
 import netcommon
+import netsplit
 import readtexttools
 
 try:
@@ -390,14 +391,9 @@ Check the server settings or use a different voice.
         _no = "0" * 10
         if ssml:
             _items = [_text]
-        elif self.common.is_ai_developer_platform():
-            _items = self.common.big_play_list(_text, _iso_lang.split("-")[0])
-        elif len(_text.splitlines()) == 1 or len(_text) < self.max_chars:
-            _items = [_text]
-        elif self.common.verify_spacy(_iso_lang.split("-")[0]):
-            _items = self.common.big_play_list(_text, _iso_lang.split("-")[0])
         else:
-            _items = [_text]
+            _netsplitlocal = netsplit.LocalHandler()
+            _items = _netsplitlocal.create_play_list(_text, _iso_lang.split("-")[0])
         for _item in _items:
             if not self.ok:
                 return False

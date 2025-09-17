@@ -47,6 +47,8 @@ except (AssertionError, ImportError):
     BASICS_OK = False
 
 import netcommon
+import netsplit
+
 import readtexttools
 
 
@@ -507,7 +509,8 @@ NOTE: Setting a MaryTTS speech rate requires the python `request` library."""
         elif len(_text) < self.max_chars:
             _items = [_text]
         else:
-            _items = self.common.big_play_list(_text, _iso_lang.split("-")[0])
+            _netsplitlocal = netsplit.LocalHandler()
+            _items = _netsplitlocal.create_play_list(_text, _iso_lang.split("-")[0])
         _tries = 0
         readtexttools.lock_my_lock(self.locker)
         _no = "0" * 10

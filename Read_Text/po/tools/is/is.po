@@ -2,12 +2,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: read-text 1.0\n"
-"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
-"/readtextextension-discuss\n"
 "POT-Creation-Date: 2015-08-15T12:42:58\n"
-"PO-Revision-Date: 2015-08-15 23:09-0700\n"
-"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
-"Language-Team: LANGUAGE\n"
+"PO-Revision-Date: 2025-06-18 07:56-0800\n"
+"Last-Translator: James\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -378,3 +375,68 @@ msgstr "Einstaklingur"
 msgid "Voice"
 msgstr "Rödd"
 
+#: src/orca/guilabels.py:205
+msgid "Default Synthesizer"
+msgstr "Default Synthesizer"
+
+#: src/orca/guilabels.py:931
+msgid "Speech Dispatcher"
+msgstr "Speech Dispatcher"
+
+#: ../src/orca/orca-setup.ui.h:116
+msgid "_Reset"
+msgstr "_Núllstilla"
+
+# is.po Claude 3 Haiku
+msgid "Model"
+msgstr "Líkan"
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "Bæt_a við"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "E_yða"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "Fja_rlægja"
+
+#. A4N7i
+#: extensions/inc/stringarrays.hrc:184
+msgctxt "RID_RSC_ENUM_SCROLLBARS"
+msgid "None"
+msgstr "Ekkert"
+
+#. Vmbbd
+#: extensions/inc/strings.hrc:30
+msgctxt "RID_STR_ENABLED"
+msgid "Enabled"
+msgstr "Virkt"
+
+#. Xk7cV
+#: extensions/uiconfig/sabpilot/ui/groupradioselectionpage.ui:49
+msgctxt "groupradioselectionpage|datasourcelabel"
+msgid "Data source"
+msgstr "Gagnagjafi"
+
+#. D9AH2
+#: extensions/inc/strings.hrc:305
+msgctxt "RID_UPDATE_STR_DOWNLOADING"
+msgid "Downloading %PRODUCTNAME %NEXTVERSION..."
+msgstr "Hala niður %PRODUCTNAME %NEXTVERSION..."
+
+#. MoGgC
+#: extensions/inc/strings.hrc:326
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOADING"
+msgid "Download of update in progress"
+msgstr "Niðurhal uppfærslu er í gangi"
+
+#. RmhyN
+#: extensions/inc/strings.hrc:332
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOAD_AVAIL"
+msgid "Download of update completed"
+msgstr "Niðurhali uppfærslu er lokið"

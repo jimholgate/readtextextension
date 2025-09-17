@@ -2,11 +2,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: read-text 1.0\n"
-"Report-Msgid-Bugs-To: https://groups.google.com/forum/#!forum"
-"/readtextextension-discuss\n"
 "POT-Creation-Date: 2015-08-15T12:42:57\n"
-"PO-Revision-Date: 2015-08-15 22:59-0700\n"
-"Last-Translator: James <readtextextension-discuss@googlegroups.com>\n"
+"PO-Revision-Date: 2025-06-15 07:59-0700\n"
+"Last-Translator: James \n"
 "Language-Team: LANGUAGE\n"
 "Language: af\n"
 "MIME-Version: 1.0\n"
@@ -398,25 +396,91 @@ msgstr "Standaard"
 
 # src/orca/orca-setup.ui:1047
 msgid "Volume"
-msgstr "Volume"
+msgstr ""
 
 # src/orca/orca-setup.ui:1095
 msgid "Pitch"
-msgstr "Hauteur"
+msgstr ""
 
 # src/orca/orca-setup.ui:1126
 msgid "Rate"
-msgstr "Débit"
+msgstr ""
 
 # src/orca/orca-setup.ui:1152
 msgid "Person"
-msgstr "Personne"
+msgstr ""
 
 # src/orca/orca-setup.ui:1178
 msgid "Language"
-msgstr "Langue"
+msgstr ""
 
 # src/orca/orca-setup.ui:1404
 msgid "Voice"
-msgstr "Voix"
+msgstr ""
 
+#: src/orca/guilabels.py:205
+msgid "Default Synthesizer"
+msgstr ""
+
+#: src/orca/guilabels.py:931
+msgid "Speech Dispatcher"
+msgstr "Speech Dispatcher"
+
+# af.po Claude 3 Haiku
+msgid "_Reset"
+msgstr "Herstel"
+
+# af.po Claude 3 Haiku 
+msgid "Model"
+msgstr "Model"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Invoeg"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_Skrap"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_Verwyder"
+
+#. A4N7i
+#: extensions/inc/stringarrays.hrc:184
+msgctxt "RID_RSC_ENUM_SCROLLBARS"
+msgid "None"
+msgstr "Geen"
+
+#. Vmbbd
+#: extensions/inc/strings.hrc:30
+msgctxt "RID_STR_ENABLED"
+msgid "Enabled"
+msgstr "Geaktiveer"
+
+#. Xk7cV
+#: extensions/uiconfig/sabpilot/ui/groupradioselectionpage.ui:49
+msgctxt "groupradioselectionpage|datasourcelabel"
+msgid "Data source"
+msgstr "Databron"
+
+#. D9AH2
+#: extensions/inc/strings.hrc:305
+msgctxt "RID_UPDATE_STR_DOWNLOADING"
+msgid "Downloading %PRODUCTNAME %NEXTVERSION..."
+msgstr "Laai tans %PRODUCTNAME %NEXTVERSION af..."
+
+#. MoGgC
+#: extensions/inc/strings.hrc:326
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOADING"
+msgid "Download of update in progress"
+msgstr "Aflaai van bywerking besig"
+
+#. RmhyN
+#: extensions/inc/strings.hrc:332
+msgctxt "RID_UPDATE_BUBBLE_T_DOWNLOAD_AVAIL"
+msgid "Download of update completed"
+msgstr "Aflaai van bywerking het voltooi"
