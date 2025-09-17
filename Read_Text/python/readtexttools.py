@@ -53,6 +53,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import codecs
 import math
 import os
+
+# import re
+import string
 import sys
 import time
 import unicodedata
@@ -78,6 +81,11 @@ except (ImportError, AssertionError):
     pass
 
 try:
+    basestring
+except NameError:
+    basestring = str
+
+try:
     import locale
 except (ImportError, AssertionError):
     pass
@@ -93,7 +101,8 @@ except (ImportError, AssertionError):
     pass
 
 try:
-    import psutil
+    if os.name == "nt":
+        import psutil
 except (ImportError, AssertionError):
     pass
 
@@ -189,48 +198,13 @@ try:
 except (ImportError, AssertionError, SyntaxError):
     pass
 
+# try:
+#     # Python 2.7+: preserves insertion order
+#     from collections import OrderedDict
+# except ImportError:
+#     OrderedDict = dict
+
 LOOK_UPS = 0
-
-SITE_QR = """
-
-
-
-
-
-        ██████████████      ██  ██████  ██████████  ██████████████
-        ██          ██  ██  ██        ██████    ██  ██          ██
-        ██  ██████  ██          ██    ████    ██    ██  ██████  ██
-        ██  ██████  ██  ██████  ████████  ██        ██  ██████  ██
-        ██  ██████  ██    ██        ██  ██████████  ██  ██████  ██
-        ██          ██  ████  ████  ████            ██          ██
-        ██████████████  ██  ██  ██  ██  ██  ██  ██  ██████████████
-                          ██████      ████    ████
-        ██████████  ████████  ██████████████████  ██  ██  ██  ██
-        ████████  ██  ████  ██  ██      ████████    ██████      ██
-            ██████  ████    ██      ████  ██    ████  ████
-          ████████      ██    ██    ██████      ██  ████████  ██
-            ██████  ████████████████████  ██      ██      ████
-            ██  ████  ██      ████████  ██    ████████████      ██
-        ████        ██  ██  ██  ██    ████████      ██  ██████
-          ████  ██    ████    ██      ██        ██████████    ██
-            ██████████    ██████████████  ██  ██      ██  ████
-        ██    ██████  ██████  ██    ██  ██████████████████  ██  ██
-        ██  ████  ████    ██        ██████  ██  ██    ████  ██
-        ██    ██████  ██  ██████      ████    ████  ██        ██
-        ██          ██    ██  ██████████  ██    ██████████  ██████
-                        ██    ██        ██      ██      ██████████
-        ██████████████  ████        ████      ████  ██  ██████
-        ██          ██    ██    ██  ██      ██████      ██    ██
-        ██  ██████  ██  ██    ██████████████    ██████████  ████
-        ██  ██████  ██  ██    ██  ██    ██  ██████        ████  ██
-        ██  ██████  ██  ██        ████████    ██████████████████
-        ██          ██  ██████████      ██      ██  ████  ██  ██
-        ██████████████  ██        ████    ██████    ██  ██████
-
-
-
-
-"""
 
 
 def killall_process(_process=""):  # -> bool
@@ -266,9 +240,11 @@ def write_plain_text_file(_file_path="", _body_text="", scodeco="utf-8"):  # -> 
     try:
         if os.path.isfile(_file_path):
             os.remove(_file_path)
-        writer = codecs.open(_file_path, mode="w", encoding=scodeco, errors="replace")
-        writer.write(_body_text)
-        writer.close()
+        with codecs.open(
+            _file_path, mode="w", encoding=scodeco, errors="replace"
+        ) as file_obj:
+            file_obj.write(_body_text)
+            file_obj.close()
     except (ValueError, UnicodeEncodeError, UnicodeDecodeError, PermissionError):
         print("`write_plain_text_file` error in readtexttools.py")
     return os.path.isfile(_file_path)
@@ -320,12 +296,7 @@ def have_posix_app(posix_app="vlc", do_test=True):  # -> bool
         return False
     if not do_test:
         try:
-            if (
-                os.system(
-                    "command -v {posix_app} > /dev/null".format(posix_app=posix_app)
-                )
-                == 0
-            ):
+            if os.system("command -v {0} > /dev/null".format(posix_app)) == 0:
                 return True
         except (OSError, SyntaxError, TypeError):
             pass
@@ -813,6 +784,8 @@ def gst_plugin_path(plug_in_name="libgstvorbis"):  # -> str
     # This does not check for plugin by pad name, mime type or extension
     if not plug_in_name:
         return ""
+    if sys.version_info[0] < 3:
+        return ""
     rt1 = ""
     version = ""
     g_versions = ["1.2", "1.1", "1.0", "1", "0.10"]
@@ -1028,6 +1001,25 @@ class ExtensionTable(object):
                 .replace(os_sep + os_sep, os_sep)
             )
 
+    def add_path_to_session_path(self, add_path=""):  # -> str
+        """Add a path to apply to the current session. If the function finds it
+        or is successful adding it to the local session path it returns the
+        `add_path` string, otherwise it returns `""`"""
+        if not add_path:
+            return ""
+        add_path = str(add_path)
+        if not os.path.exists(add_path):
+            return ""
+        env_path = os.environ["PATH"]
+        if add_path in env_path.split(os.pathsep):
+            return add_path
+        try:
+            os.environ["PATH"] += os.pathsep + add_path
+            return add_path
+        except Exception as e:
+            print("Exception:  ", e)
+        return ""
+
     def win_search(
         self, application_name="ffmpeg", application_executable="ffplay"
     ):  # -> str
@@ -1048,6 +1040,7 @@ class ExtensionTable(object):
             return ""
         elif os.name != "nt":
             return ""
+
         os_sep = os.sep
         executable_extensions = [".exe", ".com"]
         common_app_executable = ""
@@ -1060,6 +1053,7 @@ class ExtensionTable(object):
         ]
         application_searches = [
             "{0}{1}{0}command_line{0}".format(os_sep, application_name),
+            "{0}Local{0}".format(os_sep),
             "{0}Programs{0}{1}{0}".format(os_sep, application_name),
             "{0}{1}{0}bin{0}".format(os_sep, application_name),
             "{0}{1}{0}program{0}".format(os_sep, application_name),
@@ -1067,10 +1061,13 @@ class ExtensionTable(object):
             "{0}Programs{0}piper{0}".format(os_sep),
             "{0}VideoLAN{0}VLC{0}".format(os_sep),
             "{0}{1}{0}".format(os_sep, application_name),
+            "{0}.local{0}bin{0}".format(os_sep),
             "{0}".format(os_sep),
             "{0}Local{0}".format(os_sep),
             "{0}bin{0}".format(os_sep),
         ]
+        # for demo in application_searches:
+        #     print(1048, demo)
         for program_dir_search in program_dir_searches:
             get_env = os.getenv(program_dir_search)
             if not get_env:
@@ -1109,143 +1106,84 @@ class ExtensionTable(object):
         return ""
 
 
-def local_pip_search(
-    profile="", lib_name="", py_search="", include_pipx=True
+def pip_dir_search(
+    lib_name="", py_search="", include_pipx=True, pipx_root=""
 ):  # -> str
-    """Search local posix pip and optionally the posix pipx directories."""
-    _add_path = os.path.join(profile, ".local", "lib", py_search, "site-packages")
-    if not os.path.isdir(os.path.join(_add_path, lib_name.lower())):
-        if include_pipx and not os.path.isdir(os.path.join(_add_path, lib_name)):
-            _add_path = os.path.join(
-                profile,
-                ".local",
-                "pipx",
-                "venvs",
-                lib_name.lower(),
-                "lib",
-                py_search,
-                "site-packages",
-            )
-    if os.path.isdir(_add_path):
-        return _add_path
-    return ""
+    """
+    Search for local pip and, optionally, pipx ``site-packages`` directories.
 
+    The search checks user and global ``site-packages`` paths for the current
+    interpreter, with optional lookup of pipx virtual environments.
 
-def find_local_pip(lib_name="qrcode", latest=True, _add_path=""):  # -> str
-    """If you installed a pip tool as a local user, then
-    return the library path, otherwise return `''`.
+    Args:
+        lib_name (str, optional): Name of a pip or pipx-installed library,
+            e.g. ``"cowsay"``. Defaults to "".
+        py_search (str, optional): Explicit Python version string in
+            ``<major>.<minor>`` format, e.g. ``"3.13"``. If omitted, uses the
+            running interpreter's version. Defaults to "".
+        include_pipx (bool, optional): If ``True``, include pipx directories in
+            the search. Defaults to ``True``.
+        pipx_root (str, optional): If non-empty, use this directory as the base
+            when searching for a pipx library. Defaults to "".
 
-    If `latest` is `True`, return the last match, otherwise
-    return the first match. When there is a history of several
-    versions of python installed, there might be several
-    pip libraries with different tools or different versions
-    of the tools. A current good practice for programmers
-    is to use `venv`. A good practice for users is to delete
-    and rebuild your pip libraries when you do a major version
-    upgrade of your system or of python. Best practice for MacOS
-    is to set up a virtual environment using LibreOffice's
-    python version. See the `pipx` venvs documentation."""
-    retval = ""
-    path1 = ""
-    path2 = ""
-    path3 = ""
-    if sys.version_info.major < 3:
-        return ""
-    py_ver = "3.8"
-    try:
-        py_ver = "{0}.{1}".format(sys.version_info.major, sys.version_info.minor)
-    except NameError:
-        return ""
-    if os.name == "nt":
-        profile = os.getenv("LOCALAPPDATA").strip(os.sep)
-        path1 = os.path.join(profile, "Programs", "Python")
-        path2 = os.path.join("Lib", "site-packages")
-        path3 = path2
-    elif have_posix_app("say", False):
-        profile = profile = os.path.expanduser("~")
-        path1 = os.path.join(profile, "Library", "Python")
-        py_search = "python{0}".format(py_ver)
-        local_pip = local_pip_search(profile, lib_name, py_search)
-        if len(local_pip) != 0:
-            return local_pip
-        if not os.path.isdir(path1):
-            for _test in os.getenv("PATH").split(os.sep):
-                if os.path.isdir(_test) and profile in _test:
-                    path1 = _test
-                    break
-        path2 = os.path.join("lib", "python", "site-packages")
-        path3 = os.sep + os.path.join(
-            "Library",
-            "Frameworks",
-            "Python.framework",
-            "Versions",
-            py_ver,
-            "lib",
-            "python" + py_ver,
-            "site-packages",
+    Returns:
+        str: The first matching ``site-packages`` path found that includes the
+        `lib_name` library, or an empty string if no matching directory exists.
+    """
+
+    paths = []
+    ver = "python{}.{}".format(sys.version_info[0], sys.version_info[1])
+    if hasattr(site, "getusersitepackages"):
+        try:
+            paths.append(site.getusersitepackages())
+        except Exception:
+            pass
+    if hasattr(site, "getsitepackages"):
+        try:
+            paths.extend(site.getsitepackages())
+        except Exception:
+            pass
+
+    else:
+        # Fallback if not available (e.g., Python 2.7)
+        if py_search:
+            ver = str(py_search).strip()  # allow explicit override
+        paths.append(
+            os.path.join(os.path.expanduser("~"), ".local", "lib", ver, "site-packages")
         )
-    elif os.name == "posix":
-        profile = os.path.expanduser("~")
-        path1 = os.path.join(profile, ".local", "lib")
-        path2 = os.path.join("lib", "python", "site-packages")
-        path3 = path2
-        pwd_dir = os.getenv("PWD")
-        py_search = "python{0}".format(py_ver)
-        if not profile == pwd_dir:
-            if not pwd_dir.startswith(os.path.join(profile, ".config")):
-                # snap & flatpak containment check
-                return retval
-        site_list = site.getsitepackages()
-        if len(_add_path) == 0:
-            _add_path = local_pip_search(profile, lib_name, py_search)
-        if os.path.isdir(_add_path):
-            # Use the most recent local library, not the distribution library.
-            site_list.insert(0, _add_path)
-        for _site in site_list:
-            if os.path.isdir(os.path.join(_site, lib_name)):
-                retval = _site
-                if not latest:
-                    return retval
-        return retval
-    py_path = ""
-    path_result = ""
-    for _item in [path1, path3]:
-        if os.path.exists(_item):
-            path_result = _item
-            break
-    if len(path_result) == 0:
-        print("FAIL: `{0}` search: no directory at `{1}`".format(lib_name, path1))
-        return ""
-    with os.scandir(path_result) as it:
-        for entry in it:
-            for entry_name in [py_ver, entry.name]:
-                if entry_name.startswith("."):
-                    continue
-                elif "dist-info" in entry_name:
-                    continue
-                py_path = os.path.join(path_result, entry_name, path2, lib_name)
-                if not os.path.isdir(py_path):
-                    if os.path.isdir(os.path.join(path_result, lib_name)):
-                        py_path = path_result
-                pipx_path = os.path.join(
-                    path_result,
-                    "pipx",
-                    "venvs",
-                    lib_name.lower(),
-                    "lib",
-                    py_ver,
-                    "site-packages",
-                )
-                if os.path.isdir(pipx_path):
-                    retval = pipx_path
-                    break
-                elif os.path.isdir(py_path):
-                    retval = os.path.join(path1, entry_name, path2)
-                    if not latest:
-                        return retval
-            if len(retval) != 0:
-                break
-    return retval
+
+    if include_pipx:
+        the_profile = pipx_root
+        if os.name == "nt":
+            the_profile = (
+                pipx_root or os.getenv("USERPROFILE") or os.path.expanduser("~")
+            )
+        if not the_profile:
+            the_profile = pipx_root or os.path.expanduser("~")
+        pipx_roots = [
+            os.path.join(
+                the_profile, ".local", "pipx", "venvs", lib_name.lower(), "lib"
+            ),
+            os.path.join(
+                the_profile, ".local", "lib", "pipx", "venvs", lib_name.lower(), "lib"
+            ),
+            os.path.join(
+                the_profile, ".local", "share", "pipx", "venvs", lib_name.lower(), "lib"
+            ),
+            os.path.join(the_profile, lib_name.lower(), "lib"),
+        ]
+
+        if py_search:
+            ver = str(py_search).strip()
+        for root in pipx_roots:
+            if os.path.isdir(root):
+                paths.append(os.path.join(root, ver, "site-packages"))
+                if os.name == "nt":
+                    paths.append(os.path.join(root, "site-packages"))
+    for p in paths:
+        if p and os.path.exists(os.path.join(p, lib_name)):
+            return p
+    return ""
 
 
 def my_os_system(_command):  # -> bool
@@ -1890,7 +1828,7 @@ def media_converter_installed():  # -> bool
         return True
     elif bool(_extension_table.win_search("vlc", "vlc")):
         return True
-    else:
+    elif sys.version_info[0] > 2:
         try:
             dummy = bool(Gst)
             return dummy
@@ -2181,10 +2119,30 @@ class JsonTools(object):
         except AttributeError:
             self.safe_json = None
 
+    def to_safe_str(self, val):
+        """If `val` is valid for a json entry, return it, otherwise
+        return a value that is a string of the `val`"""
+        if not val:
+            return ""
+        if not isinstance(val, basestring):
+            try:
+                return unicode(val)  # Python 2
+            except NameError:
+                return str(val)  # Python 3
+        return val
+
     def sanitize_json(self, content=""):  # -> str
         """Escape json characters in content"""
+        if not content:
+            return ""
         try:
-            test_text = content.strip("\\\n\t\r")
+            if content[0] in " " + string.punctuation:
+                test_text = content.rstrip().rstrip("\\\n\t\r")
+            else:
+                test_text = content.strip("\\\n\t\r")
+            # TODO: Check that a revision retains a punctuation mark or
+            # space at the beginning of a test_text string.
+            # test_text = test_text = content.strip("\\\n\t\r")
         except AttributeError:
             try:
                 test_text = content.strip("'\\\n\t\r")
@@ -2212,7 +2170,7 @@ class JsonTools(object):
             .replace('"', '\\"')
         )
 
-    def set_json_content(
+    def audio_track_metadata_json(
         self,
         language="en",
         voice="AUTO",
@@ -2225,59 +2183,53 @@ class JsonTools(object):
         genre="",
         title="",
         track=1,
-    ):  # -> str
-        """Sanitize content and return json string"""
-        try:
-            s_rate = str(i_rate)
-        except AttributeError:
-            s_rate = "0"
-        try:
-            s_track = str(track)
-        except AttributeError:
-            s_track = "1"
-        album = self.sanitize_json(album)
-        author = self.sanitize_json(author)
-        file_spec = self.sanitize_json(file_spec)
-        flags = self.sanitize_json(flags)  # `;` list of dev flags
-        genre = self.sanitize_json(genre)
-        language = self.sanitize_json(language)
-        output_module = self.sanitize_json(output_module)
-        s_rate = self.sanitize_json(s_rate)
-        s_track = self.sanitize_json(s_track)
-        title = self.sanitize_json(title)
-        voice = self.sanitize_json(voice)
-        s_key = "{0}.json".format(file_spec)
-        l_cur = "{"
-        r_cur = "}"
-        return """{0}
-  "album": "{1}",
-  "author": "{2}",
-  "file_spec": "{3}",
-  "flags": "{4}",
-  "genre": "{5}",
-  "i_rate": {6},
-  "i_track": {7},
-  "language": "{8}",
-  "output_module": "{9}",
-  "secret_key": "{10}",
-  "title": "{11}",
-  "voice": "{12}"
-{13}""".format(
-            l_cur,
-            album,
-            author,
-            file_spec,
-            genre,
-            flags,
-            s_rate,
-            s_track,
-            language,
-            output_module,
-            s_key,
-            title,
-            voice,
-            r_cur,
-        )
+    ):
+        """
+        Build and return a compact JSON string of audio-track metadata.
+
+        The JSON object includes:
+        - album: album name
+        - author: artist or author
+        - file_spec: file identifier or path
+        - flags: custom flags
+        - genre: track genre
+        - i_rate: integer rate (e.g. sample rate)
+        - i_track: track number
+        - language: ISO language code
+        - output_module: output module name
+        - secret_key: "<file_spec>.json" if file_spec is non-empty
+        - title: track title
+        - voice: voice model code or a generic voice like `MALE1`, `FEMALE2`, or `AUTO`
+
+        Non-string inputs are coerced to strings. secret_key is empty if file_spec is empty.
+        """
+
+        language = self.to_safe_str(language)
+        voice = self.to_safe_str(voice)
+        file_spec = self.to_safe_str(file_spec)
+        output_module = self.to_safe_str(output_module)
+        flags = self.to_safe_str(flags)
+        album = self.to_safe_str(album)
+        author = self.to_safe_str(author)
+        genre = self.to_safe_str(genre)
+        title = self.to_safe_str(title)
+
+        payload = {
+            "album": album,
+            "author": author,
+            "file_spec": file_spec,
+            "flags": flags,
+            "genre": genre,
+            "i_rate": i_rate,
+            "i_track": track,
+            "language": language,
+            "output_module": output_module,
+            "secret_key": "{}.json".format(file_spec) if file_spec else "",
+            "title": title,
+            "voice": voice,
+        }
+
+        return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
 
 def sound_length_seconds(_work):  # -> int
@@ -2397,10 +2349,18 @@ class ImportedMetaData(object):
 
     def execute_command(self, a_command="", safer=True):  # -> str
         """
-        This is similar to `os.system(a_command)`, but we can get output
-        from program commands.
+        Returns the output of a command as a string.
+
+        This is similar to `os.system(a_command)`, but it can return an output
+        string from program commands, instead of an error code.
+
+        Arguments:
+            a_command (str): a command string (e.g.: `spd-say -L`)
+            safer(bool): do not execute commands that start with a blocked item like `sudo`
+        Returns:
+            *str*
+            If the command works, returns a string with the response, otherwise `""`
         """
-        # a_command is a normal command line instruction.
         if safer:
             for block_item in [
                 "sudo",
@@ -2455,8 +2415,9 @@ class ImportedMetaData(object):
         """Calculate the number of seconds of a local sound file. Return
         the value as a string and set the `self.seconds` value to an integer."""
         _extension_table = ExtensionTable()
-        # if self.seconds:
-        #    return self.seconds
+        if not file_path:
+            self.seconds = 0
+            return 0
         if not os.path.isfile(file_path):
             self.seconds = 0
             return self.seconds
@@ -2759,91 +2720,70 @@ track={track}""".format(
         except Exception:
             return ""
 
-    def get_my_id(self, erase=True):  # -> str
+    def _get_meta_field(
+        self, lock_key, attr_name=None, erase=True, post_process=None, default_return=""
+    ):
         """
-        Returns the user name, author, artist or performer
+        Core logic for reading metadata from a lock file:
+          * lock_key:    key passed to get_my_lock()
+          * attr_name:   name of self.<attr_name> to assign on success
+          * erase:       whether to erase after reading
+          * post_process: optional fn(str)→str to massage the raw value
+          * default_return: what to return if no value found
         """
-        returned_value = self.meta_from_file(get_my_lock("lock.id"), erase)
-        if bool(returned_value):
-            self.identity = returned_value
-        else:
-            self.get_defaults()
-        return self.identity
+        raw = self.meta_from_file(get_my_lock(lock_key), erase)
+        if post_process:
+            raw = post_process(raw or "")
+        if raw:
+            if attr_name:
+                setattr(self, attr_name, raw)
+            return raw
+        # fallback
+        self.get_defaults()
+        if attr_name:
+            return getattr(self, attr_name, default_return)
+        return default_return
 
-    def get_my_composer(self, erase=True):  # -> str
-        """
-        Returns the composer name.
-        """
-        returned_value = self.meta_from_file(get_my_lock("lock.composer"), erase)
-        if bool(returned_value):
-            self.composer = returned_value
-        else:
-            self.get_defaults()
-        return self.composer
+    def get_my_id(self, erase=True):
+        return self._get_meta_field("lock.id", "identity", erase)
 
-    def get_my_title(self, erase=True):  # -> str
-        """
-        Returns the song name (a. k. a. title).
-        """
-        returned_value = self.meta_from_file(get_my_lock("lock.title"), erase)
-        if bool(returned_value):
-            self.title = returned_value
-        else:
-            self.get_defaults()
-        return self.title
+    def get_my_composer(self, erase=True):
+        return self._get_meta_field("lock.composer", "composer", erase)
 
-    def get_my_genre(self, erase=True):  # -> str
-        """
-        Returns the song genre.
-        """
-        returned_value = self.meta_from_file(get_my_lock("lock.genre"), erase)
-        if bool(returned_value):
-            self.genre = returned_value
-        else:
-            self.get_defaults()
-        return self.genre
+    def get_my_title(self, erase=True):
+        return self._get_meta_field("lock.title", "title", erase)
 
-    def get_my_track(self, erase=True):  # -> str
-        """
-        Returns the song track number.
-        """
-        returned_value = self.meta_from_file(get_my_lock("lock.track"), erase)
-        if bool(returned_value):
-            self.track = returned_value
-        else:
-            self.get_defaults()
-        return self.track
+    def get_my_genre(self, erase=True):
+        return self._get_meta_field("lock.genre", "genre", erase)
 
-    def get_my_album(self, erase=True):  # -> str
-        """
-        Returns the album name.
-        """
-        # If the file is located on a remote url
-        # then the file name might be expressed
-        # as a URI. Therefore, replace `%20` with
-        # a space for the title.
-        returned_value = self.meta_from_file(get_my_lock("lock.album"), erase).replace(
-            "%20", " "
+    def get_my_track(self, erase=True):
+        return self._get_meta_field("lock.track", "track", erase)
+
+    def get_my_album(self, erase=True):
+        # replace %20 → space before assignment
+        return self._get_meta_field(
+            "lock.album", "album", erase, post_process=lambda s: s.replace("%20", " ")
         )
-        if bool(returned_value):
-            self.album = returned_value
-        else:
-            self.get_defaults()
-        return self.album
 
-    def custom_lexicon_path(self, erase=True):  # -> str
-        """
-        Returns the path to a lexicon settings directory.
-        """
-        returned_value = self.meta_from_file(get_my_lock("lock.lexicon"), erase)
-        if bool(returned_value):
-            return returned_value
-        return ""
+    def custom_lexicon_path(self, erase=True):
+        # no assignment, return raw or empty
+        return self._get_meta_field("lock.lexicon", None, erase, None, "")
 
 
 class WinMediaPlay(object):
-    """Play a sound file in Windows. Use `winsound` with uncompressed files
-    instead because Windows Media Player takes more time to start up."""
+    """
+    Windows Media Player
+    ====================
+
+    A depreciated Windows feature to play media files. In August, 2025
+    it is available as an optional feature.
+
+    Alternate Media Players
+    -----------------------
+
+    * [`ffplay`](https://www.ffmpeg.org/)
+    * [`vlc`](https://videolan.org)
+    """
 
     def __init__(self):
         """Item`[0]` of `extensions` is a file extension. Item `[1]` of
@@ -2863,28 +2803,59 @@ class WinMediaPlay(object):
             [".wma", 12209],
         ]
         self.app = get_nt_path("Windows Media Player", "wmplayer.exe")
+        if not self.app:
+            # Look for an optional installation path
+            win_dir = os.environ["WINDIR"]
+
+            pattern = os.path.join(
+                win_dir,
+                "WinSxS",
+                "wow64_microsoft-windows-mediaplayer-core_*",
+                "wmplayer.exe",
+            )
+            matches = glob.glob(pattern)
+            if matches:
+                self.app = matches[0]
+
         self.rest = 0
 
     def app_ok(self, file_path=""):  # -> bool
         """Can the Windows Media Player application play the sound file?
         Estimate the play time in seconds."""
+        if not self.app:
+            print(
+                """
+Add Windows Media Player via Optional Features
+==============================================
+
+If Windows Media Player is available, you can install it as an optional
+feature. This provides the ability to play a variety of standard media files
+using a player created by Microsoft.
+
+1. 	Settings -> Apps -> Optional features
+2. 	Click Add a feature (near the top of the page).
+3. 	In the search box, type Windows Media Player.
+4. 	Select it from the list -> click Install.
+
+"""
+            )
+            return False
+        file_path = str(file_path)
         for _test in [self.app, file_path]:
             if len(_test.strip()) == 0:
                 return False
         if not os.path.isfile(file_path):
             return False
-        _continue = False
-        _ext = os.path.splitext(file_path)[1]
-        if any(_test[0] == _ext for _test in self.extensions):
-            _continue = True
-        if not _continue:
-            return False
+        _, _ext = os.path.splitext(file_path)
+        _found_ext = ""
         _denominator = 12209
-        if any(
-            os.path.splitext(file_path.lower())[1] == _test[0]
-            for _test in self.extensions
-        ):
-            _denominator = _test[1]
+        for _test in self.extensions:
+            if _ext.lower() == _test[0]:
+                _found_ext = _ext
+                _denominator = _test[1]
+                break
+        if not _found_ext:
+            return False
         if _denominator == 0:
             self.rest = sound_length_seconds(file_path)
         else:
@@ -2895,7 +2866,9 @@ class WinMediaPlay(object):
 
     def _windowsmedia(self, file_path=""):  # -> bool
         """(Local use) Initiate Windows Media Player without a user interface"""
-        if not os.path.isfile(file_path):
+        if not os.path.isfile(str(file_path)):
+            return False
+        if not self.app:
             return False
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -2903,6 +2876,7 @@ class WinMediaPlay(object):
         a = subprocess.call(
             '{0} /play /close "{1}"'.format(_app, file_path), startupinfo=startupinfo
         )
+        print(a)
         return bool(a)
 
     def play(self, file_path=""):  # -> bool
@@ -2910,6 +2884,8 @@ class WinMediaPlay(object):
         with `app_ok` to check `wmplayer` and estimate the rest time, then if
         the file can be played `wmplayer` plays it. For supported audio files
         like `.wav` the Windows python3 `winsound` library is much faster."""
+        if not self.app:
+            return False
         if self.rest == 0:
             return False
         mythread = threading.Thread(target=self._windowsmedia, args=[file_path])
@@ -2959,6 +2935,8 @@ def gst_wav_to_media(
     <https://community.nxp.com/pwmxy87654/attachments/pwmxy87654/imx-processors%40tkb/15/2/i.MX8GStreamerUserGuide.pdf >
     """
     if have_posix_app("say", False):
+        return False
+    if sys.version_info[0] < 3:
         return False
     s_out_extension = ""
     _metas = ImportedMetaData()
@@ -3820,7 +3798,7 @@ def prefix_ohs(_int=1, _str_len=10, _symbol="0"):  # -> str
 # (IPA). To check which symbols are supported in a specific language
 # model, consult the `phonemes` field in the `test_xx-xx.jsonl` at the
 # `rhasspy/piper` GitHub site.
-# [link](https://github.com/rhasspy/piper/tree/master/etc/test_sentences)
+# [link](https://github.com/OHF-Voice/piper1-gpl/tree/master/etc/test_sentences)
 #
 # Some language models allow you to embed phonetuc code inline with the text
 # using delimiters to signal that it is a code.
@@ -3849,6 +3827,125 @@ def uses_international_phonetic_alphabet(_str_test=""):  # -> bool
     return False
 
 
+# class LexiconEdit(object):
+#     """Lexicon Tools"""
+#     def __init__(self):
+#         """Lexicon Tools"""
+#         self.ctr_re = re.compile(
+#             r'[\x00-\x1F\x7F]'  # C0 controls + delete
+#         )
+#         self.json_path = ""
+#         self.json_data = None
+#         self.json_text = None
+#         self.item_index = 0
+
+#     def merge_and_reserialize_lexicon(self, path, overwrite=True):
+#         """
+#         Returns the updated lexicon JSON (one entry per line),
+#         sorted by line-length, or "" on any error.
+#         """
+#         def update_line_prefix(_line, path, i):
+#             _, _filename = os.path.split(path)
+#             if not _filename:
+#                 return _line
+
+#             label = "{0}{1}".format(
+#                 _filename.replace("lexicon.json", ""),
+#                 prefix_ohs(i + 1, 5, "0"),
+#                 )  #  i. e.: `en-CA_`
+#             # "DT_2025-08-05_09-00-32":{"g":"mL","p":"millilitre"},
+#             if not """"g":""" in _line or not """"p":""" in _line:
+#                 return _line
+#             _, _data = _line.split(':', 1)
+#             return "{0}:{1}".format(label, _data)
+
+
+#         def sanitize(s, escape_forward_slash=False):
+#             if sys.version_info[0] < 3 and isinstance(s, str):
+#                 # decode bytes to unicode using utf-8
+#                 s = s.decode('utf-8', errors='ignore')
+#             # 1. Normalize unicode
+#             s_norm = unicodedata.normalize('NFC', s)
+
+#             # 2. Remove C0 control chars
+#             s_clean = self.ctr_re.sub('', s_norm)
+
+#             # 3. Escape via json encoder pieces
+#             # Leverage json.dumps to handle most escapes, then strip surrounding quotes
+#             encoded = json.dumps(s_clean, ensure_ascii=False)
+#             # encoded is like '"text with \"quotes\" and \\slashes"'
+#             # strip leading/trailing "
+#             s_escaped = encoded[1:-1]
+
+#             # Optionally escape forward slash
+#             if escape_forward_slash:
+#                 s_escaped = s_escaped.replace('/', r'\/')
+
+#             # 4. Collapse whitespace
+#             s_final = re.sub(r'\s+', ' ', s_escaped).strip()
+#             return s_final
+
+#         def fmt_json_line(key, val):
+#             v = val.copy()
+#             for kk, xx in v.items():
+#                 if isinstance(xx, basestring):
+#                     v[kk] = sanitize(xx)
+#             body = json.dumps(v, ensure_ascii=False, separators=(",", ": "))
+#             return '    "{0}": {1}'.format(key, body)
+
+#         def is_meta_data(g):
+#             tests = (
+#                 "$[LOCALE]",
+#                 "$[REVISION]",
+#                 "\\u0024[LOCALE]",
+#                 "\\u0024[REVISION]",
+#             )
+#             return any(t in g for t in tests)
+
+#         try:
+#             # 1. load file, preserve file order so user edits win
+#             with codecs.open(
+#                 path, mode="r", encoding="utf-8", errors="replace"
+#             ) as file_obj:
+#                 data = json.load(file_obj, object_pairs_hook=OrderedDict)
+#                 self.item_index = 0
+#             # 2. dedupe on "g" field
+#             seen_g = set()
+#             filtered = OrderedDict()
+#             for key, val in data.items():
+#                 gval = val.get("g")
+#                 if gval in seen_g:
+#                     continue
+#                 if is_meta_data(gval):
+#                     continue
+#                 seen_g.add(gval)
+#                 filtered[key] = val
+
+#             # 3. render each item on one line, then sort by length
+#             lines = [fmt_json_line(k, v) for k, v in filtered.items()]
+#             lines.sort(key=len)
+
+#             # 4. build result string
+#             out = ["{"]
+#             for i, line in enumerate(lines):
+#                 eline = update_line_prefix(line, path, i)
+#                 comma = "," if i < len(lines) - 1 else ""
+#                 out.append(eline + comma)
+#             out.append("}")
+#             result = "\n".join(out) + "\n"
+
+#             # 5. write back and return JSON
+#             if overwrite:
+#                 with codecs.open(path, mode="w", encoding="utf-8", errors="replace") as file_obj:
+#                     file_obj.write(result)
+
+#             return result
+
+#         except Exception:
+#             # any failure => empty string
+#             return ""
+
+
 def local_pronunciation(
     iso_lang="en-CA",
     text="",
@@ -3872,6 +3969,7 @@ def local_pronunciation(
     _used_graphemes = [""]
     _good_list = []
     _user_dir = os.path.join(office_user_dir(), "config", "lexicons", my_dir)
+
     if my_env in os.environ:
         _user_dir = os.getenv(my_env)
     for _lang in [iso_lang, iso_lang.split("-")[0].split("_")[0]]:
@@ -4058,14 +4156,14 @@ file for `{1}` was found.""".format(
                     text = text.replace(data[_item]["g"], data[_item]["p"]).replace(
                         grapheme, data[_item]["p"]
                     )
-    except KeyError:
+    except KeyError as e:
         _pls_text = ""
         print(
-            """WARNING: A text string was not edited because a `json` lexicon
-is incorrectly formatted for this application. (`KeyError`)
+            """KeyError (A text string was not edited because a `json` lexicon
+is incorrectly formatted for this application):  {0}
 
-{0}""".format(
-                _json_file
+{1}""".format(
+                e, _json_file
             )
         )
         _json_text = """{{
@@ -4075,14 +4173,14 @@ is incorrectly formatted for this application. (`KeyError`)
 }}""".format(
             _test, _test, _test, _test, _date
         )
-    except ImportError:  # i. e. : python 3 json.decoder.JSONDecodeError:
+    except ImportError as e:
         _pls_text = ""
         print(
-            """WARNING: A text string was not edited because a `json` lexicon
-file is missing or is incorrectly formatted for this application.
+            """ImportError: (A text string was not edited because a `json` lexicon
+file is missing or is incorrectly formatted for this application): {0}.
 
-{0}.""".format(
-                _json_file
+{1}.""".format(
+                e, _json_file
             )
         )
         _json_text = """{{
@@ -4271,30 +4369,64 @@ def show_and_play(_command="", a_app="", display_file="", file_path=""):  # -> b
 
 def play_wav_no_ui(file_path=""):  # -> bool
     """
-    Opens using command line shell.
+    Play an audio file without showing a player UI.
+
+    On Windows:
+    * Uses the file extension *and its case* to decide the playback method.
+    * If the lowercase extension is in {'.m4a', '.mp2', '.mp3', '.wma'},
+      or the extension is exactly '.WAV' (uppercase), attempt to play using
+      Windows Media Player via WinMediaPlay(). If unavailable, fall back
+      to os.startfile().
+    * If the lowercase extension is in {'.mp4', '.oga', '.ogg', '.opus', '.spx', '.webm'},
+      open it with the default system-registered app via os.startfile().
+    * All other extensions (including lowercase '.wav') use winsound.PlaySound()
+      for immediate playback without UI, falling back to os.startfile() if needed.
+
+    On other platforms:
+    * Attempts to locate a compatible built-in audio player and use the first match.
+    * If none is found, tries the default graphical media player.
+
+    Returns:
+        True if playback was successfully initiated, otherwise False.
     """
     _command = ""
     a_app = "System audio"
-    uri_path = path2url(file_path)
-    display_file = os.path.split(file_path)[1]
-    _pipe = ""
+    display_file = os.path.basename(file_path)
+    _, _ext = os.path.splitext(file_path)
+    if not _ext:
+        # If there is no extension, fail fast.
+        return False
+
     if os.name == "nt":
-        # Windows
-        _win_ext = os.path.splitext(file_path)[1].lower()
-        if _win_ext in [".m4a", ".mp2", ".mp3", ".wma"]:
-            a_app = "Windows Media Player"
+        # Extension groups
+        WIN_MEDIA_EXT = {".m4a", ".mp2", ".mp3", ".wma"}
+        # WIN_FORCE_EXT = {".WAV"}
+        DEFAULT_APP_EXT = {".mp4", ".oga", ".ogg", ".opus", ".spx", ".webm"}
+
+        # if _ext.upper in WIN_FORCE_EXT:
+        # TODO: Use winsound in blocking mode for .wav files.
+
+        if _ext.lower() in WIN_MEDIA_EXT:  # or _ext in WIN_FORCE_EXT:
             _winm = WinMediaPlay()
             if _winm.app_ok(file_path):
+                a_app = "Windows Media Player"
                 print("[>] {0} playing `{1}`".format(a_app, display_file))
                 _winm.play(file_path)
                 return True
             else:
+                print(
+                    "[>] {0} playing `{1}` using startfile()".format(
+                        a_app, display_file
+                    )
+                )
                 try:
                     return os.startfile(file_path) == 0
                 except NameError:
                     return False
-        elif _win_ext in [".mp4", ".oga", ".ogg", ".opus", ".spx", ".webm"]:
+
+        elif _ext.lower() in DEFAULT_APP_EXT:
             try:
+                print("[>] {0} playing `{1}`".format(a_app, display_file))
                 os.startfile(file_path)
                 return True
             except NameError:
@@ -4363,8 +4495,8 @@ def handle_sound_playing(_media_work="", lock="lock"):  # -> bool
             _player_app = _audio_players.player_app(_media_work)
         else:
             _wmp = WinMediaPlay()
-            if len(_wmp.get_nt_path("Windows Media Player", "wmplayer.exe")) != 0:
-                _player_app = "wmplayer.exe"
+            if _wmp.app:
+                _player_app = ""
         if len(_player_app) == 0:
             return False
         if killall_process(_player_app):
@@ -4380,6 +4512,7 @@ def main():  # -> NoReturn
     Converts the input wav sound to another format.  Ffmpeg
     can include a still frame movie if you include an image.
     """
+    print()
     if sys.argv[-1] == sys.argv[0]:
         usage()
         sys.exit(0)
@@ -4448,12 +4581,11 @@ def main():  # -> NoReturn
 if __name__ == "__main__":
     main()
 ###############################################################################
-
 # Read Text Extension
 #
 # Copyright And License
 #
-# (c) 2024 [James Holgate Vancouver, CANADA](readtextextension(a)outlook.com)
+# (c) 2025 [James Holgate Vancouver, CANADA](readtextextension(a)outlook.com)
 #
 # THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE
 # TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE

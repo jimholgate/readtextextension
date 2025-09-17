@@ -14,7 +14,7 @@ This client uses the piper engine to read text aloud using Read
 Text Extension with your office program.
 
 * [Piper samples](https://rhasspy.github.io/piper-samples)
-* [Instructions](https://github.com/rhasspy/piper)
+* [Instructions](https://github.com/OHF-Voice/piper1-gpl)
 * [Download voices](https://huggingface.co/rhasspy/piper-voices/tree/main/)
 
 Read Selection... Dialog setup:
@@ -47,7 +47,25 @@ Pied (Linux)
 
 [Pied](https://pied.mikeasoft.com/) uses a simple graphical interface to
 install and manage text-to-speech Piper voices for use with Linux Speech
-Dispatcher on supported architectures and distributions.
+Dispatcher on supported architectures and distributions. The application
+writes configuration files in the `~/.config/speech-dispatcher` directory.
+
+NOTE: By default, Firefox's reader view rejects voice models that are not
+available in a standard Linux repository in order to reduce risks associated
+with third-party programs. To disable Firefox's filter,
+
+- Open Firefox.
+- Navigate to the Advanced configuration page at `about:config`.
+- Dismiss the warning.
+- Check the following flag: `narrate.enabled`
+- The value should be `true`.
+- Search for the following flag: `narrate.filter-voices`.
+- Set it to `false`.
+- Search for the following flag: `narrate.voice`.
+- Reset it to the following value: `{"default":"automatic"}`.
+
+Pied uses a single voice model at a time. To temporarily disable custom
+speech settings, rename or move the `~/.config/speech-dispatcher` directory.
 
 ### Update System Resources
 
@@ -156,7 +174,7 @@ Binary release (Linux)
 The binary release is available for several platforms and it is fast.
 
 The most recent binary `piper` executable program included in a 
-[piper archive](https://github.com/rhasspy/piper/releases/latest) for your
+[piper archive](https://github.com/OHF-Voice/piper1-gpl/releases/latest) for your
 computer's specific processor type. For example, `piper_linux_x86_64.tar.gz`
 works with `x86_64` processors using a Linux desktop.
 
@@ -170,7 +188,7 @@ Use the following commands:
 
     python3 -c "import os;os.makedirs(os.path.expanduser('~/.local/share/piper-tts/'))"
     python3 -c "from urllib import request;import os;request.urlretrieve(\
-        'https://github.com/rhasspy/piper/releases/download/2023.11.14-2/piper_linux_x86_64.tar.gz',\
+        'https://github.com/OHF-Voice/piper1-gpl/releases/download/2023.11.14-2/piper_linux_x86_64.tar.gz',\
         os.path.expanduser(\
             '~/piper_linux_x86_64.tar.gz'))"
     tar -xf ~/piper_linux_x86_64 -C ~/.local/share/piper-tts/
@@ -201,10 +219,10 @@ Then use pipx to install `piper-tts`
 Python (developer)
 ------------------
 
-[Github](https://github.com/rhasspy/piper?tab=readme-ov-file#installation)
+[Github](https://github.com/OHF-Voice/piper1-gpl?tab=readme-ov-file#installation)
 installation notes have information about installing the full package. As a
 developer you can create and edit piper models and run piper as a home network
-[web](https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.md)
+[web](https://github.com/OHF-Voice/piper1-gpl/blob/master/src/python_run/README_http.md)
 service.
 
 Audition and download a voice model
@@ -288,6 +306,7 @@ Copyright (c) 2025 James Holgate
 
 
 import codecs
+import glob
 import os
 import random
 import stat
@@ -295,6 +314,9 @@ import sys
 import time
 import urllib
 import warnings
+
+from typing import List
+
 
 try:
     import getopt
@@ -315,6 +337,14 @@ try:
     import platform
 except (ImportError, AssertionError):
     pass
+
+try:
+    import requests
+
+    REQUESTS_OKAY = True
+except (ImportError, AssertionError, ModuleNotFoundError):
+    REQUESTS_OKAY = False
+
 
 import build_extension
 import find_replace_phonemes
@@ -346,6 +376,7 @@ class PiperTTSClass(object):
 
     def __init__(self) -> None:
         """Initialize data."""
+        self.local_voices_dictionary = None
         _common = netcommon.LocalCommons()
         self.machine = ""
         try:
@@ -394,9 +425,9 @@ class PiperTTSClass(object):
         self.tested_phrase = ""
         self.update_request = False
         self.sample_model = "en_GB-jenny_dioco-medium"
-        for _item in self.piper_minimum_dictionary:
-            if len(self.piper_minimum_dictionary[_item]["key"]) != 0:
-                self.sample_model = self.piper_minimum_dictionary[_item]["key"]
+        for _item, value in self.piper_minimum_dictionary.items():
+            if len(value["key"]) != 0:
+                self.sample_model = value["key"]
                 break
         self.sample_phrase = "A rainbow is a meteorological phenomenon."
         self.pip_checked_models = [
@@ -423,25 +454,56 @@ class PiperTTSClass(object):
         # to a gaming mouse setup program. We check alternatives before
         # testing `piper`.
         # See: [GitHub](https://github.com/libratbag/piper).
+        _app = None
         app_list = ["piper-cli", "piper-tts", "piper"]
         if os.name in ["nt"]:
             self.app = "piper.exe"
             _extension_table = readtexttools.ExtensionTable()
             for _item in app_list:
-                _app = _extension_table.win_search(f"piper-tts{os.sep}piper", _item)
-                if len(_app) != 0:
-                    self.app = _app
-                    break
+                _which_exe = netcommon.which(f"{_item}.exe")
+                if _which_exe:
+                    # If you add piper to your local system path, then this script
+                    # can find it more quickly. However, some versions of piper do
+                    # not work with this extension.
+                    #
+                    # If you install piper-tts with `pip` or `pipx`, then `piper.exe`
+                    # doesn't work with the application on the `nt` operating system.
+                    # Therefore, the script must check for directory names known to
+                    # be typical for using `pipx` and `pip`.
+                    bad_route = False
+                    for pip_block in [".local", "Scripts", "Python", "venv"]:
+                        if pip_block in _which_exe:
+                            bad_route = True
+                            break
+                    if bad_route:
+                        continue
+                    else:
+                        self.app = os.path.realpath(_which_exe)
+                        break
+            if not os.sep in self.app:
+                # Look for it...
+                for _item in app_list:
+                    _app = _extension_table.win_search(f"piper-tts{os.sep}piper", _item)
+                    if _app:
+                        self.app = os.path.realpath(_app)
+                        break
+
         else:
             _app_path = ""
             for _app in app_list:
+                netcommon_which = netcommon.which(_app)
+                if netcommon_which:
+                    # The user has specified a path, so use it.
+                    self.app = os.path.realpath(netcommon_which)
+                    break
                 for _item in [
+                    f"~/Library/Application Support/piper-tts/{_app}/{_app}",
                     f"~/.local/bin/{_app}",
                     f"~/.local/share/piper-tts/{_app}/{_app}",
                     f"~/.local/share/pied/common/{_app}/{_app}",
                     f"~/snap/pied/common/{_app}/{_app}",
                     f"~/.var/app/com.mikeasoft.pied/data/pied/piper/{_app}",
-                    f"~/.local/share/pied/piper/piper",
+                    "~/.local/share/pied/piper/piper",
                     f"/usr/local/lib/piper/{_app}",
                     f"/usr/local/share/piper/{_app}",
                     f"/usr/lib/piper/{_app}",
@@ -462,7 +524,7 @@ class PiperTTSClass(object):
         self.ok = False
         self.help_icon = _common.help_icon
         self.help_heading = "Piper TTS"
-        self.help_url = "https://github.com/rhasspy/piper"
+        self.help_url = "https://github.com/OHF-Voice/piper1-gpl"
         self.hug_url = "https://huggingface.co/rhasspy/piper-voices"
         self.voice_url = f"{self.hug_url}/tree/main"
         self.json_url = f"{self.hug_url}/raw/main/voices.json"
@@ -479,11 +541,14 @@ class PiperTTSClass(object):
         self.model = ""
         self.piper_voice_dir = ""
         self.app_data = ".local"
-        self.pied_list = []
-        self.pied_voice_dir_list = [
+        if os.path.isdir(os.path.expanduser("~/Library/Application Support/")):
+            self.app_data = ("Library/Application Support",)
+        self.flat_list = []
+        self.flat_voice_dir_list = [
             "~/snap/pied/common/models",
             "~/.var/app/com.mikeasoft.pied/data/pied/models",
             f"~/{self.app_data}/share/pied/common/models",
+            f"~/{self.app_data}/share/piper-server/common/models",
         ]
         self.piper_voice_dir_list = [
             f"~/{self.app_data}/share/piper-tts/piper-voices",
@@ -503,8 +568,9 @@ class PiperTTSClass(object):
             readtexttools.linux_machine_dir_path("piper-voices"),
             readtexttools.linux_machine_dir_path("piper-tts/piper-voices"),
         ]
+        _piper_app_dir, _ = os.path.split(self.app)
         espeak_ng_data_list = [
-            self.app.replace("piper", "espeak-ng-data"),
+            os.path.join(_piper_app_dir, "espeak-ng-data"),
             f"~/{self.app_data}/share/piper-tts/piper/espeak-ng-data",
             f"~/{self.app_data}/share/piper-tts/espeak-ng-data",
             f"~/{self.app_data}/share/piper/espeak-ng-data",
@@ -522,7 +588,6 @@ class PiperTTSClass(object):
         ]
         if os.name == "nt":
             self.app_data = "AppData\\Roaming"
-            _prog_search = os.path.split(self.app)[0]
             self.piper_voice_dir_list = [
                 f"~\\{self.app_data}\\share\\piper-tts\\piper-voices",
                 f"~\\{self.app_data}\\piper-tts\\piper-voices",
@@ -531,21 +596,28 @@ class PiperTTSClass(object):
                 "~\\AppData\\Local\\Programs\\piper-tts\\piper-voices",
                 "~\\AppData\\Local\\Programs\\piper\\piper-voices",
                 "~\\.local\\share\\piper-tts\\piper-voices",
-                f"{_prog_search}\\piper-voices",
+                f"{_piper_app_dir}\\piper-voices",
             ]
             espeak_ng_data_list = [
-                self.app.replace("piper.exe", "espeak-ng-data"),
+                os.path.join(_piper_app_dir, "espeak-ng-data"),
                 f"~\\{self.app_data}\\piper-tts\\piper\\espeak-ng-data",
                 f"~\\{self.app_data}\\piper\\espeak-ng-data",
                 f"~\\{self.app_data}\\espeak-ng\\espeak-ng-data",
+                "~\\pipx\\venvs\\piper-tts\\Lib\\site-packages\\piper\\espeak-ng-data",
                 "~\\.local\\share\\piper-tts\\piper\\espeak-ng-data",
                 "~\\AppData\\Local\\Programs\\piper\\espeak-ng-data",
                 "~\\AppData\\Local\\Programs\\piper-tts\\piper\\espeak-ng-data",
                 "~\\AppData\\Local\\Programs\\espeak-ng\\espeak-ng-data",
-                f"{_prog_search}\\espeak-ng-data",
+                f"{_piper_app_dir}\\espeak-ng-data",
+            ]
+            self.flat_voice_dir_list = [
+                f"~\\{self.app_data}\\piper-tts\\piper-server\\models",
+                f"~\\{self.app_data}\\piper\\piper-server\\models",
+                "~\\AppData\\Local\\Programs\\piper-tts\\piper-server\\models",
+                "~\\AppData\\Local\\Programs\\piper\\piper-server\\models",
             ]
         for _piper_dir in self.piper_voice_dir_list:
-            if not _piper_dir in self.pied_voice_dir_list:
+            if not _piper_dir in self.flat_voice_dir_list:
                 if os.path.isdir(os.path.expanduser(_piper_dir)):
                     self.piper_voice_dir = os.path.expanduser(_piper_dir)
                     break
@@ -559,6 +631,7 @@ class PiperTTSClass(object):
                 self.piper_voice_dir = new_dir
         self.json_file = os.path.join(self.piper_voice_dir, "voices.json")
         self.model_file = os.path.join(self.piper_voice_dir, "models.txt")
+        self.first_model = ""
         self.md5sum = ""
         self.espeak_ng_dir = ""
         for espeak_ng_dir in espeak_ng_data_list:
@@ -580,16 +653,37 @@ class PiperTTSClass(object):
         self.noise_scale = 0.667
         self.length_scale = 1
         self.noise_w = 0.8
-        self.voice_count = 0
+        self.num_speakers = 0
         # To hide the VLC interface, use the `--intf dummy` switch
         self.vlc_intfs = ["--intf dummy ", ""]
         self.use_specific_onnx_path = ""
         self.use_specific_onnx_voice_no = 0
         self.meta = readtexttools.ImportedMetaData()
         self.work_file = os.path.join(readtexttools.get_temp_prefix(), "piper-tts.wav")
+        self.working_models = []
+        self.link_failed = False
 
     def usage(self, _help: str = "") -> None:
         """Usage"""
+        if self.debug or True:
+            markdowneq = "=" * len(self.help_heading)
+            print(
+                f"""
+{self.help_heading} Usage (debug)
+=============={markdowneq}
+
+* `REQUESTS_OKAY` {REQUESTS_OKAY}
+* `self.app` {self.app}
+* `self.debug` {self.debug}
+* `self.model_flat_dir()` {self.model_flat_dir()}
+* `self.espeak_ng_dir` {self.espeak_ng_dir}
+* `self.json_file` {self.json_file}
+* `self.work_file` {self.work_file}
+
+""",
+                _help,
+            )
+            return None
         cmd = "python3 piper_read_text.py"
         _file = "'<text_path.txt>'"
         if len(_help) != 0:
@@ -680,6 +774,24 @@ not work with the python version.
 """
         return self.quick_start
 
+    def link_or_copy(self, src="", dest=""):
+        """Trys to make a symbolic link in posix, or a hard link
+        in nt."""
+        try:
+            if os.path.exists(src):
+                if os.name == "posix":
+                    try:
+                        os.symlink(src, dest)
+                    except Exception as e:
+                        print("Exception:  ", e)
+                if not os.path.islink(dest):
+                    netcommon.hardlink_or_copy(src, dest)
+            if os.path.islink(dest):
+                return True
+        except Exception as e:
+            print(f"Error linking files: {e}")
+        return False
+
     def pretty_json_write(
         self, data: any = None, _json_file: str = "", iso_lang: str = "en-US"
     ) -> bool:
@@ -687,7 +799,7 @@ not work with the python version.
         JSON string in human readable format.
         """
         b_done = False
-        if len(_json_file) == 0:
+        if not _json_file:
             return b_done
         if bool(data):
             try:
@@ -708,6 +820,19 @@ not work with the python version.
                     iso_lang,
                 )
         return b_done
+
+    def real_piper_path(self) -> str:
+        """Returns the real app path if it could be found, or else `""`."""
+        try_app = self.app
+        try:
+            if os.path.isfile(try_app):
+                try_app = os.path.realpath(self.app)
+                if os.sep in try_app:
+                    if os.path.getsize(try_app) > 0 and os.access(try_app, os.X_OK):
+                        return try_app
+        except Exception as e:
+            print("Exception in `real_piper_path`: {0}").format(3)
+        return ""
 
     def get_valid_qualities(self) -> list:
         """Determine valid qualities based on machine type and GPU
@@ -774,15 +899,9 @@ not work with the python version.
             return ""
         if not os.path.isfile(self.json_file):
             return ""
-        if not file_data in ["md5_digest", "size_bytes"]:
+        if file_data not in ["md5_digest", "size_bytes"]:
             file_data = "md5_digest"
-        try:
-            with codecs.open(
-                self.json_file, mode="r", encoding="utf-8", errors="replace"
-            ) as file_obj:
-                data = json.load(file_obj)
-        except (PermissionError, FileNotFoundError, json.JSONDecodeError):
-            return ""
+        data = self._get_piper_dict()
         for item in data.values():
             _alias = "-".join([item["name"], item["quality"]])
             if item["aliases"]:
@@ -814,6 +933,7 @@ not work with the python version.
         [Pied](https://pied.mikeasoft.com/) installer app might not store
         MODEL_CARD files in a standardized directory, so this client tries
         to download them for your reference into the client directory."""
+        data = None
         if not os.name == "posix" or not bool(all_dir_list):
             return False
         _dest_dir = ""
@@ -834,33 +954,21 @@ not work with the python version.
                             if _file.startswith(_lang):
                                 if _file.endswith(".onnx"):
                                     _file, _ext = os.path.splitext(_file)
-                                    self.pied_list.append(os.path.join(_a_dir, _file))
+                                    self.flat_list.append(os.path.join(_a_dir, _file))
                     except FileNotFoundError:
                         _file = ""
-            if not bool(self.pied_list):
+            if not bool(self.flat_list):
                 return False
         except TypeError:
             return False
 
-        _data = None
-        _json_file = self.json_file
-        if os.path.exists(_json_file):
-            try:
-                with codecs.open(
-                    _json_file, mode="r", encoding="utf-8", errors="replace"
-                ) as file_obj:
-                    data = json.load(file_obj)
-            except:
-                return False
-        try:
-            if not data:
-                return False
-        except UnboundLocalError:
+        data = self._get_piper_dict()
+        if not data:
             return False
         for _extension in [".onnx.json", ".onnx", ""]:
             try:
                 for _item in data:
-                    for _file_path in self.pied_list:
+                    for _file_path in self.flat_list:
                         _key = data[_item]["key"]
                         if _key in _file_path:
                             _source = f"{_file_path}{_extension}"
@@ -929,9 +1037,10 @@ Your local copy of `{_key}{_extension}` failed the `md5_sum` check.
 Consider deleting it and downloading it again."""
                                                     )
                                                     continue
-                                            os.symlink(_source, _dest)
+                                            self.link_or_copy(_source, _dest)
                                             print(
-                                                f"\nSymbolic link created from `{_source}` to `{_dest}`"
+                                                f"""
+Symbolic link created from `{_source}` to `{_dest}`"""
                                             )
                                             if _extension in [".onnx"]:
                                                 do_pop_message = True
@@ -940,7 +1049,8 @@ Consider deleting it and downloading it again."""
                                                     _key, "", do_pop_message
                                                 )
                                                 if len(_dir) == 0:
-                                                    # Failed to download, so show link to `_dest_dir`
+                                                    # Failed to download, so show link to
+                                                    # `_dest_dir`
                                                     readtexttools.pop_message(
                                                         self.help_heading,
                                                         _dest_dir,
@@ -958,6 +1068,83 @@ Consider deleting it and downloading it again."""
             except (KeyError, SyntaxError):
                 return False
         return retval
+
+    def find_onnx_dir(self, dir_path: str = "") -> str:
+        """
+        Return dir_path if it exists and contains at least one .onnx file;
+        otherwise return an empty string.
+        """
+        # Check directory exists
+        if not os.path.isdir(dir_path):
+            return ""
+
+        # Look for any '*.onnx' files inside
+        pattern = os.path.join(dir_path, "*.onnx")
+        if glob.glob(pattern):
+            return dir_path
+
+        return ""
+
+    def download_file(self, url: str, file_path: str) -> bool:
+        """Download a file. If the `requests` library is available, then the
+        function features resume support, a progress report and specific error
+        reports."""
+        if not REQUESTS_OKAY:
+            try:
+                urllib.request.urlretrieve(
+                    url,
+                    file_path,
+                )
+            except Exception as e:
+                print(f"Exception `urllib.request.urlretrieve`: {e}")
+            return os.path.isfile(file_path)
+        try:
+            # Check if part of the file already exists
+            existing_size = (
+                os.path.getsize(file_path) if os.path.exists(file_path) else 0
+            )
+
+            # Make initial request to get file size and handle connection errors
+            headers = {"Range": f"bytes={existing_size}-"} if existing_size else {}
+            response = requests.get(url, stream=True, headers=headers, timeout=10)
+            response.raise_for_status()
+
+            total_size = int(response.headers.get("content-length", 0)) + existing_size
+
+            # Ensure there is enough disk space
+            home_dir = os.path.expanduser("~")
+            statvfs = os.statvfs(home_dir)
+            free_space = statvfs.f_frsize * statvfs.f_bavail
+            if free_space < total_size:
+                raise OSError("Insufficient disk space.")
+
+            # Download with a basic progress indicator
+            with open(file_path, "ab") as file:
+                downloaded_size = existing_size
+                for chunk in response.iter_content(chunk_size=8192):
+                    file.write(chunk)
+                    downloaded_size += len(chunk)
+
+                    # Print progress every 5MB
+                    if downloaded_size % (5 * 1024 * 1024) < 8192:
+                        print(
+                            f"Downloaded: {downloaded_size / 1024**2:.2f} MB / {total_size / 1024**2:.2f} MB"
+                        )
+
+            print(f"Download complete: {file_path}")
+
+        except requests.exceptions.RequestException as e:
+            print(f"Network error: {e}")
+            return False
+        except PermissionError:
+            print("Permission error: Cannot write to the destination directory.")
+            return False
+        except OSError as e:
+            print(f"OS error: {e}")
+            return False
+        except Exception as e:
+            print(f"Exception: {e}")
+        return os.path.isfile(file_path)
 
     def language_supported(self, iso_lang: str = "en-GB", vox: str = "auto") -> bool:
         """Check to see if the language is available"""
@@ -985,20 +1172,13 @@ Consider deleting it and downloading it again."""
                     self.concise_lang = file_name.split("_")[0]
                 if "#" in vox:
                     self.use_specific_onnx_voice_no = int(
-                        "".join(
-                            [
-                                "0",
-                                readtexttools.safechars(
-                                    vox.split("#")[1], "1234567890"
-                                ),
-                            ]
-                        )
+                        f"""0{readtexttools.safechars(vox.split("#")[1], "1234567890")}"""
                     )
                 self.ok = True
                 return self.ok
             return False
         self.voice = int(
-            "".join(["0", readtexttools.safechars(vox.split("#")[0], "1234567890")])
+            f"""0{readtexttools.safechars(vox, "1234567890")}"""
         )
         self.voice_name = vox
         self.concise_lang = iso_lang.split("_")[0].split("-")[0]
@@ -1014,17 +1194,17 @@ Consider deleting it and downloading it again."""
         if any(_dir.startswith(self.concise_lang) for _dir in _dir_list):
             retval = True
             if self.pied_and_piper_directories_exist():
-                pied_model_path = self.pied_model_path()
-                for file_name in os.listdir(pied_model_path):
+                model_flat_dir = self.model_flat_dir()
+                for file_name in os.listdir(model_flat_dir):
                     for _test in [self.voice_name, self.lang, self.concise_lang]:
                         if file_name.startswith(_test) and file_name.endswith(".onnx"):
-                            model_test = os.path.join(pied_model_path, file_name)
+                            model_test = os.path.join(model_flat_dir, file_name)
                             if build_extension.calculate_md5(
                                 os.path.realpath(model_test)
                             ) == self.onnx_file_data_from_voices_json(
                                 model_test, "md5_digest"
                             ):
-                                all_dir_list = [self.pied_model_path()]
+                                all_dir_list = [self.model_flat_dir()]
                                 self.ok = True
                                 self.link_home_dir_list(all_dir_list, self.lang)
                                 if not os.path.isfile(self.json_file):
@@ -1044,6 +1224,14 @@ that includes the `--update True` option.
         self.ok = retval
         return self.ok
 
+    def remove_duplicates(self, _words=None):
+        """Remove duplicate string items from a list"""
+        if _words is None:
+            return []  # Return an empty list if no input is provided
+
+        seen = set()
+        return [word for word in _words if word not in seen and not seen.add(word)]
+
     def model_path_list(
         self, iso_lang: str = "en-GB", _vox: str = "", extension: str = "onnx"
     ) -> list:
@@ -1053,14 +1241,10 @@ that includes the `--update True` option.
         # NOTE: We use data that we can determine using the model key, so
         # we don't know whether a particular model is compatible with the
         # current version of piper, or whether the files' checksums match.
-        _json_file = self.json_file
-        _found_models = []
+        _model_paths = []
         _common = netcommon.LocalCommons()
-        if os.path.exists(_json_file):
-            with codecs.open(
-                _json_file, mode="r", encoding="utf-8", errors="replace"
-            ) as file_obj:
-                data = json.load(file_obj)
+        if os.path.exists(self.json_file):
+            data = self._get_piper_dict()
         else:
             try:
                 _common.set_urllib_timeout(4)
@@ -1069,15 +1253,15 @@ that includes the `--update True` option.
                 data = json.loads(data_response)
             except (TimeoutError, ValueError):
                 self.ok = False
-                return _found_models
+                return _model_paths
             except urllib.error.URLError:
                 readtexttools.unlock_my_lock(self.locker)
                 readtexttools.pop_message(
-                    self.help_heading, _json_file, 8000, self.help_icon, 1, iso_lang
+                    self.help_heading, self.json_file, 8000, self.help_icon, 1, iso_lang
                 )
                 self.ok = False
                 sys.exit(0)
-        if not self.pretty_json_write(data, _json_file, iso_lang):
+        if not self.pretty_json_write(data, self.json_file, iso_lang):
             _warning = f"WARNING: Missing {self.help_heading} File!"
             underline = len(_warning) * "="
             print(
@@ -1088,7 +1272,7 @@ that includes the `--update True` option.
 The {self.help_heading} client could not find a `.json` configuration file in
 the `piper-tts` models directory.
 
-    {_json_file}
+    {self.json_file}
 
 Attempting to do a generic on-line configuration. If you have custom piper
 voice models, then the generic json configuration will not recognize them.
@@ -1107,10 +1291,11 @@ voice models, then the generic json configuration will not recognize them.
             "zzy_AQ",
         ]
         available_language = ""
+        model_max_voice = "0"
         for description in _description_list:
             try:
                 for _item in data:
-                    if description == "zzy_AQ" and len(_found_models) == 0:
+                    if description == "zzy_AQ" and len(_model_paths) == 0:
                         _description = "en"
                         available_language = data[_item]["language"]["name_english"]
                     else:
@@ -1123,6 +1308,7 @@ voice models, then the generic json configuration will not recognize them.
                     self.j_concise_lang = data[_item]["language"]["family"]
                     self.j_model = data[_item]["name"]  # thorsten_emotional
                     self.j_quality = data[_item]["quality"]  # medium
+                    model_max_voice = str(max(0, data[_item]["num_speakers"] - 1))
                     for self.j_path in [
                         os.path.join(
                             self.piper_voice_dir,
@@ -1137,7 +1323,7 @@ voice models, then the generic json configuration will not recognize them.
                         if _vox in [self.j_key, self.j_model]:
                             return [self.j_path]
                         elif self.j_lang.startswith(_description):
-                            if self.j_path not in _found_models:
+                            if self.j_path not in _model_paths:
                                 if len(self.sample_uri) == 0:
                                     self.untested_model = self.j_key
                                     self.sample_uri = "/".join(
@@ -1158,16 +1344,20 @@ voice models, then the generic json configuration will not recognize them.
                                 # We need to confirm that items are not
                                 # onnx placeholders that only contain
                                 # brief ASCII text.
-                                if os.path.isfile(self.j_path):
+                                if self.j_path not in _model_paths and os.path.isfile(
+                                    self.j_path
+                                ):
                                     if (
                                         os.path.getsize(os.path.realpath(self.j_path))
                                         > 1000
                                     ):
-                                        _found_models.append(self.j_path)
+                                        _model_paths.append(self.j_path)
+                                        self.working_models.append(
+                                            f"{self.j_key}#{os.path.realpath(self.j_path)}#{model_max_voice}"
+                                        )
                 self._update_model_doc()
             except IndexError:
                 pass
-
         if len(available_language) != 0:
             _download_msg = readtexttools.translate_ui_element(
                 iso_lang, "Download a compatible voice model"
@@ -1187,11 +1377,11 @@ voice models, then the generic json configuration will not recognize them.
                     iso_lang,
                 )
 
-        return _found_models
+        return _model_paths
 
     def model_path(self, _extension: str = "onnx") -> str:
         """piper-tts models usually have two essential files with `.json` and
-        `.onnx` extensions. If `model.[json | .onyx]` is in an expected
+        `.onnx` extensions. If `model.[json | .onnx]` is in an expected
         directory, return the path, otherwise return `''`"""
         if len(self.use_specific_onnx_path) != 0:
             return self.use_specific_onnx_path
@@ -1230,7 +1420,7 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         return ""
 
     def py_locale(self, default_locale: str = "en-US") -> str:
-        """Try to get the python default locale in using `en_US` format."""
+        """Get the python default locale in using `en_US` format."""
         if os.name == "nt":
             try:
                 # New in Python 3.11
@@ -1247,21 +1437,15 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
             # uses the same language names as the `nt` operating system.
             # We can only reliably resolve it to the base language code
             # known as the `family`. (`de`. `es`, `en`, `fr` ...)
-            _json_file = self.json_file
+
             try:
-                with codecs.open(
-                    _json_file, mode="r", encoding="utf-8", errors="replace"
-                ) as file_obj:
-                    data = json.load(file_obj)
-                    test_locale = locale.getlocale()[0].split("(")[0].strip()
-                    for _item in data:
-                        if test_locale.startswith(
-                            data[_item]["language"]["name_english"]
-                        ):
-                            return data[_item]["language"]["family"]
-                pass
-            except:
-                pass
+                test_locale = locale.getlocale()[0].split("(")[0].strip()
+                data = self._get_piper_dict()
+                for _item in data:
+                    if test_locale.startswith(data[_item]["language"]["name_english"]):
+                        return data[_item]["language"]["family"]
+            except Exception as e:
+                print(f"Error reading file: {e}")
         else:
             try:
                 # New in Python 3.11
@@ -1272,77 +1456,243 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
                     return locale.getlocale()[0]
                 except AttributeError:
                     pass
-        return default_locale
+        return default_locale.replace("-", "_")
 
-    def _update_model_doc(self) -> bool:
+    def _speaker_id_list(self, _json_path: str = ""):
         """
-        Updates the model file with new content from `self.j_key_list`.
-        Returns `True` if the update was successful, `False` otherwise.
+        * If the `_json_path` is not okay or there's an error, return `None`.
+        * If there's only onespeaker, return `[""]`
+        * Otherwise, return a list of `speaker_id` strngs
         """
+        if not os.path.isfile(_json_path):
+            return None
         try:
-            _new_model_content = (
-                "\n".join(map(str, self.j_key_list)).strip() if self.j_key_list else ""
-            )
-            _old_model_content = ""
-            if _new_model_content:
-                if os.path.isfile(self.model_file):
-                    try:
-                        with codecs.open(
-                            self.model_file, "r", encoding="utf-8"
-                        ) as file_read:
-                            _old_model_content = file_read.read().strip()
-                    except Exception as e:
-                        print(f"Error reading file: {e}")
-                        return False
-                if _new_model_content != _old_model_content:
-                    try:
-                        with codecs.open(
-                            self.model_file, "w", encoding="utf-8"
-                        ) as file_write:
-                            file_write.write(_new_model_content)
-                    except Exception as e:
-                        print(f"Error writing file: {e}")
-                        return False  # Failed to write new content
-            return True
+            with codecs.open(
+                _json_path, mode="r", encoding="utf-8", errors="replace"
+            ) as file_obj:
+                data = json.load(file_obj)
+            try:
+                if data["num_speakers"] == 1:
+                    return [""]
+                speaker_list = []
+                for _key in data["speaker_id_map"].keys():
+                    speaker_list.append(_key)
+            except KeyError as e:
+                print(f"`KeyError` Exception: {e}")
+                return None
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            print(f"Exception: {e}")
+            return None
+        return speaker_list
+
+    def _update_model_doc(self, _sep: str = "#") -> bool:
+        """Creates divided list for values from `self.model_file`:
+        ```
+        +-------------------------+--------------------+-------------------+
+        | Model                   | ONNX File Path     | len(speaker_list) |
+        +-------------------------+--------------------+-------------------+
+        | en_US-libritts_r-medium | /path/to/file.onnx | 903               |
+        +-------------------------+--------------------+-------------------+
+        ```
+        Each ONNX file path that doesn't link to a file is recorded as `""`.
+        The accepted `_sep` values are: `["#", ":", "\\t", ";", ",", " "]`"""
+        data = self._get_piper_dict()
+        if not data:
             return False
+        if _sep not in ["#", ":", "\t", ";", ",", " "]:
+            return False
+        _rows = ""
+        linestart = ""
+        model_flat_dir = self.model_flat_dir()
+        #         print(
+        #             """
+        # Piper Server Requirements
+        # =========================
+
+        # Versions of Piper speech synthesis that support multiple voice models on a
+        # single server let you identify a directory that contains all the voice models
+        # and configuration files in one location.
+
+        # * Check that your storage system supports file linking. This is true of
+        #   the Windows NTFS file system and most Posix desktop file systems.
+        # * The published releases of piper only work on specific platforms and
+        #   architectures.
+        # * Server availability depends on the device and the network settings. Some
+        #   networks block peer-to-peer connections as a security measure.
+        # """
+        #         )
+        #         if os.name == "nt":
+        #             print(
+        #                 f"""
+        # Windows Piper Server Example
+        # ----------------------------
+
+        # ```cmd
+        # py -m piper.http_server -m en_GB-jenny_dioco-medium --speaker 0 ^
+        #     --data-dir "{model_flat_dir}"
+        # ```
+        # """
+        #             )
+        #         else:
+        #             print(
+        #                 f"""
+        # Piper Server Example
+        # --------------------
+
+        # ```bash
+        # python3 -m piper.http_server -m en_GB-jenny_dioco-medium --speaker 0 \\
+        #     --data-dir "{model_flat_dir}"
+        # ```
+        # """
+        #             )
+        #         print("[HTTP API](https://github.com/OHF-Voice/piper1-gpl/blob/main/docs/API_HTTP.md)\n")
+        try:
+            for _item in data:
+                num_speakers = str(max(0, data[_item]["num_speakers"]) - 1)
+                file_path = os.path.join(
+                    self.piper_voice_dir,
+                    data[_item]["language"]["family"],
+                    data[_item]["language"]["code"],
+                    data[_item]["name"],
+                    data[_item]["quality"],
+                    f"""{data[_item]["key"]}.onnx""",
+                )
+                # Try to create a directory containing links
+                if not self.link_failed:
+                    if (
+                        os.path.isfile(file_path)
+                        and not netcommon.which("snap")
+                        and not netcommon.which("flatpak")
+                    ):
+                        flat_link_onnx = os.path.join(
+                            model_flat_dir, f"""{data[_item]["key"]}.onnx"""
+                        )
+                        for _extension in [".json", ""]:
+                            flat_path = f"""{flat_link_onnx}{_extension}"""
+                            if not os.path.isfile(flat_path):
+                                try:
+                                    self.link_or_copy(
+                                        f"{file_path}{_extension}", flat_path
+                                    )
+                                    print(f"New link created: ", flat_path)
+                                except Exception as e:
+                                    self.link_failed = True
+                                    print("\n\nException (creating link): ", e)
+                                    break
+
+                if all(map(os.path.isfile, [file_path, f"{file_path}.json"])):
+                    file_path = os.path.realpath(file_path)
+                    speaker_id_list = self._speaker_id_list(f"{file_path}.json")
+                    if speaker_id_list:
+                        speakers = "+".join(speaker_id_list)
+                        if "+" in speakers:
+                            file_path = f"""{file_path}?{speakers}"""
+                else:
+                    file_path = ""
+                if _rows:
+                    linestart = "\n"
+                _rows = f"""{_rows}{linestart}{data[_item]["key"]}{_sep}{file_path}{_sep}{num_speakers}"""
+        except KeyError:
+            return False
+        if not _rows:
+            return False
+        try:
+            with codecs.open(self.model_file, "w", encoding="utf-8") as file_write:
+                file_write.write(_rows)
+        except Exception as e:
+            print(f"Error writing file: {e}")
+            return False
+        return os.path.isfile(self.model_file)
+
+    def _get_piper_dict(self):  # -> (Any | None)
+        """Read the Piper `voices.json` file to get a dictionary of voice
+        models."""
+        if self.local_voices_dictionary:
+            return self.local_voices_dictionary
+        try:
+            with codecs.open(
+                self.json_file, mode="r", encoding="utf-8", errors="replace"
+            ) as file_obj:
+                data = json.load(file_obj)
+                if data:
+                    self.local_voices_dictionary = data
+                    return data
+        except Exception as e:
+            self.local_voices_dictionary = None
+            print(f"Unexpected error reading `voices.json`: {e}")
+        return None
 
     def _model_voice_info(self, _model: str = "") -> int:
         """Get current info from  the `_model.json` file such as the
         number of speakers and the sample rate.  Edit the named
         json elements for individual voices if needed"""
-        _json_file = os.path.join(f"{_model}.json")
+        model_json_file = os.path.join(f"{_model}.json")
         try:
             with codecs.open(
-                _json_file, mode="r", encoding="utf-8", errors="replace"
+                model_json_file, mode="r", encoding="utf-8", errors="replace"
             ) as file_obj:
                 data = json.load(file_obj)
-                try:
-                    self.sample_rate = data["audio"]["sample_rate"]
-                    self.noise_scale = data["inference"]["noise_scale"]
-                    self.length_scale = data["inference"]["length_scale"]
-                    self.noise_w = data["inference"]["noise_w"]
-                    self.dataset = data["dataset"]
-                    self.phoneme_type = data["phoneme_type"]
-                    for _key in data["speaker_id_map"].keys():
-                        self.speaker_id_map_keys.append(_key)
-                except KeyError:
-                    pass
-                self.voice_count = data["num_speakers"]
+            try:
+                self.num_speakers = data["num_speakers"]
+                self.sample_rate = data["audio"]["sample_rate"]
+                self.noise_scale = data["inference"]["noise_scale"]
+                self.length_scale = data["inference"]["length_scale"]
+                self.noise_w = data["inference"]["noise_w"]
+                self.dataset = data["dataset"]
+                self.phoneme_type = data["phoneme_type"]
+                for _key in data["speaker_id_map"].keys():
+                    self.speaker_id_map_keys.append(_key)
+            except KeyError:
+                pass
         except (KeyError, FileNotFoundError):
-            self.voice_count = 0
+            self.num_speakers = 0
             self.sample_rate = 22050
-        return self.voice_count
 
-    def pied_model_path(self) -> str:
-        """Return model path if using a pied speech manager is available for
-        a platform that supports pied on current flatpak or snap applications,
-        otherwise return `""`."""
-        if os.name == "posix":
-            for _path in self.pied_voice_dir_list:
-                if os.path.isdir(os.path.expanduser(_path)):
-                    return os.path.expanduser(_path)
+        return self.num_speakers
+
+    def model_flat_dir(self) -> str:
+        """
+        A flat directory contains files or links of onnx resources like
+        `onnx` files and `json` configuration files. Pied and piper-server
+        usually organize files in this way to reduce complexity and to allow
+        you to easily view all the resources in one place.
+
+        When using `posix`, return model path if using a pied speech manager
+        is available for a platform that supports pied on current flatpak or
+        snap applications.
+
+        If pied speech manager is not installed, then maintain a list of
+        links to files in a local folder if there is space and permission.
+        """
+
+        for _path in self.flat_voice_dir_list:
+            if os.path.isdir(os.path.expanduser(_path)):
+                return os.path.expanduser(_path)
+        if netcommon.which("snap"):
+            return ""
+        if netcommon.which("flatpak"):
+            return ""
+
+        _new_dir = os.path.expanduser(
+            f"~/{self.app_data}/share/piper-server/common/models"
+        )
+        if os.name == "nt":
+            _new_dir = os.path.join(
+                os.path.expanduser("~"),
+                self.app_data,
+                "piper-tts",
+                "piper-server",
+                "models",
+            )
+
+        if os.path.exists(_new_dir):
+            return _new_dir
+        try:
+            os.makedirs(_new_dir)
+        except Exception as e:
+            print("Exception (creating a model directory):", e)
+        if os.path.exists(_new_dir):
+            return _new_dir
         return ""
 
     def _check_voice_request(self, _vox_number: int = 0, _list_size: int = 0) -> str:
@@ -1363,6 +1713,10 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         or is an executable binary return `True` otherwise return `False`"""
         if len(self.espeak_ng_dir) == 0:
             return False
+        if os.name == "nt":
+            if ".local" in self.app:
+                # The version of the application cannot be verified.
+                return False
         real_app = ""
         if os.sep in self.app:
             real_app = os.path.realpath(self.app)
@@ -1410,14 +1764,14 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         _count = 1
         _extensions = ["MODEL_CARD", ".onnx.json", ".onnx"]
         s_count_total = str(len(_extensions))
-        pied_model_path = self.pied_model_path()
+        model_flat_dir = self.model_flat_dir()
         for _end in _extensions:
             pied_test = ""
             try:
                 if "." in _end:
                     piper_file = f"{lang_locale}-{name}-{quality}{_end}"
-                    if os.path.isfile(os.path.join(pied_model_path, piper_file)):
-                        pied_test = os.path.join(pied_model_path, piper_file)
+                    if os.path.isfile(os.path.join(model_flat_dir, piper_file)):
+                        pied_test = os.path.join(model_flat_dir, piper_file)
                 else:
                     piper_file = _end
                     pied_test = ""
@@ -1430,11 +1784,13 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
                     # Create a symbolic link to a file downloaded using the
                     # `pied`` piper-tts configuration program.
                     try:
-                        os.symlink(pied_test, home_file)
+                        if os.path.exists(pied_test):
+                            self.link_or_copy(pied_test, home_file)
+
                         if os.path.islink(home_file):
                             continue
-                    except:
-                        pass
+                    except Exception as e:
+                        print(f"Error linking files: {e}")
 
                 _rname = urllib.parse.quote(name)
                 _rpiper_file = urllib.parse.quote(piper_file)
@@ -1452,10 +1808,9 @@ remote_file = {remote_file}
                 if os.path.isfile(home_file):
                     continue
                 print(f"Requesting `{piper_file}`")
-                urllib.request.urlretrieve(
-                    remote_file,
-                    home_file,
-                )
+
+                if not self.download_file(remote_file, home_file):
+                    return ""
                 print(f"Retrieved `{piper_file}`")
                 if do_pop_message:
                     s_count = str(_count)
@@ -1515,7 +1870,7 @@ remote_file = {remote_file}
         )
         try:
             # If system command `killall` is available, then hide the player window UI.
-            if os.system(f"command -v killall > /dev/null") == 0:
+            if os.system("command -v killall > /dev/null") == 0:
                 _ffplay_out = f"-f s16le -ar {self.sample_rate} {_commons} -nodisp -i -"
                 _vlc_out = f"""--intf dummy --demux=rawaud --rawaud-channels 1 --rawaud-samplerate {self.sample_rate} - vlc://quit"""
         except (OSError, TypeError):
@@ -1575,55 +1930,138 @@ remote_file = {remote_file}
         return _outer
 
     def _supported_player_list(self) -> list:
-        """If the client can access a compatible posix system sound player,
-        then return the player in a list, otherwise return `[]`."""
-        _programs = []
-        for _program in [
+        """Returns a list of compatible sound players available in the system `PATH`."""
+        candidates = [
             "aplay",
             "pw-cat",
             "ffplay",
             "gst-launch-1.0",
             "paplay",
             "play",
-        ]:
-            if os.path.isfile(os.path.join("usr", "bin", _program)):
-                _programs.append(_program)
-        return _programs
+            "afplay",
+        ]
+        if os.name == "nt":
+            _extension_table = readtexttools.ExtensionTable()
+            _ffplay = _extension_table.win_search("ffmpeg", "ffplay")
+            if _ffplay:
+                self.add_app_dir_to_path(_ffplay)
+                candidates = ["ffplay.exe"]
+        return [program for program in candidates if netcommon.which(program)]
 
     def _vlc_app(self) -> list:
-        """Return a list i. e.: `[_vlc="/pathto/vlc", _force_player=True]`
-        * item 0 is host system path or `""` if it cannot be found.
-        * item 1 is whether to choose `vlc` executable over a system player
-          in all cases."""
+        """Return a list i.e.: ['/pathto/vlc', True]
+
+        item 0 is host-system path or "" if it cannot be found.
+        item 1 is whether to choose vlc executable over a system player.
+        """
+        vlc_list: List[List] = []
+        _vlc: str = ""
+        _force_player: bool = False
+        fallback_retval: List = ["", False]
+
         _extension_table = readtexttools.ExtensionTable()
+
         if os.name == "nt":
             _vlc = _extension_table.win_search("vlc", "vlc")
+            if not _vlc or not isinstance(_vlc, (bytes, str)):
+                return fallback_retval
             _force_player = len(_vlc) != 0
-            return (_vlc, _force_player)
-        _vlc = ""
-        _force_player = False
-        # A Ubuntu VLC snap is sandboxed, so this client cannot use it.
-        # Check only custom installed paths.
-        vlc_list = [
-            ["/usr/local/bin/vlc", False],
-            ["/opt/vlc/bin/vlc", False],
-        ]
-        if not os.path.isdir("/snapd"):
-            vlc_list = vlc_list + [
-                ["/Applications/VLC.app/Contents/MacOS/VLC", True],
-                ["/usr/bin/vlc", False],
+            return [_vlc, _force_player]
+
+        vlc_list.append(["/Applications/VLC.app/Contents/MacOS/VLC", True])
+
+        _ncwhich = netcommon.which("vlc")
+        if isinstance(_ncwhich, (bytes, str)):
+            vlc_list.append([_ncwhich, False])
+
+        if os.path.isdir("/snapd"):
+            vlc_list = [
+                ["/usr/local/bin/vlc", False],
+                ["/opt/vlc/bin/vlc", False],
             ]
-        for _check_vlc in vlc_list:
-            if os.path.isfile(_check_vlc[0]):
-                _vlc = _check_vlc[0]
-                _force_player = _check_vlc[1]
-                break
-        if len(_vlc) == 0:
-            if len(self._supported_player_list()) == 0:
-                if len(_extension_table.vlc) != 0:
-                    _vlc = _extension_table.vlc
-                    _force_player = True
-        return (_vlc, _force_player)
+
+        try:
+            for _check_vlc in vlc_list:
+                if len(_check_vlc) != 2:
+                    continue
+                path, force = _check_vlc
+                if not isinstance(path, (bytes, str)):
+                    continue
+                if not isinstance(force, bool):
+                    continue
+                if not path:
+                    continue
+                if os.path.isfile(path):
+                    _vlc, _force_player = path, force
+                    break
+        except (IndexError, TypeError) as e:
+            print("Exception (looking up VLC path):", e)
+            _vlc, _force_player = "", False
+
+        if not _vlc:
+            players = self._supported_player_list() or []
+            if (
+                not players
+                and isinstance(_extension_table.vlc, (bytes, str))
+                and _extension_table.vlc
+            ):
+                _vlc, _force_player = _extension_table.vlc, True
+
+        if not _vlc:
+            _net_commons = netcommon.LocalCommons()
+            _vlc_test = _net_commons.flatpak_package_play_command("org.videolan.VLC")
+            try:
+                _vlc = _vlc_test.strip()
+            except (AttributeError, TypeError) as e:
+                print("Unexpected value for flatpak package path:", e)
+                return fallback_retval
+            _force_player = False
+
+        return [_vlc, _force_player]
+
+    def add_app_dir_to_path(self, app_path: str = "") -> bool:
+        """
+        Ensure the directory of a given executable is present in PATH.
+
+        Parameters
+        ----------
+        app_path : str, optional
+            Full path to the target executable. Must include the filename,
+            e.g. 'C:\\path\\to\\app.exe' on Windows or '/usr/local/bin/app' on POSIX.
+            Empty string will immediately return False.
+
+        Returns
+        -------
+        bool
+            True if:
+                - `app_path` exists as a file, and
+                - the containing directory is now in PATH (case- and path-normalized)
+                either because it was already there or has just been added.
+
+            False otherwise.
+        """
+
+        if not app_path or not os.path.isfile(app_path):
+            return False
+
+        dir_path = os.path.dirname(os.path.abspath(app_path))
+        norm_dir = os.path.normcase(os.path.normpath(dir_path))
+
+        # Normalize all current PATH entries for comparison
+        current_dirs = [
+            os.path.normcase(os.path.normpath(p))
+            for p in os.environ.get("PATH", "").split(os.pathsep)
+        ]
+
+        if norm_dir not in current_dirs:
+            os.environ["PATH"] = dir_path + os.pathsep + os.environ["PATH"]
+
+        # Rebuild and normalize PATH after possible insertion
+        updated_dirs = [
+            os.path.normcase(os.path.normpath(p))
+            for p in os.environ.get("PATH", "").split(os.pathsep)
+        ]
+        return norm_dir in updated_dirs
 
     def read(
         self,
@@ -1648,7 +2086,7 @@ remote_file = {remote_file}
             return False
         if len(self.use_specific_onnx_path) != 0:
             _model = self.use_specific_onnx_path
-            _vox = "".join(["onnx#", str(self.use_specific_onnx_voice_no)])
+            _vox = f"onnx#{self.use_specific_onnx_voice_no}"
         else:
             _model = self.model_path("onnx")
             _vox = self.voice_name
@@ -1661,8 +2099,8 @@ remote_file = {remote_file}
             self._check_voice_request(0, self._model_voice_info(_model))
             if _vox_split in self.speaker_id_map_keys:
                 voice_no = 0
-                for _index in range(len(self.speaker_id_map_keys)):
-                    if _vox_split.lower() == self.speaker_id_map_keys[_index].lower():
+                for _index, key in enumerate(self.speaker_id_map_keys):
+                    if _vox_split.lower() == key.lower():
                         voice_no = _index
                         break
             else:
@@ -1690,7 +2128,9 @@ remote_file = {remote_file}
                 self.vlc_intfs.append(f"{_frame} {_vlc_vis}{_xtra} ")
         if _player >= len(self.vlc_intfs):
             _player = random.randint(2, len(self.vlc_intfs) - 1)
-        _vlc, _force_player = self._vlc_app()
+        _vlc_app = self._vlc_app()
+        if _vlc_app:
+            _vlc, _force_player = self._vlc_app()
         if len(_vlc) != 0 and (bool(_player) or _force_player):
             if bool(_player):
                 _ui = self.vlc_intfs[_player]
@@ -1705,7 +2145,22 @@ remote_file = {remote_file}
         _demo_warning = ""
         if os.name == "nt":
             _vlc, _force_player = self._vlc_app()
-            if len(_vlc) == 0:
+            _ffplay = None
+            if os.path.isfile(str(self.app)):
+                self.add_app_dir_to_path(self.app)
+            if _vlc:
+                self.add_app_dir_to_path(_vlc)
+                _ui = self.vlc_intfs[_player]
+                _outer = f" --output-raw < {_text_file} | {_vlc} {_ui}{_vlc_demux}"
+            else:
+                _ffplay = _extension_table.win_search("ffmpeg", "ffplay")
+
+            if _ffplay:
+                self.add_app_dir_to_path(_ffplay)
+                _commons = "-autoexit -hide_banner -loglevel info -nostats"
+                _ffplay_out = f"-f s16le -ar {self.sample_rate} {_commons} -nodisp -i -"
+                _outer = f" --output-raw < {_text_file} | {_ffplay} {_ffplay_out}"
+            elif not _vlc:
                 _demo_warning = """
         @
        / \\
@@ -1723,15 +2178,12 @@ computer can start reading quickly with large or small selections of text."""
                     self.work_file.replace(".txt", ".json")
                 )
                 _outer = f""" --output_file {_work_file} """
-            else:
-                _ui = self.vlc_intfs[_player]
-                _outer = f" --output-raw < {_text_file} | {_vlc} {_ui}{_vlc_demux}"
         if os.path.isfile(self.app_locker):
             readtexttools.unlock_my_lock(self.locker)
             if len(_vlc) != 0:
                 app_list = ["vlc", "piper", "piper-cli", "VLC"]
                 if os.name == "nt":
-                    app_list = ["VLC.EXE", "PIPER.EXE"]
+                    app_list = ["VLC.EXE", "PIPER.EXE", "FFPLAY.EXE"]
             else:
                 base_list = self._supported_player_list()
                 app_list = base_list + [
@@ -1739,10 +2191,11 @@ computer can start reading quickly with large or small selections of text."""
                     "piper-cli",
                 ]
                 if os.name == "nt":
-                    app_list = ["SOX.EXE", "PIPER.EXE"]
+                    app_list = ["SOX.EXE", "PIPER.EXE", "FFPLAY.EXE"]
             print(f"[ > ] {self.help_heading} stopping...")
             for _app in app_list:
-                readtexttools.killall_process(_app)
+                if netcommon.which(_app) or os.name == "nt":
+                    readtexttools.killall_process(_app)
             return True
         else:
             readtexttools.lock_my_lock(self.locker)
@@ -1768,10 +2221,10 @@ reinstall an up-to-date binary version of Piper.
         speaker_switch = ""
         if os.path.isfile(self.work_file):
             os.remove(self.work_file)
-        if voice_no > self.voice_count - 1:
+        if voice_no > self.num_speakers - 1:
             voice_no = 0
         if voice_no != 0:
-            speaker_switch = "".join([" --speaker ", str(voice_no).strip()])
+            speaker_switch = f" --speaker {voice_no}"
         if os.path.isfile(_model):
             _json_c = f"{_model}.json"
             if os.path.isfile(_config):
@@ -1822,25 +2275,30 @@ reinstall an up-to-date binary version of Piper.
                 )
             _name_key = "None"
             _variant = str(voice_no)
-            if self.debug == 0:
+            if self.debug in [0]:
                 _name_key = self.dataset
                 try:
                     if len(self.speaker_id_map_keys) != 0:
                         _name_key = self.speaker_id_map_keys[voice_no]
-                except IndexError:
-                    pass
+                except Exception as e:
+                    print("Exception:  ", e)
+                    if os.name == "nt":
+                        readtexttools.pop_win_msg_box(
+                            "The `Piper_TTS` client failed to connect.", "Python error"
+                        )
+
                 print(
                     f"""
 Piper TTS
 =========
 
+* Default Model :  `{_vox}`
 * Language:  `{self.concise_lang}`
+* Local Language:  `{_iso_lang}`
 * Model:  `{_onnx}`
-* Requested Language:  `{_iso_lang}`
-* Requested Model:  `{_vox}`
-* Speaker #: `{_variant}`
+* Speaker Count:  `{self.num_speakers}`
+* Speaker Index: `{_variant}`
 * Speaker Name: `{_name_key}`
-* Speaker Count:  `{self.voice_count}`
 * Speech Rate:  `{_speech_rate}`
 {_esp_warning}
 [About Piper TTS]({self.help_url})
@@ -1855,45 +2313,45 @@ Piper TTS
                 print(self.j_key_list)
                 print(_command)
 
-            self._update_model_doc()
             if os.name in ["posix"]:
                 _response = os.system(_command)
             elif os.name in ["nt"]:
-                if len(_vlc) != 0:
+                _response = 1
+                if _vlc and self.debug in [0]:
                     _response = os.system(_command)
                 else:
-                    _json_tools = readtexttools.JsonTools()
-                    _content = _meta.meta_from_file(
-                        _text_file, True, "backslashreplace"
-                    )
-                    _content = _json_tools.sanitize_json(_content)
-                    _lcc = "{"
-                    _rcc = "}"
-                    readtexttools.write_plain_text_file(
-                        _text_file, f""" {_lcc} "text": "{_content}" {_rcc} """, "utf-8"
-                    )
+                    _ffplay = _extension_table.win_search("ffmpeg", "ffplay")
+                    if _ffplay:
+                        _response = os.system(_command)
+                    else:
+                        print(
+                            r"""
+Requires: `VLC.EXE` or `FFPLAY.EXE` in `$PATH`
+==============================================
 
-                    _response = readtexttools.run_powershell(_command.replace('"', "'"))
-                    # Closing the PowerShell window stops the speech. The program
-                    # waits for a response to keep the window from closing before
-                    # the speech output ends.
-                    print(_response)
-                    if os.path.isfile(self.work_file):
-                        print(VLC_WINDOWS_INFO)
-                        if os.path.getsize(os.path.realpath(self.work_file)) == 0:
-                            return False
-                        readtexttools.process_wav_media(
-                            "untitled",
-                            self.work_file,
-                            "",
-                            "",
-                            "true",
-                            "false",
-                            "",
-                            "600x600",
+If you want to use Piper on Windows, the author recommends that if you cannot
+stream using a helper program like vlc or ffplay, you should use a piper
+server.
+                              
+Windows supports piper-server using python pip or a container package like
+Podman or Docker.
+
+<https://raw.githubusercontent.com/OHF-Voice/piper1-gpl/refs/heads/main/docs/CLI.md>\
+Accessed: 2025.08.17
+
+```cmd
+py -c "import os; os.makedirs(os.path.expanduser('~/AppData/Roaming/piper-tts/piper-server/models'), exist_ok=True)"
+cd %USERPROFILE%\AppData\Roaming\piper-tts\piper-server\models
+py -m pip install piper-tts[http]
+py -m piper.download_voices en_GB-jenny_dioco-medium
+```
+"""
                         )
-            else:
-                _response = 1
+                        readtexttools.pop_win_msg_box(
+                            "Requires: `VLC.EXE` or `FFPLAY.EXE` in `PATH`",
+                            "The `Piper_TTS` client failed to connect.",
+                        )
+
             readtexttools.unlock_my_lock(self.locker)
             return _response == 0
         return False
@@ -1927,7 +2385,7 @@ Piper TTS
         except OSError as e:
             print(f"OSError downloading `{self.json_url}`: {e}")
         piper_file = ""
-        if len(_content) != 0:
+        if _content:
             data = json.loads(data_response)
             if not self.pretty_json_write(data, self.json_file, self.concise_lang):
                 return False
@@ -2262,7 +2720,7 @@ Links
         reflects the current status of the current voice model repository,
         whereas the pied program reflects the status at the time of the
         application's most recent update."""
-        if len(self.pied_model_path()) == 0:
+        if not self.model_flat_dir():
             return False
         if os.path.isdir(self.piper_voice_dir):
             return any(
@@ -2275,7 +2733,7 @@ Links
         """Given an iso language description, check for a suitable onnx
         file in a local pied resource directory. Return a usable
         file path if it checks out as valid or `""` if it does not."""
-        if len(self.pied_model_path()) == 0:
+        if len(self.model_flat_dir()) == 0:
             return ""
         if len(_lang) < 2:
             return ""
@@ -2286,11 +2744,11 @@ Links
             ["uk_UK", "uk_UA"],
         ]:
             _iso_lang = _iso_lang.replace(_pair[0], _pair[1])
-        pied_model_path = self.pied_model_path()
+        model_flat_dir = self.model_flat_dir()
         for _test in [_iso_lang, _iso_lang.split("_")[0]]:
-            for file_name in os.listdir(pied_model_path):
+            for file_name in os.listdir(model_flat_dir):
                 if file_name.startswith(_test) and file_name.endswith(".onnx"):
-                    _found_file = os.path.join(pied_model_path, file_name)
+                    _found_file = os.path.join(model_flat_dir, file_name)
                     if os.path.isfile(_found_file):
                         if not os.path.islink(_found_file):
                             if self.onnx_file_data_from_voices_json(
@@ -2300,7 +2758,7 @@ Links
         return ""
 
     def do_update(self) -> bool:
-        """"""
+        """Download a compatible voice model"""
         _backup = f"{self.json_file}.bak"
         _update_msg = self.sample_webpage
         if os.name == "nt":
@@ -2335,7 +2793,7 @@ Links
             self.json_url_wyoming,
         ]:
             try:
-                response = urllib.request.urlopen(json_url)
+                urllib.request.urlopen(json_url)
                 if os.path.isfile(self.json_file):
                     if os.path.isfile(_backup):
                         os.remove(_backup)
@@ -2356,8 +2814,8 @@ Links
     <{json_url}>"""
                 )
                 return False
-            except Exception:
-                print(f"Error resolving `{json_url}`")
+            except Exception as e:
+                print(f"Error resolving `{json_url}`: {e}")
                 return False
         if os.path.isfile(_backup):
             if not os.path.isfile(self.json_file):
@@ -2411,8 +2869,6 @@ Links
             if os.path.isfile(os.path.join(_a_dir, "voices.json")):
                 _use_dir = _a_dir
                 break
-        if not os.path.isfile(self.model_file):
-            self._update_model_doc()
         if self.link_home_dir_list(all_dir_list, _iso_lang):
             print(
                 """The Piper TTS client linked to newly installed Piper
@@ -2429,7 +2885,7 @@ Links
         if not self.language_supported(_iso_lang, _voice):
             if not self.update_request:
                 if os.path.isfile(self.app_locker):
-                    os.path.remove(self.app_locker)
+                    os.remove(self.app_locker)
                 elif not self.is_macos():
                     readtexttools.pop_message(
                         f"{self.help_heading} ({_iso_lang})",
@@ -2447,14 +2903,30 @@ Links
         if sys.argv[-1] == sys.argv[0]:
             self.usage()
             return False
-        find_replace_phonemes.fix_up_text_file(
-            _text_file_in,
-            "",
-            _iso_lang,
-            self.local_dir,
-            "PIPER_USER_DIRECTORY",
-            False,
-        )
+
+        # If the user has not manually edited the lexicon for their language
+        # and region, don't alter any pronunciation. Piper voices can include
+        # a wide variety of voice models including user generated models.
+        # Since voice models with the same and region can use completely
+        # novel rules and training data, it's impossible to generalize what
+        # speech needs modification.
+        if os.path.isfile(
+            os.path.join(
+                readtexttools.office_user_dir(),
+                "config",
+                "lexicons",
+                "default",
+                f"{_iso_lang}_lexicon.json",
+            )
+        ):
+            find_replace_phonemes.fix_up_text_file(
+                _text_file_in,
+                "",
+                _iso_lang,
+                self.local_dir,
+                "PIPER_USER_DIRECTORY",
+                False,
+            )
         self.read(
             _text_file_in,
             _iso_lang,
@@ -2535,6 +3007,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
 
 # NOTE: This python code is a client of Piper. Piper supports many voice
 # models from different sources. The quality and quantity of voice samples

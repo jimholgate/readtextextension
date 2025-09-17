@@ -629,7 +629,7 @@
 &apos;&apos; 
 &apos;&apos; ### Copyright And License
 &apos;&apos; 
-&apos;&apos; \(c\) 2008-2023 James Holgate Vancouver, CANADA (readtextextension (a)
+&apos;&apos; \(c\) 2008-2025 James Holgate Vancouver, CANADA (readtextextension (a)
 &apos;&apos; outlook.com)
 &apos;&apos; 
 &apos;&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER
@@ -768,6 +768,16 @@ Function Min(a As Integer, b As Integer) As Integer
 		Min = a
 	Else
 		Min = b
+	End If
+End Function
+
+
+Function Max(a As Integer, b As Integer) As Integer
+	&apos; A Visual Basic Method **EB 2025-05-27**
+	If a &gt; b Then
+		Max = a
+	Else
+		Max = b
 	End If
 End Function
 
@@ -933,15 +943,15 @@ End Function
 Function fbLocalHostOk(ByVal _url As String, ByVal _key As String) As Boolean
 	&apos; Check if a web api resource that returns text is available.
 	&apos; Note: fsGetWebService could freeze if you &quot;Pause&quot; a docker
-	&apos; image instead of &quot;Stopping&quot; it becaue it will wait for a reply
+	&apos; image instead of &quot;Stopping&quot; it because it will wait for a reply
 	&apos; from the local server.
 	fbLocalHostOk = False
 	On Error Goto fbLocalHostOkErr
-	Dim test_str$ : test_str = &quot;&quot;
-	Dim alt_key$ : alt_key = _key
+	Dim test_str As String : test_str = &quot;&quot;
+	Dim alt_key As String : alt_key = _key
 	If Len(_url) = 0 Then
-		&apos; rhasspy/mimic3 speech server
-		_url = &quot;http://0.0.0.0:59125/api/voices&quot;
+		&apos; OHF-voice piper speech server
+		_url = &quot;http://127.0.0.1:5000/voices&quot;
 	End If
 	test_str = fsGetWebService(_url)
 	If Len(_key) = 0 Then
@@ -1251,10 +1261,13 @@ End Function
 
 Function fbUsingPosixTalkProgram(ByVal s1) As Boolean
 	fbUsingPosixTalkProgram = False
-	Dim i#
-	i = 0
-	Dim a1
-	a1 = Array( _
+	Dim i As Integer : i = 0
+	Dim _item As String : _item = &quot;&quot;
+	If s1 = &quot;&quot; Then
+		s1 = fsProgramCommand()
+	End If
+	If s1 = &quot;&quot; Then Exit Function
+	For Each _item in Array( _
 	&quot;espeak&quot;, _
 	&quot;espeak-ng&quot;, _
 	&quot;festival&quot;, _
@@ -1262,12 +1275,7 @@ Function fbUsingPosixTalkProgram(ByVal s1) As Boolean
 	&quot;say&quot;, _
 	&quot;speak-ng&quot;, _
 	&quot;aplay&quot;)
-	If s1 = &quot;&quot; Then
-		s1 = fsProgramCommand()
-	End If
-	If s1 = &quot;&quot; Then Exit Function
-	For i = LBound(a1) To UBound(a1)
-		If Right(s1, Len(a1(i))) = a1(i) Then
+		If Right(s1, Len(_item)) = _item Then
 			fbUsingPosixTalkProgram = True
 			Exit For
 		End If
@@ -1468,12 +1476,19 @@ Function fsGetTextSelection( _
 	&apos; it reads.  In Impress, it will read the note or the text of the
 	&apos; screen if no text is selected.
 	&apos;
+	On Error GoTo fsGetTextSelectionErr
 	If fbUsingTouchScreen() Or _
 		ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) Then
 		fsGetTextSelection = fsGetSmartTextSelection(bHideMDCode, bgoRight)
 	Else
 		fsGetTextSelection = fsGetOnlySelectedText()
 	End If
+	Exit Function
+	fsGetTextSelectionErr:
+	On Error GoTo fsGetTextSelectionErr2
+	fsGetTextSelection = fsGetOnlySelectedText()
+	fsGetTextSelectionErr2:
+	fsGetTextSelection = &quot;&quot;
 End Function
 
 
@@ -1570,7 +1585,7 @@ Function fsGetSmartTextSelection( _
 	Else &apos; unsupported document format
 		sSelectedText = &quot;&quot;
 	End If
-	If fbCreatingMediaFile(&quot;.aif,.aiff,.ogg,.m4a,.mp3&quot;) Then
+	If fbCreatingMediaFile(&quot;.aif,.aiff,.ogg,.m4a,.mp3&quot;, &quot;&quot;) Then
 		&apos; Gapless music players make sentences run into each other.
 		&apos; Insert a brief pause at the end of the recording.
 		sSelectedText = Trim(sSelectedText)
@@ -1735,7 +1750,7 @@ Function fbOfficeSupports( _
 	b1 = False
 	Dim vManager
 	Dim a1
-	Dim i#
+	Dim i As Integer
 	vManager = GetProcessServiceManager()
 	a1 = vManager.getAvailableServiceNames()
 	For i = LBound(a1) To UBound(a1)
@@ -1770,14 +1785,11 @@ Function fsGetClipBoard( _
 	Dim oTypes As Variant
 	Dim oClipContents As Variant
 	Dim oConverter As Variant
-	Dim convertedString$
-	convertedString = &quot;&quot;
-	Dim i%
-	i = 0
+	Dim convertedString As String : convertedString = &quot;&quot;
+	Dim i% : i = 0
 	Dim iPlainLoc%
 	iPlainLoc =  - 1
-	Dim s$
-	s$ = &quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;
+	Dim s As String : s = &quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;
 	On Error Goto fsGetClipBoardErr
 	oClip = createUnoService(s$)
 	oConverter = createUnoService(&quot;com.sun.star.script.Converter&quot;)
@@ -1820,7 +1832,7 @@ Function WinSpeechProgramPath() As String
 	WinSpeechProgramPath = &quot;&quot;
 	Dim sub_path As Variant : sub_path = faWindowsTestArray()
 	Dim _app As Variant : _app = Array(&quot;\wscript.exe&quot;, &quot;\cscript.exe&quot;)
-	Dim s2$ : s2 = fsHomeDrive()
+	Dim s2 As String : s2 = fsHomeDrive()
 	Dim x As Integer
 	Dim y As Integer
 	For y = Lbound(_app) to Ubound(_app)
@@ -2497,7 +2509,7 @@ End Sub
 
 
 Function fiCountFestivalVoices() As Integer
-	Dim n# : n = 0
+	Dim n As Integer : n = 0
 	fiCountFestivalVoices = 0
 	For n = 0 To fiCountFestivalDirectory()
 		If FileExists(fsFestivalDirectory(n)) Then
@@ -2510,7 +2522,7 @@ End Function
 Sub CheckComboBox4UrlList(oDialog)
 	&apos; ComboBox4 should include a localhost address if a localhost
 	&apos; speech service in a web browser is enabled.
-	Dim sLocalHostSpeech$ : sLocalHostSpeech = fsLocalHostSpeech()
+	Dim sLocalHostSpeech As String : sLocalHostSpeech = fsLocalHostSpeech()
 	Dim oComboBox As Variant : oComboBox = oDialog.getControl(&quot;ComboBox4&quot;)
 	With oComboBox
 		If Len(sLocalHostSpeech) &lt;&gt; 0 Then
@@ -2535,10 +2547,13 @@ End Sub
 
 
 Function LocalLinuxPaths() As Variant
-	Dim all_paths As String
+	Dim all_paths As Variant
 	Dim _home As String : _home = Environ(&quot;HOME&quot;)
-	all_paths = (Environ(&quot;PATH&quot;) &amp; &quot;:&quot; &amp; _home &amp; &quot;/.local/bin&quot; &amp;_
-	 &quot;:&quot; &amp; _home &amp; &quot;/.local/share/piper-tts/piper&quot;)
+	all_paths = Environ(&quot;PATH&quot;) &amp; _
+	 &quot;:&quot; &amp; _home &amp; &quot;/.local/bin&quot; &amp; _
+	 &quot;:&quot; &amp; _home &amp; &quot;/.local/share/piper-tts/piper&quot; &amp; _
+	 &quot;:&quot; &amp; _home &amp; &quot;/.local/share/openoffice4/program&quot; &amp; _
+	 &quot;:&quot; &amp; _home &amp; &quot;/.local/share/libreoffice/program&quot;
 	LocalLinuxPaths = Split(all_paths, &quot;:&quot;)
 End Function
 
@@ -2561,49 +2576,450 @@ End Function
 
 
 Function fsPiperPath()
+
 	fsPiperPath = &quot;&quot;
 	Dim paths As Variant
 	Dim _apps As Variant
+	Dim os_sep As String : os_sep = &quot;/&quot;
 	Dim _path As String
 	Dim _item As String
 	Dim _app As String
 	Dim sf as Object
 	Dim _home As String : _home = Environ(&quot;HOME&quot;)
 	Dim alt_paths As Variant : alt_paths = Array(_
-		&quot;/snap/pied/common/piper/piper&quot;, _
-		&quot;/.var/app/com.mikeasoft.pied/data/pied/piper/piper&quot;, _
-		&quot;/.local/share/pied/piper/piper&quot;, _
+		&quot;/snap/pied/common/piper&quot;, _
+		&quot;/.var/app/com.mikeasoft.pied/data/pied/piper&quot;, _
+		&quot;/.local/share/pied/piper&quot;, _
+		&quot;/.local/share/bin&quot;, _
 	)
-	_apps = Array(&quot;/piper-cli&quot;, &quot;/piper&quot;)
+	_apps = Array(&quot;piper-cli&quot;, &quot;piper&quot;, &quot;piper.exe&quot;)
 	On Local Error GoTo fsPiperPathErr
 	sf = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
 	Select Case getGUIType()
 		Case 1
-		_path = fsFindAppPath(&quot;piper-tts/piper/piper.exe&quot;)
-		If Len(_path) &lt;&gt; 0 Then
-			fsPiperPath = _path
-			Exit Function
-		End If
+		os_sep = &quot;\&quot;
+		For each _item in Array(_
+		&quot;piper.exe&quot;, &quot;piper-tts/piper/piper.exe&quot;)
+			_path = fsFindAppPath(_item)
+			If Len(_path) &lt;&gt; 0 Then
+				fsPiperPath = ConvertFromUrl(_path)
+				Exit Function
+			End If
+		Next
+		_home = Environ(&quot;USERPROFILE&quot;)
+		paths = Array(&quot;C:&quot;, &quot;C:\opt&quot;)
+		alt_paths = Array(_
+			&quot;.local\bin&quot;, _
+			)
+
+		Case Else
+		paths = LocalLinuxPaths()
 	End Select
-	paths = LocalLinuxPaths()
 	For Each _app in _apps
 		For Each _path in paths
-			_item = _path &amp; _app
+			_item = _path &amp; os_sep &amp; _app
 			If sf.exists(_item) Then
 				fsPiperPath = _item
 				Exit Function
 			End If
 		Next
 	Next
-	For Each _path in alt_paths
-		If sf.exists(_home &amp; _path) Then
-			fsPiperPath = _home &amp; _path
-			Exit Function
-		End If
+	For Each _app in _apps
+		For Each _path in alt_paths
+			_item = _home &amp; os_sep &amp; _path &amp; os_sep &amp; _app
+			If sf.exists(_item) Then
+				fsPiperPath = _item
+				Exit Function
+			End If
+		Next
 	Next
 Exit Function
 fsPiperPathErr:
+fsPiperPath = &quot;&quot;
 End Function
+
+&apos;-----------------------------------------------------------------------------
+&apos; A Generic Setup for Linux Python Dialog1 ComboBox2 includes items that might
+&apos; be supported on a Distribution that uses a user interface that supports
+&apos; Freedesktop standard tools and file locations.
+&apos; 
+&apos; The Generic setup omits custom models and voices for text-to-speech
+&apos;-----------------------------------------------------------------------------
+
+Type DecisionCriteria
+	&apos; Use a type to simplify choosing which items to show
+	&apos; in dialog1 combobox2
+	Apropos As String
+	AudioOut As String
+	Criteria As Boolean
+	PlatformList As Variant
+	RequireOnnxArch As Boolean
+	RequireFString As Boolean
+	SearchTerm As String
+End Type
+
+
+Function IsOnnxArch() As Boolean
+	&apos; Returns True if the current CPU architecture is AMD64/x86_64
+	&apos; or another published ONNX-compatible architecture.
+	&apos; Uses getGUIType() to branch between Windows (1) and POSIX (4).
+
+	Dim arch As String, archWow As String, WinProbe As String, posixProbe As String
+	Dim PublishedList As Variant
+	IsOnnxArch = False
+	Select Case getGUIType()
+		Case 1  &apos; Windows (NT)
+			&apos; Windows official identifiers for 64-bit architectures
+			Dim WinList As Variant : WinList = Array(&quot;amd64&quot;, &quot;arm64&quot;)
+			arch = Environ(&quot;PROCESSOR_ARCHITECTURE&quot;)
+			archWow = Environ(&quot;PROCESSOR_ARCHITEW6432&quot;)  &apos; set for WOW64 on 64-bit Windows
+
+			For Each winProbe In WinList
+				If Len(str(s_CaReadTextExtensionArchProbe)) &gt; 0 Then
+					If LCase(winProbe) = s_CaReadTextExtensionArchProbe Then
+						IsOnnxArch = True
+						Exit Function
+					End If
+				ElseIf (LCase(arch) = LCase(winProbe)) Or (LCase(archWow) = LCase(archProbe)) Then
+					s_CaReadTextExtensionArchProbe = LCase(winProbe)
+					IsOnnxArch = True
+					Exit Function
+				End If
+			Next
+
+		Case 4  &apos; POSIX (Linux, macOS, BSD)
+			&apos; POSIX-family identifiers (uname -m), plus common aliases	
+			PublishedList = Array(&quot;x86_64&quot;, &quot;x64&quot;, &quot;aarch64&quot;, &quot;arm64&quot;, &quot;armv7l&quot;, &quot;amd64&quot;)
+			For Each posixProbe In PublishedList
+				If Len(str(s_CaReadTextExtensionArchProbe)) &gt; 0 Then
+					If LCase(posixProbe) = s_CaReadTextExtensionArchProbe Then
+						IsOnnxArch = True
+						Exit Function
+					End If
+				End If
+			Next
+			&apos; Use uname -m; accept partial matches (e.g., x86_64-v3)
+			arch = LCase(Trim(ShellAndGetOutput(&quot;uname -m&quot;, &quot;arch_detect.tmp&quot;)))
+			For Each posixProbe In PublishedList
+				If InStr(arch, LCase(CStr(posixProbe))) &gt; 0 Then
+					s_CaReadTextExtensionArchProbe = LCase(posixProbe)
+					IsOnnxArch = True
+					Exit Function
+				End If
+			Next
+	End Select
+	If Len(str(s_CaReadTextExtensionArchProbe)) &gt; 0 Then
+		s_CaReadTextExtensionArchProbe = &quot; &quot;
+	End If
+End Function
+
+
+Function ShellAndGetOutput(cmd As String, tmpFileName As String) As String
+	&apos; Helper: run a shell command and return its stdout as a string
+	Dim tmpFile As String, i As Integer, s As String
+	tmpFile = ConvertFromUrl(fsMyTempLock(tmpFileName))
+	On Local Error GoTo ShellAndGetOutputErr
+	If getGUIType() = 1 Then
+		&apos; windows
+		Shell(&quot;cmd /c &quot; &amp; cmd &amp; &quot; &gt; &quot;&quot;&quot; &amp; tmpFile &amp; &quot;&quot;&quot;&quot;, 0, True)
+	Else
+		&apos; posix
+		Shell(&quot;sh -c &quot;&quot;&quot; &amp; cmd &amp; &quot; &gt; &quot; &amp; tmpFile &amp; &quot;&quot;&quot;&quot;, 0, True)
+	End If
+	&apos; Small delay for FS sync on some environments
+	Wait 200
+	ShellAndGetOutput = fsSuperTrim(getTextFromFile(tmpfile, &quot;UTF-8&quot;, 0), &quot;&quot;)
+	fbRemoveFile(tmpFile)
+	Exit Function
+	ShellAndGetOutputErr:
+	fbRemoveFile(tmpFile)
+	ShellAndGetOutput = &quot;&quot;
+End Function
+
+
+Function CheckPlatform(ThePlatforms) As Boolean
+&apos;   Returns True if the current OS/platform (from fsTheOsId)
+&apos;   matches any of the platform identifiers in ThePlatforms array.
+&apos;   Used to determine whether a given TTS backend is supported
+&apos;   on the running system.
+	Dim Item As String : Item = &quot;&quot;
+	CheckPlatform = False
+	Dim sTheOsId As String : sTheOsId = fsTheOsId()
+	For Each Item in ThePlatforms
+		If sTheOsId = Item Then
+			CheckPlatform = True
+			Exit Function
+		End If
+	Next
+End Function
+
+
+Function GetFoundListMediaLines(ByVal Line As String, Optional byVal Exts As String) As String
+&apos;	GetFoundListMediaLines
+&apos;	Given a `Line` of code ending in `&quot;(TMP)&quot;`, return a series of code lines
+&apos;	with an audio outputs path using extebsions identifed by `Exts`,  which is
+&apos;	a period separated list of extensions to include.
+&apos;
+&apos;	Arguments
+&apos;		Line *string* - A string for a Dialog1 ComboBox. e.g.: `(FESTIVAL_READ_TEXT_PY)&quot; &quot;(TMP)&quot;`
+&apos;		Exts *string* - A string with `.` to divide output formats. e.g.: `wav.webm.oga.mp3`
+&apos;	Returns
+&apos;		GetFoundListMediaLines *string* A series of lines of text separated by `Chr(10)`
+	GetFoundListMediaLines = &quot;&quot;
+	If Len(Exts) = 0 Then
+		Exit Function
+	End If
+	If Instr(Exts, &quot;.&quot; = 0) Then
+		Exit Function
+	End If
+	Dim AudioTypes As Variant
+	Dim AudioType As String : AudioType = &quot;&quot;
+	Dim FoundItems As String : FoundItems = &quot;&quot;
+	Dim Sep As String : Sep = Chr(10)
+	Dim OsSep As String : OsSep = &quot;/&quot;
+	If getGUIType() = 1 Then
+		OsSep = &quot;\&quot;
+	End If
+	Dim MediaLine As String : MediaLine = &quot;&quot;
+	
+	Select Case fsTheOsId()
+		Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;
+		AudioTypes = Split(fsSupertrim(Exts, &quot;.&quot;), &quot;.&quot;)
+		For Each AudioType In AudioTypes
+			If Len(AudioType) &gt; 0 Then
+				MediaLine = &quot; --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)&quot; &amp; osSep &amp; &quot;(NOW).&quot; &amp; AudioType &amp; &quot;&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+				FoundItems = FoundItems &amp; Sep &amp; fsReplaceText(Line, &quot; &quot;&quot;(TMP)&quot;&quot;&quot;, MediaLine)
+			End If
+		Next
+		
+	End Select
+	GetFoundListMediaLines = Founditems
+	Exit Function
+	GetFoundListMediaLinesErr:
+	GetFoundListMediaLines = &quot;&quot;
+End Function
+
+
+Function GenericPythonDialog1ComboBoxList() As Variant
+&apos;	GenericPythonDialog1ComboBoxList
+&apos;	NOTE: This array uses a format that could be generated from a plain utf-8
+&apos;	text file to customize the menu for different platforms and releases.
+&apos;		returns GenericPythonDialog1ComboBoxList *variant* - unfiltered array of python command lines.
+	 GenericPythonDialog1ComboBoxList = Array( _
+		&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;MALE3&quot;&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;MALE2&quot;&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;MALE1&quot;&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;FEMALE3&quot;&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;FEMALE2&quot;&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;FEMALE1&quot;&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 100% &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 75% &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 100% &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 75% &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; --language ja-JP &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --voice &quot;&quot;AUTO0&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 75% &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --voice &quot;&quot;AUTO0&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(FESTIVAL_READ_TEXT_PY)&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 150% &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 125% &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 100% &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(ESPEAK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 75% &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --size 12 --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --size 9 --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		&quot;&quot;&quot;(CREATE_QR_LABEL_PY)&quot;&quot; --size 6 --output &quot;&quot;(HOME)(SELECTION_LANGUAGE_CODE)/(NOW).png&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;, _
+		)
+End Function
+
+
+Function StandardPythonDialog1Options(Optional ByVal Out As String) As Variant
+	&apos;   Builds and returns an array of tested legacy Python TTS
+	&apos;   command‑line options for Dialog1 ComboBox2.
+	&apos;   The function:
+	&apos;	 1. Defines possible legacy Python TTS command strings.
+	&apos;	 2. Creates Decision Criteria records for each backend
+	&apos;		(e.g., SPD, Pico, OpenJTalk, Festival, eSpeak).
+	&apos;	 3. Filters the list based on:
+	&apos;		  - Whether the backend is available (Test = True)
+	&apos;		  - Whether the current platform is supported
+	&apos;	 4. Returns only the matching commands as an array.
+	&apos;   If an error occurs, returns the full unfiltered list.
+	On Local Error GoTo StandardPythonDialog1OptionsErr
+	If IsMissing(Out) Then
+		&apos; Do not show any output options.
+		Out = &quot;&quot;
+	End If
+
+	Dim Python2Options As Variant : Python2Options = GenericPythonDialog1ComboBoxList()
+	Dim FoundList As String : FoundList = &quot;&quot;
+	Dim Sep As String : Sep = Chr(10)
+	Dim Line As String : Line = &quot;&quot;
+	Dim bSupportOnnx As Boolean : bSupportOnnx = IsOnnxArch()
+	Dim bPySupportFStrings As Boolean : bPySupportFStrings = fbPySupportFStrings()
+	Dim bSpdSayOk As Boolean : bSpdSayOk = fbSpdSayOk()
+	Dim Model
+	
+	Dim SpdSay As DecisionCriteria
+	With SpdSay
+		.Apropos = &quot;Send text-to-speech output request to speech-dispatcher.&quot;
+		.AudioOut = &quot;&quot;
+		.Criteria = bSpdSayOk Or bPySupportFStrings
+		If bSpdSayOk Then
+			.PlatformList = Array(&quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;WINDOWS.WINE&quot;)
+		Else
+			.PlatformList = Array(&quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;)
+		End If
+		.RequireOnnxArch = False
+		.RequireFString = False
+		.SearchTerm = &quot;(SPD_READ_TEXT_PY)&quot;
+	End With
+
+	Dim SvoxPico As DecisionCriteria
+	With SvoxPico
+		.Apropos = &quot;pico2wave: Small Footprint TTS&quot;
+		.AudioOut = &quot;.wav&quot;
+		.Criteria = fbPosixProgramOK(&quot;pico2wave&quot;, &quot; --usage &gt; /dev/null&quot;)
+		.PlatformList = Array(&quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.EXPERIMENTAL&quot;)
+		.RequireOnnxArch = False
+		.RequireFString = False
+		.SearchTerm = &quot;(PICO_READ_TEXT_PY)&quot;
+	End With
+	
+	Dim PiedPiper As DecisionCriteria
+	With PiedPiper
+		.Apropos = &quot;piper-tts: Use piper or piper-cli to read text aloud using contributor supplied ONNX voice models.&quot;
+		.AudioOut = &quot;&quot;
+		.Criteria = Len(fsLocalHostSpeech()) &gt; 0
+		.PlatformList = Array(&quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;)
+		.RequireOnnxArch = True
+		.RequireFString = True
+		.SearchTerm = &quot;(PIPER_READ_TEXT_PY)&quot;
+	End With
+
+	Dim OpenJTalk As DecisionCriteria
+	With OpenJTalk
+		.Apropos = &quot;open_jtalk: The Open JTalk is a Japanese TTS System.&quot;
+		.AudioOut = &quot;.wav&quot;
+		.Criteria = fbDisplayOpenJapanese()
+		.PlatformList = Array(&quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.EXPERIMENTAL&quot;)
+		.RequireOnnxArch = False
+		.RequireFString = False
+		.SearchTerm = &quot;(OPENJTALK_READ_TEXT_PY)&quot;
+	End With
+
+	Dim HomeNetworkStream As DecisionCriteria
+	With HomeNetworkStream
+		.Apropos = &quot;Home network: Use a speech server via a python pip library or a container like Podman or Docker.&quot;
+		.AudioOut = &quot;&quot;
+		.Criteria = Len(fsLocalHostSpeech()) &lt;&gt; 0 
+		.PlatformList = Array(&quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.FLATPAK&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;)
+		.RequireOnnxArch = False
+		.RequireFString = True
+		.SearchTerm = &quot;(NETWORK_READ_TEXT_PY)&quot;
+	End With
+
+	Dim FestivalFlite As DecisionCriteria
+	With FestivalFlite
+		.Apropos = &quot;flite: A small simple speech synthesizer. text2wav: a wrapper for festival TTS.&quot;
+		.AudioOut = &quot;.wav&quot;
+		.Criteria = fbPosixProgramOK(&quot;flite&quot;, &quot;-? &gt; /dev/null&quot;) Or _
+				Len(fsFindAppPath(&quot;text2wave&quot;)) &lt;&gt; 0 Or _
+				FileExists(fsProgramDirectoryx86() &amp; &quot;festival\text2wave.exe&quot;) Or _
+				FileExists(fsProgramDirectory() &amp; &quot;festivFalseal\text2wave.exe&quot;)
+		.PlatformList = Array(&quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;WINDOWS&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;)
+		.RequireOnnxArch = False
+		.RequireFString = False
+		.SearchTerm = &quot;(FESTIVAL_READ_TEXT_PY)&quot;
+	End With
+
+	Dim EspeakNg As DecisionCriteria
+	With EspeakNg
+		.Apropos = &quot;espeak=ng: A multi-lingual software speech synthesizer.&quot;
+		Select Case fsTheOsId()
+			Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;
+				.AudioOut = &quot;.wav&quot;
+			Case Else
+				.AudioOut = &quot;&quot;
+		End Select
+		.Criteria = fbHaveEspeak()
+		.PlatformList = Array(&quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;WINDOWS&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;)
+		.RequireOnnxArch = False
+		.RequireFString = False
+		.SearchTerm = &quot;(ESPEAK_READ_TEXT_PY)&quot;
+	End With
+	
+
+	Dim QrCode As DecisionCriteria
+	With QrCode
+		.Apropos = &quot;qrcode: Create a QRCode offline using the python3-pil and python3-qrcode libraries.&quot;
+		.AudioOut = &quot;&quot;
+		.Criteria = fbHavePyQrCode()
+		.PlatformList = Array(&quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;)
+		.RequireOnnxArch = False
+		.RequireFString = True
+		.SearchTerm = &quot;(CREATE_QR_LABEL_PY)&quot;
+	End With
+	
+	For Each Line In Python2Options
+		For Each Model in Array(SpdSay, SvoxPico, OpenJTalk, PiedPiper, HomeNetworkStream, FestivalFlite, EspeakNg, QrCode)
+			If Model.RequireFString And Not bPySupportFStrings() Then
+				&apos; pass
+			ElseIf Model.RequireOnnxArch And Not bSupportOnnx Then
+				&apos; pass
+			ElseIf CheckPlatform(Model.PlatformList) Then
+				If Instr(Line, Model.SearchTerm) &gt; 0 Then
+					If Model.Criteria Then
+						If Len(FoundList) = 0 Then
+							FoundList = Line
+						Else
+							FoundList = FoundList &amp; Sep &amp; Line
+						End If
+						If Instr(Out, &quot;.&quot;) &gt; 0 And Instr(Model.AudioOut, &quot;.&quot;) &gt; 0 Then
+							FoundList = FoundList &amp; GetFoundListMediaLines(Line, Out)
+						End If
+					End If
+				End If
+			End If
+		Next
+	Next
+	If Len(FoundList) = 0 Then
+		FoundList = &quot;-m webbrowser -t &quot;&quot;https://translate.google.com/?sl=auto&amp;tl=(LANGUAGE_CODE)&amp;text=(OOO_WEBTEXT)&quot;&quot;&quot;
+		
+		Select Case fsGetOS()
+			Case &quot;POSIX&quot;
+			FoundList = FoundList &amp; Sep &amp; _
+			&quot;-m piper.http_server --model en_GB-jenny_dioco-medium --speaker 0 --data-dir &quot;&quot;~/.local/share/piper-server/common/models&quot;&quot;&quot;
+			Case &quot;WINDOWS&quot;
+			FoundList = FoundList &amp; Sep &amp; _
+			&quot;-m piper.http_server --model en_GB-jenny_dioco-medium --speaker 0 --data-dir &quot;&quot;~/AppData/Roaming/piper-tts/piper-server/models&quot;&quot;&quot;
+		End Select
+	End If
+	StandardPythonDialog1Options = Split(FoundList, Sep)
+	Exit Function
+	StandardPythonDialog1OptionsErr:
+	StandardPythonDialog1Options = GenericPythonDialog1ComboBoxList()
+End Function
+
+&apos;-----------------------------------------------------------------------------
+&apos; This concludes the Generic Setup portion of the code.
+&apos;
+&apos; The Generic setup includes text-to-speech models and voices typically
+&apos; available using a Linux desktop system package manager.
+&apos;
+&apos; Some new speech tools use locally hosted network servers or local
+&apos; code that relies on a recent version of python.
+&apos;
+&apos; Example: Piper-TTS
+&apos; ------------------
+&apos;
+&apos; For piper-tts, on systems that use python 3.8 or greater, you can 
+&apos; select specific models and voices to generate custom commands using
+&apos; dialog4. If you use the newest version of `pipx install piper-tts[http]`
+&apos; you can manage voices using the standard commands described on the piper
+&apos; [HTTP](https://github.com/OHF-Voice/piper1-gpl/blob/main/docs/API_HTTP.md)
+&apos; API site.
+&apos;-----------------------------------------------------------------------------
 
 
 Function fbHidePythonAudioFileExportOptions() As Boolean
@@ -2630,22 +3046,44 @@ Function fiDialog1CombosShowMyPythonChoices(_
 	FileControl As String) As Integer
 	&apos; Python
 	&apos; Show the python script options
+	Dim oComboBox As Variant : oComboBox = oDialog.getControl(getControl)
+	Dim a1 As Variant
+	Dim n As Integer : n = 1
+	Dim sTheOsId As String : sTheOsId = fsTheOsId()
+	With oComboBox
+		n = .getItemCount()
+		.removeItems(0, n)
+		.addItem(&quot;(RESET_ALL)&quot;, 0)
+		Select Case sTheOsId
+			Case &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;POSIX.FLATPAK&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;, &quot;MACOS.EXPERIMENTAL&quot;
+			&apos; pass
+			Case Else
+			If Not fbPySupportFStrings() Or _
+				Not fbYouAreStaffOrAdmin(Array()) Then
+				a1 = StandardPythonDialog1Options()
+				For n = UBound(a1) To LBound(a1) Step -1
+					.addItem(a1(n), 0)
+				Next
+				Exit Function
+			End If
+		End Select
+	End With
 	fiDialog1CombosShowMyPythonChoices = 0
 	Dim _opt As String : _opt = &quot;&quot;
 	Dim _opts As Variant : _opts = Array()
-	Dim a1 As Variant
+
 	Dim a2 As Variant
 	Dim bEnableLocalHostRate As Boolean : bEnableLocalHostRate = True
 	Dim bEnableRate As Boolean : bEnableRate = True
 	Dim bIsAppImage As Boolean : bIsAppImage = False
-	Dim ClientId$ : ClientId = &quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot;
+	Dim ClientId As String : ClientId = &quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot;
 	Dim CR As String : CR = Chr(10)
 	Dim high_suggestion As String : high_suggestion = &quot;&quot;
 	Dim _item As String : _item = &quot;&quot;
+	Dim Item As String : Item = &quot;&quot;
 	Dim local_suggestion As String: local_suggestion = &quot;&quot;
-	Dim n As Integer : n = 1
+
 	Dim n2 As Integer : n2 = 0
-	Dim oComboBox As Variant
 	Dim player7 As String : player7 = &quot;&quot;
 	Dim s1 As String : s1 = &quot;&quot;
 	Dim s2 As String : s2 = &quot;&quot;
@@ -2654,7 +3092,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 	Dim sGetOS As String : sGetOS = fsGetOS()
 	Dim sLanguage As String : sLanguage = LCase(fsGetLanguage())
 	Dim sSpdToken As String : sSpdToken = &quot;&quot;
-	Dim sTheOsId As String : sTheOsId = fsTheOsId()
+	
 	Dim bnetworkTTS As Boolean : bnetworkTTS = fbHaveNetworkTTS()
 
 	Select Case sGetOS
@@ -2669,7 +3107,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 				bEnableRate = False
 				Case Else
 				ClientId = &quot;&quot;
-				player7 = &quot; --player 0&quot;
+				player7 = &quot;&quot;
 			End Select
 		Case Else
 			Select Case sTheOsId
@@ -2746,8 +3184,18 @@ Function fiDialog1CombosShowMyPythonChoices(_
 			&apos; pass
 			Case Else
 			&apos; Enable a home network Speech Synthesis Server Option
-			s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot; 
-			s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+			&apos; xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+			If fbGotLangModelMimic3(&quot;&quot;) Then
+				For Each Item In GetMimic3CommandList(&quot;&quot;)
+					s1 = s1 &amp; fspyPlayOption(oDialog, Item)
+				Next
+			End If
+			If Len(gttsResourceCheck()) &lt;&gt; 0 Then
+				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate &quot;&quot;70%&quot;&quot; --voice &quot;&quot;AUTO0&quot;&quot;&quot;
+				s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+				s4 = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --voice &quot;&quot;AUTO0&quot;&quot;&quot;
+				s1 = s1 &amp; fspyPlayOption(oDialog, s4)
+			End If
 		End Select
 	End If
 	Select Case sGetOS
@@ -2880,7 +3328,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 				&quot;MALE1&quot;, &quot;FEMALE1&quot;)
 			End Select
 			If Len(sSpdToken) &lt;&gt; 0 Then
-				If Len(fsFindAppPath(&quot;afconvert&quot;)) &lt;&gt; 0 Then
+				If  sGetOS = &quot;MACOS&quot; Then
 					&apos; Darwin Platform
 					s4 = sSpdToken &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 					s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
@@ -2893,13 +3341,19 @@ Function fiDialog1CombosShowMyPythonChoices(_
 						s1 = s1 &amp; CR &amp; sSpdToken &amp; _
 						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
 						&quot;&quot;&quot; --rate &quot;&quot;140%&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+
+						s1 = s1 &amp; CR &amp; sSpdToken &amp; _
+						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
+						&quot;&quot;&quot; --rate &quot;&quot;100%&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+						
 						s1 = s1 &amp; CR &amp; sSpdToken &amp; _
 						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
 						&quot;&quot;&quot; --rate &quot;&quot;70%&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
+					Else
+						s1 = s1 &amp; CR &amp; sSpdToken &amp; _
+						&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
+						&quot;&quot;&quot; &quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 					End If
-					s1 = s1 &amp; CR &amp; sSpdToken &amp; _
-					&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;&quot; &amp; _opts(n) &amp; _
-					&quot;&quot;&quot;&quot; &amp; ClientId &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 				Next
 				Select Case sGetOS
 					Case &quot;MACOS&quot;
@@ -2970,7 +3424,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 		s4 = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot;&quot; &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, True)
 	End If
-	If fbPosixProgramOK(&quot;open_jtalk&quot;, &quot; &gt; /dev/null&quot;) Then
+	If fbDisplayOpenJapanese() Then
 		s4 = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; --language ja-JP&quot;
 		s1 = s1 &amp; fspyOutOptions(oDialog, s4, False)
 	End If
@@ -2986,91 +3440,36 @@ Function fiDialog1CombosShowMyPythonChoices(_
 		End Select
 	End If
 	If fbPiperTtsOk(&quot;&quot;) Then
-		high_suggestion = PiperLocalSuggestion(&quot;&quot;, True)
 		local_suggestion = PiperLocalSuggestion(&quot;&quot;, False)
-		If fbIsSandboxed() Then
-			ReDim _opts : _opts = Array(_
-				player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
-				player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
-				player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
-				player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
-				&quot;&quot;, _
-			)
-		ElseIf SkipPiedCheck() Then
-			ReDim _opts : _opts = Array(_
-				player7 &amp; &quot; --update True&quot;,_
-				player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
-				player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
-				player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
-				player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
-				player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion,_
-				player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
-				&quot;&quot;, _
-			)
-		ElseIf getGUIType() = 1 Then
-			&apos; A hidden WINDOWS player cannot include `%` in the command.
-			&apos; When the command includes `--update` then a Windows python
-			&apos; command window with debugging data appears.
-			ReDim _opts : _opts = Array(_
-			player7 &amp; &quot; --update True --voice &quot; &amp; high_suggestion,_
-			player7 &amp; &quot; --update True --voice &quot; &amp; local_suggestion,_
-			player7 &amp; &quot; --update True&quot;,_
-			player7 &amp; &quot; --update False&quot;,_
-			player7 &amp; &quot; --rate &quot;&quot;125 percent&quot;&quot; --voice AUTO1#4&quot;,_
-			player7 &amp; &quot; --rate &quot;&quot;100 percent&quot;&quot; --voice AUTO1#0&quot;,_
-			player7 &amp; &quot; --rate &quot;&quot;75 percent&quot;&quot; --voice AUTO1#64&quot;,_
-			player7 &amp; &quot; --rate &quot;&quot;125 percent&quot;&quot; --voice &quot; &amp; high_suggestion,_
-			player7 &amp; &quot; --rate &quot;&quot;100 percent&quot;&quot; --voice &quot; &amp; high_suggestion,_
-			player7 &amp; &quot; --rate &quot;&quot;75 percent&quot;&quot; --voice &quot; &amp; high_suggestion,_
-			player7 &amp; &quot; --rate &quot;&quot;125 percent&quot;&quot; --voice &quot; &amp; local_suggestion,_
-			player7 &amp; &quot; --rate &quot;&quot;100 percent&quot;&quot; --voice &quot; &amp; local_suggestion,_
-			player7 &amp; &quot; --rate &quot;&quot;75 percent&quot;&quot; --voice &quot; &amp; local_suggestion,_
-			&quot;&quot;, _
-			)		
-		Else
-			ReDim _opts : _opts = Array(_
-			player7 &amp; &quot; --update True --voice &quot; &amp; high_suggestion,_
-			player7 &amp; &quot; --update True --voice &quot; &amp; local_suggestion,_
-			player7 &amp; &quot; --update True&quot;,_
-			player7 &amp; &quot; --rate 125% --voice AUTO1#4&quot;,_
-			player7 &amp; &quot; --rate 100% --voice AUTO1#0&quot;,_
-			player7 &amp; &quot; --rate 75% --voice AUTO1#64&quot;,_
-			player7 &amp; &quot; --rate 125% --voice &quot; &amp; high_suggestion,_
-			player7 &amp; &quot; --rate 100% --voice &quot; &amp; high_suggestion,_
-			player7 &amp; &quot; --rate 75% --voice &quot; &amp; high_suggestion,_
-			player7 &amp; &quot; --rate 125% --voice &quot; &amp; local_suggestion,_
-			player7 &amp; &quot; --rate 100% --voice &quot; &amp; local_suggestion,_
-			player7 &amp; &quot; --rate 75% --voice &quot; &amp; local_suggestion,_
-			&quot;&quot;, _
-			)
-		End If
-		For n = Lbound(_opts) to Ubound(_opts)
-			If Instr(_opts(n), &quot;--update True --voice&quot;) = 0 Then
-				s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				_opts(n) &amp; _
-				&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;
+		Select Case sTheOsId
+			Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;WINDOWS&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;, _
+			&quot;WINDOWS.WINE&quot;, &quot;WINDOWS.NOSCRIPT&quot;
+			If fbPiperModelInstalled(local_suggestion) Then
+				local_suggestion = &quot; --player 3 --voice &quot; &amp; local_suggestion
 			Else
-				s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
-				_opts(n)
+				local_suggestion = &quot; --player 3 --update True --voice &quot; &amp; local_suggestion
 			End If
+			Case Else
+			local_suggestion = &quot; --player 3 --voice &quot; &amp; local_suggestion
+		End Select
+		ReDim _opts : _opts = Array(_
+		player7 &amp; &quot; --voice AUTO1#0 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,_
+		player7 &amp; &quot; --voice AUTO0#0 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,_
+		player7 &amp; &quot; --rate &quot; &amp; fsSystemSafePercentString(&quot;130%&quot;) &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,_
+		player7 &amp; &quot; --rate &quot; &amp; fsSystemSafePercentString(&quot;70%&quot;) &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,_
+		player7 &amp; local_suggestion,_
+		player7 &amp; &quot; --player 3 --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,_
+		player7 &amp; &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;,_
+		)
+		For n = Lbound(_opts) to Ubound(_opts)
+			s4 = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
+			_opts(n)
 			s1 = s1 &amp; fspyPlayOption(oDialog, s4)		
 		Next
 		s4 = &quot;&quot;
 	End If
 	oComboBox = oDialog.getControl(getControl)
 	With oComboBox
-		n = .getItemCount()
-		.removeItems(0, n)
-		.addItem(&quot;(RESET_ALL)&quot;, 0)		
-		
 		If Len(s1) &lt;&gt; 0 Then
 			If Asc(Left(s1, 1)) = 10 Then
 				s1 = Mid(s1, 2)
@@ -3102,6 +3501,7 @@ Function fiDialog1CombosShowMyPythonChoices(_
 			End If
 		End If
 		fiDialog1CombosShowMyPythonChoices = .getItemCount()
+		.Visible = True
 	End With
 	Exit Function
 	fiDialog1CombosShowMyPythonChoicesErr
@@ -3320,7 +3720,7 @@ End Function
 
 Function fsLibreAppImageClassificationPath()
 	On Error GoTo fsLibreAppImageClassificationPathErr
-	Dim x# : x = 0
+	Dim x As Integer : x = 0
 	Dim _paths As Variant
 	fsLibreAppImageClassificationPath = ConvertFromURL(_
 	Split(CreateUNOService(_
@@ -3333,7 +3733,7 @@ End Function
 
 Function fsLibreAppImageGalleryPath()
 	On Error GoTo fsOpenAppImageGalleryPathErr
-	Dim x# : x = 0
+	Dim x As Integer : x = 0
 	Dim _paths As Variant
 	fsLibreAppImageGalleryPath = ConvertFromURL(_
 	Split(CreateUNOService(_
@@ -3349,11 +3749,9 @@ Function fsOpenAppImageGalleryPath( _
 	&apos; Linux AppImage installations use a specific version of python
 	&apos; running in a temporary mounted directory.				
 	fsOpenAppImageGalleryPath = &quot;&quot;
-	Dim i#
-	i = 0
-	Dim x#
-	x = 0
-	Dim _checkPath$ : _checkPath = ConvertFromUrl(Split(CreateUNOService(_
+	Dim i As Integer : i = 0
+	Dim x As Integer : x = 0
+	Dim _checkPath As String : _checkPath = ConvertFromUrl(Split(CreateUNOService(_
 	&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
 	Dim a1 As Variant : a1 = Array(_
 	_checkPath, _
@@ -3370,13 +3768,8 @@ Function fsOpenAppImageGalleryPath( _
 				fsOpenAppImageGalleryPath = &quot;&quot;
 			End If
 		End If
-	Next
-	
+	Next	
 End Function
-
-sub resetAppImagePrivate()
-	ps_appimageresourcepath = &quot;&quot;
-end sub
 
 
 Function fsAppImageResourcePath( _
@@ -3413,15 +3806,15 @@ Function fsAppImageResourcePath( _
 		Exit Function
 	End If
 
-	Dim _checkPath$ : _checkPath = &quot;&quot;
-	Dim _checkPath1$ : _checkPath1 = fsLibreAppImageGalleryPath()
-	Dim _checkPath2$ : _checkPath2 = fsLibreAppImageClassificationPath()
+	Dim _checkPath As String : _checkPath = &quot;&quot;
+	Dim _checkPath1 As String : _checkPath1 = fsLibreAppImageGalleryPath()
+	Dim _checkPath2 As String : _checkPath2 = fsLibreAppImageClassificationPath()
  	Dim walks As Variant
  	Dim walk As String
  	Dim testwalk As String : testwalk = &quot;&quot;
 	Dim foundwalks As Variant
-	Dim _makePath$ : _makePath = &quot;/&quot;
-	Dim _foundPath$ : _foundPath = &quot;&quot;
+	Dim _makePath As String : _makePath = &quot;/&quot;
+	Dim _foundPath As String : _foundPath = &quot;&quot;
 	On Error Resume Next
 	Dim _checkPaths As Variant : _checkPaths = Array(_
 		_checkPath2, _checkPath1)
@@ -3469,8 +3862,7 @@ Function fsContainerResourcePath( _
 	&apos; Linux Snap installations use a specific version of python
 	&apos; running in the root `/snap` directory.
 	fsContainerResourcePath = &quot;&quot;
-	Dim i#
-	i = 0
+	Dim i As Integer : i = 0
 	Dim s1$
 	s1 = ConvertFromUrl(Split(CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).Gallery, &quot;;&quot;)(0))
 	If Len(fsAppImageResourcePath(sApp)) &gt; 10 Then
@@ -3505,8 +3897,11 @@ Function fsMyTitleInputBox( _
 	Dim s4 As String
 	Dim s5 As String
 	Dim x As Integer
-	Dim unwanted_characters As String
-	unwanted_characters = &quot;,:;-–&gt;&lt;{_}|&quot;
+	Dim unwanted_characters As String : unwanted_characters = &quot;&quot;&quot;“”‘’&apos;,:;-–&gt;&lt;{_}|&quot;
+	If Instr(dialog_title, &quot;()&quot;) &lt;&gt; 0 Then
+		dialog_title = fsReplaceText(dialog_title, &quot;()&quot;, &quot;(&quot; &amp; _
+		fsLookUpTerm(fsSelectionLanguage()) &amp; &quot;)&quot;)
+	End If
 	If b_skip_windows Then
 		Select Case getGUIType()
 			Case 1  &apos; WINDOWS
@@ -3644,13 +4039,18 @@ Function getTextFromFile( _
 	Dim myTextFile As Object,sf As Object,fileStream As Object
 	Dim aLineOfText As String : aLineOfText = Chr(13)
 	Dim myFilePath As String : myFilePath = convertToURL(sFilePath)
-	Dim myFileLen# : myFileLen = 0
+	Dim myFileLen As Double : myFileLen = 0
 	If not FileExists(sFilePath) Then
 		Exit Function
 	End if
-	If Len(sEncoding) = 0 Then
-		sEncoding = &quot;UTF-8&quot;
-	End If
+	Dim Item As String
+	For Each Item in Array(sEncoding, &quot;UTF-8&quot;)
+		On Local Error Resume Next
+		If Len(Item) &gt; 0 Then
+			sEncoding = Item
+			Exit For
+		End If
+	Next
 	myFileLen = FileLen(sFilePath)
 	sf = createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
 	On Error Goto fichierKO
@@ -3833,50 +4233,26 @@ Sub ttsActuate( _
 	msgs() As Variant, _
 	ErrorCode As Integer, _
 	ByVal sTextToSpeak As String)
-	Dim a1
-	a1 = Array(_
-	&quot;id&quot;, _
-	&quot;title&quot;, _
-	&quot;album&quot;, _
-	&quot;genre&quot;, _
-	&quot;track&quot;)
-	Dim bAddTime As Boolean
-	bAddTime = False
-	Dim language$
-	language = fsSelectionLanguageAndRegion(True)
-	Dim model$
-	model = &quot;&quot;
-	Dim _text_file$
-	_text_file = fsTemporaryTextDoc()
-	Dim s1$
-	s1 = &quot;&quot;
-	Dim sArtLook$
-	sArtLook = &quot;&quot;
-	Dim sArtURL$
-	sArtURL = &quot;&quot;
-	Dim scodec$
-	scodec = &quot;UTF-8&quot;
-	Dim sCommand$
-	sCommand = &quot;&quot;
-	Dim sGetOS$
-	sGetOS = fsGetOs()
-	Dim sScript$
-	sScript = &quot;&quot;
-	Dim sProgram$
-	sProgram = &quot;&quot;
-	Dim aVal As Integer
-	Dim bWait As Boolean
-	bWait = False
-	Dim n As Integer
-	Dim bIsLibreOffice As Boolean
-	bIsLibreOffice = fbIsLibreOffice()
-	n = 0
+	Dim Item As String : Item = &quot;&quot;
+	Dim bAddTime As Boolean : bAddTime = False
+	Dim language As String : language = fsSelectionLanguageAndRegion(True)
+	Dim model As String : model = &quot;&quot;
+	Dim _text_file As String : _text_file = fsTemporaryTextDoc()
+	Dim s1 As String : s1 = &quot;&quot;
+	Dim sArtLook As String : sArtLook = &quot;&quot;
+	Dim sArtURL As String : sArtURL = &quot;&quot;
+	Dim scodec As String : scodec = &quot;UTF-8&quot;
+	Dim sCommand As String : sCommand = &quot;&quot;
+	Dim sGetOS As String : sGetOS = fsGetOs()
+	Dim sScript As String : sScript = &quot;&quot;
+	Dim sProgram As String : sProgram = &quot;&quot;
+	Dim aVal As Integer : aVal = 0
+	Dim bWait As Boolean : bWait = False
+	Dim n As Integer : n = 0
+	Dim bIsLibreOffice As Boolean : bIsLibreOffice = fbIsLibreOffice()
 	Dim oBar    &apos; Generated status bar
 	Dim oFrame  &apos; Current frame
-	Dim media_list As String
-	media_list = &quot;.3gp,.aac,.aif,.aiff,.alsa,.ape,.asf,.au,.avi,.caf,.dts,.flac,&quot; &amp; _
-		&quot;.m4a,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.oma,.opus,.riff,.rm,.smp,.snd,.sou,.spx,&quot; &amp; _
-		&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;
+	Dim media_list As String : media_list = MediaList()
 	Dim sExtensionSettingsIni As String : sExtensionSettingsIni = fsExtensionSettingsIni()
 &apos; Temporary Files
 	On Error Goto errorHandler
@@ -3885,11 +4261,25 @@ Sub ttsActuate( _
 		sTextToSpeak = fsGetTextSelection(False, True)
 	End If
 
-	For n = LBound(a1) To UBound(a1)
-		fbRemoveFile(fsMyTempLock(&quot;lock.&quot; &amp; a1(n)))
+	For Each Item in Array(_
+	&quot;id&quot;, _
+	&quot;title&quot;, _
+	&quot;album&quot;, _
+	&quot;genre&quot;, _
+	&quot;track&quot;)
+		fbRemoveFile(fsMyTempLock(&quot;lock.&quot; &amp; Item))
 	Next
 	If Len(sTextToSpeak) = 0 Then
 		Exit Sub
+	End If
+	Dim ReloadOnError As Boolean : ReloadOnError = False
+	If fbPySupportFStrings() Then
+		Select Case fsTheOsId()
+			Case &quot;POSIX&quot;, &quot;WINDOWS.EXPERIMENTAL&quot;, &quot;WINDOWS&quot;
+			&apos; Allow this script to handle an error without displaying a system error
+			&apos; message.
+			ReloadOnError = True
+		End Select
 	End If
 	On Error Resume Next
 	oFrame = ThisComponent.getCurrentController().getFrame()
@@ -3898,7 +4288,6 @@ Sub ttsActuate( _
 	
 	&apos;Get rid of the old files containing a script And/or plain text of selected String
 	resetSpeech
-	sArtLook = Config(5)
 	If Len(Config(pi_external_path_string)) = 0 Then
 		&apos; The office program failed to save or read the current settings file correctly,
 		&apos; so check the file, and use the defaults if we fail again.
@@ -3920,11 +4309,14 @@ Sub ttsActuate( _
 			Config() = fvTts_config_createDefaultConfig(msgs(), errorCode)
 		End If
 	End If
-	
-	If fbCreatingMediaFile(media_list) Then
+	If fbUsingOutputFlag(ReloadOnError, Config) Then
 		&apos; Get current track, then increment it by one to a maximum value of 255.
 		&apos; (hex FF)
-		n = fiMyCurrentAudioTrack(True)
+		If Config(pi_use_experimental_boolean) Then
+			sArtLook = Config(pi_experimental_options_string)
+		ElseIf Config(pi_use_external_boolean) Then
+			sArtLook = Config(pi_external_options_string)
+		End If
 		If sGetOS = &quot;MACOS&quot; Then
 			&apos; If metadata is required, it is written into a temporary
 			&apos; osascript document.
@@ -3944,15 +4336,17 @@ Sub ttsActuate( _
 					s1 = fsThisSoundTitle()
 					Case Else
 					s1 = fsMyTitleInputBox(_
-					True, _
-					fsThisSoundTitle(), _
-					fsThisDocGenre() &amp; &quot; (&quot; &amp; fsGetActuateExtension(_
-					sArtLook, media_list) &amp; &quot;)&quot; )
+						True, _
+						fsThisSoundTitle(), _
+						fsThisDocGenre() &amp; &quot; (&quot; &amp; fsGetActuateExtension(_
+						sArtLook, media_list) &amp; &quot;)&quot; )
 					If s1 = &quot;&quot; Then
+						oBar.End()
 						Exit Sub
 					End If
 				End Select
-				fbWriteTextLocks(s1, n)  &apos; title As String, track as Integer
+				fbWriteTextLocks(s1, fiMyCurrentAudioTrack(_
+				True))  &apos; title As String, track as Integer
 			End If
 		End If
 	Else
@@ -4112,6 +4506,7 @@ Sub ttsActuate( _
 				fswriteMacOSSpeechScript(&quot;&quot;, _
 				language, sArtURL)
 			End If
+
 		End Select
 		If InStr(sCommand,&quot;&quot;&quot;(TTS_WSCRIPT_VBS)&quot;&quot;&quot;) = 1 Then
 			&apos;only consider SAPI voices
@@ -4153,14 +4548,7 @@ Sub ttsActuate( _
 		&apos; program parameter strings,
 		&apos; False - tasks do not wait until shell task ends
 		bWait = False
-		If sGetOS = &quot;POSIX&quot; Then
-			If Right(sProgram, Len(&quot;festival&quot;)) = &quot;festival&quot; Then
-				&apos; When festival is the external program, the routine pauses while
-				&apos; the computer is speaking to avoid the possibility of playing
-				&apos; two voices at once.
-				bWait = True
-			End If
-		End If
+
 		If Len(sCommand) &lt;&gt; 0 Then
 			Select Case getGUIType()
 				Case 1 &apos; WINDOWS
@@ -4174,14 +4562,26 @@ Sub ttsActuate( _
 				Else
 					ErrorCode = Shell(sProgram, 0, sCommand, bWait)
 				End If
-				Case Else
-				&apos; Specify a program path as URL because
-				&apos; a program path to a python application
-				&apos; could include spaces.
-				If bIsLibreOffice And sGetOS =&quot;MACOS&quot; And _
-				InStr(sProgram, &quot;/python&quot;) &lt;&gt; 0 Then
-					sProgram = PosixPythonPath()				
-				End If
+				Case Else &apos; POSIX and MACOS
+				Select Case sGetOS
+					Case &quot;POSIX&quot;
+					If Right(sProgram, Len(&quot;festival&quot;)) = &quot;festival&quot; Then
+						&apos; When festival is the external program, the routine pauses while
+						&apos; the computer is speaking to avoid the possibility of playing
+						&apos; two voices at once.
+						bWait = True
+					End If
+					Case &quot;MACOS&quot;
+					If bIsLibreOffice And InStr(sProgram, &quot;/python&quot;) &lt;&gt; 0 Then
+						&apos; Specify a program path as URL because
+						&apos; a program path to a python application
+						&apos; could include spaces.
+						&apos; TODO: Review the best path for current release of LibreOffice;
+						&apos; consider switching it if Preferences - Advanced - Experimental
+						&apos; is activated.
+						sProgram = PosixPythonPath()				
+					End If
+				End Select
 				ErrorCode = Shell(_
 				converttourl(_
 				sProgram), 0, sCommand, bWait)
@@ -4221,7 +4621,7 @@ Sub ttsActuate( _
 	oBar.End()
 	Exit Sub
 	ErrorHandler:
-	ErrorDisplay(&quot;4140&quot;)
+	ErrorDisplay(&quot;4222&quot;)
 	ResetAll()
 End Sub
 
@@ -5802,10 +6202,9 @@ Sub MsgSpeak( _
 	Dim msgs() As Variant
 	Dim errorCode As Integer
 	Dim Config(fiUboundConfigOptions) As Variant
-	
 
 	If FileExists(sFile) Then
-		If fbCreatingMediaFile() Then
+		If fbCreatingMediaFile(&quot;&quot;, &quot;&quot;) Then
 			&apos; We show you the settings and ask you to
 			&apos; verify that you really want to create
 			&apos; a media file.
@@ -5839,7 +6238,7 @@ Sub MsgSpeak( _
 		ElseIf fsTheOsId() = &quot;MACOS&quot; And _
 			fbCreatingMediaFile(&quot;AppleTV,attic,basement,bedroom,BLUETOOTH,B&amp;W,Bose,Bowers,&quot; &amp; _
 			&quot;Creative,Dell,Harmon,Jambox,Jawbone,JBL,kitchen,LogiTech,Polk,Reflector,room,&quot; &amp; _
-			&quot;Soundcast,Ultimate,yard&quot;) Then
+			&quot;Soundcast,Ultimate,yard&quot;, &quot;&quot;) Then
 			&apos; Using say speech synthesis with a wireless
 			&apos; option could fail silently.
 			&apos;
@@ -6143,6 +6542,23 @@ Function fiMyMouseEventToInt(_
 End Function
 
 
+Sub UpdatePiperDialog1ComboBox(fileControl As String, comboBox As String)
+	&apos; Updates the specified combo box control within `Dialog1`, based on the results
+	&apos; from `Dialog4`.
+	With f_dlgSpeechSetup
+		If Instr(LCase(.GetControl(fileControl).Model.Text), &quot;python&quot;) &lt;&gt; 0 Then
+			If Instr(.GetControl(comboBox).Model.Text, &quot;(PIPER_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
+				Dim _command As String
+				_command = UpdatePiperSettings(False)
+				If Instr(_command, &quot;(PIPER_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
+					.GetControl(comboBox).Model.Text = _command
+				End If
+			End If
+		End If
+	End With
+End Sub
+
+
 Sub windowsSAPIControl(Event As Object)
 	&apos; MouseButtonReleased Dialog3, ImageControl5
 	Dim sA as String
@@ -6150,6 +6566,8 @@ Sub windowsSAPIControl(Event As Object)
 	Dim MouseMain As Integer : MouseMain = 1
 	Dim MouseAlt As Integer : MouseAlt = 2
 	Dim MouseOther As Integer : MouseOther = 3
+	Dim _command As String : _command = &quot;&quot;
+	Dim b_response As Boolean : b_response = False
 	If fbExperimentalMode() Then
 		&apos; You have enabled the Experimental Mode so this Dialog3
 		&apos; control edits JSON lexicon files by default.
@@ -6170,7 +6588,7 @@ Sub windowsSAPIControl(Event As Object)
 				&apos; python is enabled.
 				If fbIsLibreOffice() and Instr(_
 				fsProgramCommand, AppleScriptPath()) = 0 Then
-					EditJsonPhonemeTable()
+					EditJsonLexicon()
 				End If
 				Case Else
 				Shell(&quot;open&quot;, 0, &quot;-b com.apple.systempreferences&quot;, False)
@@ -6183,9 +6601,19 @@ Sub windowsSAPIControl(Event As Object)
 				&apos; NOTE: Apache OpenOffice 4 for Windows does not support `Wscript.Shell`,
 				&apos; `com.sun.star.util.PathSubstitution` or python 3 features.
 				If fbIsLibreOffice() Then
-					EditJsonPhonemeTable()
+					EditJsonLexicon()
 				End If
 				Case Else
+				If fbPiperTtsOk(&quot;&quot;) Then
+					For Each b_response In Array(_
+					CheckUpdatePiperDialog1ComboBox(&quot;FileControl2&quot;, &quot;ComboBox2&quot;), _
+					CheckUpdatePiperDialog1ComboBox(&quot;FileControl1&quot;, &quot;ComboBox1&quot;) _
+					)
+						If b_response Then
+							Exit Sub
+						End If
+					Next
+				End If
 				If Len(sA) &lt;&gt; 0 Then
 					oSvc.execute(sA, &quot;&quot;, 0)
 				End If
@@ -6197,11 +6625,32 @@ Sub windowsSAPIControl(Event As Object)
 			&apos;pass
 			Case MouseAlt
 			ResetHostSpeechURI
-			EditJsonPhonemeTable()
+			EditJsonLexicon()
 			Case Else
+			If fbPiperTtsOk(&quot;&quot;) Then
+				sA = &quot;&quot;
+				For Each b_response In Array(_
+				CheckUpdatePiperDialog1ComboBox(&quot;FileControl2&quot;, &quot;ComboBox2&quot;), _
+				CheckUpdatePiperDialog1ComboBox(&quot;FileControl1&quot;, &quot;ComboBox1&quot;) _
+				)
+					If b_response Then
+						Exit Sub
+					End If
+				Next
+			End If
 			If Len(fsLocalHostSpeech()) &lt;&gt; 0 Then
-				webHelp(fsLocalHostSpeech())
-			ElseIf Len(sA) &lt;&gt; 0 Then
+				For Each b_response in Array(_
+				CheckDialog1ComboBox(&quot;FileControl2&quot;, &quot;ComboBox2&quot;, &quot;python&quot;, &quot;(NETWORK_READ_TEXT_PY)&quot;), _
+				CheckDialog1ComboBox(&quot;FileControl1&quot;, &quot;ComboBox1&quot;, &quot;python&quot;, &quot;(NETWORK_READ_TEXT_PY)&quot;), _
+				)
+					If b_response Then
+						myBeep()
+						webHelp(fsLocalHostSpeech())
+						Exit Sub
+					End If
+				Next
+			End If
+			If Len(sA) &lt;&gt; 0 Then
 				Shell(sA, 0, &quot;&quot;, False)
 			End If
 		End Select
@@ -6214,23 +6663,23 @@ Function faWindowsTestArray() As Variant
 	&apos; System programs, Control Panels or other resources
 	&apos; i.e: [&apos;SysArm32&apos;, &apos;System32&apos;, &apos;SysWOW64&apos; ...]
 	faWindowsTestArray = Array()
-	Dim _div$ : _div = Chr(13)
-	Dim _win_dir$ : _win_dir = &quot;C:\Windows&quot;
+	Dim _div As String : _div = Chr(13)
+	Dim _win_dir As String : _win_dir = &quot;C:\Windows&quot;
 	On Error Goto faWindowsTestArrayErr
 	If Len(Environ(&quot;windir&quot;)) &lt;&gt; 0 Then
 		win_dir = Environ(&quot;windir&quot;)
 	End If
 	faWindowsTestArrayErr:
-	Dim _system$ : _system = &quot;System32&quot;
+	Dim _system As String : _system = &quot;System32&quot;
 	If fbIsWin64Program(&quot;&quot;) Then
 		_system = &quot;SysWOW64&quot;
 	End If
-	Dim _skip$ : _skip = &quot;;SYSTEM;SYSTEMAPPS;SYSTEMRESOURCES;SYSTEMTEMP;&quot;
-	Dim x# : x = 0
+	Dim _skip As String : _skip = &quot;;SYSTEM;SYSTEMAPPS;SYSTEMRESOURCES;SYSTEMTEMP;&quot;
+	Dim x As Integer : x = 0
 	Dim _Dirs As Variant : _Dirs = Split(_
 	_system &amp; _div &amp; fsSubDirectories(_win_dir), _
 	_div)
-	Dim result$ : result = &quot;&quot;
+	Dim result As String : result = &quot;&quot;
 	For x = Lbound(_Dirs) To Ubound(_Dirs)
 		If instr(Ucase(_Dirs(x)), &quot;SYS&quot;) &lt;&gt; 0 Then
 			If Instr(_skip, Ucase(&quot;;&quot; &amp; _Dirs(x) &amp; &quot;;&quot;)) = 0 Then
@@ -6517,7 +6966,7 @@ Function fbMacOSLegacyReplacePhonemes(_
 		_text_file_in As String) As Boolean
     &apos;Replaces mispronounced words with phonemes
     fbMacOSLegacyReplacePhonemes = False
-    Dim PyPath$ : PyPath = BundlePyPath()
+    Dim PyPath As String : PyPath = BundlePyPath()
     If Len(PyPath) = 0 Then
     	Exit Function
     End If
@@ -6542,7 +6991,6 @@ Function fswriteMacOSSpeechScript( _
 &apos; Writes an osascript to read a sound, or create and convert a sound.
 &apos; Creates a lock file to prevent double talk and to silence the speaker
 &apos; if the button is clicked while the synthesizer is speaking.
-
 	fswriteMacOSSpeechScript = &quot;&quot;
 	Dim CR$
 	CR = Chr(13)
@@ -6597,16 +7045,8 @@ Function fswriteMacOSSpeechScript( _
 		bestEncoder = &quot;MP3&quot;
 		confirmMetaData = &quot;.aif,.aiff,.caf,.mp3&quot;
 	End Select
-	fbRemoveFile(sFile)
+
 	If FileExists(sFile) Then
-		&apos; if we can&apos;t make a fresh file, then we don&apos;t want to run an
-		&apos; arbitrary script.
-		Exit Function
-	Else
-		&apos; Make sure we have a valid directory
-		CreateFile(sFile, _
-		sA, _
-		&quot;&quot;)
 		fbRemoveFile(sFile)
 	End If
 	sA = &quot;&quot;
@@ -6629,14 +7069,8 @@ Function fswriteMacOSSpeechScript( _
 			sLangLocale = fsReplaceText(sArgLangLocale,&quot;-&quot;,&quot;_&quot;)
 		End Select
 	End If
-	If fbIsLibreOffice() And Len(sArgLangLocale) &lt;&gt; 0 Then
-		Dim model$ : model = MacOSSpeechAppInfo().json_dir
-		If FileExists(fsFullPathOf(fsExtensionSetJson(&quot;lexicons/&quot; &amp; model, sArgLangLocale))) Then
-			fbMacOSLegacyReplacePhonemes(sArgLangLocale, model, fsTemporaryTextDoc())
-		End If
-	End If
 
-	If Len(myTunes) &lt;&gt; 0 And fbCreatingMediaFile() Then
+	If Len(myTunes) &lt;&gt; 0 And fbCreatingMediaFile(&quot;&quot;, &quot;&quot;) Then
 		&apos; MacOS 10 iTunes or MacOS 11 Music programs can generate
 		&apos; audio files and playlists.
 		If ArtPath = &quot;&quot; Or _
@@ -6648,7 +7082,7 @@ Function fswriteMacOSSpeechScript( _
 		&apos; Check generated  title
 		
 		If fbCreatingMediaFile( _
-			confirmMetaData) And sGetOS = &quot;MACOS&quot; Then
+			confirmMetaData, &quot;&quot;) And sGetOS = &quot;MACOS&quot; Then
 			sTitle = fsMyTitleInputBox(True, fsThisSoundTitle(&quot;`&gt;_ &quot;), &quot;&quot;)
 			If sTitle = &quot;&quot; Then
 				s1 = &quot;-- &quot; &amp; fsNow() &amp; &quot;.  The title is undefined.  &quot; &amp; _
@@ -7542,7 +7976,7 @@ Function fbHavePyQrCode() As Boolean
 	If fbHavePyQrCode Then
 		Exit Function
 	End If
-	Dim x# : x = 0
+	Dim x As Integer : x = 0
 	Dim Tokens As Variant
 	Dim _home as String
 	Select Case getGUIType()
@@ -7577,8 +8011,8 @@ Function fbOKWithRhVoice(_
     If Not FileExists(fsRhVoiceTtsDoc()) Then
         Exit Function
     End If
-	Dim _test$ : _test$ = &quot;&quot;
-	Dim languages$ : languages = &quot;file:///usr/share/RHVoice/languages/&quot;
+	Dim _test As String : _test$ = &quot;&quot;
+	Dim languages As String : languages = &quot;file:///usr/share/RHVoice/languages/&quot;
 	Dim a1 : a1 = Array(_
 		&quot;RHVoice-test&quot;)
 	Dim x As Integer : x = 0
@@ -7630,12 +8064,12 @@ Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
 	&apos; unless the current user has explicitly installed it with a version
 	&apos; of pip that makes user installed pip libraries available to other
 	&apos; user applications, excluding python virtual environments (`venvs`).
-	Dim ret_val$ : ret_val = &quot;&quot;
-	Dim os_div$ : os_div = getPathSeparator
+	Dim ret_val As String : ret_val = &quot;&quot;
+	Dim os_div As String : os_div = getPathSeparator
 	Dim sPythonSubDirs$
-	Dim _pipx$ : _pipx = &quot;&quot;
+	Dim _pipx As String : _pipx = &quot;&quot;
 	Dim py_dir$
-	Dim home$ : home = Environ(&quot;HOME&quot;)
+	Dim home As String : home = Environ(&quot;HOME&quot;)
 	fsGetPipLibPath = &quot;&quot;
 
 	Select Case fsGetOs()
@@ -7680,7 +8114,7 @@ Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
 		sPythonSubDirs = &quot;/site-packages&quot;
 		py_dir = home &amp; &quot;/.local/lib&quot;
 	End Select
-	Dim sSubDirectories$ : sSubDirectories = fsSubDirectories(py_dir)
+	Dim sSubDirectories As String : sSubDirectories = fsSubDirectories(py_dir)
 	Dim version_list As Variant : version_list = Split(sSubDirectories, Chr(13))
 
 	Dim x As Integer : x = 0
@@ -7702,7 +8136,7 @@ Function fsGetPipLibPath(s_test As String, only_local As Boolean) As String
 End Function
 
 
-Function fsSubDirectories(sPath As String)
+Function fsSubDirectories(sPath As String) As String
 	&apos; Returns directories
 	Dim sDir As String : sDir = &quot;&quot;
 	Dim sValue As String : sValue = &quot;&quot;
@@ -7744,17 +8178,17 @@ Function fbLocalPythonDevKit() As Boolean
 End Function
 
 
-Function AwsBoto3Json()
+Function AwsBoto3Json() As String
 	AwsBoto3Json = fsFullPathOf(&quot;aws/boto3/Config.json&quot;)
 End Function
 
 
-Function AwsPolyJson()
+Function AwsPolyJson() As String
 	AwsPolyJson = fsFullPathOf(&quot;aws/polly/Config.json&quot;)
 End Function
 
 
-Function GoogleApisJson()
+Function GoogleApisJson() As String
 	&apos; https://codelabs.developers.google.com/codelabs/cloud-text-speech-python3
 	&apos; Requires registration with Google:
 	&apos; Project_Email Project_Name, Project_ID, Project_Number
@@ -7768,17 +8202,17 @@ Function GoogleApisJson()
 End Function
 
 
-Function msAzureJson()
+Function msAzureJson() As String
 	msAzureJson = fsFullPathOf(&quot;ms/azure/cognitiveservices/speech/Config.json&quot;)
 End Function
 
 
-Function ibmWatsonJson()
+Function ibmWatsonJson() As String
 	ibmWatsonJson = fsFullPathOf(&quot;ibm/watson/speech/Config.json&quot;)
 End Function
 
 
-Function gttsResourceCheck()
+Function gttsResourceCheck() As String
 	gttsResourceCheck = &quot;&quot;
 	Select Case fsTheOsId()
 	Case &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;POSIX.FLATPAK&quot;
@@ -7819,7 +8253,7 @@ Function fbHaveNetworkTTS() As Boolean
 			End If
 		Next
 	End Select
-	Dim x# : x = 0
+	Dim x As Integer : x = 0
 	Dim Tokens : Tokens = Array(_
 	gttsResourceCheck(), _
 	AwsBoto3Json(), _
@@ -7963,14 +8397,19 @@ Function fsGetPath(app As String) As String
 	&apos; Most platforms let you add and remove paths in the
 	&apos; system user&apos;s &quot;PATHS&quot; list.
 	FsGetPath = &quot;&quot;
-	Dim spliter$ : spliter = &quot;:&quot;
+	Dim spliter As String : spliter = &quot;:&quot;
+	Dim a1 As Variant
 	Select Case getGUIType():
 		Case 1  &apos; WINDOWS
+		a1 = split(Environ(&quot;PATH&quot;), spliter)
 		spliter = &quot;;&quot;
+		
+		Case Else
+		a1 = LocalLinuxPaths()
 	End Select
-	Dim a1 : a1 = split(Environ(&quot;PATH&quot;), spliter)
-	Dim n# : n = 0
-	Dim prueba$ : prueba = &quot;&quot;
+
+	Dim n As Integer : n = 0
+	Dim prueba As String : prueba = &quot;&quot;
 	For n = Lbound(a1) To Ubound(a1)
 		prueba = ConvertToURL(a1(n)) &amp; &quot;/&quot; &amp; app
 		If FileExists(prueba) Then
@@ -7978,6 +8417,7 @@ Function fsGetPath(app As String) As String
 			Exit Function
 		End If
 	Next
+	
 End Function
 
 
@@ -8025,6 +8465,7 @@ Function fsFindAppPath(sa As String) As String
 		converttourl(Environ(&quot;ProgramW6432&quot;) &amp; &quot;\&quot;), _
 		converttourl(Environ(&quot;HOMEDRIVE&quot;) &amp; &quot;\opt\&quot;), _
 		converttourl(Environ(&quot;SystemRoot&quot;) &amp; &quot;\&quot;), _
+		converttourl(Environ(&quot;USERPROFILE&quot;) &amp; &quot;\.local\bin\&quot;), _
 		converttourl(Environ(&quot;USERPROFILE&quot;) &amp; &quot;\opt\&quot;), _
 		converttourl(Environ(&quot;HOMEDRIVE&quot;) &amp; &quot;\opt\&quot;), _
 		converttourl(Environ(&quot;LOCALAPPDATA&quot;) &amp; &quot;\Programs\&quot;))
@@ -8264,13 +8705,14 @@ Sub resetSpeechDispatcher( _
 &apos;Stopping Speech
 	Dim a1 As Variant
 	Dim a2 As Variant
-	Dim i# : i = 0
-	Dim j# : j = 0
-	Dim _path$ : _path = &quot;&quot;
+	Dim i As Integer : i = 0
+	Dim j As Integer : j = 0
+	Dim _path As String : _path = &quot;&quot;
 	Dim errorCode
 	Dim oBar
 	Dim oFrame
 	Dim sTemp
+	Dim sLock As String : sLock = fsMyTempLock(&quot;lock&quot;)
 	
 	On Error Resume Next
 	oFrame = ThisComponent.getCurrentController().getFrame()
@@ -8280,13 +8722,13 @@ Sub resetSpeechDispatcher( _
 	On Error Goto resetSpeechDispatcherErr
     Select Case fsGetOs()
     	Case &quot;WINDOWS&quot;
-		fbRemoveFile(fsMyTempLock(&quot;lock&quot;))
+		fbRemoveFile(sLock)
     	Case &quot;MACOS&quot;
 		If FileExists(&quot;/usr/bin/say&quot;) Then
 			If Not (fbCreatingMacOSMediaFile()) Then
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;say&quot;, True)
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;afplay&quot;, True)
-				fbRemoveFile(fsMyTempLock(&quot;lock&quot;))
+				fbRemoveFile(sLock)
 			End If
 		End If
 
@@ -8342,7 +8784,7 @@ Sub resetSpeechDispatcher( _
 				errorCode = Shell(&quot;killall&quot;, 0, &quot;--quiet vlc&quot;, True)
 			End If
 		End If
-		fbRemoveFile(fsMyTempLock(&quot;lock&quot;))
+		fbRemoveFile(sLock)
 		fbRemoveFile(fsTemporaryTextDoc() &amp; &quot;.sable&quot;)
     End Select
 	fbRemoveFile(fsTemporaryTextDoc())
@@ -8360,11 +8802,11 @@ Function fbLetButtonInterruptPosixPlayer() As Boolean
 	&apos; don&apos;t interrupt if we are writing a media file
 	b1 = fbCreatingMediaFile(&quot;.3gp,.aac,.aif,.aiff,.alsa,.ape,.asf,.au,.avi,.caf,.dts,.flac,&quot; &amp; _
 	&quot;.m4a,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.oma,.opus,.riff,.rm,.smp,.snd,.sou,.spx,&quot; &amp; _
-	&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;)
+	&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;, &quot;&quot;)
 	&apos; don&apos;t interrupt if we are using a graphical player.
 	If fbCreatingMediaFile( _
-		&quot;--visible true,--visible &apos;true&apos;,--visible &quot;&quot;true&quot;&quot;&quot;) Or _
-		Not (fbCreatingMediaFile(&quot;--visible &quot;)) Then
+		&quot;--visible true,--visible &apos;true&apos;,--visible &quot;&quot;true&quot;&quot;&quot;, &quot;&quot;) Or _
+		Not (fbCreatingMediaFile(&quot;--visible &quot;, &quot;&quot;)) Then
 		b1 = False
 	End If
 	fbLetButtonInterruptPosixPlayer = b1
@@ -8374,75 +8816,145 @@ End Function
 Function fbCreatingMacOSType2Media() As Boolean
 	&apos; We either didn&apos;t use ffmpeg or a compatible media player is missing.
 	fbCreatingMacOSType2Media = fbCreatingMediaFile( _
-	&quot;.aif,.avi,.aiff,.flac,.m4a,.oga,.ogg,.ogv,.wav,.webm,.wma,.wmv&quot;)
+	&quot;.aif,.avi,.aiff,.flac,.m4a,.oga,.ogg,.ogv,.wav,.webm,.wma,.wmv&quot;, &quot;&quot;)
 End Function
 
 
 Function fbCreatingMacOSType1Media() As Boolean
-	fbCreatingMacOSType1Media = fbCreatingMediaFile(&quot;.caf,.m4v,.mp3,.mp4&quot;)
+	fbCreatingMacOSType1Media = fbCreatingMediaFile(&quot;.caf,.m4v,.mp3,.mp4&quot;, &quot;&quot;)
 End Function
 
 
 Function fbCreatingMacOSMediaFile() As Boolean
 	Dim sA As String
-	fbCreatingMacOSMediaFile = fbCreatingMediaFile(&quot;.aif,.caf,.m4v,.mp3,.mp4&quot;)
+	fbCreatingMacOSMediaFile = fbCreatingMediaFile(&quot;.aif,.caf,.m4v,.mp3,.mp4&quot;, &quot;&quot;)
+End Function
+
+Function MediaList() As String
+	MediaList =  &quot;.3gp,.aac,.aif,.aiff,.alsa,.ape,.asf,.au,.avi,.caf,.dts,.flac,&quot; &amp; _
+	&quot;.m4a,.mp2,.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.oma,.opus,.riff,.rm,.smp,.snd,.sou,.spx,&quot; &amp; _
+	&quot;.tta,.voc,.wav,.weba,.webm,.wma,.wmv,.wsaud&quot;
+	Select Case fsTheOsId()
+		Case &quot;POSIX.SNAP&quot;, &quot;WINDOWS.WINE&quot;
+		MediaList = &quot;.au,.avi,.snd,.wav&quot;
+	End Select
+End Function
+
+
+Function CheckConfig() As Boolean
+	CheckConfig = False
+	On Error GoTo CheckConfigErr
+	Dim sFile As String
+	Dim ErrorCode As Integer
+
+	Select Case Ubound(Config)
+	Case 0
+	sFile = fsExtensionSettingsIni()
+	If Not FileExists(sFile) Then
+		CheckConfig = False
+	End If
+	tts_config_parseFile(sFile, Config(), errorCode)
+	End Select
+	CheckConfig = True
+	Exit Function
+	CheckConfigErr:
+	CheckConfig = False
 End Function
 
 
 Function fbCreatingMediaFile( _
-	Optional ByVal sA, _
-	Optional ByVal sB) As Boolean
-	&apos; s2 is a csv string of media identifiers- for example, file extensions.
-	&apos; Config is a set of preferences. This function uses use Config(5); the
-	&apos; string in `Tools - Add-ons - Read Selection... - Command Line Options`
-	&apos; You can test or simulate different command strings with sB.
-	fbCreatingMediaFile = False
-	If Not FileExists(fsExtensionSettingsIni()) Then
-		&apos; By default, the extension reads text aloud.
-		Exit Function
+    Optional ByVal sCsv As String, _
+    Optional ByVal sArguments As String) As Boolean
+    &apos; Determines whether a given command string (`sCsv`) or global configuration
+    &apos; implies the creation or export of a media file, based on specific media-related arguments.
+	If IsMissing(sArguments) Then
+		sArguments = &quot;&quot;
 	End If
-	If ismissing(sA) Then
-		sA = &quot;.3gp,.aac,.aif,.aiff,.au,.avi,.bit,.flac,.m4a,.m4v,.mov,.mkv,.mp2,&quot; &amp; _
-		&quot;.mp3,.mp4,.mpeg,.oga,.ogg,.ogm,.ogv,.opus,.wav,.webm,.wma,.wmv&quot;
+	If IsMissing(sCsv) Then
+		sCsv = &quot;&quot;
 	End If
-	If ismissing(sB) Then
-		sB = &quot;&quot;
-	End If
-	Dim sFile As String
-	Dim aA
-	Dim bTattle As Boolean
-	bTattle = False
-	Dim n As Integer
-	n = 0
-	Dim msgs()As Variant
-	Dim errorCode As Integer
-	errorCode = 0
-	Dim Config(fiUboundConfigOptions) As Variant
+    fbCreatingMediaFile = False
+    On Error GoTo fbCreatingMediaFileErr
 
-	sFile = fsExtensionSettingsIni()
-	tts_config_parseFile(sFile, Config(), errorCode)
-	If Len(sB) &lt; 1 Then
-		sB = LCase(Config(5))
+    &apos; Default media-related arguments
+    Dim MediaArgs As Variant
+    MediaArgs = Array(&quot;--output&quot;, &quot; -o&quot;)
+
+    &apos; If sCsv is provided and contains commas, treat it as a CSV list of media identifiers
+    If Instr(sCsv, &quot;,&quot;) &gt; 0 Then
+        MediaArgs = Split(sCsv, &quot;,&quot;)
+    End If
+
+    &apos; Check sArguments for any media-related argument
+    Dim MediaArg As String
+    If Len(sArguments) &gt; 0 Then
+        For Each MediaArg In MediaArgs
+            If Instr(sArguments, MediaArg) &gt; 0 Then
+                fbCreatingMediaFile = True
+                Exit Function
+            End If
+        Next
+    &apos; If sArguments is empty, check global configuration
+
+    ElseIf Ubound(Config()) &gt; 10 Then
+        For Each MediaArg In MediaArgs
+            If Config(pi_use_external_boolean) Then
+                If Instr(Config(pi_external_options_string), MediaArg) &gt; 0 Then
+                    fbCreatingMediaFile = True
+                    Exit Function
+                End If
+            ElseIf Config(pi_use_experimental_boolean) Then
+                If Instr(Config(pi_experimental_options_string), MediaArg) &gt; 0 Then
+                    fbCreatingMediaFile = True
+                    Exit Function
+                End If
+            End If
+        Next
+    End If
+
+    Exit Function
+
+fbCreatingMediaFileErr:
+    fbCreatingMediaFile = False
+End Function
+
+
+Function fbUsingOutputFlag(_
+ByVal ReloadOnError As Boolean,_ 
+ByVal TestConfig) As Boolean
+	&apos; Check if an executable command string includes an `--output` flag so that
+	&apos; when the software and file format permit you can save metadata with an
+	&apos; audio file.
+	fbUsingOutputFlag = False
+	Dim errorCode As Variant
+	If ReloadOnError Then
+		&apos; Allow the system to show an error Dialog.
+		On Error GoTo fbUsingOutputFlagErr
 	End If
-	If bTattle Then
-		MsgBox sB &amp; Chr(10) &amp; sA
-	End If
-	If Not(Config(pi_use_external_boolean)) Then
-		&apos; if the external option button in the main dialogue is not selected, then return
-		&apos;     fbCreatingMediaFile = False
+	Select Case Ubound(TestConfig)
+		Case 0
 		Exit Function
+	End Select
+
+	If TestConfig(pi_use_external_boolean) Then
+		If Instr(TestConfig(pi_external_options_string), &quot; --output &quot;) &lt;&gt; 0 Then
+			fbUsingOutputFlag = True
+			Exit Function
+		End If
+	ElseIf TestConfig(pi_use_experimental_boolean) Then
+		If Instr(TestConfig(pi_experimental_options_string), &quot; --output &quot;) &lt;&gt; 0 Then
+			fbUsingOutputFlag = True
+			Exit Function
+		End If
 	End If
-	aA = Split(LCase(sA), &quot;,&quot;)
-	If Len(sB) &lt;&gt; 0 Then
-		For n = LBound(aA) To UBound(aA)
-			If aA(n) = &quot;&quot; Then
-				Exit For
-			ElseIf InStr(sB, aA(n)) &lt;&gt; 0 Then
-				fbCreatingMediaFile = True
-				Exit For
-			End If
-		Next
+	Exit Function
+	fbUsingOutputFlagErr:
+	If ReloadOnError Then
+		tts_config_parseFile(fsExtensionSettingsIni(), Config(), errorCode)
+		TestConfig = Config()
+		fbUsingOutputFlag(False, TestConfig)
 	End If
+	fbUsingOutputFlag = False			
 End Function
 
 
@@ -8504,8 +9016,8 @@ Function fbExperimentalOsId() As Boolean
 	If Not fbTestLibraryLoaded(&quot;Tools&quot;) Then
 		Exit Function
 	End If
-	Dim sKeyName$ : sKeyName = &quot;ExperimentalMode&quot;
-	Dim sNodePath$ : sNodePath = &quot;org.openoffice.Office.Common/Misc&quot;
+	Dim sKeyName As String : sKeyName = &quot;ExperimentalMode&quot;
+	Dim sNodePath As String : sNodePath = &quot;org.openoffice.Office.Common/Misc&quot;
 	On Error GoTo fbExperimentalOsIdErr
 	Dim oNode as Object : oNode = GetRegistryKeyContent(_
 	sNodePath)
@@ -8545,7 +9057,7 @@ Function fsGetThisUsers( _
 	If ismissing(cType) Then
 		cType = &quot;fn&quot;
 	End If
-	Dim sNodePath$ : sNodePath = &quot;/org.openoffice.UserProfile/Data&quot;
+	Dim sNodePath As String : sNodePath = &quot;/org.openoffice.UserProfile/Data&quot;
 	Dim oNode as Object : oNode = GetRegistryKeyContent(_
 	sNodePath)
 	Dim snval$
@@ -9476,25 +9988,17 @@ Function fmyFontWidthIndex( _
 End Function
 
 
-Function fbsetnote( _
-	oPage, _
-	sA) As Boolean
+Function fbsetnote(oPage, sA) As Boolean
 	&apos; oPage is a presentation slide.
 	&apos; sA is the string to write
-	Dim i
-	
-	i = 1
-	If HasUnoInterfaces(oPage.getnotesPage.getByIndex(i), _
-		&quot;com.sun.star.text.XText&quot;) Then
-		oPage.getnotesPage.getByIndex(i).String = sA &amp; Chr(10)
-		fbsetnote = True
-	Else
-		fbsetnote = False
-	End If
-	Exit Function
-	fbsetnoteErr
-	
-	fbsetnote = False
+    
+    If HasUnoInterfaces(oPage.getnotesPage.getByIndex(1), _
+        &quot;com.sun.star.text.XText&quot;) Then
+        oPage.getnotesPage.getByIndex(1).String = sA &amp; Chr(10)
+        fbsetnote = True
+    Else
+        fbsetnote = False
+    End If
 End Function
 
 
@@ -9672,7 +10176,7 @@ Sub NewPresentionFromSelection( _
 		BgCanaryYellow(0)
 		x.DocumentProperties.Title = sA
 		&apos; Format the aspect ratio of the presentation
-		Select Case fbCreatingMediaFile()
+		Select Case fbCreatingMediaFile(&quot;&quot;, &quot;&quot;)
 			Case True
 			&apos; Square - aspect ratio of the presentation is the same as an album cover
 			&apos; displayed in an audio media player. With compatible convertors, you can
@@ -9796,7 +10300,7 @@ Sub NewPresentionFromSelection( _
 			End If
 			oBar.Value = j
 		Next
-		Select Case fbCreatingMediaFile()
+		Select Case fbCreatingMediaFile(&quot;&quot;, &quot;&quot;)
 			Case False
 			oShape1 = x.getDrawPages().getByIndex(x.GetDrawPages.getCount() - 1).getByIndex(1)
 			oShape1.setString(&quot; ? &quot;)
@@ -9870,7 +10374,7 @@ Sub addTextToSlide( _
 		sStyle = &quot;&quot;
 	End If
 	If ismissing(bLiveText) Then
-		Select Case fbCreatingMediaFile()
+		Select Case fbCreatingMediaFile(&quot;&quot;, &quot;&quot;)
 			Case True
 			bLiveText = False
 			Case Else
@@ -10484,8 +10988,8 @@ Function BundlePyPath()
 	End Select
 	If FileExists(BundlePyPath) Then Exit Function	
 	Dim v1 As Variant : v1=CreateUnoService(&quot;com.sun.star.util.PathSubstitution&quot;)
-	Dim _path$ : _path = v1.substituteVariables(&quot;$(inst)&quot;, True)
-	Dim _path2$ : _path2 = DirectoryNameoutofPath(_path, &quot;/&quot;)
+	Dim _path As String : _path = v1.substituteVariables(&quot;$(inst)&quot;, True)
+	Dim _path2 As String : _path2 = DirectoryNameoutofPath(_path, &quot;/&quot;)
 	&apos;inputbox &quot;Check the path&quot;, _path2, ConvertFromURL(_path)
 	Dim _item As String : _item = &quot;&quot;
 	Dim test_roots As Variant : test_roots = Array(_path, _path2, &quot;&quot;)
@@ -10576,7 +11080,7 @@ Function fbWindowsReplacePhonemes(_
     &apos;Replaces mispronounced words with phonemes
 	&apos; NOTE: Apache OpenOffice 4 for Windows does not support python 3
     fbWindowsReplacePhonemes = False
-    Dim PyPath$ : PyPath = BundlePyPath()
+    Dim PyPath As String : PyPath = BundlePyPath()
     If Len(PyPath) = 0 Then
     	Exit Function
     End If
@@ -10615,7 +11119,7 @@ Function fsGetFirstKey(Config) As String
 	&apos; Example `libreoffice_Aa01Aa01Aa01Aa01`
 	fsGetFirstKey = &quot;&quot;
 	On Error GoTo fsGetFirstKeyErr
-	Dim FirstKey$ : FirstKey = s_CaReadTextExtensionCurrentAnonymousKey
+	Dim FirstKey As String : FirstKey = s_CaReadTextExtensionCurrentAnonymousKey
 	Select Case Len(Str(FirstKey))
 		Case 0
 		Select Case Len(Config(pi_anonymous_key_string))
@@ -10718,10 +11222,10 @@ Function fbDoWinBat(_
 	End Select
 	If Len(sA) = 0 Then Exit Function
 	Dim b1 As Boolean : b1 = False
-	Dim CR$ : CR = Chr(13) &amp; Chr(10)  &apos; Batch files use `/r/n` line endings
-	Dim n# : n = 0
-	Dim s4$ : s4 = fsMyTempLock(&quot;bat&quot;)
-	Dim s5$ : s5 = &quot;@echo off&quot; &amp; _
+	Dim CR As String : CR = Chr(13) &amp; Chr(10)  &apos; Batch files use `/r/n` line endings
+	Dim n As Integer : n = 0
+	Dim s4 As String : s4 = fsMyTempLock(&quot;bat&quot;)
+	Dim s5 As String : s5 = &quot;@echo off&quot; &amp; _
 			CR &amp; _
 			&quot;chcp 65001&gt;nul&quot; &amp; _
 			CR

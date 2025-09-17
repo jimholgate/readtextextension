@@ -21,6 +21,6 @@
     <manifest:file-entry manifest:full-path="description/component.txt.it" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=it" />
     <manifest:file-entry manifest:full-path="description/component.txt.ru" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=ru" />
     <manifest:file-entry manifest:full-path="description/component.txt.zh" manifest:media-type="application/vnd.sun.star.package-bundle-description;locale=zh" />
-    <!--Help: Show context appropriate help using F1 when Read Text dialog is showing **NOT ALL VERSIONS OF LIBREOFFICE CAN SHOW EXTENSION HELP CONTENT**-->
+    <!--Help: Show context appropriate help using F1 when Read Text dialog is showing-->
     <manifest:file-entry manifest:media-type="application/vnd.sun.star.help" manifest:full-path="help/" />
 </manifest:manifest>

@@ -35,7 +35,7 @@ There may be acceptable use policies, limits or costs.
   or snap, some functions might not work because the application
   does not have permission to execute them.
 * On some systems, you might need to install additional software
-  libraries like `bs4`, `spacy`, `docker.io`, `podman`, `python3-requests`
+  libraries like `bs4`, `docker.io`, `podman`, `python3-requests`
   and `ffmpeg` to ensure that libraries are available to download
   and process files.
 
@@ -51,6 +51,37 @@ compatibility mode. The compatibility mode allows the speech synthesis
 image to use the maryTTS address and port and the maryTTS Application
 Program Interface (API) to list installed voices and to produce spoken
 audio files over a local web service.
+
+Rhasspy Piper
+-------------
+
+*September 6, 2025*
+
+Piper TTS is a fast, local neural text-to-speech system that can run as a
+network server to use onnx voice models and voices across devices. The updated
+setup supports multiple platforms, but performance depends on your hardware
+and home network, with container deployments (Podman or Docker) recommended
+for stability.  A simple way to install it as a local user is to use the
+`python3-pipx` application.
+
+```bash
+pipx install piper-tts[http]
+pipx ensurepath
+```
+The current release of Piper offers a variety of voices and languages, each with
+its own license terms.
+
+When running the piper server in a command line window, it shows the following
+warning:
+
+> WARNING: This is a development server. Do not use it in a
+> production deployment.
+
+You can find out more at the HTTP API page on
+[GitHub](https://github.com/OHF-Voice/piper1-gpl/blob/main/docs/API_HTTP.md)
+
+See also:
+[Source](https://raw.githubusercontent.com/jimholgate/readtextextension/refs/heads/master/Read_Text/python/netpiper.py)
 
 Mimic 3
 -------
@@ -99,34 +130,6 @@ If you use python pip to install local libraries, you might have to
 manually update them from time to time. Packages that are managed
 by update utilities like `apt-get`, `yum` and `dnf` are upgraded
 by the distribution.
-
-Rhasspy Piper
--------------
-
-*Dec 21, 2023*
-
-[Rhasspy Piper](https://github.com/rhasspy/piper) is a fast, local
-neural text to speech system. A local network server version of
-Rhasspy Piper can serve a single voice model to different devices
-for a home network as an assistant to home automation devices
-or as a speech synthesis system for computer desktop applications
-that cannot run a locally installed piper program or model.
-
-This Rhasspy Piper network client will only work correctly if the
-language of the model that it serves is the same as the language
-locale of the user.
-
-When running the piper server in a command line window, it shows
-the following warning:
-
-> WARNING: This is a development server. Do not use it in a
-> production deployment.
-
-You can find out more about installing and using the server on
-[The GitHub Rhasspy project
-site](https://github.com/rhasspy/piper/blob/master/src/python_run/README_http.md)
-
-See also: <https://www.youtube.com/watch?v=pLR5AsbCMHs>
 
 Rhvoice
 -------
@@ -179,8 +182,8 @@ Additional Resources
 * [Rhasspy community](https://community.rhasspy.org/)
 """
 
-
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
 import sys
 
@@ -227,6 +230,9 @@ try:
     import netcommon
 except (AttributeError, ImportError):
     pass
+
+
+ENGINE_IDS = ["gtts", "mary", "mimic3", "opentts", "piper", "rhvoice"]
 
 
 def usage():  # -> None
@@ -287,13 +293,15 @@ def network_problem(voice="default"):  # -> str
     )
 
 
-def network_ok(_iso_lang="en-US", _local_url=""):  # -> bool
+def network_ok(_iso_lang="en-US", _local_url="", requested_voice=""):  # -> bool
     """Do at least one of the classes support an on-line speech library?"""
     _continue = False
     if not _continue:
         try:
-            _piper = netpiper.RhasspyPiperClass()
-            _continue = _piper.language_supported(_iso_lang, _local_url)
+            _piper = netpiper.GPLPiperClass()
+            _continue = _piper.language_supported(
+                _iso_lang, _local_url, requested_voice
+            )
         except NameError:
             pass
     if not _continue:
@@ -342,6 +350,118 @@ def is_ssml(_text=""):
     return _ssml
 
 
+def identify_engine_by_vox(_vox=""):  # -> Tuple[str, str]
+    """
+    Identify if a given voice string includes the name of a known speech engine.
+
+    Examples:
+        - identify_engine_by_vox("mimic3") -> ("mimic3", "male1")
+        - identify_engine_by_vox("mimic3/MALE1") -> ("mimic3", "mimic3/MALE1")
+        - identify_engine_by_vox("mimic3/en_US/vctk_low#p227") -> ("mimic3", "mimic3/en_US/vctk_low#p227")
+        - identify_engine_by_vox("MALE1") -> ("", "MALE1")
+
+    Arguments:
+        _vox (str): The `--voice` argument provided by the user.
+
+    Returns:
+        tuple:
+            - str: Engine name if found, otherwise "".
+            - str: The normalized `_vox` string or default `"male1"` if only the engine name was given.
+    """
+
+    if not _vox:
+        return "", str(_vox)
+    _vox = str(_vox)
+    vox = _vox.lower()
+    if vox in ENGINE_IDS:
+        return vox, "male1"
+    for _test in ENGINE_IDS:
+        if _test in vox:
+            return _test, _vox
+    return "", _vox
+
+
+def use_engine(this_engine="", _vox=""):  # type: (str, str) -> bool
+    """
+    Decide whether to use `this_engine` given the requested voice `_vox`.
+
+    Rules:
+        - If `_vox` has no known engine, return True (use this_engine).
+        - If `_vox` specifies a known engine, return True only if it matches `this_engine` (case-insensitive).
+
+    Examples:
+        - use_engine("mimic3", "mimic3") -> True
+        - use_engine("mimic3", "mimic3/MALE1") -> True
+        - use_engine("mimic3", "mimic3/en_US/vctk_low#p227") -> True
+        - use_engine("mimic3", "MALE1") -> True   # no engine specified
+        - use_engine("espeak", "mimic3/MALE1") -> False
+        - use_engine("", "MALE1") -> True         # treat as default: no engine specified
+
+    Arguments:
+        this_engine (str): The current engine id to evaluate (e.g., "mimic3").
+        _vox (str): The `--voice` argument provided by the user.
+
+    Returns:
+        bool: True if `_vox` does not specify a different supported engine,
+              or if it matches `this_engine`; otherwise False.
+    """
+    # Treat empty this_engine as "use the current/default engine"
+    if not this_engine:
+        this_engine = ""
+
+    # No voice provided, so no engine specified, therefore use this_engine
+    if not _vox:
+        return True
+
+    # engine is "" if none is found
+    engine, ret_vox = identify_engine_by_vox(_vox)
+
+    # If there is not a valid engine substring in _vox, use this_engine
+    if not engine:
+        return True
+
+    # Otherwise, require exact engine match (case-insensitive)
+    return engine == str(this_engine).lower()
+
+
+def normalize_vox(_vox=""):
+    """
+    Remove the engine name from a voice description, returning only the voice ID.
+
+    Examples:
+        - normalize_vox("mimic3") -> "mimic3"
+        - normalize_vox("mimic3/MALE1") -> "male1"
+        - normalize_vox("mimic3/en_US/vctk_low#p227") -> "en_US/vctk_low#p227"
+        - normalize_vox("MALE1") -> "male1"
+
+    Arguments:
+        _vox (str): The `--voice` argument provided by the user.
+
+    Returns:
+        str: A normalized voice string without the engine name.
+             If no engine is detected, returns `_vox` (possibly lowercased).
+             If `_vox` is empty, returns "".
+    """
+
+    if not _vox:
+        return ""
+    engine, test_vox = identify_engine_by_vox(_vox)
+    if not engine:
+        return test_vox
+    if not str.islower(test_vox):
+        if netcommon.is_voice_id_formatted_for_speechd(test_vox):
+            test_vox = test_vox.lower()
+
+    for item in [
+        "{0}/".format(engine),
+        "/{0}".format(engine),
+        "({0})".format(engine),
+    ]:
+        if item in test_vox:
+            return test_vox.replace(item, "").strip(" /\r\t\n#()")
+    return test_vox
+
+
 def network_main(
     _text_file_in="",
     _iso_lang="ca-ES",
@@ -355,9 +475,7 @@ def network_main(
     _speech_rate=160,
     _vox="",
     _local_url="",
-    _denoiser_strength=0.005,
-    _noise_scale=0.667,
-):  # -> boolean
+):  # -> Any
     """Read a text file aloud using a network resource."""
     _imported_meta = readtexttools.ImportedMetaData()
     _text = _imported_meta.meta_from_file(_text_file_in)
@@ -367,6 +485,7 @@ def network_main(
     clip_title = readtexttools.check_title(_title, "espeak")
     # If the library does not require a postprocess, use `0`,
     # otherwise use the item corresponding to the next action.
+
     _post_processes = [
         None,
         "process_mp3_media",
@@ -375,162 +494,216 @@ def network_main(
         "process_vorbis_media",
         "process_wav_media",
         "process_audio_media",
+        "process_stream_media",  # Look for best streaming option.
     ]
-    _vox = _vox.strip("'\" \t\n").lower()
+    _vox = _vox.strip("'\" \t\n")
+
+    if netcommon.is_voice_id_formatted_for_speechd(_vox):
+        _vox = _vox.lower()
     # Prioritize speech engines that use json to communicate data
     # because text tables can use ambiguous labels (i. e.: `NA`)
     # Prioritize engines where everything can be achieved using `urllib`
     # because some immutable office packages do not include `requests`
     # support.
-    try:
-        _piper = netpiper.RhasspyPiperClass()
-        _ssml = False
-        if _piper.language_supported(_iso_lang, _local_url):
-            _piper.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _ssml,
-                20,
-                60,
-            )
-            return True
-    except NameError:
-        pass
-    try:
-        _mimic3 = netmimic3.Mimic3Class()
-        if _mimic3.language_supported(_iso_lang, _local_url, _vox):
-            _mimic3.spd_voice_to_mimic3_voice(_vox, _iso_lang, _local_url)
-            _ssml = is_ssml(_text)
-            _mimic3.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _ssml,
-                20,
-                60,
-            )
-            return True
-    except NameError:
-        pass
-    try:
-        _rhvoice_rest = netrhvoice.RhvoiceLocalHost()
-        if _rhvoice_rest.language_supported(_iso_lang, _local_url):
-            _rhvoice_rest.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _vox,
-                4,
-                30,
-            )
-            return True
-    except NameError:
-        pass
-    try:
-        _opentts = netopentts.OpenTTSClass()
-        if _opentts.language_supported(_iso_lang, _local_url):
-            _ssml = is_ssml(_text)
-            _opentts.spd_voice_to_opentts_voice(_vox, _iso_lang)
-            _opentts.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _ssml,
-                0.03,
-                20,
-                60,
-            )
-            return True
-    except NameError:
-        pass
-    try:
-        _marytts = netmary.MaryTtsClass()
-        if _marytts.language_supported(_iso_lang, _local_url):
-            _ssml = is_ssml(_text)
-            if REQUESTS_OK:
-                if int(requests.__version__[0] == 1):
+    do_post = 5
+    # if os.name == "nt":
+    #     do_post = 6
+    _g_class_ok = True
+    if use_engine("piper", _vox):
+        try:
+            _piper = netpiper.GPLPiperClass()
+            _ssml = False
+            if _piper.language_supported(_iso_lang, _local_url, _vox):
+                _vox = normalize_vox(_vox)
+                _piper.read(
+                    _text.strip(),
+                    _iso_lang.strip(),
+                    _visible,
+                    _audible,
+                    _media_out,
+                    _icon,
+                    clip_title,
+                    _post_processes[do_post],
+                    _info,
+                    _size,
+                    _speech_rate,
+                    _vox,
+                    4,
+                    30,
+                )
+                return True
+        except NameError:
+            pass
+
+    if use_engine("mimic3", _vox):
+        try:
+            _mimic3 = netmimic3.Mimic3Class()
+            _vox = normalize_vox(_vox)
+            if _mimic3.language_supported(_iso_lang, _local_url, _vox):
+                if not _mimic3.spd_voice_to_mimic3_voice(_iso_lang, _local_url, _vox):
+                    # Check the returned value:
+                    # - *str* language/model#speaker: e.g.: `en_US/cmu-arctic_low#lnh` (`True`)
+                    # - *str* language/model: e.g.: `pl_PL/piotr_nater` (`True`)
+                    # - *str* no model `""` (`False`)
+                    print(
+                        """WARNING:
+========
+
+Could not match a Mimic3 model with `{0}`.
+
+[Mimic3 Help]({1})""".format(
+                            _vox, _mimic3.help_url
+                        )
+                    )
+                _ssml = is_ssml(_text)
+                _mimic3.read(
+                    _text,
+                    _iso_lang,
+                    _visible,
+                    _audible,
+                    _media_out,
+                    _icon,
+                    clip_title,
+                    _post_processes[do_post],
+                    _info,
+                    _size,
+                    _speech_rate,
+                    _ssml,
+                    20,
+                    60,
+                )
+                return True
+        except NameError:
+            pass
+
+    if use_engine("rhvoice", _vox):
+        _vox = normalize_vox(_vox)
+        try:
+            _rhvoice_rest = netrhvoice.RhvoiceLocalHost()
+            if _rhvoice_rest.language_supported(_iso_lang, _local_url):
+                _rhvoice_rest.read(
+                    _text,
+                    _iso_lang,
+                    _visible,
+                    _audible,
+                    _media_out,
+                    _icon,
+                    clip_title,
+                    _post_processes[do_post],
+                    _info,
+                    _size,
+                    _speech_rate,
+                    _vox,
+                    4,
+                    30,
+                )
+                return True
+        except NameError:
+            pass
+
+    if use_engine("opentts", _vox):
+        _vox = normalize_vox(_vox)
+        try:
+            _opentts = netopentts.OpenTTSClass()
+            if _opentts.language_supported(_iso_lang, _local_url):
+                _ssml = is_ssml(_text)
+                _opentts.spd_voice_to_opentts_voice(_vox, _iso_lang)
+                _opentts.read(
+                    _text,
+                    _iso_lang,
+                    _visible,
+                    _audible,
+                    _media_out,
+                    _icon,
+                    clip_title,
+                    _post_processes[do_post],
+                    _info,
+                    _size,
+                    _ssml,
+                    0.03,
+                    20,
+                    60,
+                )
+                return True
+        except NameError:
+            pass
+
+    if use_engine("mary", _vox):
+        _vox = normalize_vox(_vox)
+        try:
+            _marytts = netmary.MaryTtsClass()
+            if _marytts.language_supported(_iso_lang, _local_url):
+                _ssml = is_ssml(_text)
+                if REQUESTS_OK:
+                    if int(requests.__version__[0] == 1):
+                        if _ssml:
+                            _text = readtexttools.strip_xml(_text)
+                            _ssml = False
+                else:
                     if _ssml:
                         _text = readtexttools.strip_xml(_text)
                         _ssml = False
-            else:
-                if _ssml:
-                    _text = readtexttools.strip_xml(_text)
-                    _ssml = False
-            _marytts.read(
+                _marytts.read(
+                    _text,
+                    _iso_lang,
+                    _visible,
+                    _audible,
+                    _media_out,
+                    _icon,
+                    clip_title,
+                    _post_processes[do_post],
+                    _info,
+                    _size,
+                    _speech_rate,
+                    _ssml,
+                    _vox,
+                    4,
+                    15,
+                )
+                return True
+        except NameError:
+            pass
+
+    if use_engine("gtts", _vox):
+        _vox = normalize_vox(_vox)
+        try:
+            _gtts_class = netgtts.GoogleTranslateClass()
+            remove_digits = lambda s: "".join(c for c in s if not c.isdigit())
+            if _gtts_class.check_version(_gtts_class.tested_version):
+                if remove_digits(_vox).lower() in _gtts_class.accept_voice:
+                    _post_process = "process_mp3_media"
+                    _gtts_class.read(
+                        _text,
+                        _iso_lang,
+                        _visible,
+                        _audible,
+                        _media_out,
+                        _icon,
+                        clip_title,
+                        _post_process,
+                        _info,
+                        _size,
+                        _speech_rate,
+                    )
+                    return True
+                else:
+                    print(
+                        """To use `gtts`, specify one of these these voices"
+
+    {0}
+    """.format(
+                            "\n".join(_gtts_class.accept_voice)
+                        )
+                    )
+
+        except NameError:
+            _g_class_ok = False
+        if netcommon.which("gtts_cli"):
+            return _gtts_class.stream(
                 _text,
                 _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[5],
-                _info,
-                _size,
-                _speech_rate,
-                _ssml,
-                _vox,
-                4,
-                15,
-            )
-            return True
-    except NameError:
-        pass
-    _g_class_ok = True
-    try:
-        _gtts_class = netgtts.GoogleTranslateClass()
-        if (
-            _gtts_class.check_version(_gtts_class.tested_version)
-            and _vox in _gtts_class.accept_voice
-        ):
-            _gtts_class.read(
-                _text,
-                _iso_lang,
-                _visible,
-                _audible,
-                _media_out,
-                _icon,
-                clip_title,
-                _post_processes[1],
-                _info,
-                _size,
                 _speech_rate,
             )
-            return True
-    except NameError:
-        _g_class_ok = False
     # Just display a translation link.
     if _g_class_ok:
         try:
@@ -572,7 +745,6 @@ def main():  # -> NoReturn
     _media_out = ""
     _visible = "false"
     _audible = "true"
-    _text = ""
     _percent_rate = "100%"
     _speech_rate = netcommon.speech_wpm(_percent_rate)
     _denoiser_strength = 0.005
@@ -581,7 +753,7 @@ def main():  # -> NoReturn
     _title = ""
     _writer = ""
     _size = "600x600"
-    _speaker = "AUTO"
+    _vox = "AUTO"
     _local_url = ""
     _text_file_in = sys.argv[-1]
 
@@ -592,7 +764,7 @@ def main():  # -> NoReturn
         try:
             opts, args = getopt.gnu_getopt(
                 sys.argv[1:],
-                "ovalritndsxuech",
+                "ovalritndxuech",
                 [
                     "output=",
                     "visible=",
@@ -603,7 +775,6 @@ def main():  # -> NoReturn
                     "title=",
                     "artist=",
                     "dimensions=",
-                    "speaker=",
                     "voice=",
                     "url=",
                     "denoiser_strength=",
@@ -638,11 +809,8 @@ def main():  # -> NoReturn
                 _writer = a
             elif o in ("-d", "--dimensions"):
                 _size = a
-            elif o in ("-s", "--speaker"):
-                # depreciated
-                _speaker = a
             elif o in ("-x", "--voice"):
-                _speaker = a
+                _vox = a
             elif o in ("-u", "--url"):
                 _local_url = a
             elif o in ("-e", "--denoiser_strength"):
@@ -675,10 +843,8 @@ def main():  # -> NoReturn
             _icon,
             _size,
             _speech_rate,
-            _speaker,
+            _vox,
             _local_url,
-            _denoiser_strength,
-            _noise_scale,
         )
     else:
         usage()

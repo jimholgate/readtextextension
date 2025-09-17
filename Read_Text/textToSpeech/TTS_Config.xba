@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TTS_Config" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  *
-&apos;&apos; TTS_Config
+&apos;&apos; TTS_Configz
 &apos;&apos; # Configuration tools
 &apos;&apos; 
 &apos;&apos; These procedures make dialogues, get settings and write settings.
@@ -29,8 +29,10 @@ Option Explicit
 Private f_dlgSpeechSetup As Variant
 Private f_dlgJsonEdit As Variant
 Private f_dlgAboutReadSelection As Variant
+Private f_dlgOnnxSetting As Variant
 &apos; Persistent information about the current recording track and
 &apos; the URL of last processed document.
+
 
 Sub ClearWorkingCountryLanguage()
 	s_CaReadTextExtensionWorkingCountryLanguage = &quot;&quot;
@@ -145,14 +147,14 @@ Sub ImportJsonPhonemeTable(Event)
 		Exit Sub
 	End Select
 	Dim _in_file As String : _in_file = OpenJsonFileDialog()
-	Dim _file As String : _file = &quot;&quot;
-	Dim _language As String
-	Dim _model As String
-	Dim _json_display As String
 	If Len(_in_file) = 0 Then
 		Exit Sub
 	End If
-	_json_display = getLimitedTextFromFile(_in_file)
+	Dim _file As String : _file = &quot;&quot;
+	Dim _language As String : _language = &quot;&quot;
+	Dim _model As String : _model = &quot;&quot;
+	Dim _json_display As String : _json_display = getLimitedTextFromFile(_in_file)
+
 	If Instr(_json_display, &quot;&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot;) = 0 Or Instr(_
 	_json_display, &quot;}&quot;) = 0 Then
 		Exit Sub
@@ -320,7 +322,7 @@ End Function
 Function PiperSpeechHostInfo()
 	Dim _info As SpeechHostInfo
 	&apos; On 2023-12-21 synesthesiam (Michael Hansen) committed
-	&apos; &lt;https://github.com/rhasspy/piper/commit/2fa4c2c13933c1f6b8d87e34d12788ca8e6d073b&gt;
+	&apos; &lt;https://github.com/OHF-Voice/piper1-gpl/commit/2fa4c2c13933c1f6b8d87e34d12788ca8e6d073b&gt;
 	&apos; See: https://raw.githubusercontent.com/rhasspy/piper/master/src/python_run/piper/http_server.py
 	&apos; See: https://www.youtube.com/watch?v=pLR5AsbCMHs
 	&apos; ```(venv)
@@ -333,21 +335,21 @@ Function PiperSpeechHostInfo()
 	&apos;
 	&apos; * Running on all addresses (0.0.0.0)
 	&apos; * Running on http://127.0.0.1:5000
-	&apos; * Running on http://192.168.0.108:5000
+	&apos; * Running on http://192.168.0.nnn:5000
 	&apos; ```
 
 	With _info
-		.about = Join(Array(&quot;[Piper TTS](https://github.com/rhasspy/piper)&quot;,_
+		.about = Join(Array(&quot;[Piper TTS](https://github.com/OHF-Voice/piper1-gpl)&quot;,_
 		&quot; is a neural text to speech system.&quot;), _
 		&quot;&quot;)
-		.key = &quot;PiperTTS&quot;
+		.key = &quot;,&quot;&quot;inference&quot;&quot;:&quot;  &apos; Check for this JSON key string
 		.label = &quot;piper-server&quot;
 		.langs = Left(fsLang(), 2)
 		.token = &quot;&quot;
-		.url = &quot;http://127.0.0.1:5000&quot;  &apos; The server uses 1 voice model.
-		.url_info = &quot;?text=0&quot;  &apos; No UI, check for Error, not content.
+		.url = &quot;http://127.0.0.1:5000&quot;  &apos; The server can serve several voice models.
+		.url_info = &quot;/voices&quot;  &apos; Check if the server is running. There&apos;s no UI.
 		.json_dir = &quot;default&quot;
-		.sample = &quot;http://127.0.0.1:5000/?text=Hello%20World.&quot;
+		.sample = &quot;http://127.0.0.1:5000/voices&quot;
 		.docker = &quot;&quot;
 		.tags = Array(&quot;splitlines&quot;, &quot;text&quot;, &quot;wav&quot;)
 	End With
@@ -573,12 +575,12 @@ Function fsGitRawJson(_
 
 	If Len(json_dir) = 0 Then json_dir = _fallback_info.json_dir
 	If Len(lang_region) = 0 Then lang_region = &quot;en-US&quot;
-	Dim home_git$ : home_git = &quot;https://raw.githubusercontent.com/jimholgate/readtextextension/master/Read_Text/po/&quot;
+	Dim home_git As String : home_git = &quot;https://raw.githubusercontent.com/jimholgate/readtextextension/master/Read_Text/po/&quot;
 	&apos; `docker_url` might be assigned to another service. Please set a local server
 	&apos; using the `READTEXT_ONLINE_LEXICON_URL` environment variable to get your
 	&apos; locally hosted lexicon resources.
-	Dim docker_url$ : docker_url = fsGetWebService(&quot;http://localhost:41604/po/&quot;)
-	Dim _temp_json$ :  _temp_json = fsMyTempLock(&quot;rt-git-raw.json&quot;)
+	Dim docker_url As String : docker_url = fsGetWebService(&quot;http://localhost:41604/po/&quot;)
+	Dim _temp_json As String :  _temp_json = fsMyTempLock(&quot;rt-git-raw.json&quot;)
 	If Len(raw_git) = 0 Then
 		If Len(docker_url) &lt;&gt; 0 Then
 			raw_git = docker_url
@@ -593,15 +595,15 @@ Function fsGitRawJson(_
 		fsGitRawJson = &quot;&quot;
 		Exit Function
 	End If
-	Dim lang$ : lang = Split(lang_region, &quot;-&quot;)(0)
-	Dim  fallback$ : fallback = Join(Array(_
+	Dim lang As String : lang = Split(lang_region, &quot;-&quot;)(0)
+	Dim  fallback As String : fallback = Join(Array(_
 	home_git, _fallback_info.json_dir, &quot;/&quot;, &quot;en-US&quot;, &quot;_lexicon.json&quot;), &quot;&quot;)
 	On Error GoTo fsGitRawJsonErr
 	Dim _searches As Variant : _searches = Array(lang_region, fsSelectionLanguage(True), &quot;en-US&quot;, &quot;en&quot;)
 	Dim x As Integer
-	Dim _search$ : _search = &quot;&quot;
+	Dim _search As String : _search = &quot;&quot;
 	
-	Dim _get$ : _get = &quot;&quot;
+	Dim _get As String : _get = &quot;&quot;
 	For x = Lbound(_searches) To Ubound(_searches)
 		_search = Join(_
 		Array(raw_git, json_dir, &quot;/&quot;, _searches(x), &quot;_lexicon.json&quot;), &quot;&quot;)
@@ -626,17 +628,110 @@ Exit Function
 End Function
 
 
+Function GetMimic3CommandList(ByVal sLang As String) As Variant
+	GetMimic3CommandList = Array()
+	Dim Opts As Variant : Opts = Array()
+	Dim Item As String
+	Dim Response As String
+	Dim MimicLang As String
+	If Len(sLang) = 0 Then
+		sLang = fsSelectionLanguage()
+	End If
+	For Each Item in Array(&quot;_&quot;, &quot;-&quot;)
+		sLang = Split(sLang &amp; Item, Item)(0)
+	Next
+	If Len(sLang) = 0 Then
+		Exit Function
+	End If
+	For Each Item in GetMimic3OrMaryTTSArray(&quot; &quot;)
+		MimicLang = Split(Item, &quot;_&quot;)(0)
+		Select Case Instr(sLang, MimicLang)
+			Case 1
+			ReDim Preserve Opts(Ubound(Opts) + 1)
+			Opts(Ubound(Opts)) = &quot;&quot;&quot;(NETWORK_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;&quot; &amp; _
+			&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; &amp; &quot;&quot;&quot; --voice &quot;&quot;mimic3/&quot; &amp; Item &amp; &quot;&quot;&quot; &quot;
+		End Select
+	Next
+	GetMimic3CommandList = Opts
+	Exit Function
+	GetMimic3CommandListErr:
+	GetMimic3CommandList = Array()
+End Function
+
+
+Function GetMimic3OrMaryTTSArray(_divider As String) As Variant
+	&apos; Retrieves available speech synthesis voices from a Mimic3 or MaryTTS server.
+	&apos; It queries a local service running on `http://0.0.0.0:59125/voices` and 
+	&apos; processes the response to extract voice model identifiers.
+	&apos;
+	&apos; The function:
+	&apos; - Sends a web request to the speech synthesis server.
+	&apos; - Checks if the server response contains expected delimiters.
+	&apos; - Splits the voice list using the provided `_divider` (if valid).
+	&apos; - Returns an array of available voices.
+	&apos;
+	&apos; Example server response format:
+	&apos; en_UK/apope_low en_UK NA vits
+	&apos; fr_FR/m-ailabs_low#ezwa fr_FR NA vits
+	&apos; fr_FR/m-ailabs_low#nadine_eckert_boulet fr_FR NA vits
+	&apos; fr_FR/m-ailabs_low#bernard fr_FR NA vits
+
+	GetMimic3OrMaryTTSArray = Array()
+	Dim Opts As Variant : Opts = Array()
+	Dim Item As String
+	Dim FoundItem As String
+	Dim Chr10 As String : Chr10 = Chr(10)
+	Dim WebGet As String : WebGet = fsGetWebService(&quot;http://0.0.0.0:59125/voices&quot;)
+
+	Dim WebList As Variant : WebList = Split(WebGet, Chr10)
+	For Each Item in Array(Chr10, &quot;_&quot;, &quot;-&quot;, &quot;/&quot;, &quot; &quot;)
+		If Instr(WebGet, Item) = 0 Then
+			Exit Function
+		End If
+	Next
+	For Each Item In WebList
+		If Len(Item) &lt;&gt; 0 Then
+			ReDim Preserve Opts(Ubound(Opts) + 1)
+			Select Case Len(_divider)
+				Case 1
+				Opts(Ubound(Opts)) = Split(Item, _divider)(0)
+				Case Else
+				Opts(Ubound(Opts)) = Item
+			End Select
+		End If
+	Next
+	GetMimic3OrMaryTTSArray = Opts
+End Function
+
+
+Function fbGotLangModelMimic3(ByVal sLang As String) As Boolean
+	&apos; Return `True` if a model supporting the language `sLang` is available.
+	fbGotLangModelMimic3 = False
+	Dim Item As string : Item = &quot;&quot;
+	If Len(sLang) = 0 Then
+		sLang = fsSelectionLanguage()
+	End If
+	sLang = Split(Split(sLang, &quot;_&quot;)(0), &quot;-&quot;)(0)
+	For Each Item in GetMimic3OrMaryTTSArray(&quot;_&quot;)
+		If Item = sLang Then
+			fbGotLangModelMimic3 = True
+			Exit Function
+		End If
+	Next
+End Function
+
+
 Function fsGetWebService(_
-		ByVal _uri As String)
+		ByVal _uri As String) As String
 	fsGetWebService = &quot;&quot;
-	&apos; Get web text that shows MaryTTS voices
+	&apos; Get web text that shows MaryTTS or other online content
 	&apos; =WEBSERVICE(&quot;http://0.0.0.0:59125/voices&quot;)
 	&apos; Use with tested and trusted sources
 	On Local Error GoTo fsGetWebServiceErr
 	If _uri = &quot;&quot; Then Exit Function
 	Dim fA : fA = CreateUNOService(&quot;com.sun.star.sheet.FunctionAccess&quot;)
-	Dim s1$ : s1 = &quot;WEBSERVICE&quot;
-	Dim s2$ : s2 = fA.callFunction(s1, Array(_uri))
+	Dim s1 As String : s1 = &quot;WEBSERVICE&quot;
+	Dim s2 As String : s2 = fA.callFunction(s1, Array(_uri))
 	fsGetWebService = s2
 	Exit Function
 	fsGetWebServiceErr:
@@ -645,7 +740,7 @@ End Function
 
 
 Function fbMimicOrMaryttsOk() As Boolean
-	fbMimicOrMaryttsOk = fbGetWebServiceOK(&quot;http://0.0.0.0:59125&quot;)
+	fbMimicOrMaryttsOk = fbGetWebServiceOK(&quot;http://0.0.0.0:59125/voices&quot;)
 End Function
 
 
@@ -670,6 +765,7 @@ Function SpeechHostInfoList() As Variant
 		&apos; Several speech engines have limited or no support for
 		&apos; phoneme code or can only speak using certain sounds.
 		SpeechHostInfoList = Array(_
+		PiperSpeechHostInfo(), _
 		MimicSpeechHostInfo(), _
 		OpenttsSpeechHostInfo(), _
 		RhvoiceSpeechHostInfo(), _
@@ -677,11 +773,13 @@ Function SpeechHostInfoList() As Variant
 		)
 	Case &quot;WINDOWS.EXPERIMENTAL&quot;, &quot;POSIX.EXPERIMENTAL&quot;, &quot;MACOS.EXPERIMENTAL&quot;
 		SpeechHostInfoList = Array(_
+		PiperSpeechHostInfo(), _
 		MimicSpeechHostInfo(), _
 		)
 	Case Else
 		&apos; Prioritize recent tts frameworks
 		SpeechHostInfoList = Array(_
+		PiperSpeechHostInfo(), _
 		MimicSpeechHostInfo(), _
 		OpenttsSpeechHostInfo(), _
 		MaryTtsSpeechHostInfo(), _
@@ -728,7 +826,7 @@ Function fsLocalHostSpeech() As String
 	On Error GoTo fsLocalHostSpeechErr
 	fsLocalHostSpeech = &quot;&quot;
 	Dim _info As Variant
-	Dim x As Integer
+	Dim x As Integer : x = 0
 	Select Case Len(s_CaReadTextExtensionLocalHostSpeechURI)
 		Case 0
 		_info = SpeechHostInfoList()
@@ -750,43 +848,42 @@ Function fsLocalHostSpeech() As String
 End Function
 
 
-Function fsDefaultJson(_select_lang As String) As String
-	Dim CR As String
-	CR = Chr(13)
-	fsDefaultJson = Join(Array(&quot;{&quot;,_
+Function fsDefaultLexiconJson(_select_lang As String) As String
+	fsDefaultLexiconJson = Join(Array(&quot;{&quot;,_
 	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00001&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read Text Extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;},&quot;,_
 	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_00002&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;Read text extension&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;reed text extension&quot;&quot;},&quot;,_
 	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_99998&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;$[LOCALE]&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot; &amp; _select_lang &amp; &quot;&quot;&quot;},&quot;,_
 	&quot;    &quot;&quot;&quot; &amp; _select_lang &amp; &quot;_99999&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;$[REVISION]&quot;&quot;,&quot;&quot;p&quot;&quot;:&quot;&quot;&quot; &amp; fsTimeStamp() &amp; &quot;&quot;&quot;}&quot;,_
-	&quot;}&quot;), CR)
+	&quot;}&quot;), Chr(13))
 End Function
 
 
-Function EditJsonPhonemeTable() As String
+Function EditJsonLexicon() As String
+	&apos; Returns a file path if okay, otherwise `&quot;&quot;`.
 	&apos; Dialog2 - lexicon editor .helpURL
 	&apos; Dialog1 (f_dlgSpeechSetup) - We gather preliminary data about
 	&apos; the tokens that the first dialog displays.
 	&apos; This Json editor adds new grapheme / phoneme pairs to json file
 	&apos; so individuals can edit the pronunciation of names and things that
 	&apos; are important to them -like employees and students.
-	EditJsonPhonemeTable = &quot;&quot;
-	Dim _lang As String  &apos; en
-	Dim _select_lang As String  &apos; en-CA
-	Dim _grapheme as String
-	Dim _phoneme as String
-	Dim _out_file As String
-	Dim _in_file As String
-	_select_lang = &quot;&quot;
-	Dim _test_str As String
-	Dim x As Integer
-	Dim _json_display As String
-	_json_display = &quot;&quot;
+	&apos; Locally produced JSON indexes use specific formatting so that they
+	&apos; are compatible with BASIC, so alterting it might cause it to stop
+	&apos; working.
+	EditJsonLexicon = &quot;&quot;
+	Dim _lang As String : _lang = &quot;&quot;  &apos; en
+	Dim _select_lang As String : _select_lang = &quot;&quot;  &apos; en-CA
+	Dim _grapheme as String : _grapheme = &quot;&quot;
+	Dim _phoneme as String : _phoneme = &quot;&quot;
+	Dim _out_file As String : _out_file = &quot;&quot;
+	Dim _in_file As String	: _in_file = &quot;&quot;
+	Dim _test_str As String : _test_str = &quot;&quot;
+	Dim x As Integer : x = 0
+	Dim _json_display As String : _json_display = &quot;&quot;
 	Dim _po_dir As String : _po_dir = &quot;&quot;
-	Dim CR As String
-	CR = Chr(13)
-	Dim is_unique As Boolean
-	Dim _display_phoneme As String
-	Dim token_text As String
+	Dim CR As String : CR = Chr(13)
+	Dim is_unique As Boolean : is_unique = 0
+	Dim _display_phoneme As String : _display_phoneme = &quot;&quot;
+	Dim token_text As String: token_text = &quot;&quot;
 	Dim _info As Variant
 	
 	With f_dlgSpeechSetup
@@ -942,7 +1039,7 @@ Function EditJsonPhonemeTable() As String
 		End If
 	End With
 	If FileExists(_out_file) Then
-		EditJsonPhonemeTable = _out_file
+		EditJsonLexicon = _out_file
 	End If
 End Function
 
@@ -952,12 +1049,12 @@ Function bespokeJsonDeletion(_
 	_grapheme As String)
 	&apos; TODO: Connect to a python script. The Function currently depends on the
 	&apos; specific formatting of the data, so verify the results before clicking.
-	Dim CR$ : CR = Chr(13)
+	Dim CR As String : CR = Chr(13)
 	If Instr(_json_display, CR) = 0 Then CR = Chr(10)
 	bespokeJsonDeletion = &quot;&quot;
 	Dim _list As Variant : _list = Split(_json_display, CR)
 	Dim _col As Variant
-	Dim x As Integer
+	Dim x As Integer : x = 0
 	If Instr(_json_display, &quot;99999&quot;&quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;$[REVISION]&quot;&quot;,&quot;&quot;p&quot;&quot;&quot;) = 0 Then
 		bespokeJsonDeletion = _json_display
 		Exit Function
@@ -972,47 +1069,44 @@ End Function
 
 
 Function bespokeJsonExtraction(_
-	_json_display As String,_
-	_grapheme As String)
-	&apos; TODO: Connect to a python script. The Function currently depends on the
-	&apos; specific formatting of the data, so verify the results before clicking OK
-	bespokeJsonExtraction = &quot;&quot;
-	Dim CR$ : CR = Chr(13)
-	If Instr(_json_display, CR) = 0 Then CR = Chr(10)
+	_json_display As String, _
+	_grapheme As String) As String
+
+	Dim CR As String : CR = Chr(13)
+	If InStr(_json_display, CR) = 0 Then CR = Chr(10)
+
 	Dim _list As Variant : _list = Split(_json_display, CR)
-	Dim _col As Variant
-	Dim x As Integer
-	For x = LBound(_list) To Ubound(_list)
-		If Instr(_list(x), &quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;&quot; &amp; _grapheme &amp; &quot;&quot;&quot;&quot;) &lt;&gt; 0 Then
+	Dim _col As Variant, x As Integer
+
+	For x = LBound(_list) To UBound(_list)
+		If InStr(_list(x), &quot;:{&quot;&quot;g&quot;&quot;:&quot;&quot;&quot; &amp; _
+			_grapheme &amp; &quot;&quot;&quot;&quot;) &lt;&gt; 0 Then
 			_col = Split(_list(x), &quot;:&quot;)
-			bespokeJsonExtraction = Mid(_
-			fsReplaceText(_
-			_col(_
-			Ubound(_
-			_col)), &quot;&quot;&quot;},&quot;, &quot;&quot;), 2)
+			bespokeJsonExtraction = Mid( _
+				fsReplaceText( _
+				_col(UBound(_col)), &quot;&quot;&quot;},&quot;, &quot;&quot;), 2)
 			Exit Function
 		End If
 	Next
+	bespokeJsonExtraction = &quot;&quot;
 End Function
 
 
 Function fsJsonSafe(_text As String) As String
-	&apos; Replace json code characters with to safe versions
+	&apos; Replace json code characters to safe versions
 	fsJsonSafe = &quot;&quot;
 	If Len(_text) = 0 Then
 		Exit Function
 	End If
-	Dim check_list As Variant
-	check_list = Array(_
+	Dim Item As Variant
+	For Each Item in Array(_
 	Array(&quot;\&quot;, &quot;\u005C&quot;),_
 	Array(&quot;&quot;&quot;&quot;, &quot;\&quot;&quot;&quot;),_
 	Array(&quot;{&quot;, &quot;\u007B&quot;),_
 	Array(&quot;}&quot;, &quot;\u0070&quot;),_
 	Array(&quot;@&quot;, &quot;\u0040&quot;)_
 	)
-	Dim x As Integer
-	For x = Lbound(check_list) To Ubound(check_list)
-		_text = fsReplaceText(_text, check_list(x)(0), check_list(x)(1))
+		_text = fsReplaceText(_text, Item(0), Item(1))
 	Next
 	fsJsonSafe = _text
 End Function
@@ -1043,8 +1137,8 @@ Sub ResetPhonemesGit()
 	&apos;
 	&apos; Back up your home settings on your local Android phone or
 	&apos; device using Wifi File Explorer PRO as a http file server.
-	Dim json_dir As String
-	Dim lang_region As String
+	Dim json_dir As String : json_dir  = &quot;&quot;
+	Dim lang_region As String : lang_region = &quot;&quot;
 	Dim raw_git As String : raw_git = &quot;&quot;
 	Dim environ_path As String : environ_path = &quot;&quot;
 	On Error Resume Next
@@ -1058,7 +1152,7 @@ Sub ResetPhonemesGit()
  		lang_region = .GetControl(&quot;_test1&quot;).model.helpText 		
  		json_data = fsGitRawJson(json_dir, lang_region, raw_git)
  		If Len (json_data) = 0 Then
- 			json_data = fsDefaultJson(lang_region)
+ 			json_data = fsDefaultLexiconJson(lang_region)
  		End If
  		.GetControl(&quot;_json_text&quot;).model.Text = json_data
  		.Execute
@@ -1067,12 +1161,11 @@ End Sub
 
 
 Sub ConfigureReadTextAloud()
-	Dim sFile As String
+	Dim sFile As String : sFile = &quot;&quot;
 	Dim msgs() As Variant
-	Dim errorCode As Integer
-	Dim bHideExports As Boolean
-	Dim _integer As Integer
-	bHideExports = False
+	Dim errorCode As Integer : errorCode = 0
+	Dim bHideExports As Boolean : bHideExports = False
+	Dim _integer As Integer : _integer = 0
 	
 	&apos; Open up the dialog
 	CheckUnixSpeech()
@@ -1150,6 +1243,7 @@ Sub ConfigureReadTextAloud()
 			End If
 			.GetControl(&quot;OptionButton3&quot;).Model.State = Config(pi_use_html_boolean)
 		End If
+		ttsInitiateHomeLangLabels()
 		ttsUpdateLabels()
 		ttsUpdateCombo1()
 		FillComboBox4UrlList(f_dlgSpeechSetup)
@@ -1217,9 +1311,9 @@ End Sub
 Sub updateDialog1FileControlComboBox( _
 	bRefreshText, FileControl, ComboBox)
 	Dim _bin_python As String : _bin_python = &quot;program/python&quot;
-	Dim ClientId$ : ClientId = &quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot;
-	Dim _spd_update$ : _spd_update$ = &quot;&quot;
-	Dim sTheOsId$ : sTheOsId = fsTheOsId()
+	Dim ClientId As String : ClientId = &quot; --client_id &quot;&quot;(SESSION_ID)&quot;&quot;&quot;
+	Dim _spd_update As String : _spd_update$ = &quot;&quot;
+	Dim sTheOsId As String : sTheOsId = fsTheOsId()
 	Select Case sTheOsId
 		Case &quot;MACOS&quot;, &quot;WINDOWS&quot;, &quot;WINDOWS.WINE&quot;, &quot;WINDOWS.NOSCRIPT&quot;
 		ClientId = &quot;&quot;
@@ -1299,12 +1393,31 @@ Sub updateDialog1FileControlComboBox( _
     End With
 End Sub
 
+Sub ttsInitiateHomeLangLabels()
+	ttsUpdateLabels2(fsLang())
+End Sub
+
 
 Sub ttsUpdateLabels()
-	Dim s1 As String
+	On Error GoTo ttsUpdateLabelsErr
+	Dim TestLang As String : TestLang = ttsUpdateLabels2(Config(pi_display_language_string))
+	If Len(TestLang) = 0 Then
+		ttsUpdateLabels2(fsLang())
+	End If
+	Exit Sub
+	ttsUpdateLabelsErr:
+		ttsUpdateLabels2(fsLang())
+	Exit Sub
+End Sub
+
+
+Function ttsUpdateLabels2(Lang)
+	ttsUpdateLabels2 = &quot;&quot;
+	Dim s1 As String : s1 = Trim(Cstr(Lang))
 	UpdatePoSettingsDone =  - 1
-	s1 = fsDisplayLanguage()
-	&apos;Update the labels with your language
+	On Local Error GoTo ttsUpdateLabels2Err
+	&apos;Update the labels with your language from .GetControl(&quot;ComboBox3&quot;).model.Text
+
 	With f_dlgSpeechSetup
 		.GetControl(&quot;CheckBox1&quot;).model.Label = fsLookUpTerm2(&quot;s_always-show-this-dialog&quot;, s1)
 		.GetControl(&quot;CheckBox2&quot;).model.Label = fsLookUpTerm2(&quot;s_touch-screen&quot;, s1)
@@ -1315,22 +1428,28 @@ Sub ttsUpdateLabels()
 		.GetControl(&quot;FrameControl2&quot;).model.Label = fsLookUpTerm2(&quot;s_display&quot;, s1)
 		If fbPiperTtsOk(&quot;&quot;) or fsTheOsId() = &quot;MACOS&quot; Then
 			.GetControl(&quot;Label1&quot;).model.Label = fsLookUpTerm2(&quot;s_command-line-options&quot;, s1)
-			.GetControl(&quot;OptionButton1&quot;).model.Label = fsLookUpTerm2(&quot;s_enable_experimental_features&quot;, s1)
+			.GetControl(&quot;OptionButton1&quot;).model.Label = fsLookUpTerm2(&quot;s_enable-experimental-features&quot;, s1)
 		ElseIf InStr(LCase(.GetControl(&quot;FileControl1&quot;).Model.Text),&quot;festival&quot;) &lt;&gt; 0 Then
 			&apos; or Instr(.GetControl(&quot;ComboBox1&quot;).Model.Text, &quot;&quot;&quot;(TMP)&quot;&quot; nil)(quit)&quot;) Then
 			.GetControl(&quot;Label1&quot;).model.Label = fsLookUpTerm2(&quot;s_command&quot;, s1)
 			.GetControl(&quot;OptionButton1&quot;).model.Label = fsLookUpTerm2(&quot;s_use-festival-with-a-script&quot;, s1)
 		Else
 			.GetControl(&quot;Label1&quot;).model.Label = fsLookUpTerm2(&quot;s_command-line-options&quot;, s1)
-			.GetControl(&quot;OptionButton1&quot;).model.Label = fsLookUpTerm2(&quot;s_enable_experimental_features&quot;, s1)
+			.GetControl(&quot;OptionButton1&quot;).model.Label = fsLookUpTerm2(&quot;s_enable-experimental-features&quot;, s1)
 		End If
 		.GetControl(&quot;Label2&quot;).model.Label = fsLookUpTerm2(&quot;s_command-line-options&quot;, s1)
 
 		.GetControl(&quot;OptionButton2&quot;).model.Label = fsLookUpTerm2(&quot;s_external-program&quot;, s1)
 		.GetControl(&quot;OptionButton3&quot;).model.Label = fsLookUpTerm2(&quot;s_use-a-web-application&quot;, s1)
+		.GetControl(&quot;ComboBox3&quot;).model.HelpText = fsLookUpTerm2(.GetControl(&quot;ComboBox3&quot;).model.Text, s1)
 		.model.Title = fsLookUpTerm2(&quot;s_read-text&quot;, s1)
 	End With
-End Sub
+
+	ttsUpdateLabels2 = s1
+	Exit Function
+	ttsUpdateLabels2Err:
+	ttsUpdateLabels2 = &quot;&quot;
+End Function
 
 
 Function fbUsingFestival(_test_text As String) As Boolean
@@ -1342,9 +1461,9 @@ End Function
 Sub ttsUpdateDisplay()
 	&apos; These dialog items toggle between enabled And disabled depending On option button selected
 	With f_dlgSpeechSetup
-		Dim i#
-		Dim _test_text$ : _test_text = .GetControl(&quot;FileControl1&quot;).Model.Text
-		i = Len(.GetControl(&quot;FileControl1&quot;).Model.Text)
+		Dim i As Integer : i = Len(.GetControl(&quot;FileControl1&quot;).Model.Text)
+		Dim _test_text As String : _test_text = .GetControl(&quot;FileControl1&quot;).Model.Text
+		
 		If Len(fsMyURL()) = 0 Then
 			.GetControl(&quot;OptionButton1&quot;).model.enabled = False
 			.GetControl(&quot;OptionButton2&quot;).model.enabled = False
@@ -1374,10 +1493,9 @@ End Sub
 
 
 Function fvCurrentDialogConfig() As Variant
-	Dim file_control_2 As String
 	With f_dlgSpeechSetup
 		On Error Resume Next
-		file_control_2 = .GetControl(&quot;FileControl2&quot;).Model.Text
+		Dim file_control_2 As String : file_control_2 = .GetControl(&quot;FileControl2&quot;).Model.Text
 		If fsTheOsId() = &quot;MACOS&quot; and fbIsLibreOffice() And _
 		Instr(file_control_2, &quot;/usr/python&quot;) &lt;&gt; 0 Then
 			file_control_2 = PosixPythonPath()
@@ -1406,6 +1524,7 @@ Sub aboutReadTextDialog()
 	AboutAddOn(&quot;&quot;)
 End Sub
 
+
 Function fbCheckFestivalDialog1(Config As Variant) As Boolean
 	fbCheckFestivalDialog1 = False
 	On Local Error GoTo fbCheckFestivalDialog1Err	
@@ -1422,25 +1541,21 @@ Sub AboutAddOn( _
 	myText As String)
 	&apos; Dialog3
 	Dim f_dlgAboutReadSelection As Variant
-	Dim sFile As String
-	Dim sA As String
-	Dim sC As String
-	Dim sE As String
+	Dim sFile As String : sFile = &quot;&quot;
+	Dim sA As String : sA = &quot;&quot;
+	Dim sC As String : sC = &quot;&quot;
+	Dim sE As String : sE = &quot;&quot;
 	Dim file_spec As String : file_spec = &quot;&quot;
 	Dim title_special As String : title_special = &quot;&quot;
 	Dim msgs() As Variant
 	Dim errorCode As Integer
-	Dim s1$
-	s1 = fsDisplayLanguage()
-	Dim s2$
-	s2 = fsHomeDrive()
-	Dim s3$
-	s3 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
-	Dim s4$
-	s4 = &quot;&quot;
+	Dim s1$ : s1 = fsDisplayLanguage()
+	Dim s2 : s2 = fsHomeDrive()
+	Dim s3$: s3 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
+	Dim s4$ : s4 = &quot;&quot;
 	Dim TextField As String : TextField = &quot;_text_field&quot;
 	If fbExperimentalMode() Then
-		title_special = &quot; - &quot; &amp; fsLookUpTerm2(&quot;s_enable_experimental_features&quot;, s1)
+		title_special = &quot; - &quot; &amp; fsLookUpTerm2(&quot;s_enable-experimental-features&quot;, s1)
 	End If	
 	&apos; Open up the dialog
 	fbTestDialogLoaded(&quot;textToSpeech&quot;)
@@ -1599,5 +1714,1358 @@ Sub AboutAddOn( _
 		.Execute()
 	End With
 End Sub
+
+
+Type TypeUserIconSet
+	checkmark As String
+	circle As String
+	heart As String
+	smile As String
+	square As String
+	all As String
+End Type
+
+
+Function ShowSpeechDispatcherButton() As Boolean
+	&apos; Determines if the Speech Dispatcher button should be shown in Dialog4.
+	ShowSpeechDispatcherButton = False
+
+	If getGUIType() = 4 Then
+		If fsTheOsId() = &quot;POSIX.EXPERIMENTAL&quot; Or fbYouAreStaffOrAdmin(_
+		Array(fsPiperPath(), PiperModelFile(&quot;voices.json&quot;))) Then
+			ShowSpeechDispatcherButton = True
+
+		ElseIf Instr(fsPiperPath(), &quot;/pied/&quot;) &lt;&gt; 0 And _
+		fsTheOsId() = &quot;POSIX&quot; And fbYouAreStaffOrAdmin(_
+		Array(fsPiperPath(), PiperModelFile(&quot;voices.json&quot;))) Then
+			ShowSpeechDispatcherButton = True
+		End If
+	End If
+End Function
+
+
+Function CheckNumInput(_str As String, OKCharacters As String) As String
+	&apos; Return allowed characters (digits only)
+	CheckNumInput = 0
+	Select Case Len(OKCharacters) 
+	Case 0
+	OkCharacters = &quot;01234567890&quot;
+	End Select
+	Dim i As Integer : i = 0
+	Dim result As String : result = &quot;&quot;
+		For i = 1 To Len(_str)
+		If InStr(1, OkCharacters, Mid(_str, i, 1)) &gt; 0 Then
+			result = result &amp; Mid(_str, i, 1)
+		End If
+	Next i
+	If result = &quot;&quot; Then result = &quot;0&quot;	
+	CheckNumInput = result
+End Function
+
+
+Sub Dialog4Speech_DispatcherButtonClick
+	&apos; Dialog4
+	Dim ModelLang As String : ModelLang = &quot;&quot;
+	Dim ModelAndVoice() As String
+	With f_dlgOnnxSetting
+		ModelAndVoice = Split(.GetControl(&quot;ComboBox1&quot;).Model.Text &amp; &quot;#&quot; &amp; _
+			.GetControl(&quot;ComboBox2&quot;).Model.Text, &quot; &quot;)
+		Select Case .GetControl(&quot;_speech_dispatcher&quot;).Model.Label
+			Case fsLookUpTerm(&quot;s_speech-dispatcher&quot;)
+			&apos; Show a MsgBox for Dialog4 to confirm updating the Speech Dispatcher
+			&apos; settings.
+			ModelLang = GuessDialog4Combo1Language() &apos; GetDialog4CurrentLanguage() 
+			Select Case msgbox(ModelLang &amp; Chr(13) &amp; _
+			.GetControl(&quot;ComboBox1&quot;).Model.Text &amp; &quot;#&quot; &amp; _
+			.GetControl(&quot;ComboBox2&quot;).Model.Text, 1, fsLookUpTerm(&quot;s_read-text&quot;) &amp; _
+			&quot; - &quot; &amp; fsLookUpTerm(&quot;s_speech-dispatcher&quot;) &amp; _
+			&quot; - &quot; &amp; fsLookUpTerm(&quot;s_default-synthesizer&quot;))
+				Case 1
+					If UpdateSpeechDispatcher(_
+					ModelAndVoice(Ubound(ModelAndVoice))_
+					) Then
+						myBeep()
+					End If
+				Case Else
+					Exit Sub
+			End Select
+	
+			Case Else
+				&apos; print &quot;TODO: Do another function like remove a model&quot;
+		End Select
+	
+	End With
+End Sub
+
+
+Function Dialog4Icon() As TypeUserIconSet
+	Dim info as TypeUserIconSet
+	Dim Item As String
+	With info
+		&apos; Legacy-friendly characters, no duplicates
+			.checkmark = &quot;✅ &quot;  &apos; Check mark
+			.circle = &quot;● &quot;      &apos; Filled circle
+			.heart = &quot;♥ &quot;       &apos; Heart
+			.smile = &quot;☺ &quot;       &apos; Smiling face
+			.square = &quot;■ &quot;      &apos; Solid square
+		.all = Replace(Join(Array(.checkmark, .circle, .heart, .smile, .square), _
+		&quot;&quot;), &quot; &quot;, &quot;&quot;)
+	End With
+	Dialog4Icon = info
+End Function
+
+
+Function GetDialog4CurrentLanguage() As String
+&apos; Returns a human-friendly language name from Dialog4’s ComboBox3 selection.
+&apos; Falls back to an empty string if an error occurs.
+    Dim displayLanguage As String
+    Dim englishIndex    As Integer
+    Dim combo3Model     As Object
+
+    &apos; Default values
+    displayLanguage = &quot;en&quot;
+    englishIndex    = -1
+    GetDialog4CurrentLanguage = &quot;&quot;
+
+    On Error GoTo getDialog4CurrentLanguageErr
+
+    With f_dlgOnnxSetting
+        Set combo3Model = .GetControl(&quot;ComboBox0&quot;).Model
+
+        &apos; Get the selected language code
+        displayLanguage = combo3Model.Text
+        &apos; Convert to human-readable language name
+        GetDialog4CurrentLanguage = isoToEnglish(displayLanguage, &quot;tools&quot;, englishIndex) &apos; -1
+    End With
+
+    Exit Function
+
+getDialog4CurrentLanguageErr:
+    GetDialog4CurrentLanguage = &quot;&quot;
+End Function
+
+
+Function GuessDialog4Combo1Language()
+	GuessDialog4Combo1Language = &quot;&quot;
+	Dim sDisplayLanguage As String : sDisplayLanguage = &quot;en&quot;
+	Dim icon As TypeUserIconSet : icon = Dialog4Icon()
+	With f_dlgSpeechSetup
+		&apos; The Dialog1 ComboBox3 lets you choose a display language
+		sDisplayLanguage = .GetControl(&quot;ComboBox3&quot;).Model.Text
+	End With
+	Dim ModelLang As String : ModelLang = &quot; &quot;
+	Dim iEnglish As Integer : iEnglish = -1
+	If Left(sDisplayLanguage, 2) = &quot;en&quot; Then
+		iEnglish = -2
+	End If
+	With f_dlgOnnxSetting
+		Select Case Len(.GetControl(&quot;ComboBox1&quot;).Model.Text)
+			Case 0
+				ModelLang = isoToEnglish(fsSelectionLanguage(),  &quot;tools&quot;, iEnglish)
+			Case Else
+			ModelLang =_(isoToEnglish(Split(_
+			fsSupertrim(.GetControl(&quot;ComboBox1&quot;).Model.Text, &quot; &quot; &amp; icon.all &amp; &quot;# &quot;), &quot;_&quot;)(0)), &quot;tools&quot;, iEnglish)
+		End Select
+		Select Case Instr(ModelLang, &quot; &quot;)
+			Case 0
+			If Lcase(ModelLang) = ModelLang Then
+				&apos; Show Windows Language data &quot;816&quot; (Portuguese) with normal capitalization
+				GuessDialog4Combo1Language = Ucase(Left(ModelLang, 1)) &amp; Mid(ModelLang, 2)
+			Else
+				GuessDialog4Combo1Language = ModelLang
+			End If
+			Case Else
+			GuessDialog4Combo1Language = Split(_
+			fsSupertrim(.GetControl(&quot;ComboBox1&quot;).Model.Text, &quot; &quot; &amp; icon.all &amp; &quot;# &quot;), &quot;-&quot;)(0)
+		End Select
+	End With
+End Function
+
+
+Function CheckDialog1ComboBox(fileControl As String, comboBox As String, _
+Application As String, Token As String) As Boolean
+	&apos; Check the specified combo box controls within `Dialog1`, Returns `True` 
+    &apos; if a ComboBox is Enabled and it includes the `Token`
+
+	CheckDialog1ComboBox = False
+	Dim _command As String : _command = Lcase(Application)
+
+	With f_dlgSpeechSetup
+		If .GetControl(comboBox).model.Enabled Then
+			If Instr(.GetControl(comboBox).Model.Text, Token) &lt;&gt; 0 Then
+				If Instr(LCase(.GetControl(fileControl).Model.Text), _command) &lt;&gt; 0 Then
+					CheckDialog1ComboBox = True
+					Exit Function
+				End If
+			End If
+		End If
+	End With
+End Function
+
+
+Type PiperType
+	&apos; key value pairs as Strings, Integers, and Variants (i.e.: an Array)
+	onnx_model As String
+	file_option As String
+	ubound As Integer
+	voice_ids As Variant
+End Type
+
+
+	&apos; Locally installed models are not usually available globally. ONNX model
+	&apos; files are big. In an organization, it might be best to back up the
+	&apos; models locally. If you are using [Pied](https://github.com/Elleo/pied)
+	&apos; to manage speech models, the extension links to model Pied&apos;s ONNX files
+	&apos; automatically.
+	&apos;
+	&apos; * `UpdatePiperSettings(True)` installs the onnx files immediately,
+	&apos;    then reads the selected text aloud.
+	&apos; * `UpdatePiperSettings(False) sets the main dialog command line
+	&apos;    To update it upon clicking **OK** in Dialog1.
+	&apos;
+
+Function CheckUpdatePiperDialog1ComboBox( _
+    ByVal fileControlName As String, _
+    ByVal comboBoxName   As String _
+) As Boolean
+
+&apos; Checks and updates a Dialog1 combo box with the Piper command string from Dialog4.
+&apos; Returns True if the combo box text was replaced with the new Piper command.
+    Dim setupDialog    As Object
+    Dim fileCtrl       As Object
+    Dim comboCtrl      As Object
+    Dim commandStr     As String
+
+    &apos; Default return value
+    CheckUpdatePiperDialog1ComboBox = False
+    commandStr = &quot;&quot;
+
+    &apos; Reference the speech-setup dialog
+    Set setupDialog = f_dlgSpeechSetup
+
+    With setupDialog
+        &apos; Cache the relevant controls
+        Set fileCtrl  = .GetControl(fileControlName)
+        Set comboCtrl = .GetControl(comboBoxName)
+
+        &apos; Only update if the combo box is enabled and contains the Piper placeholder
+        If comboCtrl.Model.Enabled Then
+            If InStr(comboCtrl.Model.Text, &quot;(PIPER_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
+                &apos; Ensure the file-path field mentions Python
+                If InStr(LCase(fileCtrl.Model.Text), &quot;python&quot;) &lt;&gt; 0 Then
+                    &apos; Launch Dialog4 (without immediate playback) to get the command
+                    commandStr = UpdatePiperSettings(False)
+                    &apos; If the returned command still contains the placeholder, apply it
+                    If InStr(commandStr, &quot;(PIPER_READ_TEXT_PY)&quot;) &lt;&gt; 0 Then
+                        comboCtrl.Model.Text = commandStr
+                        CheckUpdatePiperDialog1ComboBox = True
+                    End If
+                End If
+            End If
+        End If
+    End With
+End Function
+
+
+
+Function LookUpUboundOfPiperModel(ByVal modelId As String) As Integer
+&apos; Returns the maximum voice index for a given Piper model.
+&apos; Looks up the model in the PiperModelList and returns the UBound of its parts.
+    Dim entry           As String
+    Dim foundList       As Variant
+
+    &apos; Default return value
+    LookUpUboundOfPiperModel = 0
+    
+    On Local Error GoTo ErrHandler
+    
+    For Each entry In PiperModelList(&quot;&quot;, False)
+        foundList = Split(entry, &quot;#&quot;)
+        &apos; Check if the model identifier matches
+        If foundList(LBound(foundList)) = modelId Then
+            &apos; Return the highest subscript (voice count index)
+            LookUpUboundOfPiperModel = CInt(foundList(UBound(foundList)))
+            Exit Function
+        End If
+    Next entry
+
+    Exit Function
+
+ErrHandler:
+    &apos; On any error, return zero as fallback
+    LookUpUboundOfPiperModel = 0
+End Function
+
+
+Sub PlaySamplePiperSpeaker()
+    &apos; Plays a Piper sample for the selected model and voice in the ONNX dialog.
+    On Local Error GoTo playSamplePiperSpeakerErr
+
+    Dim foundList        As Variant
+    Dim voiceNum         As String
+    Dim checkedVoiceNum  As String
+    Dim allModels        As Variant
+    Dim entry            As Variant
+    Dim testModelList    As Variant
+    Dim combo1           As Object
+    Dim combo2           As Object
+    Dim modifiedModel    As Object
+
+    &apos; Initialize defaults and load models
+    voiceNum        = &quot;0&quot;
+    checkedVoiceNum = &quot;0&quot;
+    allModels       = PiperModelList(&quot;&quot;, False)
+
+    With f_dlgOnnxSetting
+        &apos; Cache key controls
+        Set combo1        = .GetControl(&quot;ComboBox1&quot;)
+        Set combo2        = .GetControl(&quot;ComboBox2&quot;)
+        Set modifiedModel = .GetControl(&quot;_modified&quot;).Model
+
+        &apos; Parse selections
+        foundList = Split(combo1.Model.Text, &quot; &quot;)
+        voiceNum  = CheckNumInput(combo2.Model.Text, &quot;01234567890&quot;)
+
+        Select Case UBound(foundList)
+        Case 0, 1
+            For Each entry In allModels
+                &apos; Match the model identifier
+                If InStr(entry, foundList(UBound(foundList))) &lt;&gt; 0 Then
+                    testModelList = Split(entry, &quot;#&quot;)
+
+                    &apos; Clamp voiceNum to available range
+                    checkedVoiceNum = CStr( _
+                        Min( _
+                            Int(voiceNum), _
+                            Int(testModelList(UBound(testModelList))) _
+                        ) _
+                    )
+
+                    &apos; Windows‐only fallback if VLC not installed
+                    If getGUIType() = 1 _
+                       And Len(fsFindAppPath(&quot;VideoLAN/VLC/vlc.exe&quot;)) = 0 Then
+                        webHelp(&quot;https://rhasspy.github.io/piper-samples/&quot;)
+                        Exit Sub
+                    Else
+                        &apos; Play the model sample
+                        PiperPlaySound entry, checkedVoiceNum
+                        Exit Sub
+                    End If
+                End If
+            Next entry
+
+        Case Else
+            &apos; (optional) handle other cases
+
+        End Select   &apos; ← **MISSING**: closes the Select Case
+
+        &apos; Mark dialog as modified
+        modifiedModel.State = 1
+    End With
+
+    Exit Sub
+
+playSamplePiperSpeakerErr:
+    &apos; If anything goes wrong, prompt a recommended model
+    PlayRecommendedPiperModel()
+End Sub
+
+
+Function PlayRecommendedPiperModel() As String
+&apos; Prompts the user to play a sample from the recommended Piper model.
+&apos; Returns the selected model identifier (including voice code) if “Yes” is chosen,
+&apos; otherwise returns an empty string.
+    Dim userChoice       As Integer
+    Dim foundList        As Variant
+    Dim modelIdentifier  As String
+    Dim promptTitle      As String
+    Dim promptMessage    As String
+
+    &apos; Default return value
+    PlayRecommendedPiperModel = &quot;&quot;
+
+    &apos; Get the suggested model (language-region lookup)
+    modelIdentifier = PiperLocalSuggestion( _
+        fsSelectionLanguageAndRegion(True), False)
+
+    &apos; Build the message and title for the prompt
+    promptMessage = fsLookUpTerm(&quot;s_test&quot;) &amp; &quot;:&quot; &amp; Chr(10) &amp; Chr(10) &amp; _
+                    &quot;`&quot; &amp; modelIdentifier &amp; &quot;`&quot;
+    promptTitle   = fsLookUpTerm(&quot;s_read-text&quot;) &amp; &quot; - &quot; &amp; _
+                    fsLookUpTerm(&quot;s_use-a-web-application&quot;)
+
+    &apos; Ask user if they want to play a sample
+    Dim StarBasicYesNo As Integer : StarBasicYesNo = 4
+    userChoice = MsgBox(promptMessage, StarBasicYesNo, promptTitle)
+    Dim StarBasicYes As Integer : StarBasicYes  = 6
+    If userChoice = StarBasicYes Then 
+        PlayRecommendedPiperModel = modelIdentifier
+        foundList = Split(modelIdentifier, &quot;#&quot;)
+        &apos; If voice code is included, use it; otherwise default to &quot;0&quot;
+        If UBound(foundList) = 1 Then
+            PiperPlaySound foundList(0), foundList(1)
+        Else
+            PiperPlaySound foundList(0), &quot;0&quot;
+        End If
+    End If
+End Function
+
+
+Function UpdatePiperSettings(ByVal doPlay As Boolean) As String
+&apos; Displays the ONNX settings dialog, optionally plays the selected text through Piper,
+&apos; and returns the final Piper command string (empty if cancelled).
+    Dim errorCode       As Integer
+    Dim waitFlag        As Boolean
+    Dim pythonPath      As String
+    Dim rawCommand      As String
+    Dim cleanedCommand  As String
+    Dim textSelection   As String
+    Dim guiType         As Integer
+
+    &apos; Default return value
+    UpdatePiperSettings = &quot;&quot;
+
+    &apos; Locate Python interpreter and show the settings dialog
+    pythonPath     = PosixPythonPath()
+    rawCommand     = ShowOnnxEditor()
+    textSelection  = Trim(fsGetTextSelection(False, True))
+    waitFlag       = False
+
+    &apos; If user cancelled or there&apos;s no command, bail out
+    If Len(rawCommand) = 0 Then Exit Function
+
+    &apos; If not playing now or no text selected, just return the command
+    If Not doPlay Or Len(textSelection) = 0 Then
+        UpdatePiperSettings = rawCommand
+        Exit Function
+    End If
+
+    &apos; Write the selected text to a temp file for Piper
+    CreateFile(fsTemporaryTextDoc(), textSelection, &quot;UTF-8&quot;)
+
+    &apos; Remove the update‐flag token from the command before execution
+    cleanedCommand = Replace( _
+        replaceLocalTokensWithStr(rawCommand), _
+        &quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE)&quot;, &quot;&quot;)
+
+    &apos; Choose execution method based on GUI platform
+    guiType = getGUIType()
+    Select Case guiType
+        Case 1  &apos; Windows
+            If fbDoWinBat(&quot;&quot;&quot;&quot; &amp; pythonPath &amp; &quot;&quot;&quot; &quot; &amp; cleanedCommand) Then
+                errorCode = 0
+            Else
+                errorCode = 5
+            End If
+            If errorCode = 5 Then
+                errorCode = Shell(pythonPath, 0, cleanedCommand, waitFlag)
+            End If
+
+        Case Else  &apos; POSIX / macOS
+            errorCode = Shell( _
+                converttourl(pythonPath), _
+                0, cleanedCommand, waitFlag)
+    End Select
+
+    &apos; Strip out the update flag and return the user‐facing command
+    UpdatePiperSettings = Replace(rawCommand, &quot; --update True&quot;, &quot;&quot;)
+End Function
+
+
+Sub UpdateShowOnnxEditor()
+&apos; Updates the ONNX settings dialog when the model selector (ComboBox1) changes:
+&apos; - Refreshes language hint and model info panel
+&apos; - Enables/disables speech dispatcher and OK button
+&apos; - Clears or repopulates ComboBox2 as needed
+    Dim models            As Variant
+    Dim icons             As TypeUserIconSet
+    Dim modelFile         As String
+    Dim foundList         As Variant
+    Dim itemValue         As String
+    Dim trimModelId       As String
+    Dim i                 As Integer
+
+    &apos; Cached control objects for clarity and performance
+    Dim combo1            As Object
+    Dim combo2Model       As Object
+    Dim imageControl      As Object
+    Dim modelInfoText     As Object
+    Dim speechDispatcher  As Object
+    Dim okButton          As Object
+    Dim modifiedModel     As Object
+
+    &apos; Load all installed models (validated)
+    models = PiperModelList(&quot;&quot;, True)
+    Set icons = Dialog4Icon()
+
+    With f_dlgOnnxSetting
+        &apos; Cache frequently used controls/models
+        Set combo1           = .GetControl(&quot;ComboBox1&quot;)
+        Set combo2Model      = .GetControl(&quot;ComboBox2&quot;).Model
+        Set imageControl     = .GetControl(&quot;ImageControl1&quot;)
+        Set modelInfoText    = .GetControl(&quot;_model_info_text&quot;).Model
+        Set speechDispatcher = .GetControl(&quot;_speech_dispatcher&quot;)
+        Set okButton         = .GetControl(&quot;_ok&quot;).Model
+        Set modifiedModel    = .GetControl(&quot;_modified&quot;).Model
+
+        &apos; Extract the identifier portion of the ComboBox1 text
+        trimModelId = Trim(combo1.Model.Text)
+        If InStr(trimModelId, &quot; &quot;) &lt;&gt; 0 Then
+            trimModelId = Split(combo1.Model.Text, &quot; &quot;)(1)
+        End If
+
+        &apos; Iterate through model entries to find the selected one
+        For Each itemValue In models
+            If InStr(LCase(Trim(itemValue)), LCase(trimModelId)) = 0 Then
+                &apos; No match: continue
+            Else
+                foundList = Split(itemValue, &quot;#&quot;)
+                Select Case UBound(foundList)
+                    Case 2
+                        &apos; Reset language hint
+                        imageControl.Model.helpText = &quot;&quot;
+
+                        &apos; If the entry has a JSON file, display its contents
+                        If Left(combo1.Model.Text, 2) = icons.checkmark Then
+                            modelFile = Split(foundList(1), &quot;?&quot;)(0) &amp; &quot;.json&quot;
+                            If FileExists(modelFile) Then
+                                modelInfoText.helpText = modelFile
+                                modelInfoText.Text     = getTextFromFile(modelFile, &quot;UTF-8&quot;, 0)
+                                speechDispatcher.Visible = ShowSpeechDispatcherButton()
+                                okButton.Enabled        = True
+                            End If
+                        Else
+                            &apos; Unchecked entries clear the info panel
+                            modelInfoText.helpText = &quot;&quot;
+                            modelInfoText.Text     = &quot;&quot;
+                            speechDispatcher.Visible = False
+                            okButton.Enabled        = False
+                        End If
+
+                    Case Else
+                        &apos; Clear and exit loop
+                        modelInfoText.helpText = &quot;&quot;
+                        modelInfoText.Text     = &quot;&quot;
+                        combo2Model.Text       = &quot;0&quot;
+                        speechDispatcher.Visible = False
+                        Exit For
+                End Select
+            End If
+        Next itemValue
+
+        &apos; Always reset the help text on ComboBox2 until next check
+        combo2Model.helpText = &quot;&quot;
+
+        &apos; Mark dialog as modified on first run or enforce control state
+        If modifiedModel.State = 0 Then
+            modifiedModel.State = 1
+        Else
+            If Left(combo1.Model.Text, 2) = icons.checkmark Then
+                okButton.Enabled = True
+            Else
+                modelInfoText.Text     = &quot;&quot;
+                modelInfoText.helpText = &quot;&quot;
+                okButton.Enabled       = False
+                speechDispatcher.Visible = False
+            End If
+        End If
+
+        &apos; Refresh the voice selector
+        EditDialog4ComboBox2()
+
+        &apos; Show or hide the speech dispatcher based on the checkmark
+        If Left(combo1.Model.Text, 2) = icons.checkmark Then
+            speechDispatcher.Visible = ShowSpeechDispatcherButton()
+            fsOnnxCombo2HelpText()
+        Else
+            speechDispatcher.Visible = False
+        End If
+    End With
+End Sub
+
+
+Sub CheckOnnxSpeechRatePercent()
+&apos; Validates and clamps the speech‐rate percentage in ComboBox3 to [25%,250%],
+&apos; updates the display with “%”, and flags the dialog as modified.
+    Dim speechRate     As Integer
+    Dim rangeBoundary  As Variant
+    Dim combo3         As Object
+    Dim combo3Model    As Object
+    Dim modifiedModel  As Object
+
+    &apos; Default and valid range
+    speechRate    = 0
+    rangeBoundary = Array(25, 250)
+
+    With f_dlgOnnxSetting
+        &apos; Cache the controls
+        Set combo3        = .GetControl(&quot;ComboBox3&quot;)
+        Set combo3Model   = combo3.Model
+        Set modifiedModel = .GetControl(&quot;_modified&quot;).Model
+
+        &apos; Parse user input, clamp to [25–250]
+        speechRate = Int(CheckNumInput(combo3Model.Text, &quot;01234567890&quot;))
+        speechRate = Min(Max(speechRate, rangeBoundary(0)), rangeBoundary(1))
+
+        &apos; Update text with percent sign
+        combo3Model.Text = CStr(speechRate) &amp; &quot;%&quot;
+
+        &apos; Mark dialog as modified
+        modifiedModel.State = 1
+    End With
+End Sub
+
+
+
+Sub CheckOnnxVoiceCountBoundary()
+&apos; Ensures the selected voice number in ComboBox2 is within valid bounds
+&apos; and marks the dialog as modified when the boundary is enforced.
+    Dim voiceBound      As Integer
+    Dim rangeBoundary   As Variant
+    Dim combo2          As Object
+    Dim combo2Model     As Object
+    Dim modifiedModel   As Object
+
+    voiceBound = 0
+
+    With f_dlgOnnxSetting
+        &apos; Cache controls for clarity and performance
+        Set combo2        = .GetControl(&quot;ComboBox2&quot;)
+        Set combo2Model   = combo2.Model
+        Set modifiedModel = .GetControl(&quot;_modified&quot;).Model
+
+
+
+        &apos; Compute valid index range: [0, itemCount-1]
+        rangeBoundary = Array(0, combo2.getItemCount() - 1)
+
+        &apos; Parse user input, clamp within the valid range
+        voiceBound = Int(CheckNumInput(combo2Model.Text, &quot;01234567890&quot;))
+        voiceBound = Min(Max(voiceBound, rangeBoundary(0)), rangeBoundary(1))
+
+        &apos; Write the clamped value back into the control
+        combo2Model.Text = CStr(voiceBound)
+        
+        &apos; Refresh the help text based on current selection
+        combo2Model.HelpText = fsOnnxCombo2HelpText()
+
+        &apos; Mark the dialog as modified
+        modifiedModel.State = 1
+    End With
+End Sub
+
+
+Type PiperModelCardType
+	OnlyLocal As Integer
+	OnlyOnline As Integer
+	LocalOrOnline As Integer
+    SaveOnline As Integer
+    SaveOnlineOrAltMessage As Integer
+    LocalOrAltMessage As Integer
+    ModelCardPath As Integer
+    ModelCardURL As Integer
+    ModelCardURLorPath As Integer
+    SampleTextURL As Integer
+    SampleText As Integer
+End Type
+
+
+Function SharedPiperUseModel()
+	Dim UseModel As PiperModelCardType
+	With UseModel
+		.OnlyLocal = 0
+		.OnlyOnline = 1
+		.LocalOrOnline = 2
+        .SaveOnline = 3
+        .SaveOnlineOrAltMessage = 4
+        .LocalOrAltMessage = 5
+        .ModelCardPath = 6
+        .ModelCardURL = 7
+        .ModelCardURLorPath = 8
+        .SampleTextURL = 9
+        .SampleText = 10
+	End With
+	SharedPiperUseModel = UseModel
+End Function
+
+
+Function GetModelCard(Model As String, Mode As Integer) As String
+	Dim ParsedModel As String : ParsedModel = SanitizeModel(Model)
+	If ParsedModel = &quot;&quot; Then
+		GetModelCard = &quot;&quot;
+		Exit Function
+	End If
+	Dim UseModel As PiperModelCardType
+	UseModel = SharedPiperUseModel()
+	Dim Lang As String : Lang = Split(ParsedModel, &quot;_&quot;)(0)
+	Dim PathParts As Variant : PathParts = Split(ParsedModel, &quot;-&quot;)
+
+	Dim Model_CardPath As String
+	Model_CardPath = fsSuperTrim(ConvertToURL(Environ(&quot;HOME&quot;)), &quot;/&quot;) &amp; _
+					 &quot;/.local/share/piper-tts/piper-voices/&quot; &amp; Lang &amp; &quot;/&quot;
+	Dim URL As String : URL = &quot;https://rhasspy.github.io/piper-samples/samples/&quot; &amp; Lang &amp; &quot;/&quot;
+
+	Dim Part As String
+	For Each Part In PathParts
+		Model_CardPath = Model_CardPath &amp; Part &amp; &quot;/&quot;
+		URL = URL &amp; Part &amp; &quot;/&quot;
+	Next
+	Model_CardPath = Model_CardPath &amp; &quot;MODEL_CARD&quot;
+	Dim SampleURL As String : SampleURL = URL &amp; &quot;sample.txt&quot;
+	URL = URL &amp; &quot;MODEL_CARD&quot;
+
+	Dim ModelCard As String : ModelCard = &quot;&quot;
+	Dim AltModelCard As String : AltModelCard = Join(Array( _
+	 &quot;&quot;, _  
+	 &quot;Using Contributors&apos; Speech Platforms&quot;, _  
+	 &quot;====================================&quot;, _  
+	 &quot;&quot;, _  
+	 &quot;**[Read Text Extension][1]** can produce synthesized speech with LibreOffice.&quot;, _  
+	 &quot;It supports Piper and Mimic3, platforms that use contributor supported voice&quot;, _  
+	 &quot;models to produce high quality speech from text. It also supports small and&quot;, _  
+	 &quot;efficient contributor speech platforms like MaryTTS and Rhvoice.&quot;, _  
+	 &quot;&quot;, _  
+	 &quot;[1]: https://github.com/jimholgate/readtextextension/blob/master/README.md&quot; _  
+	 ), Chr(13))
+	Select Case Mode
+		Case UseModel.OnlyLocal
+			If FileExists(Model_CardPath) Then
+				ModelCard = getTextFromFile(Model_CardPath, &quot;UTF-8&quot;, 0)
+			Else
+				ModelCard = &quot;&quot;
+			End If
+
+		Case UseModel.OnlyOnline
+			ModelCard = fsGetWebService(URL)
+			If Len(Trim(ModelCard)) &lt;&gt; 0 Then
+				CreateFile Model_CardPath, Trim(ModelCard), &quot;UTF-8&quot;
+			End If
+
+		Case UseModel.LocalOrOnline
+			If FileExists(Model_CardPath) Then
+				ModelCard = getTextFromFile(Model_CardPath, &quot;UTF-8&quot;, 0)
+			Else
+				ModelCard = fsGetWebService(URL)
+			End If
+
+		Case UseModel.SaveOnline
+			If FileExists(Model_CardPath) Then
+				ModelCard = getTextFromFile(Model_CardPath, &quot;UTF-8&quot;, 0)
+			Else
+				ModelCard = fsGetWebService(URL)
+				If Len(Trim(ModelCard)) &lt;&gt; 0 Then
+					CreateFile Model_CardPath, Trim(ModelCard), &quot;UTF-8&quot;
+				End If
+			End If
+
+		Case UseModel.SaveOnlineOrAltMessage 
+			If FileExists(Model_CardPath) Then
+				ModelCard = getTextFromFile(Model_CardPath, &quot;UTF-8&quot;, 0)
+			Else
+				ModelCard = fsGetWebService(URL)
+				If Len(Trim(ModelCard)) &lt;&gt; 0 Then
+					CreateFile Model_CardPath, Trim(ModelCard), &quot;UTF-8&quot;
+                Else
+                    ModelCard = AltModelCard
+				End If
+			End If
+		Case UseModel.ModelCardPath
+			ModelCard = Model_CardPath
+		Case UseModel.ModelCardURL
+			ModelCard = URL
+		Case UseModel.ModelCardURLorPath
+			If FileExists(Model_CardPath) Then
+				ModelCard = Model_CardPath
+			Else
+				ModelCard = URL
+			End If
+		Case UseModel.SampleTextURL
+			ModelCard = SampleURL
+		Case UseModel.SampleText
+			ModelCard = Split(fsGetWebService(SampleURL), Chr(10))(0)
+	End Select
+	GetModelCard = ModelCard
+End Function
+
+
+Function SanitizeModel(Model As String) As String
+	Dim icon As TypeUserIconSet : icon = Dialog4Icon()
+	If InStr(Model, &quot;-&quot;) = 0 Then
+		Model = &quot;en_GB-jenny_dioco-medium&quot;
+	End If
+	SanitizeModel = fsSuperTrim(Split(Model, &quot;#&quot;)(0), &quot; ,&quot;&quot;;:&quot; &amp; icon.all)
+End Function
+
+
+&apos;=====================================================
+&apos;=====================================================
+
+Sub TestModelCard()
+	Dim UseModel As PiperModelCardType
+	UseModel = SharedPiperUseModel()
+
+	Dim CardText As String
+	CardText = GetModelCard(&quot;en_GB-jenny_dioco-medium&quot;, UseModel.SaveOnline)
+	MsgBox CardText
+End Sub
+
+&apos;=====================================================
+
+
+Sub PiperPlaySound(ByVal model As String, ByVal voiceNo As String)
+&apos; Plays an online Piper sample MP3 for the given model and voice number.
+&apos; Temporarily disables UI controls during playback and restores their state afterwards.
+    Dim delimiter                As Variant
+    Dim splitModel               As Variant
+    Dim lang                     As String
+    Dim doSound                  As String
+    Dim pathDir                  As Variant
+    Dim testUrl                  As String
+    Dim comboBox1Text            As String
+    Dim modelCard                As String
+    Dim sampleText               As String
+    Dim icons                    As TypeUserIconSet
+    Dim useModel                 As PiperModelCardType
+    Dim speechDispatcherEnabled  As Boolean
+    Dim cancelEnabled            As Boolean
+    Dim combo0Enabled            As Boolean
+    Dim combo1Enabled            As Boolean
+    Dim combo2Enabled            As Boolean
+    Dim combo3Enabled            As Boolean
+    Dim modelInfoEnabled         As Boolean
+    Dim image1Enabled            As Boolean
+    Dim okEnabled                As Boolean
+    Dim ctrlName                 As String
+    
+    &apos; Initialize
+    Set icons   = Dialog4Icon()
+    testUrl     = &quot;&quot;
+    comboBox1Text = &quot;&quot;
+    modelCard   = &quot;&quot;
+    sampleText = &quot;&quot;
+    modelInfoEnabled = True
+    
+    useModel    = SharedPiperUseModel()
+    
+    &apos; Ensure model string contains a dash, else default
+    If InStr(model, &quot;-&quot;) = 0 Then
+        model = &quot;en_GB-jenny_dioco-medium&quot;
+    End If
+    
+    &apos; Strip off any trailing characters after delimiters
+    For Each delimiter In Array(&quot;#&quot;, &quot; &quot;, &quot;,&quot;, &quot;;&quot;, &quot;:&quot;)
+        model = Split(model, delimiter)(0)
+    Next delimiter
+    model = Trim(Replace(model, &quot;#&quot;, &quot;&quot;))
+    
+    &apos; Parse components
+    splitModel = Split(model, &quot;-&quot;)
+    lang       = Split(model, &quot;_&quot;)(0)
+    
+    Select Case UBound(splitModel)
+        Case 2
+            &apos; Build the URL to the remote MP3 sample
+            doSound = &quot;https://rhasspy.github.io/piper-samples/samples/&quot; &amp; lang &amp; &quot;/&quot;
+            For Each pathDir In splitModel
+                doSound = doSound &amp; pathDir &amp; &quot;/&quot;
+            Next pathDir
+            doSound = doSound &amp; &quot;speaker_&quot; &amp; voiceNo &amp; &quot;.mp3&quot;
+            
+            &apos; Retrieve model card info (or alt message)
+            modelCard = GetModelCard(model, useModel.SaveOnlineOrAltMessage)
+            sampleText = GetModelCard(model, useModel.SampleText)
+            On Local Error GoTo piperPlaySoundErr
+            If Len(modelCard) &lt;&gt; 0 Then
+                With f_dlgOnnxSetting
+                    &apos; Cache current control states
+                    speechDispatcherEnabled = .GetControl(&quot;_speech_dispatcher&quot;).Model.Enabled
+                    cancelEnabled           = .GetControl(&quot;_cancel&quot;).Model.Enabled
+                    comboBox1Text           = Trim(.GetControl(&quot;ComboBox1&quot;).Model.Text)
+                    combo0Enabled           = .GetControl(&quot;ComboBox0&quot;).Model.Enabled
+                    combo1Enabled           = .GetControl(&quot;ComboBox1&quot;).Model.Enabled
+                    combo2Enabled           = .GetControl(&quot;ComboBox2&quot;).Model.Enabled
+                    combo3Enabled           = .GetControl(&quot;ComboBox3&quot;).Model.Enabled
+                    modelInfoEnabled        = .GetControl(&quot;_model_info_text&quot;).Model.Enabled
+                    image1Enabled           = .GetControl(&quot;ImageControl1&quot;).Model.Enabled
+                    okEnabled               = .GetControl(&quot;_ok&quot;).Model.Enabled
+                    .GetControl(&quot;_model_info_text&quot;).Model.Text       = sampleText &apos; modelCard
+                    .GetControl(&quot;_model_info_text&quot;).Model.helpText   = testUrl
+                    .GetControl(&quot;ComboBox1&quot;).Model.Text              = comboBox1Text
+                    &apos; Disable all interactive controls
+                    For Each ctrlName In Array( _
+                         &quot;ImageControl1&quot;,&quot;ComboBox3&quot;,&quot;ComboBox2&quot;, _
+                         &quot;ComboBox1&quot;,&quot;ComboBox0&quot;,&quot;_ok&quot;,&quot;_cancel&quot;, _
+                         &quot;_speech_dispatcher&quot;)
+                        .GetControl(ctrlName).Model.Enabled = False
+                    Next ctrlName
+                    
+                    &apos; Play the sound if Python-style f-strings are supported
+                    If fbPySupportFStrings() Then
+                        PlaySound doSound
+                        .GetControl(&quot;ComboBox1&quot;).Model.Text = comboBox1Text
+                        .GetControl(&quot;ComboBox2&quot;).Model.Text = _
+                            LookUpUboundOfPiperModel(comboBox1Text)
+                    End If
+                    
+                    &apos; Re-enable only the OK button and image
+                    .GetControl(&quot;ImageControl1&quot;).Model.Enabled = True
+                    .GetControl(&quot;_ok&quot;).Model.Enabled           = True
+                    
+                    &apos; Restore remaining control states
+                    .GetControl(&quot;ComboBox0&quot;).Model.Enabled          = combo0Enabled
+                    .GetControl(&quot;ComboBox1&quot;).Model.Enabled          = combo1Enabled
+                    .GetControl(&quot;ComboBox2&quot;).Model.Enabled          = combo2Enabled
+                    .GetControl(&quot;ComboBox3&quot;).Model.Enabled          = combo3Enabled
+                    .GetControl(&quot;_model_info_text&quot;).Model.Enabled   = modelInfoEnabled
+                    .GetControl(&quot;_model_info_text&quot;).Model.Text       = modelCard &apos; sampleText
+                    .GetControl(&quot;_speech_dispatcher&quot;).Model.Enabled = speechDispatcherEnabled
+                    .GetControl(&quot;_cancel&quot;).Model.Enabled            = cancelEnabled
+                    .GetControl(&quot;ImageControl1&quot;).Model.HelpText = &quot;&quot;
+                    
+                End With
+            End If
+    End Select
+    
+    Exit Sub
+
+piperPlaySoundErr:
+    &apos; Fallback: always attempt playback even on error
+    PlaySound doSound
+End Sub
+
+
+
+Function fsOnnxCombo2HelpText() As String
+&apos; Returns the help text for ComboBox2 by extracting the speaker identifier
+&apos; from the selected ONNX model’s JSON metadata. Models with only one voice
+&apos; or uninstalled models yield an empty help text.
+
+    Dim piperConfig   As PiperType
+    Dim modelEntries  As Variant
+    Dim entry         As String
+    Dim foundList     As Variant
+    Dim voiceIndex    As Integer
+    Dim combo1Model   As Object
+    Dim combo2Model   As Object
+
+    &apos; Initialize default piperConfig
+    piperConfig.onnx_model  = &quot;&quot;
+    piperConfig.file_option = &quot;&quot;
+    piperConfig.voice_ids   = Array(&quot;0&quot;)
+    piperConfig.ubound      = 0
+
+    With f_dlgOnnxSetting
+        &apos; Cache the ComboBox models
+        Set combo1Model = .GetControl(&quot;ComboBox1&quot;).Model
+        Set combo2Model = .GetControl(&quot;ComboBox2&quot;).Model
+
+        &apos; If ComboBox1 is disabled, clear help and exit
+        If Not combo1Model.Enabled Then
+            combo2Model.helpText = &quot;&quot;
+            Exit Function
+        End If
+
+        &apos; Fetch all models (no validation flag)
+        modelEntries = PiperModelList(&quot;&quot;, False)
+
+        &apos; Iterate entries to find matching onnx model
+        For Each entry In modelEntries
+            foundList = Split(entry, &quot;#&quot;)
+            If UBound(foundList) = 2 _
+               And InStr(combo1Model.Text, foundList(0)) &lt;&gt; 0 Then
+
+                &apos; Capture model name
+                piperConfig.onnx_model = foundList(0)
+
+                &apos; Parse file option and voice IDs
+                If InStr(foundList(1), &quot;?&quot;) &lt;&gt; 0 _
+                   And InStr(foundList(1), &quot;+&quot;) &lt;&gt; 0 Then
+
+                    piperConfig.file_option = Split(foundList(1), &quot;?&quot;)(0)
+                    piperConfig.voice_ids   = _
+                        Split(Split(foundList(1), &quot;?&quot;)(1), &quot;+&quot;)
+                    piperConfig.ubound      = UBound(piperConfig.voice_ids)
+                Else
+                    piperConfig.file_option = foundList(1)
+                    piperConfig.voice_ids   = Array(&quot;0&quot;)
+                    piperConfig.ubound      = 0
+                End If
+
+                &apos; Determine valid voiceIndex from ComboBox2 text
+                voiceIndex = CInt(CheckNumInput(combo2Model.Text, &quot;01234567890&quot;))
+                If voiceIndex &lt; 0 Then
+                    voiceIndex = 0
+                ElseIf voiceIndex &gt; piperConfig.ubound Then
+                    voiceIndex = piperConfig.ubound
+                End If
+
+                &apos; Set helpText to the selected voice identifier
+                combo2Model.helpText = piperConfig.voice_ids(voiceIndex)
+                Exit For
+            End If
+        Next entry
+
+        &apos; Return whatever helpText was assigned (or remain empty)
+        fsOnnxCombo2HelpText = combo2Model.helpText
+    End With
+End Function
+
+
+Function fsSystemSafePercentString(byVal percentage As String) As String
+	percentage = CheckNumInput(percentage, &quot;01234567890&quot;)
+	If getGUIType() = 1 Then
+		&apos; Windows
+		fsSystemSafePercentString = &quot;&quot;&quot;&quot; &amp; percentage &amp; &quot; percent&quot;&quot;&quot;
+	Else 
+		fsSystemSafePercentString = percentage &amp; &quot;%&quot;					
+	End If
+End Function
+
+
+Sub FillDialog4ComboBox0()
+&apos; Populates ComboBox0 in f_dlgOnnxSetting with a list of available Piper 
+&apos; ISO language code.
+	Dim UseLang As String : UseLang = &quot;&quot; &apos; &quot;en&quot;
+	Dim Models As Variant : Models = PiperModelList(&quot;&quot;, False)
+	Dim Row As String : Row = &quot;&quot;
+	Dim Tally As String : Tally = &quot;&quot;
+	Dim Language As String : Language = &quot;&quot;  &apos; i. e. `en`
+	Dim englishIndex As Integer : englishIndex = -1
+	Dim x As Integer
+	
+	For x = UBound(Models) To LBound(Models) Step -1
+		Row = Models(x)
+		
+		If Instr(Row, &quot;_&quot;) &lt;&gt; 0 Then
+			Language = Split(Row, &quot;_&quot;)(0)
+			If Instr(Tally, Language) = 0 Then
+				If Len(Tally) = 0 Then
+					Tally = Language
+				Else
+					Tally = Tally &amp; &quot;,&quot; &amp; Language
+				End If
+			End If
+		End If
+	Next
+
+	With f_dlgOnnxSetting
+		.GetControl(&quot;ComboBox0&quot;).removeItems(0, .GetControl(&quot;ComboBox1&quot;).getItemCount())
+		For Each Row in Split(Tally, &quot;,&quot;)
+			.GetControl(&quot;ComboBox0&quot;).addItem(Row, 0)
+		Next
+		If Instr(Tally, fsSelectionLanguage(False)) &lt;&gt; 0 Then
+			UseLang = fsSelectionLanguage(False) 
+		ElseIf Instr(Tally, Config(pi_display_language_string)) &lt;&gt; 0 Then
+			PopulateConfigPrivates()
+			UseLang = Config(pi_display_language_string)
+		End If
+		.GetControl(&quot;ComboBox0&quot;).Text = UseLang
+	End With
+End Sub
+
+
+Sub EditDialog4ComboBox2()
+&apos; Populates ComboBox2 with voice numbers for the selected Piper model,
+&apos; disabling/enabling the control and setting help text accordingly.
+    Dim icons       As TypeUserIconSet : Set icons       = Dialog4Icon()
+    Dim model       As String            : model       = &quot;&quot;
+    Dim models      As Variant
+    Dim rowValue    As String            : rowValue    = &quot;&quot;
+    Dim voiceNo     As String            : voiceNo     = &quot;0&quot;
+    Dim i           As Integer
+    Dim PiperUBound As Integer
+
+    With f_dlgOnnxSetting
+        &apos; Cache the key controls/models
+        Dim combo0       As Object : Set combo0       = .GetControl(&quot;ComboBox0&quot;)
+        Dim combo1       As Object : Set combo1       = .GetControl(&quot;ComboBox1&quot;)
+        Dim combo2       As Object : Set combo2       = .GetControl(&quot;ComboBox2&quot;)
+        Dim combo2Model  As Object : Set combo2Model  = combo2.Model
+
+        &apos; Start with ComboBox2 disabled
+        combo2Model.Enabled = False
+        
+        &apos; Read and validate the selected model string
+        model = Trim(combo1.Text)
+        If Len(model) &lt; 5 Or UBound(Split(model, &quot;-&quot;)) &lt;&gt; 2 Then Exit Sub
+
+        &apos; Clear any existing items and reset text
+        combo2.removeItems 0, combo2.getItemCount()
+        PiperUbound = LookUpUboundOfPiperModel(SanitizeModel(Model))
+
+		voiceNo = Trim(Cstr(PiperUBound))
+		combo2Model.Text = voiceNo
+
+		For i = PiperUBound To 0 Step -1
+            combo2.addItem CStr(i), 0
+        Next i
+
+        &apos; Enable or disable ComboBox2 based on the chosen voice number
+        If Trim(combo2Model.Text) = &quot;0&quot; Then
+            combo2Model.Enabled  = False
+            combo2Model.HelpText = &quot;&quot;
+        Else
+            combo2Model.Enabled  = True
+            combo2Model.HelpText = fsOnnxCombo2HelpText()
+        End If
+    End With
+End Sub
+
+
+
+Sub PiperDialog0OnChange()
+	DIm Models As Variant
+	EditDialog4ComboBox2()
+	Dim Item As String
+	With f_dlgOnnxSetting
+		
+		Models = PiperModelList(.GetControl(&quot;ComboBox0&quot;).Text, False)
+		Select Case Ubound(Models)
+			Case -1
+			Exit Sub
+			Case 0
+
+			Select Case Ubound(Split(Models(0), &quot;#&quot;))
+				Case 2
+				EditDialog4ComboBox1List(Models)
+
+				Case Else
+				Exit Sub
+
+			End Select
+			
+			Case Else
+				EditDialog4ComboBox1List(Models)
+	
+		End Select
+
+		Dim TestLang As String : TestLang = Config(pi_display_language_string)
+		.GetControl(&quot;ComboBox0&quot;).Model.helpText = fsLookUpTerm2(.GetControl(&quot;ComboBox0&quot;).Text, TestLang)
+		ManagePiperModelDisplay()
+	End With
+End Sub
+
+
+Sub ManagePiperModelDisplay()
+	Dim icon As TypeUserIconSet : icon = Dialog4Icon()
+	Dim UseModel As PiperModelCardType
+	UseModel = SharedPiperUseModel()
+	With f_dlgOnnxSetting
+		.GetControl(&quot;_model_info_text&quot;).Model.helpText = GetModelCard(_
+		SanitizeModel(.GetControl(&quot;ComboBox1&quot;).Model.Text), UseModel.ModelCardURLorPath)
+		
+		
+		.GetControl(&quot;_model_info_text&quot;).Model.Text = GetModelCard(_
+		 SanitizeModel(.GetControl(&quot;ComboBox1&quot;).Model.Text), UseModel.SaveOnline)
+
+		Select Case Instr(Trim(.GetControl(&quot;ComboBox1&quot;).Text), icon.checkmark)
+			Case 1
+			.GetControl(&quot;_ok&quot;).Model.Enabled = True		
+			.GetControl(&quot;_speech_dispatcher&quot;).Visible = fsTheOsId() = &quot;POSIX&quot;
+
+			Case Else
+			.GetControl(&quot;_ok&quot;).Model.Enabled = False
+			.GetControl(&quot;_speech_dispatcher&quot;).Visible = False
+
+		End Select
+	.GetControl(&quot;ImageControl1&quot;).Model.HelpText = .GetControl(&quot;ComboBox1&quot;).Text
+	Dim TestLang As String : TestLang = Config(pi_display_language_string)
+	.GetControl(&quot;ComboBox0&quot;).Model.helpText = fsLookUpTerm2(.GetControl(&quot;ComboBox0&quot;).Text, TestLang)
+	End With
+	EditDialog4ComboBox2()
+End Sub
+
+
+Sub EditDialog4ComboBox1List(models As Variant)
+&apos; Populates ComboBox1 in f_dlgOnnxSetting with Piper models,
+&apos; applies icon prefixes, handles initial suggestion, and updates related controls.
+    Dim x As Integer
+    Dim icons      As TypeUserIconSet: Set icons       = Dialog4Icon()
+    Dim iconPrefix As String         : iconPrefix       = icons.heart
+    Dim workingModel As String       : workingModel     = &quot;&quot;
+    Dim foundList   As Variant
+    Dim modelFile   As String
+    Dim firstMatch  As String        : firstMatch       = &quot;&quot;
+    Dim suggestion  As String        : suggestion       = _
+        PiperLocalSuggestion(fsSelectionLanguageAndRegion(True), False)
+    Dim UseSuggestion  As String     : UseSuggestion    = &quot;&quot;
+    
+    With f_dlgOnnxSetting
+        &apos; Cache controls/models for efficiency
+        Dim combo0        As Object: Set combo0        = .GetControl(&quot;ComboBox0&quot;).Model
+        Dim combo1        As Object: Set combo1        = .GetControl(&quot;ComboBox1&quot;).Model
+        Dim combo2        As Object: Set combo2        = .GetControl(&quot;ComboBox2&quot;).Model
+        Dim speechButton  As Object: Set speechButton  = .GetControl(&quot;_speech_dispatcher&quot;)
+        Dim infoText      As Object: Set infoText      = .GetControl(&quot;_model_info_text&quot;).Model
+    
+        &apos; Disable and clear before populating
+        combo0.Enabled = False
+        combo1.Enabled = False
+        .GetControl(&quot;ComboBox1&quot;).removeItems(0, .GetControl(&quot;ComboBox1&quot;).getItemCount())
+    
+        For x = UBound(models) To LBound(models) Step -1
+            foundList = Split(models(x), &quot;#&quot;)
+            
+            &apos; Case: no &quot;##&quot; marker → initial population pass
+            If InStr(models(x), &quot;##&quot;) = 0 Then
+                iconPrefix = icons.checkmark
+                If Instr(models(x), suggestion) &gt; 0 Then
+                	UseSuggestion = IconPrefix &amp; suggestion
+                End If
+                If Len(models(x)) &gt; 0 Then
+                    workingModel = foundList(0)
+                    combo1.Text = iconPrefix &amp; workingModel
+                    speechButton.Visible = ShowSpeechDispatcherButton()
+                End If
+                
+                If UBound(foundList) = 2 Then
+                    modelFile = Split(foundList(1), &quot;?&quot;)(0) &amp; &quot;.json&quot;
+                    If FileExists(modelFile) Then
+                        workingModel = foundList(0)
+                        combo1.Text = iconPrefix &amp; workingModel
+                        infoText.helpText = modelFile
+                        combo2.Text = foundList(2)
+                        If CheckNumInput(foundList(2), &quot;01234567890&quot;) = &quot;0&quot; _
+                           Or CheckNumInput(foundList(2), &quot;01234567890&quot;) = &quot;&quot; Then
+                            combo2.Enabled = False
+                        End If
+                        combo2.helpText = fsOnnxCombo2HelpText()
+                    End If
+                End If
+                
+            &apos; Case: &quot;##&quot; marker present → second pass for icon variations
+            ElseIf UBound(foundList) = 2 Then
+                workingModel = foundList(0)
+                Select Case foundList(2)
+                    Case &quot;0&quot;, &quot;-1&quot;, 0, -1, False
+                        iconPrefix = icons.heart
+                    Case Else
+                        iconPrefix = icons.smile
+                End Select
+            End If
+    
+            &apos; Add non-empty entries to ComboBox1
+            If Len(workingModel) &gt; 0 Then
+                &apos; Capture firstMatch, preferring checkmark entries
+                If Len(firstMatch) = 0 Then
+                    firstMatch = iconPrefix &amp; workingModel
+                ElseIf iconPrefix = icons.checkmark _
+                   And InStr(firstMatch, icons.checkmark) = 0 Then
+                    firstMatch = iconPrefix &amp; workingModel
+                End If
+    
+                .GetControl(&quot;ComboBox1&quot;).addItem iconPrefix &amp; workingModel, 0
+            End If
+    
+            workingModel = &quot;&quot;  &apos; reset for next iteration
+        Next x
+    
+        &apos; Apply suggestion or fallback firstMatch
+        If Len(UseSuggestion) &gt; 0 And InStr(combo1.Text, UseSuggestion) = 0 Then
+            combo1.Text = UseSuggestion
+        ElseIf Len(firstMatch) &gt; 0 And InStr(combo1.Text, icons.checkmark) = 0 Then
+            combo1.Text = firstMatch
+        End If
+    
+        &apos; Re-enable controls
+        combo0.Enabled = True
+        combo1.Enabled = True
+    End With
+End Sub
+
+
+Function ShowOnnxEditor()
+	ShowOnnxEditor = &quot;&quot;
+	&apos; `f_dlgOnnxSetting` is a global variable of type `Variant`
+	&apos; This function displays Dialog4. It outputs a command line
+	&apos; string depending on the values you choose in the dialog.
+	&apos; If you cancel the dialog, then it outputs `&quot;&quot;`.
+	
+	Dim _found_list As Variant
+	Dim icon As TypeUserIconSet : icon = Dialog4Icon()
+	Dim _percentage As String : _percentage = &quot;100%&quot;
+	Dim x As Integer: x = 0
+	Dim _lang As String : _lang = fsDisplayLanguage()
+	Dim _working_model As String : _working_model = &quot;&quot;
+	Dim model_file As String : model_file = &quot;&quot;
+	Dim _item As String : _item = &quot;&quot;
+	Dim download_flag As String : download_flag = &quot;&quot;
+	Dim suggested_model As String : suggested_model = PiperLocalSuggestion(_
+	fsSelectionLanguageAndRegion(True), False)
+	Dim _models As Variant : _models = PiperModelList(fsSelectionLanguage(False), False)
+	Dim ComboBox1 As String : ComboBox1 = &quot;&quot;
+	Dim IconPrefix As String : IconPrefix = icon.heart
+	Dim VoiceList As Variant
+	fbTestDialogLoaded(&quot;textToSpeech&quot;)
+	f_dlgOnnxSetting = CreateUnoDialog(DialogLibraries.textToSpeech.Dialog4)
+	With f_dlgOnnxSetting
+		.GetControl(&quot;_modified&quot;).Model.State = 0
+		.model.Title = fsLookUpTerm2(&quot;s_read-text&quot;, _lang) &amp; _
+		&quot; - &quot; &amp; fsLookUpTerm2(&quot;s_speech-properties&quot;, _lang)
+		.GetControl(&quot;_edit_frame&quot;).model.Label = fsLookUpTerm2(_
+		&quot;s_default-synthesizer&quot;, _lang)
+		.GetControl(&quot;_models&quot;).model.Label = fsLookUpTerm2(&quot;s_model&quot;, _lang)
+		.GetControl(&quot;_rate&quot;).model.Label = fsLookUpTerm2(&quot;s_rate&quot;, _lang)
+		.GetControl(&quot;_voice&quot;).model.Label = fsLookUpTerm2(&quot;s_voice&quot;, _lang)
+		.GetControl(&quot;_ok&quot;).Model.Label = fsLookUpTerm2(&quot;s_ok&quot;, _lang)
+		.GetControl(&quot;_cancel&quot;).Model.Label = fsLookUpTerm2(&quot;s_cancel&quot;, _lang)
+		.GetControl(&quot;_speech_dispatcher&quot;).Model.Label = fsLookUpTerm2(&quot;s_speech-dispatcher&quot;, _lang)
+		.GetControl(&quot;ImageControl1&quot;).model.ImageURL = fsSpeakerLogo()
+		.GetControl(&quot;ImageControl1&quot;).model.helpText = &quot;&quot;
+		Select Case Instr(suggested_model, &quot;#&quot;)
+			Case 0
+			.GetControl(&quot;ComboBox2&quot;).Model.Text = &quot;0&quot;
+			Case Else
+			.GetControl(&quot;ComboBox2&quot;).Model.Text = Split(suggested_model, &quot;#&quot;)(1)
+		End Select
+		
+		Select Case Instr(suggested_model, &quot;#0&quot;)
+			Case 0
+			.GetControl(&quot;ComboBox1&quot;).Model.Text = icon.smile &amp; Split(suggested_model, &quot;#&quot;)(0)
+			Case Else
+			.GetControl(&quot;ComboBox1&quot;).Model.Text = icon.heart &amp; Split(suggested_model, &quot;#&quot;)(0)
+		End Select		
+		.GetControl(&quot;_code_frame&quot;).model.Label = fsLookUpTerm2(&quot;s_about&quot;, _lang)
+		If Len(model_file) &lt;&gt; 0 Then
+			.GetControl(&quot;_model_info_text&quot;).Model.Text = getTextFromFile(model_file, &quot;UTF-8&quot;, 0)
+			.GetControl(&quot;_ok&quot;).Model.Enabled = True
+		End If
+
+		&apos; Populate &quot;ComboBox2&quot; with a list of numbers... 
+		EditDialog4ComboBox1List(_models)
+		&apos; Populate ComboBox0 with a list of available language codes
+		FillDialog4ComboBox0()
+		Select Case .Execute()
+		Case 0
+
+		Case Else
+			Select Case .GetControl(&quot;ComboBox3&quot;).Model.Text
+				Case &quot;100%&quot;
+				_percentage = &quot;&quot;			
+				Case Else			
+				_percentage = &quot; --rate &quot; &amp; fsSystemSafePercentString(.GetControl(&quot;ComboBox3&quot;).Model.Text)
+			End Select
+			ComboBox1 = Trim(.GetControl(&quot;ComboBox1&quot;).Model.Text)
+			Select Case Instr(ComboBox1, &quot; &quot;)
+				Case 0
+				Case Else
+				Select Case Ubound(Split(ComboBox1, &quot; &quot;))
+					Case 1
+					suggested_model = Split(ComboBox1, &quot; &quot;)(1)
+					If Instr(icon.checkmark, Left(ComboBox1, 1)) = 0 Then
+						download_flag = &quot; --update True&quot;
+					End If
+					ShowOnnxEditor = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot;&quot; &amp; download_flag &amp; _
+					 _percentage &amp; &quot; --voice &quot; &amp; suggested_model &amp; &quot;#&quot; &amp; .GetControl(&quot;ComboBox2&quot;).Model.Text &amp; _
+					&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
+				End Select
+			End Select
+		End Select
+	End With
+	
+	Exit Function
+	ShowOnnxEditorErr:
+	ShowOnnxEditor = &quot;&quot;
+End Function
 
 </script:module>

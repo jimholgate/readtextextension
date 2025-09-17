@@ -216,18 +216,24 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import codecs
 import os
 import sys
+import re
 import time
 import espeak_read_text_file
 import netcommon
+import netsplit
 import network_read_text_file
 import openjtalk_read_text_file
 import readtexttools
 
 try:
-    import spd_say_set
+    import subprocess
 except (SyntaxError, ImportError, AssertionError, AttributeError):
     pass
 
+try:
+    import spd_say_set
+except (SyntaxError, ImportError, AssertionError, AttributeError):
+    pass
 try:
     import getopt
 except (ImportError, AssertionError, AttributeError):
@@ -378,12 +384,11 @@ def get_whoami():  # -> str
     for _env_key in ["USER", "USERNAME", "LOGNAME", "PWD", "HOME"]:
         try:
             whoami = os.getenv(_env_key)
-            if len(whoami) != 0:
-                whoami = whoami.split(os.sep)[-1]
-                break
+            if whoami:
+                return whoami.split(os.sep)[-1]
         except TypeError:
             pass
-    return whoami
+    return ""
 
 
 def filterinputs(s0):
@@ -440,14 +445,45 @@ def usage():  # -> None
         hard_reset(player)
 
 
-def guess_time(second_string, word_rate, _file_path, _language):  # -> int
+def guess_time(phrase="", word_rate=1, _file_path="", _language="en"):  # -> int
     """
-    Estimate time in seconds for speech to finish
+    Estimate time in seconds for speech to finish.
+
+    - `phrase` - The string to analyse "Hello world"
+    - `word_rate` - Speed to speak. i.e.: 1.25 would speak 125% speech rate.
+    - `_filepath` - Path of scratch audio file used to check the estimate.
+    - `_language` - If a language is more dense, then the function needs to
+       factor in the rate used to calculate the estimate.
     """
+    if len(phrase.strip()) == 0:
+        return 0
     i_rate = ((int(word_rate) * 0.8) + 100) / 100
-    i_seconds = 1 + len(second_string) / 18
-    retval = i_rate * i_seconds
-    if i_seconds < 60:
+    i_seconds = 1 + len(phrase) / 18
+    # NOTE: Check more languages. Increasing the value of the factor increases
+    # the estimate of the duration.
+    max_seconds = 60
+    language_settings = {
+        "en-US": (0.8, 60),
+        "en": (0.8, 60),
+        "es": (0.8, 60),
+        "fr": (0.8, 60),
+    }
+
+    factor = 0.8  # default
+    for idiom, vals in language_settings.items():
+        if _language.startswith(idiom):
+            factor = vals[0]
+            max_seconds = vals[1]
+            break
+
+    try:
+        word_rate = float(word_rate)
+    except (ValueError, TypeError):
+        word_rate = 1.0
+
+    i_rate = ((int(word_rate) * factor) + 100) / 100
+    i_seconds = 1 + len(phrase) / 18
+    if i_seconds < max_seconds:
         _command = "/usr/bin/espeak"
         if os.path.isfile("/usr/bin/espeak-ng"):
             _command = "/usr/bin/espeak-ng"
@@ -471,19 +507,26 @@ def guess_time(second_string, word_rate, _file_path, _language):  # -> int
                     50,
                     160,
                 )
-                retval = i_rate * (readtexttools.sound_length_seconds(_wave))
+                return i_rate * (readtexttools.sound_length_seconds(_wave))
             except (AttributeError, TypeError, ImportError):
                 # Library is missing or incorrect version
                 print("A local library for guess_time is missing or damaged.")
-                retval = i_rate * i_seconds
-    return retval
+                return i_rate * i_seconds
+    return i_rate * i_seconds
 
 
 def net_play(
     _file_spec="", _language="en-US", i_rate=0, _requested_voice=""
 ):  # -> bool
     """Attempt to play a sound from the network."""
-    if network_read_text_file.network_ok(_language):
+    if sys.version_info[0] < 3:
+        return False
+    network_address = ""
+    if network_read_text_file.network_ok(
+        _language,
+        network_address,
+        _requested_voice,
+    ):
         if _requested_voice.upper() in NET_SERVICE_LIST:
             net_rate = 160
             if i_rate < 0:
@@ -500,6 +543,7 @@ def net_play(
                 "600x600",
                 net_rate,
                 _requested_voice,
+                "",
             )
             readtexttools.unlock_my_lock()
             return bool(ret_val)
@@ -590,7 +634,10 @@ class SpdFormats(object):
         `100` but the actual speed will depend on the language, voice,
         settings and the text to speech tool."""
         try:
-            _percent_int = int(_percent_int)
+            test_str = re.sub(r"\D", "", str(_percent_int))
+            if not test_str:
+                test_str = "0"
+            _percent_int = int(test_str)
         except (AttributeError, ValueError):
             return 0
         for low, high, _bar, value in self.rate_scales:
@@ -735,7 +782,7 @@ class SpdFormats(object):
                             hard_reset(_application)
                         os.remove(self.local_json)
                     else:
-                        self.json_content = self.json_tools.set_json_content(
+                        self.json_content = self.json_tools.audio_track_metadata_json(
                             language, voice, i_rate, _file_spec, output_module
                         )
                         readtexttools.write_plain_text_file(
@@ -744,7 +791,15 @@ class SpdFormats(object):
                         retval = net_play(_file_spec, language, i_rate, voice)
                         if not retval:
                             print(network_read_text_file.network_problem(voice))
-                        os.remove(self.local_json)
+                        if os.path.isfile(self.local_json):
+                            try:
+                                os.remove(self.local_json)
+                            except Exception as e:
+                                print(
+                                    "Error removing `{0}`: {1}".format(
+                                        self.local_json, e
+                                    )
+                                )
                         return retval
                     return False
             else:
@@ -755,7 +810,7 @@ class SpdFormats(object):
                 pass
         except (ImportError, NameError, speechd.SpawnError):
             if len(voice) != 0:
-                self.json_content = self.json_tools.set_json_content(
+                self.json_content = self.json_tools.audio_track_metadata_json(
                     language, voice, i_rate, _file_spec, output_module
                 )
                 readtexttools.write_plain_text_file(
@@ -1561,6 +1616,22 @@ class SayFormats(object):
         self.history_json_str = _fmd.meta_from_file(_app_out, _remove)
         return self.history_json_str
 
+    def is_program_available(self, program):  # -> bool
+        """Check if a posix program is available"""
+        if netcommon.which(program):
+            return True
+        try:
+            subprocess.run(
+                ["command", "-v", program],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True,
+                shell=True,
+            )
+            return True
+        except (subprocess.CalledProcessError, NameError):
+            return False
+
     def check_grep_filter(self, name="Lee"):  # -> str
         """Uses `self.parse_prefs()` to generate a `grep` string. It returns
         a filter string that allows the `name` if it is in the log file
@@ -2106,34 +2177,59 @@ class SayFormats(object):
         _rate="100%",
         _visible=False,
     ):  # -> bool
-        """The fallback Posix system speech tool requires `spd-say`. It is
-        part of the debian 12 `speech-dispatcher` package. To enable setting
-        the speech rate using he `pied` generated `speech-dispatcher` settings
-        for `piper-tts`, you must install the `sox` command line utility.
+        """
+        Fallback POSIX speech tool using spd-say.
+
+        Args:
+            _file_spec (str):
+                Path to the text file whose contents will be spoken.
+            _client_id (str):
+                Identifier to register with speech-dispatcher (optional).
+            _output_module (str):
+                Name of the speech-dispatcher output module to use (optional).
+            _language (str):
+                BCP-47 language tag (e.g. "en", "en-GB").
+            _voice (str):
+                Predefined voice label (e.g. "MALE1", "FEMALE2").
+            _rate (str | int | bool):
+                Speech rate as a percentage string or numeric value
+                (e.g. "100%", 120). Defaults to "100%".
+            _visible (bool):
+                If True, print debug/command info to stdout.
+
+        Returns:
+            bool:
+                True if the `spd-say` call exited with code 0; False otherwise.
         """
         _spd_formats = SpdFormats()
         _connection_name = ""
         _module = ""
         _sd_rate = ""
-        _type = ""
+        _type_or_voice = ""
 
         if not _rate in ["100%", "100", "", 100, 0, False]:
-            _sd_rate = "-r {0} ".format(_spd_formats.percent_to_spd(_rate * 160))
-        if not _voice in ["", "MALE1"]:
-            _type = "-t {0} ".format(_voice)
-        if len(_client_id) == 0:
+            rval = _spd_formats.percent_to_spd(_rate)
+            _sd_rate = "-r {0} ".format(rval)
+        if not _voice.lower() in ["", "male1"]:
+            if "male" in _voice.lower():
+                _type_or_voice = "-t {0} ".format(_voice.lower())
+            elif _voice:
+                _type_or_voice = """-y "{0}" """.format(_voice)
+        if _client_id:
             _connection_name = " -n {0}".format(_client_id)
-        if len(_output_module) != 0:
+        if _output_module:
             _module = "-m {_output_module} ".format(_output_module)
-        _command = '''sed -e 's/^!-!/ !-!/g' - | \\
-spd-say -w -e -l {0} {1} {2}{3}{4} < "{5}"'''.format(
-            _language, _module, _sd_rate, _type, _connection_name, _file_spec
+
+        _command = '''spd-say -w -e -l {0} {1} {2}{3}{4} < "{5}"'''.format(
+            _language, _module, _sd_rate, _type_or_voice, _connection_name, _file_spec
         )
-        if os.path.isfile(readtexttools.get_my_lock("lock")):
+        if os.path.isfile(readtexttools.get_my_lock("lock")) or not os.path.isfile(
+            _file_spec
+        ):
             _command = "spd-say -C"
-            readtexttools.unlock_my_lock()
+            readtexttools.unlock_my_lock("lock")
         else:
-            readtexttools.lock_my_lock()
+            readtexttools.lock_my_lock("lock")
         if _visible:
             _localcommons = netcommon.LocalCommons()
             if _localcommons.debug == 0:
@@ -2146,21 +2242,21 @@ spd-say -w -e -l {0} {1} {2}{3}{4} < "{5}"'''.format(
         time.sleep(1)
         if "spd-say -C" not in _command:
             for item in ["sed", "spd-say"]:
-                hard_reset(item)
-        readtexttools.unlock_my_lock()
+                readtexttools.killall_process(item)
+        readtexttools.unlock_my_lock("lock")
         return _result == 0
 
     def prefer_spd_say(self, _visible=False):  # -> boolean
         """Use criteria to choose `spd-say`. The Linux python `speechd`
         library is installed by default on many distributions, so making
         it available ensures that the extension works on new installations.
-        
+
         If you use the default speechd library using third party speech
         models like `libttspico-utils` or `piper-tts` with the python
         speechd library, the speech might occasionally stop before it
         should. This does not happen if the extensions uses the `spd-say`
         program.
-        
+
         You can manually force the extension to use `spd-say` in the main
         menu of the extension using `"(SPD_READ_TEXT_PY)" --visible True ...`
         which enables checking the strings while the application is reading
@@ -2169,18 +2265,72 @@ spd-say -w -e -l {0} {1} {2}{3}{4} < "{5}"'''.format(
         """
         if not os.path.isfile("/usr/bin/spd-say"):
             return False
-        if not USE_SPEECHD:
-            # Python could not import `speechd`
+
+        if sys.version_info < (3, 6):
             return True
-        if _visible:
+
+        if USE_SPEECHD and not _visible:
+            for name in ["pico2wave", "piper", "piper-cls"]:
+                if self.is_program_available(name):
+                    return True
+            return False
+
+        if not USE_SPEECHD or _visible:
             return True
-        _meta = readtexttools.ImportedMetaData()
-        for _default in ["espeak-ng", "espeak", "speak-ng"]:
-            _result = _meta.execute_command("{0} -O".format(_default))
-            if """OUTPUT MODULES
-{0}""".format(_default) in _result:
-                return False            
-        return True
+
+        _espeak = ""
+        _espeak = next(
+            (
+                name
+                for name in ["espeak-ng", "espeak", "speak-ng"]
+                if self.is_program_available(name)
+            ),
+            "",
+        )
+        if not _espeak:
+            try:
+                result = subprocess.run(
+                    ["spd-say", "-O"], capture_output=True, text=True, check=True
+                )
+                return _espeak in result.stdout.splitlines()
+            except (subprocess.CalledProcessError, NameError):
+                return False
+        else:
+            _speech_app = ""
+            _speech_app = next(
+                (
+                    name
+                    for name in [
+                        "piper",
+                        "piper-cli",
+                        "piper-tts",
+                        "pico2wave",
+                        "text2wave",
+                        "RHVoice-test",
+                    ]
+                    if self.is_program_available(name)
+                ),
+                "",
+            )
+            if len(_speech_app) != 0:
+                print(
+                    """NOTE: It looks like your system can use `{0}`. Consider using it if
+you encounter issues with the extension using `spd-say`. For example:
+
+- Distorted sound on older systems
+- Unexpected interruptions
+- Missing parts of messages
+- Preferences related to speech synthesis settings (e.g., adjusting pitch for 
+  capitalized words or modifying announcements for users relying on non-visual 
+  cues)
+- The extension is unable to determine the status of the speech-dispatcher.
+    * speech utterence starting while a previous utterence is still playing 
+    * you need to click the play button twice to start playing speech.
+""".format(
+                        _speech_app
+                    )
+                )
+        return False
 
     def spd_main(
         self,
@@ -2197,6 +2347,7 @@ spd-say -w -e -l {0} {1} {2}{3}{4} < "{5}"'''.format(
         """Posix system speech tool"""
         _spd_formats = SpdFormats()
         _imported_metadata = readtexttools.ImportedMetaData()
+        _netsplitlocal = netsplit.LocalHandler()
         sd_rate = _spd_formats.percent_to_spd(_rate)
         _is_dev = self.debug != 0
         _word_rate = 160
@@ -2215,6 +2366,21 @@ spd-say -w -e -l {0} {1} {2}{3}{4} < "{5}"'''.format(
         _spd_formats.revise_client_id(_client_id)
 
         if os.path.isfile("/usr/bin/say"):
+            ######################################################################################
+            # NOTE:
+            #
+            # On MacOS, versions of python included with LibreOffice and with Apache OpenOffice
+            # are not certified to run third party scripts outside of a context where access to
+            # the extension includes specific support files to enable direct data exchange with
+            # the host program, or the scripts are located within a local settings directory.
+            #
+            # By default, the extension uses the Apple proprietary scripting language to support
+            # text to speech.
+            #
+            # -----
+            # See also the official documentation for Python 3: <https://python.org>
+            ######################################################################################
+
             if os.path.isfile(readtexttools.get_my_lock("lock")):
                 hard_reset("say")
                 readtexttools.unlock_my_lock()
@@ -2294,6 +2460,30 @@ spd-say -w -e -l {0} {1} {2}{3}{4} < "{5}"'''.format(
                             )
             sys.exit(0)
         elif os.name == "posix":
+            ######################################################################################
+            # NOTE:
+            #
+            # Is speechd usable? If you use an office program that is not compatible with the
+            # system version of python, or the policy of the installation restricts access to
+            # system tools, then you cannot use this tool with the python 3 speechd library. It
+            # **can** use `spd-say` as a fallback for Apache OpenOffice, which uses python 2.7.
+            #
+            # Native apps have a faster response than when you use speech-dispatcher as a speech
+            # manager. However, speech dispatcher allows users to select different speech models
+            # for specific languages by editing local configuration files.
+            #
+            # If you use Pied to manage your local voice models, then this application can continue
+            # to use speech dispatcher, but with Pied's speech dispatcher settings, the extension
+            # only supports the current piper voice model when you use spd-say or the python 3
+            # speechd library. (Essentially, the script will ignore the rate, language, pitch and
+            # other options that any third party implementation of speechd does not support.)
+            #
+            #################################f#####################################################
+            _spd_formats = SpdFormats()
+            if _voice.upper() in _spd_formats.spd_voices:
+                _voice = _voice.lower()
+            elif "male" in _voice.lower() or "child" in _voice.lower():
+                _voice = _voice.lower()
             if _update_local:
                 if sys.version_info >= (3, 6):
                     print(
@@ -2329,9 +2519,14 @@ no change to local settings.
                     _visible,
                 ):
                     return True
+                if sys.version_info[0] < 3:
+                    return False
+                _user_permissions = netcommon.UserPermissions()
+                if not _user_permissions.is_staff_or_admin():
+                    return False
                 print(
                     """The `speechd` library is not compatible with your application
-    or platform. Try a networked speech tool like `mimic-server` or `docker-marytts`."""
+or platform. Try a networked speech tool like `mimic-server` or `docker-marytts`."""
                 )
                 if i_rate == 0:
                     _word_rate = 160
@@ -2351,13 +2546,18 @@ no change to local settings.
                 ):
                     _web_message = _imported_metadata.meta_from_file(_file_spec).strip()
                     _max_message_len = 4999
+                    # Use netsplit with `re` to split long text into shorter text taking
+                    # into account internationally supported languages and writing systems.
+                    _phrase = "" 
                     if len(_web_message) > _max_message_len:
-                        for punct in ["\n", "\t", "?", "!", ".", ",", ";", ":", " "]:
-                            if punct in _web_message:
-                                _web_message = _web_message.split(punct)[0]
-                                if not len(_web_message) > _max_message_len:
+                        items = _netsplitlocal.create_play_list(_web_message, _language)
+                        for _phrase in items:
+                            if _phrase:
+                                _phrase = (str(_phrase).trim())
+                                if len(_phrase) > 0 and not len(_phrase) > _max_message_len:
+                                    _web_message = _phrase
                                     break
-                    if len(_web_message) > _max_message_len:
+                    if len(_web_message) == 0 or len(_web_message) > _max_message_len:
                         exit(0)
                     readtexttools.web_info_translate(_web_message, _language)
                 sys.exit(0)
@@ -2373,7 +2573,6 @@ no change to local settings.
                 )
                 usage()
                 sys.exit(0)
-            _testing = False
             if not _spd_formats.speak_spd(
                 _output_module, _language, _voice, sd_rate, _file_spec
             ):
@@ -2411,7 +2610,7 @@ def main():
         _language = "en"
 
     if not os.path.isfile(_file_spec):
-        print("I was unable to find the text file you specified!")
+        print("A script was unable to find the text file you specified!")
         usage()
         sys.exit(0)
     elif sys.argv[-1] == sys.argv[0]:
@@ -2433,8 +2632,8 @@ def main():
                 "help",
             ],
         )
-    except getopt.GetoptError:
-        print("option was not recognized")
+    except getopt.GetoptError as e:
+        print("getopt.GetoptError: option was not recognized ", e)
         usage()
         sys.exit(2)
     for o, a in opts:
@@ -2455,7 +2654,7 @@ def main():
             # MALE1, MALE2 ...
             _voice = a
         elif o in ("-r", "--rate"):
-            _rate = o
+            _rate = a
         elif o in ("-i", "--visible"):
             _visible = readtexttools.lax_bool(a)
         elif o in ("-h", "--help"):

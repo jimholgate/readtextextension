@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Dialog4" dlg:left="0" dlg:top="70" dlg:width="285" dlg:height="215" dlg:closeable="true" dlg:moveable="true" dlg:title="_read_text_onnx">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:border="none"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:button dlg:id="_cancel" dlg:tab-index="1" dlg:left="145" dlg:top="193" dlg:width="66" dlg:height="16" dlg:page="-7" dlg:value="_cancel" dlg:button-type="cancel" dlg:grab-focus="false"/>
+  <dlg:titledbox dlg:id="_code_frame" dlg:tab-index="7" dlg:left="5" dlg:top="55" dlg:width="277" dlg:height="112">
+   <dlg:title dlg:value="_code_frame"/>
+  </dlg:titledbox>
+  <dlg:titledbox dlg:id="_edit_frame" dlg:tab-index="5" dlg:left="5" dlg:top="2" dlg:width="277" dlg:height="48">
+   <dlg:title dlg:value="_edit_frame"/>
+  </dlg:titledbox>
+  <dlg:textfield dlg:id="_model_info_text" dlg:tab-index="3" dlg:left="10" dlg:top="69" dlg:width="268" dlg:height="95" dlg:vscroll="true" dlg:multiline="true" dlg:readonly="true"/>
+  <dlg:text dlg:id="_voice" dlg:tab-index="9" dlg:left="186" dlg:top="12" dlg:width="32" dlg:height="12" dlg:page="-2" dlg:value="_voice"/>
+  <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="6" dlg:left="44" dlg:top="24" dlg:width="140" dlg:height="17" dlg:value="en_GB-jenny_dioco-medium" dlg:spin="true" dlg:linecount="15">
+   <dlg:menupopup>
+    <dlg:menuitem dlg:value="en_GB-jenny_dioco-medium"/>
+   </dlg:menupopup>
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ManagePiperModelDisplay?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:combobox>
+  <dlg:combobox dlg:id="ComboBox2" dlg:tab-index="4" dlg:left="186" dlg:top="24" dlg:width="32" dlg:height="17" dlg:value="0" dlg:spin="true" dlg:maxlength="4" dlg:linecount="15">
+   <dlg:menupopup>
+    <dlg:menuitem dlg:value="0"/>
+   </dlg:menupopup>
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.CheckOnnxVoiceCountBoundary?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:combobox>
+  <dlg:text dlg:id="_models" dlg:tab-index="8" dlg:left="10" dlg:top="12" dlg:width="175" dlg:height="12" dlg:page="-2" dlg:value="_models"/>
+  <dlg:button dlg:id="_speech_dispatcher" dlg:tab-index="2" dlg:left="7" dlg:top="193" dlg:width="132" dlg:height="16" dlg:page="3" dlg:tabstop="true" dlg:value="_speech_dispatcher" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.Dialog4Speech_DispatcherButtonClick?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="_ok" dlg:tab-index="0" dlg:left="214" dlg:top="193" dlg:width="66" dlg:height="16" dlg:page="-4" dlg:default="true" dlg:value="_ok" dlg:button-type="ok"/>
+  <dlg:textfield dlg:id="_current_item" dlg:tab-index="11" dlg:visible="false" dlg:left="8" dlg:top="173" dlg:width="272" dlg:height="13"/>
+  <dlg:img dlg:style-id="0" dlg:id="ImageControl1" dlg:tab-index="12" dlg:left="264" dlg:top="26" dlg:width="13" dlg:height="13">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.PlaySamplePiperSpeaker?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:img>
+  <dlg:combobox dlg:id="ComboBox3" dlg:tab-index="10" dlg:left="220" dlg:top="24" dlg:width="40" dlg:height="17" dlg:value="100%" dlg:spin="true" dlg:linecount="15">
+   <dlg:menupopup>
+    <dlg:menuitem dlg:value="30%"/>
+    <dlg:menuitem dlg:value="40%"/>
+    <dlg:menuitem dlg:value="50%"/>
+    <dlg:menuitem dlg:value="60%"/>
+    <dlg:menuitem dlg:value="70%"/>
+    <dlg:menuitem dlg:value="80%"/>
+    <dlg:menuitem dlg:value="90%"/>
+    <dlg:menuitem dlg:value="100%"/>
+    <dlg:menuitem dlg:value="110%"/>
+    <dlg:menuitem dlg:value="120%"/>
+    <dlg:menuitem dlg:value="130%"/>
+    <dlg:menuitem dlg:value="140%"/>
+    <dlg:menuitem dlg:value="150%"/>
+    <dlg:menuitem dlg:value="160%"/>
+    <dlg:menuitem dlg:value="170%"/>
+    <dlg:menuitem dlg:value="180%"/>
+    <dlg:menuitem dlg:value="190%"/>
+    <dlg:menuitem dlg:value="200%"/>
+    <dlg:menuitem dlg:value="210%"/>
+    <dlg:menuitem dlg:value="220%"/>
+    <dlg:menuitem dlg:value="230%"/>
+    <dlg:menuitem dlg:value="240%"/>
+   </dlg:menupopup>
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.CheckOnnxSpeechRatePercent?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:combobox>
+  <dlg:text dlg:id="_rate" dlg:tab-index="13" dlg:left="220" dlg:top="12" dlg:width="46" dlg:height="12" dlg:page="-2" dlg:value="_rate"/>
+  <dlg:checkbox dlg:id="_modified" dlg:tab-index="14" dlg:disabled="true" dlg:visible="false" dlg:left="8" dlg:top="173" dlg:width="93" dlg:height="15" dlg:printable="false" dlg:tabstop="false" dlg:value="_modified" dlg:checked="false"/>
+  <dlg:combobox dlg:id="ComboBox0" dlg:tab-index="15" dlg:left="10" dlg:top="24" dlg:width="32" dlg:height="17" dlg:value="en" dlg:spin="true" dlg:maxlength="4" dlg:linecount="15">
+   <dlg:menupopup>
+    <dlg:menuitem dlg:value="en"/>
+   </dlg:menupopup>
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.PiperDialog0OnChange?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:combobox>
+ </dlg:bulletinboard>
+</dlg:window>

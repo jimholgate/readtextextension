@@ -206,6 +206,7 @@ def main():  # -> NoReturn
     _strict = "false"
     _text = ""
     _rate = "100%"
+    _pico_text = None
     _pitch = "100%"
     _image = ""
     _title = ""
@@ -298,7 +299,7 @@ def main():  # -> NoReturn
 <pitch level = '{}'>'{}</pitch></speed>"'''.format(
                 _rate, _pitch, _text
             )
-    if len(_pico_text) != 0:
+    if _pico_text:
         _artist_ok = readtexttools.check_artist(_artist)
         _title_ok = readtexttools.check_title(_title, "pico")
         picoread(

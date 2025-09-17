@@ -14,7 +14,11 @@ Copyright and License
 * "Bubble" icon (c) 2013 icomoon.io Creative Commons 2.5 (Attribution) license.
 * "ellio/pied" (c) Copyright 2023-2024 Mike Sheldon. Elleo/pied is licensed under
   the GNU General Public License v3.0 <https://github.com/Elleo/pied/blob/main/COPYING>
-* "python-speech-d" (c) Copyright: 2001-2010, Brailcom, o.p.s. 2009, Marco Skambraks marco@openblinux.de 2009, Rui Batista rui.batista@ist.utl.pt License: LGPL-2.1<https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+* This project includes files that are a part of the NonVisual Desktop Access (NVDA)
+  project. Copyright (c) 2011-2024 NVDA Contributors. Licensed under the GNU General
+  Public License (GPL). For full licensing terms, see:
+  https://github.com/nvaccess/nvda#readme
+* "python-speech-d" (c) Copyright: 2001-2010, Brailcom, o.p.s. 2009, Marco Skambraks marco@openblinux.de 2009, Rui Batista rui.batista@ist.utl.pt License: LGPL-2.1
 * "PicoSvoxOOo" lexicon excerpts (c) Copyright 2013, Marie-Pierre Beauregare/ LGPL-2.1
 
 This is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version. This script is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.

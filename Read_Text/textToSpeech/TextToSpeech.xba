@@ -3,9 +3,11 @@
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="TextToSpeech" script:language="StarBasic">Rem *  *  *  *  * BASIC *  *  *  *  *
 &apos; TextToSpeech
 Option Explicit
-&apos;&apos; # Read Text Extension
+&apos;&apos; Read Text Extension
+&apos;&apos; ===================
 &apos;&apos; 
-&apos;&apos; ##  ![About Read Text Extension][1]
+&apos;&apos; ![About Read Text Extension][1]
+&apos;&apos; -------------------------------
 &apos;&apos; 
 &apos;&apos; **Read Text** reads text aloud, saves audio or video files from text,
 &apos;&apos; and can use resources from the web based on the selected text.
@@ -15,7 +17,8 @@ Option Explicit
 &apos;&apos; -   To read aloud, accept the default in the dialogue, or choose another
 &apos;&apos;     action from the menus.
 &apos;&apos; 
-&apos;&apos; ## Features
+&apos;&apos; Features
+&apos;&apos; --------
 &apos;&apos; 
 &apos;&apos; -   Automatically change languages according to the text language.
 &apos;&apos; -   Create sound or still-image speech files for listening on the go.
@@ -24,7 +27,8 @@ Option Explicit
 &apos;&apos; -   Get help by pressing the **\[F1\]** key while your computer shows
 &apos;&apos;     a Read Text Extension dialog.
 &apos;&apos; 
-&apos;&apos; ## Installation
+&apos;&apos; Installation
+&apos;&apos; ------------
 &apos;&apos; 
 &apos;&apos; Get *Read Text* from the download page and install it by double-clicking
 &apos;&apos; it.
@@ -47,7 +51,8 @@ Option Explicit
 &apos;&apos; 
 &apos;&apos; ------------------------------------------------------------------------
 &apos;&apos; 
-&apos;&apos; ## Procedures
+&apos;&apos; Procedures
+&apos;&apos; ----------
 &apos;&apos; 
 &apos;&apos; Procedures are called from menu items or from the tool bar.
 &apos;&apos; 
@@ -122,6 +127,7 @@ Global i_CheckInitialState As Integer
 Global f_CaReadTextExtensionCurrentConfig As Variant
 Global Config As Variant
 Global s_CaReadTextExtensionCurrentSessionCookie As String
+Global s_CaReadTextExtensionArchProbe As String
 Global s_CaReadTextExtensionGetOS As String
 Private b_CaReadTextExtensionHideExports As Boolean
 Private i_CaReadTextExtensionLastSpokenTrack As Integer
@@ -133,9 +139,37 @@ Private s_CaReadTextExtensionLastSpokenDocTitle As String
 Private s_CaReadTextExtensionLocalHostSpeechURI As String
 Private s_CaReadTextExtensionWorkingCountryLanguage As String
 Private UpdatePoSettingsDone As Integer
+Sub ___________________test()
+REM Use with OpenOffice to check a local function.
+REM
+&apos;Dim Line As String
+&apos; print IsOnnxArch()
+
+&apos; For Each Line in StandardPythonDialog1Options(&quot;&quot;)
+&apos;
+&apos;	Print Line
+&apos; Next
+End sub  &apos; ___________________test()
+
+Function fbNewUnicodeOK()
+	&apos; With the current settings, can  STARBASIC reliably handle emoji
+	&apos; like characters with an ASCII value less than or equal to 255?
+	fbNewUnicodeOK = True
+	Dim Item As String
+	Dim x As Integer
+	Dim CorrectLen As Integer : CorrectLen = Len(&quot;# &quot;)
+
+	For Each Item In Array(&quot;🔴 &quot;, &quot;♥️ &quot;, &quot;🔒 &quot;, &quot;🟥 &quot;, &quot;🗑 &quot;)
+		If Len(Item) &lt;&gt; CorrectLen Then
+			fbNewUnicodeOK = False
+			Exit Function
+		End If
+	Next
+End Function
+
 
 Sub CheckInitialState()
-	Dim s_item As String
+	Dim s_item As String : s_item = &quot;&quot;
 	&apos; Check status.
 	&apos; Remove temporary service files upon a restart or a crash.
 	Select Case i_CheckInitialState
@@ -146,6 +180,7 @@ Sub CheckInitialState()
 	For Each s_item in Array(&quot;lock&quot;, &quot;net_speech&quot;, &quot;bat&quot;)
 		fbRemoveFile(fsMyTempLock(s_item))
 	Next
+	fbRemoveFile(fsTemporaryTextDoc())
 	If Len(fsTheOsId()) &lt;&gt; 0 Then
 		i_CheckInitialState = 1
 	End If
@@ -169,13 +204,10 @@ Function JavaSettingFile() As String
 	&apos; Returns java settings file path in the URI format
 	&apos; i. e.: `file:///home/user/.config/libreoffice/4/config/&lt;file&gt;.xml`
 	JavaSettingFile = &quot;&quot;
-	Dim sPath As String
-	Dim sDir as String
-	Dim sValue as String
-	
-	sPath = CreateUNOService(_
+	Dim sPath As String : sPath = CreateUNOService(_
 		&quot;com.sun.star.util.PathSettings&quot;).userConfig
-	sValue = Dir$(sPath + getPathSeparator + &quot;java*.xml&quot;, 0)
+	Dim sDir as String : sDir = &quot;&quot; 
+	Dim sValue as String : sValue = Dir$(sPath + getPathSeparator + &quot;java*.xml&quot;, 0)
 	Do
 		If sValue &lt;&gt; &quot;.&quot; and sValue &lt;&gt; &quot;..&quot; Then
 		sDir = sValue
@@ -215,7 +247,7 @@ Function fbStandardPosix()
 	&apos; path.
 	On Local Error GoTo fbStandardPosixErr
 	fbStandardPosix = False
-	Dim EnviroPath$ : EnviroPath = Environ(&quot;PATH&quot;)
+	Dim EnviroPath As String : EnviroPath = Environ(&quot;PATH&quot;)
 	Select Case Getattr(&quot;/usr/local/&quot;)
 		Case 17, 16
 		If Instr(EnviroPath, &quot;:/tmp/.mount_&quot;) = 0 Then
@@ -341,6 +373,9 @@ Sub ReadTextAloud()
 
 	If FileExists(sFile) Then
 		tts_config_parseFile(sFile, Config(), errorCode)
+&apos;		If Len(Trim(Config(pi_anonymous_key_string))) = 0 Then
+&apos;			Config(pi_anonymous_key_string) = fsSetupThisSessionKey()
+&apos;		End If
 		If Config(pi_display_info_integer) = 1 Then
 			ConfigureReadTextAloud()
 		Else
@@ -386,10 +421,8 @@ End Sub
 
 Sub ReadClipBoard
 &apos; Tools - Add-ons - Read Clipboard
-	Dim s1$
-	s1 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
-	Dim s2$
-	s2 = &quot;&quot;
+	Dim s1 As String : s1 = fsFullPathOf(&quot;ReadClipBoard.lock&quot;)
+	Dim s2 As String : s2 = &quot;&quot;
 	On Error Goto ReadClipBoardErr
 	CheckInitialState
 	ClearWorkingCountryLanguage
@@ -453,6 +486,7 @@ Sub ResetAll()
 	&apos; `&quot;(RESET_ALL)&quot;`
 	fbRemoveFile(fsExtensionSettingsIni())
 	fbRemoveFile(fsFullPathOf(&quot;ReadClipBoard.lock&quot;))
+	fbRemoveFile(fsTemporaryTextDoc())
 	resetSpeech()
 	f_CaReadTextExtensionCurrentConfig = Array()
 End Sub
@@ -477,6 +511,7 @@ Sub ReadImpress()
 &apos; Tools - Add-ons - Impress-View
 	PresentSelection2(fsGetLanguage())
 End Sub
+
 
 Sub testRtl
 	PresentSelection2(&quot;ar&quot;)
@@ -523,19 +558,15 @@ Sub PresentSelection2(sB)
 	&apos;   to the right margin in the help template if the language of
 	&apos;   the user interface is a right to left language.
 	&apos;   
-	Dim b1 As Boolean
-	Dim i As Integer
-	Dim j As Integer
-	Dim sA As String
-	
+	Dim i As Integer : i = 0
+	Dim j As Integer : j = 0
+	Dim sA As String : sA = fsGetTextSelection(True, False)
+	Dim b1 As Boolean : b1 = ThisComponent.supportsService(_
+	&quot;com.sun.star.formula.formulaProperties&quot;) Or _
+	ThisComponent.supportsService(&quot;com.sun.star.sdb.DatabaseContext&quot;)
+
 	ClearWorkingCountryLanguage
-	If ThisComponent.supportsService(&quot;com.sun.star.formula.formulaProperties&quot;) Or _
-		ThisComponent.supportsService(&quot;com.sun.star.sdb.DatabaseContext&quot;) Then
-		b1 = False
-	Else
-		b1 = True
-	End If
-	sA = fsGetTextSelection(True, False)
+
 	If FileExists(fsMyTempLock(&quot;lock&quot;)) Then
 		resetSpeechDispatcher(True)
 	End If
@@ -554,10 +585,9 @@ End Sub
 
 Sub ReadTheSlidenote
 &apos; Read the note
-	Dim s1 As String
-	Dim nPage As Integer
-	
-	nPage = fiCurrentSlideIndex
+	Dim s1 As String : s1 = &quot;&quot;
+	Dim nPage As Integer : nPage = fiCurrentSlideIndex()
+
 	If nPage =  - 1 Or _
 		Not(ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;)) Then
 		&apos; not a valid index or document
@@ -594,9 +624,9 @@ Sub WinStopSpeaking()
 	Select Case getGUIType()
 	Case 1
 		Dim speech As Object
-		Dim WinSVSFPurgeBeforeSpeak# : WinSVSFPurgeBeforeSpeak = 2
-		Dim WinvbNullString$ : WinvbNullString = &quot;&quot;
-		Dim WinSVSFlagsAsync# : WinSVSFlagsAsync = 1
+		Dim WinSVSFPurgeBeforeSpeak As Integer : WinSVSFPurgeBeforeSpeak = 2
+		Dim WinvbNullString As String : WinvbNullString = &quot;&quot;
+		Dim WinSVSFlagsAsync As Integer : WinSVSFlagsAsync = 1
 		Set speech = Createobject(&quot;Sapi.SpVoice&quot;)
 		speech.Speak WinvbNullString, WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak
 		Set speech = Nothing
@@ -655,12 +685,10 @@ Function fsNetSAPI5WindowsSpeech(_
 	&apos; [InvokeSAPI2]: https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ms723609(v=vs.85)
 	&apos;
 	fsNetSAPI5WindowsSpeech = &quot;&quot;
-	Dim s2$ : s2 = &quot;&quot;
-	Dim iRate# : iRate = 0
-	Dim oFrame
-	oFrame = ThisComponent.getCurrentController().getFrame() &apos; Current frame
-	Dim oBar
-	oBar = oFrame.createStatusIndicator() &apos; Generated status bar
+	Dim s2 As String : s2 = &quot;&quot;
+	Dim iRate As Integer : iRate = 0
+	Dim oFrame : oFrame = ThisComponent.getCurrentController().getFrame() &apos; Current frame
+	Dim oBar : oBar = oFrame.createStatusIndicator() &apos; Generated status bar
 	If fbUsingWine(False) Then
 		s2 = fsMyTempLock(&quot;lock&quot;)
 		oBar.start(_
@@ -687,9 +715,9 @@ Function fsNetSAPI5WindowsSpeech(_
 		End If
 		oBar.Value = 70
 		CreateFile(s2, fsAppSignature(), &quot;&quot;)
-		Dim WinSVSFPurgeBeforeSpeak# : WinSVSFPurgeBeforeSpeak = 2
-		Dim WinvbNullString$ : WinvbNullString = &quot;&quot;
-		Dim WinSVSFlagsAsync# : WinSVSFlagsAsync = 1
+		Dim WinSVSFPurgeBeforeSpeak As Integer : WinSVSFPurgeBeforeSpeak = 2
+		Dim WinvbNullString As String : WinvbNullString = &quot;&quot;
+		Dim WinSVSFlagsAsync As Integer : WinSVSFlagsAsync = 1
 		Dim speech As Object
 	
 		On Local Error GoTo fsNetSAPI5WindowsSpeechErr

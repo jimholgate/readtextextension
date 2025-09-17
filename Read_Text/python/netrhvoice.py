@@ -49,6 +49,7 @@ import os
 import sys
 
 try:
+    import platform
     import urllib
     import json
     import tempfile
@@ -57,6 +58,7 @@ try:
 except (ImportError, AssertionError):
     BASICS_OK = False
 import netcommon
+import netsplit
 import readtexttools
 
 
@@ -124,6 +126,12 @@ class RhvoiceLocalHost(object):
         self.help_url = "https://github.com/Aculeasis/rhvoice-rest/"
         self.audio_format = ["wav", "mp3", "opus", "flac"][0]
         self.input_types = ["TEXT"]
+        self.machine = ""
+        try:
+            self.machine = platform.uname().machine
+        except (AttributeError, NameError, TypeError):
+            _meta = readtexttools.ImportedMetaData()
+            self.machine = _meta.execute_command("uname -m")
         self.accept_voice = [
             "",
             "all",
@@ -234,11 +242,11 @@ class RhvoiceLocalHost(object):
                     self.checked_lang = item[0]
                     self.ok = True
                     break
-            if len(self.checked_lang) != 0:
+            if self.checked_lang:
                 break
-        if len(self.checked_lang) != 0:
+        if self.checked_lang:
             for item in self.checklist:
-                if bool(self.common.debug):
+                if self.common.debug:
                     print(item)
                 if item[2] == _iso_lang.lower():
                     self.checked_lang = item[0]
@@ -376,12 +384,11 @@ Checking {help_heading} voices for `{_iso_lang}`
             _tries = 0
             readtexttools.lock_my_lock(self.locker)
             _no = "0" * 10
-            # Rhvoice has low latency, so using `spacy` to divide text into sentences
-            # might degrade performance. Use `splitlines()`
-            if self.common.ai_developer_platforms:
-                _items = _text.splitlines()
+            if self.machine[-2:] == "64":
+                _netsplitlocal = netsplit.LocalHandler()
+                _items = _netsplitlocal.create_play_list(_text, _iso_lang, False)
             else:
-                _items = [_text]
+                _items = _text.splitlines()
             for _item in _items:
                 if not self.ok:
                     return False

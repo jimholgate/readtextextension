@@ -49,7 +49,7 @@ file that `[pied][3]` creates, but it does differ in a few ways.
   extension's own piper-voice update tool.
 
 [1]: https://freebsoft.org/speechd
-[2]: https://github.com/rhasspy/piper
+[2]: https://github.com/OHF-Voice/piper1-gpl
 [3]: https://pied.mikeasoft.com/
 [4]: https://huggingface.co/rhasspy/piper-voices/tree/main
 """
@@ -57,7 +57,10 @@ file that `[pied][3]` creates, but it does differ in a few ways.
 import codecs
 import os
 import sys
-import piper_read_text
+try:
+    import piper_read_text
+except (AttributeError, SyntaxError, TypeError):
+    pass
 import readtexttools
 
 
@@ -72,7 +75,10 @@ class SpdSetter(object):
         self.speechd_conf = "{0}/speechd.conf".format(self.speech_dispatcher_dir)
         self.piper_conf = "{0}/piper.conf".format(self.modules_dir)
         self.speaker = ""
-        _piper = piper_read_text.PiperTTSClass()
+        try:
+            _piper = piper_read_text.PiperTTSClass()
+        except:
+            exit()
         _generator = "READ TEXT"
         if "{0}pied{1}".format(os.sep, os.sep) in _piper.app:
             _generator = "PIED"
@@ -107,6 +113,7 @@ Include "clients/*.conf"
         model, otherwise return `""`"""
         model_path = os.path.expanduser(_model_path)
         piper_path = os.path.expanduser(_piper_path)
+        piper_conf_contents = ""
         _piper = piper_read_text.PiperTTSClass()
         lang_env = "en_GB"
         if any(_test not in model_path for _test in [os.sep, "_", "-", ".onnx"]):
@@ -116,13 +123,11 @@ Include "clients/*.conf"
         if any(not os.path.isfile(_test) for _test in [model_path, piper_path]):
             self.piper_conf_contents = ""
             return ""
-        if _speaker in ["0", "", 0, False]:
+        self.speaker = " -s {0}".format(str(int(_speaker)))
+        if self.speaker == " -s 0":
+            # Ensure compatibility with piper installations generated using
+            # python locally using pipx, pip3 or from source code.
             self.speaker = ""
-        else:
-            try:
-                self.speaker = " -s {0}".format(str(int(_speaker)))
-            except:
-                self.speaker = ""
         if _piper.length_scale == 1:
             length_scale_flag = ""
         else:
@@ -159,14 +164,16 @@ AddVoice "{4}" "MALE1" "Piper"
 {0}""".format(
                 self.piper_conf_values
             )
-        self.piper_conf_contents = piper_conf_contents
+            self.piper_conf_contents = piper_conf_contents
         return piper_conf_contents
 
     def edit_piper_conf(self, _search: str = "en_", verbose: bool = False) -> bool:
         """The `_search` can be one of the following, in order of decreasing
         specificity:
 
+        - `~/path_to/en_GB-jenny_dioco-medium#0`
         - `~/path_to/en_GB-jenny_dioco-medium`
+        - `en_GB-jenny_dioco-medium#0`
         - `en_GB-jenny_dioco-medium`
         - `en_GB`
         - `en`"""
@@ -186,10 +193,24 @@ AddVoice "{4}" "MALE1" "Piper"
             _first_result = model_path_list[0]
         except (IndexError, TypeError):
             return False
-        _configuration_code = self.piper_code(
-            _piper.app, _first_result, _piper.use_specific_onnx_voice_no
-        )
-        if len(_configuration_code) == 0:
+        _configuration_code = ""
+        if len(_search.split("#")) == 2:
+            try:
+                _configuration_code = self.piper_code(
+                    _piper.app, _first_result, str(int(_search.split("#")[1]))
+                )
+            except (NameError, ValueError):
+                pass
+        if not _configuration_code:
+            print(
+                "Evaluating `{0}` to get a numeric speaker code.".format(
+                    _search
+                )
+            )
+            _configuration_code = self.piper_code(
+                _piper.app, _first_result, _piper.use_specific_onnx_voice_no
+            )
+        if not _configuration_code:
             return False
 
         for _dir in [self.clients_dir, self.modules_dir]:

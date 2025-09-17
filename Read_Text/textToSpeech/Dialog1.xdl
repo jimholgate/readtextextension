@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
-<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Dialog1" dlg:left="18" dlg:top="60" dlg:width="269" dlg:height="222" dlg:closeable="true" dlg:moveable="true" dlg:title="Dialog1">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Dialog1" dlg:left="18" dlg:top="60" dlg:width="270" dlg:height="222" dlg:closeable="true" dlg:moveable="true" dlg:title="Dialog1">
  <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:textToSpeech.TextToSpeechConfiguration.testEvent?language=Basic&amp;location=application" script:language="Script"/>
  <dlg:bulletinboard>
   <dlg:filecontrol dlg:id="FileControl1" dlg:tab-index="6" dlg:disabled="true" dlg:left="16" dlg:top="28" dlg:width="240" dlg:height="14" dlg:value="_file_control1">
    <script:event script:event-name="on-blur" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateCombo1?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:filecontrol>
-  <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="7" dlg:disabled="true" dlg:left="16" dlg:top="55" dlg:width="240" dlg:height="14" dlg:tag=" " dlg:value="_combobox1" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true" dlg:linecount="6">
+  <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="7" dlg:disabled="true" dlg:left="16" dlg:top="55" dlg:width="240" dlg:height="14" dlg:tag=" " dlg:value="_combobox1" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true" dlg:linecount="8">
    <dlg:menupopup>
-    <dlg:menuitem dlg:value=""/>
+    <dlg:menuitem dlg:value="&quot;(ESPEAK_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 75% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(ESPEAK_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 100% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(ESPEAK_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 125% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(ESPEAK_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 150% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(FESTIVAL_READ_TEXT_PY)&quot; &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(NETWORK_READ_TEXT_PY)&quot; --voice &quot;AUTO0&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(OPENJTALK_READ_TEXT_PY)&quot; --language ja-JP &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(PICO_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 100% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(PICO_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 75% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(SPD_READ_TEXT_PY)&quot; --client_id &quot;(SESSION_ID)&quot; &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(SPD_READ_TEXT_PY)&quot; --language &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; --client_id &quot;(SESSION_ID)&quot; &quot;(TMP)&quot;"/>
     <dlg:menuitem dlg:value="(RESET_ALL)"/>
    </dlg:menupopup>
   </dlg:combobox>
@@ -24,9 +34,19 @@
   <dlg:filecontrol dlg:id="FileControl2" dlg:tab-index="8" dlg:disabled="true" dlg:left="16" dlg:top="84" dlg:width="240" dlg:height="14" dlg:value="_file_control2">
    <script:event script:event-name="on-keyup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateCombo2?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:filecontrol>
-  <dlg:combobox dlg:id="ComboBox2" dlg:tab-index="9" dlg:disabled="true" dlg:left="16" dlg:top="110" dlg:width="240" dlg:height="14" dlg:value="_combobox2" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true">
+  <dlg:combobox dlg:id="ComboBox2" dlg:tab-index="9" dlg:disabled="true" dlg:left="16" dlg:top="110" dlg:width="240" dlg:height="14" dlg:value="_combobox2" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true" dlg:linecount="8">
    <dlg:menupopup>
-    <dlg:menuitem dlg:value=""/>
+    <dlg:menuitem dlg:value="&quot;(ESPEAK_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 75% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(ESPEAK_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 100% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(ESPEAK_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 125% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(ESPEAK_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 150% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(FESTIVAL_READ_TEXT_PY)&quot; &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(NETWORK_READ_TEXT_PY)&quot; --voice &quot;AUTO0&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(OPENJTALK_READ_TEXT_PY)&quot; --language ja-JP &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(PICO_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 100% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(PICO_READ_TEXT_PY)&quot; --language (SELECTION_LANGUAGE_COUNTRY_CODE) --rate 75% &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(SPD_READ_TEXT_PY)&quot; --client_id &quot;(SESSION_ID)&quot; &quot;(TMP)&quot;"/>
+    <dlg:menuitem dlg:value="&quot;(SPD_READ_TEXT_PY)&quot; --language &quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot; --client_id &quot;(SESSION_ID)&quot; &quot;(TMP)&quot;"/>
     <dlg:menuitem dlg:value="(RESET_ALL)"/>
    </dlg:menupopup>
    <script:event script:event-name="on-focus" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateCombo2F?language=Basic&amp;location=application" script:language="Script"/>
@@ -62,7 +82,7 @@
   <dlg:checkbox dlg:id="CheckBox1" dlg:tab-index="15" dlg:left="13" dlg:top="175" dlg:width="200" dlg:height="10" dlg:value="CheckBox1" dlg:checked="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.UseAlwaysShow_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:checkbox>
-  <dlg:combobox dlg:id="ComboBox3" dlg:tab-index="16" dlg:left="221" dlg:top="174" dlg:width="36" dlg:height="14" dlg:tag="Display language" dlg:tabstop="false" dlg:value="_combobox3" dlg:hide-inactive-selection="false" dlg:spin="true">
+  <dlg:combobox dlg:id="ComboBox3" dlg:tab-index="16" dlg:left="221" dlg:top="174" dlg:width="36" dlg:height="14" dlg:tag="Display language" dlg:tabstop="false" dlg:value="en" dlg:hide-inactive-selection="false" dlg:spin="true">
    <dlg:menupopup>
     <dlg:menuitem dlg:value="af"/>
     <dlg:menuitem dlg:value="ar"/>
@@ -105,7 +125,7 @@
    </dlg:menupopup>
    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Config.ttsUpdateLabels?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:combobox>
-  <dlg:combobox dlg:id="ComboBox4" dlg:tab-index="10" dlg:left="16" dlg:top="139" dlg:width="240" dlg:height="14" dlg:page="-6" dlg:value="_combobox4" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true" dlg:linecount="-43"/>
+  <dlg:combobox dlg:id="ComboBox4" dlg:tab-index="10" dlg:left="16" dlg:top="139" dlg:width="240" dlg:height="14" dlg:page="-6" dlg:value="_combobox4" dlg:autocomplete="false" dlg:hide-inactive-selection="false" dlg:spin="true" dlg:linecount="8"/>
   <dlg:checkbox dlg:id="CheckBox2" dlg:tab-index="12" dlg:left="13" dlg:top="200" dlg:width="84" dlg:height="10" dlg:value="CheckBox2" dlg:checked="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:textToSpeech.TTS_Utilities.UseAlwaysShow_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:checkbox>

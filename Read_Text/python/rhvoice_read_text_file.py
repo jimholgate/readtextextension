@@ -444,23 +444,20 @@ class RhVoiceClass(object):
         self.ok = False
         return False
 
-    def first_good_voice(self, _voices=None, _check_list=None):  # -> str
-        """Check the default Linux installation for the first
-        voice available from the `_voices` list. The preferred
-        voice in English depends on the region. If English is not
-        installed, try reading the text with the native voice."""
+    def first_good_voice(self, _voices=None, _check_list=None) -> str:
+        """Find the first available voice from `_voices` list.
+        If English is not installed, use the native voice."""
+
         for test_voice in _voices:
             try:
                 _voice = test_voice.strip()
-                if bool(_voice):
-                    if bool(_check_list):
-                        if _voice in _check_list:
-                            return _voice
-                    else:
-                        if os.path.isdir(
-                            "/usr/share/RHVoice/voices/{_voice}".format(_voice=_voice)
-                        ):
-                            return _voice
+                if _voice:
+                    if _check_list and _voice in _check_list:
+                        return _voice
+                    elif os.path.isdir(
+                        f"/usr/share/RHVoice/voices/{_voice}"
+                    ):
+                        return _voice
             except (AttributeError, SyntaxError):
                 pass
         return ""
@@ -479,27 +476,25 @@ class RhVoiceClass(object):
             return ""
         try:
             _domain = self.domain_table
-            _len = len(_domain)
-            _tld = ""
-            _lang1 = ""
-            _region = ""
+            _tld, _lang1, _region = "", "", ""
             _voices = [""]
-            for i in range(_len):
-                _region = "-".join([_domain[i]["lang1"], _domain[i]["iso_code"]])
+
+            for entry in _domain:
+                _region = f"{entry['lang1']}-{entry['iso_code']}"
                 if _region.strip() == iso_lang.strip():
-                    return self.first_good_voice(_domain[i]["voices"])
-            for i in range(_len):
-                if _domain[i]["lang1"] == test_lang.lower():
-                    _tld = _domain[i]["package"]
-                    _lang1 = _domain[i]["lang1"]
-                    _region = "-".join([_lang1, _domain[i]["iso_code"]])
-                    _voices = _domain[i]["voices"]
+                    return self.first_good_voice(entry["voices"])
+
+            for entry in _domain:
+                if entry["lang1"] == test_lang.lower():
+                    _tld = entry["package"]
+                    _lang1 = entry["lang1"]
+                    _region = f"{_lang1}-{entry['iso_code']}"
+                    _voices = entry["voices"]
                     break
-            for _test in [iso_lang, test_lang]:
-                if len(_voices[0]) == 0:
-                    if len(_test) != 0:
-                        if not "-" in _test:
-                            return _test
+            for _test in (iso_lang, test_lang):
+                if not _voices[0] and _test:
+                    if "-" not in _test:
+                        return _test
                 elif _test.lower() == _region.lower():
                     return self.first_good_voice(_voices, _check_list)
                 elif _test.lower() == _lang1:

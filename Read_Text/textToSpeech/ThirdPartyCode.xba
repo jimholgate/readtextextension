@@ -17,11 +17,9 @@ Function fbTts_util_stringToBoolean( _
 	&apos; Converts a String to a boolean value.
 	&apos; True=&gt; &quot;True&quot;
 	&apos; False=&gt; &quot;False&quot;
-	Dim b As Boolean
-	b = False
-	Dim v As String
-	v = Trim(value)
-	If StrComp(v,&quot;True&quot;, 0) = 0 _
+	Dim b As Boolean : b = False
+	Dim v As String : v = Lcase(Trim(value))
+	If StrComp(v,&quot;true&quot;, 0) = 0 _
 		Or StrComp(v,&quot;yes&quot;, 0) = 0 _
 		Or StrComp(v,&quot;1&quot;, 0) = 0 _
 		Or val(v) &lt;&gt; 0 Then
@@ -31,19 +29,9 @@ Function fbTts_util_stringToBoolean( _
 End Function
 
 
-Function fsTts_util_booleanToString( _
-	value As Boolean) As String
-	&apos; Converts a boolean value to a String.
-	&apos; True=&gt; &quot;True&quot;
-	&apos; False=&gt; &quot;False&quot;
-	Dim s As String
-	
-	If value Then
-		s = &quot;True&quot;
-	Else
-		s = &quot;False&quot;
-	End If
-	fsTts_util_booleanToString = s
+Function fsTts_util_booleanToString(value As Boolean) As String
+    &apos; Converts a Boolean value to a String.
+    fsTts_util_booleanToString = IIf(value, &quot;True&quot;, &quot;False&quot;)
 End Function
 
 
@@ -59,8 +47,8 @@ End Function
 
 Function fsGetHomePyVer(home As String) As String
 	fsGetHomePyVer = &quot;&quot;
-	Dim sub_dirs$ : sub_dirs = fsSubDirectories(home)
-	Dim x# : x = 0
+	Dim sub_dirs As String : sub_dirs = fsSubDirectories(home)
+	Dim x As Integer : x = 0
 	Dim a1 As Variant : a1 = split(sub_dirs, Chr(13))
 	For x = Lbound(a1) to Ubound(a1)
 		If a1(x) &lt;&gt; &quot;Current&quot; Then
@@ -76,7 +64,7 @@ Function fsMacPythonVersion()
 	If fsGetOs() &lt;&gt; &quot;MACOS&quot; Then
 		Exit Function
 	End If
-	Dim home$ : home = &quot;/Applications/LibreOffice.app/Contents/Frameworks/LibreOfficePython.framework/Versions&quot;
+	Dim home As String : home = &quot;/Applications/LibreOffice.app/Contents/Frameworks/LibreOfficePython.framework/Versions&quot;
 	fsMacPythonVersion = fsGetHomePyVer(home)
 End Function
 
@@ -84,10 +72,10 @@ End Function
 Function fsLinux64PythonLib() As String
 	&apos; Find location of the fedora python library
 	fsLinux64PythonLib = &quot;&quot;
-	Dim home$ : home = &quot;/usr/lib64&quot;
-	Dim sub_dirs$ : sub_dirs = fsSubDirectories(home)
+	Dim home As String : home = &quot;/usr/lib64&quot;
+	Dim sub_dirs As String : sub_dirs = fsSubDirectories(home)
 	Dim a1 As Variant : a1 = Split(sub_dirs, Chr(13))
-	Dim x# : x = 0
+	Dim x As Integer : x = 0
 	For x = Lbound(a1) To Ubound(a1)
 		if instr(a1(x), &quot;python&quot;) = 1 Then
 			 fsLinux64PythonLib = home &amp; &quot;/&quot; &amp; a1(x)
@@ -97,21 +85,77 @@ Function fsLinux64PythonLib() As String
 End Function
 
 
+
 Function fbCheckPython3Ok(_cmd) As Boolean
 	&apos; For some local users, the system python3 is unavailable or incomplete.
 	&apos; &lt;https://github.com/urllib3/urllib3/issues/3020#issuecomment-1539843879&gt;
 	&apos; Try importing a library and see if there is an error.
+	&apos;
+	&apos; NOTE: A Sandboxed version of the Office program might always return `True`
+	&apos; because it was not allowed to report any shell errors.  This is to prevent
+	&apos; a user from getting characteristics of the host machine.
 	fbCheckPython3Ok = False
+	Dim _python3 As String : _python3 = BundlePyPath()
 	If Len(_cmd) = 0 Then
 		_cmd = &quot;import sys;sys.exec_prefix&quot;
 	End If
 	On Error GoTo fbCheckPython3OkErr
-	If Shell(&quot;python3&quot;, 0, &quot;-c &quot;&quot;&quot; &amp; _cmd &amp; &quot;&quot;&quot;&quot;) = 0 Then
+	If Shell(_python3, 0, &quot;-c &quot;&quot;&quot; &amp; _cmd &amp; &quot;&quot;&quot;&quot;) = 0 Then
 		fbCheckPython3Ok = True
 	End If
 	Exit Function
 	fbCheckPython3OkErr:
 	fbCheckPython3Ok = False
+End Function
+
+
+Function fbYouAreStaffOrAdmin(FileFilter As Variant) As Boolean
+&apos; ONNX speech synthesis models are large, requiring careful management of advanced options.
+&apos; To restrict access, the script enforces permissions by checking whether key program and
+&apos; configuration files are set to &quot;Read-Only&quot;.
+&apos;
+&apos; If users have permission to modify this script, they can override the default restrictions.
+&apos; The script first checks file permissions before verifying whether the user belongs to an
+&apos; approved group, such as administrators or staff members.
+	
+	fbYouAreStaffOrAdmin = False
+	Dim  Item As String :  Item = &quot;&quot;
+	Dim _cmds()
+	For Each  Item In FileFilter
+	    If FileExists(Item) Then
+	    	If GetAttr(Item) &lt;&gt; 0 Then Exit Function
+	    End If
+	Next
+	On Local Error GoTo fbYouAreStaffOrAdminErr
+	Dim groupNames() As String
+	Dim i As Integer : i = 0
+	Dim dev_test : dev_test = &quot;import os; _check = &quot;&quot;READTEXTUSERADMINKEY&quot;&quot;; os.environ.get(_check) == os.environ.get(&quot;&quot;USER&quot;&quot;) or exec(&quot;&quot;raise NotImplementedError(&apos;Some python commands are not available to a local user&apos;)&quot;&quot;)&quot;
+	Select Case getGUIType()
+		Case 1
+		_cmds = Array(_
+		&quot;import ctypes; ctypes.windll.shell32.IsUserAnAdmin() or exec(&apos;raise NotImplementedError(&quot;&quot;Some python commands are not available to this user.&quot;&quot;)&apos;)&quot;, _
+		dev_test, _
+		)
+		Case Else
+		groupNames = Array(&quot;admin&quot;, &quot;sudo&quot;, &quot;staff&quot;, &quot;readtextadmin&quot;, &quot;wheel&quot;)
+		ReDim Preserve _cmds(UBound(groupNames)+ 1)
+		For i = LBound(groupNames) To UBound(groupNames)
+		    _cmds(i) = &quot;import os; &quot;&quot;&quot; &amp; groupNames(i) &amp; _
+		    &quot;&quot;&quot; in os.popen(&quot;&quot;groups&quot;&quot;).read().strip().split() or exec(&apos;raise NotImplementedError(&quot;&quot;Some &quot; &amp; _
+		    groupNames(i) &amp; &quot; python commands are not available to this user.&quot;&quot;)&apos;)&quot;
+		Next i
+		_cmds(UBound(groupNames)+ 1) = dev_test
+	End Select
+
+	For Each  Item In _cmds
+		If fbCheckPython3Ok(Item) Then
+			fbYouAreStaffOrAdmin = True
+			Exit Function
+		End If
+	Next
+	Exit Function
+	fbYouAreStaffOrAdminErr:
+	fbYouAreStaffOrAdmin = False
 End Function
 
 
@@ -128,11 +172,11 @@ Function PosixPythonPath() As String
 	&apos; version of python3 and pip3 just work.
 	Dim a0 As Variant
 	Dim a1 As Variant
-	Dim x# : x = 0
-	Dim y# : y = 0
-	Dim py_ver$ : py_ver = fsMacPythonVersion()
+	Dim x As Integer : x = 0
+	Dim y As Integer : y = 0
+	Dim py_ver As String : py_ver = fsMacPythonVersion()
 	PosixPythonPath = &quot;&quot;
-	Dim EnvironPy$ : EnvironPy = Environ(&quot;READ_TEXT_USE_PY&quot;)
+	Dim EnvironPy As String : EnvironPy = Environ(&quot;READ_TEXT_USE_PY&quot;)
 	If Len(Environ(EnvironPy) &lt;&gt; 0) Then
 		&apos; On Posix systems, you can edit a file to specify environmental
 		&apos; values. To see your current values, open a console and type
@@ -195,11 +239,20 @@ End Function
 
 
 Function fbOsaScriptOk(_command) As Boolean
-	&apos; Return `True` if MacOS `osascript` is executable
+	&apos; Return `True` if MacOS `osascript` is okay
+	fbOsaScriptOk = False
+	Dim _exe As String : _exe = &quot;file:///usr/bin/osascript&quot;
+	On Error GoTo fbOsaScriptOkErr
 	If Len(_command) = 0 Then
-		_command = &quot;-e &apos;set checked to &quot;&quot;osascript ok&quot;&quot;&apos;&quot;
+		If FileExists(_exe) Then
+			fbOsaScriptOK = getattr(_exe) = 1
+		End If
+		Exit Function
 	End If
-	fbPosixProgramOK(&quot;osascript&quot;, _command)
+	fbOsaScriptOk = Shell(_exe, 0, _command) = 0
+	Exit Function
+	fbOsaScriptOkErr:
+	fbOsaScriptOk = False
 End Function
 
 
@@ -209,7 +262,6 @@ Function fbPiperTtsOk(_command) As Boolean
 	If Len(_command) = 0 Then
 		_command = &quot; -h&quot;
 	End If
-	fbPiperTtsOk = False
 	Select Case i_CaReadTextExtensionPiperTestResult
 		&apos; Only test once per session.
 		&apos; Did test complete?
@@ -252,26 +304,29 @@ Function fbPiperTtsOk(_command) As Boolean
 End Function
 
 
-Function PiperModelFile()
-	&apos; returns the path to the piper `voices.json` catalog
+Function PiperModelFile(file_name As String) As String
+	&apos; returns the path to data from the piper `voices.json` catalog
 	&apos; of available voices, if available, otherwise return
 	&apos; `&quot;&quot;`
 	PiperModelFile = &quot;&quot;
+	If Len(file_name) = 0 Then
+		file_name = &quot;models.txt&quot;
+	End If
 	Dim _item As String : _item = &quot;&quot;
-	Dim _home As String
+	Dim _home As String : _home = &quot;&quot;
 	Dim _paths As Variant
 	Select Case getGUIType()
 		Case 1 &apos; WINDOWS
 		_home = converttourl(Environ(&quot;APPDATA&quot;))
 		_paths = Array(_
-		&quot;/piper-tts/piper-voices/models.txt&quot;, _
-		&quot;/piper/piper-voices/models.txt&quot;, _
+		&quot;/piper-tts/piper-voices/&quot; &amp; file_name, _
+		&quot;/piper/piper-voices/&quot; &amp; file_name, _
 		)
 		Case Else
 		_home = Environ(&quot;HOME&quot;)
 		_paths = Array(_
-		&quot;/.local/share/piper-tts/piper-voices/models.txt&quot;, _
-		&quot;/.local/share/piper/piper-voices/models.txt&quot;, _
+		&quot;/.local/share/piper-tts/piper-voices/&quot; &amp; file_name, _
+		&quot;/.local/share/piper/piper-voices/&quot; &amp; file_name, _
 		)
 	End Select
 	For Each _item in _paths
@@ -283,36 +338,107 @@ Function PiperModelFile()
 End Function
 
 
-Function CheckPiperModel(byVal _lang) As String
-	&apos; Return the first available compatible model string, or if there
-	&apos; is not a compatible model, then return `&quot;&quot;`.
-	CheckPiperModel = &quot;&quot;
-	Dim _model_file As String : _model_file = PiperModelFile()
-	Dim _item As String : _item = &quot;&quot;
-	Dim _search As String : _search = &quot;&quot;
-	Dim _contents As String : _contents = &quot;&quot;
-	Dim langs As Variant
+Function fbPiperModelInstalled(Model) As Boolean
+	fbPiperModelInstalled = False
+	Dim Item As String
+	Dim Langs() As String : Langs = Split(Model, &quot;-&quot;)
+	Select Case Ubound(Langs)
+		Case 2
+		For Each Item in PiperModelList(Langs(0), False)
+			If Instr(Item, &quot;##&quot;) = 0 And Len(Item) &gt; 2 Then
+				fbPiperModelInstalled = True
+				Exit Function
+			End If
+		Next
+	End Select
+End Function
+
+
+Function PiperModelList(ByVal _lang As String, ByVal validate As Boolean) As Variant
+&apos; Returns a filtered list of Piper-compatible model entries from the
+&apos; models.txt file
+	Dim _model_file As String : _model_file = PiperModelFile(&quot;models.txt&quot;)
 	If Len(_model_file) = 0 Then
+		PiperModelList = Array()  &apos; Return empty array if file not found
 		Exit Function
 	End If
-	langs = Array(_
-	fsReplaceText(_lang, &quot;-&quot;, &quot;_&quot;,), _
-	Split(_lang, &quot;-&quot;)(0), _
-	Split(_lang, &quot;_&quot;)(0))
-	_contents = getTextFromFile(_model_file, &quot;UTF-8&quot;, 0)
-	For Each _search in langs
-		If Instr(_contents, _search) &lt;&gt; 0 Then
-			For Each _item in Split(_contents, Chr(13))
-				Select Case Instr(_item, _search)
-					Case 1
-					CheckPiperModel = Trim(_item)
-					Exit Function
-				End Select	
-			Next
+
+	&apos; Read file contents into string, split by carriage return
+	Dim _contents As String : _contents = getTextFromFile(_model_file, &quot;UTF-8&quot;, 0)
+	Dim _lines As Variant : _lines = Split(_contents, Chr(13))
+
+	&apos; Create list of language keys to try
+	Dim _searchKeys As Variant
+	Select Case Len(_lang)
+		Case 0
+			_searchKeys = Array(&quot;&quot;)
+		Case Else
+			_searchKeys = Array( _
+				fsReplaceText(_lang, &quot;-&quot;, &quot;_&quot;), _
+				Split(_lang, &quot;_&quot;)(0), _
+				Split(_lang, &quot;-&quot;)(0))
+	End Select
+
+	&apos; Prepare result container
+	Dim _result() As String
+	ReDim _result(0)
+	Dim i As Integer : i = 0
+	Dim x As Integer : x = 0
+
+	Dim key As String, lineText As String
+	Dim found As Boolean : found = False
+
+	For x = LBound(_searchKeys) To UBound(_searchKeys) 
+		If found Then Exit For
+		key = Trim(_searchKeys(x))
+		Select Case Len(key)
+			Case 0  &apos; Return all valid entries when no filter is provided
+				For Each lineText In _lines
+					lineText = Trim(lineText)
+					If UBound(Split(lineText, &quot;#&quot;)) = 2 Then  &apos; Only entries with one &quot;#&quot; (2 parts)
+						If i = 0 And Len(_result(0)) = 0 Then
+							_result(0) = lineText
+						Else
+							i = i + 1
+							ReDim Preserve _result(i)
+							_result(i) = lineText
+						End If
+					End If
+				Next
+
+			Case Else  &apos; Filter by language prefix
+				For Each lineText In _lines
+					If InStr(lineText, key) = 1 Then  &apos; line starts with language code
+						If (Not validate) Or (InStr(lineText, &quot;#&quot;) &lt;&gt; 0) Then
+							If Not ExistsInArray(_result, lineText) Then
+								If i = 0 And Len(_result(0)) = 0 Then
+									_result(0) = lineText
+								Else
+									i = i + 1
+									ReDim Preserve _result(i)
+									_result(i) = lineText
+								End If
+								found = True  &apos; Stop after finding matches
+							End If
+						End If
+					End If
+				Next
+		End Select
+	Next
+	PiperModelList = _result
+End Function
+
+
+Function ExistsInArray(arr As Variant, value As String) As Boolean
+&apos; Checks if a string already exists in an array
+	ExistsInArray = False
+	Dim item As String
+	For Each item In arr
+		If item = value Then
+			ExistsInArray = True
+			Exit Function
 		End If
 	Next
-	CheckPiperModelErr:
-	CheckPiperModel = &quot;&quot;
 End Function
 
 
@@ -325,8 +451,8 @@ Function PiperLocalSuggestion(ByVal _lang As String, ByVal _high As Boolean) As 
 		_lang = fsSelectionLanguageAndRegion(False)
 	End If
 	PiperLocalSuggestion = &quot;&quot;
-	Dim models As Variant
-	Dim found_model As String : found_model = &quot;&quot;
+	Dim models() As String
+	Dim found_model() As String
 	If _high Then
 		PiperLocalSuggestion = &quot;en_US-lessac-high#0&quot;
 		models = Array(_
@@ -350,8 +476,10 @@ Function PiperLocalSuggestion(ByVal _lang As String, ByVal _high As Boolean) As 
 		Array(&quot;fa_IR&quot;, &quot;fa_IR-gyro-medium#0&quot;),_
 		Array(&quot;fi_FI&quot;, &quot;fi_FI-harri-medium#0&quot;),_
 		Array(&quot;fr_FR&quot;, &quot;fr_FR-upmc-medium#0&quot;),_
+		Array(&quot;nl_BE&quot;, &quot;nl_BE-rdh-medium&quot;), _
+		Array(&quot;nl_NL&quot;, &quot;nl_NL-ronnie-medium#0&quot;), _
 		Array(&quot;pl_PL&quot;, &quot;pl_PL-darkman-medium#0&quot;),_
-		Array(&quot;pt_BR&quot;, &quot;pt_BR-faber-medium#0&quot;),_
+		Array(&quot;pt_BR&quot;, &quot;pt_BR-cadu-medium#0&quot;),_
 		Array(&quot;pt_PT&quot;, &quot;pt_PT-tugão-medium#0&quot;),_
 		Array(&quot;ru_RU&quot;, &quot;ru_RU-dmitri-medium#0&quot;),_
 		Array(&quot;sv_SE&quot;, &quot;sv_SE-nst-medium#0&quot;),_
@@ -377,12 +505,12 @@ Function PiperLocalSuggestion(ByVal _lang As String, ByVal _high As Boolean) As 
 	Next
 	Select Case Instr(PiperLocalSuggestion, &quot;-&quot;)
 	Case 0
-		found_model = CheckPiperModel(_lang)
-		Select Case Len(found_model)
-			Case 0
-			PiperLocalSuggestion = &quot;en_GB-jenny_dioco-medium#0&quot;
+		found_model = Split(PiperModelList(_lang, False)(0), &quot;#&quot;)
+		Select Case Ubound(found_model)
+			Case 2
+				PiperLocalSuggestion = found_model(0) &amp; &quot;#&quot; &amp; found_model(2)
 			Case Else
-			PiperLocalSuggestion = found_model &amp; &quot;#0&quot;
+				PiperLocalSuggestion = &quot;en_GB-jenny_dioco-medium#0&quot;
 		End Select
 	End Select
 End Function
@@ -411,6 +539,7 @@ Function fbPosixProgramOK(_command As String, _challenge As String) As Boolean
 	&apos; Usage:  If fiPosixProgramOK(&quot;pico2wave&quot;, &quot;--usage &gt; /dev/null&quot;) Then
 	fbPosixProgramOK = fiPosixProgram023(_command, _challenge) = 3
 End Function
+&apos; If getGUIType() = 1
 
 
 Function fbSpdSayOk() As Boolean
@@ -482,6 +611,22 @@ Function GoogleTranslateDefault()
 End Function
 
 
+Function fbDisplayOpenJapanese() As Boolean
+	&apos; Enable display of `open_jtalk` Language options if it is installed
+	&apos; and the current environment, document or text selection is Japanese.
+	fbDisplayOpenJapanese = False
+	Dim _item As String
+	If fbPosixProgramOK(&quot;open_jtalk&quot;, &quot; &gt; /dev/null&quot;) Then
+		For Each _item in fvGetIsoLangArray()
+			If Left(_item, 2) = &quot;ja&quot; Then
+				fbDisplayOpenJapanese = True
+				Exit Function
+			End If
+		Next
+	End If
+End Function
+
+
 Function fvTts_config_createDefaultConfig( _
 	msgs() As Variant, _
 	errorCode As Integer) As Variant
@@ -499,6 +644,7 @@ Function fvTts_config_createDefaultConfig( _
 	Dim sLocalHostSpeech As String : sLocalHostSpeech = &quot;&quot;
 	Dim Item As Variant
 	Dim bHaveNetworkTTS As Boolean : bHaveNetworkTTS = fbHaveNetworkTTS()
+	Dim sPython As String : sPython = &quot;&quot;
 	&apos; Create default values for variables
 
 	Dim pyFallBack As String : pyFallBack = &quot;-c &quot;&quot;import webbrowser;webbrowser.open_new_tab(&apos;https://quickchart.io/qr?size=350&amp;text=(OOO_WEBTEXT)&apos;)&quot;&quot;&quot;
@@ -506,7 +652,7 @@ Function fvTts_config_createDefaultConfig( _
 		Case 1  &apos; Windows
 		bUsingWine = fbUsingWine(False)
 		If not bUsingWine Then
-			player7 = &quot; --player 0&quot;
+			player7 = &quot;&quot;
 		End If
 		If bPiperOk Then
 			Config(pi_use_experimental_boolean) = False
@@ -547,16 +693,19 @@ Function fvTts_config_createDefaultConfig( _
 		End If
 		Config(pi_display_info_integer) = 0
 		Config(pi_display_language_string) = sGetLanguage
+
 		Case Else
 		&apos; Posix or MacOS
+
+		sPython = PosixPythonPath()
 		If bPiperOk Then
 			Config(pi_use_experimental_boolean) = False
-			Config(pi_experimental_path_string) = PosixPythonPath()
+			Config(pi_experimental_path_string) = sPython
 			Config(pi_experimental_options_string) = &quot;&quot;&quot;(PIPER_READ_TEXT_PY)&quot;&quot; --player 7 --voice &quot; &amp; _
 			PiperLocalSuggestion(&quot;&quot;, False) &amp; &quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		ElseIf fsGetOS() = &quot;MACOS&quot; Then
 			Config(pi_use_experimental_boolean) = False
-			Config(pi_experimental_path_string) = PosixPythonPath()
+			Config(pi_experimental_path_string) = sPython
 			Config(pi_experimental_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 		Else  &apos; Posix
 			If FileExists(&quot;/usr/bin/festival&quot;) Then
@@ -565,22 +714,22 @@ Function fvTts_config_createDefaultConfig( _
 				Config(pi_experimental_options_string) = &quot;(audio_mode &apos;async)(tts&quot;&quot;(TMP)&quot;&quot; nil) (quit)&quot;
 			ElseIf fbSpdSayOk() Then
 				Config(pi_use_experimental_boolean) = False
-				Config(pi_experimental_path_string) = PosixPythonPath()
+				Config(pi_experimental_path_string) = sPython
 				Config(pi_experimental_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
 			ElseIf fbIsLibreOffice() Then
 				Select Case fsTheOsId()
 					Case &quot;POSIX&quot;, &quot;POSIX.EXPERIMENTAL&quot;
 					Config(pi_use_experimental_boolean) = False
-					Config(pi_experimental_path_string) = PosixPythonPath()
+					Config(pi_experimental_path_string) = sPython
 					Config(pi_experimental_options_string) = &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot; --voice &quot;&quot;AUTO&quot;&quot; --rate &quot;&quot;70%&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;			
 					Case Else
 					Config(pi_use_experimental_boolean) = False
-					Config(pi_experimental_path_string) = PosixPythonPath()
+					Config(pi_experimental_path_string) = sPython
 					Config(pi_experimental_options_string) = pyFallBack
 				End Select			
 			Else
 				Config(pi_use_experimental_boolean) = False
-				Config(pi_experimental_path_string) = PosixPythonPath()
+				Config(pi_experimental_path_string) = sPython
 				Config(pi_experimental_options_string) = pyFallBack
 			End If
 		End If
@@ -595,7 +744,7 @@ Function fvTts_config_createDefaultConfig( _
 		If fsGetOS() = &quot;POSIX&quot; Then
 			&apos; Linux
 			If Len(PosixPythonPath()) &lt;&gt; 0 Then
-				Config(pi_external_path_string) = PosixPythonPath()
+				Config(pi_external_path_string) = sPython
 			Else
 				Config(pi_external_path_string) = &quot;/usr/bin/python&quot;
 			End If
@@ -614,7 +763,7 @@ Function fvTts_config_createDefaultConfig( _
 				ElseIf fbPosixProgramOK(&quot;pico2wave&quot;, &quot; --usage &gt; /dev/null&quot;) Then
 					Config(pi_external_options_string) = &quot;&quot;&quot;(PICO_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 					&quot;--language (SELECTION_LANGUAGE_COUNTRY_CODE) &quot;&quot;(TMP)&quot;&quot;&quot;
-				ElseIf fbPosixProgramOK(&quot;open_jtalk&quot;, &quot; &gt; /dev/null&quot;) And sGetLanguage = &quot;ja&quot; Then
+				ElseIf fbDisplayOpenJapanese() Then
 					&apos; Japanese
 					Config(pi_external_options_string) = &quot;&quot;&quot;(OPENJTALK_READ_TEXT_PY)&quot;&quot; &quot; &amp; _
 					&quot;&quot;&quot;(TMP)&quot;&quot;&quot;
@@ -658,12 +807,12 @@ Function fvTts_config_createDefaultConfig( _
 				Config(pi_external_path_string) = AppleScriptPath()
 				Config(pi_external_options_string) = &quot;&quot;&quot;(SAY_APPLESCRIPT)&quot;&quot;&quot;
 			ElseIf bHaveNetworkTTS Then
-				Config(pi_external_path_string) = PosixPythonPath()
+				Config(pi_external_path_string) = sPython
 				Config(pi_external_options_string) =  &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; --voice &quot;&quot;AUTO&quot;&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
 			Else
-				Config(pi_external_path_string) = PosixPythonPath()
+				Config(pi_external_path_string) = sPython
 				Config(pi_external_options_string) =  &quot;&quot;&quot;(SPD_READ_TEXT_PY)&quot;&quot;&quot; &amp; _
 				&quot; --language &quot;&quot;(SELECTION_LANGUAGE_COUNTRY_CODE)&quot;&quot;&quot; &amp; _
 				&quot; &quot;&quot;(TMP)&quot;&quot;&quot;
@@ -689,12 +838,11 @@ Sub tts_config_writeFile( _
 	&apos; Writes a configuration file from an array.
 	&apos; This function updated 2013-08-29 - always write as UTF-8
 	On Local Error Goto tts_config_writeFileErr
-	Dim sA As String
-	Dim CR As String
-	Dim ExternalCommand As String
+	Dim sA As String : sA = &quot;&quot;
+	Dim CR As String : CR = Chr(10)
+	Dim ExternalCommand As String : ExternalCommand = &quot;&quot;
 	Dim PyVersion() As String
-	Dim x As Integer
-	ExternalCommand = &quot;&quot;
+	Dim x As Integer : x = 0
 	Dim EnvironPy As String : EnvironPy = Environ(&quot;READ_TEXT_USE_PY&quot;)
 	If Len(EnvironPy) &lt;&gt; 0 Then
 		If FileExists(EnvironPy) Then
@@ -733,7 +881,7 @@ Sub tts_config_writeFile( _
 	If Len(Config(pi_display_language_string)) = 0 Then
 		Config(pi_display_language_string) = fsGetLanguage()
 	End If
-	CR = Chr(10)
+	
 	sA = Join(Array(_
 	&quot;dialog1.anonymous.key.string=&quot;, Config(pi_anonymous_key_string), CR, _
 	&quot;dialog1.display.info.integer=&quot;, Config(pi_display_info_integer), CR, _
@@ -816,23 +964,23 @@ Sub tts_config_parseFile( _
 		If Len(key) &lt;&gt; 0 And Len(value) &lt;&gt; 0 Then
 			Select Case key
 				Case &quot;dialog1.use.experimental.boolean&quot;
-					Config(pi_use_experimental_boolean) = fbTts_util_stringToBoolean(value)
+					Config(pi_use_experimental_boolean) = fbTts_util_stringToBoolean(Trim(value))
 				Case &quot;dialog1.experimental.path.string&quot;
-					Config(pi_experimental_path_string) = value
+					Config(pi_experimental_path_string) = Trim(value)
 				Case &quot;dialog1.experimental.options.string&quot;
-					Config(pi_experimental_options_string) = value
+					Config(pi_experimental_options_string) = Trim(value)
 				Case &quot;dialog1.use.external.boolean&quot;
-					Config(pi_use_external_boolean) = fbTts_util_stringToBoolean(value)
+					Config(pi_use_external_boolean) = fbTts_util_stringToBoolean(Trim(value))
 				Case &quot;dialog1.external.path.string&quot;
 					Select Case fsTheOsId()
 						Case &quot;POSIX&quot;, &quot;POSIX.APPIMAGE&quot;, &quot;POSIX.SNAP&quot;, &quot;MACOS&quot;
 							If InStr(value, &quot;/python&quot;) &lt;&gt; 0 And Not fbExperimentalMode() Then
 								Config(pi_external_path_string) = ConvertFromUrl(BundlePyPath())
 							Else
-								Config(pi_external_path_string) = value
+								Config(pi_external_path_string) = Trim(value)
 							End If
 						Case Else
-							Config(pi_external_path_string) = value
+							Config(pi_external_path_string) = Trim(value)
 					End Select
 				Case &quot;dialog1.external.options.string&quot;
 					Config(pi_external_options_string) = value
@@ -843,17 +991,17 @@ Sub tts_config_parseFile( _
 							End If
 					End Select
 				Case &quot;dialog1.use.html.boolean&quot;
-					Config(pi_use_html_boolean) = fbTts_util_stringToBoolean(value)
+					Config(pi_use_html_boolean) = fbTts_util_stringToBoolean(Trim(value))
 				Case &quot;dialog1.html.string&quot;
-					Config(pi_html_string) = value
+					Config(pi_html_string) = Trim(value)
 				Case &quot;dialog1.anonymous.key.string&quot;
-					Config(pi_anonymous_key_string) = value
+					Config(pi_anonymous_key_string) = Trim(value)
 				Case &quot;dialog1.display.info.integer&quot;
-					Config(pi_display_info_integer) = fiStringToInteger(value)
+					Config(pi_display_info_integer) = fiStringToInteger(Trim(value))
 				Case &quot;dialog1.display.language.string&quot;
-					Config(pi_display_language_string) = value
+					Config(pi_display_language_string) = Trim(value)
 				Case &quot;dialog1.use.smart.select.integer&quot;
-					Config(pi_use_smart_select_integer) = value
+					Config(pi_use_smart_select_integer) = Trim(value)
 			End Select
 		End If
 		ContinueParsing:
@@ -1037,60 +1185,163 @@ Sub ChangeBackground( _
 End Sub
 
 
-Sub zzTestPlaySound
-	PlaySound(&quot;https://github.com/jimholgate/readtextextension/raw/master/media/mac_os_alex-bill_freeman-environmental_science_excerpt_cc_by_international.mp3&quot;)
-End Sub
-
-
-Function PlaySound(i_soundpath as string) As Boolean
+Function PlaySound(s_soundpath as string) As Boolean
 	&apos; Return `True` if there is no error. For Windows and Linux. Adapted from:
 	&apos; &lt;https://forum.openoffice.org/en/forum/viewtopic.php?p=387091&amp;sid=3eead031a698db5d92833cf3df9bfaad#p387091&gt;
 	&apos; &lt;https://opengrok.libreoffice.org/xref/core/avmedia/source/macavf/avmediaMacAVF.component?r=43d2f3d5&gt;
-	&apos; The Function blocks BASIC code execution while the sound is playing.
+	&apos; On supported platforms, the function blocks BASIC code execution while the sound is playing.
 	PlaySound = False
-	Select Case fsTheOsId()
-	Case &quot;POSIX.APPIMAGE&quot;, &quot;WINDOWS.WINE&quot;
-		Exit Function
-	End Select
+	If Len(s_soundpath) = 0 Then Exit Function
 	On Error GoTo PlaySoundErr
 	Dim oPlayer1 As Object
 	Dim sUrlSound As String
 	Dim oSounMgr As Object
+	Dim Player As String : Player = &quot;&quot;
+	Dim ErrNo As Integer : ErrNo = 0
 	
-	sUrlSound = ConvertToUrl(i_soundpath)
+	sUrlSound = ConvertToUrl(s_soundpath)
 
 	If Not FileExists(sUrlSound) And Instr(sUrlSound, &quot;file://&quot;) = 1 Then	   
 		MsgBox sUrlSound &amp; &quot; does not exist&quot;, 16
-	Else
-		If GetGuiType() = 1 Then
+		Exit Function
+	End If
+	Select Case fsTheOsId()
+	Case &quot;WINDOWS.WINE&quot;
+		Exit Function
+	Case &quot;POSIX.APPIMAGE&quot;
+		PlaySound = webHelp(sUrlSound)
+		Exit Function
+	End Select
+
+	If GetGuiType() = 1 Then
+		For Each Player in Array(_
+			fsFindAppPath(&quot;VideoLAN/VLC/vlc.exe&quot;))
+			If Len(Player) &gt; 0 Then
+				ErrNo = Shell(Player, 6, &quot;--intf dummy &quot;&quot;&quot; &amp; sURLSound &amp; _
+				&quot;&quot;&quot; &quot;&quot;vlc://quit&quot;&quot;&quot;, True)
+				PlaySound = ErrNo = 0
+				Exit Function
+			End If
+		Next
+		Select Case inStr(sUrlSound, &quot;file://&quot;)
+			Case 1
 			oSounMgr = CreateUnoService(&quot;com.sun.star.media.Manager_DirectX&quot;)
-		ElseIf fsGetOs() = &quot;POSIX&quot; Then
+			
+			Case Else
+			&apos; `oPlayer1.isPlaying` is unreliable using DirectX with online content. The
+			&apos; `webHelp command intiates the default player or web browser.
+			PlaySound = webHelp(sUrlSound)
+
+		End Select
+	ElseIf fsGetOs() = &quot;POSIX&quot; Then
+		If fbPySupportFStrings() Then
 			oSounMgr = CreateUnoService(&quot;com.sun.star.comp.media.Manager_GStreamer&quot;)
 		Else
-			oSounMgr = CreateUnoService(&quot;com.sun.star.media.Manager_MacAVF&quot;)
+			PlaySound = webHelp(sUrlSound)
+			Exit Function	
 		End If
-		
-		If IsNull(oSounMgr) Then
-			MsgBox &quot;Sound Manager not set&quot;, 16
-		Else
-			oPlayer1 = oSounMgr.createPlayer(sUrlSound)
-			With oPlayer1
-				.setMediaTime(0.0)
-				.setVolumeDB(-10) &apos; Adjust volume as needed
-				.setPlayBackLoop(0) &apos; Set to 1 if you want to loop
-				.start(0)
-				While .isPlaying()
-					DoEvents
-				Wend
-			End With
-			oPlayer1 = Nothing
-			oSounMgr = Nothing
-			PlaySound = True
-		End If
+	Else
+		oSounMgr = CreateUnoService(&quot;com.sun.star.media.Manager_MacAVF&quot;)
+	End If
+	
+	If Not IsNull(oSounMgr) Then
+		oPlayer1 = oSounMgr.createPlayer(sUrlSound)
+		With oPlayer1
+			.setMediaTime(0.0)
+			.setVolumeDB(-10) &apos; Adjust volume as needed
+			.setPlayBackLoop(0) &apos; Set to 1 if you want to loop
+			.start(0)
+			While .isPlaying()
+				DoEvents
+			Wend
+		End With
+		oPlayer1 = Nothing
+		oSounMgr = Nothing
+		PlaySound = True
 	End If
 	Exit Function
 	PlaySoundErr:
 	PlaySound = False
 End Function
+
+
+Function UpdateSpeechDispatcher(byVal sModel As String) As Boolean
+	&apos; On an installed ONNX voice model, `Dialog4` can update Speech Dispatcher
+	&apos; settings. Returns `True` if the voice model is fully qualified with a
+	&apos; language, name, quality, and voice number and if running the command
+	&apos; causes no error.
+	&apos;
+	&apos; The Dialog4 button **should** be disabled or hidden if it is not usable for
+	&apos; editing the speech dispatcher local settings.
+	&apos;
+	&apos; If the application does not support `speech-dispatcher`, show a sample
+	&apos; phrase using a supported language in a web browser.
+	UpdateSpeechDispatcher = False
+	Dim ErrorCode : ErrorCode = 0
+	Dim bWait : bWait = False
+	Dim sProgram As String : sProgram = PosixPythonPath()
+	Dim sCommand As String : sCommand = &quot;&quot;
+	Dim Item As Variant
+	Dim Divider() As String
+	Dim FoundMatch As Boolean : FoundMatch = False
+	Dim SampleTextURLIndex As Integer : SampleTextURLIndex = 9
+	Dim default_model As String : default_model = &quot;en_GB-jenny_dioco-medium#0&quot;
+
+
+	For Each Item in Array(sModel, default_model)
+		On Local Error Resume Next
+		For Each Divider in Array(_
+		Array(&quot;_&quot;, 1), _
+		Array(&quot;#&quot;, 1), _
+		Array(&quot;-&quot;, 2) _
+		)
+			If Len(sModel) = 0 Then
+				sModel = default_model
+			End If
+			If Ubound(Split(Item, Divider(0))) = Divider(1) Then
+				sModel = Item
+				FoundMatch = True
+				Exit For
+
+			End If
+			If FoundMatch Then
+				Exit For
+
+			End If
+		Next
+	Next
+	Select Case fsTheOsId()
+		Case &quot;POSIX&quot;
+		If fbPiperTtsOk(&quot;&quot;) Then
+			sCommand = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsMyURL() &amp; &quot;/python/spd_say_set.py&quot;) &amp; _
+			&quot;&quot;&quot; &quot; &amp; sModel
+		Else
+			sCommand = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsMyURL() &amp; &quot;/python/update_piper.py&quot;)
+		End If
+		ErrorCode = Shell(_
+		converttourl(_
+		sProgram), 0, sCommand, bWait)
+
+		Case &quot;WINDOWS.EXPERIMENTAL&quot;, &quot;WINDOWS&quot;
+		If fbPiperTtsOk(&quot;&quot;) Then
+			webHelp(GetModelCard(SanitizeModel(sModel), SampleTextURLIndex))
+		Else
+			sCommand = &quot;&quot;&quot;&quot; &amp; ConvertFromUrl(fsMyURL() &amp; &quot;/python/update_piper.py&quot;)
+			ErrorCode = Shell(_
+			converttourl(_
+			sProgram), 0, sCommand, bWait)
+
+		End If
+		Case Else
+		&apos; The office application cannot use speech-dispatcher, so do not create or
+		&apos; overwrite any files. We show some sample online Text in the default web
+		&apos; browser. NOTE: After testing, link to online WMD editor like 
+		&apos; &lt;https://try.commonmark.org&gt;, but accessible.
+		webHelp(GetModelCard(SanitizeModel(sModel), SampleTextURLIndex))
+
+	End Select
+	UpdateSpeechDispatcher = (ErrorCode = 0)
+End Function
+
 
 </script:module>

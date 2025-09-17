@@ -162,7 +162,7 @@ Sub PopulateConfigPrivates()
 	&apos; Populate declared private variables with an Integer from
 	&apos; the `fvExtensionKeys()` Array
 	Dim key_info_list As Variant : key_info_list = fvExtensionKeys()
-	Dim i As Integer
+	Dim i As Integer : i = 0
 	For i = LBound(key_info_list) To UBound(key_info_list)
 		Select Case key_info_list(i)(0)
 			Case 0 
@@ -196,10 +196,10 @@ End Sub
 
 Sub DevRepairConfigPrivates()
 	&apos; Create Values with the current `Config` List.
-	Dim Story$ : Story = &quot;&quot;
-	Dim x#
-	Dim Item$ : Item = &quot;&quot;
-	Dim Prefix$ : Prefix = &quot;dialog1.&quot;
+	Dim Story As String : Story = &quot;&quot;
+	Dim x As Integer : x = 0
+	Dim Item As String : Item = &quot;&quot;
+	Dim Prefix As String : Prefix = &quot;dialog1.&quot;
 	Dim DevPrivate As Variant : DevPrivate = Array()
 
 	For x = 0 To fiUboundConfigOptions()
@@ -317,7 +317,7 @@ Function fiKeyToInteger(_key As String) As Integer
 
 	On Error GoTo fiKeyToIntegerErr
     Dim key_info_list As Variant : key_info_list = fvExtensionKeys()
-    Dim i As Integer
+    Dim i As Integer : i = 0
     For i = LBound(key_info_list) To UBound(key_info_list)
         If key_info_list(i)(1) = _key Then
             fiKeyToInteger = key_info_list(i)(0)
@@ -329,13 +329,10 @@ Function fiKeyToInteger(_key As String) As Integer
 End Function
 
 
-Function fsLookUpTerm( _
-	ByVal sTermCode As String) As String
+Function fsLookUpTerm(ByVal sTermCode As String) As String
 	&apos; Look up a term using your language
-	Dim sMyLang$
-	sMyLang = fsGetLanguage()
-	Dim bReverse As Boolean
-	bReverse = False
+	Dim sMyLang$ : sMyLang = fsGetLanguage()
+	Dim bReverse As Boolean : bReverse = False
 	fsLookUpTerm = fsLookUpTerm3( _
 	sTermCode, _
 	sMyLang, _
@@ -343,12 +340,9 @@ Function fsLookUpTerm( _
 End Function
 
 
-Function fsLookUpTerm2( _
-	ByVal sTermCode As String, _
-	ByVal sMyLang As String) As String
+Function fsLookUpTerm2( ByVal sTermCode As String, ByVal sMyLang As String) As String
 	&apos; Look up a term in a specific language
-	Dim bReverse As Boolean
-	bReverse = False
+	Dim bReverse As Boolean: bReverse = False
 	fsLookUpTerm2 = fsLookUpTerm3( _
 	sTermCode, _
 	sMyLang, _
@@ -388,10 +382,8 @@ Function fsLookUpTerm3( _
 	&apos; `UpdatePoSettingsDone` Private variable to -1.
 	&apos;
 	fsLookUpTerm3 = &quot;&quot;
-	Dim s2$
-	s2 = fsZzxToEnglish( _
-	sTermCode, _
-	&quot;en&quot;) &apos; Machine to English
+	Dim s2 As String : s2 = fsZzxToEnglish( _
+	sTermCode, &quot;en&quot;)  &apos; Machine to English
 	fsLookUpTerm3 = _(s2, &quot;tools&quot;, sMyLang)
 End Function
 
@@ -410,9 +402,9 @@ Function _( _
 	&apos;* `iAlt` = if -1, then converts from English
 	&apos;   and if 1, then converts to English. If zero returns &quot;&quot;
 	_ = &quot;&quot;
-	Dim i As Integer
-	Dim iMax As Integer
-	Dim trad As String
+	Dim i As Integer : i = 0
+	Dim iMax As Integer : iMax = 0
+	Dim trad As String : trad = &quot;&quot;
 	Dim UseLang As String : UseLang = fsDisplayLanguage()
 	Dim sMyLang As String : sMyLang = &quot;&quot;
 	Dim sDirPo As String : sDirPo = &quot;&quot;
@@ -458,9 +450,7 @@ Function _( _
 		Exit Function
 	End If
 	On Error GoTo EnglishTableTransErr
-	Dim sMyPoFile
-	sMyPoFile = &quot;&quot;
-	sMyPoFile = ConvertFromUrl( _
+	Dim sMyPoFile As String: sMyPoFile = ConvertFromUrl( _
 	fsMyURL() &amp; _
 	&quot;/po/&quot; &amp; _
 	sDirPo &amp; _
@@ -508,8 +498,7 @@ Function fbTranslateTable( _
 	cntMsg, _
 	sMyTranslationType, _
 	nbPlural) As Boolean
-	Dim s1$
-	s1 = &quot;&quot;
+	Dim s1 As String : s1 = &quot;&quot;
 	fbTranslateTable = False
 	On Error Goto fbTranslateTableErr
 	If message = &quot;&quot; Then Exit Function
@@ -549,39 +538,26 @@ Function UpdatePoSettings( _
 	&apos;
 	UpdatePoSettings = False
 	On Error Goto UpdatePoSettingsErr
-	Dim lenLineRead#
-	lenLineRead = 0  &apos; &apos;length of line read
-	Dim cntMsg#
-	cntMsg = 0  &apos; &apos;message counter
-	Dim nbPlural#
-	nbPlural = 0  &apos; &apos;current plural
-	Dim nbPluralMax#
-	nbPluralMax = 0  &apos; &apos;how many plurals
-	Dim position#
-	position = 0  &apos; &apos;position in a string
-	Dim idquo#
-	idquo = 0  &apos; &apos;1 after first quotation mark
-	Dim iNumber#
-	iNumber = 0  &apos;for file access
-	
-	Dim lineRead$
-	lineRead = &quot;&quot;  &apos;line read in the po file
-	Dim TranslationType$
-	TranslationType = &quot;&quot;  &apos;are we on msgctxt, msgid, msgid_plural, msgstr ?
-	Dim message$
-	message = &quot;&quot;  &apos;string of msgid or msgstr
+	Dim lenLineRead As Integer : lenLineRead = 0  &apos; &apos;length of line read
+	Dim cntMsg As Integer : cntMsg = 0  &apos; &apos;message counter
+	Dim nbPlural As Integer : nbPlural = 0  &apos; &apos;current plural
+	Dim nbPluralMax As Integer : nbPluralMax = 0  &apos; &apos;how many plurals
+	Dim position As Integer : position = 0  &apos; &apos;position in a string
+	Dim idquo As Integer : idquo = 0  &apos; &apos;1 after first quotation mark
+	Dim iNumber As Integer : iNumber = 0  &apos;for file access
+	Dim lineRead As String : lineRead = &quot;&quot;  &apos;line read in the po file
+	Dim TranslationType As String : TranslationType = &quot;&quot;  &apos;are we on msgctxt, msgid, msgid_plural, msgstr ?
+	Dim message As String : message = &quot;&quot;  &apos;string of msgid or msgstr
 	If ismissing(isoCode) Then
 		isoCode = fsDisplayLanguage()  &apos;fr, en, es, it, de, ...
 	ElseIf isoCode = &quot;&quot; Then
 		isoCode = fsDisplayLanguage()
 	End If
-	Dim sFilePath$
-	sFilePath = &quot;&quot;
-	Dim sf As object
-	Dim myTextFile As object
-	Dim fileStream As object
+	Dim sFilePath As String : sFilePath = &quot;&quot;
+	Dim sf As object : 	sf = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	Dim myTextFile As Object
+	Dim fileStream As Object
 
-	sf = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
 	&apos; check for existance of PO directory and file
 	If sf.isFolder(podir) Then
 		If Right(podir,1) &lt;&gt; &quot;/&quot; Then podir = podir + &quot;/&quot;
@@ -694,33 +670,47 @@ Function fsZzxToEnglish( _
 	fsZzxToEnglish = &quot;&quot;
 	Dim LookUpList As Variant : LookUpList = Array(_
 	Array(&quot;s_about&quot;, &quot;About&quot;), _
+	Array(&quot;s_add&quot;, &quot;Add&quot;), _
 	Array(&quot;s_always-show-this-dialog&quot;, &quot;Always show this dialog&quot;), _
 	Array(&quot;s_c-james-holgate&quot;, &quot;© 2008-2025 James Holgate&quot;), _
 	Array(&quot;s_cancel&quot;, &quot;Cancel&quot;), _
 	Array(&quot;s_command-line-options&quot;, &quot;Command line options&quot;), _
 	Array(&quot;s_command&quot;, &quot;Command&quot;), _
 	Array(&quot;s_could-not-locate-the-program&quot;, &quot;Could not locate the program.&quot;), _
+	Array(&quot;s_data-source&quot;, &quot;Data source&quot;), _
+	Array(&quot;s_default-synthesizer&quot;, &quot;Default Synthesizer&quot;), _
+	Array(&quot;s_delete&quot;, &quot;Delete&quot;), _
 	Array(&quot;s_display&quot;, &quot;Display&quot;), _
-	Array(&quot;s_enable_experimental_features&quot;, &quot;Enable experimental features&quot;), _
+	Array(&quot;s_download-of-update-completed&quot;, &quot;Download of update completed&quot;), _
+	Array(&quot;s_download-of-update-in-progress&quot;, &quot;Download of update in progress&quot;), _
+	Array(&quot;s_downloading-productname-nextversion&quot;, &quot;Downloading %PRODUCTNAME %NEXTVERSION...&quot;), _
+	Array(&quot;s_enable-experimental-features&quot;, &quot;Enable experimental features&quot;), _
+	Array(&quot;s_enabled&quot;, &quot;Enabled&quot;), _
 	Array(&quot;s_external-program&quot;, &quot;External program&quot;), _
 	Array(&quot;s_find&quot;, &quot;Find&quot;), _
 	Array(&quot;s_http-help-url&quot;, &quot;https://sites.google.com/site/readtextextension/&quot;), _
+	Array(&quot;s_model&quot;, &quot;Model&quot;), _
+	Array(&quot;s_none&quot;, &quot;None&quot;), _
 	Array(&quot;s_ok&quot;, &quot;OK&quot;), _
 	Array(&quot;s_on-line-help&quot;, &quot;On-line help&quot;), _
+	Array(&quot;s_rate&quot;, &quot;Rate&quot;), _
 	Array(&quot;s_read-text&quot;, &quot;Read Text&quot;), _
 	Array(&quot;s_read-with-an-external-program&quot;, &quot;Read with an external program&quot;), _
+	Array(&quot;s_remove&quot;, &quot;Remove&quot;), _
 	Array(&quot;s_replace&quot;, &quot;Replace&quot;), _
+	Array(&quot;s_reset&quot;, &quot;_Reset&quot;), _
 	Array(&quot;s_script-commands&quot;, &quot;Script commands&quot;), _
 	Array(&quot;s_script&quot;, &quot;Script&quot;), _
+	Array(&quot;s_speech-dispatcher&quot;, &quot;Speech Dispatcher&quot;), _
 	Array(&quot;s_speech-properties&quot;, &quot;Speech properties&quot;), _
-	Array(&quot;s_speech-synthesis&quot;, &quot;Speech&quot;), _
+	Array(&quot;s_speech-synthesis&quot;, &quot;Speech synthesis&quot;), _
 	Array(&quot;s_string-cannot-be-analyzed&quot;, &quot;String cannot be analyzed!&quot;), _
 	Array(&quot;s_system-settings&quot;, &quot;System settings&quot;), _
 	Array(&quot;s_test&quot;, &quot;Test&quot;), _
 	Array(&quot;s_touch-screen&quot;, &quot;Touch screen&quot;), _
 	Array(&quot;s_use-a-web-application&quot;, &quot;Use a web application&quot;), _
 	Array(&quot;s_use-festival-with-a-script&quot;, &quot;Use Festival with a script&quot;), _
-	Array(&quot;en&quot;, &quot;English&quot;), _
+	Array(&quot;s_voice&quot;, &quot;Voice&quot;), _
 	Array(&quot;af&quot;, &quot;Afrikaans&quot;), _
 	Array(&quot;bg&quot;, &quot;Bulgarian&quot;), _
 	Array(&quot;ca&quot;, &quot;Catalan&quot;), _
@@ -804,14 +794,10 @@ Function fsSampleMd(ByVal hl) As String
 	&apos; Markdown sample code that creates presentations with heading
 	&apos; levels, block quotes and preformatted text.
 	
-	Dim cr$
-	cr = Chr(10)
-	Dim s1$
-	s1 = &quot;&quot;
-	Dim s2$
-	s2 = &quot;&quot;
-	Dim s3$
-	s3 = &quot;&quot;
+	Dim cr As String : cr = Chr(10)
+	Dim s1 As String : s1 = &quot;&quot;
+	Dim s2 As String : s2 = &quot;&quot;
+	Dim s3 As String : s3 = &quot;&quot;
 	
 	Select Case hl
 		Case &quot;ar&quot;
@@ -920,8 +906,7 @@ End Function
 
 
 Function fsUser() As String
-	Dim s1
-	s1 = Environ(&quot;USER&quot;)
+	Dim s1 As String : s1 = Environ(&quot;USER&quot;)
 	If s1 = &quot;&quot; Then
 		s1 = Environ(&quot;USERNAME&quot;)
 	End If
@@ -934,23 +919,18 @@ End Function
 
 
 Function fsMyTempLock(ByVal sExt) As String
-	Dim a1
-	Dim a2
-	Dim sTemp$
-	sTemp = &quot;&quot;
-	Dim sDiv$
-	sDiv = &quot;&quot;
-	Dim sUser$
-	sUser = fsUser()
-	Dim i#
-	i = 0
-	Dim sHome$
-	sHome = &quot;&quot;
-	
 	fsMyTempLock = &quot;&quot;
+	Dim a1 As Variant
+	Dim a2  As Variant
+	Dim sTemp As String : sTemp = &quot;&quot;
+	Dim sDiv As String : sDiv = &quot;&quot;
+	Dim sUser As String : sUser = fsUser()
+	Dim Item As String : Item = &quot;&quot;
+	Dim sHome As String : sHome = &quot;&quot;
+	
 	a1 = Array(&quot;READTEXTTEMP&quot;,&quot;TEMP&quot;,&quot;TMP&quot;,&quot;TMPDIR&quot;,&quot;TEMPDIR&quot;)
-	For i = LBound(a1) To UBound(a1)
-		sTemp = Environ(a1(i))
+	For Each Item In a1
+		sTemp = Environ(Item)
 		If Len(sTemp) &gt; 0 Then
 			If fbTestDirRW(sTemp) Then
 				Exit For
@@ -969,10 +949,10 @@ Function fsMyTempLock(ByVal sExt) As String
 		sHome &amp; &quot;/.temp&quot;, _
 		CreateUNOService(&quot;com.sun.star.util.PathSettings&quot;).temp &amp; &quot;&quot;, _
 		sHome)
-		For i = LBound(a2) To UBound(a2)
-			If FileExists(a2(i)) Then
-				If fbTestDirRW(a2(i)) Then
-					sTemp = a2(i)
+		For Each Item in a2
+			If FileExists(Item) Then
+				If fbTestDirRW(Item) Then
+					sTemp = Item
 					Exit For
 				End If
 			End If
@@ -994,8 +974,8 @@ Function fbTestDirRW( _
 	fbTestDirRW = False
 	If sA = &quot;&quot; Then Exit Function
 	On Error Goto fbTestDirRWErr
-	Dim s1$
-	Dim sUser$ : sUser = fsUser()
+	Dim s1 As String : s1 = &quot;&quot;
+	Dim sUser As String : sUser = fsUser()
 	s1 = fsAppSignature() &amp; &quot;.&quot; &amp; sUser &amp; &quot;.test.txt&quot;
 	If InStr(&quot;/\&quot;,Right(sA, 1)) = 0 Then
 		If InStr(sA, &quot;/&quot;) &lt;&gt; 0 Then
@@ -1017,11 +997,11 @@ End Function
 
 
 Function fsExtensionVersion() As String
-	Dim aFile As String
-	Dim iNumber As Integer
-	Dim sLine As String
-	Dim s1 As String
-	Dim s2 As String
+	Dim aFile As String  : aFile = &quot;&quot;
+	Dim iNumber As Integer : iNumber = 0
+	Dim sLine As String : sLine = &quot;&quot;
+	Dim s1 As String : s1 = &quot;&quot;
+	Dim s2 As String : s2 = &quot;&quot;
 	On Error GoTo fsExtensionVersionErr
 	s1 = fsMyURL() &amp; &quot;/description.xml&quot;
 	s2 = &quot;&quot;
@@ -1053,60 +1033,56 @@ Function fsPosterImg() As String
 	&apos; note - country abbreviations are usually capitalized - ES for Spain
 	&apos; Language abbreviations are usually lower case. - es for Spanish
 	fsPosterImg = &quot;&quot;
-	Dim s1$
-	s1 = createUnoService( _
+	Dim s1 As String : s1 = createUnoService( _
 	&quot;com.sun.star.util.PathSettings&quot;).temp &amp; &quot;/image-&quot; &amp; fsAppSignature()
-	Dim s2$
-	s2 = &quot;&quot;
-	Dim s3$
-	s3 = converttourl(fsGetHomeDir())
-	Dim a1
-	a1 = Array(fsSelectionLanguageAndRegion(True), _
+	Dim s2 As String : s2 = &quot;&quot;
+	Dim s3 As String : s3 = converttourl(fsGetHomeDir())
+	Dim a1 As Variant : a1 = Array(fsSelectionLanguageAndRegion(True), _
 	fsSelectionLanguage(), _
 	fsSelectionCountry())
-	Dim a2
-	a2 = Array(&quot;.png&quot;, &quot;.jpg&quot;, &quot;.jpeg&quot;)
-	Dim n As Integer
-	n = 0
-	Dim o As Integer
-	n = 0
-	For n = LBound(a2) To UBound(a2)
-		If FileExists(s1 &amp; a2(n)) Then
-			fsPosterImg = s1 &amp; a2(n)
+	Dim a2 As Variant : a2 = Array(&quot;.png&quot;, &quot;.jpg&quot;, &quot;.jpeg&quot;)
+	Dim n As Integer : n = 0
+	Dim o As Integer : n = 0
+	Dim Item As String : Item = &quot;&quot;
+	Dim DirName As String : DirName = &quot;&quot;
+
+	For Each Item in a2
+		If FileExists(s1 &amp; Item) Then
+			fsPosterImg = s1 &amp; Item
 			Exit For
 		End If
 	Next
-	If Len(fsPosterImg) = 0 Then
-		For o = LBound(a2) To UBound(a2)
-			fsPosterImg = fsMyURL() &amp; &quot;/images/poster-001&quot; &amp; a2(o)
-			For n = LBound(a1) To UBound(a1)
-				
-				If FileExists(s3 &amp; _
-					a1(n) &amp; _
-					&quot;/poster-&quot; &amp; _
-					Right(&quot;000&quot; &amp; _
-					Trim(str(fiMyCurrentAudioTrack(False))), 3) &amp; _
-					a2(o) ) Then
-					s2 = s3 &amp; _
-					a1(n) &amp; _
-					&quot;/poster-&quot; &amp; _
-					Right(&quot;000&quot; &amp; _
-					Trim(str(fiMyCurrentAudioTrack(False))), 3) + a2(o)
-				ElseIf FileExists(s3 &amp; a1(n) &amp; &quot;/poster-001&quot; &amp; a2(o)) Then
-					s2 = s3 &amp; a1(n) &amp; &quot;/poster-001&quot; &amp;  + a2(o)
-				ElseIf FileExists(fsMyURL &amp; &quot;/images/poster-&quot; &amp; a1(n) &amp; a2(o)) Then
-					s2 = fsMyURL &amp; &quot;/images/poster-&quot; &amp; a1(n) &amp; a2(o)
-				End If
-				If Len(s2) &lt;&gt; 0 Then
-					fsPosterImg = s2
-					Exit For
-				End If
-			Next
-			If Len(fsPosterImg) &lt;&gt; 0 Then
+	If Not Len(fsPosterImg) = 0 Then
+		Exit Function
+	End If
+	For Each Item In a2
+		fsPosterImg = fsMyURL() &amp; &quot;/images/poster-001&quot; &amp; Item
+		For Each DirName In a1	
+			If FileExists(s3 &amp; _
+				DirName &amp; _
+				&quot;/poster-&quot; &amp; _
+				Right(&quot;000&quot; &amp; _
+				Trim(str(fiMyCurrentAudioTrack(False))), 3) &amp; _
+				Item ) Then
+				s2 = s3 &amp; _
+				DirName &amp; _
+				&quot;/poster-&quot; &amp; _
+				Right(&quot;000&quot; &amp; _
+				Trim(str(fiMyCurrentAudioTrack(False))), 3) + Item
+			ElseIf FileExists(s3 &amp; DirName &amp; &quot;/poster-001&quot; &amp; Item) Then
+				s2 = s3 &amp; DirName &amp; &quot;/poster-001&quot; &amp;  + Item
+			ElseIf FileExists(fsMyURL &amp; &quot;/images/poster-&quot; &amp; DirName &amp; Item) Then
+				s2 = fsMyURL &amp; &quot;/images/poster-&quot; &amp; DirName &amp; Item
+			End If
+			If Len(s2) &lt;&gt; 0 Then
+				fsPosterImg = s2
 				Exit For
 			End If
 		Next
-	End If
+		If Len(fsPosterImg) &lt;&gt; 0 Then
+			Exit For
+		End If
+	Next
 End Function
 
 
@@ -1151,9 +1127,7 @@ End Function
 
 
 Function fsLicenseDoc() As String
-	Dim s1 As String
-	
-	s1 = fsMyURL &amp; &quot;/license/LICENSE&quot;
+	Dim s1 As String : s1 = fsMyURL &amp; &quot;/license/LICENSE&quot;
 	If FileExists(s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()) Then
 		fsLicenseDoc = s1 &amp; &quot;.&quot; &amp; fsDisplayLanguage()
 	ElseIf FileExists(s1 &amp; &quot;.&quot; &amp; fsGetLanguage()) Then
@@ -1310,14 +1284,14 @@ End Function
 Function fsTheOsId() As String
 	&apos; Return a specific system platform identifier
 	&apos; Example 1 : `WINDOWS.NOSCRIPT`
-	&apos; Example 2 : `POSIX.APPIMAGE
-	&apos; Example 2 : `MACOS.EXPERIMENTAL
+	&apos; Example 2 : `POSIX.APPIMAGE`
+	&apos; Example 2 : `MACOS.EXPERIMENTAL`
 	&apos; Returns the base type `WINDOWS`, `POSIX` or `UNKNOWN` if no more specific
 	&apos; information is available.
 	&apos; UNIX (in capitals) refers to a specific Posix platform, but here, &quot;POSIX&quot;
 	&apos; refers to Posix compliant systems generally, with the exception of MACOS.
 
-	Dim ErrLevel As Integer
+	Dim ErrLevel As Integer : ErrLevel = 0
 	On Error GoTo fsTheOsIdErr1
 	If Len(s_CaReadTextExtensionGetOS) &lt;&gt; 0 Then
 		fsTheOsId = s_CaReadTextExtensionGetOS
@@ -1340,8 +1314,8 @@ Function fsTheOsId() As String
 		fsTheOsIdErr2:
 		s_CaReadTextExtensionGetOS = fsTheOsId
 		Case 4
-		Dim PosixPath As String
-		Dim TestPath As String
+		Dim PosixPath As String : PosixPath = &quot;&quot;
+		Dim TestPath As String : TestPath = &quot;&quot;
 		Dim IsMac As Boolean : IsMac = FileExists(AppleScriptPath())
 		On Error GoTo fsTheOsIdErr3
 		If Not IsMac Then
@@ -1445,7 +1419,7 @@ End Function
 
 Function fsDisplayLanguage() As String
 	On Error Goto DISPLAYLANGUAGEERROR
-	Dim s1$
+	Dim s1 As String : s1 = &quot;&quot;
 	s1 = f_dlgSpeechSetup.GetControl(&quot;ComboBox3&quot;).Model.Text
 	
 	Select Case Trim(s1)
@@ -1482,14 +1456,13 @@ End Function
 
 
 Function fsSubStringToright( _
-	ByVal x, _
-	ByVal y) As String
-	Dim a1
-	Dim z As String
-	
-	z = x
-	If InStr(x,y) &lt;&gt; 0 Then
-		a1 = Split(x,y)
+	ByVal x As String, _
+	ByVal y As String) As String
+	Dim a1 As Variant
+	Dim z As String  : z = x
+
+	If InStr(x, y) &lt;&gt; 0 Then
+		a1 = Split(x, y)
 		z = a1(UBound(a1))
 	End If
 	fsSubStringToRight = z
@@ -1498,10 +1471,8 @@ End Function
 
 Function fsFestivalVoice( _
 	n)
-	Dim x As String
-	
-	x = converttourl(fsFestivalDirectory(n))
-	fsFestivalVoice = fsSubStringToright(x,&quot;/&quot;)
+	Dim x As String : x = converttourl(fsFestivalDirectory(n))
+	fsFestivalVoice = fsSubStringToright(x, &quot;/&quot;)
 End Function
 
 
@@ -1513,7 +1484,7 @@ Function fsMatchFestivalVoice(_
 	If Len(_search) = 0 Then
 		_search = &quot;_hts&quot;
 	End If
-	Dim x As Integer
+	Dim x As Integer : x = 0
 	For x = 0 To fiCountFestivalVoices()
 		If Len(fsFestivalDirectory(x)) = 0 Then
 			Exit For
@@ -1527,8 +1498,9 @@ End Function
 
 Function fsFestivalDirectory( _
 	n) As String
-	Dim s1, s2 As String
-	Dim a1
+	Dim s1 As String : s1 = &quot;&quot;
+	Dim s2 As String : s2 = &quot;&quot;
+	Dim a1 As Variant
 	fsFestivalDirectory = &quot;&quot;
 	&apos; Incorrectly installed voices will be silent. Some instructions on
 	&apos; the web for installing mbrola voices need to be updated to work
@@ -1612,7 +1584,8 @@ End Function
 
 
 Function fiCountFestivalDirectory() As Integer
-	Dim n As Integer
+	fiCountFestivalDirectory = 0
+	Dim n As Integer : n = 0
 	
 	For n = 0 To 80
 		If fsFestivalDirectory(n) = &quot;&quot; Then
@@ -1625,12 +1598,14 @@ End Function
 
 
 Function fsFestivalLanguage( _
-	n, o) As String
+	n As Integer, o As Integer) As String
 	&apos; if `o` is `0` then returns directory to check
 	&apos; otherwise returns iso language + area code like `en-US`
-	Dim s1, s2 As String
-	Dim a1
 	fsFestivalLanguage = &quot;&quot;
+
+	Dim s1 As String : s1 = &quot;&quot;
+	Dim s2 As String : s2 = &quot;&quot;
+	Dim a1 As Variant
 	&apos; Incorrectly installed voices will be silent. Some instructions on
 	&apos; the web for installing mbrola voices need to be updated to work
 	&apos; with the latest version of Festival.
@@ -1674,7 +1649,8 @@ End Function
 
 
 Function fiCountFestivalLanguage() As Integer
-	Dim n As Integer
+	fiCountFestivalLanguage = 0
+	Dim n As Integer : n = 0
 	
 	For n = 0 To 80
 		If fsFestivalLanguage(n, 0) = &quot;&quot; Then
@@ -1767,6 +1743,7 @@ End Sub
 
 
 Function fsGetEspeakMbrolaLanguage(i As Integer, j As Integer) As String
+	fsGetEspeakMbrolaLanguage = &quot;&quot;
 	&apos; This function returns information about Espeak Mbrola languages.
 	&apos; The parameters i and j determine the specific information returned.
 	&apos;
@@ -1800,9 +1777,10 @@ End Function
 
 
 Function fsDateMyRegion(i As Integer) As String
-	Dim sL10N As String
-	Dim s1 As String
-	
+	fsDateMyRegion =  &quot;&quot;
+	Dim sL10N As String : sL10N = &quot;&quot;
+	Dim s1 As String : s1 = &quot;&quot;
+
 	If i = 0 Then
 		&apos; Use language of doc
 		s1 = fsDocLanguage()
@@ -1844,7 +1822,7 @@ Function fsDateMyRegion(i As Integer) As String
 		Case &quot;en&quot;,&quot;lv&quot;,&quot;sk&quot;,&quot;uk&quot;,&quot;tl&quot; &apos;January 1, 2009
 		sL10N = format(Now,&quot;MMMM D, YYYY&quot;)
 		Case Else
-		&apos; &quot;af&quot;,&quot;bg&quot;,&quot;el&quot;,&quot;it&quot;,&quot;hi&quot;,&quot;id&quot;,&quot;mk&quot;,&quot;nl&quot;,&quot;po&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sl&quot;,&quot;th&quot;,&quot;tr
+		&apos; &quot;af&quot;,&quot;bg&quot;,&quot;el&quot;,&quot;it&quot;,&quot;hi&quot;,&quot;id&quot;,&quot;mk&quot;,&quot;nl&quot;,&quot;po&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sl&quot;,&quot;th&quot;,&quot;tr&quot; ...
 		sL10N = Year(Now) &amp; &quot;-&quot; &amp; Right(&quot; 00&quot; &amp; Month(Now), 2) &amp; &quot;-&quot; &amp; Right(&quot; 00&quot; &amp; Day(Now), 2)
 		&apos; Revised to international time 2011-02-06
 	End Select
@@ -1853,8 +1831,9 @@ End Function
 
 
 Function fsTimeMyRegion(i As Integer) As String
-	Dim sL10N As String
-	Dim s1 As String
+	fsTimeMyRegion = &quot;&quot;
+	Dim sL10N As String : sL10N = &quot;&quot;
+	Dim s1 As String : s1 = &quot;&quot;
 	
 	If i = 0 Then
 		&apos; Use language of doc
@@ -1913,13 +1892,12 @@ Function fsGetHomeDir() As String
 	&apos; Work directory also known As My Documents or home
 	&apos; We look up the home directory. if it was deleted,
 	&apos; we try to recreate it. Returns blank if we fail.
-	Dim s1 , cr As String
-	Dim n As Integer
-	Dim a1
-	
-	cr = Chr(10)
 	fsGetHomeDir = &quot;&quot;
-	s1 = ConvertFromUrl(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;)
+	Dim s1 As String : s1 = ConvertFromUrl(fsPathSettings(&quot;Work&quot;) &amp; &quot;/&quot;)
+	Dim cr As String : cr = Chr(10)
+	Dim n As Integer : n = 0
+	Dim a1 As Variant
+
 	If FileExists(s1) Then
 		fsGetHomeDir = s1
 	Else
@@ -1943,28 +1921,17 @@ End Function
 
 
 Function fbIsLegacyMac() As Boolean
-	&apos; The `Environ(&quot;LANG&quot;)` command doesn&apos;t work on MacOS 11, so the
-	&apos; script can&apos;t use the system `LANG` value to guess your language.
-	&apos; See also: `fsGetMyTunesApp()`
-	Dim _env As String
-	_env = Environ(&quot;LANG&quot;)
-	Select Case Len(_env)
-		Case 0
-		fbIsLegacyMac = True
-		Case Else
-		fbIsLegacyMac = False
-	End Select
+    &apos; Determines if MacOS is a legacy version based on LANG environment variable.
+    fbIsLegacyMac = (Len(Environ(&quot;LANG&quot;)) = 0)
 End Function
 
 
 Function fvGetIsoLangArray() As Variant
 	&apos; Returns an array of ISO strings from specific to
 	&apos; non-specific.
-	Dim _env As String
+	Dim _env As String : _env = &quot;en-US&quot;
 
-	If fbIsLegacyMac() Then
-		_env = &quot;en-US&quot;
-	Else
+	If Not fbIsLegacyMac() Then
 		_env = fsReplaceText(_
 		fsReplaceText(_
 		_env, &quot;.UTF-8&quot;, &quot;&quot;), &quot;_&quot;, &quot;-&quot;)
@@ -1988,12 +1955,10 @@ Function fsGetMacOsBaseVoice() As String
 	&apos; for your region by adding your language and region code to the
 	&apos; case options. For example, if your region is `en-SG`, you might
 	&apos; prefer Daniel&apos;s voice instead of Alex&apos;s voice as a default.
-	Dim n As Integer
-	n = 0
-	Dim s1$
-	s1 = &quot;&quot;
-	Dim a1() As Variant
-	a1 = fvGetIsoLangArray()
+	fsGetMacOsBaseVoice = &quot;Alex&quot;
+	Dim n As Integer : n = 0
+	Dim s1$ : s1 = &quot;&quot;
+	Dim a1() As Variant : a1 = fvGetIsoLangArray()
 	Dim bIsLegacyMac As Boolean
 	bIsLegacyMac = fbIsLegacyMac()
 
@@ -2148,7 +2113,7 @@ Sub debugfsLookUpTerm()
 	&apos; might have a partial fill of language strings.  for example,
 	&apos; Korean has the main dialog strings, but not any strings
 	&apos; relating to adding tags to m4a exports.
-	Dim s1 As String
+	Dim s1 As String : s1 = &quot;&quot;
 	UpdatePoSettingsDone =  - 1
 	s1 = InputBox(&quot;Enter the code to look up&quot;,&quot;Debug&quot;, &quot;s_mdsample&quot;)
 	MsgBox( fxStr(fsLookUpTerm3(s1, _
