@@ -305,7 +305,6 @@ Copyright (c) 2025 James Holgate
 """
 
 
-import codecs
 import glob
 import os
 import random
@@ -801,14 +800,16 @@ not work with the python version.
         b_done = False
         if not _json_file:
             return b_done
-        if bool(data):
+
+        if data:
             try:
                 json_string = json.dumps(data, ensure_ascii=False, indent=4)
-                with codecs.open(_json_file, "w", "utf-8") as f:
+                with open(_json_file, "w", encoding="utf-8") as f:
                     f.write(json_string)
                     b_done = True
-            except (UnicodeDecodeError.TypeError, OSError, LookupError):
+            except (UnicodeDecodeError, TypeError, OSError, LookupError):
                 pass
+
         if not b_done:
             if not os.path.isfile(self.app_locker):
                 readtexttools.pop_message(
@@ -1461,29 +1462,30 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
     def _speaker_id_list(self, _json_path: str = ""):
         """
         * If the `_json_path` is not okay or there's an error, return `None`.
-        * If there's only onespeaker, return `[""]`
-        * Otherwise, return a list of `speaker_id` strngs
+        * If there's only one speaker, return [""].
+        * Otherwise, return a list of speaker_id strings.
         """
         if not os.path.isfile(_json_path):
             return None
+
         try:
-            with codecs.open(
-                _json_path, mode="r", encoding="utf-8", errors="replace"
-            ) as file_obj:
+            with open(_json_path, mode="r", encoding="utf-8", errors="replace") as file_obj:
                 data = json.load(file_obj)
-            try:
-                if data["num_speakers"] == 1:
-                    return [""]
-                speaker_list = []
-                for _key in data["speaker_id_map"].keys():
-                    speaker_list.append(_key)
-            except KeyError as e:
-                print(f"`KeyError` Exception: {e}")
+
+            # Validate structure
+            if data.get("num_speakers") == 1:
+                return [""]
+
+            speaker_map = data.get("speaker_id_map")
+            if not isinstance(speaker_map, dict):
                 return None
-        except Exception as e:
+
+            return list(speaker_map.keys())
+
+        except (OSError, json.JSONDecodeError, KeyError) as e:
             print(f"Exception: {e}")
             return None
-        return speaker_list
+
 
     def _update_model_doc(self, _sep: str = "#") -> bool:
         """Creates divided list for values from `self.model_file`:
@@ -1597,40 +1599,41 @@ INFO: Piper TTS cannot find `{self.lang}` `.json` and `.onnx` files.
         if not _rows:
             return False
         try:
-            with codecs.open(self.model_file, "w", encoding="utf-8") as file_write:
+            with open(self.model_file, "w", encoding="utf-8") as file_write:
                 file_write.write(_rows)
         except Exception as e:
             print(f"Error writing file: {e}")
             return False
         return os.path.isfile(self.model_file)
 
-    def _get_piper_dict(self):  # -> (Any | None)
-        """Read the Piper `voices.json` file to get a dictionary of voice
-        models."""
+
+    def _get_piper_dict(self):  # -> dict | None
+        """Read the Piper `voices.json` file to get a dictionary of voice models."""
         if self.local_voices_dictionary:
             return self.local_voices_dictionary
+
+        if not os.path.isfile(self.json_file):
+            return None
+
         try:
-            with codecs.open(
-                self.json_file, mode="r", encoding="utf-8", errors="replace"
-            ) as file_obj:
+            with open(self.json_file, mode="r", encoding="utf-8", errors="replace") as file_obj:
                 data = json.load(file_obj)
                 if data:
                     self.local_voices_dictionary = data
                     return data
-        except Exception as e:
+        except (OSError, json.JSONDecodeError) as e:
             self.local_voices_dictionary = None
             print(f"Unexpected error reading `voices.json`: {e}")
+
         return None
 
     def _model_voice_info(self, _model: str = "") -> int:
         """Get current info from  the `_model.json` file such as the
         number of speakers and the sample rate.  Edit the named
         json elements for individual voices if needed"""
-        model_json_file = os.path.join(f"{_model}.json")
+        model_json_file = f"{_model}.json"
         try:
-            with codecs.open(
-                model_json_file, mode="r", encoding="utf-8", errors="replace"
-            ) as file_obj:
+            with open(model_json_file, mode="r", encoding="utf-8", errors="replace") as file_obj:
                 data = json.load(file_obj)
             try:
                 self.num_speakers = data["num_speakers"]

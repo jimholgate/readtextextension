@@ -3,7 +3,6 @@
 """Module to download
 [Rhasspy Piper TTS](https://github.com/OHF-Voice/piper1-gpl/)
 """
-import codecs
 import os
 import subprocess
 import tempfile
@@ -206,21 +205,23 @@ class GetPiperClass:
 export PATH="$PATH:{new_path}"
 """
         try:
-            with codecs.open(
+            with open(
                 _bashrc, mode="r", encoding="utf-8", errors="replace"
             ) as file_obj:
                 _bashrc_text = file_obj.read()
-        except (PermissionError, FileNotFoundError):
+        except (UnicodeDecodeError, PermissionError, FileNotFoundError) as e:
+            print(f"Error Reading {_bashrc}: {e}")
             return False
         if f'export PATH="$PATH:{new_path}"' in _bashrc_text:
             return True
         _bashrc_text = f"{_bashrc_text}{_entry}"
         try:
-            with codecs.open(
+            with open(
                 _bashrc, mode="w", encoding="utf-8", errors="replace"
             ) as file_obj:
                 file_obj.write(_bashrc_text)
-        except (PermissionError, ValueError):
+        except (PermissionError, ValueError) as e:
+            print(f"Error Writing {_bashrc}: {e}")
             return False
         return True
 

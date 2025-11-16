@@ -377,6 +377,27 @@ Function RhvoiceSpeechHostInfo()
 End Function
 
 
+Function LocalHostSpeechWebDisplayURL()
+	LocalHostSpeechWebDisplayURL = fsLocalHostSpeech()
+	If Len(LocalHostSpeechWebDisplayURL) = 0 Then
+		Exit Function
+	End If
+	Dim _info As SpeechHostInfo
+	For Each _info in Array(_
+		PiperSpeechHostInfo(), _
+		MimicSpeechHostInfo(), _
+		OpenttsSpeechHostInfo(), _
+		MaryTtsSpeechHostInfo(), _
+		RhvoiceSpeechHostInfo(), _
+		)
+		If _info.url = LocalHostSpeechWebDisplayURL Then
+			LocalHostSpeechWebDisplayURL = LocalHostSpeechWebDisplayURL &amp; _info.url_info
+			Exit Function
+		End If
+	Next
+End Function
+
+
 Function MacOSSpeechAppInfo()
 	Dim _info As SpeechHostInfo
 	Select Case fsTheOsId()

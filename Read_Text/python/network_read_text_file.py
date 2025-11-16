@@ -194,7 +194,7 @@ except (ImportError, AssertionError, AttributeError):
 
 try:
     import netgtts
-except (AttributeError, ImportError, SyntaxError):
+except (AttributeError, ImportError, SyntaxError, TypeError):
     pass
 try:
     import requests
@@ -204,27 +204,27 @@ except (AttributeError, ImportError):
     REQUESTS_OK = False
 try:
     import netmimic3
-except (AttributeError, ImportError, SyntaxError):
+except (AttributeError, ImportError, SyntaxError, TypeError):
     pass
 try:
     import netmary
-except (AttributeError, ImportError, SyntaxError):
+except (AttributeError, ImportError, SyntaxError, TypeError):
     pass
 try:
     import netopentts
-except (AttributeError, ImportError, SyntaxError):
+except (AttributeError, ImportError, SyntaxError, TypeError):
     pass
 try:
     import netpiper
-except (AttributeError, ImportError, SyntaxError):
+except (AttributeError, ImportError, SyntaxError, TypeError):
     pass
 try:
     import netrhvoice
-except (AttributeError, ImportError, SyntaxError):
+except (AttributeError, ImportError, SyntaxError, TypeError):
     pass
 try:
     import readtexttools
-except (AttributeError, ImportError, SyntaxError):
+except (AttributeError, ImportError, SyntaxError, TypeError):
     pass
 try:
     import netcommon

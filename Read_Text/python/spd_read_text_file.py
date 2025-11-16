@@ -213,15 +213,20 @@ Copyright (c) 2010 - 2025 James Holgate
 
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-import codecs
+import io
 import os
 import sys
 import re
+import threading
 import time
 import espeak_read_text_file
 import netcommon
 import netsplit
-import network_read_text_file
+
+try:
+    import network_read_text_file
+except TypeError:
+    pass
 import openjtalk_read_text_file
 import readtexttools
 
@@ -445,74 +450,23 @@ def usage():  # -> None
         hard_reset(player)
 
 
-def guess_time(phrase="", word_rate=1, _file_path="", _language="en"):  # -> int
-    """
-    Estimate time in seconds for speech to finish.
+class SpeechMonitor(threading.Thread):
+    def __init__(self, client, text):
+        super(SpeechMonitor, self).__init__()
+        self.client = client
+        self.text = text
+        self.done = threading.Event()
 
-    - `phrase` - The string to analyse "Hello world"
-    - `word_rate` - Speed to speak. i.e.: 1.25 would speak 125% speech rate.
-    - `_filepath` - Path of scratch audio file used to check the estimate.
-    - `_language` - If a language is more dense, then the function needs to
-       factor in the rate used to calculate the estimate.
-    """
-    if len(phrase.strip()) == 0:
-        return 0
-    i_rate = ((int(word_rate) * 0.8) + 100) / 100
-    i_seconds = 1 + len(phrase) / 18
-    # NOTE: Check more languages. Increasing the value of the factor increases
-    # the estimate of the duration.
-    max_seconds = 60
-    language_settings = {
-        "en-US": (0.8, 60),
-        "en": (0.8, 60),
-        "es": (0.8, 60),
-        "fr": (0.8, 60),
-    }
+    def callback(self, event_type, index_mark=None):
+        if event_type == speechd.CallbackType.END:
+            self.done.set()
 
-    factor = 0.8  # default
-    for idiom, vals in language_settings.items():
-        if _language.startswith(idiom):
-            factor = vals[0]
-            max_seconds = vals[1]
-            break
-
-    try:
-        word_rate = float(word_rate)
-    except (ValueError, TypeError):
-        word_rate = 1.0
-
-    i_rate = ((int(word_rate) * factor) + 100) / 100
-    i_seconds = 1 + len(phrase) / 18
-    if i_seconds < max_seconds:
-        _command = "/usr/bin/espeak"
-        if os.path.isfile("/usr/bin/espeak-ng"):
-            _command = "/usr/bin/espeak-ng"
-        if os.name == "nt":
-            win_subdir = "eSpeak/command_line/espeak.exe"
-            _command = readtexttools.get_nt_path(win_subdir)
-        if os.path.isfile(_command):
-            _wave = readtexttools.get_work_file_path("", "", "TEMP")
-            try:
-                espeak_read_text_file.espkread(
-                    _file_path,
-                    _language,
-                    "",
-                    "",
-                    _wave,
-                    "",
-                    "",
-                    "show_sound_length_seconds",
-                    "",
-                    "",
-                    50,
-                    160,
-                )
-                return i_rate * (readtexttools.sound_length_seconds(_wave))
-            except (AttributeError, TypeError, ImportError):
-                # Library is missing or incorrect version
-                print("A local library for guess_time is missing or damaged.")
-                return i_rate * i_seconds
-    return i_rate * i_seconds
+    def run(self):
+        self.client.speak(
+            self.text, callback=self.callback, event_types=(speechd.CallbackType.END,)
+        )
+        self.done.wait()
+        self.client.close()
 
 
 def net_play(
@@ -628,23 +582,64 @@ class SpdFormats(object):
         except Exception:
             pass
 
-    def percent_to_spd(self, _percent_int=100):  # -> int
-        """Given a percent, returns an integer representing a speech
+    def percent_to_spd(self, percentage="100%"):  # -> int
+        """Given a percentage, returns an integer representing a speech
         rate to pass to speech-dispatcher. It is between `-100` and
         `100` but the actual speed will depend on the language, voice,
         settings and the text to speech tool."""
+        if percentage in [100, "100%"]:
+            return 0
         try:
-            test_str = re.sub(r"\D", "", str(_percent_int))
+            test_str = re.sub(r"\D", "", str(percentage))
             if not test_str:
                 test_str = "0"
-            _percent_int = int(test_str)
+            percentage = int(test_str)
         except (AttributeError, ValueError):
             return 0
         for low, high, _bar, value in self.rate_scales:
-            if low >= _percent_int >= high:
+            if low >= percentage >= high:
                 print("speech rate : -100 [{_bar}] 100".format(_bar=_bar))
                 return value
         return 0
+
+    def fixed_text_from_file(self, file_spec="", language="en-CA"):  # -> str
+        """
+        Apply modifications to text to use local pronunciation and strip
+        machine code and mojibake from the text.
+
+        Args:
+            file_spec (str): Path or identifier of the file containing text.
+            language (str): Language code for pronunciation adjustments
+                (e.g., "en-CA" for Canadian English).
+
+        Returns:
+            str: The cleaned and localized text."""
+        _txt = ""
+        if not os.path.isfile(file_spec):
+            return ""
+        try:
+            with io.open(
+                file_spec,
+                mode="r",
+                encoding=sys.getfilesystemencoding(),
+                errors="replace",
+            ) as f:
+                _txt = f.read()
+        except IOError:
+            print("I was unable to open the file you specified!")
+            usage()
+            return ""
+        if len(_txt) == 0:
+            self.client.close()
+            readtexttools.unlock_my_lock()
+            return ""
+        concise_lang = language.split("-")[0].split("_")[0].lower()
+        _txt = readtexttools.strip_xml(_txt)
+        _txt = readtexttools.strip_mojibake(concise_lang, _txt)
+        _txt = readtexttools.local_pronunciation(
+            language, _txt, "default", "SPEECH_USER_DIRECTORY", False
+        )[0]
+        return _txt
 
     def is_a_supported_language(self, _lang="en", experimental=False):  # -> Bool
         """Verify that your installed speech synthesisers are *registered* with
@@ -712,7 +707,11 @@ class SpdFormats(object):
 
     def _switch_to_female(self, voice=""):  # -> bool
         """If voice includes `FEMALE` or a network voice, return `True`"""
-        if voice.count("FEMALE") != 0 or voice.upper() in NET_SERVICE_LIST:
+        if (
+            voice.count("FEMALE") != 0
+            or voice.count("female") != 0
+            or voice.upper() in NET_SERVICE_LIST
+        ):
             return True
         return False
 
@@ -722,7 +721,28 @@ class SpdFormats(object):
         """Set user configuration settings"""
         _lock = readtexttools.get_my_lock("lock")
         _audio_players = readtexttools.PosixAudioPlayers()
-        _try_voice = voice
+        _try_voice = str(voice)
+        _display_voice = "male1"
+        if voice:
+            _display_voice = voice
+        voice_list = self.client.list_synthesis_voices()
+        if len(voice_list) == 1:
+            # Only one voice model is available, so use the model's language.
+            # Example: [pied](https://github.com/Elleo/pied) speech dispatcher
+            # configuration.
+            language = voice_list[0][1]
+        print(
+            """
+Speech Dispatcher
+=================
+* Output Module: {0}
+* Language: {1}
+* Requested Voice: {2}
+
+""".format(
+                self.get_output_module(), language, _display_voice
+            )
+        )
         if voice not in self.all_voices:
             if voice not in [
                 "none",
@@ -759,6 +779,7 @@ class SpdFormats(object):
                 if bool(_try_voice):
                     self.client.set_voice(_try_voice)
             except AssertionError:
+                # Fallback for client.stop() not working
                 if _try_voice == self.stop_voice:
                     self.client.close()
                     time.sleep(0.2)
@@ -823,32 +844,8 @@ class SpdFormats(object):
             else:
                 readtexttools.unlock_my_lock()
             return False
-        try:
-            f = codecs.open(_file_spec, mode="r", encoding=sys.getfilesystemencoding())
-        except IOError:
-            print("I was unable to open the file you specified!")
-            usage()
-            return False
-        _txt = f.read()
-        f.close()
-        if len(_txt) == 0:
-            self.client.close()
-            readtexttools.unlock_my_lock()
-            return False
-        concise_lang = language.split("-")[0].split("_")[0].lower()
-        _txt = readtexttools.strip_xml(_txt)
-        _txt = readtexttools.strip_mojibake(concise_lang, _txt)
-        _txt = readtexttools.local_pronunciation(
-            language, _txt, "default", "SPEECH_USER_DIRECTORY", False
-        )[0]
-        try:
-            if os.uname()[1] in ["centos", "fedora", "rhel"]:
-                # `espeak-ng` for `speechd` on fedora 5.18.18-200.fc36.x86_64
-                # changes the pitch of capitalized words. This could make the
-                # synthesized speech hard to understand.
-                _txt = _txt.lower()
-        except [AttributeError, TypeError]:
-            pass
+        _txt = self.fixed_text_from_file(_file_spec, language)
+
         if self.xml_tool.use_mode in ["text"]:
             _message = ' " {}"'.format(_txt)
         else:
@@ -858,25 +855,26 @@ class SpdFormats(object):
 <speak version='1.1' xml:lang='{}'>{}</speak>""".format(
                 language, _txt
             )
-        _time = guess_time(_txt, i_rate, _file_spec, language)
         self.client.set_data_mode(self.xml_tool.use_mode)
         self.client.set_punctuation(speechd.PunctuationMode.SOME)
         _voice_list = None
+        is_female = self._switch_to_female
         # Try to match requested gender and locale for supported synthesizers
         try:
-            _client_voices = self.list_synthesis_voices(language.split("-")[0])
-            # Bare `except` because when using a Linux appimage, we get a
-            # TypeError: catching classes that do not inherit from
-            # BaseException is not allowed if we include specific exceptions.
-        except:
-            _client_voices = [""]
+            _client_voices = self.list_synthesis_voices(
+                language.split("-")[0].split("_")[0]
+            )
+        except Exception as e:
+            print("Exception (list client voices):", e)
+            _client_voices = None
         if language[:2] == "de":
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = [
                     "eva_k",
                     "hokuspokus",
                     "kerstin",
                     "rebecca_braunert_plunkett",
+                    "sabrina",
                     "karlsson",
                     "pavoque",
                     "thorsten",
@@ -892,9 +890,10 @@ class SpdFormats(object):
                     "kerstin",
                     "rebecca_braunert_plunkett",
                     "German",
+                    "sabrina",
                 ]
         elif language in ["en-AS", "en-PH", "en-PR", "en-UM", "en-US", "en-VI"]:
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = [
                     "Slt",
                     "cmu_slt",
@@ -965,7 +964,7 @@ class SpdFormats(object):
                     "English (America)+male1",
                 ]
         elif language == "en-IN":
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = [
                     "cmu_slp",
                     "serena",
@@ -1038,7 +1037,7 @@ class SpdFormats(object):
                     "English",
                 ]
         elif language[:2] == "en":
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = [
                     "serena",
                     "blizzard_fls",
@@ -1111,32 +1110,43 @@ class SpdFormats(object):
                     "English",
                 ]
         elif language[:2] == "es":
-            if self._switch_to_female(voice):
-                _voice_list = ["karen_savage", "carlfm", "Spanish+female1"]
+            if is_female(voice):
+                _voice_list = ["karen_savage", "carlfm", "Spanish+female1", "isabel"]
             else:
-                _voice_list = ["carlfm", "karen_savage", "Spanish"]
+                _voice_list = ["carlfm", "karen_savage", "Spanish", "isabel"]
         elif language == "fr-CA":
-            if self._switch_to_female(voice):
-                _voice_list = ["siwis", "tom", "gilles_le_blanc", "French+female1"]
+            if is_female(voice):
+                _voice_list = [
+                    "siwis",
+                    "tom",
+                    "gilles_le_blanc",
+                    "French+female1",
+                    "virginie",
+                ]
             else:
-                _voice_list = ["tom", "gilles_le_blanc", "siwis", "French"]
+                _voice_list = ["tom", "gilles_le_blanc", "siwis", "French", "virginie"]
         elif language[:2] == "fr":
-            if self._switch_to_female(voice):
-                _voice_list = ["siwis", "gilles_le_blanc", "tom" "French+female1"]
+            if is_female(voice):
+                _voice_list = [
+                    "siwis",
+                    "gilles_le_blanc",
+                    "tom" "French+female1",
+                    "virginie",
+                ]
             else:
-                _voice_list = ["gilles_le_blanc", "tom", "siwis", "French"]
+                _voice_list = ["gilles_le_blanc", "tom", "siwis", "French", "virginie"]
         elif language[:2] == "it":
-            if self._switch_to_female(voice):
-                _voice_list = ["lisa", "riccardo_fasol", "Italian+female1"]
+            if is_female(voice):
+                _voice_list = ["lisa", "riccardo_fasol", "Italian+female1", "silvia"]
             else:
-                _voice_list = ["riccardo_fasol", "lisa", "Italian"]
+                _voice_list = ["riccardo_fasol", "lisa", "Italian", "silvia"]
         elif language[:2] == "kg":
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = ["Azamat", "Nazgul", "Kyrgyz+female1"]
             else:
                 _voice_list = ["Nazgul", "Azamat", "Kyrgyz"]
         elif language[:2] == "nl":
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = [
                     "nathalie",
                     "bart_de_leeuw",
@@ -1153,12 +1163,12 @@ class SpdFormats(object):
                     "Dutch",
                 ]
         elif language[:2] == "pl":
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = ["Magda", "Natan", "Polish+female1"]
             else:
                 _voice_list = ["Natan", "Magda", "Polish"]
         elif language[:2] == "ru":
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = [
                     "Anna",
                     "Elena",
@@ -1181,32 +1191,55 @@ class SpdFormats(object):
                     "Russian",
                 ]
         elif language[:2] == "sv":
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = ["talesyntese", "Swedish+female1"]
             else:
                 _voice_list = ["talesyntese", "Swedish"]
         elif language[:2] == "sw":
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = ["biblia_takatifu", "Swahili+female1"]
             else:
                 _voice_list = ["biblia_takatifu", "Swahili"]
         elif language[:2] == "uk":
-            if self._switch_to_female(voice):
+            if is_female(voice):
                 _voice_list = ["Natalia", "Anatol", "Ukrainian+female1"]
             else:
                 _voice_list = ["Anatol", "Natalia", "Ukrainian"]
         else:
-            _voice_list = [voice]
-        for test_voice in _voice_list:
-            if test_voice in _client_voices:
-                try:
-                    self.client.set_synthesis_voice(test_voice)
-                    break
-                except (AttributeError, SyntaxError, TypeError):
-                    pass
-        self.client.speak(_message)
-        time.sleep(_time)
-        self.client.close()
+            _voice_list = None
+        if _display_voice:
+            try:
+                if _display_voice.lower() in [
+                    "child_female",
+                    "child_male",
+                    "female1",
+                    "female2",
+                    "female3",
+                    "male1",
+                    "male2",
+                    "male3",
+                ]:
+                    self.client.set_voice(_display_voice)
+                elif _voice_list:
+                    if _client_voices:
+                        for check_voice in _voice_list:
+                            if check_voice.lower() == _display_voice.lower():
+                                if check_voice in _client_voices:
+                                    self.client.set_synthesis_voice(check_voice)
+                                    break
+            except (
+                AttributeError,
+                IOError,
+                SyntaxError,
+                TypeError,
+                speechd.SSIPCommandError,
+                speechd.SSIPCommunicationError,
+            ):
+                pass
+        self.client.set_cap_let_recogn("none")
+        monitor = SpeechMonitor(self.client, _message)
+        monitor.start()
+        monitor.join()
         readtexttools.unlock_my_lock()
         return True
 
@@ -1234,18 +1267,18 @@ class SpdFormats(object):
                 return string_list[:-1].split(":")
         return None
 
-    def list_synthesis_voices(self, _language=""):  # -> (tuple | None)
+    def list_synthesis_voices(self, _language=""):  # -> (list | None)
         """List synthesis voices. i. e.: ('Alan', 'southern_english_male',
         'northern_english_male', 'Slt',...)"""
-        string_list = ""
+        string_list = []
         if bool(self.client):
-            for _item in self.client.list_synthesis_voices():
-                if bool(_language):
-                    if _language in [_item[1], _item[2]]:
-                        string_list = string_list + _item[0] + ":"
-                else:
-                    string_list = string_list + _item[0] + ":"
-            return string_list[:-1].split(":")
+            if _language:
+                _concise_lang = _language.split("_")[0].split("-")[0]
+                for _item in self.client.list_synthesis_voices():
+                    if _item[1].startswith(_concise_lang):
+                        string_list.append(_item[2])
+            if string_list:
+                return string_list
         return None
 
     def list_output_modules(self):  # -> (tuple | None)
@@ -1254,6 +1287,11 @@ class SpdFormats(object):
         if bool(self.client):
             return self.client.list_output_modules()
         return None
+
+    def get_output_module(self):
+        """Get the current output module"""
+        if bool(self.client):
+            return self.client.get_output_module()
 
     def revise_client_id(self, client_id=""):
         """Use a specific client string instead of the default."""
@@ -2206,6 +2244,7 @@ class SayFormats(object):
         _module = ""
         _sd_rate = ""
         _type_or_voice = ""
+        _result = 0
 
         if not _rate in ["100%", "100", "", 100, 0, False]:
             rval = _spd_formats.percent_to_spd(_rate)
@@ -2236,17 +2275,21 @@ class SayFormats(object):
                 print(75 * "-")
             else:
                 print(_command)
+        _txt = _spd_formats.fixed_text_from_file(_file_spec, _language)
+        readtexttools.write_plain_text_file(
+            _file_spec, _txt, sys.getfilesystemencoding()
+        )
         _result = os.system(_command)
         # `time.sleep(1)` is blocking the thread to avoid a duplicate
         # system `spd-say` execution process:
         time.sleep(1)
         if "spd-say -C" not in _command:
+            print("\n")
             for item in ["sed", "spd-say"]:
                 readtexttools.killall_process(item)
+            _result = 0
         readtexttools.unlock_my_lock("lock")
         return _result == 0
-
-    def prefer_spd_say(self, _visible=False):  # -> boolean
         """Use criteria to choose `spd-say`. The Linux python `speechd`
         library is installed by default on many distributions, so making
         it available ensures that the extension works on new installations.
@@ -2267,6 +2310,9 @@ class SayFormats(object):
             return False
 
         if sys.version_info < (3, 6):
+            return True
+
+        if readtexttools.using_container(True):
             return True
 
         if USE_SPEECHD and not _visible:
@@ -2332,6 +2378,39 @@ you encounter issues with the extension using `spd-say`. For example:
                 )
         return False
 
+    def prefer_spd_say(self, _visible=False):  # -> boolean
+        """Use criteria to choose `spd-say`. The Linux python `speechd`
+        library is installed by default on many distributions, so making
+        it available ensures that the extension works on new installations.
+
+        If you use the default speechd library using third party speech
+        models like `libttspico-utils` or `piper-tts` with the python
+        speechd library, the speech might occasionally stop before it
+        should. This does not happen if the extensions uses the `spd-say`
+        program.
+
+        You can manually force the extension to use `spd-say` in the main
+        menu of the extension using `"(SPD_READ_TEXT_PY)" --visible True ...`
+        which enables checking the strings while the application is reading
+        text aloud in a command terminal running the application. This
+        routine determines if it `spd-say` is available and appropriate.
+        """
+        if not os.path.isfile("/usr/bin/spd-say"):
+            return False
+
+        if sys.version_info < (3, 6):
+            return True
+
+        if readtexttools.using_container(True):
+            return True
+
+        if USE_SPEECHD and not _visible:
+            return False
+
+        if not USE_SPEECHD or _visible:
+            return True
+        return False
+
     def spd_main(
         self,
         _file_spec="",
@@ -2345,6 +2424,8 @@ you encounter issues with the extension using `spd-say`. For example:
         _visible=False,
     ):
         """Posix system speech tool"""
+        if not os.path.isfile(_file_spec):
+            return False
         _spd_formats = SpdFormats()
         _imported_metadata = readtexttools.ImportedMetaData()
         _netsplitlocal = netsplit.LocalHandler()
@@ -2352,17 +2433,20 @@ you encounter issues with the extension using `spd-say`. For example:
         _is_dev = self.debug != 0
         _word_rate = 160
         i_rate = 0
-        try:
-            if _rate.endswith("%"):
-                _rate = int(readtexttools.remove_unsafe_chars(_rate))
-                i_rate = _rate * 0.01
-                _word_rate = netcommon.speech_wpm(_rate)
-            else:
-                i_rate = int(readtexttools.remove_unsafe_chars(_rate))
-        except ValueError:
-            i_rate = 0
-        if not os.path.isfile(_file_spec):
-            return False
+        if _rate in ["100%", 160]:
+            pass
+        else:
+            try:
+                if _rate.endswith("%"):
+                    _rate = int(readtexttools.remove_unsafe_chars(_rate))
+                    i_rate = _rate * 0.01
+                    _word_rate = netcommon.speech_wpm(_rate)
+                else:
+                    i_rate = int(readtexttools.remove_unsafe_chars(_rate))
+            except ValueError:
+                i_rate = 0
+                _word_rate = 160
+
         _spd_formats.revise_client_id(_client_id)
 
         if os.path.isfile("/usr/bin/say"):
@@ -2478,23 +2562,31 @@ you encounter issues with the extension using `spd-say`. For example:
             # speechd library. (Essentially, the script will ignore the rate, language, pitch and
             # other options that any third party implementation of speechd does not support.)
             #
-            #################################f#####################################################
+            #######################################################################################
             _spd_formats = SpdFormats()
             if _voice.upper() in _spd_formats.spd_voices:
                 _voice = _voice.lower()
             elif "male" in _voice.lower() or "child" in _voice.lower():
                 _voice = _voice.lower()
+
             if _update_local:
                 if sys.version_info >= (3, 6):
                     print(
-                        """You have requested an update to local `speech dispatcher` settings with
-`python {0}.{1}`.
+                        """You have requested an update to local `speech dispatcher`
+ settings with `python {0}.{1}`.
 
 This could change local `{2}` voice model characteristics of other
-applications that use speech synthesis like Firefox and Thoriums Reader.
+applications that use speech synthesis like [Firefox][1] and
+[Thorium Reader][2].
 
-You can revert or edit speech settings using a settings editor like **Pied**
-or the `spd-config` program using the terminal.""".format(
+You can revert or edit speech settings using a settings editor like
+**[Pied][3]** or the [`spd-config`][4] program using the terminal.
+
+[1]: https://www.firefox.com
+[2]: https://thorium.edrlab.org
+[3]: https://pied.mikeasoft.com
+[4]: https://htmlpreview.github.io/?https://github.com/brailcom/speechd/blob/master/doc/speech-dispatcher.html
+""".format(
                             sys.version_info.major, sys.version_info.minor, _language
                         )
                     )
@@ -2509,6 +2601,7 @@ no change to local settings.
 """
                     )
             if self.prefer_spd_say(_visible):
+
                 if self.spd_main_fallback(
                     _file_spec,
                     _client_id,
@@ -2548,13 +2641,16 @@ or platform. Try a networked speech tool like `mimic-server` or `docker-marytts`
                     _max_message_len = 4999
                     # Use netsplit with `re` to split long text into shorter text taking
                     # into account internationally supported languages and writing systems.
-                    _phrase = "" 
+                    _phrase = ""
                     if len(_web_message) > _max_message_len:
                         items = _netsplitlocal.create_play_list(_web_message, _language)
                         for _phrase in items:
                             if _phrase:
-                                _phrase = (str(_phrase).trim())
-                                if len(_phrase) > 0 and not len(_phrase) > _max_message_len:
+                                _phrase = str(_phrase).trim()
+                                if (
+                                    len(_phrase) > 0
+                                    and not len(_phrase) > _max_message_len
+                                ):
                                     _web_message = _phrase
                                     break
                     if len(_web_message) == 0 or len(_web_message) > _max_message_len:
@@ -2662,6 +2758,7 @@ def main():
             sys.exit()
         else:
             assert False, "unhandled option"
+
     _say_formats.spd_main(
         _file_spec,
         _client_id,

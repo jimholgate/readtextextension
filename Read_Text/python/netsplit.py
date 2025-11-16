@@ -40,20 +40,20 @@ class LocalHandler(object):
 
     def create_play_list(self, _text="", _lang_str="en", _verbose=True):  # -> list
         """
-    Splits a long string of sentences or paragraphs into a list
-    using local punctuation and line endings.
+        Splits a long string of sentences or paragraphs into a list
+        using local punctuation and line endings.
 
-    Example:
-        - `create_play_list("Bye! Sleep Well!", "en", False)`
+        Example:
+            - `create_play_list("Bye! Sleep Well!", "en", False)`
 
-    Args:
-        _text (str): The text to split.
-        _lang_str (str): A short ISO language code, e.g., 'en'.
-        _verbose (bool): Print the exception if it occurs.
+        Args:
+            _text (str): The text to split.
+            _lang_str (str): A short ISO language code, e.g., 'en'.
+            _verbose (bool): Print the exception if it occurs.
 
-    Returns:
-        list
-    """
+        Returns:
+            list
+        """
         # <https://raw.githubusercontent.com/nvaccess/nvda/refs/heads/master/source/locale/en/symbols.dic>
         #
         # This project includes files that are a part of the NonVisual
@@ -61,7 +61,6 @@ class LocalHandler(object):
         # Contributors. Licensed under the GNU General
         # Public License (GPL). For full licensing terms, see:
         # https://github.com/nvaccess/nvda#readme
-
 
         if not _text.strip():
             return []
@@ -292,7 +291,12 @@ def is_valid_short_fragment(text="", limit=3):  # -> bool
         return True
 
     # Capitalized abbreviations up to the value of `limit` letters + period
-    if 3 <= len(s) <= limit + 1 and s[:-1].isalpha() and s[0].isupper() and s[1:].islower():
+    if (
+        3 <= len(s) <= limit + 1
+        and s[:-1].isalpha()
+        and s[0].isupper()
+        and s[1:].islower()
+    ):
         return True
 
     return False

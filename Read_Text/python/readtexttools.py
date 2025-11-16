@@ -33,15 +33,19 @@ trimmed image as a `jpg` or `png` image file.
 Experimental issues
 -------------------
 
-Experimental codecs might produce bad results.  If the command line includes
-`-strict experimental`, check the output file on different devices.
+Some encoders in a Linux distribution could be incomplete or not fully
+tested.  If the command line includes a `-strict experimental` flag,
+check the output file on different devices to make sure that the media
+files work. For example, some legacy MP3 "compatible" files would crash
+Firefox or have limited application support.
 
 Python version
 --------------
 
-Currently, python3 is *required* for `speech-dispatcher`.  Python2 requires the
-`future` toolkit.  Unless you are using a library or tool that requires
- python2, use `python3` in the command line.
+Python 3 is *required* for some speech engines and support frameworks. 
+
+Python 2 works with a subset of available voice engines using the
+`__future__` library.
 
 [Read Text Extension](http://sites.google.com/site/readtextextension/)
 
@@ -50,11 +54,10 @@ Copyright (c) 2011 - 2025 James Holgate
 
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-import codecs
+import io
 import math
 import os
 
-# import re
 import string
 import sys
 import time
@@ -101,10 +104,9 @@ except (ImportError, AssertionError):
     pass
 
 try:
-    if os.name == "nt":
-        import psutil
+    import psutil
 except (ImportError, AssertionError):
-    pass
+    psutil = False
 
 try:
     import site
@@ -198,55 +200,81 @@ try:
 except (ImportError, AssertionError, SyntaxError):
     pass
 
-# try:
-#     # Python 2.7+: preserves insertion order
-#     from collections import OrderedDict
-# except ImportError:
-#     OrderedDict = dict
-
 LOOK_UPS = 0
 
 
-def killall_process(_process=""):  # -> bool
-    """If process is active, then stop it. Posix systems can use the posix
-    `killall` command. Windows uses the `pip3` `psutil` library. Returns
-    `True` if a process was stopped."""
-    _success = False
-    try:
-        for proc in psutil.process_iter():
-            if proc.name() == _process:
+# Shim: define subprocess.run if missing (Python < 3.5)
+if not hasattr(subprocess, "run"):
+    def run(*popenargs, **kwargs):
+        """
+        Minimal backport of subprocess.run for Python 2.7.
+        Returns a simple object with a .returncode attribute.
+        """
+        class CompletedProcess(object):
+            def __init__(self, returncode):
+                self.returncode = returncode
+
+        # Use subprocess.call under the hood
+        rc = subprocess.call(*popenargs, **kwargs)
+        return CompletedProcess(rc)
+
+    subprocess.run = run
+
+
+def killall_process(process_name=""):  # -> bool
+    """
+    Stop a process by name. Uses psutil if available, otherwise falls back
+    to platform-specific commands.
+
+    Args:
+        process_name (str): The name of the process to terminate.
+
+    Returns:
+        bool: True if at least one process was stopped, False otherwise.
+    """
+    success = False
+
+    if psutil:
+        for proc in psutil.process_iter(attrs=["name"]):
+            if proc.info["name"] == process_name:
                 proc.kill()
-                _success = True
-        return _success
-    except NameError:
+                success = True
+        return success
+    try:
         if os.name == "posix":
-            # `killall` might not be available to the script if it is running
-            # in a container that does not include the `killall` command.
-            return os.system("killall {0}".format(_process)) == 0
+            result = subprocess.run(["killall", process_name])
+            return result.returncode == 0
         elif os.name == "nt":
-            # /f force /im <imagename>
-            return os.system("taskkill /f /im {0}".format(_process)) == 0
-        print("WARNING: NameError in `killall_process`. Requires pip3 `psutil`")
+            result = subprocess.run(["taskkill", "/f", "/im", process_name])
+            return result.returncode == 0
+    except Exception as e:
+        print("Exception: ", e)
+
     return False
 
 
 def write_plain_text_file(_file_path="", _body_text="", scodeco="utf-8"):  # -> bool
     """
     Create a plain text file.
-    `write_plain_text_file("/path/file.txt", "Hello world", "utf-8")`
+    Example:
+        write_plain_text_file("/path/file.txt", "Hello world", "utf-8")
     """
-    if not bool(_file_path):
+    if not _file_path:
         return False
+
     try:
         if os.path.isfile(_file_path):
             os.remove(_file_path)
-        with codecs.open(
+        with io.open(
             _file_path, mode="w", encoding=scodeco, errors="replace"
         ) as file_obj:
             file_obj.write(_body_text)
-            file_obj.close()
-    except (ValueError, UnicodeEncodeError, UnicodeDecodeError, PermissionError):
-        print("`write_plain_text_file` error in readtexttools.py")
+
+    except (ValueError, UnicodeEncodeError, UnicodeDecodeError, IOError, OSError) as e:
+        # PermissionError is a subclass of OSError in Python 3, not available in 2.7
+        print("`write_plain_text_file` error in readtexttools.py: {}".format(e))
+        return False
+
     return os.path.isfile(_file_path)
 
 
@@ -521,17 +549,23 @@ def net_error_icon():  # -> string
 
 
 def strip_mojibake(concise_lang="en", _raw_text="", _strict=False):  # -> str
-    """If possible, remove parts of text strings containing characters that a
-    speech synthesizer cannot pronounce correctly.
+    """
+    Remove parts of text strings containing characters that a speech synthesizer
+    cannot pronounce correctly.
 
-    * `concise_lang` - The language in the form `en` or `en-US`
-    * `_raw_text` - The text to check and modify
-    * `_strict` - If not strict, then use all supported unicode characters if
-      the text contains western European accented characters that English
-      might employ. (i. e.: café, cliché, La Niña...). If strict, allow
-      only plain characters (i. e.: computer safe code). `utf-8` encoded text
-      uses `ascii` for the first 127 characters and `latin-1` for the first
-      255 characters."""
+    Args:
+        concise_lang (str): The language code, e.g. "en" or "en-US".
+        _raw_text (str): The text to check and modify.
+        _strict (bool):
+            - If False, allow all supported Unicode characters, including
+              Western European accented characters (e.g., café, cliché, La Niña).
+            - If True, allow only plain ASCII characters (computer-safe code).
+              UTF-8 encoded text uses ASCII for the first 127 characters and
+              Latin-1 for the first 255 characters.
+
+    Returns:
+        str: The cleaned text string."""
+
     rare_chars = "ĿŀǾǿĲĳŠšŽžŠšŽžŒœŸÿẞŐőŰűḂḃĊċḊḋḞḟĠġṀṁṖṗṠṡṪṫẀẁẂẃŴŵẄẅỲỳŶŷŸ"
     if _strict:
         _ubound = 126
@@ -586,7 +620,7 @@ def strip_mojibake(concise_lang="en", _raw_text="", _strict=False):  # -> str
         if len(set(_raw_text).intersection(rare_chars)) == 0:
             try:
                 returnval = set(_raw_text).intersection(safe_chars)
-                return returnval.strip("\n\t .;\\{\\}()[]")
+                return returnval.strip("\n\t ;\\{\\}()[]")
             except AttributeError:
                 pass
     elif concise_lang in ["haw", "roo", "sw"]:
@@ -596,7 +630,7 @@ def strip_mojibake(concise_lang="en", _raw_text="", _strict=False):  # -> str
         _coding = "utf-8"
     try:
         _code = _raw_text.encode(_coding, "ignore")
-        return _code.decode("utf-8", "ignore").strip("\n\t .;\\{\\}()[]")
+        return _code.decode("utf-8", "ignore").strip("\n\t ;\\{\\}()[]")
     except LookupError:
         return _raw_text
 
@@ -2687,37 +2721,41 @@ track={track}""".format(
         self, _file_path="", erase=False, _errors="backslashreplace"
     ):  # -> str
         """If the specified text file exists, then return the contents,
-        otherwise return `''`."""
+        otherwise return ''.
+        """
         return_value = ""
         _encoding = "utf-8"
-        if os.name == "nt":
-            if sys.stdin.encoding != _encoding:
-                _encoding = "utf_8_sig"
+
+        # On Windows, use UTF-8 with BOM if stdin encoding differs
+        if os.name == "nt" and sys.stdin.encoding != _encoding:
+            _encoding = "utf_8_sig"
+
+        if not os.path.isfile(_file_path):
+            return ""
+
         try:
-            if os.path.isfile(_file_path):
-                f = codecs.open(
-                    _file_path, mode="r", encoding=_encoding, errors=_errors
-                )
+            with io.open(_file_path, mode="r", encoding=_encoding, errors=_errors) as f:
                 return_value = f.read()
-                f.close()
-                if erase:
-                    try:
-                        os.remove(_file_path)
-                    except:
-                        pass
-                return return_value
-            else:
-                return ""
+
+            if erase:
+                try:
+                    os.remove(_file_path)
+                except OSError:
+                    pass
+
+            return return_value
+
         except UnicodeDecodeError:
+            # Retry with backslashreplace if decoding fails
             return_value = self.meta_from_file(_file_path, erase, "backslashreplace")
             print(
-                """WARNING: Could not decode characters in the file:
-`{0}`""".format(
+                "WARNING: Could not decode characters in the file:\n`{0}`".format(
                     _file_path
                 )
             )
             return return_value
-        except Exception:
+
+        except (IOError, OSError, ValueError):
             return ""
 
     def _get_meta_field(
@@ -3747,11 +3785,17 @@ def show_with_app(_out):  # -> bool
 
 def path2url(_file_path):  # -> str
     """Convert a file path to a file URL"""
+    abs_path = os.path.abspath(_file_path)
+    if sys.version_info >= (3, 4):
+        path = pathlib.Path(abs_path)
+        if path:
+            return path.as_uri()
+        return ""
     try:
-        return urlparse.urljoin("file:", urllib.pathname2url(_file_path))
+        return urlparse.urljoin("file:", urllib.pathname2url(abs_path))
     except NameError:
         # Fall back works on Posix
-        return "file://{0}".format(_file_path.replace(" ", "%20"))
+        return "file://{0}".format(abs_path.replace(" ", "%20"))
 
 
 def office_user_dir(_top="uno_packages"):  # -> str
@@ -3827,125 +3871,6 @@ def uses_international_phonetic_alphabet(_str_test=""):  # -> bool
     return False
 
 
-# class LexiconEdit(object):
-#     """Lexicon Tools"""
-#     def __init__(self):
-#         """Lexicon Tools"""
-#         self.ctr_re = re.compile(
-#             r'[\x00-\x1F\x7F]'  # C0 controls + delete
-#         )
-#         self.json_path = ""
-#         self.json_data = None
-#         self.json_text = None
-#         self.item_index = 0
-
-#     def merge_and_reserialize_lexicon(self, path, overwrite=True):
-#         """
-#         Returns the updated lexicon JSON (one entry per line),
-#         sorted by line-length, or "" on any error.
-#         """
-#         def update_line_prefix(_line, path, i):
-#             _, _filename = os.path.split(path)
-#             if not _filename:
-#                 return _line
-
-#             label = "{0}{1}".format(
-#                 _filename.replace("lexicon.json", ""),
-#                 prefix_ohs(i + 1, 5, "0"),
-#                 )  #  i. e.: `en-CA_`
-#             # "DT_2025-08-05_09-00-32":{"g":"mL","p":"millilitre"},
-#             if not """"g":""" in _line or not """"p":""" in _line:
-#                 return _line
-#             _, _data = _line.split(':', 1)
-#             return "{0}:{1}".format(label, _data)
-
-
-#         def sanitize(s, escape_forward_slash=False):
-#             if sys.version_info[0] < 3 and isinstance(s, str):
-#                 # decode bytes to unicode using utf-8
-#                 s = s.decode('utf-8', errors='ignore')
-#             # 1. Normalize unicode
-#             s_norm = unicodedata.normalize('NFC', s)
-
-#             # 2. Remove C0 control chars
-#             s_clean = self.ctr_re.sub('', s_norm)
-
-#             # 3. Escape via json encoder pieces
-#             # Leverage json.dumps to handle most escapes, then strip surrounding quotes
-#             encoded = json.dumps(s_clean, ensure_ascii=False)
-#             # encoded is like '"text with \"quotes\" and \\slashes"'
-#             # strip leading/trailing "
-#             s_escaped = encoded[1:-1]
-
-#             # Optionally escape forward slash
-#             if escape_forward_slash:
-#                 s_escaped = s_escaped.replace('/', r'\/')
-
-#             # 4. Collapse whitespace
-#             s_final = re.sub(r'\s+', ' ', s_escaped).strip()
-#             return s_final
-
-#         def fmt_json_line(key, val):
-#             v = val.copy()
-#             for kk, xx in v.items():
-#                 if isinstance(xx, basestring):
-#                     v[kk] = sanitize(xx)
-#             body = json.dumps(v, ensure_ascii=False, separators=(",", ": "))
-#             return '    "{0}": {1}'.format(key, body)
-
-#         def is_meta_data(g):
-#             tests = (
-#                 "$[LOCALE]",
-#                 "$[REVISION]",
-#                 "\\u0024[LOCALE]",
-#                 "\\u0024[REVISION]",
-#             )
-#             return any(t in g for t in tests)
-
-#         try:
-#             # 1. load file, preserve file order so user edits win
-#             with codecs.open(
-#                 path, mode="r", encoding="utf-8", errors="replace"
-#             ) as file_obj:
-#                 data = json.load(file_obj, object_pairs_hook=OrderedDict)
-#                 self.item_index = 0
-#             # 2. dedupe on "g" field
-#             seen_g = set()
-#             filtered = OrderedDict()
-#             for key, val in data.items():
-#                 gval = val.get("g")
-#                 if gval in seen_g:
-#                     continue
-#                 if is_meta_data(gval):
-#                     continue
-#                 seen_g.add(gval)
-#                 filtered[key] = val
-
-#             # 3. render each item on one line, then sort by length
-#             lines = [fmt_json_line(k, v) for k, v in filtered.items()]
-#             lines.sort(key=len)
-
-#             # 4. build result string
-#             out = ["{"]
-#             for i, line in enumerate(lines):
-#                 eline = update_line_prefix(line, path, i)
-#                 comma = "," if i < len(lines) - 1 else ""
-#                 out.append(eline + comma)
-#             out.append("}")
-#             result = "\n".join(out) + "\n"
-
-#             # 5. write back and return JSON
-#             if overwrite:
-#                 with codecs.open(path, mode="w", encoding="utf-8", errors="replace") as file_obj:
-#                     file_obj.write(result)
-
-#             return result
-
-#         except Exception:
-#             # any failure => empty string
-#             return ""
-
-
 def local_pronunciation(
     iso_lang="en-CA",
     text="",
@@ -3969,7 +3894,6 @@ def local_pronunciation(
     _used_graphemes = [""]
     _good_list = []
     _user_dir = os.path.join(office_user_dir(), "config", "lexicons", my_dir)
-
     if my_env in os.environ:
         _user_dir = os.getenv(my_env)
     for _lang in [iso_lang, iso_lang.split("-")[0].split("_")[0]]:
@@ -4000,17 +3924,14 @@ file for `{1}` was found.""".format(
         return [text, _json_text]
     _date = time.strftime("%Y-%m-%d_%H:%M:%S")
     try:
-        _content = ""
-        with codecs.open(
+        data = None
+        with io.open(
             _json_file, mode="r", encoding="utf-8", errors="replace"
         ) as file_obj:
             _content = file_obj.read()
-        with codecs.open(
-            _json_file, mode="r", encoding="utf-8", errors="replace"
-        ) as file_obj:
-            data = json.load(file_obj)
+            data = json.loads(_content)
             l_text = text.lower()
-            if bool(data):
+            if data:
                 if is_dev:
                     # return json with standard formatting and
                     # removing duplicate graphemes in list item
@@ -4446,7 +4367,11 @@ def play_wav_no_ui(file_path=""):  # -> bool
     else:
         _audio_play = PosixAudioPlayers()
         _command = _audio_play.player_command(file_path, True)
+
         if len(_command) == 0:
+            if not os.path.isfile(file_path):
+                return False
+            uri_path = path2url(file_path)
             try:
                 if bool(Gst):
                     _pipe = 'playbin uri="{0}" '.format(uri_path)

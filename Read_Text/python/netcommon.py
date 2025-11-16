@@ -5,8 +5,6 @@
 import io
 import math
 import os
-import string
-import subprocess
 import time
 import wave
 

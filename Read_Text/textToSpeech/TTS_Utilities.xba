@@ -6645,7 +6645,7 @@ Sub windowsSAPIControl(Event As Object)
 				)
 					If b_response Then
 						myBeep()
-						webHelp(fsLocalHostSpeech())
+						webHelp(LocalHostSpeechWebDisplayURL)
 						Exit Sub
 					End If
 				Next

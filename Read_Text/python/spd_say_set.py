@@ -54,9 +54,10 @@ file that `[pied][3]` creates, but it does differ in a few ways.
 [4]: https://huggingface.co/rhasspy/piper-voices/tree/main
 """
 
-import codecs
+import io
 import os
 import sys
+
 try:
     import piper_read_text
 except (AttributeError, SyntaxError, TypeError):
@@ -202,11 +203,7 @@ AddVoice "{4}" "MALE1" "Piper"
             except (NameError, ValueError):
                 pass
         if not _configuration_code:
-            print(
-                "Evaluating `{0}` to get a numeric speaker code.".format(
-                    _search
-                )
-            )
+            print("Evaluating `{0}` to get a numeric speaker code.".format(_search))
             _configuration_code = self.piper_code(
                 _piper.app, _first_result, _piper.use_specific_onnx_voice_no
             )
@@ -219,13 +216,19 @@ AddVoice "{4}" "MALE1" "Piper"
                     os.makedirs(_dir)
                 except:
                     return False
-        speechdconf_text = ""
+
         if os.path.isfile(self.speechd_conf):
-            f = codecs.open(
-                self.speechd_conf, mode="r", encoding="utf-8", errors="backslashreplace"
-            )
-            speechdconf_text = f.read()
-            f.close()
+            try:
+                with io.open(
+                    self.speechd_conf,
+                    mode="r",
+                    encoding="utf-8",
+                    errors="backslashreplace",
+                ) as f:
+                    speechdconf_text = f.read()
+            except IOError as e:
+                print("Error opening speechd.conf: {}".format(e))
+                return False
         _conf_ok = True
         if not 'DefaultModule "piper"' in speechdconf_text:
             _conf_ok = readtexttools.write_plain_text_file(
@@ -234,12 +237,20 @@ AddVoice "{4}" "MALE1" "Piper"
         if not _conf_ok:
             return False
         piper_conf_text = ""
+
         if os.path.isfile(self.piper_conf):
-            f = codecs.open(
-                self.piper_conf, mode="r", encoding="utf-8", errors="backslashreplace"
-            )
-            piper_conf_text = f.read()
-            f.close()
+            try:
+                with io.open(
+                    self.piper_conf,
+                    mode="r",
+                    encoding="utf-8",
+                    errors="backslashreplace",
+                ) as f:
+                    piper_conf_text = f.read()
+            except IOError as e:
+                print("Error opening piper.conf: {}".format(e))
+                piper_conf_text = None
+
         if self.piper_conf_values.strip() in piper_conf_text:
             if verbose:
                 print("The existing `piper.conf` settings file is current.")

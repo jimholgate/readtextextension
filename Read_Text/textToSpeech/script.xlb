@@ -4,6 +4,6 @@
  <library:element library:name="TTS_Indices"/>
  <library:element library:name="TTS_Utilities"/>
  <library:element library:name="TTS_Config"/>
- <library:element library:name="ThirdPartyCode"/>
  <library:element library:name="TextToSpeech"/>
+ <library:element library:name="ThirdPartyCode"/>
 </library:library>

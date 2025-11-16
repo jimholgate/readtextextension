@@ -66,7 +66,7 @@ import readtexttools
 from urllib.parse import quote
 
 try:
-    import codecs
+    import io
     import getopt
     import webbrowser
 except (ImportError, AssertionError, AttributeError):
@@ -276,9 +276,8 @@ def main():  # -> NoReturn
         if not os.path.isfile(_text_file_in):
             usage()
             sys.exit(0)
-        _file_handle = codecs.open(_text_file_in, mode="r", encoding="utf-8")
-        _content = _file_handle.read()
-        _file_handle.close()
+        with io.open(_text_file_in, mode="r", encoding="utf-8", errors="replace") as f:
+            _content = f.read()
         qrencode(_content, _image_out, _size, _level, _fill_color, _back_color)
     else:
         print("I was unable to find the file you specified!")
