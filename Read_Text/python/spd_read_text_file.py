@@ -1965,11 +1965,12 @@ class SayFormats(object):
         library is installed by default on many distributions, so making
         it available ensures that the extension works on new installations.
 
-        If you use the default speechd library using third party speech
-        models like `libttspico-utils` or `piper-tts` with the python
-        speechd library, the speech might occasionally stop before it
-        should. This does not happen if the extensions uses the `spd-say`
-        program.
+        If you use the default speechd library and it does not behave as
+        expected, you may be able to force the system to use a command
+        line program called `spd-say` instead. As an example, the python
+        speechd is normally unavailable to versions of the application
+        that use an unsupported version of python or are limited due to
+        the application's security settings. 
 
         You can manually force the extension to use `spd-say` in the main
         menu of the extension using `"(SPD_READ_TEXT_PY)" --visible True ...`
