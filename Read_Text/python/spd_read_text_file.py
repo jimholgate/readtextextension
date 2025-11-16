@@ -858,8 +858,6 @@ Speech Dispatcher
         self.client.set_data_mode(self.xml_tool.use_mode)
         self.client.set_punctuation(speechd.PunctuationMode.SOME)
         _voice_list = None
-        is_female = self._switch_to_female
-        # Try to match requested gender and locale for supported synthesizers
         try:
             _client_voices = self.list_synthesis_voices(
                 language.split("-")[0].split("_")[0]
@@ -867,348 +865,14 @@ Speech Dispatcher
         except Exception as e:
             print("Exception (list client voices):", e)
             _client_voices = None
-        if language[:2] == "de":
-            if is_female(voice):
-                _voice_list = [
-                    "eva_k",
-                    "hokuspokus",
-                    "kerstin",
-                    "rebecca_braunert_plunkett",
-                    "sabrina",
-                    "karlsson",
-                    "pavoque",
-                    "thorsten",
-                    "German+female1",
-                ]
-            else:
-                _voice_list = [
-                    "karlsson",
-                    "pavoque",
-                    "thorsten",
-                    "eva_k",
-                    "hokuspokus",
-                    "kerstin",
-                    "rebecca_braunert_plunkett",
-                    "German",
-                    "sabrina",
-                ]
-        elif language in ["en-AS", "en-PH", "en-PR", "en-UM", "en-US", "en-VI"]:
-            if is_female(voice):
-                _voice_list = [
-                    "Slt",
-                    "cmu_slt",
-                    "Clb",
-                    "cmu_clb",
-                    "ek",
-                    "harvard",
-                    "judy_bieber",
-                    "kathleen",
-                    "ljspeech",
-                    "cmu_eey",
-                    "cmu_ljm",
-                    "cmu_lnh",
-                    "blizzard_lessac",
-                    "mary_ann",
-                    "samantha",
-                    "blizzard_fls",
-                    "southern_english_female",
-                    "cmu_slp",
-                    "Bdl",
-                    "cmu_bdl",
-                    "Alan",
-                    "southern_english_male",
-                    "northern_english_male",
-                    "cmu_ahw",
-                    "cmu_aup",
-                    "cmu_fem",
-                    "cmu_jmk",
-                    "cmu_ksp",
-                    "cmu_rms",
-                    "cmu_rxr",
-                    "scottish_english_male",
-                    "English (America)+female1",
-                ]
-            else:
-                _voice_list = [
-                    "Bdl",
-                    "cmu_bdl",
-                    "Alan",
-                    "southern_english_male",
-                    "northern_english_male",
-                    "cmu_ahw",
-                    "cmu_aup",
-                    "cmu_fem",
-                    "cmu_jmk",
-                    "cmu_ksp",
-                    "cmu_rms",
-                    "cmu_rxr",
-                    "scottish_english_male",
-                    "Clb",
-                    "cmu_clb",
-                    "ek",
-                    "harvard",
-                    "judy_bieber",
-                    "kathleen",
-                    "ljspeech",
-                    "cmu_eey",
-                    "cmu_ljm",
-                    "cmu_lnh",
-                    "Slt",
-                    "cmu_slt",
-                    "blizzard_lessac",
-                    "mary_ann",
-                    "samantha",
-                    "blizzard_fls",
-                    "southern_english_female",
-                    "cmu_slp",
-                    "English (America)+male1",
-                ]
-        elif language == "en-IN":
-            if is_female(voice):
-                _voice_list = [
-                    "cmu_slp",
-                    "serena",
-                    "blizzard_fls",
-                    "southern_english_female",
-                    "blizzard_lessac",
-                    "mary_ann",
-                    "Slt",
-                    "cmu_slt",
-                    "Clb",
-                    "cmu_clb",
-                    "ek",
-                    "harvard",
-                    "judy_bieber",
-                    "kathleen",
-                    "ljspeech",
-                    "cmu_eey",
-                    "cmu_ljm",
-                    "cmu_lnh",
-                    "cmu_ahw",
-                    "Alan",
-                    "southern_english_male",
-                    "northern_english_male",
-                    "cmu_aew",
-                    "cmu_aup",
-                    "cmu_fem",
-                    "cmu_jmk",
-                    "cmu_ksp",
-                    "cmu_rms",
-                    "cmu_rxr",
-                    "scottish_english_male",
-                    "Bdl",
-                    "cmu_bdl",
-                    "English+female1",
-                ]
-            else:
-                _voice_list = [
-                    "cmu_ahw",
-                    "Alan",
-                    "southern_english_male",
-                    "northern_english_male",
-                    "cmu_aew",
-                    "cmu_aup",
-                    "cmu_fem",
-                    "cmu_jmk",
-                    "cmu_ksp",
-                    "cmu_rms",
-                    "cmu_rxr",
-                    "scottish_english_male",
-                    "Bdl",
-                    "cmu_bdl",
-                    "blizzard_lessac",
-                    "mary_ann",
-                    "cmu_slp",
-                    "Clb",
-                    "cmu_clb",
-                    "ek",
-                    "harvard",
-                    "judy_bieber",
-                    "kathleen",
-                    "ljspeech",
-                    "cmu_eey",
-                    "cmu_ljm",
-                    "cmu_lnh",
-                    "Slt",
-                    "cmu_slt",
-                    "serena",
-                    "blizzard_fls",
-                    "southern_english_female",
-                    "English",
-                ]
-        elif language[:2] == "en":
-            if is_female(voice):
-                _voice_list = [
-                    "serena",
-                    "blizzard_fls",
-                    "southern_english_female",
-                    "blizzard_lessac",
-                    "mary_ann",
-                    "cmu_slp",
-                    "Slt",
-                    "cmu_slt",
-                    "Clb",
-                    "cmu_clb",
-                    "ek",
-                    "harvard",
-                    "judy_bieber",
-                    "kathleen",
-                    "ljspeech",
-                    "cmu_eey",
-                    "cmu_ljm",
-                    "cmu_lnh",
-                    "Alan",
-                    "southern_english_male",
-                    "northern_english_male",
-                    "cmu_aew",
-                    "cmu_ahw",
-                    "cmu_aup",
-                    "cmu_fem",
-                    "cmu_jmk",
-                    "cmu_ksp",
-                    "cmu_rms",
-                    "cmu_rxr",
-                    "scottish_english_male",
-                    "Bdl",
-                    "cmu_bdl",
-                    "English+female1",
-                ]
-            else:
-                _voice_list = [
-                    "Alan",
-                    "southern_english_male",
-                    "northern_english_male",
-                    "cmu_aew",
-                    "cmu_ahw",
-                    "cmu_aup",
-                    "cmu_fem",
-                    "cmu_jmk",
-                    "cmu_ksp",
-                    "cmu_rms",
-                    "cmu_rxr",
-                    "scottish_english_male",
-                    "Bdl",
-                    "cmu_bdl",
-                    "blizzard_lessac",
-                    "mary_ann",
-                    "Clb",
-                    "cmu_clb",
-                    "ek",
-                    "harvard",
-                    "judy_bieber",
-                    "kathleen",
-                    "ljspeech",
-                    "cmu_eey",
-                    "cmu_ljm",
-                    "cmu_lnh",
-                    "Slt",
-                    "cmu_slt",
-                    "serena",
-                    "blizzard_fls",
-                    "southern_english_female",
-                    "cmu_slp",
-                    "English",
-                ]
-        elif language[:2] == "es":
-            if is_female(voice):
-                _voice_list = ["karen_savage", "carlfm", "Spanish+female1", "isabel"]
-            else:
-                _voice_list = ["carlfm", "karen_savage", "Spanish", "isabel"]
-        elif language == "fr-CA":
-            if is_female(voice):
-                _voice_list = [
-                    "siwis",
-                    "tom",
-                    "gilles_le_blanc",
-                    "French+female1",
-                    "virginie",
-                ]
-            else:
-                _voice_list = ["tom", "gilles_le_blanc", "siwis", "French", "virginie"]
-        elif language[:2] == "fr":
-            if is_female(voice):
-                _voice_list = [
-                    "siwis",
-                    "gilles_le_blanc",
-                    "tom" "French+female1",
-                    "virginie",
-                ]
-            else:
-                _voice_list = ["gilles_le_blanc", "tom", "siwis", "French", "virginie"]
-        elif language[:2] == "it":
-            if is_female(voice):
-                _voice_list = ["lisa", "riccardo_fasol", "Italian+female1", "silvia"]
-            else:
-                _voice_list = ["riccardo_fasol", "lisa", "Italian", "silvia"]
-        elif language[:2] == "kg":
-            if is_female(voice):
-                _voice_list = ["Azamat", "Nazgul", "Kyrgyz+female1"]
-            else:
-                _voice_list = ["Nazgul", "Azamat", "Kyrgyz"]
-        elif language[:2] == "nl":
-            if is_female(voice):
-                _voice_list = [
-                    "nathalie",
-                    "bart_de_leeuw",
-                    "flemishguy",
-                    "rdh",
-                    "Dutch+female1",
-                ]
-            else:
-                _voice_list = [
-                    "bart_de_leeuw",
-                    "flemishguy",
-                    "rdh",
-                    "nathalie",
-                    "Dutch",
-                ]
-        elif language[:2] == "pl":
-            if is_female(voice):
-                _voice_list = ["Magda", "Natan", "Polish+female1"]
-            else:
-                _voice_list = ["Natan", "Magda", "Polish"]
-        elif language[:2] == "ru":
-            if is_female(voice):
-                _voice_list = [
-                    "Anna",
-                    "Elena",
-                    "Aleksandr",
-                    "Artemiy",
-                    "hajdurova",
-                    "minaev",
-                    "nikolaev",
-                    "Russian+female1",
-                ]
-            else:
-                _voice_list = [
-                    "Aleksandr",
-                    "Artemiy",
-                    "hajdurova",
-                    "minaev",
-                    "nikolaev",
-                    "Anna",
-                    "Elena",
-                    "Russian",
-                ]
-        elif language[:2] == "sv":
-            if is_female(voice):
-                _voice_list = ["talesyntese", "Swedish+female1"]
-            else:
-                _voice_list = ["talesyntese", "Swedish"]
-        elif language[:2] == "sw":
-            if is_female(voice):
-                _voice_list = ["biblia_takatifu", "Swahili+female1"]
-            else:
-                _voice_list = ["biblia_takatifu", "Swahili"]
-        elif language[:2] == "uk":
-            if is_female(voice):
-                _voice_list = ["Natalia", "Anatol", "Ukrainian+female1"]
-            else:
-                _voice_list = ["Anatol", "Natalia", "Ukrainian"]
-        else:
-            _voice_list = None
         if _display_voice:
             try:
+                # In this format, speech-dispatcher settings
+                # determine the voice to use for each category.
+                # Not all speech programs support all categories;
+                # so speech-dispatcher might use a default.
+                # **See**: `~/.config/speech-dispatcher` and
+                # `/usr/share/speech-dispatcher`
                 if _display_voice.lower() in [
                     "child_female",
                     "child_male",
@@ -1219,14 +883,19 @@ Speech Dispatcher
                     "male2",
                     "male3",
                 ]:
-                    self.client.set_voice(_display_voice)
-                elif _voice_list:
-                    if _client_voices:
-                        for check_voice in _voice_list:
-                            if check_voice.lower() == _display_voice.lower():
-                                if check_voice in _client_voices:
-                                    self.client.set_synthesis_voice(check_voice)
-                                    break
+                    self.client.set_voice(_display_voice.lower())
+
+                elif _client_voices:
+                    # `_client_voices` is a list, not a dictionary.
+                    # Example: `["Adam", "Alex", "Alicia", "UniversalRobot"]`
+                    # espeak-ng includes voices like `male4, male5` etc.
+                    # Speech apps use different character names and codes.
+                    # Setting the voice requires exact capitalization.
+                    if (
+                        _display_voice in _client_voices
+                        and _display_voice.lower() not in ["", "none"]
+                    ):
+                        self.client.set_synthesis_voice(_display_voice)
             except (
                 AttributeError,
                 IOError,
@@ -2290,93 +1959,6 @@ class SayFormats(object):
             _result = 0
         readtexttools.unlock_my_lock("lock")
         return _result == 0
-        """Use criteria to choose `spd-say`. The Linux python `speechd`
-        library is installed by default on many distributions, so making
-        it available ensures that the extension works on new installations.
-
-        If you use the default speechd library using third party speech
-        models like `libttspico-utils` or `piper-tts` with the python
-        speechd library, the speech might occasionally stop before it
-        should. This does not happen if the extensions uses the `spd-say`
-        program.
-
-        You can manually force the extension to use `spd-say` in the main
-        menu of the extension using `"(SPD_READ_TEXT_PY)" --visible True ...`
-        which enables checking the strings while the application is reading
-        text aloud in a command terminal running the application. This
-        routine determines if it `spd-say` is available and appropriate.
-        """
-        if not os.path.isfile("/usr/bin/spd-say"):
-            return False
-
-        if sys.version_info < (3, 6):
-            return True
-
-        if readtexttools.using_container(True):
-            return True
-
-        if USE_SPEECHD and not _visible:
-            for name in ["pico2wave", "piper", "piper-cls"]:
-                if self.is_program_available(name):
-                    return True
-            return False
-
-        if not USE_SPEECHD or _visible:
-            return True
-
-        _espeak = ""
-        _espeak = next(
-            (
-                name
-                for name in ["espeak-ng", "espeak", "speak-ng"]
-                if self.is_program_available(name)
-            ),
-            "",
-        )
-        if not _espeak:
-            try:
-                result = subprocess.run(
-                    ["spd-say", "-O"], capture_output=True, text=True, check=True
-                )
-                return _espeak in result.stdout.splitlines()
-            except (subprocess.CalledProcessError, NameError):
-                return False
-        else:
-            _speech_app = ""
-            _speech_app = next(
-                (
-                    name
-                    for name in [
-                        "piper",
-                        "piper-cli",
-                        "piper-tts",
-                        "pico2wave",
-                        "text2wave",
-                        "RHVoice-test",
-                    ]
-                    if self.is_program_available(name)
-                ),
-                "",
-            )
-            if len(_speech_app) != 0:
-                print(
-                    """NOTE: It looks like your system can use `{0}`. Consider using it if
-you encounter issues with the extension using `spd-say`. For example:
-
-- Distorted sound on older systems
-- Unexpected interruptions
-- Missing parts of messages
-- Preferences related to speech synthesis settings (e.g., adjusting pitch for 
-  capitalized words or modifying announcements for users relying on non-visual 
-  cues)
-- The extension is unable to determine the status of the speech-dispatcher.
-    * speech utterence starting while a previous utterence is still playing 
-    * you need to click the play button twice to start playing speech.
-""".format(
-                        _speech_app
-                    )
-                )
-        return False
 
     def prefer_spd_say(self, _visible=False):  # -> boolean
         """Use criteria to choose `spd-say`. The Linux python `speechd`
